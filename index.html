@@ -1,0 +1,1474 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>IA-Entrepreneur — Gabriel Vanderbecken</title>
+  <meta name="description" content="Formateur et entrepreneur spécialisé en IA et création d'entreprise pour les TPE. +1500 porteurs de projets accompagnés partout en France." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+
+  <style>
+    /* ── Reset & Base ─────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:        #0A0F2C;
+      --bg2:       #0D1340;
+      --bg3:       #111847;
+      --primary:   #1A3CFF;
+      --primary-h: #2d4fff;
+      --accent:    #10B981;
+      --accent-h:  #0ea372;
+      --text:      #F0F2FF;
+      --muted:     #8A91B4;
+      --border:    rgba(255,255,255,0.08);
+      --card:      rgba(255,255,255,0.04);
+      --radius:    14px;
+      --shadow:    0 8px 40px rgba(0,0,0,0.5);
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.65;
+      overflow-x: hidden;
+    }
+
+    a { color: inherit; text-decoration: none; }
+    img { display: block; max-width: 100%; }
+
+    .container {
+      width: 100%;
+      max-width: 1140px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    /* ── Utility ──────────────────────────────────────────── */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 14px 28px;
+      border-radius: 50px;
+      font-weight: 700;
+      font-size: 0.95rem;
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s, background 0.2s;
+      border: none;
+    }
+    .btn-primary {
+      background: var(--primary);
+      color: #fff;
+      box-shadow: 0 4px 24px rgba(26,60,255,0.4);
+    }
+    .btn-primary:hover {
+      background: var(--primary-h);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 32px rgba(26,60,255,0.55);
+    }
+    .btn-accent {
+      background: var(--accent);
+      color: #fff;
+      box-shadow: 0 4px 24px rgba(16,185,129,0.35);
+    }
+    .btn-accent:hover {
+      background: var(--accent-h);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 32px rgba(16,185,129,0.5);
+    }
+    .btn-outline {
+      background: transparent;
+      color: var(--text);
+      border: 1.5px solid var(--border);
+    }
+    .btn-outline:hover {
+      border-color: var(--primary);
+      color: var(--primary);
+      transform: translateY(-2px);
+    }
+
+    .tag {
+      display: inline-block;
+      padding: 4px 14px;
+      border-radius: 50px;
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      background: rgba(26,60,255,0.15);
+      color: #7a9fff;
+      border: 1px solid rgba(26,60,255,0.3);
+      margin-bottom: 16px;
+    }
+
+    .section-label {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+    .section-label span {
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--accent);
+    }
+    .section-label::before {
+      content: '';
+      display: block;
+      width: 28px;
+      height: 2px;
+      background: var(--accent);
+      border-radius: 2px;
+    }
+
+    h2.section-title {
+      font-size: clamp(1.75rem, 4vw, 2.6rem);
+      font-weight: 800;
+      line-height: 1.2;
+      margin-bottom: 14px;
+    }
+    p.section-sub {
+      font-size: 1.05rem;
+      color: var(--muted);
+      max-width: 540px;
+      margin-bottom: 48px;
+    }
+
+    /* ── Scroll animations ────────────────────────────────── */
+    .reveal {
+      opacity: 0;
+      transform: translateY(32px);
+      transition: opacity 0.65s ease, transform 0.65s ease;
+    }
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .reveal-delay-1 { transition-delay: 0.1s; }
+    .reveal-delay-2 { transition-delay: 0.2s; }
+    .reveal-delay-3 { transition-delay: 0.3s; }
+    .reveal-delay-4 { transition-delay: 0.4s; }
+
+    /* ── Header ───────────────────────────────────────────── */
+    header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 100;
+      transition: background 0.3s, backdrop-filter 0.3s, border-color 0.3s;
+      border-bottom: 1px solid transparent;
+    }
+    header.scrolled {
+      background: rgba(10,15,44,0.85);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      border-color: var(--border);
+    }
+    .header-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 70px;
+    }
+    .logo {
+      font-size: 1.3rem;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+    }
+    .logo span { color: var(--accent); }
+
+    nav { display: flex; align-items: center; gap: 8px; }
+    nav a {
+      padding: 8px 16px;
+      border-radius: 50px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--muted);
+      transition: color 0.2s, background 0.2s;
+    }
+    nav a:hover { color: var(--text); background: var(--card); }
+
+    .nav-cta {
+      padding: 9px 20px;
+      background: var(--primary);
+      color: #fff !important;
+      border-radius: 50px;
+      font-weight: 700;
+      font-size: 0.88rem;
+      box-shadow: 0 3px 16px rgba(26,60,255,0.4);
+      transition: transform 0.2s, box-shadow 0.2s !important;
+    }
+    .nav-cta:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 24px rgba(26,60,255,0.55) !important;
+      background: var(--primary) !important;
+    }
+
+    /* Hamburger */
+    .hamburger {
+      display: none;
+      flex-direction: column;
+      gap: 5px;
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 4px;
+    }
+    .hamburger span {
+      display: block;
+      width: 24px;
+      height: 2px;
+      background: var(--text);
+      border-radius: 2px;
+      transition: transform 0.3s, opacity 0.3s;
+    }
+    .hamburger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+    .hamburger.open span:nth-child(2) { opacity: 0; }
+    .hamburger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+    .mobile-menu {
+      display: none;
+      flex-direction: column;
+      gap: 4px;
+      padding: 16px 24px 20px;
+      background: rgba(10,15,44,0.98);
+      border-top: 1px solid var(--border);
+    }
+    .mobile-menu.open { display: flex; }
+    .mobile-menu a {
+      padding: 12px 16px;
+      border-radius: var(--radius);
+      font-weight: 600;
+      color: var(--muted);
+      transition: color 0.2s, background 0.2s;
+    }
+    .mobile-menu a:hover { color: var(--text); background: var(--card); }
+
+    /* ── Hero ─────────────────────────────────────────────── */
+    #accueil {
+      position: relative;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      overflow: hidden;
+      padding: 120px 0 80px;
+    }
+
+    /* Animated background grid */
+    .hero-grid {
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(26,60,255,0.07) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(26,60,255,0.07) 1px, transparent 1px);
+      background-size: 60px 60px;
+      mask-image: radial-gradient(ellipse 80% 70% at 50% 40%, black 30%, transparent 100%);
+    }
+
+    /* Glow blobs */
+    .blob {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(100px);
+      pointer-events: none;
+    }
+    .blob-1 {
+      width: 600px; height: 600px;
+      background: rgba(26,60,255,0.2);
+      top: -200px; right: -150px;
+    }
+    .blob-2 {
+      width: 400px; height: 400px;
+      background: rgba(16,185,129,0.12);
+      bottom: -100px; left: -100px;
+    }
+
+    .hero-content {
+      position: relative;
+      max-width: 720px;
+    }
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 16px;
+      background: rgba(16,185,129,0.1);
+      border: 1px solid rgba(16,185,129,0.3);
+      border-radius: 50px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--accent);
+      margin-bottom: 28px;
+    }
+    .hero-badge::before {
+      content: '';
+      width: 8px; height: 8px;
+      background: var(--accent);
+      border-radius: 50%;
+      animation: pulse 2s ease-in-out infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.5; transform: scale(0.8); }
+    }
+
+    .hero-title {
+      font-size: clamp(2.4rem, 6vw, 4rem);
+      font-weight: 800;
+      line-height: 1.1;
+      letter-spacing: -0.03em;
+      margin-bottom: 24px;
+    }
+    .hero-title .gradient {
+      background: linear-gradient(135deg, #7a9fff 0%, #1A3CFF 40%, #10B981 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .hero-desc {
+      font-size: 1.15rem;
+      color: var(--muted);
+      max-width: 560px;
+      margin-bottom: 40px;
+      line-height: 1.7;
+    }
+
+    .hero-actions { display: flex; gap: 14px; flex-wrap: wrap; margin-bottom: 56px; }
+
+    .hero-stats {
+      display: flex;
+      gap: 40px;
+      flex-wrap: wrap;
+    }
+    .hero-stat {
+      display: flex;
+      flex-direction: column;
+    }
+    .hero-stat strong {
+      font-size: 1.9rem;
+      font-weight: 800;
+      color: var(--text);
+      letter-spacing: -0.03em;
+    }
+    .hero-stat span {
+      font-size: 0.82rem;
+      color: var(--muted);
+      font-weight: 500;
+    }
+
+    /* ── Services ─────────────────────────────────────────── */
+    #services {
+      padding: 100px 0;
+      background: var(--bg2);
+      position: relative;
+    }
+    #services::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--border), transparent);
+    }
+
+    .services-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+    }
+
+    .service-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 36px 32px;
+      position: relative;
+      overflow: hidden;
+      transition: border-color 0.3s, transform 0.3s, box-shadow 0.3s;
+      cursor: default;
+    }
+    .service-card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(26,60,255,0.06) 0%, transparent 60%);
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+    .service-card:hover {
+      border-color: rgba(26,60,255,0.4);
+      transform: translateY(-6px);
+      box-shadow: 0 20px 50px rgba(0,0,0,0.4), 0 0 0 1px rgba(26,60,255,0.1);
+    }
+    .service-card:hover::before { opacity: 1; }
+
+    .service-icon {
+      width: 56px; height: 56px;
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      margin-bottom: 24px;
+    }
+    .service-icon.blue { background: rgba(26,60,255,0.15); }
+    .service-icon.green { background: rgba(16,185,129,0.15); }
+    .service-icon.purple { background: rgba(139,92,246,0.15); }
+
+    .service-card h3 {
+      font-size: 1.2rem;
+      font-weight: 700;
+      margin-bottom: 12px;
+    }
+    .service-card p {
+      font-size: 0.93rem;
+      color: var(--muted);
+      line-height: 1.7;
+      margin-bottom: 24px;
+    }
+    .service-features {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .service-features li {
+      font-size: 0.88rem;
+      color: var(--muted);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .service-features li::before {
+      content: '';
+      width: 6px; height: 6px;
+      background: var(--accent);
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    /* ── Chiffres ─────────────────────────────────────────── */
+    #chiffres {
+      padding: 100px 0;
+      position: relative;
+      overflow: hidden;
+    }
+    .chiffres-bg {
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse 70% 80% at 50% 50%, rgba(26,60,255,0.07) 0%, transparent 70%);
+    }
+    .chiffres-grid {
+      position: relative;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 2px;
+      background: var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+      border: 1px solid var(--border);
+    }
+    .chiffre-item {
+      background: var(--bg);
+      padding: 48px 32px;
+      text-align: center;
+    }
+    .chiffre-num {
+      font-size: clamp(2.5rem, 5vw, 3.5rem);
+      font-weight: 800;
+      letter-spacing: -0.04em;
+      line-height: 1;
+      margin-bottom: 8px;
+      background: linear-gradient(135deg, var(--text), var(--muted));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .chiffre-num.accent {
+      background: linear-gradient(135deg, var(--accent), #34d399);
+      -webkit-background-clip: text;
+      background-clip: text;
+    }
+    .chiffre-label {
+      font-size: 0.88rem;
+      font-weight: 600;
+      color: var(--muted);
+      line-height: 1.4;
+    }
+
+    /* ── Témoignages ──────────────────────────────────────── */
+    #temoignages {
+      padding: 100px 0;
+      background: var(--bg2);
+      position: relative;
+    }
+    #temoignages::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--border), transparent);
+    }
+
+    .temoignages-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+    }
+
+    .temoignage-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 32px;
+      position: relative;
+      transition: border-color 0.3s, transform 0.3s;
+    }
+    .temoignage-card:hover {
+      border-color: rgba(16,185,129,0.3);
+      transform: translateY(-4px);
+    }
+
+    .quote-icon {
+      font-size: 3rem;
+      line-height: 1;
+      color: var(--accent);
+      opacity: 0.3;
+      font-family: Georgia, serif;
+      margin-bottom: 4px;
+    }
+
+    .temoignage-text {
+      font-size: 0.95rem;
+      color: #c8cfe8;
+      line-height: 1.75;
+      margin-bottom: 24px;
+      font-style: italic;
+    }
+
+    .stars {
+      display: flex;
+      gap: 3px;
+      margin-bottom: 20px;
+    }
+    .star { color: #f59e0b; font-size: 0.9rem; }
+
+    .temoignage-author {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+    .author-avatar {
+      width: 46px; height: 46px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 1rem;
+      flex-shrink: 0;
+      border: 2px solid var(--border);
+    }
+    .author-info strong {
+      display: block;
+      font-size: 0.95rem;
+      font-weight: 700;
+    }
+    .author-info span {
+      font-size: 0.82rem;
+      color: var(--muted);
+    }
+
+    /* ── Blog ─────────────────────────────────────────────── */
+    #blog {
+      padding: 100px 0;
+    }
+
+    .blog-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 24px;
+    }
+
+    .blog-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+      transition: border-color 0.3s, transform 0.3s, box-shadow 0.3s;
+      display: flex;
+      flex-direction: column;
+    }
+    .blog-card:hover {
+      border-color: rgba(26,60,255,0.3);
+      transform: translateY(-5px);
+      box-shadow: 0 16px 48px rgba(0,0,0,0.35);
+    }
+
+    .blog-thumbnail {
+      height: 180px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 3rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .blog-body {
+      padding: 28px 28px 24px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .blog-meta {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+    .blog-cat {
+      font-size: 0.74rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--accent);
+    }
+    .blog-date {
+      font-size: 0.8rem;
+      color: var(--muted);
+    }
+
+    .blog-card h3 {
+      font-size: 1.08rem;
+      font-weight: 700;
+      line-height: 1.35;
+      margin-bottom: 10px;
+    }
+    .blog-card p {
+      font-size: 0.88rem;
+      color: var(--muted);
+      line-height: 1.7;
+      flex: 1;
+      margin-bottom: 20px;
+    }
+    .btn-blog {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--primary);
+      transition: gap 0.2s;
+    }
+    .btn-blog:hover { gap: 10px; }
+    .btn-blog svg { transition: transform 0.2s; }
+    .btn-blog:hover svg { transform: translateX(3px); }
+
+    /* ── Contact ──────────────────────────────────────────── */
+    #contact {
+      padding: 100px 0;
+      background: var(--bg2);
+      position: relative;
+    }
+    #contact::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--border), transparent);
+    }
+
+    .contact-wrapper {
+      display: grid;
+      grid-template-columns: 1fr 1.4fr;
+      gap: 60px;
+      align-items: start;
+    }
+
+    .contact-info h2 { margin-bottom: 16px; }
+    .contact-info p {
+      font-size: 1rem;
+      color: var(--muted);
+      line-height: 1.7;
+      margin-bottom: 40px;
+    }
+
+    .contact-items {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+    .contact-item {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+    .contact-item-icon {
+      width: 44px; height: 44px;
+      border-radius: 12px;
+      background: rgba(26,60,255,0.12);
+      border: 1px solid rgba(26,60,255,0.2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.1rem;
+      flex-shrink: 0;
+    }
+    .contact-item-text strong {
+      display: block;
+      font-size: 0.88rem;
+      font-weight: 600;
+      margin-bottom: 2px;
+    }
+    .contact-item-text span {
+      font-size: 0.85rem;
+      color: var(--muted);
+    }
+
+    /* Form */
+    .contact-form {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 40px;
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+      margin-bottom: 18px;
+    }
+    .form-group:last-of-type { margin-bottom: 0; }
+
+    .form-group label {
+      font-size: 0.83rem;
+      font-weight: 600;
+      color: var(--muted);
+      letter-spacing: 0.02em;
+    }
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 13px 16px;
+      color: var(--text);
+      font-family: inherit;
+      font-size: 0.93rem;
+      transition: border-color 0.2s, box-shadow 0.2s;
+      outline: none;
+      width: 100%;
+    }
+    .form-group input::placeholder,
+    .form-group textarea::placeholder { color: rgba(138,145,180,0.5); }
+    .form-group input:focus,
+    .form-group select:focus,
+    .form-group textarea:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(26,60,255,0.15);
+    }
+    .form-group textarea { resize: vertical; min-height: 130px; }
+    .form-group select option { background: var(--bg2); }
+
+    .form-submit {
+      margin-top: 24px;
+      width: 100%;
+      justify-content: center;
+      font-size: 1rem;
+      padding: 16px;
+    }
+
+    .form-note {
+      text-align: center;
+      margin-top: 14px;
+      font-size: 0.78rem;
+      color: var(--muted);
+    }
+    .form-success {
+      display: none;
+      text-align: center;
+      padding: 20px;
+      background: rgba(16,185,129,0.1);
+      border: 1px solid rgba(16,185,129,0.3);
+      border-radius: 10px;
+      color: var(--accent);
+      font-weight: 600;
+      margin-top: 16px;
+    }
+
+    /* ── Footer ───────────────────────────────────────────── */
+    footer {
+      padding: 48px 0;
+      border-top: 1px solid var(--border);
+    }
+    .footer-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 20px;
+    }
+    .footer-logo {
+      font-size: 1.1rem;
+      font-weight: 800;
+    }
+    .footer-logo span { color: var(--accent); }
+
+    .footer-links {
+      display: flex;
+      gap: 24px;
+      flex-wrap: wrap;
+    }
+    .footer-links a {
+      font-size: 0.85rem;
+      color: var(--muted);
+      transition: color 0.2s;
+    }
+    .footer-links a:hover { color: var(--text); }
+
+    .footer-copy {
+      font-size: 0.82rem;
+      color: var(--muted);
+    }
+
+    /* ── Progress bar ─────────────────────────────────────── */
+    #progress-bar {
+      position: fixed;
+      top: 0; left: 0;
+      height: 2px;
+      background: linear-gradient(90deg, var(--primary), var(--accent));
+      z-index: 200;
+      width: 0%;
+      transition: width 0.1s linear;
+    }
+
+    /* ── Back to top ──────────────────────────────────────── */
+    #back-top {
+      position: fixed;
+      bottom: 32px;
+      right: 32px;
+      width: 46px; height: 46px;
+      background: var(--primary);
+      border: none;
+      border-radius: 50%;
+      color: #fff;
+      font-size: 1.1rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      transform: translateY(10px);
+      transition: opacity 0.3s, transform 0.3s, box-shadow 0.2s;
+      box-shadow: 0 4px 20px rgba(26,60,255,0.4);
+      z-index: 90;
+    }
+    #back-top.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    #back-top:hover { box-shadow: 0 8px 32px rgba(26,60,255,0.6); }
+
+    /* ── Responsive ───────────────────────────────────────── */
+    @media (max-width: 1024px) {
+      .services-grid { grid-template-columns: repeat(2, 1fr); }
+      .chiffres-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    @media (max-width: 768px) {
+      nav { display: none; }
+      .hamburger { display: flex; }
+
+      .hero-title { font-size: 2.1rem; }
+      .hero-stats { gap: 24px; }
+
+      .services-grid { grid-template-columns: 1fr; }
+      .chiffres-grid { grid-template-columns: repeat(2, 1fr); }
+      .temoignages-grid { grid-template-columns: 1fr; }
+      .blog-grid { grid-template-columns: 1fr; }
+      .contact-wrapper { grid-template-columns: 1fr; gap: 40px; }
+      .form-row { grid-template-columns: 1fr; }
+      .footer-inner { flex-direction: column; align-items: flex-start; }
+    }
+
+    @media (max-width: 480px) {
+      .chiffres-grid { grid-template-columns: 1fr; }
+      .hero-actions { flex-direction: column; }
+      .hero-actions .btn { width: 100%; justify-content: center; }
+      .contact-form { padding: 24px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Progress bar -->
+  <div id="progress-bar"></div>
+
+  <!-- Back to top -->
+  <button id="back-top" aria-label="Retour en haut">
+    <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+      <path d="M5 15l7-7 7 7"/>
+    </svg>
+  </button>
+
+  <!-- ── Header ─────────────────────────────────────────────── -->
+  <header id="header">
+    <div class="container">
+      <div class="header-inner">
+        <a href="#accueil" class="logo">IA<span>-</span>Entrepreneur</a>
+        <nav>
+          <a href="#accueil">Accueil</a>
+          <a href="#services">Services</a>
+          <a href="#temoignages">Témoignages</a>
+          <a href="#blog">Blog</a>
+          <a href="#contact" class="nav-cta">Me contacter</a>
+        </nav>
+        <button class="hamburger" id="hamburger" aria-label="Menu">
+          <span></span><span></span><span></span>
+        </button>
+      </div>
+    </div>
+    <div class="mobile-menu" id="mobile-menu">
+      <a href="#accueil">Accueil</a>
+      <a href="#services">Services</a>
+      <a href="#temoignages">Témoignages</a>
+      <a href="#blog">Blog</a>
+      <a href="#contact">Me contacter</a>
+    </div>
+  </header>
+
+  <!-- ── Hero ───────────────────────────────────────────────── -->
+  <section id="accueil">
+    <div class="hero-grid"></div>
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+    <div class="container">
+      <div class="hero-content">
+        <div class="hero-badge">Formateur & Expert IA pour TPE</div>
+
+        <h1 class="hero-title">
+          Donnez à votre entreprise<br />
+          la puissance de <span class="gradient">l'intelligence artificielle</span>
+        </h1>
+
+        <p class="hero-desc">
+          Gabriel Vanderbecken — formateur et entrepreneur depuis plus de 7 ans.
+          J'aide les porteurs de projet et les TPE à créer, structurer et accélérer leur activité grâce à des méthodes concrètes et aux meilleurs outils IA du moment.
+        </p>
+
+        <div class="hero-actions">
+          <a href="#contact" class="btn btn-accent">
+            Démarrer maintenant
+            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+              <path d="M5 12h14M12 5l7 7-7 7"/>
+            </svg>
+          </a>
+          <a href="#services" class="btn btn-outline">Découvrir les formations</a>
+        </div>
+
+        <div class="hero-stats">
+          <div class="hero-stat">
+            <strong>1 500+</strong>
+            <span>Porteurs accompagnés</span>
+          </div>
+          <div class="hero-stat">
+            <strong>7 ans</strong>
+            <span>D'expérience terrain</span>
+          </div>
+          <div class="hero-stat">
+            <strong>100%</strong>
+            <span>France & à distance</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Services ───────────────────────────────────────────── -->
+  <section id="services">
+    <div class="container">
+      <div class="section-label reveal"><span>Ce que je propose</span></div>
+      <h2 class="section-title reveal">Des formations pensées<br />pour <em style="font-style:normal;color:var(--accent)">agir, pas juste savoir</em></h2>
+      <p class="section-sub reveal">Présentiel, distanciel ou e-learning — j'adapte chaque format à votre réalité de terrain et aux enjeux concrets de votre projet.</p>
+
+      <div class="services-grid">
+
+        <div class="service-card reveal reveal-delay-1">
+          <div class="service-icon blue">🎓</div>
+          <h3>Formation Entrepreneuriat</h3>
+          <p>De l'idée au business plan opérationnel : construisez votre projet sur des fondations solides grâce à une méthode éprouvée auprès de plus de 1 500 porteurs de projets.</p>
+          <ul class="service-features">
+            <li>Valider son idée et son marché</li>
+            <li>Construire un business model rentable</li>
+            <li>Choisir son statut juridique</li>
+            <li>Financer et piloter son lancement</li>
+          </ul>
+        </div>
+
+        <div class="service-card reveal reveal-delay-2">
+          <div class="service-icon green">🤖</div>
+          <h3>Formation IA pour TPE</h3>
+          <p>Gagnez 10h par semaine en automatisant les tâches répétitives. Je vous montre comment intégrer l'IA dans votre quotidien sans compétences techniques requises.</p>
+          <ul class="service-features">
+            <li>Maîtriser ChatGPT & les LLMs</li>
+            <li>Automatiser sa communication</li>
+            <li>Créer des contenus IA en masse</li>
+            <li>Outils gratuits & accessibles</li>
+          </ul>
+        </div>
+
+        <div class="service-card reveal reveal-delay-3">
+          <div class="service-icon purple">🚀</div>
+          <h3>Accompagnement Création</h3>
+          <p>Un suivi personnalisé de A à Z pour transformer votre idée en entreprise viable. Je suis à vos côtés à chaque étape clé de votre création.</p>
+          <ul class="service-features">
+            <li>Coaching individuel hebdomadaire</li>
+            <li>Révision de votre business plan</li>
+            <li>Préparation aux financeurs</li>
+            <li>Réseau & mise en relation</li>
+          </ul>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Chiffres clés ───────────────────────────────────────── -->
+  <section id="chiffres">
+    <div class="chiffres-bg"></div>
+    <div class="container">
+      <div class="chiffres-grid reveal">
+        <div class="chiffre-item">
+          <div class="chiffre-num accent">1 500+</div>
+          <div class="chiffre-label">Porteurs de projets<br />accompagnés</div>
+        </div>
+        <div class="chiffre-item">
+          <div class="chiffre-num">7 ans</div>
+          <div class="chiffre-label">D'expérience en<br />formation & entrepreneuriat</div>
+        </div>
+        <div class="chiffre-item">
+          <div class="chiffre-num accent">France</div>
+          <div class="chiffre-label">Entière couverte,<br />partout où vous êtes</div>
+        </div>
+        <div class="chiffre-item">
+          <div class="chiffre-num">3</div>
+          <div class="chiffre-label">Formats : présentiel,<br />distanciel & e-learning</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Témoignages ─────────────────────────────────────────── -->
+  <section id="temoignages">
+    <div class="container">
+      <div class="section-label reveal"><span>Ils témoignent</span></div>
+      <h2 class="section-title reveal">Ce que disent ceux<br />qui ont <span style="color:var(--accent)">franchi le cap</span></h2>
+      <p class="section-sub reveal">Des centaines d'entrepreneurs ont transformé leur projet grâce à nos formations. Voici quelques retours d'expérience.</p>
+
+      <div class="temoignages-grid">
+
+        <div class="temoignage-card reveal reveal-delay-1">
+          <div class="quote-icon">"</div>
+          <div class="stars">
+            <span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span>
+          </div>
+          <p class="temoignage-text">
+            "Grâce à Gabriel, j'ai arrêté de procrastiner et j'ai lancé ma boutique en ligne en 3 mois. Sa méthode est ultra-concrète — on passe directement à l'action. Les modules sur l'IA m'ont permis de gérer seule mon contenu, mes réseaux et mon service client."
+          </p>
+          <div class="temoignage-author">
+            <div class="author-avatar" style="background:rgba(16,185,129,0.15);color:var(--accent);">SA</div>
+            <div class="author-info">
+              <strong>Sophie A.</strong>
+              <span>Fondatrice d'une boutique e-commerce mode</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="temoignage-card reveal reveal-delay-2">
+          <div class="quote-icon">"</div>
+          <div class="stars">
+            <span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span>
+          </div>
+          <p class="temoignage-text">
+            "La formation IA pour TPE a littéralement changé ma façon de travailler. En 2 semaines j'ai automatisé mes devis, mes relances et mes posts LinkedIn. Je récupère facilement 8h par semaine que je réinvestis dans mon cœur de métier."
+          </p>
+          <div class="temoignage-author">
+            <div class="author-avatar" style="background:rgba(26,60,255,0.15);color:#7a9fff;">TM</div>
+            <div class="author-info">
+              <strong>Thomas M.</strong>
+              <span>Gérant d'une TPE en plomberie-chauffage</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="temoignage-card reveal reveal-delay-3">
+          <div class="quote-icon">"</div>
+          <div class="stars">
+            <span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span>
+          </div>
+          <p class="temoignage-text">
+            "J'avais une idée floue, Gabriel m'a aidé à la structurer en business plan solide en quelques séances. Son accompagnement personnalisé m'a donné la clarté et la confiance nécessaires pour décrocher un financement Bpifrance. Résultat : mon agence est lancée !"
+          </p>
+          <div class="temoignage-author">
+            <div class="author-avatar" style="background:rgba(139,92,246,0.15);color:#a78bfa;">CR</div>
+            <div class="author-info">
+              <strong>Camille R.</strong>
+              <span>Créatrice d'une agence de communication digitale</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Blog ───────────────────────────────────────────────── -->
+  <section id="blog">
+    <div class="container">
+      <div class="section-label reveal"><span>Ressources & conseils</span></div>
+      <h2 class="section-title reveal">Le blog des entrepreneurs<br /><span style="color:var(--primary)">qui passent à l'action</span></h2>
+      <p class="section-sub reveal">Articles pratiques, retours d'expérience et outils concrets pour avancer dans votre projet — semaine après semaine.</p>
+
+      <div class="blog-grid">
+
+        <div class="blog-card reveal reveal-delay-1">
+          <div class="blog-thumbnail" style="background:linear-gradient(135deg,#0f1f5c,#1a3cff);">🤖</div>
+          <div class="blog-body">
+            <div class="blog-meta">
+              <span class="blog-cat">Intelligence Artificielle</span>
+              <span class="blog-date">12 mars 2026</span>
+            </div>
+            <h3>ChatGPT, Gemini, Claude : quel outil IA choisir pour votre TPE en 2026 ?</h3>
+            <p>Face à l'explosion des outils IA, difficile de savoir par où commencer. On compare les 3 assistants les plus utilisés par les entrepreneurs pour vous aider à choisir celui qui correspond à vos besoins réels.</p>
+            <a href="#" class="btn-blog">
+              Lire la suite
+              <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                <path d="M5 12h14M12 5l7 7-7 7"/>
+              </svg>
+            </a>
+          </div>
+        </div>
+
+        <div class="blog-card reveal reveal-delay-2">
+          <div class="blog-thumbnail" style="background:linear-gradient(135deg,#064e3b,#10b981);">🚀</div>
+          <div class="blog-body">
+            <div class="blog-meta">
+              <span class="blog-cat">Création d'entreprise</span>
+              <span class="blog-date">5 mars 2026</span>
+            </div>
+            <h3>Les 7 étapes incontournables pour créer son entreprise en 2026 (sans se planter)</h3>
+            <p>De la validation de votre idée à votre premier client payant : voici le chemin exact que j'ai vu parcourir les entrepreneurs qui réussissent. Un guide sans jargon, orienté action.</p>
+            <a href="#" class="btn-blog">
+              Lire la suite
+              <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                <path d="M5 12h14M12 5l7 7-7 7"/>
+              </svg>
+            </a>
+          </div>
+        </div>
+
+        <div class="blog-card reveal reveal-delay-3">
+          <div class="blog-thumbnail" style="background:linear-gradient(135deg,#1e1b4b,#7c3aed);">🛠️</div>
+          <div class="blog-body">
+            <div class="blog-meta">
+              <span class="blog-cat">Outils & Ressources</span>
+              <span class="blog-date">20 février 2026</span>
+            </div>
+            <h3>15 outils IA 100% gratuits pour booster votre TPE dès aujourd'hui</h3>
+            <p>Pas besoin d'un budget colossal pour intégrer l'IA dans votre activité. Cette sélection d'outils gratuits couvre votre marketing, votre comptabilité, votre relation client et bien plus encore.</p>
+            <a href="#" class="btn-blog">
+              Lire la suite
+              <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                <path d="M5 12h14M12 5l7 7-7 7"/>
+              </svg>
+            </a>
+          </div>
+        </div>
+
+        <div class="blog-card reveal reveal-delay-4">
+          <div class="blog-thumbnail" style="background:linear-gradient(135deg,#1a1a2e,#f59e0b);">💼</div>
+          <div class="blog-body">
+            <div class="blog-meta">
+              <span class="blog-cat">Témoignage</span>
+              <span class="blog-date">8 février 2026</span>
+            </div>
+            <h3>De salarié à entrepreneur : comment Julien a lancé sa micro-entreprise en 60 jours</h3>
+            <p>À 34 ans, Julien a quitté son CDI pour créer une activité de conseil en organisation. Retour sur les 60 jours qui ont tout changé — les doutes, les décisions et les outils IA qui ont accéléré son lancement.</p>
+            <a href="#" class="btn-blog">
+              Lire la suite
+              <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                <path d="M5 12h14M12 5l7 7-7 7"/>
+              </svg>
+            </a>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Contact ─────────────────────────────────────────────── -->
+  <section id="contact">
+    <div class="container">
+      <div class="contact-wrapper">
+
+        <div class="contact-info">
+          <div class="section-label reveal"><span>Parlons de votre projet</span></div>
+          <h2 class="section-title reveal">Prêt à<br /><span style="color:var(--accent)">franchir le cap ?</span></h2>
+          <p class="reveal">Que vous ayez une question sur mes formations, un projet à structurer ou simplement envie d'échanger — je réponds à tous les messages sous 24h.</p>
+
+          <div class="contact-items">
+            <div class="contact-item reveal reveal-delay-1">
+              <div class="contact-item-icon">📍</div>
+              <div class="contact-item-text">
+                <strong>Zone d'intervention</strong>
+                <span>France entière — présentiel, distanciel & e-learning</span>
+              </div>
+            </div>
+            <div class="contact-item reveal reveal-delay-2">
+              <div class="contact-item-icon">⚡</div>
+              <div class="contact-item-text">
+                <strong>Réponse rapide</strong>
+                <span>Sous 24h en jours ouvrés</span>
+              </div>
+            </div>
+            <div class="contact-item reveal reveal-delay-3">
+              <div class="contact-item-icon">🎓</div>
+              <div class="contact-item-text">
+                <strong>Formations certifiées</strong>
+                <span>Éligibles CPF et financements publics</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="contact-form reveal reveal-delay-2">
+          <form
+            action="https://formspree.io/f/XXXXXXX"
+            method="POST"
+            id="contact-form"
+          >
+            <div class="form-row">
+              <div class="form-group">
+                <label for="prenom">Prénom</label>
+                <input type="text" id="prenom" name="prenom" placeholder="Jean" required />
+              </div>
+              <div class="form-group">
+                <label for="nom">Nom</label>
+                <input type="text" id="nom" name="nom" placeholder="Dupont" required />
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="email">Adresse e-mail</label>
+              <input type="email" id="email" name="email" placeholder="jean.dupont@email.com" required />
+            </div>
+
+            <div class="form-group">
+              <label for="sujet">Sujet</label>
+              <select id="sujet" name="sujet" required>
+                <option value="" disabled selected>Choisissez un sujet</option>
+                <option>Formation Entrepreneuriat</option>
+                <option>Formation IA pour TPE</option>
+                <option>Accompagnement Création d'entreprise</option>
+                <option>Intervention en école / organisme</option>
+                <option>Autre demande</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="message">Votre message</label>
+              <textarea id="message" name="message" placeholder="Décrivez brièvement votre projet ou votre question..." required></textarea>
+            </div>
+
+            <button type="submit" class="btn btn-accent form-submit">
+              Envoyer mon message
+              <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                <path d="M22 2L11 13M22 2L15 22l-4-9-9-4 20-7z"/>
+              </svg>
+            </button>
+            <p class="form-note">Aucun spam. Vos données restent confidentielles.</p>
+          </form>
+          <div class="form-success" id="form-success">
+            ✅ Message envoyé ! Je vous réponds sous 24h.
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Footer ─────────────────────────────────────────────── -->
+  <footer>
+    <div class="container">
+      <div class="footer-inner">
+        <div class="footer-logo">IA<span>-</span>Entrepreneur</div>
+
+        <div class="footer-links">
+          <a href="#accueil">Accueil</a>
+          <a href="#services">Services</a>
+          <a href="#temoignages">Témoignages</a>
+          <a href="#blog">Blog</a>
+          <a href="#contact">Contact</a>
+        </div>
+
+        <p class="footer-copy">© 2025 IA-Entrepreneur — Gabriel Vanderbecken. Tous droits réservés.</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ── JavaScript ──────────────────────────────────────────── -->
+  <script>
+    // ── Header scroll ───────────────────────────────────────
+    const header = document.getElementById('header');
+    window.addEventListener('scroll', () => {
+      header.classList.toggle('scrolled', window.scrollY > 20);
+    }, { passive: true });
+
+    // ── Progress bar ────────────────────────────────────────
+    const progressBar = document.getElementById('progress-bar');
+    window.addEventListener('scroll', () => {
+      const scrolled = window.scrollY;
+      const max = document.documentElement.scrollHeight - window.innerHeight;
+      progressBar.style.width = (scrolled / max * 100) + '%';
+    }, { passive: true });
+
+    // ── Back to top ─────────────────────────────────────────
+    const backTop = document.getElementById('back-top');
+    window.addEventListener('scroll', () => {
+      backTop.classList.toggle('visible', window.scrollY > 500);
+    }, { passive: true });
+    backTop.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+
+    // ── Mobile menu ─────────────────────────────────────────
+    const hamburger = document.getElementById('hamburger');
+    const mobileMenu = document.getElementById('mobile-menu');
+    hamburger.addEventListener('click', () => {
+      hamburger.classList.toggle('open');
+      mobileMenu.classList.toggle('open');
+    });
+    mobileMenu.querySelectorAll('a').forEach(link => {
+      link.addEventListener('click', () => {
+        hamburger.classList.remove('open');
+        mobileMenu.classList.remove('open');
+      });
+    });
+
+    // ── Scroll reveal ───────────────────────────────────────
+    const revealObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+          revealObserver.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
+
+    document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
+
+    // ── Counter animation ───────────────────────────────────
+    function animateCounter(el, target, suffix) {
+      let current = 0;
+      const duration = 1800;
+      const step = target / (duration / 16);
+      const timer = setInterval(() => {
+        current = Math.min(current + step, target);
+        if (suffix === '+') {
+          el.textContent = Math.floor(current).toLocaleString('fr-FR') + (current >= target ? '+' : '');
+        } else {
+          el.textContent = Math.floor(current) + suffix;
+        }
+        if (current >= target) clearInterval(timer);
+      }, 16);
+    }
+
+    // Trigger counters when chiffres section is visible
+    const chiffresSection = document.getElementById('chiffres');
+    let countersStarted = false;
+    const chiffresObserver = new IntersectionObserver((entries) => {
+      if (entries[0].isIntersecting && !countersStarted) {
+        countersStarted = true;
+        const nums = document.querySelectorAll('.chiffre-num');
+        // 1500+
+        animateCounter(nums[0], 1500, '+');
+        // 7 ans (static, just show)
+        // France (static)
+        // 3 formats (static)
+      }
+    }, { threshold: 0.3 });
+    chiffresObserver.observe(chiffresSection);
+
+    // ── Form AJAX submission ────────────────────────────────
+    const form = document.getElementById('contact-form');
+    const formSuccess = document.getElementById('form-success');
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const btn = form.querySelector('button[type="submit"]');
+      btn.textContent = 'Envoi en cours…';
+      btn.disabled = true;
+
+      try {
+        const response = await fetch(form.action, {
+          method: 'POST',
+          body: new FormData(form),
+          headers: { 'Accept': 'application/json' }
+        });
+
+        if (response.ok) {
+          form.style.display = 'none';
+          formSuccess.style.display = 'block';
+        } else {
+          btn.textContent = 'Réessayer';
+          btn.disabled = false;
+          alert('Une erreur est survenue. Veuillez réessayer.');
+        }
+      } catch {
+        btn.textContent = 'Réessayer';
+        btn.disabled = false;
+        alert('Problème de connexion. Veuillez réessayer.');
+      }
+    });
+
+    // ── Active nav link on scroll ───────────────────────────
+    const sections = document.querySelectorAll('section[id]');
+    const navLinks = document.querySelectorAll('nav a[href^="#"]');
+
+    const activeObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          navLinks.forEach(link => {
+            link.style.color = '';
+            if (link.getAttribute('href') === '#' + entry.target.id) {
+              link.style.color = 'var(--text)';
+            }
+          });
+        }
+      });
+    }, { threshold: 0.4 });
+
+    sections.forEach(s => activeObserver.observe(s));
+  </script>
+
+</body>
+</html>
