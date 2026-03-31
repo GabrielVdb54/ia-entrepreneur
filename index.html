@@ -1188,6 +1188,153 @@
       .hero-actions .btn { width: 100%; justify-content: center; }
       .contact-form { padding: 24px; }
     }
+
+    /* ── Pricing ─────────────────────────────────────────── */
+    .pricing-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+      align-items: stretch;
+    }
+    .pricing-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 40px 32px 36px;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      transition: border-color 0.3s, transform 0.3s, box-shadow 0.3s;
+    }
+    .pricing-card:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 20px 50px rgba(0,0,0,0.4);
+    }
+    .pricing-card.featured {
+      border: 2px solid var(--primary);
+      background: linear-gradient(165deg, rgba(26,60,255,0.08) 0%, var(--card) 40%);
+      transform: scale(1.04);
+      z-index: 2;
+    }
+    .pricing-card.featured:hover {
+      transform: scale(1.04) translateY(-6px);
+      box-shadow: 0 24px 60px rgba(26,60,255,0.25);
+    }
+    .pricing-badge {
+      position: absolute;
+      top: -14px;
+      left: 50%;
+      transform: translateX(-50%);
+      padding: 6px 20px;
+      border-radius: 50px;
+      font-size: 0.75rem;
+      font-weight: 800;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      background: var(--primary);
+      color: #fff;
+      box-shadow: 0 4px 16px rgba(26,60,255,0.4);
+      white-space: nowrap;
+    }
+    .pricing-icon {
+      font-size: 2rem;
+      margin-bottom: 16px;
+    }
+    .pricing-name {
+      font-size: 1.3rem;
+      font-weight: 800;
+      margin-bottom: 6px;
+    }
+    .pricing-desc {
+      font-size: 0.88rem;
+      color: var(--muted);
+      line-height: 1.6;
+      margin-bottom: 24px;
+    }
+    .pricing-price {
+      font-size: 2.4rem;
+      font-weight: 800;
+      color: var(--accent);
+      letter-spacing: -0.03em;
+      margin-bottom: 4px;
+    }
+    .pricing-price-note {
+      font-size: 0.78rem;
+      color: var(--muted);
+      margin-bottom: 28px;
+      line-height: 1.5;
+    }
+    .pricing-features {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-bottom: 32px;
+      flex: 1;
+    }
+    .pricing-features li {
+      font-size: 0.9rem;
+      color: #c8cfe8;
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      line-height: 1.5;
+    }
+    .pricing-features li::before {
+      content: '✓';
+      color: var(--accent);
+      font-weight: 800;
+      font-size: 0.85rem;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+    .pricing-cta {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 14px 24px;
+      border-radius: 50px;
+      font-weight: 700;
+      font-size: 0.95rem;
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s;
+      text-decoration: none;
+      border: none;
+      text-align: center;
+    }
+    .pricing-cta-primary {
+      background: var(--primary);
+      color: #fff;
+      box-shadow: 0 4px 24px rgba(26,60,255,0.4);
+    }
+    .pricing-cta-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 32px rgba(26,60,255,0.55);
+    }
+    .pricing-cta-outline {
+      background: transparent;
+      color: var(--text);
+      border: 1.5px solid var(--border);
+    }
+    .pricing-cta-outline:hover {
+      border-color: var(--primary);
+      color: var(--primary);
+      transform: translateY(-2px);
+    }
+    .pricing-footer-note {
+      text-align: center;
+      margin-top: 32px;
+      font-size: 0.82rem;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    @media (max-width: 1024px) {
+      .pricing-grid { grid-template-columns: 1fr; max-width: 480px; margin: 0 auto; }
+      .pricing-card.featured { transform: scale(1); }
+      .pricing-card.featured:hover { transform: translateY(-6px); }
+    }
   </style>
 </head>
 <body>
@@ -1301,60 +1448,76 @@
   <section id="services">
     <div class="container">
       <div class="section-label reveal"><span>Ce que je propose</span></div>
-      <h2 class="section-title reveal">Formations en <em style="font-style:normal;color:var(--accent)">création d'entreprise</em><br />et <em style="font-style:normal;color:var(--primary)">automatisation IA</em></h2>
-      <p class="section-sub reveal">Présentiel, distanciel ou e-learning — j'adapte chaque format à votre réalité de terrain et aux enjeux concrets de votre projet.</p>
+      <h2 class="section-title reveal">Nos formations — <span style="color:var(--primary)">choisissez votre parcours</span></h2>
+      <p class="section-sub reveal">De la création de votre statut au parcours complet avec business plan, financement et premiers clients — chaque offre est conçue pour vous faire avancer concrètement.</p>
 
-      <div class="services-grid">
+      <div class="pricing-grid">
 
-        <div class="service-card reveal reveal-delay-1">
-          <div class="service-icon blue">🚀</div>
-          <h3>Accompagnement Création &amp; Développement d'Entreprise</h3>
-          <p>De l'idée à la première vente — j'accompagne les porteurs de projet et nouveaux dirigeants à créer, structurer et développer leur entreprise. Une méthode terrain éprouvée auprès de +1500 entrepreneurs.</p>
-          <ul class="service-features">
-            <li>Valider l'idée : étude de marché, concurrence &amp; produit/service</li>
-            <li>Business plan avec 3 scénarios pour anticiper toute éventualité</li>
-            <li>Choisir le bon statut juridique (+ création de société offerte)*</li>
-            <li>Préparer le dossier de financement</li>
-            <li>Développer ses premières ventes</li>
+        <!-- ESSENTIEL -->
+        <div class="pricing-card reveal reveal-delay-1">
+          <div class="pricing-icon">⚡</div>
+          <h3 class="pricing-name">Essentiel</h3>
+          <p class="pricing-desc">Vous avez votre idée, vous savez où vous allez — il vous faut le bon statut et la bonne structure pour démarrer.</p>
+          <div class="pricing-price">500€</div>
+          <p class="pricing-price-note">*Hors frais légaux</p>
+          <ul class="pricing-features">
+            <li>Conseil personnalisé sur le choix du statut juridique (micro, EURL, SASU)</li>
+            <li>Création de votre société incluse*</li>
+            <li>Orientation vers les aides disponibles (ACRE, ARCE)</li>
+            <li>Accompagnement par un entrepreneur expérimenté</li>
+          </ul>
+          <a href="https://calendly.com/gabriel-ia-entrepreneur/decouverte" target="_blank" rel="noopener noreferrer" class="pricing-cta pricing-cta-outline">
+            Réserver mon appel gratuit
+          </a>
+        </div>
+
+        <!-- PRO — FEATURED -->
+        <div class="pricing-card featured reveal reveal-delay-2">
+          <div class="pricing-badge">Le + populaire</div>
+          <div class="pricing-icon">🚀</div>
+          <h3 class="pricing-name">Pro</h3>
+          <p class="pricing-desc">Le parcours complet pour créer votre entreprise de A à Z — de l'idée au premier client.</p>
+          <div class="pricing-price">1 000€</div>
+          <p class="pricing-price-note">*Hors frais légaux — Tarif lancement (1 500€ après éligibilité CPF)</p>
+          <ul class="pricing-features">
+            <li>Étude de marché complète : concurrence, positionnement &amp; produit/service</li>
+            <li>Business plan avec 3 scénarios (pessimiste, réaliste, optimiste)</li>
+            <li>Choix du statut juridique + création de société incluse*</li>
+            <li>Dossier de financement complet (ACRE, ARCE, prêt d'honneur, aides régionales)</li>
+            <li>Stratégie premières ventes &amp; acquisition clients</li>
             <li>Kit de lancement marketing (Google My Business + site web)</li>
           </ul>
-          <div style="margin:20px 0 8px;display:flex;align-items:baseline;gap:8px;">
-            <span style="font-size:1.6rem;font-weight:800;color:#10B981;">À partir de 1 500€</span>
-          </div>
-          <p style="font-size:0.78rem;color:#8A91B4;margin-bottom:20px;line-height:1.5;">*Hors frais légaux — Non éligible CPF, certification Qualiopi en cours</p>
-          <a href="https://calendly.com/gabriel-ia-entrepreneur/decouverte" target="_blank" rel="noopener noreferrer" style="display:inline-flex;align-items:center;gap:8px;padding:12px 24px;border-radius:50px;font-weight:700;font-size:0.9rem;background:#1A3CFF;color:#fff;border:none;cursor:pointer;box-shadow:0 4px 20px rgba(26,60,255,0.4);transition:transform 0.2s,box-shadow 0.2s;text-decoration:none;position:relative;z-index:2;" onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='0 8px 32px rgba(26,60,255,0.55)'" onmouseout="this.style.transform='translateY(0)';this.style.boxShadow='0 4px 20px rgba(26,60,255,0.4)'">
+          <a href="https://calendly.com/gabriel-ia-entrepreneur/decouverte" target="_blank" rel="noopener noreferrer" class="pricing-cta pricing-cta-primary">
             Réserver mon appel gratuit
             <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M22 2L11 13M22 2L15 22l-4-9-9-4 20-7z"/></svg>
           </a>
-          <div style="margin-top:16px;">
-            <span class="service-badge">Pour porteurs de projet &amp; nouveaux dirigeants</span>
-          </div>
         </div>
 
-        <div class="service-card reveal reveal-delay-2">
-          <div class="service-icon green">🤖</div>
-          <h3>Formation IA &amp; Automatisation des Processus</h3>
-          <p>Gagnez 10h par semaine en automatisant vos tâches répétitives. Je forme vos équipes et dirigeants à intégrer l'IA dans leurs chaînes de valeur — sans compétences techniques.</p>
-          <ul class="service-features">
-            <li>Maîtriser ChatGPT, Claude &amp; Gemini</li>
-            <li>Automatiser sa prospection et sa communication</li>
+        <!-- IA & AUTOMATISATION -->
+        <div class="pricing-card reveal reveal-delay-3">
+          <div class="pricing-icon">🤖</div>
+          <h3 class="pricing-name">IA &amp; Automatisation</h3>
+          <p class="pricing-desc">Gagnez 10h par semaine en automatisant vos tâches répétitives grâce à l'IA — sans compétences techniques.</p>
+          <div class="pricing-price" style="font-size:1.6rem;color:var(--muted);">Sur devis</div>
+          <p class="pricing-price-note">Adapté à vos besoins et à la taille de votre équipe</p>
+          <ul class="pricing-features">
+            <li>Maîtriser ChatGPT, Claude &amp; Gemini pour votre activité</li>
+            <li>Automatiser prospection, emails &amp; relation client</li>
             <li>Créer des workflows IA sur mesure</li>
-            <li>Optimiser sa productivité globale</li>
-            <li>Outils 100% accessibles</li>
+            <li>Optimiser votre productivité globale</li>
+            <li>Formation applicable immédiatement — outils 100% accessibles</li>
           </ul>
-          <div style="margin:20px 0 8px;display:flex;align-items:baseline;gap:8px;">
-            <span style="font-size:1.3rem;font-weight:700;color:#8A91B4;">Sur devis — adapté à vos besoins</span>
-          </div>
-          <a href="#contact" style="display:inline-flex;align-items:center;gap:8px;padding:12px 24px;border-radius:50px;font-weight:700;font-size:0.9rem;background:transparent;color:#F0F2FF;border:1.5px solid rgba(255,255,255,0.15);cursor:pointer;transition:all 0.2s;text-decoration:none;position:relative;z-index:2;" onmouseover="this.style.borderColor='#1A3CFF';this.style.color='#1A3CFF';this.style.transform='translateY(-2px)'" onmouseout="this.style.borderColor='rgba(255,255,255,0.15)';this.style.color='#F0F2FF';this.style.transform='translateY(0)'">
+          <a href="#contact" class="pricing-cta pricing-cta-outline">
             Demander un devis
-            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
           </a>
-          <div style="margin-top:16px;">
-            <span class="service-badge">Pour TPE, dirigeants &amp; équipes</span>
-          </div>
         </div>
 
       </div>
+
+      <p class="pricing-footer-note reveal">
+        Toutes les formations sont dispensées en présentiel, distanciel ou e-learning.<br>
+        Non éligible CPF — certification Qualiopi en cours. <strong>Profitez du tarif lancement avant augmentation.</strong>
+      </p>
     </div>
   </section>
 
