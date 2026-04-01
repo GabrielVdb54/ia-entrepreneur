@@ -307,6 +307,12 @@
       overflow: hidden;
       padding: 120px 0 80px;
     }
+    @media (max-width: 768px) {
+      #accueil {
+        min-height: auto;
+        padding: 90px 0 40px;
+      }
+    }
 
     /* Animated background grid */
     .hero-grid {
@@ -1149,15 +1155,48 @@
         display: flex;
         justify-content: center;
         order: -1;
-        margin-bottom: 32px;
+        margin-bottom: 16px;
       }
       .hero-photo {
-        max-width: 320px;
+        max-width: 160px;
         margin: 0 auto;
+        border-radius: 50%;
+        object-fit: cover;
+        object-position: center top;
+        width: 160px;
+        height: 160px;
       }
       .hero-photo-glow { display: none; }
-      .hero-title { font-size: 2.1rem; }
-      .hero-stats { gap: 24px; }
+      .hero-title { font-size: 1.8rem; }
+      .hero-stats { gap: 20px; }
+      .hero-badge { margin-bottom: 16px; }
+      .hero-desc { font-size: 0.95rem; margin-bottom: 24px; }
+      .hero-actions { margin-bottom: 32px; }
+
+      /* Sections padding mobile */
+      #services, #apropos, #chiffres, #temoignages, #blog, #contact { padding: 60px 0; }
+
+      /* Stats banner mobile */
+      [style*="gap:40px"] { 
+        flex-direction: column !important; 
+        gap: 16px !important; 
+        align-items: flex-start !important;
+        padding-left: 16px !important;
+      }
+      [style*="width:1px;height:28px"] { display: none !important; }
+
+      /* Coaching section stack */
+      [style*="grid-template-columns:1fr 1fr"] { 
+        grid-template-columns: 1fr !important; 
+        gap: 32px !important;
+      }
+
+      /* Comment ça marche - 2 columns on tablet */
+      #methode [style*="grid-template-columns:repeat(4"] {
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 20px !important;
+      }
+      #methode [style*="position:absolute;top:48px"] { display: none !important; }
 
       .services-grid { grid-template-columns: 1fr; }
       .chiffres-grid { grid-template-columns: repeat(2, 1fr); }
@@ -1190,6 +1229,20 @@
       .hero-actions { flex-direction: column; }
       .hero-actions .btn { width: 100%; justify-content: center; }
       .contact-form { padding: 24px; }
+      .hero-photo {
+        max-width: 140px !important;
+        width: 140px !important;
+        height: 140px !important;
+      }
+      .hero-title { font-size: 1.6rem !important; }
+      #services, #apropos, #chiffres, #temoignages, #blog, #contact { padding: 48px 0 !important; }
+      #methode [style*="grid-template-columns:repeat(4"], 
+      #methode [style*="grid-template-columns:repeat(2"] { 
+        grid-template-columns: 1fr !important; 
+      }
+      .pricing-card.featured { transform: scale(1) !important; }
+      .pricing-card.featured:hover { transform: translateY(-6px) !important; }
+      .article-cta, .versus-box { padding: 28px 20px !important; }
     }
 
     /* ── Pricing ─────────────────────────────────────────── */
