@@ -231,26 +231,28 @@
     }
     .logo span { color: var(--accent); }
 
-    nav { display: flex; align-items: center; gap: 8px; }
+    nav { display: flex; align-items: center; gap: 4px; }
     nav a {
-      padding: 8px 14px;
+      padding: 7px 12px;
       border-radius: 50px;
-      font-size: 0.85rem;
+      font-size: 0.84rem;
       font-weight: 600;
       color: var(--muted);
       transition: color 0.2s, background 0.2s;
+      white-space: nowrap;
     }
     nav a:hover { color: var(--text); background: var(--card); }
 
     .nav-cta {
-      padding: 9px 20px;
+      padding: 8px 18px;
       background: var(--primary);
       color: #fff !important;
       border-radius: 50px;
       font-weight: 700;
-      font-size: 0.88rem;
+      font-size: 0.84rem;
       box-shadow: 0 3px 16px rgba(26,60,255,0.4);
       transition: transform 0.2s, box-shadow 0.2s !important;
+      white-space: nowrap;
     }
     .nav-cta:hover {
       transform: translateY(-1px);
@@ -1411,10 +1413,12 @@
       <div class="header-inner">
         <a href="#accueil" class="logo">IA<span>-</span>Entrepreneur</a>
         <nav>
+          <a href="#accueil">Accueil</a>
           <a href="#services">Création d'entreprise</a>
-          <a href="/formations-entreprises.html">Entreprises</a>
+          <a href="/formations-entreprises.html">Formations entreprises</a>
           <a href="#apropos">À propos</a>
           <a href="#blog">Blog</a>
+          <a href="tel:+33699250344" style="display:flex;align-items:center;gap:5px;"><svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6A19.79 19.79 0 012.12 4.18 2 2 0 014.11 2h3a2 2 0 012 1.72c.127.96.362 1.903.7 2.81a2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.338 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg>06 99 25 03 44</a>
           <a href="https://calendly.com/gabriel-ia-entrepreneur/decouverte" target="_blank" rel="noopener noreferrer" class="nav-cta" style="background:var(--accent);box-shadow:0 3px 16px rgba(16,185,129,0.35);">Appel gratuit</a>
         </nav>
         <button class="hamburger" id="hamburger" aria-label="Menu">
@@ -1423,12 +1427,14 @@
       </div>
     </div>
     <div class="mobile-menu" id="mobile-menu">
+      <a href="#accueil">Accueil</a>
       <a href="#services">Création d'entreprise</a>
       <a href="/formations-entreprises.html">Formations entreprises</a>
       <a href="#apropos">À propos</a>
       <a href="#blog">Blog</a>
+      <a href="tel:+33699250344">📞 06 99 25 03 44</a>
       <a href="#contact">Me contacter</a>
-      <a href="https://calendly.com/gabriel-ia-entrepreneur/decouverte" target="_blank" rel="noopener noreferrer" style="background:var(--accent);color:#fff;text-align:center;border-radius:var(--radius);margin-top:8px;">Réserver un appel gratuit</a>
+      <a href="https://calendly.com/gabriel-ia-entrepreneur/decouverte" target="_blank" rel="noopener noreferrer" style="background:var(--accent);color:#fff;text-align:center;border-radius:var(--radius);margin-top:8px;padding:14px;">Réserver un appel gratuit</a>
     </div>
   </header>
 
