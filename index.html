@@ -1638,6 +1638,7 @@
         <!-- Colonne gauche : texte -->
         <div class="apropos-text reveal">
           <h2>Un entrepreneur qui forme<br /><span style="color:var(--accent)">des entrepreneurs</span></h2>
+          <p style="font-size:0.9rem;color:var(--primary);font-weight:600;margin-bottom:24px;border-left:3px solid var(--primary);padding-left:12px;">Chaque formation est construite à partir d'expériences réelles — pas de théorie descendante, pas de slides récités.</p>
 
           <p>Je suis <strong>Gabriel Vanderbecken</strong>, formateur et entrepreneur basé dans le <strong>Grand Est</strong>. Je ne transmets pas ce que j'ai lu — <strong>je transmets ce que j'ai construit</strong>. J'ai fondé deux entreprises et accompagné plus de <strong>1 500 porteurs de projet</strong>. Quand j'ai lancé Clindit, la V1 ne correspondait pas au marché — comme YouTube qui a démarré comme un site de rencontres. On a écouté, pivoté, et construit ce que le terrain nous demandait. C'est cette discipline que j'enseigne.</p>
 
@@ -2196,7 +2197,9 @@
         countersStarted = true;
         const nums = document.querySelectorAll('.chiffre-num');
         animateCounter(nums[0], 1500, '+');
-        animateCounter(nums[2], 100, '+');
+        if (nums[1]) nums[1].textContent = '2';
+        if (nums[2]) { animateCounter(nums[2], 6, ''); }
+        if (nums[3]) nums[3].textContent = '3';
       }
     }, { threshold: 0.3 });
     chiffresObserver.observe(chiffresSection);
