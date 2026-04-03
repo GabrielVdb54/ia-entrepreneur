@@ -79,54 +79,60 @@
     }
     @media(max-width:480px){.method-grid{grid-template-columns:1fr}}
 
-    @media (max-width: 480px) {
-      .formation-card { padding: 24px 20px; }
-      .formation-card p { font-size: 0.85rem; margin-bottom: 12px; }
-      .page-hero { padding: 60px 0 40px; }
-      .page-hero h1 { font-size: 1.8rem; }
-      .method-grid { grid-template-columns: 1fr !important; gap: 24px; }
-      .cta-section { padding: 60px 0; }
-      .cta-section h2 { font-size: 1.4rem; }
-    }
 
-    /* ── Formations tabs mobile ────────────────────────────── */
-    .formation-tabs {
-      display: none;
-    }
+
+
+    /* ── Formations compact mobile ─────────────────────────── */
     @media (max-width: 768px) {
       .formations-grid {
-        display: block !important;
+        grid-template-columns: 1fr !important;
+        gap: 14px !important;
       }
       .formation-card {
-        display: none !important;
+        padding: 20px 18px !important;
+        display: flex !important;
+        flex-direction: column !important;
       }
-      .formation-card.ftab-active {
-        display: block !important;
+      .formation-card .formation-icon {
+        font-size: 1.6rem !important;
+        margin-bottom: 8px !important;
       }
-      .formation-tabs {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 6px;
-        margin-bottom: 20px;
-        padding: 0 0 16px;
+      .formation-card h3 {
+        font-size: 1rem !important;
+        margin-bottom: 6px !important;
       }
-      .formation-tab {
-        padding: 8px 14px;
-        border: 1px solid var(--border);
-        background: var(--card);
-        color: var(--muted);
-        font-family: inherit;
-        font-size: 0.78rem;
-        font-weight: 700;
-        border-radius: 50px;
-        cursor: pointer;
-        transition: all 0.2s;
+      .formation-card p {
+        font-size: 0.82rem !important;
+        line-height: 1.5 !important;
+        margin-bottom: 10px !important;
       }
-      .formation-tab.active {
-        background: var(--primary);
-        color: #fff;
-        border-color: var(--primary);
-        box-shadow: 0 2px 12px rgba(26,60,255,0.3);
+      .formation-tags {
+        margin-bottom: 10px !important;
+      }
+      .formation-tag {
+        font-size: 0.68rem !important;
+        padding: 3px 8px !important;
+      }
+      .page-hero {
+        padding: 60px 0 32px !important;
+      }
+      .page-hero h1 {
+        font-size: 1.6rem !important;
+      }
+      .page-hero p {
+        font-size: 0.9rem !important;
+      }
+      .method-grid {
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 16px !important;
+      }
+      .cta-section {
+        padding: 48px 0 !important;
+      }
+    }
+    @media (max-width: 480px) {
+      .method-grid {
+        grid-template-columns: 1fr !important;
       }
     }
   </style>
@@ -299,21 +305,6 @@
     hamburger.addEventListener('click',()=>{hamburger.classList.toggle('open');mobileMenu.classList.toggle('open');});
     mobileMenu.querySelectorAll('a').forEach(link=>{link.addEventListener('click',()=>{hamburger.classList.remove('open');mobileMenu.classList.remove('open');});});
   
-    // Formation tabs mobile
-    function switchFormTab(idx) {
-      document.querySelectorAll('.formation-tab').forEach((t,i) => {
-        t.classList.toggle('active', i === idx);
-      });
-      document.querySelectorAll('.formation-card').forEach((c,i) => {
-        c.classList.toggle('ftab-active', i === idx);
-      });
-    }
-    // Init: show first tab on mobile
-    if (window.innerWidth <= 768) {
-      document.querySelectorAll('.formation-card').forEach((c,i) => {
-        c.classList.toggle('ftab-active', i === 0);
-      });
-    }
 
   </script>
 </body>
