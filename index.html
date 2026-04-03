@@ -1220,6 +1220,46 @@
       }
     }
 
+
+    /* ── Pricing carousel mobile ────────────────────────────── */
+    @media (max-width: 768px) {
+      .pricing-grid {
+      position: relative;
+        display: flex !important;
+        overflow-x: auto !important;
+        scroll-snap-type: x mandatory !important;
+        -webkit-overflow-scrolling: touch;
+        gap: 16px !important;
+        padding-bottom: 20px !important;
+        scrollbar-width: none;
+      }
+      .pricing-grid::-webkit-scrollbar { display: none; }
+      .pricing-card {
+        min-width: 85vw !important;
+        max-width: 85vw !important;
+        scroll-snap-align: center;
+        flex-shrink: 0 !important;
+      }
+      .pricing-card.featured {
+        transform: scale(1) !important;
+        min-width: 85vw !important;
+        max-width: 85vw !important;
+      }
+      .pricing-card.featured:hover { transform: translateY(-4px) !important; }
+      /* Swipe hint indicator */
+      .pricing-grid::after {
+        content: '← Swipez pour voir les offres →';
+        position: absolute;
+        bottom: -8px;
+        left: 0;
+        right: 0;
+        text-align: center;
+        font-size: 0.72rem;
+        color: var(--muted);
+        opacity: 0.6;
+      }
+    }
+
     @media (max-width: 480px) {
       #methode [style*="grid-template-columns:repeat(4"] {
         grid-template-columns: 1fr !important;
@@ -1474,15 +1514,15 @@
           <div class="hero-stats">
             <div class="hero-stat">
               <strong>1 500+</strong>
-              <span>Entrepreneurs accompagnés</span>
+              <span>Porteurs de projet accompagnés</span>
             </div>
             <div class="hero-stat">
-              <strong>7 ans</strong>
-              <span>D'expérience terrain</span>
+              <strong>2</strong>
+              <span>Entreprises créées &amp; dirigées</span>
             </div>
             <div class="hero-stat">
-              <strong>100%</strong>
-              <span>France &amp; à distance</span>
+              <strong>6</strong>
+              <span>Modules enseignés en entreprise &amp; école de commerce</span>
             </div>
           </div>
         </div>
@@ -1533,6 +1573,13 @@
       <div class="section-label reveal"><span>Ce que je propose</span></div>
       <h2 class="section-title reveal">Nos formations — <span style="color:var(--primary)">choisissez votre parcours</span></h2>
       <p class="section-sub reveal">Vous lancez votre entreprise ou vous voulez structurer une activité récente ? 3 formules pour passer de l'idée au premier client — ou reprendre les bases sur de bons rails.</p>
+
+      <div style="text-align:center;margin-top:16px;margin-bottom:32px;" class="reveal">
+        <a href="/blog/combien-coute-creation-entreprise-2026.html" style="display:inline-flex;align-items:center;gap:8px;font-size:0.88rem;font-weight:600;color:var(--primary);transition:gap 0.2s;padding:10px 20px;border:1px solid rgba(26,60,255,0.2);border-radius:50px;background:rgba(26,60,255,0.05);" onmouseover="this.style.gap='12px';this.style.background='rgba(26,60,255,0.1)'" onmouseout="this.style.gap='8px';this.style.background='rgba(26,60,255,0.05)'">
+          📊 Combien coûte réellement la création d'une entreprise ?
+          <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </a>
+      </div>
 
       <div class="pricing-grid">
 
@@ -1600,7 +1647,7 @@
 
 
       <!-- Encart Formations Entreprises -->
-      <div style="margin-top:48px;background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:36px 40px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:24px;" class="reveal">
+      <div style="margin-top:32px;background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:28px 24px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:20px;" class="reveal">
         <div>
           <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
             <span style="font-size:1.4rem;">🏢</span>
@@ -1614,12 +1661,7 @@
         </a>
       </div>
 
-      <div style="text-align:center;margin-top:32px;" class="reveal">
-        <a href="/blog/combien-coute-creation-entreprise-2026.html" style="display:inline-flex;align-items:center;gap:8px;font-size:0.9rem;font-weight:600;color:var(--primary);transition:gap 0.2s;" onmouseover="this.style.gap='12px'" onmouseout="this.style.gap='8px'">
-          📊 Voir le détail : combien coûte réellement la création d'une entreprise ?
-          <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-        </a>
-      </div>
+
 
       <p class="pricing-footer-note reveal">
         Toutes les formations sont dispensées en présentiel, distanciel ou e-learning.<br>
