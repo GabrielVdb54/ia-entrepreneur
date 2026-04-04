@@ -1,0 +1,13 @@
+# robots.txt - ia-entrepreneur.fr
+User-agent: *
+Allow: /
+
+# Bloquer les scripts Python et fichiers de build
+Disallow: /*.py$
+Disallow: /*.pyc$
+Disallow: /node_modules/
+Disallow: /.git/
+Disallow: /.DS_Store
+
+# Sitemap
+Sitemap: https://ia-entrepreneur.fr/sitemap.xml
