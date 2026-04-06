@@ -1,0 +1,10 @@
+{
+  "redirects": [
+    {
+      "source": "/(.*)",
+      "has": [{ "type": "host", "value": "www.ia-entrepreneur.fr" }],
+      "destination": "https://ia-entrepreneur.fr/$1",
+      "permanent": true
+    }
+  ]
+}
