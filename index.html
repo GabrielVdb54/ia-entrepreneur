@@ -405,6 +405,10 @@
       .hero-stat strong {
         font-size: 1.5rem;
       }
+      /* Expertises grid mobile */
+      .expertises-grid {
+        grid-template-columns: 1fr !important;
+      }
     }
 
     /* Animated background grid */
@@ -769,8 +773,9 @@
     .apropos-photo-wrapper {
       position: relative;
       border-radius: 24px;
-      overflow: hidden;
+      overflow: visible;
       box-shadow: 0 24px 64px rgba(26,60,255,0.12);
+      padding-bottom: 24px;
     }
     .apropos-photo-wrapper img {
       width: 100%;
@@ -779,14 +784,14 @@
     }
     .apropos-photo-badge {
       position: absolute;
-      bottom: -16px;
+      bottom: 0;
       left: 50%;
       transform: translateX(-50%);
       background: #fff;
       border: 1px solid var(--border);
       border-radius: 50px;
       padding: 8px 20px;
-      font-size: 0.8rem;
+      font-size: 0.78rem;
       font-weight: 700;
       color: var(--text);
       white-space: nowrap;
@@ -1974,6 +1979,51 @@
     </div>
   </div>
 
+  <!-- ── Nos 2 expertises ──────────────────────────────────────── -->
+  <section style="padding:64px 0 40px;">
+    <div class="container">
+      <div class="section-label reveal" style="margin-bottom:16px;"><span>Qui sommes-nous là pour aider ?</span></div>
+      <h2 class="section-title reveal" style="margin-bottom:12px;">Deux expertises, <span style="color:var(--primary)">un seul organisme</span></h2>
+      <p class="section-sub reveal" style="margin-bottom:40px;">Que vous soyez porteur de projet ou dirigeant d'entreprise, nous avons une offre faite pour vous.</p>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;" class="reveal">
+
+        <!-- Porteurs de projet -->
+        <div style="background:linear-gradient(135deg, rgba(16,185,129,0.05) 0%, rgba(16,185,129,0.02) 100%);border:1.5px solid rgba(16,185,129,0.25);border-radius:24px;padding:36px 32px;display:flex;flex-direction:column;gap:20px;">
+          <div style="width:52px;height:52px;background:rgba(16,185,129,0.1);border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:1.5rem;">🚀</div>
+          <div>
+            <div style="font-size:0.72rem;font-weight:800;letter-spacing:0.1em;text-transform:uppercase;color:var(--accent);margin-bottom:8px;">Porteurs de projet & Créateurs</div>
+            <h3 style="font-size:1.4rem;font-weight:800;margin-bottom:12px;line-height:1.2;">Créez votre entreprise avec les bonnes méthodes</h3>
+            <p style="font-size:0.92rem;color:var(--muted);line-height:1.7;margin-bottom:20px;">Vous avez une idée ou un projet en tête ? Nos formations vous accompagnent de la validation du concept au lancement opérationnel — structure juridique, offre, premiers clients, automatisation IA.</p>
+            <ul style="list-style:none;padding:0;margin:0 0 24px;display:flex;flex-direction:column;gap:8px;">
+              <li style="font-size:0.88rem;color:var(--muted);display:flex;align-items:center;gap:8px;"><span style="color:var(--accent);font-weight:700;">✓</span> Formation création d'entreprise (éligible CPF à venir)</li>
+              <li style="font-size:0.88rem;color:var(--muted);display:flex;align-items:center;gap:8px;"><span style="color:var(--accent);font-weight:700;">✓</span> Coaching individuel & accompagnement personnalisé</li>
+              <li style="font-size:0.88rem;color:var(--muted);display:flex;align-items:center;gap:8px;"><span style="color:var(--accent);font-weight:700;">✓</span> Webinaires & sessions collectives</li>
+            </ul>
+          </div>
+          <a href="#services" class="btn btn-accent" style="align-self:flex-start;">Voir les formations →</a>
+        </div>
+
+        <!-- Entreprises -->
+        <div style="background:linear-gradient(135deg, rgba(26,60,255,0.05) 0%, rgba(26,60,255,0.02) 100%);border:1.5px solid rgba(26,60,255,0.2);border-radius:24px;padding:36px 32px;display:flex;flex-direction:column;gap:20px;">
+          <div style="width:52px;height:52px;background:rgba(26,60,255,0.08);border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:1.5rem;">🏢</div>
+          <div>
+            <div style="font-size:0.72rem;font-weight:800;letter-spacing:0.1em;text-transform:uppercase;color:var(--primary);margin-bottom:8px;">Entreprises & Dirigeants</div>
+            <h3 style="font-size:1.4rem;font-weight:800;margin-bottom:12px;line-height:1.2;">Formez vos équipes sur les compétences qui font la différence</h3>
+            <p style="font-size:0.92rem;color:var(--muted);line-height:1.7;margin-bottom:20px;">Prospection, négociation, management, IA & automatisation, prise de parole. Des formations sur mesure, finançables via votre OPCO sur budget formation. Zéro reste à charge pour l'entreprise.</p>
+            <ul style="list-style:none;padding:0;margin:0 0 24px;display:flex;flex-direction:column;gap:8px;">
+              <li style="font-size:0.88rem;color:var(--muted);display:flex;align-items:center;gap:8px;"><span style="color:var(--primary);font-weight:700;">✓</span> Certifié Qualiopi — finançable OPCO</li>
+              <li style="font-size:0.88rem;color:var(--muted);display:flex;align-items:center;gap:8px;"><span style="color:var(--primary);font-weight:700;">✓</span> Inter ou intra-entreprise, présentiel ou distanciel</li>
+              <li style="font-size:0.88rem;color:var(--muted);display:flex;align-items:center;gap:8px;"><span style="color:var(--primary);font-weight:700;">✓</span> Programme 100% personnalisable selon vos besoins</li>
+            </ul>
+          </div>
+          <a href="/formations-entreprises.html" class="btn btn-primary" style="align-self:flex-start;">Formations entreprises →</a>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
   <!-- ── Services ─────────────────────────────────────────────── -->
   <section id="services">
     <div class="container">
@@ -2192,8 +2242,9 @@
       </div>
 
     </div>
-  </section> ─────────────────────────────────────────── -->
-  <section id="chiffres">
+  </section>
+
+  <!-- ── Chiffres clés
     <div class="chiffres-bg"></div>
     <div class="container">
       <div class="chiffres-grid reveal">
