@@ -742,7 +742,7 @@
 
     /* ── À propos ───────────────────────────────────────────── */
     #apropos {
-      padding: 50px 0;
+      padding: 80px 0;
       position: relative;
     }
     #apropos::before {
@@ -753,11 +753,190 @@
       background: linear-gradient(90deg, transparent, var(--border), transparent);
     }
 
-    .apropos-layout {
+    /* Histoire : photo gauche + texte droite */
+    .apropos-histoire {
+      display: grid;
+      grid-template-columns: 340px 1fr;
+      gap: 64px;
+      align-items: start;
+      margin-bottom: 72px;
+    }
+
+    /* Photo Gabriel */
+    .apropos-photo-col {
+      position: relative;
+    }
+    .apropos-photo-wrapper {
+      position: relative;
+      border-radius: 24px;
+      overflow: hidden;
+      box-shadow: 0 24px 64px rgba(26,60,255,0.12);
+    }
+    .apropos-photo-wrapper img {
+      width: 100%;
+      display: block;
+      border-radius: 24px;
+    }
+    .apropos-photo-badge {
+      position: absolute;
+      bottom: -16px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 50px;
+      padding: 8px 20px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: var(--text);
+      white-space: nowrap;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* Stats rapides sous la photo */
+    .apropos-mini-stats {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 72px;
-      align-items: start;
+      gap: 10px;
+      margin-top: 36px;
+    }
+    .apropos-mini-stat {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 14px 16px;
+      text-align: center;
+    }
+    .apropos-mini-stat strong {
+      display: block;
+      font-size: 1.4rem;
+      font-weight: 800;
+      color: var(--primary);
+    }
+    .apropos-mini-stat span {
+      font-size: 0.75rem;
+      color: var(--muted);
+      line-height: 1.3;
+      margin-top: 2px;
+      display: block;
+    }
+
+    /* Texte histoire */
+    .apropos-histoire-text h2 {
+      font-size: clamp(1.75rem, 3vw, 2.4rem);
+      font-weight: 800;
+      line-height: 1.2;
+      margin-bottom: 8px;
+    }
+    .apropos-histoire-text .apropos-quote {
+      font-size: 0.92rem;
+      color: var(--primary);
+      font-weight: 600;
+      border-left: 3px solid var(--primary);
+      padding-left: 14px;
+      margin-bottom: 28px;
+      line-height: 1.6;
+    }
+    .apropos-histoire-text p {
+      font-size: 0.96rem;
+      color: var(--muted);
+      line-height: 1.85;
+      margin-bottom: 18px;
+    }
+    .apropos-histoire-text p strong {
+      color: var(--text);
+      font-weight: 700;
+    }
+
+    /* Équipe */
+    .apropos-equipe {
+      border-top: 1px solid var(--border);
+      padding-top: 56px;
+    }
+    .apropos-equipe-title {
+      text-align: center;
+      font-size: 1.3rem;
+      font-weight: 800;
+      margin-bottom: 6px;
+    }
+    .apropos-equipe-sub {
+      text-align: center;
+      font-size: 0.9rem;
+      color: var(--muted);
+      margin-bottom: 40px;
+    }
+    .equipe-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+    }
+    .equipe-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 28px 24px;
+      text-align: center;
+      transition: border-color 0.3s, transform 0.3s, box-shadow 0.3s;
+    }
+    .equipe-card:hover {
+      border-color: rgba(26,60,255,0.25);
+      transform: translateY(-4px);
+      box-shadow: 0 16px 40px rgba(26,60,255,0.08);
+    }
+    .equipe-card.fondateur {
+      border-color: rgba(26,60,255,0.2);
+      background: rgba(26,60,255,0.03);
+    }
+    .equipe-avatar {
+      width: 72px;
+      height: 72px;
+      border-radius: 50%;
+      margin: 0 auto 16px;
+      overflow: hidden;
+      background: var(--bg2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.8rem;
+      border: 2px solid var(--border);
+    }
+    .equipe-avatar img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center top;
+    }
+    .equipe-nom {
+      font-size: 1rem;
+      font-weight: 800;
+      color: var(--text);
+      margin-bottom: 4px;
+    }
+    .equipe-role {
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: var(--primary);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-bottom: 12px;
+    }
+    .equipe-specialites {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      justify-content: center;
+    }
+    .equipe-tag {
+      padding: 3px 10px;
+      border-radius: 50px;
+      font-size: 0.72rem;
+      font-weight: 600;
+      background: rgba(26,60,255,0.07);
+      color: var(--primary);
+      border: 1px solid rgba(26,60,255,0.15);
     }
 
     .apropos-text h2 {
@@ -816,6 +995,12 @@
       font-weight: 400;
       color: var(--muted);
       margin-top: 2px;
+    }
+
+    @media (max-width: 900px) {
+      .apropos-histoire { grid-template-columns: 1fr; gap: 40px; }
+      .apropos-photo-col { max-width: 300px; margin: 0 auto; }
+      .equipe-grid { grid-template-columns: 1fr; max-width: 380px; margin: 0 auto; }
     }
 
     /* ── Chiffres ───────────────────────────────────────────── */
@@ -1645,7 +1830,10 @@
   <header id="header">
     <div class="container">
       <div class="header-inner">
-        <a href="#accueil" class="logo">IA<span>-</span>Entrepreneur</a>
+        <a href="#accueil" class="logo" style="line-height:1.2;">
+          IA<span>-</span>Entrepreneur
+          <span style="display:block;font-size:0.58rem;font-weight:500;color:var(--muted);letter-spacing:0.03em;margin-top:2px;text-decoration:none;">Organisme de formation certifié Qualiopi</span>
+        </a>
         <nav>
           <a href="#accueil">Accueil</a>
           <a href="#services">Création d'entreprise</a>
@@ -1893,88 +2081,111 @@
   <!-- ── À propos ──────────────────────────────────────────────── -->
   <section id="apropos">
     <div class="container">
-      <div class="section-label reveal"><span>À propos</span></div>
+      <div class="section-label reveal"><span>À propos de l'organisme</span></div>
 
-      <div class="apropos-layout">
+      <!-- Histoire : photo + texte -->
+      <div class="apropos-histoire">
 
-        <!-- Colonne gauche : texte -->
-        <div class="apropos-text reveal">
-          <h2>Un entrepreneur qui forme<br /><span style="color:var(--accent)">des entrepreneurs</span></h2>
-          <p style="font-size:0.9rem;color:var(--primary);font-weight:600;margin-bottom:24px;border-left:3px solid var(--primary);padding-left:12px;">Chaque formation est construite à partir d'expériences réelles — pas de théorie descendante, pas de slides récités.</p>
-
-          <p>Je suis <strong>Gabriel Vanderbecken</strong>, formateur et entrepreneur basé dans le <strong>Grand Est</strong>. Je ne transmets pas ce que j'ai lu — <strong>je transmets ce que j'ai construit</strong>. J'ai fondé deux entreprises et accompagné plus de <strong>1 500 porteurs de projet</strong>. Quand j'ai lancé Clindit, la V1 ne correspondait pas au marché — comme YouTube qui a démarré comme un site de rencontres. On a écouté, pivoté, et construit ce que le terrain nous demandait. C'est cette discipline que j'enseigne.</p>
-
-          
-
-          <p>Ma méthode est simple : d'abord, on valide que votre projet est en adéquation avec le marché et vos moyens. Ensuite seulement, on automatise et on pérennise avec l'IA. Aujourd'hui, l'information est gratuite — ce qui manque aux entrepreneurs, c'est <strong>l'expérience terrain</strong>. C'est ça que je transmets. <strong>C'est dans cet ordre que ça fonctionne.</strong></p>
-          
-
-          <div class="apropos-cta">
+        <!-- Photo + mini stats -->
+        <div class="apropos-photo-col reveal">
+          <div class="apropos-photo-wrapper">
+            <img src="gabriel-about.png" alt="Gabriel Vanderbecken — Fondateur de IA-Entrepreneur" />
+            <div class="apropos-photo-badge">
+              <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+              Certifié Qualiopi · NDA 44 54 04871 54
+            </div>
+          </div>
+          <div class="apropos-mini-stats">
+            <div class="apropos-mini-stat">
+              <strong>1 500+</strong>
+              <span>Porteurs de projet accompagnés</span>
+            </div>
+            <div class="apropos-mini-stat">
+              <strong>300+</strong>
+              <span>Salariés formés en entreprise</span>
+            </div>
+            <div class="apropos-mini-stat">
+              <strong>2</strong>
+              <span>Entreprises créées & dirigées</span>
+            </div>
+            <div class="apropos-mini-stat">
+              <strong>7 ans</strong>
+              <span>D'expérience terrain</span>
+            </div>
+          </div>
+          <div style="margin-top:20px;text-align:center;">
             <a href="https://www.linkedin.com/in/gabriel-vanderbecken/" target="_blank" rel="noopener noreferrer" class="btn-linkedin">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-                <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 0 1-2.063-2.065 2.064 2.064 0 1 1 2.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
-              </svg>
-              Me retrouver sur LinkedIn →
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 0 1-2.063-2.065 2.064 2.064 0 1 1 2.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+              LinkedIn →
             </a>
           </div>
         </div>
 
-        <!-- Colonne droite : compétences liées aux formations -->
-        <div class="apropos-realisations reveal reveal-delay-2">
+        <!-- Histoire -->
+        <div class="apropos-histoire-text reveal reveal-delay-1">
+          <h2>D'où vient<br /><span style="color:var(--accent);">IA-Entrepreneur</span> ?</h2>
+          <p class="apropos-quote">Chaque formation que nous dispensons est construite à partir d'expériences réelles — pas de théorie descendante, pas de slides récités.</p>
 
-          <!-- Bloc 1: Création d'entreprise -->
-          <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:20px;margin-bottom:14px;">
-            <div style="font-size:0.72rem;font-weight:800;letter-spacing:0.1em;text-transform:uppercase;color:var(--primary);margin-bottom:10px;">→ Création d'entreprise</div>
-            <div class="realisation-item" style="border:none;padding:6px 0;">
-              <div class="realisation-icon">📋</div>
-              <div class="realisation-text">1 500+ porteurs de projet accompagnés<span>En cabinet comptable &amp; en formation</span></div>
+          <p>Tout a commencé bien avant la création de l'organisme. <strong>Gabriel Vanderbecken</strong>, fondateur d'IA-Entrepreneur, accompagne des porteurs de projet depuis ses débuts en cabinet, puis auprès de <strong>France Travail et d'Epitech</strong>, où il anime ses premières formations. Il découvre alors ce qui le passionne vraiment : <strong>transmettre ce qu'il a vécu sur le terrain</strong>, pas ce qu'il a lu dans des manuels.</p>
+
+          <p>Parallèlement, il intervient dans des <strong>écoles de commerce</strong> sur des modules commerciaux et entrepreneuriaux, tout en fondant deux entreprises et en accompagnant des centaines d'entrepreneurs à créer et développer leur activité. Des proches, d'anciens clients, des entrepreneurs en difficulté continuent de le solliciter — non pas parce qu'il est consultant, <strong>mais parce qu'il a lui-même traversé les épreuves de l'entrepreneuriat</strong> et qu'il sait ce que ça coûte réellement.</p>
+
+          <p>C'est ce vécu — les erreurs, les pivots, les victoires — qui est au cœur d'IA-Entrepreneur. <strong>Notre mission : permettre à chaque entrepreneur et chaque salarié d'accéder à une formation qui change vraiment les choses</strong>, sans reste à charge pour les particuliers, financée via les OPCO pour les entreprises.</p>
+
+          <p>Aujourd'hui, IA-Entrepreneur est un <strong>organisme de formation agréé, certifié Qualiopi</strong>, réunissant une équipe de formateurs-praticiens actifs dans leur domaine. Nous intervenons partout en France, en présentiel comme en distanciel.</p>
+        </div>
+      </div>
+
+      <!-- Équipe -->
+      <div class="apropos-equipe reveal">
+        <h3 class="apropos-equipe-title">Notre équipe de formateurs</h3>
+        <p class="apropos-equipe-sub">Des praticiens actifs — ils enseignent ce qu'ils font au quotidien.</p>
+
+        <div class="equipe-grid">
+
+          <!-- Gabriel -->
+          <div class="equipe-card fondateur">
+            <div class="equipe-avatar">
+              <img src="gabriel-about.png" alt="Gabriel Vanderbecken" />
             </div>
-            <div class="realisation-item" style="border:none;padding:6px 0;">
-              <div class="realisation-icon">🏢</div>
-              <div class="realisation-text">2 entreprises créées &amp; dirigées<span>Clindit &amp; Gains Analyses B2B</span></div>
-            </div>
-            <div class="realisation-item" style="border:none;padding:6px 0;">
-              <div class="realisation-icon">💰</div>
-              <div class="realisation-text">10 000€ économisés/an pour un client<span>Optimisation de statut juridique</span></div>
+            <div class="equipe-nom">Gabriel Vanderbecken</div>
+            <div class="equipe-role">Fondateur & Formateur principal</div>
+            <div class="equipe-specialites">
+              <span class="equipe-tag">Création d'entreprise</span>
+              <span class="equipe-tag">IA & Automatisation</span>
+              <span class="equipe-tag">Prise de parole</span>
+              <span class="equipe-tag">Entrepreneuriat</span>
             </div>
           </div>
 
-          <!-- Bloc 2: Vente, négociation & prospection -->
-          <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:20px;margin-bottom:14px;">
-            <div style="font-size:0.72rem;font-weight:800;letter-spacing:0.1em;text-transform:uppercase;color:var(--accent);margin-bottom:10px;">→ Vente, négociation &amp; prospection</div>
-            <div class="realisation-item" style="border:none;padding:6px 0;">
-              <div class="realisation-icon">🎯</div>
-              <div class="realisation-text">+100 RDV qualifiés/mois<span>Système de prospection automatisé créé par mes soins</span></div>
-            </div>
-            <div class="realisation-item" style="border:none;padding:6px 0;">
-              <div class="realisation-icon">🤝</div>
-              <div class="realisation-text">Partenariats grands comptes négociés<span>Dont Derichebourg — closing terrain</span></div>
-            </div>
-            <div class="realisation-item" style="border:none;padding:6px 0;">
-              <div class="realisation-icon">🎓</div>
-              <div class="realisation-text">Modules négociation &amp; prospection<span>Enseignés en entreprise &amp; à ECM Nancy</span></div>
+          <!-- Charly -->
+          <div class="equipe-card">
+            <div class="equipe-avatar">🎯</div>
+            <div class="equipe-nom">Charly M.</div>
+            <div class="equipe-role">Formateur associé</div>
+            <div class="equipe-specialites">
+              <span class="equipe-tag">Création d'entreprise</span>
+              <span class="equipe-tag">Marketing</span>
+              <span class="equipe-tag">Stratégie commerciale</span>
             </div>
           </div>
 
-          <!-- Bloc 3: Prise de parole, management & IA -->
-          <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:20px;">
-            <div style="font-size:0.72rem;font-weight:800;letter-spacing:0.1em;text-transform:uppercase;color:#7a9fff;margin-bottom:10px;">→ Prise de parole, management &amp; IA</div>
-            <div class="realisation-item" style="border:none;padding:6px 0;">
-              <div class="realisation-icon">🎤</div>
-              <div class="realisation-text">3 conférences publiques<span>Go Entrepreneur, France Travail, ECM Nancy</span></div>
-            </div>
-            <div class="realisation-item" style="border:none;padding:6px 0;">
-              <div class="realisation-icon">👥</div>
-              <div class="realisation-text">+10 personnes managées<span>En cabinet et dans mes entreprises</span></div>
-            </div>
-            <div class="realisation-item" style="border:none;padding:6px 0;">
-              <div class="realisation-icon">⚡</div>
-              <div class="realisation-text">5h gagnées/semaine grâce à l'IA<span>Automatisation appliquée sur mes propres entreprises</span></div>
+          <!-- Ryad -->
+          <div class="equipe-card">
+            <div class="equipe-avatar">🚀</div>
+            <div class="equipe-nom">Ryad M.</div>
+            <div class="equipe-role">Formateur associé</div>
+            <div class="equipe-specialites">
+              <span class="equipe-tag">Prospection</span>
+              <span class="equipe-tag">Vente & Closing</span>
+              <span class="equipe-tag">Management</span>
+              <span class="equipe-tag">Développement personnel</span>
             </div>
           </div>
 
         </div>
       </div>
+
     </div>
   </section>
 
@@ -1988,16 +2199,16 @@
           <div class="chiffre-label">Porteurs de projet<br>accompagnés</div>
         </div>
         <div class="chiffre-item">
-          <div class="chiffre-num accent">2</div>
-          <div class="chiffre-label">Entreprises créées<br>&amp; dirigées</div>
-        </div>
-        <div class="chiffre-item">
-          <div class="chiffre-num accent">6</div>
-          <div class="chiffre-label">Modules enseignés<br>en entreprise &amp; école de commerce</div>
+          <div class="chiffre-num accent">300+</div>
+          <div class="chiffre-label">Salariés formés<br>en entreprise</div>
         </div>
         <div class="chiffre-item">
           <div class="chiffre-num accent">3</div>
-          <div class="chiffre-label">Conférences publiques<br>Go Entrepreneur, France Travail, ECM</div>
+          <div class="chiffre-label">Formateurs<br>praticiens actifs</div>
+        </div>
+        <div class="chiffre-item">
+          <div class="chiffre-num accent">6</div>
+          <div class="chiffre-label">Modules de formation<br>entreprise & école de commerce</div>
         </div>
       </div>
     </div>
