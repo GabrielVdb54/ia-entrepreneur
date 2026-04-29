@@ -1,1445 +1,2542 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>CLINDIT — Gantt Stratégique 2026 · Lancement Offres Gold & Platinum</title>
-<style>
-  :root {
-    --primary: #1a3c5e;
-    --secondary: #2d7dd2;
-    --accent: #e8a020;
-    --gold: #d4a017;
-    --platinum: #a8b8c8;
-    --freemium: #4caf50;
-    --red: #e53935;
-    --green: #43a047;
-    --bg: #f0f4f8;
-    --card: #ffffff;
-    --border: #dde3ea;
-    --text: #1e293b;
-    --muted: #64748b;
-    --t1: #e3f2fd;
-    --t2: #fff3e0;
-    --t3: #e8f5e9;
-    --t4: #fce4ec;
-  }
-  * { margin:0; padding:0; box-sizing:border-box; }
-  body { font-family:'Segoe UI',Arial,sans-serif; background:var(--bg); color:var(--text); font-size:13px; }
+  <!-- Google Analytics GA4 -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-SZG9XPNNNC"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-SZG9XPNNNC');
+</script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="google-site-verification" content="VOTRE_CODE_VERIFICATION_ICI" />
 
-  /* HEADER */
-  .header { background:linear-gradient(135deg,#1a3c5e 0%,#2d7dd2 60%,#1a5276 100%); color:#fff; padding:24px 32px 20px; }
-  .header-top { display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:12px; }
-  .header h1 { font-size:22px; font-weight:800; letter-spacing:0.5px; }
-  .header h1 span { color:#ffd54f; }
-  .header p { font-size:12px; opacity:0.85; margin-top:4px; }
-  .badge-row { display:flex; gap:8px; flex-wrap:wrap; margin-top:14px; }
-  .badge { padding:4px 12px; border-radius:20px; font-size:11px; font-weight:700; }
-  .badge-f { background:#43a047; color:#fff; }
-  .badge-g { background:#d4a017; color:#fff; }
-  .badge-p { background:#78909c; color:#fff; }
-  .badge-obj { background:rgba(255,255,255,0.2); color:#fff; border:1px solid rgba(255,255,255,0.4); }
+  <link rel="icon" type="image/png" href="/favicon.png" />
+  <link rel="apple-touch-icon" href="/favicon.png" />
 
-  /* TABS */
-  .tabs { display:flex; background:#1a3c5e; border-bottom:3px solid var(--secondary); }
-  .tab { padding:12px 28px; cursor:pointer; font-size:13px; font-weight:600; color:rgba(255,255,255,0.6); transition:all .2s; border-bottom:3px solid transparent; margin-bottom:-3px; }
-  .tab:hover { color:#fff; background:rgba(255,255,255,0.08); }
-  .tab.active { color:#ffd54f; border-bottom:3px solid #ffd54f; background:rgba(255,255,255,0.06); }
 
-  /* MAIN */
-  .container { padding:20px 24px; max-width:1600px; margin:0 auto; }
+  <!-- ── SEO ─────────────────────────────────────────────────── -->
+  <title>Créer son entreprise : formation &amp; accompagnement personnalisé 2026 | IA-Entrepreneur</title>
+  <meta name="description" content="Créez votre entreprise avec un accompagnement terrain : statut juridique, business plan, financement, premiers clients. +1500 porteurs de projet accompagnés. Formation certifiée." />
+  <meta name="keywords" content="créer son entreprise, formation création entreprise, accompagnement création entreprise, business plan, statut juridique entreprise, aide création entreprise 2026, formation entrepreneuriat, ACRE ARCE, formateur IA TPE" />
+  <link rel="canonical" href="https://ia-entrepreneur.fr" />
 
-  /* SECTION */
-  .section { display:none; }
-  .section.active { display:block; }
+  <!-- Open Graph -->
+  <meta property="og:title" content="Créer son entreprise : formation &amp; accompagnement personnalisé 2026 | IA-Entrepreneur" />
+  <meta property="og:description" content="Créez votre entreprise avec un accompagnement terrain : statut juridique, business plan, financement, premiers clients. +1500 porteurs de projet accompagnés. Formation certifiée." />
+  <meta property="og:image" content="https://ia-entrepreneur.fr/gabriel-hero.png" />
+  <meta property="og:url" content="https://ia-entrepreneur.fr" />
+  <meta property="og:type" content="website" />
 
-  /* CONTEXT CARDS */
-  .cards-row { display:grid; grid-template-columns:repeat(auto-fit,minmax(190px,1fr)); gap:12px; margin-bottom:20px; }
-  .card { background:var(--card); border-radius:10px; padding:14px 16px; border:1px solid var(--border); box-shadow:0 1px 4px rgba(0,0,0,.05); }
-  .card-label { font-size:10px; font-weight:700; text-transform:uppercase; color:var(--muted); letter-spacing:0.5px; margin-bottom:4px; }
-  .card-value { font-size:20px; font-weight:800; color:var(--primary); }
-  .card-sub { font-size:10px; color:var(--muted); margin-top:2px; }
-  .card.gold .card-value { color:var(--gold); }
-  .card.plat .card-value { color:#546e7a; }
-  .card.green .card-value { color:var(--green); }
-  .card.blue .card-value { color:var(--secondary); }
+  <!-- Schema.org JSON-LD -->
+  <script type="application/ld+json">
+  [
+    {
+      "@context": "https://schema.org",
+      "@type": "EducationalOrganization",
+      "name": "IA-Entrepreneur",
+      "url": "https://ia-entrepreneur.fr",
+      "logo": "https://ia-entrepreneur.fr/favicon.png",
+      "description": "Formation création d'entreprise et IA pour entrepreneurs, dirigeants TPE et salariés en reconversion.",
+      "address": {
+        "@type": "PostalAddress",
+        "addressRegion": "Grand Est",
+        "addressCountry": "FR"
+      },
+      "founder": {
+        "@type": "Person",
+        "name": "Gabriel Vanderbecken",
+        "jobTitle": "Formateur en Entrepreneuriat & Intelligence Artificielle",
+        "sameAs": ["https://www.linkedin.com/in/gabriel-vanderbecken/"]
+      },
+      "contactPoint": {
+        "@type": "ContactPoint",
+        "email": "contact@ia-entrepreneur.fr",
+        "contactType": "customer service",
+        "availableLanguage": "French"
+      },
+      "hasCredential": {
+        "@type": "EducationalOccupationalCredential",
+        "name": "Certification Qualiopi",
+        "credentialCategory": "Certification qualité organisme de formation"
+      }
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "Course",
+      "name": "Accompagnement Création d'Entreprise - Essentiel",
+      "description": "Statut juridique, création de société certifiée par expert-comptable, orientation aides ACRE/ARCE.",
+      "provider": {"@type": "Organization", "name": "IA-Entrepreneur", "url": "https://ia-entrepreneur.fr"},
+      "offers": {"@type": "Offer", "price": "300", "priceCurrency": "EUR", "availability": "https://schema.org/InStock"}
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "Course",
+      "name": "Accompagnement Création d'Entreprise - Pro",
+      "description": "Étude de marché, business plan 3 scénarios, financement, premières ventes et kit marketing.",
+      "provider": {"@type": "Organization", "name": "IA-Entrepreneur", "url": "https://ia-entrepreneur.fr"},
+      "offers": {"@type": "Offer", "price": "1000", "priceCurrency": "EUR", "availability": "https://schema.org/InStock"}
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "Course",
+      "name": "Accompagnement Création d'Entreprise - Premium",
+      "description": "Accompagnement individuel one-to-one, accès WhatsApp 3 mois, suivi post-création.",
+      "provider": {"@type": "Organization", "name": "IA-Entrepreneur", "url": "https://ia-entrepreneur.fr"},
+      "offers": {"@type": "Offer", "price": "3000", "priceCurrency": "EUR", "availability": "https://schema.org/InStock"}
+    }
+  ]
+  </script>
 
-  /* LEGEND */
-  .legend { display:flex; gap:16px; flex-wrap:wrap; margin-bottom:16px; align-items:center; }
-  .legend-item { display:flex; align-items:center; gap:6px; font-size:11px; color:var(--muted); }
-  .legend-dot { width:14px; height:14px; border-radius:3px; flex-shrink:0; }
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
 
-  /* GANTT TABLE */
-  .gantt-wrap { overflow-x:auto; border-radius:10px; border:1px solid var(--border); box-shadow:0 2px 8px rgba(0,0,0,.06); }
-  table.gantt { width:100%; border-collapse:collapse; background:var(--card); min-width:900px; }
-  table.gantt thead tr { background:var(--primary); color:#fff; }
-  table.gantt thead th { padding:10px 10px; font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.4px; text-align:center; border-right:1px solid rgba(255,255,255,0.15); white-space:nowrap; }
-  table.gantt thead th.left { text-align:left; }
-  table.gantt thead th.t1 { background:#1565c0; }
-  table.gantt thead th.t2 { background:#e65100; }
-  table.gantt thead th.t3 { background:#2e7d32; }
-  table.gantt thead th.t4 { background:#880e4f; }
+  <style>
+    /* ── Reset & Base ─────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-  table.gantt tbody tr { border-bottom:1px solid var(--border); transition:background .15s; }
-  table.gantt tbody tr:hover { background:#f8fafc; }
-  table.gantt tbody tr.section-header { background:#e8edf5; }
-  table.gantt tbody tr.section-header td { font-weight:800; font-size:12px; color:var(--primary); padding:8px 12px; text-transform:uppercase; letter-spacing:0.5px; border-left:4px solid var(--secondary); }
-  table.gantt tbody td { padding:7px 10px; vertical-align:middle; border-right:1px solid #eef1f5; }
-  table.gantt tbody td.task-name { font-weight:600; font-size:12px; min-width:200px; max-width:240px; }
-  table.gantt tbody td.resp { font-size:11px; color:var(--muted); white-space:nowrap; }
-  table.gantt tbody td.center { text-align:center; }
+    :root {
+      --bg:        #FFFFFF;
+      --bg2:       #F5F7FF;
+      --bg3:       #EEF2FF;
+      --primary:   #1A3CFF;
+      --primary-h: #2d4fff;
+      --accent:    #10B981;
+      --accent-h:  #0ea372;
+      --text:      #0A0F2C;
+      --muted:     #525880;
+      --border:    rgba(10,15,44,0.10);
+      --card:      rgba(10,15,44,0.04);
+      --radius:    14px;
+      --shadow:    0 8px 40px rgba(0,0,0,0.10);
+    }
 
-  /* GANTT CELLS */
-  .bar { border-radius:4px; padding:4px 8px; font-size:10px; font-weight:700; color:#fff; text-align:center; white-space:nowrap; display:inline-block; min-width:60px; }
-  .bar-f { background:linear-gradient(90deg,#2e7d32,#43a047); }
-  .bar-g { background:linear-gradient(90deg,#b8860b,#d4a017); }
-  .bar-p { background:linear-gradient(90deg,#455a64,#78909c); }
-  .bar-blue { background:linear-gradient(90deg,#1565c0,#2196f3); }
-  .bar-orange { background:linear-gradient(90deg,#e65100,#ff6d00); }
-  .bar-teal { background:linear-gradient(90deg,#00695c,#26a69a); }
-  .bar-purple { background:linear-gradient(90deg,#4a148c,#7b1fa2); }
-  .bar-gray { background:linear-gradient(90deg,#455a64,#78909c); }
-  .bar-red { background:linear-gradient(90deg,#b71c1c,#e53935); }
+    html { scroll-behavior: smooth; }
 
-  .jalon { display:inline-flex; align-items:center; gap:3px; font-size:10px; font-weight:700; color:#fff; background:#e53935; border-radius:20px; padding:3px 8px; }
-  .jalon::before { content:"🔴"; font-size:9px; }
-  .jalon.g { background:var(--gold); }
-  .jalon.g::before { content:"🏅"; }
-  .jalon.p { background:#546e7a; }
-  .jalon.p::before { content:"💎"; }
-  .jalon.v { background:var(--green); }
-  .jalon.v::before { content:"✅"; }
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.65;
+      overflow-x: hidden;
+    }
 
-  .empty { background:#f5f5f5; border-radius:3px; height:22px; display:block; }
+    /* ── Texte justifié ────────────────────────────────────── */
+    /* .section-sub exclue du justify */
+    /* .pricing-desc exclue */
+    .pricing-footer-note,
+    .apropos-text p,
+    .service-card p,
+    .hero-desc {
+      text-align: justify;
+    }
 
-  /* KPI TABLE */
-  table.kpi { width:100%; border-collapse:collapse; }
-  table.kpi thead tr { background:var(--primary); color:#fff; }
-  table.kpi thead th { padding:9px 12px; font-size:11px; text-transform:uppercase; letter-spacing:0.4px; text-align:left; }
-  table.kpi tbody tr { border-bottom:1px solid var(--border); }
-  table.kpi tbody tr:hover { background:#f8fafc; }
-  table.kpi tbody td { padding:8px 12px; font-size:12px; vertical-align:middle; }
-  table.kpi tbody tr.cat-header td { background:#e8edf5; font-weight:800; font-size:11px; color:var(--primary); text-transform:uppercase; letter-spacing:0.5px; padding:6px 12px; }
 
-  .pill { display:inline-block; padding:2px 8px; border-radius:12px; font-size:10px; font-weight:700; }
-  .pill-r { background:#ffebee; color:#c62828; }
-  .pill-o { background:#fff3e0; color:#e65100; }
-  .pill-g { background:#e8f5e9; color:#2e7d32; }
-  .pill-b { background:#e3f2fd; color:#1565c0; }
+    a { color: inherit; text-decoration: none; }
+    img { display: block; max-width: 100%; }
 
-  /* MISSION VOLUMES */
-  .mission-box { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:16px; margin-bottom:20px; }
-  .mbox { background:var(--card); border-radius:10px; padding:16px 18px; border:1px solid var(--border); box-shadow:0 1px 4px rgba(0,0,0,.05); }
-  .mbox-title { font-size:11px; font-weight:800; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:10px; display:flex; align-items:center; gap:6px; }
-  .mbox-title.f { color:var(--freemium); }
-  .mbox-title.g { color:var(--gold); }
-  .mbox-title.p { color:#546e7a; }
-  .mbox-row { display:flex; justify-content:space-between; align-items:center; margin-bottom:4px; font-size:11px; }
-  .mbox-row span:last-child { font-weight:700; color:var(--primary); }
-  .mbox-divider { border-top:1px solid var(--border); margin:8px 0; }
+    .container {
+      width: 100%;
+      max-width: 1140px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
 
-  /* SCENARIO TABLE */
-  table.scenario { width:100%; border-collapse:collapse; }
-  table.scenario thead tr { background:#1a3c5e; color:#fff; }
-  table.scenario thead th { padding:10px 12px; font-size:11px; text-transform:uppercase; letter-spacing:0.4px; }
-  table.scenario tbody tr { border-bottom:1px solid var(--border); }
-  table.scenario tbody tr:hover { background:#f8fafc; }
-  table.scenario tbody td { padding:8px 12px; font-size:12px; }
-  table.scenario .highlight { background:#fff3cd; font-weight:700; }
+    /* ── Utility ────────────────────────────────────────────── */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 14px 28px;
+      border-radius: 50px;
+      font-weight: 700;
+      font-size: 0.95rem;
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s, background 0.2s;
+      border: none;
+    }
+    .btn-primary {
+      background: var(--primary);
+      color: #fff;
+      box-shadow: 0 4px 24px rgba(26,60,255,0.4);
+    }
+    .btn-primary:hover {
+      background: var(--primary-h);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 32px rgba(26,60,255,0.55);
+    }
+    .btn-accent {
+      background: var(--accent);
+      color: #fff;
+      box-shadow: 0 4px 24px rgba(16,185,129,0.35);
+    }
+    .btn-accent:hover {
+      background: var(--accent-h);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 32px rgba(16,185,129,0.5);
+    }
+    .btn-outline {
+      background: transparent;
+      color: var(--text);
+      border: 1.5px solid var(--border);
+    }
+    .btn-outline:hover {
+      border-color: var(--primary);
+      color: var(--primary);
+      transform: translateY(-2px);
+    }
+    .btn-linkedin {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 13px 26px;
+      border-radius: 50px;
+      font-weight: 700;
+      font-size: 0.93rem;
+      background: #0A66C2;
+      color: #fff;
+      box-shadow: 0 4px 20px rgba(10,102,194,0.35);
+      transition: transform 0.2s, box-shadow 0.2s;
+      border: none;
+    }
+    .btn-linkedin:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 28px rgba(10,102,194,0.5);
+    }
 
-  /* ANALYSIS */
-  .analysis-grid { display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:20px; }
-  @media(max-width:768px){ .analysis-grid { grid-template-columns:1fr; } }
-  .analysis-card { background:var(--card); border-radius:10px; padding:16px 18px; border:1px solid var(--border); box-shadow:0 1px 4px rgba(0,0,0,.05); }
-  .analysis-card h3 { font-size:13px; font-weight:800; color:var(--primary); margin-bottom:10px; display:flex; align-items:center; gap:6px; }
-  .analysis-card ul { list-style:none; }
-  .analysis-card ul li { font-size:12px; padding:4px 0; border-bottom:1px solid #f0f0f0; display:flex; gap:8px; }
-  .analysis-card ul li::before { content:"▸"; color:var(--secondary); flex-shrink:0; }
+    .tag {
+      display: inline-block;
+      padding: 4px 14px;
+      border-radius: 50px;
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      background: rgba(26,60,255,0.08);
+      color: var(--primary);
+      border: 1px solid rgba(26,60,255,0.2);
+      margin-bottom: 16px;
+    }
 
-  .title-section { font-size:16px; font-weight:800; color:var(--primary); margin:20px 0 12px; display:flex; align-items:center; gap:8px; }
-  .title-section::after { content:""; flex:1; height:2px; background:linear-gradient(90deg,var(--secondary),transparent); }
+    .section-label {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+    .section-label span {
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--accent);
+    }
+    .section-label::before {
+      content: '';
+      display: block;
+      width: 28px;
+      height: 2px;
+      background: var(--accent);
+      border-radius: 2px;
+    }
 
-  .footer-note { background:#fff; border-radius:8px; border:1px solid var(--border); padding:12px 16px; margin-top:20px; font-size:11px; color:var(--muted); line-height:1.7; }
-  .footer-note strong { color:var(--primary); }
-  .note-tag { display:inline-block; background:#e3f2fd; color:#1565c0; border-radius:4px; padding:1px 6px; font-size:10px; font-weight:700; margin-right:4px; }
+    h2.section-title {
+      font-size: clamp(1.75rem, 4vw, 2.6rem);
+      font-weight: 800;
+      line-height: 1.2;
+      margin-bottom: 14px;
+    }
+    p.section-sub {
+      font-size: 1.05rem;
+      color: var(--muted);
+      max-width: 540px;
+      margin-bottom: 48px;
+    }
 
-  .tag-month { font-size:9px; font-weight:700; color:var(--muted); display:block; text-align:center; }
+    /* ── Scroll animations ──────────────────────────────────── */
+    .reveal {
+      opacity: 0;
+      transform: translateY(32px);
+      transition: opacity 0.65s ease, transform 0.65s ease;
+    }
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .reveal-delay-1 { transition-delay: 0.1s; }
+    .reveal-delay-2 { transition-delay: 0.2s; }
+    .reveal-delay-3 { transition-delay: 0.3s; }
+    .reveal-delay-4 { transition-delay: 0.4s; }
 
-  .progress-bar-wrap { height:10px; background:#e0e0e0; border-radius:5px; overflow:hidden; }
-  .progress-bar { height:100%; border-radius:5px; }
-</style>
+    /* ── Header ─────────────────────────────────────────────── */
+    header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 100;
+      transition: background 0.3s, backdrop-filter 0.3s, border-color 0.3s;
+      border-bottom: 1px solid transparent;
+    }
+    header.scrolled {
+      background: rgba(255,255,255,0.92);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      border-color: var(--border);
+      box-shadow: 0 2px 24px rgba(10,15,44,0.08);
+    }
+    .header-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 70px;
+    }
+    .logo {
+      font-size: 1.3rem;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+    }
+    .logo span { color: var(--accent); }
+
+    nav { display: flex; align-items: center; gap: 4px; }
+    nav a {
+      padding: 7px 12px;
+      border-radius: 50px;
+      font-size: 0.84rem;
+      font-weight: 600;
+      color: var(--muted);
+      transition: color 0.2s, background 0.2s;
+      white-space: nowrap;
+    }
+    nav a:hover { color: var(--text); background: var(--card); }
+
+    .nav-cta {
+      padding: 8px 18px;
+      background: var(--primary);
+      color: #fff !important;
+      border-radius: 50px;
+      font-weight: 700;
+      font-size: 0.84rem;
+      box-shadow: 0 3px 16px rgba(26,60,255,0.4);
+      transition: transform 0.2s, box-shadow 0.2s !important;
+      white-space: nowrap;
+    }
+    .nav-cta:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 24px rgba(26,60,255,0.55) !important;
+      background: var(--primary) !important;
+    }
+
+    /* Hamburger */
+    .hamburger {
+      display: none;
+      flex-direction: column;
+      gap: 5px;
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 4px;
+    }
+    .hamburger span {
+      display: block;
+      width: 24px;
+      height: 2px;
+      background: var(--text);
+      border-radius: 2px;
+      transition: transform 0.3s, opacity 0.3s;
+    }
+    .hamburger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+    .hamburger.open span:nth-child(2) { opacity: 0; }
+    .hamburger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+    .mobile-menu {
+      display: none;
+      flex-direction: column;
+      gap: 4px;
+      padding: 16px 24px 20px;
+      background: rgba(255,255,255,0.98);
+      border-top: 1px solid var(--border);
+      box-shadow: 0 8px 24px rgba(10,15,44,0.08);
+    }
+    .mobile-menu.open { display: flex; }
+    .mobile-menu a {
+      padding: 12px 16px;
+      border-radius: var(--radius);
+      font-weight: 600;
+      color: var(--muted);
+      transition: color 0.2s, background 0.2s;
+    }
+    .mobile-menu a:hover { color: var(--text); background: var(--card); }
+
+    /* ── Hero ───────────────────────────────────────────────── */
+    #accueil {
+      position: relative;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      overflow: hidden;
+      padding: 90px 0 40px;
+    }
+    @media (max-width: 768px) {
+      #accueil {
+        min-height: auto;
+        padding: 90px 0 40px;
+      }
+    }
+
+    /* Animated background grid */
+    .hero-grid {
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(26,60,255,0.05) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(26,60,255,0.05) 1px, transparent 1px);
+      background-size: 60px 60px;
+      mask-image: radial-gradient(ellipse 80% 70% at 50% 40%, black 30%, transparent 100%);
+    }
+
+    /* Glow blobs */
+    .blob {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(100px);
+      pointer-events: none;
+    }
+    .blob-1 {
+      width: 600px; height: 600px;
+      background: rgba(26,60,255,0.08);
+      top: -200px; right: -150px;
+    }
+    .blob-2 {
+      width: 400px; height: 400px;
+      background: rgba(16,185,129,0.07);
+      bottom: -100px; left: -100px;
+    }
+
+    /* Hero 2-col layout */
+    .hero-layout {
+      position: relative;
+      display: grid;
+      grid-template-columns: 60% 40%;
+      gap: 40px;
+      align-items: center;
+      width: 100%;
+    }
+
+    .hero-content { position: relative; }
+
+    /* Hero photo */
+    .hero-photo-col {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    .hero-photo-wrapper {
+      position: relative;
+      display: inline-block;
+    }
+    .hero-photo-glow {
+      position: absolute;
+      top: 20%;
+      left: 10%;
+      right: 10%;
+      bottom: 0;
+      border-radius: 50%;
+      background: rgba(26,60,255,0.10);
+      filter: blur(60px);
+      z-index: 0;
+      animation: float 3s ease-in-out infinite;
+    }
+    .hero-photo {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      max-width: 380px;
+      border-radius: 0;
+      object-fit: contain;
+      object-position: center bottom;
+      animation: float 3s ease-in-out infinite;
+      filter: drop-shadow(0 20px 40px rgba(26,60,255,0.3));
+    }
+
+    /* ── Hero Carousel ─────────────────────────────────────────── */
+    .hero-carousel {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      max-width: 420px;
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: 0 24px 64px rgba(26,60,255,0.15), 0 8px 24px rgba(0,0,0,0.08);
+      aspect-ratio: 4/3;
+    }
+    .hero-carousel-track {
+      display: flex;
+      height: 100%;
+      transition: transform 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .hero-carousel-slide {
+      flex: 0 0 100%;
+      height: 100%;
+      overflow: hidden;
+    }
+    .hero-carousel-slide img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+    .hero-carousel-dots {
+      position: absolute;
+      bottom: 14px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 6px;
+      z-index: 2;
+    }
+    .hero-carousel-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.5);
+      transition: background 0.3s, width 0.3s;
+      cursor: pointer;
+    }
+    .hero-carousel-dot.active {
+      background: #fff;
+      width: 20px;
+      border-radius: 3px;
+    }
+    /* Caption overlay */
+    .hero-carousel-caption {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      padding: 28px 20px 40px;
+      background: linear-gradient(transparent, rgba(10,15,44,0.7));
+      color: #fff;
+      font-size: 0.82rem;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      z-index: 1;
+    }
+
+    /* ── Qualiopi Badge ────────────────────────────────────────── */
+    .qualiopi-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 5px 14px 5px 8px;
+      background: rgba(26,60,255,0.07);
+      border: 1px solid rgba(26,60,255,0.2);
+      border-radius: 50px;
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: var(--primary);
+      letter-spacing: 0.04em;
+      margin-top: 8px;
+    }
+    .qualiopi-badge svg { flex-shrink: 0; }
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-8px); }
+    }
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 16px;
+      background: rgba(16,185,129,0.08);
+      border: 1px solid rgba(16,185,129,0.25);
+      border-radius: 50px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--accent);
+      margin-bottom: 16px;
+    }
+    .hero-badge::before {
+      content: '';
+      width: 8px; height: 8px;
+      background: var(--accent);
+      border-radius: 50%;
+      animation: pulse 2s ease-in-out infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.5; transform: scale(0.8); }
+    }
+
+    .hero-title {
+      font-size: clamp(2.4rem, 5vw, 3.6rem);
+      font-weight: 800;
+      line-height: 1.1;
+      letter-spacing: -0.03em;
+      margin-bottom: 24px;
+    }
+    .hero-title .gradient {
+      background: linear-gradient(135deg, #1A3CFF 0%, #2d4fff 50%, #10B981 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .hero-desc {
+      font-size: 1.1rem;
+      color: var(--muted);
+      max-width: 520px;
+      margin-bottom: 28px;
+      line-height: 1.7;
+    }
+
+    .hero-actions { display: flex; gap: 14px; flex-wrap: wrap; margin-bottom: 28px; }
+
+    .hero-stats {
+      display: flex;
+      gap: 32px;
+      flex-wrap: wrap;
+    }
+    .hero-stat {
+      display: flex;
+      flex-direction: column;
+    }
+    .hero-stat strong {
+      font-size: 1.9rem;
+      font-weight: 800;
+      color: var(--accent);
+      letter-spacing: -0.03em;
+    }
+    .hero-stat span {
+      font-size: 0.82rem;
+      color: var(--muted);
+      font-weight: 500;
+    }
+
+    /* ── Services ───────────────────────────────────────────── */
+    #services {
+      padding: 50px 0;
+      background: var(--bg2);
+      position: relative;
+    }
+    #services::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--border), transparent);
+    }
+
+    .services-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 28px;
+    }
+
+    .service-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 44px 40px;
+      position: relative;
+      overflow: hidden;
+      transition: border-color 0.3s, transform 0.3s, box-shadow 0.3s;
+      cursor: default;
+    }
+    .service-card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(26,60,255,0.06) 0%, transparent 60%);
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+    .service-card:hover {
+      border-color: rgba(26,60,255,0.3);
+      transform: translateY(-6px);
+      box-shadow: 0 20px 50px rgba(10,15,44,0.10), 0 0 0 1px rgba(26,60,255,0.08);
+    }
+    .service-card:hover::before { opacity: 1; }
+
+    .service-icon {
+      width: 64px; height: 64px;
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.8rem;
+      margin-bottom: 24px;
+    }
+    .service-icon.blue { background: rgba(26,60,255,0.15); }
+    .service-icon.green { background: rgba(16,185,129,0.15); }
+
+    .service-card h3 {
+      font-size: 1.3rem;
+      font-weight: 700;
+      margin-bottom: 14px;
+      line-height: 1.3;
+    }
+    .service-card p {
+      font-size: 0.95rem;
+      color: var(--muted);
+      line-height: 1.7;
+      margin-bottom: 24px;
+    }
+    .service-features {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-bottom: 28px;
+    }
+    .service-features li {
+      font-size: 0.9rem;
+      color: var(--muted);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .service-features li::before {
+      content: '';
+      width: 6px; height: 6px;
+      background: var(--accent);
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+    .service-badge {
+      display: inline-block;
+      padding: 5px 14px;
+      border-radius: 50px;
+      font-size: 0.78rem;
+      font-weight: 700;
+      background: rgba(16,185,129,0.1);
+      color: var(--accent);
+      border: 1px solid rgba(16,185,129,0.25);
+    }
+
+    /* ── À propos ───────────────────────────────────────────── */
+    #apropos {
+      padding: 50px 0;
+      position: relative;
+    }
+    #apropos::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--border), transparent);
+    }
+
+    .apropos-layout {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 72px;
+      align-items: start;
+    }
+
+    .apropos-text h2 {
+      font-size: clamp(1.75rem, 3.5vw, 2.4rem);
+      font-weight: 800;
+      line-height: 1.2;
+      margin-bottom: 28px;
+    }
+    .apropos-text p {
+      font-size: 0.97rem;
+      color: var(--muted);
+      line-height: 1.8;
+      margin-bottom: 18px;
+    }
+    .apropos-text p strong {
+      color: var(--text);
+      font-weight: 700;
+    }
+    .apropos-text .apropos-cta {
+      margin-top: 36px;
+    }
+
+    .apropos-realisations {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+    .realisation-item {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 18px 22px;
+      transition: border-color 0.3s, transform 0.3s;
+    }
+    .realisation-item:hover {
+      border-color: rgba(16,185,129,0.3);
+      transform: translateX(4px);
+    }
+    .realisation-icon {
+      font-size: 1.4rem;
+      flex-shrink: 0;
+      width: 40px;
+      text-align: center;
+    }
+    .realisation-text {
+      font-size: 0.93rem;
+      font-weight: 600;
+      color: var(--text);
+    }
+    .realisation-text span {
+      display: block;
+      font-size: 0.82rem;
+      font-weight: 400;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+
+    /* ── Chiffres ───────────────────────────────────────────── */
+    #chiffres {
+      padding: 50px 0;
+      position: relative;
+      overflow: hidden;
+      background: var(--bg2);
+    }
+    #chiffres::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--border), transparent);
+    }
+    .chiffres-bg {
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse 70% 80% at 50% 50%, rgba(26,60,255,0.07) 0%, transparent 70%);
+    }
+    .chiffres-grid {
+      position: relative;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 2px;
+      background: var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+      border: 1px solid var(--border);
+    }
+    .chiffre-item {
+      background: var(--bg);
+      padding: 48px 32px;
+      text-align: center;
+    }
+    .chiffre-num {
+      font-size: clamp(2.5rem, 5vw, 3.5rem);
+      font-weight: 800;
+      letter-spacing: -0.04em;
+      line-height: 1;
+      margin-bottom: 8px;
+      background: linear-gradient(135deg, var(--text), var(--muted));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .chiffre-num.accent {
+      background: linear-gradient(135deg, var(--accent), #34d399);
+      -webkit-background-clip: text;
+      background-clip: text;
+    }
+    .chiffre-label {
+      font-size: 0.88rem;
+      font-weight: 600;
+      color: var(--muted);
+      line-height: 1.4;
+    }
+
+    /* ── Témoignages ────────────────────────────────────────── */
+    #temoignages {
+      padding: 50px 0;
+      position: relative;
+    }
+    #temoignages::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--border), transparent);
+    }
+
+    .temoignages-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+    }
+
+    .temoignage-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 32px;
+      position: relative;
+      transition: border-color 0.3s, transform 0.3s;
+    }
+    .temoignage-card:hover {
+      border-color: rgba(16,185,129,0.3);
+      transform: translateY(-4px);
+    }
+
+    .quote-icon {
+      font-size: 3rem;
+      line-height: 1;
+      color: var(--accent);
+      opacity: 0.3;
+      font-family: Georgia, serif;
+      margin-bottom: 4px;
+    }
+
+    .temoignage-text {
+      font-size: 0.95rem;
+      color: var(--muted);
+      line-height: 1.75;
+      margin-bottom: 24px;
+      font-style: italic;
+    }
+
+    .stars {
+      display: flex;
+      gap: 3px;
+      margin-bottom: 20px;
+    }
+    .star { color: #f59e0b; font-size: 0.9rem; }
+
+    .temoignage-author {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+    .author-avatar {
+      width: 46px; height: 46px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 1rem;
+      flex-shrink: 0;
+      border: 2px solid var(--border);
+    }
+    .author-info strong {
+      display: block;
+      font-size: 0.95rem;
+      font-weight: 700;
+    }
+    .author-info span {
+      font-size: 0.82rem;
+      color: var(--muted);
+    }
+
+    /* ── Blog ───────────────────────────────────────────────── */
+    #blog {
+      padding: 50px 0;
+      background: var(--bg2);
+      position: relative;
+    }
+    #blog::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--border), transparent);
+    }
+
+    .blog-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 24px;
+    }
+
+    .blog-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+      transition: border-color 0.3s, transform 0.3s, box-shadow 0.3s;
+      display: flex;
+      flex-direction: column;
+    }
+    .blog-card:hover {
+      border-color: rgba(26,60,255,0.3);
+      transform: translateY(-5px);
+      box-shadow: 0 16px 48px rgba(0,0,0,0.35);
+    }
+
+    .blog-thumbnail {
+      height: 200px;
+      position: relative;
+      overflow: hidden;
+    }
+    .blog-thumbnail img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      transition: transform 0.4s ease;
+    }
+    .blog-card:hover .blog-thumbnail img {
+      transform: scale(1.04);
+    }
+    .blog-thumbnail-overlay {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 60%;
+      background: linear-gradient(to top, rgba(10,15,44,0.85) 0%, transparent 100%);
+      pointer-events: none;
+    }
+
+    .blog-body {
+      padding: 28px 28px 24px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .blog-meta {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+    .blog-cat {
+      font-size: 0.74rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--accent);
+    }
+    .blog-date {
+      font-size: 0.8rem;
+      color: var(--muted);
+    }
+
+    .blog-card h3 {
+      font-size: 1.08rem;
+      font-weight: 700;
+      line-height: 1.35;
+      margin-bottom: 10px;
+    }
+    .blog-card p {
+      font-size: 0.88rem;
+      color: var(--muted);
+      line-height: 1.7;
+      flex: 1;
+      margin-bottom: 20px;
+    }
+    .btn-blog {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--primary);
+      transition: gap 0.2s;
+    }
+    .btn-blog:hover { gap: 10px; }
+    .btn-blog svg { transition: transform 0.2s; }
+    .btn-blog:hover svg { transform: translateX(3px); }
+
+    /* ── Contact ────────────────────────────────────────────── */
+    #contact {
+      padding: 50px 0;
+      position: relative;
+    }
+    #contact::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--border), transparent);
+    }
+
+    .contact-wrapper {
+      display: grid;
+      grid-template-columns: 1fr 1.4fr;
+      gap: 40px;
+      align-items: start;
+    }
+
+    .contact-info h2 { margin-bottom: 16px; }
+    .contact-info p {
+      font-size: 1rem;
+      color: var(--muted);
+      line-height: 1.7;
+      margin-bottom: 40px;
+    }
+
+    .contact-items {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+    .contact-item {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+    .contact-item-icon {
+      width: 44px; height: 44px;
+      border-radius: 12px;
+      background: rgba(26,60,255,0.12);
+      border: 1px solid rgba(26,60,255,0.2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.1rem;
+      flex-shrink: 0;
+    }
+    .contact-item-text strong {
+      display: block;
+      font-size: 0.88rem;
+      font-weight: 600;
+      margin-bottom: 2px;
+    }
+    .contact-item-text span {
+      font-size: 0.85rem;
+      color: var(--muted);
+    }
+    .contact-item-text a {
+      font-size: 0.85rem;
+      color: var(--accent);
+      transition: opacity 0.2s;
+    }
+    .contact-item-text a:hover { opacity: 0.8; }
+
+    /* Form */
+    .contact-form {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 40px;
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+      margin-bottom: 18px;
+    }
+    .form-group:last-of-type { margin-bottom: 0; }
+
+    .form-group label {
+      font-size: 0.83rem;
+      font-weight: 600;
+      color: var(--muted);
+      letter-spacing: 0.02em;
+    }
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 13px 16px;
+      color: var(--text);
+      font-family: inherit;
+      font-size: 0.93rem;
+      transition: border-color 0.2s, box-shadow 0.2s;
+      outline: none;
+      width: 100%;
+    }
+    .form-group input::placeholder,
+    .form-group textarea::placeholder { color: rgba(138,145,180,0.5); }
+    .form-group input:focus,
+    .form-group select:focus,
+    .form-group textarea:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(26,60,255,0.15);
+    }
+    .form-group textarea { resize: vertical; min-height: 130px; }
+    .form-group select option { background: var(--bg2); }
+
+    .form-submit {
+      margin-top: 24px;
+      width: 100%;
+      justify-content: center;
+      font-size: 1rem;
+      padding: 16px;
+    }
+
+    .form-note {
+      text-align: center;
+      margin-top: 14px;
+      font-size: 0.78rem;
+      color: var(--muted);
+    }
+    .form-success {
+      display: none;
+      text-align: center;
+      padding: 20px;
+      background: rgba(16,185,129,0.1);
+      border: 1px solid rgba(16,185,129,0.3);
+      border-radius: 10px;
+      color: var(--accent);
+      font-weight: 600;
+      margin-top: 16px;
+    }
+
+    /* ── Footer ─────────────────────────────────────────────── */
+    footer {
+      padding: 48px 0;
+      border-top: 1px solid var(--border);
+    }
+    .footer-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 20px;
+    }
+    .footer-logo {
+      font-size: 1.1rem;
+      font-weight: 800;
+    }
+    .footer-logo span { color: var(--accent); }
+
+    .footer-center {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .footer-links {
+      display: flex;
+      gap: 24px;
+      flex-wrap: wrap;
+    }
+    .footer-links a {
+      font-size: 0.85rem;
+      color: var(--muted);
+      transition: color 0.2s;
+    }
+    .footer-links a:hover { color: var(--text); }
+
+    .footer-linkedin {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.82rem;
+      color: var(--muted);
+      transition: color 0.2s;
+    }
+    .footer-linkedin:hover { color: #0A66C2; }
+    .footer-linkedin svg { flex-shrink: 0; }
+
+    .footer-right {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 6px;
+    }
+    .footer-copy {
+      font-size: 0.82rem;
+      color: var(--muted);
+    }
+    .footer-tagline {
+      font-size: 0.75rem;
+      color: rgba(138,145,180,0.5);
+    }
+
+    /* ── Progress bar ───────────────────────────────────────── */
+    #progress-bar {
+      position: fixed;
+      top: 0; left: 0;
+      height: 2px;
+      background: linear-gradient(90deg, var(--primary), var(--accent));
+      z-index: 200;
+      width: 0%;
+      transition: width 0.1s linear;
+    }
+
+    /* ── Back to top ────────────────────────────────────────── */
+    #back-top {
+      position: fixed;
+      bottom: 32px;
+      right: 32px;
+      width: 46px; height: 46px;
+      background: var(--primary);
+      border: none;
+      border-radius: 50%;
+      color: #fff;
+      font-size: 1.1rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      transform: translateY(10px);
+      transition: opacity 0.3s, transform 0.3s, box-shadow 0.2s;
+      box-shadow: 0 4px 20px rgba(26,60,255,0.4);
+      z-index: 90;
+    }
+    #back-top.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    #back-top:hover { box-shadow: 0 8px 32px rgba(26,60,255,0.6); }
+
+    /* ── Responsive ─────────────────────────────────────────── */
+    @media (max-width: 1024px) {
+      .hero-layout { grid-template-columns: 1fr; gap: 0; }
+      .hero-photo-col { display: none; }
+      .chiffres-grid { grid-template-columns: repeat(2, 1fr); }
+      .apropos-layout { grid-template-columns: 1fr; gap: 48px; }
+    }
+
+    @media (max-width: 768px) {
+      nav { display: none; }
+      .hamburger { display: flex; }
+
+      .hero-layout { grid-template-columns: 1fr; }
+      .hero-photo-col {
+        display: flex;
+        justify-content: center;
+        order: -1;
+        margin-bottom: 16px;
+      }
+      .hero-photo {
+        max-width: 160px;
+        margin: 0 auto;
+        border-radius: 50%;
+        object-fit: cover;
+        object-position: center top;
+        width: 160px;
+        height: 160px;
+      }
+      .hero-photo-glow { display: none; }
+      .hero-title { font-size: 1.8rem; }
+      .hero-stats { gap: 20px; }
+      .hero-badge { margin-bottom: 16px; }
+      .hero-desc { font-size: 0.95rem; margin-bottom: 24px; }
+      .hero-actions { margin-bottom: 32px; }
+
+      /* Sections padding mobile */
+      #services, #apropos, #chiffres, #temoignages, #blog, #contact { padding: 60px 0; }
+
+      /* Stats banner mobile */
+      [style*="gap:40px"] { 
+        flex-direction: column !important; 
+        gap: 16px !important; 
+        align-items: flex-start !important;
+        padding-left: 16px !important;
+      }
+      [style*="width:1px;height:28px"] { display: none !important; }
+
+      /* Coaching section stack */
+      [style*="grid-template-columns:1fr 1fr"] { 
+        grid-template-columns: 1fr !important; 
+        gap: 32px !important;
+      }
+
+      /* Comment ça marche - 2 columns on tablet */
+      #methode [style*="grid-template-columns:repeat(4"] {
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 20px !important;
+      }
+      #methode [style*="position:absolute;top:48px"] { display: none !important; }
+
+      .services-grid { grid-template-columns: 1fr; }
+      .chiffres-grid { grid-template-columns: repeat(2, 1fr); }
+      .temoignages-grid { grid-template-columns: 1fr; }
+      .blog-grid { grid-template-columns: 1fr; }
+      .contact-wrapper { grid-template-columns: 1fr; gap: 40px; }
+      .form-row { grid-template-columns: 1fr; }
+      .footer-inner { flex-direction: column; align-items: flex-start; }
+      .footer-right { align-items: flex-start; }
+      .apropos-layout { grid-template-columns: 1fr; gap: 40px; }
+    }
+
+    @media (max-width: 1024px) {
+      #methode [style*="grid-template-columns:repeat(4"] {
+        grid-template-columns: repeat(2, 1fr) !important;
+      }
+      #methode [style*="position:absolute;top:48px"] {
+        display: none !important;
+      }
+    }
+
+
+      }
+    }
+
+
+
+    /* ── Pricing compact mobile ────────────────────────────── */
+    @media (max-width: 768px) {
+      .pricing-grid {
+        grid-template-columns: 1fr !important;
+        gap: 16px !important;
+      }
+      .pricing-card {
+        padding: 24px 20px !important;
+      }
+      .pricing-card .pricing-icon {
+        font-size: 1.4rem !important;
+        margin-bottom: 8px !important;
+      }
+      .pricing-card .pricing-name {
+        font-size: 1.1rem !important;
+        margin-bottom: 6px !important;
+      }
+      .pricing-card .pricing-desc {
+        display: none !important;
+      }
+      .pricing-card .pricing-price {
+        font-size: 2rem !important;
+        margin: 12px 0 6px !important;
+      }
+      .pricing-card .pricing-price-note {
+        font-size: 0.72rem !important;
+        margin-bottom: 12px !important;
+      }
+      .pricing-card .pricing-features {
+        margin-bottom: 16px !important;
+      }
+      .pricing-card .pricing-features li {
+        font-size: 0.85rem !important;
+        padding: 6px 0 !important;
+      }
+      .pricing-card .pricing-cta,
+      .pricing-card .pricing-cta-outline {
+        padding: 12px 20px !important;
+        font-size: 0.88rem !important;
+      }
+      .pricing-card.featured {
+        transform: scale(1) !important;
+      }
+    }
+
+    @media (max-width: 480px) {
+      #methode [style*="grid-template-columns:repeat(4"] {
+        grid-template-columns: 1fr !important;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .chiffres-grid { grid-template-columns: 1fr; }
+      .hero-actions { flex-direction: column; }
+      .hero-actions .btn { width: 100%; justify-content: center; }
+      .contact-form { padding: 24px; }
+      .hero-photo {
+        max-width: 140px !important;
+        width: 140px !important;
+        height: 140px !important;
+      }
+      .hero-title { font-size: 1.6rem !important; }
+      #services, #apropos, #chiffres, #temoignages, #blog, #contact { padding: 48px 0 !important; }
+      #methode [style*="grid-template-columns:repeat(4"], 
+      #methode [style*="grid-template-columns:repeat(2"] { 
+        grid-template-columns: 1fr !important; 
+      }
+      .pricing-card.featured { transform: scale(1) !important; }
+      .pricing-card.featured:hover { transform: translateY(-6px) !important; }
+      .article-cta, .versus-box { padding: 28px 20px !important; }
+    }
+
+    /* ── Pricing ─────────────────────────────────────────── */
+    .pricing-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+      align-items: stretch;
+    }
+    .pricing-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 40px 32px 36px;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      transition: border-color 0.3s, transform 0.3s, box-shadow 0.3s;
+    }
+    .pricing-card:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 20px 50px rgba(0,0,0,0.4);
+    }
+    .pricing-card.featured {
+      border: 2px solid var(--primary);
+      background: linear-gradient(165deg, rgba(26,60,255,0.08) 0%, var(--card) 40%);
+      transform: scale(1.04);
+      z-index: 2;
+    }
+    .pricing-card.featured:hover {
+      transform: scale(1.04) translateY(-6px);
+      box-shadow: 0 24px 60px rgba(26,60,255,0.25);
+    }
+    .pricing-badge {
+      position: absolute;
+      top: -14px;
+      left: 50%;
+      transform: translateX(-50%);
+      padding: 6px 20px;
+      border-radius: 50px;
+      font-size: 0.75rem;
+      font-weight: 800;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      background: var(--primary);
+      color: #fff;
+      box-shadow: 0 4px 16px rgba(26,60,255,0.4);
+      white-space: nowrap;
+    }
+    .pricing-icon {
+      font-size: 2rem;
+      margin-bottom: 16px;
+    }
+    .pricing-name {
+      font-size: 1.3rem;
+      font-weight: 800;
+      margin-bottom: 6px;
+    }
+    .pricing-desc {
+      font-size: 0.88rem;
+      color: var(--muted);
+      line-height: 1.6;
+      margin-bottom: 24px;
+    }
+    .pricing-price {
+      font-size: 2.4rem;
+      font-weight: 800;
+      color: var(--accent);
+      letter-spacing: -0.03em;
+      margin-bottom: 4px;
+    }
+    .pricing-price-note {
+      font-size: 0.78rem;
+      color: var(--muted);
+      margin-bottom: 28px;
+      line-height: 1.5;
+    }
+    .pricing-features {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-bottom: 32px;
+      flex: 1;
+    }
+    .pricing-features li {
+      font-size: 0.9rem;
+      color: var(--muted);
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      line-height: 1.5;
+    }
+    .pricing-features li::before {
+      content: '✓';
+      color: var(--accent);
+      font-weight: 800;
+      font-size: 0.85rem;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+    .pricing-cta {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 14px 24px;
+      border-radius: 50px;
+      font-weight: 700;
+      font-size: 0.95rem;
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s;
+      text-decoration: none;
+      border: none;
+      text-align: center;
+    }
+    .pricing-cta-primary {
+      background: var(--primary);
+      color: #fff;
+      box-shadow: 0 4px 24px rgba(26,60,255,0.4);
+    }
+    .pricing-cta-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 32px rgba(26,60,255,0.55);
+    }
+    .pricing-cta-outline {
+      background: transparent;
+      color: var(--text);
+      border: 1.5px solid var(--border);
+    }
+    .pricing-cta-outline:hover {
+      border-color: var(--primary);
+      color: var(--primary);
+      transform: translateY(-2px);
+    }
+    .pricing-footer-note {
+      text-align: center;
+      margin-top: 32px;
+      font-size: 0.82rem;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    @media (max-width: 1024px) {
+      .pricing-grid { grid-template-columns: 1fr; max-width: 480px; margin: 0 auto; }
+      .pricing-card.featured { transform: scale(1); }
+      .pricing-card.featured:hover { transform: translateY(-6px); }
+    }
+  </style>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-SZG9XPNNNC"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-SZG9XPNNNC');
+  gtag('config', 'AW-18076082295');
+</script>
 </head>
 <body>
 
-<!-- ===================== HEADER ===================== -->
-<div class="header">
-  <div class="header-top">
-    <div>
-      <h1>🧹 <span>CLINDIT</span> — Gantt Stratégique 2026</h1>
-      <p>Plateforme B2B Nettoyage Professionnel · Strasbourg · Lancement offres Freemium / Gold / Platinum</p>
+  <!-- Progress bar -->
+  <div id="progress-bar"></div>
+
+  <!-- Back to top -->
+  <button id="back-top" aria-label="Retour en haut">
+    <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+      <path d="M5 15l7-7 7 7"/>
+    </svg>
+  </button>
+
+  <!-- ── Header ───────────────────────────────────────────────── -->
+  <header id="header">
+    <div class="container">
+      <div class="header-inner">
+        <a href="#accueil" class="logo">IA<span>-</span>Entrepreneur</a>
+        <nav>
+          <a href="#accueil">Accueil</a>
+          <a href="#services">Création d'entreprise</a>
+          <a href="/formations-entreprises.html">Formations entreprises</a>
+          <a href="#apropos">À propos</a>
+          <a href="#blog">Blog</a>
+          <a href="mailto:contact@ia-entrepreneur.fr" style="display:flex;align-items:center;gap:5px;"><svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,12 2,6"/></svg>contact@ia-entrepreneur.fr</a>
+          <a href="https://calendly.com/gabriel-ia-entrepreneur/decouverte" target="_blank" rel="noopener noreferrer" class="nav-cta" style="background:var(--accent);box-shadow:0 3px 16px rgba(16,185,129,0.35);">Appel gratuit</a>
+        </nav>
+        <button class="hamburger" id="hamburger" aria-label="Menu">
+          <span></span><span></span><span></span>
+        </button>
+      </div>
     </div>
-    <div style="text-align:right;font-size:11px;opacity:.8;">
-      <div>📅 Horizon : Jan → Déc 2026</div>
-      <div>🎯 Jalon critique : <strong style="color:#ffd54f;">30 abonnés Gold+Platinum au 31/07/2026</strong></div>
-      <div>💰 Budget total : ~85 600 € | Marché FR : 17 Md€</div>
+    <div class="mobile-menu" id="mobile-menu">
+      <a href="#accueil">Accueil</a>
+      <a href="#services">Création d'entreprise</a>
+      <a href="/formations-entreprises.html">Formations entreprises</a>
+      <a href="#apropos">À propos</a>
+      <a href="#blog">Blog</a>
+      <a href="mailto:contact@ia-entrepreneur.fr">✉️ contact@ia-entrepreneur.fr</a>
+      <a href="#contact">Me contacter</a>
+      <a href="https://calendly.com/gabriel-ia-entrepreneur/decouverte" target="_blank" rel="noopener noreferrer" style="background:var(--accent);color:#fff;text-align:center;border-radius:var(--radius);margin-top:8px;padding:14px;">Réserver un appel gratuit</a>
     </div>
-  </div>
-  <div class="badge-row">
-    <span class="badge badge-f">🌱 FREEMIUM — 1 mission/jour</span>
-    <span class="badge badge-g">🏅 GOLD — 5 missions/jour</span>
-    <span class="badge badge-p">💎 PLATINUM — 10 missions/jour</span>
-    <span class="badge badge-obj">Scénario pessimiste · 30 abonnés payants cumulés au 31/07</span>
-  </div>
-</div>
-
-<!-- ===================== TABS ===================== -->
-<div class="tabs">
-  <div class="tab active" onclick="showTab('trimestriel')">📅 Vue Trimestrielle</div>
-  <div class="tab" onclick="showTab('annuel')">📆 Vue Annuelle</div>
-  <div class="tab" onclick="showTab('kpis')">📊 KPIs & Jalons</div>
-  <div class="tab" onclick="showTab('missions')">⚡ Volume Missions</div>
-  <div class="tab" onclick="showTab('analyse')">🔍 Analyse Experte</div>
-</div>
-
-<!-- ============================================================ -->
-<!--  VUE TRIMESTRIELLE                                          -->
-<!-- ============================================================ -->
-<div id="tab-trimestriel" class="section active">
-<div class="container">
-
-  <div class="cards-row">
-    <div class="card blue"><div class="card-label">Budget T1</div><div class="card-value">26 175 €</div><div class="card-sub">Jan – Mar 2026 · Fondation</div></div>
-    <div class="card" style="border-top:3px solid #e65100;"><div class="card-label">Budget T2</div><div class="card-value">21 675 €</div><div class="card-sub">Avr – Juin 2026 · Accélération</div></div>
-    <div class="card green"><div class="card-label">Budget T3</div><div class="card-value">18 175 €</div><div class="card-sub">Juil – Sep 2026 · 🎯 Jalon 30 abonnés</div></div>
-    <div class="card" style="border-top:3px solid #880e4f;"><div class="card-label">Budget T4</div><div class="card-value">15 575 €</div><div class="card-sub">Oct – Déc 2026 · Consolidation</div></div>
-    <div class="card gold"><div class="card-label">Objectif 31/07</div><div class="card-value">30+</div><div class="card-sub">abonnés Gold + Platinum</div></div>
-    <div class="card plat"><div class="card-label">Budget Total</div><div class="card-value">85 600 €</div><div class="card-sub">12 axes stratégiques</div></div>
-  </div>
-
-  <div class="legend">
-    <span style="font-size:11px;font-weight:700;color:var(--primary);">Légende :</span>
-    <span class="legend-item"><span class="legend-dot" style="background:#2e7d32;"></span>Freemium (recrutement / activation)</span>
-    <span class="legend-item"><span class="legend-dot" style="background:#d4a017;"></span>Gold (conversion / upsell)</span>
-    <span class="legend-item"><span class="legend-dot" style="background:#546e7a;"></span>Platinum (grands comptes)</span>
-    <span class="legend-item"><span class="legend-dot" style="background:#1565c0;"></span>Digital / SEO / SEA</span>
-    <span class="legend-item"><span class="legend-dot" style="background:#e65100;"></span>Commercial terrain</span>
-    <span class="legend-item"><span class="legend-dot" style="background:#7b1fa2;"></span>Partenariats</span>
-    <span class="legend-item"><span class="legend-dot" style="background:#e53935;"></span>🔴 Jalon critique</span>
-  </div>
-
-  <div class="gantt-wrap">
-  <table class="gantt">
-    <thead>
-      <tr>
-        <th class="left" style="width:230px;">Tâche / Mission</th>
-        <th style="width:110px;">Responsable</th>
-        <th style="width:70px;">Priorité</th>
-        <th class="t1" style="width:150px;" colspan="3">T1 — Jan / Fév / Mar</th>
-        <th class="t2" style="width:150px;" colspan="3">T2 — Avr / Mai / Juin</th>
-        <th class="t3" style="width:150px;" colspan="3">T3 — Juil / Aoû / Sep</th>
-        <th class="t4" style="width:150px;" colspan="3">T4 — Oct / Nov / Déc</th>
-        <th style="width:100px;">KPI cible</th>
-      </tr>
-      <tr>
-        <th class="left"></th><th></th><th></th>
-        <th class="t1"><span class="tag-month">Jan</span></th><th class="t1"><span class="tag-month">Fév</span></th><th class="t1"><span class="tag-month">Mar</span></th>
-        <th class="t2"><span class="tag-month">Avr</span></th><th class="t2"><span class="tag-month">Mai</span></th><th class="t2"><span class="tag-month">Juin</span></th>
-        <th class="t3"><span class="tag-month">Juil</span></th><th class="t3"><span class="tag-month">Aoû</span></th><th class="t3"><span class="tag-month">Sep</span></th>
-        <th class="t4"><span class="tag-month">Oct</span></th><th class="t4"><span class="tag-month">Nov</span></th><th class="t4"><span class="tag-month">Déc</span></th>
-        <th></th>
-      </tr>
-    </thead>
-    <tbody>
-
-      <!-- === AXE 0 : FONDATION PRODUIT === -->
-      <tr class="section-header"><td colspan="18">⚙️ AXE 0 — FONDATION PRODUIT & PLATEFORME</td></tr>
-
-      <tr>
-        <td class="task-name">🛠 Finalisation offres Freemium/Gold/Platinum sur la plateforme</td>
-        <td class="resp">CTO + CEO</td>
-        <td class="center"><span class="pill pill-r">Critique</span></td>
-        <td class="center"><span class="bar bar-blue">Dev</span></td>
-        <td class="center"><span class="bar bar-blue">Dev</span></td>
-        <td class="center"><span class="jalon">V1 LIVE</span></td>
-        <td class="center"></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
-        <td class="center"><span class="jalon v">Déployé</span></td>
-        <td class="center" style="font-size:11px;">Plateforme opérationnelle à J+60</td>
-      </tr>
-
-      <tr>
-        <td class="task-name">💻 Refonte landing pages (BTP, Conciergerie, PME)</td>
-        <td class="resp">CM + Dev Web</td>
-        <td class="center"><span class="pill pill-r">Critique</span></td>
-        <td class="center"><span class="bar bar-blue">Maquette</span></td>
-        <td class="center"><span class="bar bar-blue">Dev</span></td>
-        <td class="center"><span class="jalon v">Go live</span></td>
-        <td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
-        <td class="center" style="font-size:11px;">+25% conversion · 3 pages sectorielles</td>
-      </tr>
-
-      <tr>
-        <td class="task-name">🔔 Mise en place CRM + outils stack complète</td>
-        <td class="resp">Ops / Fondateur</td>
-        <td class="center"><span class="pill pill-o">Haute</span></td>
-        <td class="center"><span class="bar bar-teal">Config</span></td>
-        <td class="center"><span class="bar bar-teal">Déploiement</span></td>
-        <td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
-        <td class="center" style="font-size:11px;">Stack opérationnelle M2</td>
-      </tr>
-
-      <!-- === AXE 1 : FREEMIUM === -->
-      <tr class="section-header"><td colspan="18">🌱 AXE 1 — FREEMIUM : RECRUTEMENT & ACTIVATION (1 mission/j)</td></tr>
-
-      <tr>
-        <td class="task-name">📣 Campagnes Meta Ads recrutement nettoyeurs</td>
-        <td class="resp">Community Mgr</td>
-        <td class="center"><span class="pill pill-r">Critique</span></td>
-        <td class="center"><span class="bar bar-f">300€/m</span></td>
-        <td class="center"><span class="bar bar-f">300€/m</span></td>
-        <td class="center"><span class="bar bar-f">300€/m</span></td>
-        <td class="center"><span class="bar bar-f">300€/m</span></td>
-        <td class="center"><span class="bar bar-f">300€/m</span></td>
-        <td class="center"><span class="bar bar-f">300€/m</span></td>
-        <td class="center"><span class="bar bar-f">300€/m</span></td>
-        <td class="center"><span class="bar bar-f">300€/m</span></td>
-        <td class="center"><span class="bar bar-f">300€/m</span></td>
-        <td class="center"><span class="bar bar-f">300€/m</span></td>
-        <td class="center"><span class="bar bar-f">300€/m</span></td>
-        <td class="center"><span class="bar bar-f">300€/m</span></td>
-        <td class="center" style="font-size:11px;">100 nettoyeurs actifs</td>
-      </tr>
-
-      <tr>
-        <td class="task-name">📍 Flyers terrain (Strasbourg, Metz, Nancy, Mulhouse)</td>
-        <td class="resp">Commercial</td>
-        <td class="center"><span class="pill pill-o">Haute</span></td>
-        <td class="center"><span class="bar bar-f">Déploiement</span></td>
-        <td></td>
-        <td class="center"><span class="jalon v">+25 inscrits</span></td>
-        <td></td>
-        <td class="center"><span class="bar bar-f">Vague 2</span></td>
-        <td></td><td></td>
-        <td class="center"><span class="bar bar-f">Vague 3</span></td>
-        <td></td><td></td>
-        <td class="center"><span class="bar bar-f">Vague 4</span></td>
-        <td></td>
-        <td class="center" style="font-size:11px;">150 €/vague × 4 vagues</td>
-      </tr>
-
-      <tr>
-        <td class="task-name">🎓 Partenariats centres de formation nettoyage</td>
-        <td class="resp">CEO / Commercial</td>
-        <td class="center"><span class="pill pill-o">Haute</span></td>
-        <td class="center"><span class="bar bar-f">Prospection</span></td>
-        <td class="center"><span class="bar bar-f">Négociation</span></td>
-        <td class="center"><span class="jalon v">2 conventions</span></td>
-        <td></td><td></td><td></td>
-        <td class="center"><span class="jalon v">Bilan H1</span></td>
-        <td></td><td></td><td></td><td></td><td></td>
-        <td class="center" style="font-size:11px;">2 conventions signées · 40 profils/an</td>
-      </tr>
-
-      <tr>
-        <td class="task-name">🔁 Programme parrainage nettoyeurs (50€/parrainage)</td>
-        <td class="resp">Ops / CM</td>
-        <td class="center"><span class="pill pill-o">Haute</span></td>
-        <td></td>
-        <td class="center"><span class="bar bar-f">Lancement</span></td>
-        <td class="center"><span class="bar bar-f">Actif</span></td>
-        <td class="center"><span class="bar bar-f">Actif</span></td>
-        <td class="center"><span class="bar bar-f">Actif</span></td>
-        <td class="center"><span class="bar bar-f">Actif</span></td>
-        <td class="center"><span class="bar bar-f">Actif</span></td>
-        <td class="center"><span class="bar bar-f">Actif</span></td>
-        <td class="center"><span class="bar bar-f">Actif</span></td>
-        <td class="center"><span class="bar bar-f">Actif</span></td>
-        <td class="center"><span class="bar bar-f">Actif</span></td>
-        <td class="center"><span class="bar bar-f">Actif</span></td>
-        <td class="center" style="font-size:11px;">40 parrainages = 2 000€ invest.</td>
-      </tr>
-
-      <!-- === AXE 2 : GOLD === -->
-      <tr class="section-header"><td colspan="18">🏅 AXE 2 — GOLD : CONVERSION & MONTÉE EN PUISSANCE (5 missions/j)</td></tr>
-
-      <tr>
-        <td class="task-name">📧 Séquence emails onboarding → conversion Gold</td>
-        <td class="resp">CM + SDR</td>
-        <td class="center"><span class="pill pill-r">Critique</span></td>
-        <td class="center"><span class="bar bar-g">Rédaction</span></td>
-        <td class="center"><span class="bar bar-g">Intégration</span></td>
-        <td class="center"><span class="jalon g">Séq. live</span></td>
-        <td class="center"><span class="bar bar-g">A/B test</span></td>
-        <td class="center"><span class="bar bar-g">Optim.</span></td>
-        <td class="center"><span class="jalon g">5 Gold</span></td>
-        <td class="center"><span class="jalon g">20 Gold</span></td>
-        <td class="center"><span class="bar bar-g">Actif</span></td>
-        <td class="center"><span class="bar bar-g">Actif</span></td>
-        <td class="center"><span class="bar bar-g">Actif</span></td>
-        <td class="center"><span class="bar bar-g">Actif</span></td>
-        <td class="center"><span class="bar bar-g">Actif</span></td>
-        <td class="center" style="font-size:11px;">30% taux ouverture · 8 emails séquence</td>
-      </tr>
-
-      <tr>
-        <td class="task-name">📞 SDR freelance prospection téléphonique B2B</td>
-        <td class="resp">SDR / Commercial</td>
-        <td class="center"><span class="pill pill-r">Critique</span></td>
-        <td class="center"><span class="bar bar-g">Briefing</span></td>
-        <td class="center"><span class="bar bar-g">100 app/sem</span></td>
-        <td class="center"><span class="bar bar-g">100 app/sem</span></td>
-        <td class="center"><span class="bar bar-g">100 app/sem</span></td>
-        <td class="center"><span class="bar bar-g">100 app/sem</span></td>
-        <td class="center"><span class="bar bar-g">100 app/sem</span></td>
-        <td class="center"><span class="bar bar-g">100 app/sem</span></td>
-        <td></td><td></td><td></td><td></td><td></td>
-        <td class="center" style="font-size:11px;">6 mois × 700€ = 4 200€ · 50+ RDV qualifiés</td>
-      </tr>
-
-      <tr>
-        <td class="task-name">🤝 Réseau apporteurs d'affaires (5% GMV)</td>
-        <td class="resp">CEO / BizDev</td>
-        <td class="center"><span class="pill pill-r">Critique</span></td>
-        <td class="center"><span class="bar bar-purple">Recrutement</span></td>
-        <td class="center"><span class="bar bar-purple">5 apporteurs</span></td>
-        <td class="center"><span class="bar bar-purple">10 apporteurs</span></td>
-        <td class="center"><span class="bar bar-purple">Actif</span></td>
-        <td class="center"><span class="bar bar-purple">Actif</span></td>
-        <td class="center"><span class="bar bar-purple">15 apporteurs</span></td>
-        <td class="center"><span class="bar bar-purple">Actif</span></td>
-        <td class="center"><span class="bar bar-purple">Actif</span></td>
-        <td class="center"><span class="bar bar-purple">20 apporteurs</span></td>
-        <td class="center"><span class="bar bar-purple">Actif</span></td>
-        <td class="center"><span class="bar bar-purple">Actif</span></td>
-        <td class="center"><span class="bar bar-purple">Actif</span></td>
-        <td class="center" style="font-size:11px;">20 apporteurs actifs · 700€/m commissions</td>
-      </tr>
-
-      <tr>
-        <td class="task-name">🎪 Salon BTP (ex Batimat) + Salon Conciergerie</td>
-        <td class="resp">CEO + Commercial</td>
-        <td class="center"><span class="pill pill-o">Haute</span></td>
-        <td></td>
-        <td class="center"><span class="bar bar-orange">Préparation</span></td>
-        <td class="center"><span class="bar bar-orange">Préparation</span></td>
-        <td class="center"><span class="jalon g">Salon BTP</span></td>
-        <td></td>
-        <td></td>
-        <td class="center"><span class="jalon g">Salon Concie.</span></td>
-        <td></td><td></td><td></td><td></td><td></td>
-        <td class="center" style="font-size:11px;">3 000€ + 2 000€ · 50+ contacts qualifiés</td>
-      </tr>
-
-      <tr>
-        <td class="task-name">🎬 Vidéo présentation plateforme (2 min)</td>
-        <td class="resp">CM + Prestataire</td>
-        <td class="center"><span class="pill pill-o">Haute</span></td>
-        <td class="center"><span class="bar bar-teal">Script</span></td>
-        <td class="center"><span class="bar bar-teal">Tournage</span></td>
-        <td class="center"><span class="jalon v">Vidéo live</span></td>
-        <td class="center"><span class="bar bar-teal">Diffusion</span></td>
-        <td class="center"><span class="bar bar-teal">Diffusion</span></td>
-        <td class="center"><span class="bar bar-teal">Diffusion</span></td>
-        <td></td><td></td><td></td><td></td><td></td><td></td>
-        <td class="center" style="font-size:11px;">2 500€ prod · 50K vues cumulées</td>
-      </tr>
-
-      <!-- === AXE 3 : PLATINUM === -->
-      <tr class="section-header"><td colspan="18">💎 AXE 3 — PLATINUM : GRANDS COMPTES & FIDÉLISATION (10 missions/j)</td></tr>
-
-      <tr>
-        <td class="task-name">🏢 Onboarding premium top 20 comptes B2B</td>
-        <td class="resp">CEO + Account Mgr</td>
-        <td class="center"><span class="pill pill-r">Critique</span></td>
-        <td></td>
-        <td class="center"><span class="bar bar-p">Identification</span></td>
-        <td class="center"><span class="bar bar-p">Qualification</span></td>
-        <td class="center"><span class="bar bar-p">Démo / pitch</span></td>
-        <td class="center"><span class="bar bar-p">Proposition</span></td>
-        <td class="center"><span class="jalon p">5 Platinum</span></td>
-        <td class="center"><span class="jalon p">10 Platinum</span></td>
-        <td class="center"><span class="bar bar-p">Suivi</span></td>
-        <td class="center"><span class="bar bar-p">Suivi</span></td>
-        <td class="center"><span class="bar bar-p">Suivi</span></td>
-        <td class="center"><span class="bar bar-p">Suivi</span></td>
-        <td class="center" style="font-size:11px;">10 comptes Platinum actifs</td>
-      </tr>
-
-      <tr>
-        <td class="task-name">🔎 LinkedIn Ads ciblage décideurs BTP/PME/Immo</td>
-        <td class="resp">CM / Agency</td>
-        <td class="center"><span class="pill pill-r">Critique</span></td>
-        <td class="center"><span class="bar bar-p">Setup</span></td>
-        <td class="center"><span class="bar bar-p">360€/m</span></td>
-        <td class="center"><span class="bar bar-p">360€/m</span></td>
-        <td class="center"><span class="bar bar-p">360€/m</span></td>
-        <td class="center"><span class="bar bar-p">360€/m</span></td>
-        <td class="center"><span class="bar bar-p">360€/m</span></td>
-        <td class="center"><span class="bar bar-p">360€/m</span></td>
-        <td class="center"><span class="bar bar-p">360€/m</span></td>
-        <td class="center"><span class="bar bar-p">360€/m</span></td>
-        <td class="center"><span class="bar bar-p">360€/m</span></td>
-        <td></td><td></td>
-        <td class="center" style="font-size:11px;">360€/m × 10m · CPL < 40€</td>
-      </tr>
-
-      <tr>
-        <td class="task-name">🎁 Cadeaux onboarding 20 clients clés (35€/u)</td>
-        <td class="resp">Commercial</td>
-        <td class="center"><span class="pill pill-g">Normale</span></td>
-        <td></td>
-        <td></td>
-        <td class="center"><span class="bar bar-p">Commande</span></td>
-        <td class="center"><span class="bar bar-p">Envoi vague 1</span></td>
-        <td></td>
-        <td class="center"><span class="bar bar-p">Envoi vague 2</span></td>
-        <td></td><td></td><td></td><td></td><td></td><td></td>
-        <td class="center" style="font-size:11px;">700€ · Fidélisation top comptes</td>
-      </tr>
-
-      <!-- === AXE 4 : DIGITAL === -->
-      <tr class="section-header"><td colspan="18">🎯 AXE 4 — ACQUISITION DIGITALE (SEO + SEA)</td></tr>
-
-      <tr>
-        <td class="task-name">🔍 Google Ads Search B2B (600€/m)</td>
-        <td class="resp">CM / Agency Ads</td>
-        <td class="center"><span class="pill pill-r">Critique</span></td>
-        <td class="center"><span class="bar bar-blue">600€</span></td>
-        <td class="center"><span class="bar bar-blue">600€</span></td>
-        <td class="center"><span class="bar bar-blue">600€</span></td>
-        <td class="center"><span class="bar bar-blue">600€</span></td>
-        <td class="center"><span class="bar bar-blue">600€</span></td>
-        <td class="center"><span class="bar bar-blue">600€</span></td>
-        <td class="center"><span class="bar bar-blue">600€</span></td>
-        <td class="center"><span class="bar bar-blue">600€</span></td>
-        <td class="center"><span class="bar bar-blue">600€</span></td>
-        <td class="center"><span class="bar bar-blue">600€</span></td>
-        <td class="center"><span class="bar bar-blue">600€</span></td>
-        <td class="center"><span class="bar bar-blue">600€</span></td>
-        <td class="center" style="font-size:11px;">7 200€/an · 500 leads qualifiés</td>
-      </tr>
-
-      <tr>
-        <td class="task-name">✍️ SEO — 5 articles/mois (100€/article)</td>
-        <td class="resp">Rédacteur freelance</td>
-        <td class="center"><span class="pill pill-o">Haute</span></td>
-        <td class="center"><span class="bar bar-blue">500€</span></td>
-        <td class="center"><span class="bar bar-blue">500€</span></td>
-        <td class="center"><span class="bar bar-blue">500€</span></td>
-        <td class="center"><span class="bar bar-blue">500€</span></td>
-        <td class="center"><span class="bar bar-blue">500€</span></td>
-        <td class="center"><span class="bar bar-blue">500€</span></td>
-        <td class="center"><span class="bar bar-blue">500€</span></td>
-        <td class="center"><span class="bar bar-blue">500€</span></td>
-        <td class="center"><span class="bar bar-blue">500€</span></td>
-        <td class="center"><span class="bar bar-blue">500€</span></td>
-        <td></td><td></td>
-        <td class="center" style="font-size:11px;">50 articles · Top 3 SERP nettoyage pro</td>
-      </tr>
-
-      <tr>
-        <td class="task-name">📰 Relations presse + communiqués (×4/an)</td>
-        <td class="resp">CEO / RP freelance</td>
-        <td class="center"><span class="pill pill-g">Normale</span></td>
-        <td></td>
-        <td class="center"><span class="bar bar-teal">CP Lancement</span></td>
-        <td></td>
-        <td></td>
-        <td class="center"><span class="bar bar-teal">CP Gold live</span></td>
-        <td></td>
-        <td class="center"><span class="bar bar-teal">CP 30 abonnés</span></td>
-        <td></td><td></td>
-        <td></td>
-        <td class="center"><span class="bar bar-teal">CP Bilan</span></td>
-        <td></td>
-        <td class="center" style="font-size:11px;">10 articles presse · FrenchWeb, BFM BTP</td>
-      </tr>
-
-      <!-- === JALONS CRITIQUES === -->
-      <tr class="section-header"><td colspan="18">🔴 JALONS CRITIQUES — Feuille de route officielle</td></tr>
-
-      <tr>
-        <td class="task-name" style="font-weight:700;">🚀 Lancement V2 plateforme (Freemium actif)</td>
-        <td class="resp">CEO + CTO</td>
-        <td class="center"><span class="pill pill-r">Critique</span></td>
-        <td></td>
-        <td></td>
-        <td class="center"><span class="jalon">31 Mars</span></td>
-        <td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
-        <td class="center" style="font-size:11px;">Plateforme fully opérationnelle</td>
-      </tr>
-
-      <tr>
-        <td class="task-name" style="font-weight:700;">🏅 10 abonnés Gold actifs</td>
-        <td class="resp">Commercial + SDR</td>
-        <td class="center"><span class="pill pill-r">Critique</span></td>
-        <td></td><td></td><td></td><td></td>
-        <td class="center"><span class="jalon g">Mai 2026</span></td>
-        <td></td><td></td><td></td><td></td><td></td><td></td><td></td>
-        <td class="center" style="font-size:11px;">10 abonnés Gold payants actifs</td>
-      </tr>
-
-      <tr>
-        <td class="task-name" style="font-weight:700;">💎 5 abonnés Platinum actifs</td>
-        <td class="resp">CEO + Account Mgr</td>
-        <td class="center"><span class="pill pill-r">Critique</span></td>
-        <td></td><td></td><td></td><td></td><td></td>
-        <td class="center"><span class="jalon p">Juin 2026</span></td>
-        <td></td><td></td><td></td><td></td><td></td><td></td>
-        <td class="center" style="font-size:11px;">5 comptes Platinum signés</td>
-      </tr>
-
-      <tr>
-        <td class="task-name" style="font-weight:700;background:#fff3cd;">🎯 JALON 31/07 — 30 abonnés Gold+Platinum</td>
-        <td class="resp" style="font-weight:700;">TOUTE L'ÉQUIPE</td>
-        <td class="center"><span class="pill pill-r">CRITIQUE</span></td>
-        <td></td><td></td><td></td><td></td><td></td><td></td>
-        <td class="center"><span class="jalon" style="background:#e65100;font-size:11px;">🎯 31 JUIL</span></td>
-        <td></td><td></td><td></td><td></td><td></td>
-        <td class="center" style="font-size:11px;font-weight:700;color:#e65100;">Objectif pivot scénario pessimiste</td>
-      </tr>
-
-      <tr>
-        <td class="task-name" style="font-weight:700;">📊 Revue trimestrielle + ajustement stratégie</td>
-        <td class="resp">CEO + Équipe</td>
-        <td class="center"><span class="pill pill-o">Haute</span></td>
-        <td></td><td></td>
-        <td class="center"><span class="jalon v">Bilan T1</span></td>
-        <td></td><td></td>
-        <td class="center"><span class="jalon v">Bilan T2</span></td>
-        <td></td><td></td>
-        <td class="center"><span class="jalon v">Bilan T3</span></td>
-        <td></td><td></td>
-        <td class="center"><span class="jalon v">Bilan T4</span></td>
-        <td class="center" style="font-size:11px;">4 revues · NPS + ROI + abonnés</td>
-      </tr>
-
-    </tbody>
-  </table>
-  </div>
-
-  <div class="footer-note">
-    <strong>📌 Hypothèses terrain retenues :</strong>
-    <span class="note-tag">Marché</span> Secteur nettoyage professionnel France = 17 Md€, 15 000 entreprises, croissance ~3%/an.
-    <span class="note-tag">Cycle vente</span> Gold : cycle court 2-4 sem (TPE/PME). Platinum : cycle long 6-10 sem (grands comptes multisite).
-    <span class="note-tag">Commission</span> CLINDIT perçoit ~20% GMV + abonnements mensuels Gold/Platinum.
-    <span class="note-tag">Terrain</span> Zone cœur : Grand Est (Strasbourg, Metz, Nancy, Mulhouse). Extension nationale via digital à partir de T3.
-    <span class="note-tag">Taux conversion</span> Freemium → Gold : 15-20% réaliste sur 6 mois selon benchmarks SaaS B2B sectoriels.
-  </div>
-
-</div>
-</div>
-
-<!-- ============================================================ -->
-<!--  VUE ANNUELLE                                               -->
-<!-- ============================================================ -->
-<div id="tab-annuel" class="section">
-<div class="container">
-
-  <div class="title-section">📆 Vue Annuelle Consolidée — 12 axes sur 52 semaines</div>
-
-  <div class="cards-row">
-    <div class="card blue"><div class="card-label">Budget Total</div><div class="card-value">85 600 €</div><div class="card-sub">12 axes · Annuel 2026</div></div>
-    <div class="card green"><div class="card-label">Missions Freemium/j</div><div class="card-value">1</div><div class="card-sub">Accès limité · vitrinage</div></div>
-    <div class="card gold"><div class="card-label">Missions Gold/j</div><div class="card-value">5</div><div class="card-sub">×5 vs Freemium</div></div>
-    <div class="card plat"><div class="card-label">Missions Platinum/j</div><div class="card-value">10</div><div class="card-sub">×10 vs Freemium · Illimité</div></div>
-    <div class="card" style="border-top:3px solid #e53935;"><div class="card-label">Abonnés payants cible</div><div class="card-value">30</div><div class="card-sub">Gold + Platinum au 31/07</div></div>
-    <div class="card" style="border-top:3px solid #4caf50;"><div class="card-label">GMV cible annuelle</div><div class="card-value">480 K€</div><div class="card-sub">Commission ~15-20%</div></div>
-  </div>
-
-  <div class="gantt-wrap">
-  <table class="gantt">
-    <thead>
-      <tr>
-        <th class="left" style="width:200px;">Axe Stratégique</th>
-        <th style="width:100px;">Responsable</th>
-        <th style="width:80px;">Budget</th>
-        <th style="width:80px;">Priorité</th>
-        <th class="t1" colspan="2">T1 · Jan–Mar</th>
-        <th class="t2" colspan="2">T2 · Avr–Jun</th>
-        <th class="t3" colspan="2">T3 · Jul–Sep ⚑</th>
-        <th class="t4" colspan="2">T4 · Oct–Déc</th>
-        <th style="width:120px;">KPI annuel cible</th>
-        <th style="width:80px;">Statut</th>
-      </tr>
-    </thead>
-    <tbody>
-
-      <tr class="section-header"><td colspan="14">⚙️ FONDATION — Infrastructure & Produit</td></tr>
-      <tr>
-        <td class="task-name">🛠 V2 Plateforme (paliers d'offres)</td>
-        <td class="resp">CEO + CTO</td>
-        <td class="center">—</td>
-        <td class="center"><span class="pill pill-r">Critique</span></td>
-        <td class="center" colspan="2"><span class="bar bar-blue">Dev & Tests (2 mois)</span></td>
-        <td class="center" colspan="2"><span class="bar bar-teal">Itérations UX</span></td>
-        <td class="center" colspan="2"></td>
-        <td class="center" colspan="2"></td>
-        <td style="font-size:11px;">V2 live avant fin T1</td>
-        <td class="center"><span class="jalon v">En cours</span></td>
-      </tr>
-      <tr>
-        <td class="task-name">💻 CRO Landing pages (3 secteurs)</td>
-        <td class="resp">Dev + CM</td>
-        <td class="center">5 500€</td>
-        <td class="center"><span class="pill pill-r">Critique</span></td>
-        <td class="center" colspan="2"><span class="bar bar-blue">Maquette + Dev</span></td>
-        <td class="center" colspan="2"><span class="bar bar-blue">A/B Tests</span></td>
-        <td class="center" colspan="2"><span class="bar bar-teal">Optim.</span></td>
-        <td class="center" colspan="2"><span class="bar bar-teal">Optim.</span></td>
-        <td style="font-size:11px;">+25% taux conversion</td>
-        <td class="center"><span class="jalon">T1</span></td>
-      </tr>
-      <tr>
-        <td class="task-name">📦 Stack outils (CRM, Brevo, Hotjar, Buffer…)</td>
-        <td class="resp">Ops</td>
-        <td class="center">3 600€</td>
-        <td class="center"><span class="pill pill-o">Haute</span></td>
-        <td class="center" colspan="2"><span class="bar bar-blue">Configuration</span></td>
-        <td class="center" colspan="8"><span class="bar bar-gray" style="width:100%;display:block;">Abonnements actifs toute l'année</span></td>
-        <td style="font-size:11px;">Stack 100% opérationnelle M1</td>
-        <td class="center"><span class="jalon">T1</span></td>
-      </tr>
-
-      <tr class="section-header"><td colspan="14">🌱 ACQUISITION — Recrutement Professionnels (Freemium)</td></tr>
-      <tr>
-        <td class="task-name">📣 Meta Ads nettoyeurs (300€/m)</td>
-        <td class="resp">Community Mgr</td>
-        <td class="center">3 600€</td>
-        <td class="center"><span class="pill pill-r">Critique</span></td>
-        <td class="center" colspan="8"><span class="bar bar-f" style="width:100%;display:block;">Campagne continue 12 mois</span></td>
-        <td class="center" colspan="2"><span class="bar bar-f">Actif</span></td>
-        <td style="font-size:11px;">100 nettoyeurs actifs</td>
-        <td class="center"><span class="pill pill-r">Annuel</span></td>
-      </tr>
-      <tr>
-        <td class="task-name">📍 Prospection terrain + Flyers (4 villes)</td>
-        <td class="resp">Commercial</td>
-        <td class="center">600€</td>
-        <td class="center"><span class="pill pill-o">Haute</span></td>
-        <td class="center" colspan="2"><span class="bar bar-f">Vague 1</span></td>
-        <td class="center" colspan="2"><span class="bar bar-f">Vague 2</span></td>
-        <td class="center" colspan="2"><span class="bar bar-f">Vague 3</span></td>
-        <td class="center" colspan="2"><span class="bar bar-f">Vague 4</span></td>
-        <td style="font-size:11px;">150€/vague · 4 villes</td>
-        <td class="center"><span class="pill pill-g">T1-T4</span></td>
-      </tr>
-
-      <tr class="section-header"><td colspan="14">🏅 CONVERSION — Upsell Gold (5 missions/j)</td></tr>
-      <tr>
-        <td class="task-name">🎯 Google Ads B2B + LinkedIn Ads</td>
-        <td class="resp">CM / Agency</td>
-        <td class="center">11 280€</td>
-        <td class="center"><span class="pill pill-r">Critique</span></td>
-        <td class="center" colspan="2"><span class="bar bar-blue">Setup + T1</span></td>
-        <td class="center" colspan="2"><span class="bar bar-blue">Scaling T2</span></td>
-        <td class="center" colspan="2"><span class="bar bar-blue">Optim. T3</span></td>
-        <td class="center" colspan="2"><span class="bar bar-blue">Maintien T4</span></td>
-        <td style="font-size:11px;">500 leads · CAC < 150€</td>
-        <td class="center"><span class="pill pill-r">Annuel</span></td>
-      </tr>
-      <tr>
-        <td class="task-name">📧 Email automation + séquences onboarding</td>
-        <td class="resp">CM + SDR</td>
-        <td class="center">4 200€</td>
-        <td class="center"><span class="pill pill-r">Critique</span></td>
-        <td class="center" colspan="2"><span class="bar bar-g">Rédaction</span></td>
-        <td class="center" colspan="2"><span class="bar bar-g">Lancement + A/B</span></td>
-        <td class="center" colspan="2"><span class="bar bar-g">Optimisation</span></td>
-        <td class="center" colspan="2"><span class="bar bar-g">Automatisé</span></td>
-        <td style="font-size:11px;">3 000 contacts · 30% ouverture</td>
-        <td class="center"><span class="pill pill-r">Annuel</span></td>
-      </tr>
-      <tr>
-        <td class="task-name">📞 SDR Freelance prospection (100 app/sem)</td>
-        <td class="resp">SDR</td>
-        <td class="center">4 200€</td>
-        <td class="center"><span class="pill pill-r">Critique</span></td>
-        <td class="center" colspan="2"><span class="bar bar-g">Briefing + Démarrage</span></td>
-        <td class="center" colspan="2"><span class="bar bar-g">Actif</span></td>
-        <td class="center" colspan="2"><span class="bar bar-g">Actif</span></td>
-        <td class="center" colspan="2"></td>
-        <td style="font-size:11px;">6 mois · 50+ RDV qualifiés</td>
-        <td class="center"><span class="jalon g">T1-T3</span></td>
-      </tr>
-      <tr>
-        <td class="task-name">🎪 Salons professionnels (Batimat + Conciergerie)</td>
-        <td class="resp">CEO + Commercial</td>
-        <td class="center">5 000€</td>
-        <td class="center"><span class="pill pill-o">Haute</span></td>
-        <td class="center" colspan="2"><span class="bar bar-orange">Préparation</span></td>
-        <td class="center" colspan="2"><span class="bar bar-orange">Salon BTP (Avr)</span></td>
-        <td class="center" colspan="2"><span class="bar bar-orange">Salon Concie. (Juil)</span></td>
-        <td class="center" colspan="2"></td>
-        <td style="font-size:11px;">3 salons · 50+ contacts</td>
-        <td class="center"><span class="jalon">T2-T3</span></td>
-      </tr>
-
-      <tr class="section-header"><td colspan="14">💎 GRANDS COMPTES — Platinum (10 missions/j)</td></tr>
-      <tr>
-        <td class="task-name">🏢 Onboarding Top 20 comptes B2B (Platinum)</td>
-        <td class="resp">CEO + Account Mgr</td>
-        <td class="center">Humain</td>
-        <td class="center"><span class="pill pill-r">Critique</span></td>
-        <td class="center" colspan="2"><span class="bar bar-p">Identification</span></td>
-        <td class="center" colspan="2"><span class="bar bar-p">Démos + Pitch</span></td>
-        <td class="center" colspan="2"><span class="bar bar-p">Closing + Suivi</span></td>
-        <td class="center" colspan="2"><span class="bar bar-p">Expansion</span></td>
-        <td style="font-size:11px;">10 Platinum signés à fin T3</td>
-        <td class="center"><span class="jalon p">T2-T3</span></td>
-      </tr>
-      <tr>
-        <td class="task-name">🤝 Réseau Apporteurs d'affaires (5% GMV)</td>
-        <td class="resp">CEO / BizDev</td>
-        <td class="center">12 000€</td>
-        <td class="center"><span class="pill pill-r">Critique</span></td>
-        <td class="center" colspan="2"><span class="bar bar-purple">Recrutement (5 apport.)</span></td>
-        <td class="center" colspan="2"><span class="bar bar-purple">Scaling (15 apport.)</span></td>
-        <td class="center" colspan="2"><span class="bar bar-purple">Actif (20 apport.)</span></td>
-        <td class="center" colspan="2"><span class="bar bar-purple">Actif</span></td>
-        <td style="font-size:11px;">20 apporteurs actifs</td>
-        <td class="center"><span class="pill pill-r">Annuel</span></td>
-      </tr>
-
-      <tr class="section-header"><td colspan="14">📣 NOTORIÉTÉ & CONTENU — Brand Building</td></tr>
-      <tr>
-        <td class="task-name">📱 Community Management (LinkedIn, Instagram, FB)</td>
-        <td class="resp">CM freelance</td>
-        <td class="center">9 600€</td>
-        <td class="center"><span class="pill pill-r">Critique</span></td>
-        <td class="center" colspan="8"><span class="bar bar-teal" style="width:100%;display:block;">Animation continue · 500€/mois · 2j/semaine</span></td>
-        <td class="center" colspan="2"><span class="bar bar-teal">Actif</span></td>
-        <td style="font-size:11px;">10K abonnés LinkedIn · >3% engagement</td>
-        <td class="center"><span class="pill pill-r">Annuel</span></td>
-      </tr>
-      <tr>
-        <td class="task-name">🎬 Vidéo présentation + 3 témoignages clients</td>
-        <td class="resp">CM + Prestataire</td>
-        <td class="center">6 000€</td>
-        <td class="center"><span class="pill pill-o">Haute</span></td>
-        <td class="center" colspan="2"><span class="bar bar-teal">Prod. vidéo principale</span></td>
-        <td class="center" colspan="2"><span class="bar bar-teal">2 témoignages</span></td>
-        <td class="center" colspan="2"><span class="bar bar-teal">1 témoignage</span></td>
-        <td class="center" colspan="2"></td>
-        <td style="font-size:11px;">50K vues cumulées · 4 vidéos</td>
-        <td class="center"><span class="jalon">T1-T3</span></td>
-      </tr>
-      <tr>
-        <td class="task-name">🔔 Relations presse (FrenchWeb, BFM BTP)</td>
-        <td class="resp">CEO / RP</td>
-        <td class="center">3 500€</td>
-        <td class="center"><span class="pill pill-g">Normale</span></td>
-        <td class="center" colspan="2"><span class="bar bar-teal">CP Lancement</span></td>
-        <td class="center" colspan="2"><span class="bar bar-teal">CP Gold/Plat.</span></td>
-        <td class="center" colspan="2"><span class="bar bar-teal">CP Milestone 30</span></td>
-        <td class="center" colspan="2"><span class="bar bar-teal">CP Bilan annuel</span></td>
-        <td style="font-size:11px;">10 articles · 4 communiqués</td>
-        <td class="center"><span class="pill pill-g">T2-T4</span></td>
-      </tr>
-
-      <tr class="section-header"><td colspan="14">🔁 FIDÉLISATION & RÉCURRENCE</td></tr>
-      <tr>
-        <td class="task-name">🎁 Programme parrainage clients (30€/parrainage)</td>
-        <td class="resp">Ops / CM</td>
-        <td class="center">4 000€</td>
-        <td class="center"><span class="pill pill-o">Haute</span></td>
-        <td class="center" colspan="2"></td>
-        <td class="center" colspan="2"><span class="bar bar-g">Lancement</span></td>
-        <td class="center" colspan="2"><span class="bar bar-g">Actif</span></td>
-        <td class="center" colspan="2"><span class="bar bar-g">Actif</span></td>
-        <td style="font-size:11px;">60 parrainages · 30% récurrence</td>
-        <td class="center"><span class="pill pill-g">T2-T4</span></td>
-      </tr>
-      <tr>
-        <td class="task-name">📊 NPS + enquêtes satisfaction trimestrielles</td>
-        <td class="resp">CEO / Ops</td>
-        <td class="center">320€</td>
-        <td class="center"><span class="pill pill-g">Normale</span></td>
-        <td class="center" colspan="2"><span class="bar bar-gray">NPS T1</span></td>
-        <td class="center" colspan="2"><span class="bar bar-gray">NPS T2</span></td>
-        <td class="center" colspan="2"><span class="bar bar-gray">NPS T3</span></td>
-        <td class="center" colspan="2"><span class="bar bar-gray">NPS T4</span></td>
-        <td style="font-size:11px;">NPS > 50 · 40% rétention</td>
-        <td class="center"><span class="pill pill-b">Trimestriel</span></td>
-      </tr>
-
-      <tr class="section-header" style="background:#fff3cd;"><td colspan="14" style="color:#e65100;">🎯 JALONS ANNUELS — Feuille de route officielle 2026</td></tr>
-      <tr style="background:#fff8f0;">
-        <td class="task-name" style="font-weight:700;">🔴 J1 — V2 Plateforme live</td>
-        <td class="resp">CTO + CEO</td>
-        <td class="center">—</td>
-        <td class="center"><span class="pill pill-r">Critique</span></td>
-        <td class="center" colspan="2"><span class="jalon">31 Mars 2026</span></td>
-        <td colspan="8"></td>
-        <td style="font-size:11px;">Offres F/G/P actives en production</td>
-        <td></td>
-      </tr>
-      <tr style="background:#fff8f0;">
-        <td class="task-name" style="font-weight:700;">🟡 J2 — 10 abonnés Gold</td>
-        <td class="resp">SDR + Commercial</td>
-        <td class="center">—</td>
-        <td class="center"><span class="pill pill-r">Critique</span></td>
-        <td colspan="4"></td>
-        <td class="center" colspan="2"><span class="jalon g">Mai 2026</span></td>
-        <td colspan="4"></td>
-        <td style="font-size:11px;">10 Gold payants actifs</td>
-        <td></td>
-      </tr>
-      <tr style="background:#fff8f0;">
-        <td class="task-name" style="font-weight:700;">🔷 J3 — 5 abonnés Platinum</td>
-        <td class="resp">CEO + Acc. Mgr</td>
-        <td class="center">—</td>
-        <td class="center"><span class="pill pill-r">Critique</span></td>
-        <td colspan="4"></td>
-        <td class="center" colspan="2"><span class="jalon p">Juin 2026</span></td>
-        <td colspan="4"></td>
-        <td style="font-size:11px;">5 Platinum actifs (démo validée)</td>
-        <td></td>
-      </tr>
-      <tr style="background:#ffecb3;font-weight:800;">
-        <td class="task-name" style="font-weight:800;color:#e65100;">🎯 J4 — 30 abonnés Gold+Platinum</td>
-        <td class="resp" style="font-weight:700;">ÉQUIPE ENTIÈRE</td>
-        <td class="center">—</td>
-        <td class="center"><span class="pill pill-r">CRITIQUE</span></td>
-        <td colspan="6"></td>
-        <td class="center" colspan="2"><span class="jalon" style="background:#e65100;font-size:11px;padding:5px 10px;">⚑ 31 JUILLET 2026</span></td>
-        <td colspan="2"></td>
-        <td style="font-size:11px;color:#e65100;font-weight:800;">Scénario pessimiste · Pivot si non atteint</td>
-        <td></td>
-      </tr>
-      <tr style="background:#fff8f0;">
-        <td class="task-name" style="font-weight:700;">🟢 J5 — 500 clients entreprises actifs</td>
-        <td class="resp">Commercial + CM</td>
-        <td class="center">—</td>
-        <td class="center"><span class="pill pill-o">Haute</span></td>
-        <td colspan="10"></td>
-        <td class="center" colspan="2"><span class="jalon v">31 Déc 2026</span></td>
-        <td style="font-size:11px;">500 entreprises · GMV 480K€</td>
-        <td></td>
-      </tr>
-
-    </tbody>
-  </table>
-  </div>
-
-</div>
-</div>
-
-<!-- ============================================================ -->
-<!--  KPIs & JALONS                                              -->
-<!-- ============================================================ -->
-<div id="tab-kpis" class="section">
-<div class="container">
-
-  <div class="title-section">📊 Tableau de Bord KPIs — Suivi Performance 2026</div>
-
-  <div class="cards-row">
-    <div class="card blue"><div class="card-label">Visiteurs/mois (cible)</div><div class="card-value">5 000</div><div class="card-sub">Taux conv. 4,5%</div></div>
-    <div class="card gold"><div class="card-label">Leads qualifiés/an</div><div class="card-value">500</div><div class="card-sub">CAC < 150€</div></div>
-    <div class="card green"><div class="card-label">Nettoyeurs actifs</div><div class="card-value">150</div><div class="card-sub">Taux d'activité > 70%</div></div>
-    <div class="card plat"><div class="card-label">Revenus commission</div><div class="card-value">72 K€</div><div class="card-sub">15% de 480K€ GMV</div></div>
-  </div>
-
-  <div class="gantt-wrap" style="margin-bottom:20px;">
-  <table class="kpi">
-    <thead>
-      <tr>
-        <th style="width:220px;">KPI</th>
-        <th style="width:120px;">Cible Annuelle</th>
-        <th style="width:100px;">T1 (Réf.)</th>
-        <th style="width:100px;">T2 (Réf.)</th>
-        <th style="width:100px;">T3 ⚑ Jalon</th>
-        <th style="width:100px;">T4 (Réf.)</th>
-        <th>Note terrain</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr class="cat-header"><td colspan="7">🌱 FREEMIUM — Recrutement & Activation</td></tr>
-      <tr>
-        <td>Nettoyeurs inscrits (Freemium)</td>
-        <td class="center"><strong>150</strong></td>
-        <td class="center">30</td><td class="center">70</td><td class="center">110</td><td class="center">150</td>
-        <td>Meta Ads + flyers terrain. Taux activation >70%.</td>
-      </tr>
-      <tr>
-        <td>Missions Freemium générées/j</td>
-        <td class="center">1 mission/j/pro</td>
-        <td class="center">30/j</td><td class="center">70/j</td><td class="center">110/j</td><td class="center">150/j</td>
-        <td>Plafond : 1 mission/jour par profil Freemium</td>
-      </tr>
-      <tr>
-        <td>Taux Freemium → Gold (mensuel)</td>
-        <td class="center"><strong>15-20%</strong></td>
-        <td class="center">5%</td><td class="center">12%</td><td class="center">18%</td><td class="center">20%</td>
-        <td>Benchmark SaaS B2B similaires : 10-25%</td>
-      </tr>
-
-      <tr class="cat-header"><td colspan="7">🏅 GOLD — Conversion & Croissance (5 missions/j)</td></tr>
-      <tr>
-        <td>Abonnés Gold actifs (cumulés)</td>
-        <td class="center"><strong>20+</strong></td>
-        <td class="center"><span class="pill pill-r">2</span></td>
-        <td class="center"><span class="pill pill-o">10</span></td>
-        <td class="center"><span class="pill pill-g">20</span></td>
-        <td class="center"><span class="pill pill-g">25</span></td>
-        <td>Objectif partiel : 10 Gold au 31/05/2026</td>
-      </tr>
-      <tr>
-        <td>Missions Gold générées/j</td>
-        <td class="center">5 missions/j/pro</td>
-        <td class="center">10/j</td><td class="center">50/j</td><td class="center">100/j</td><td class="center">125/j</td>
-        <td>×5 vs Freemium — accès renforcé plateforme</td>
-      </tr>
-      <tr>
-        <td>Churn mensuel Gold</td>
-        <td class="center"><strong>< 5%</strong></td>
-        <td class="center">10%</td><td class="center">7%</td><td class="center">5%</td><td class="center">4%</td>
-        <td>Rétention via séquences email + NPS</td>
-      </tr>
-
-      <tr class="cat-header"><td colspan="7">💎 PLATINUM — Grands Comptes (10 missions/j)</td></tr>
-      <tr>
-        <td>Abonnés Platinum actifs (cumulés)</td>
-        <td class="center"><strong>10+</strong></td>
-        <td class="center"><span class="pill pill-r">0</span></td>
-        <td class="center"><span class="pill pill-o">3</span></td>
-        <td class="center"><span class="pill pill-g">10</span></td>
-        <td class="center"><span class="pill pill-g">13</span></td>
-        <td>Objectif partiel : 5 Platinum au 30/06/2026</td>
-      </tr>
-      <tr>
-        <td>Missions Platinum générées/j</td>
-        <td class="center">10 missions/j/pro</td>
-        <td class="center">0/j</td><td class="center">30/j</td><td class="center">100/j</td><td class="center">130/j</td>
-        <td>×10 vs Freemium — référencement prioritaire</td>
-      </tr>
-      <tr>
-        <td>Cycle moyen de vente Platinum</td>
-        <td class="center"><strong>6-10 sem.</strong></td>
-        <td class="center">—</td><td class="center">—</td><td class="center">Fermetures</td><td class="center">Renouvellement</td>
-        <td>Grands comptes multisite, achat B2B rationnel</td>
-      </tr>
-
-      <tr class="cat-header"><td colspan="7">🎯 OBJECTIF PIVOT — 31 JUILLET 2026</td></tr>
-      <tr style="background:#fff3cd;font-weight:700;">
-        <td>Gold + Platinum cumulés au 31/07</td>
-        <td class="center" style="color:#e65100;font-weight:800;">30 MINIMUM</td>
-        <td class="center">2</td><td class="center">13</td>
-        <td class="center" style="color:#e65100;font-weight:800;">⚑ 30</td>
-        <td class="center">38</td>
-        <td style="font-weight:700;color:#e65100;">Scénario pessimiste. < 30 = révision stratégique urgente.</td>
-      </tr>
-
-      <tr class="cat-header"><td colspan="7">🎯 ACQUISITION DIGITALE</td></tr>
-      <tr>
-        <td>Visiteurs uniques/mois (site)</td>
-        <td class="center"><strong>5 000</strong></td>
-        <td class="center">1 000</td><td class="center">2 500</td><td class="center">4 000</td><td class="center">5 000</td>
-        <td>SEO + Google Ads · Semrush/Ahrefs tracking</td>
-      </tr>
-      <tr>
-        <td>Taux conversion inscription</td>
-        <td class="center"><strong>4,5%</strong></td>
-        <td class="center">2%</td><td class="center">3%</td><td class="center">4%</td><td class="center">4,5%</td>
-        <td>Hotjar heatmaps + A/B tests CTA</td>
-      </tr>
-      <tr>
-        <td>Coût par acquisition (CAC)</td>
-        <td class="center"><strong>< 150€</strong></td>
-        <td class="center">250€</td><td class="center">180€</td><td class="center">140€</td><td class="center">120€</td>
-        <td>Amélioration progressive avec échelle</td>
-      </tr>
-      <tr>
-        <td>Leads qualifiés (cumulés)</td>
-        <td class="center"><strong>500</strong></td>
-        <td class="center">80</td><td class="center">220</td><td class="center">370</td><td class="center">500</td>
-        <td>Pipeline CRM HubSpot tracké</td>
-      </tr>
-
-      <tr class="cat-header"><td colspan="7">📱 RÉSEAUX SOCIAUX & NOTORIÉTÉ</td></tr>
-      <tr>
-        <td>Abonnés LinkedIn (page entreprise)</td>
-        <td class="center"><strong>10 000</strong></td>
-        <td class="center">1 500</td><td class="center">3 500</td><td class="center">6 500</td><td class="center">10 000</td>
-        <td>Animation 5×/sem · Boost posts mensuels</td>
-      </tr>
-      <tr>
-        <td>Taux d'engagement LinkedIn</td>
-        <td class="center"><strong>> 3%</strong></td>
-        <td class="center">1,5%</td><td class="center">2,2%</td><td class="center">2,8%</td><td class="center">3,2%</td>
-        <td>Contenus vidéo + témoignages = ×3 engagement</td>
-      </tr>
-      <tr>
-        <td>Articles de presse obtenus</td>
-        <td class="center"><strong>10</strong></td>
-        <td class="center">2</td><td class="center">5</td><td class="center">7</td><td class="center">10</td>
-        <td>FrenchWeb, BFM BTP, newsletters B2B</td>
-      </tr>
-
-      <tr class="cat-header"><td colspan="7">💰 PERFORMANCE FINANCIÈRE</td></tr>
-      <tr>
-        <td>GMV (volume missions)</td>
-        <td class="center"><strong>480 000€</strong></td>
-        <td class="center">30 K€</td><td class="center">90 K€</td><td class="center">200 K€</td><td class="center">480 K€</td>
-        <td>Commission 20% CLINDIT perçue sur GMV</td>
-      </tr>
-      <tr>
-        <td>Revenus commissions (20%)</td>
-        <td class="center"><strong>96 000€</strong></td>
-        <td class="center">6 K€</td><td class="center">18 K€</td><td class="center">40 K€</td><td class="center">96 K€</td>
-        <td>À rapprocher du budget marketing 85,6K€</td>
-      </tr>
-      <tr>
-        <td>ROI Marketing global</td>
-        <td class="center"><strong>> 3×</strong></td>
-        <td class="center">0,2×</td><td class="center">0,8×</td><td class="center">1,5×</td><td class="center">3,2×</td>
-        <td>ROI négatif T1-T2 normal (phase amorçage)</td>
-      </tr>
-    </tbody>
-  </table>
-  </div>
-
-  <!-- JALONS OFFICIELS -->
-  <div class="title-section">🔴 Jalons Officiels — Feuille de Route 2026</div>
-  <div class="gantt-wrap">
-  <table class="scenario">
-    <thead>
-      <tr>
-        <th>#</th>
-        <th>Jalon</th>
-        <th>Date cible</th>
-        <th>Responsable(s)</th>
-        <th>Critère de succès</th>
-        <th>Risque si non atteint</th>
-        <th>Action corrective</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td class="center">J1</td>
-        <td>🛠 V2 Plateforme + offres live</td>
-        <td class="center"><strong>31 Mars 2026</strong></td>
-        <td>CEO + CTO</td>
-        <td>F/G/P fonctionnels en prod, paiement actif</td>
-        <td>Retard cascade sur tous les jalons</td>
-        <td>Sprint dédié + freelance dev si besoin</td>
-      </tr>
-      <tr>
-        <td class="center">J2</td>
-        <td>🏅 10 abonnés Gold</td>
-        <td class="center"><strong>31 Mai 2026</strong></td>
-        <td>SDR + CM</td>
-        <td>10 abonnements Gold actifs et payants</td>
-        <td>Objectif global 31/07 compromis</td>
-        <td>+200€/m Google Ads + relance téléphonique</td>
-      </tr>
-      <tr>
-        <td class="center">J3</td>
-        <td>💎 5 abonnés Platinum</td>
-        <td class="center"><strong>30 Juin 2026</strong></td>
-        <td>CEO + Account Mgr</td>
-        <td>5 contrats Platinum signés</td>
-        <td>Sous-utilisation canal premium</td>
-        <td>Prospection réseau personnel + apporteurs</td>
-      </tr>
-      <tr class="highlight">
-        <td class="center">J4 ⚑</td>
-        <td>🎯 30 abonnés Gold + Platinum</td>
-        <td class="center"><strong>31 Juillet 2026</strong></td>
-        <td>TOUTE L'ÉQUIPE</td>
-        <td>≥ 30 abonnements actifs (any mix G+P)</td>
-        <td>Révision stratégique. Scénario pivot activé.</td>
-        <td>Audit tunnel conversion + offre spéciale été</td>
-      </tr>
-      <tr>
-        <td class="center">J5</td>
-        <td>📈 500 entreprises clientes</td>
-        <td class="center"><strong>31 Déc 2026</strong></td>
-        <td>Commercial + CM</td>
-        <td>500 clients actifs · GMV 480K€</td>
-        <td>Revenus insuffisants · ROI < 1×</td>
-        <td>Activation canal SEO long terme + partenariats</td>
-      </tr>
-    </tbody>
-  </table>
-  </div>
-
-</div>
-</div>
-
-<!-- ============================================================ -->
-<!--  VOLUME MISSIONS                                            -->
-<!-- ============================================================ -->
-<div id="tab-missions" class="section">
-<div class="container">
-
-  <div class="title-section">⚡ Modélisation Volume de Missions & Revenus par Palier</div>
-
-  <div class="mission-box">
-    <div class="mbox">
-      <div class="mbox-title f">🌱 FREEMIUM — 1 mission/jour</div>
-      <div class="mbox-row"><span>Missions/jour/pro</span><span>1</span></div>
-      <div class="mbox-row"><span>Missions/mois/pro</span><span>~22</span></div>
-      <div class="mbox-row"><span>Visibilité plateforme</span><span>Standard (rang 3)</span></div>
-      <div class="mbox-row"><span>Accès leads qualifiés</span><span>Limité</span></div>
-      <div class="mbox-divider"></div>
-      <div class="mbox-row"><span>Coût pour le pro</span><span style="color:var(--freemium);">Gratuit</span></div>
-      <div class="mbox-row"><span>Commission CLINDIT</span><span>20% GMV</span></div>
-      <div class="mbox-row"><span>Missions T1 (30 pros)</span><span>~660/mois</span></div>
-      <div class="mbox-row"><span>Missions T3 (110 pros)</span><span>~2 420/mois</span></div>
+  </header>
+
+  <!-- ── Hero ─────────────────────────────────────────────────── -->
+  <section id="accueil">
+    <div class="hero-grid"></div>
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+    <div class="container">
+      <div class="hero-layout">
+
+        <!-- Colonne gauche : texte -->
+        <div class="hero-content">
+          <div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:28px;">
+            <div class="hero-badge" style="margin-bottom:0;">Formateur &amp; Expert IA pour TPE</div>
+            <div class="qualiopi-badge">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+              Certifié Qualiopi
+            </div>
+          </div>
+
+          <h1 class="hero-title">
+            Formation <span class="gradient">entrepreneuriat</span><br />
+            &amp; <span class="gradient">intelligence artificielle</span><br />
+            partout en France
+          </h1>
+
+          <p class="hero-desc">
+            Gabriel Vanderbecken — formateur et entrepreneur depuis plus de 7 ans.
+            J'aide les porteurs de projet et les TPE à créer, structurer et accélérer leur activité grâce à des méthodes concrètes et aux meilleurs outils IA du moment.
+          </p>
+
+          <div class="hero-actions">
+            <a href="#services" class="btn btn-accent">
+              Lancer mon entreprise
+              <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                <path d="M5 12h14M12 5l7 7-7 7"/>
+              </svg>
+            </a>
+            <a href="/formations-entreprises.html" class="btn btn-outline">Former mes équipes</a>
+          </div>
+
+          <div class="hero-stats">
+            <div class="hero-stat">
+              <strong>1 500+</strong>
+              <span>Porteurs de projet accompagnés</span>
+            </div>
+            <div class="hero-stat">
+              <strong>2</strong>
+              <span>Entreprises créées &amp; dirigées</span>
+            </div>
+            <div class="hero-stat">
+              <strong>6</strong>
+              <span>Modules enseignés en entreprise &amp; école de commerce</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Colonne droite : carousel photos -->
+        <div class="hero-photo-col">
+          <div class="hero-photo-wrapper" style="width:100%;max-width:420px;">
+            <div class="hero-photo-glow"></div>
+            <div class="hero-carousel" id="heroCarousel">
+              <div class="hero-carousel-track" id="heroCarouselTrack">
+                <div class="hero-carousel-slide">
+                  <img src="https://images.unsplash.com/photo-1524178232363-1fb2b075b655?w=840&q=80&auto=format&fit=crop" alt="Formation entrepreneuriat en salle" loading="eager" />
+                  <div class="hero-carousel-caption">Formation création d'entreprise</div>
+                </div>
+                <div class="hero-carousel-slide">
+                  <img src="https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=840&q=80&auto=format&fit=crop" alt="Conférence entrepreneuriat" loading="lazy" />
+                  <div class="hero-carousel-caption">Conférence &amp; prise de parole publique</div>
+                </div>
+                <div class="hero-carousel-slide">
+                  <img src="https://images.unsplash.com/photo-1557804506-669a67965ba0?w=840&q=80&auto=format&fit=crop" alt="Coaching individuel entrepreneur" loading="lazy" />
+                  <div class="hero-carousel-caption">Accompagnement individuel</div>
+                </div>
+                <div class="hero-carousel-slide">
+                  <img src="https://images.unsplash.com/photo-1552664730-d307ca884978?w=840&q=80&auto=format&fit=crop" alt="Formation équipe en entreprise" loading="lazy" />
+                  <div class="hero-carousel-caption">Formations en entreprise</div>
+                </div>
+              </div>
+              <div class="hero-carousel-dots" id="heroCarouselDots">
+                <div class="hero-carousel-dot active" data-index="0"></div>
+                <div class="hero-carousel-dot" data-index="1"></div>
+                <div class="hero-carousel-dot" data-index="2"></div>
+                <div class="hero-carousel-dot" data-index="3"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
     </div>
-    <div class="mbox">
-      <div class="mbox-title g">🏅 GOLD — 5 missions/jour</div>
-      <div class="mbox-row"><span>Missions/jour/pro</span><span>5</span></div>
-      <div class="mbox-row"><span>Missions/mois/pro</span><span>~110</span></div>
-      <div class="mbox-row"><span>Visibilité plateforme</span><span>Priorité (rang 2)</span></div>
-      <div class="mbox-row"><span>Accès leads qualifiés</span><span>Étendu</span></div>
-      <div class="mbox-divider"></div>
-      <div class="mbox-row"><span>Abonnement mensuel</span><span style="color:var(--gold);">Payant (tarif à définir)</span></div>
-      <div class="mbox-row"><span>Commission CLINDIT</span><span>20% GMV</span></div>
-      <div class="mbox-row"><span>Missions T2 (10 pros Gold)</span><span>~1 100/mois</span></div>
-      <div class="mbox-row"><span>Missions T3 (20 pros Gold)</span><span>~2 200/mois</span></div>
-    </div>
-    <div class="mbox">
-      <div class="mbox-title p">💎 PLATINUM — 10 missions/jour</div>
-      <div class="mbox-row"><span>Missions/jour/pro</span><span>10</span></div>
-      <div class="mbox-row"><span>Missions/mois/pro</span><span>~220</span></div>
-      <div class="mbox-row"><span>Visibilité plateforme</span><span>Premium (rang 1)</span></div>
-      <div class="mbox-row"><span>Accès leads qualifiés</span><span>Complet + Illimité</span></div>
-      <div class="mbox-divider"></div>
-      <div class="mbox-row"><span>Abonnement mensuel</span><span style="color:#546e7a;">Premium (tarif à définir)</span></div>
-      <div class="mbox-row"><span>Commission CLINDIT</span><span>20% GMV</span></div>
-      <div class="mbox-row"><span>Missions T2 (3 pros Plat.)</span><span>~660/mois</span></div>
-      <div class="mbox-row"><span>Missions T3 (10 pros Plat.)</span><span>~2 200/mois</span></div>
+  </section>
+
+
+  <!-- ── Stats Impact ──────────────────────────────────────────── -->
+  <div style="background:var(--bg2);border-top:1px solid var(--border);border-bottom:1px solid var(--border);padding:18px 0;">
+    <div class="container">
+      <div style="display:flex;align-items:center;justify-content:center;gap:40px;flex-wrap:wrap;text-align:center;">
+        <div style="display:flex;align-items:center;gap:10px;">
+          <span style="font-size:1.1rem;">📉</span>
+          <span style="font-size:0.88rem;color:var(--muted);line-height:1.4;"><strong style="color:var(--text);">1 entreprise sur 2</strong> ferme avant 5 ans en France <span style="font-size:0.72rem;opacity:0.6;">(INSEE)</span></span>
+        </div>
+        <div style="width:1px;height:28px;background:var(--border);"></div>
+        <div style="display:flex;align-items:center;gap:10px;">
+          <span style="font-size:1.1rem;">📈</span>
+          <span style="font-size:0.88rem;color:var(--muted);line-height:1.4;"><strong style="color:var(--accent);">+20 points de survie</strong> avec un accompagnement structuré <span style="font-size:0.72rem;opacity:0.6;">(INSEE/BGE)</span></span>
+        </div>
+        <div style="width:1px;height:28px;background:var(--border);"></div>
+        <div style="display:flex;align-items:center;gap:10px;">
+          <span style="font-size:1.1rem;">🇫🇷</span>
+          <span style="font-size:0.88rem;color:var(--muted);line-height:1.4;"><strong style="color:var(--text);">1,2 million</strong> d'entreprises créées en 2025</span>
+        </div>
+      </div>
     </div>
   </div>
 
-  <div class="title-section">📈 Projection Volume Total — Scénario Pessimiste (Objectif 31/07)</div>
+  <!-- ── Services ─────────────────────────────────────────────── -->
+  <section id="services">
+    <div class="container">
+      <div class="section-label reveal"><span>Ce que je propose</span></div>
+      <h2 class="section-title reveal">Nos formations — <span style="color:var(--primary)">choisissez votre parcours</span></h2>
+      <p class="section-sub reveal">Vous lancez votre entreprise ou vous voulez structurer une activité récente ? 3 formules pour passer de l'idée au premier client — ou reprendre les bases sur de bons rails.</p>
 
-  <div class="gantt-wrap">
-  <table class="scenario">
-    <thead>
-      <tr>
-        <th>Trimestre</th>
-        <th>Pros Freemium</th>
-        <th>Pros Gold</th>
-        <th>Pros Platinum</th>
-        <th>Total G+P payants</th>
-        <th>Missions/mois totales</th>
-        <th>GMV estimée/mois (panier moy. 150€)</th>
-        <th>Commission CLINDIT (~20%)</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><strong>T1 — Jan/Mars</strong></td>
-        <td class="center">30</td>
-        <td class="center"><span class="pill pill-r">2</span></td>
-        <td class="center"><span class="pill pill-r">0</span></td>
-        <td class="center"><strong>2</strong></td>
-        <td class="center">880</td>
-        <td class="center">132 000€</td>
-        <td class="center">26 400€</td>
-      </tr>
-      <tr>
-        <td><strong>T2 — Avr/Juin</strong></td>
-        <td class="center">70</td>
-        <td class="center"><span class="pill pill-o">10</span></td>
-        <td class="center"><span class="pill pill-o">3</span></td>
-        <td class="center"><strong>13</strong></td>
-        <td class="center">2 870</td>
-        <td class="center">430 500€</td>
-        <td class="center">86 100€</td>
-      </tr>
-      <tr class="highlight">
-        <td><strong>⚑ 31 JUILLET 2026</strong></td>
-        <td class="center">90</td>
-        <td class="center"><span class="pill pill-g">20</span></td>
-        <td class="center"><span class="pill pill-g">10</span></td>
-        <td class="center" style="color:#e65100;font-weight:800;">⚑ 30</td>
-        <td class="center">4 180</td>
-        <td class="center">627 000€</td>
-        <td class="center">125 400€</td>
-      </tr>
-      <tr>
-        <td><strong>T3 — Juil/Sep</strong></td>
-        <td class="center">110</td>
-        <td class="center"><span class="pill pill-g">20</span></td>
-        <td class="center"><span class="pill pill-g">10</span></td>
-        <td class="center"><strong>30</strong></td>
-        <td class="center">4 620</td>
-        <td class="center">693 000€</td>
-        <td class="center">138 600€</td>
-      </tr>
-      <tr>
-        <td><strong>T4 — Oct/Déc</strong></td>
-        <td class="center">150</td>
-        <td class="center"><span class="pill pill-g">25</span></td>
-        <td class="center"><span class="pill pill-g">13</span></td>
-        <td class="center"><strong>38</strong></td>
-        <td class="center">6 560</td>
-        <td class="center">984 000€</td>
-        <td class="center">196 800€</td>
-      </tr>
-      <tr style="background:#e8f5e9;font-weight:700;">
-        <td><strong>TOTAL ANNUEL 2026</strong></td>
-        <td class="center">150 actifs</td>
-        <td class="center">25 Gold</td>
-        <td class="center">13 Platinum</td>
-        <td class="center">38</td>
-        <td class="center">~39 000/an</td>
-        <td class="center" style="color:var(--green);">~5,8 M€ GMV</td>
-        <td class="center" style="color:var(--green);">~1,16 M€</td>
-      </tr>
-    </tbody>
-  </table>
-  </div>
+      <div style="text-align:center;margin-top:16px;margin-bottom:32px;" class="reveal">
+        <a href="/blog/combien-coute-creation-entreprise-2026.html" style="display:inline-flex;align-items:center;gap:8px;font-size:0.88rem;font-weight:600;color:var(--primary);transition:gap 0.2s;padding:10px 20px;border:1px solid rgba(26,60,255,0.2);border-radius:50px;background:rgba(26,60,255,0.05);" onmouseover="this.style.gap='12px';this.style.background='rgba(26,60,255,0.1)'" onmouseout="this.style.gap='8px';this.style.background='rgba(26,60,255,0.05)'">
+          📊 Combien coûte réellement la création d'une entreprise ?
+          <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </a>
+      </div>
 
-  <div class="footer-note" style="margin-top:16px;">
-    <strong>📌 Hypothèses de calcul :</strong> Panier moyen mission nettoyage professionnel = 150€ HT (marché Grand Est, nettoyage après-travaux/bureaux/logement). Commission CLINDIT = 20% GMV (confirmé FAQ officielle). Taux d'activité professionnels = 70% (hors absences/congés). Jours ouvrés/mois = 22. Ces projections sont <strong>conservatives (scénario pessimiste)</strong> — le scénario optimiste verrait ×2 à ×3 sur la GMV avec une accélération des conversions Gold/Platinum.
-  </div>
+      <div class="pricing-grid">
 
-</div>
-</div>
+        <!-- ESSENTIEL -->
+        <div class="pricing-card reveal reveal-delay-1">
+          <div class="pricing-icon">⚡</div>
+          <h3 class="pricing-name">Essentiel</h3>
+          <p class="pricing-desc">Vous avez votre idée, vous savez où vous allez — il vous faut le bon statut et la bonne structure pour démarrer.</p>
+          <div class="pricing-price">300€</div>
+          <p class="pricing-price-note">*Frais de tiers non inclus (frais de greffe &amp; annonce légale, environ 200€)</p>
+          <ul class="pricing-features">
+            <li>Conseil personnalisé sur le choix du statut juridique (micro, EURL, SASU)</li>
+            <li>Création complète de votre société : rédaction des statuts, dépôt de capital, dépôt du dossier &amp; obtention du Kbis — certifié par un expert-comptable</li>
+            <li>Orientation vers les aides disponibles (ACRE, ARCE)</li>
+            <li>Accompagnement par un entrepreneur expérimenté</li>
+          </ul>
+          <a href="https://calendly.com/gabriel-ia-entrepreneur/decouverte" target="_blank" rel="noopener noreferrer" class="pricing-cta pricing-cta-outline">
+            Réserver mon appel gratuit
+          </a>
+        </div>
 
-<!-- ============================================================ -->
-<!--  ANALYSE EXPERTE                                            -->
-<!-- ============================================================ -->
-<div id="tab-analyse" class="section">
-<div class="container">
+        <!-- PRO — FEATURED -->
+        <div class="pricing-card featured reveal reveal-delay-2">
+          <div class="pricing-badge">Le + populaire</div>
+          <div class="pricing-icon">🚀</div>
+          <h3 class="pricing-name">Pro</h3>
+          <p class="pricing-desc">Le parcours complet pour créer votre entreprise de A à Z — de l'idée au premier client.</p>
+          <div class="pricing-price">1 000€</div>
+          <p class="pricing-price-note">*Frais de tiers non inclus (frais de greffe &amp; annonce légale, environ 200€) — Offre de lancement, places limitées</p>
+          <ul class="pricing-features">
+            <li style="color:var(--accent);font-weight:700;border-bottom:1px solid var(--border);padding-bottom:12px;margin-bottom:4px;">✦ Tout ce qui est inclus dans l'offre Essentiel</li>
+            <li>Étude de marché complète : concurrence, positionnement &amp; produit/service</li>
+            <li>Business plan avec 3 scénarios (pessimiste, réaliste, optimiste)</li>
+            <li>Dossier de financement complet (ACRE, ARCE, prêt d'honneur, aides régionales)</li>
+            <li>Stratégie premières ventes &amp; acquisition clients</li>
+            <li>Kit de lancement marketing (Google My Business + site web)</li>
+          </ul>
+          <a href="https://calendly.com/gabriel-ia-entrepreneur/decouverte" target="_blank" rel="noopener noreferrer" class="pricing-cta pricing-cta-primary">
+            Réserver mon appel gratuit
+            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M22 2L11 13M22 2L15 22l-4-9-9-4 20-7z"/></svg>
+          </a>
+        </div>
 
-  <div class="title-section">🔍 Analyse Experte — Audit Stratégique CLINDIT 2026</div>
+        <!-- PREMIUM -->
+        <div class="pricing-card reveal reveal-delay-3">
+          <div class="pricing-icon">👑</div>
+          <h3 class="pricing-name">Premium</h3>
+          <p class="pricing-desc">L'accompagnement individuel et exclusif — je construis votre entreprise avec vous, en one-to-one.</p>
+          <div class="pricing-price">3 000€</div>
+          <p class="pricing-price-note">*Frais de tiers non inclus (frais de greffe &amp; annonce légale, environ 200€)</p>
+          <ul class="pricing-features">
+            <li style="color:var(--accent);font-weight:700;border-bottom:1px solid var(--border);padding-bottom:12px;margin-bottom:4px;">✦ Tout ce qui est inclus dans l'offre Pro</li>
+            <li>Accompagnement 100% individuel (one-to-one, pas en groupe)</li>
+            <li>Accès direct par téléphone &amp; WhatsApp pendant 3 mois</li>
+            <li>3 sessions de suivi post-création (à 1, 2 et 3 mois)</li>
+            <li>Relecture et validation personnelle de tous vos documents</li>
+            <li>Stratégie d'acquisition clients sur mesure avec mise en place opérationnelle</li>
+          </ul>
+          <a href="https://calendly.com/gabriel-ia-entrepreneur/decouverte" target="_blank" rel="noopener noreferrer" class="pricing-cta pricing-cta-outline">
+            Réserver mon appel gratuit
+          </a>
+        </div>
 
-  <div class="analysis-grid">
-    <div class="analysis-card">
-      <h3>💪 Forces identifiées</h3>
-      <ul>
-        <li>Marché adressable énorme : 17 Md€, croissance +3%/an · 15 000 entreprises en France</li>
-        <li>Modèle commission 20% GMV = revenus sans friction · zéro coût d'entrée côté pro</li>
-        <li>Ancrage local fort Grand Est (Strasbourg) = test market réel avant scaling national</li>
-        <li>3 paliers tarifaires clairs (F/G/P) = upsell naturel avec proposition de valeur différenciée</li>
-        <li>Budget plan d'action complet et structuré en 12 axes cohérents</li>
-        <li>Mix acquisition équilibré : digital (SEO/SEA) + terrain (salons) + humain (SDR)</li>
-      </ul>
+      </div>
+
+
+      <!-- Encart Formations Entreprises -->
+      <div style="margin-top:32px;background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:28px 24px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:20px;" class="reveal">
+        <div>
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+            <span style="font-size:1.4rem;">🏢</span>
+            <h3 style="font-size:1.15rem;font-weight:800;color:var(--text);">Vous êtes une entreprise ?</h3>
+          </div>
+          <p style="font-size:0.92rem;color:var(--muted);max-width:520px;line-height:1.6;">Formations sur mesure pour vos équipes : prospection, négociation, vente, management, prise de parole en public et IA appliquée. <strong style="color:var(--accent);">Certifié Qualiopi</strong> — finançable sur budget formation entreprise (OPCO). Non éligible CPF.</p>
+        </div>
+        <a href="/formations-entreprises.html" style="display:inline-flex;align-items:center;gap:8px;padding:12px 24px;border-radius:50px;font-weight:700;font-size:0.9rem;background:transparent;color:var(--text);border:1.5px solid var(--border);cursor:pointer;transition:all 0.2s;text-decoration:none;white-space:nowrap;" onmouseover="this.style.borderColor='var(--primary)';this.style.color='var(--primary)';this.style.transform='translateY(-2px)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text)';this.style.transform='translateY(0)'">
+          Découvrir nos formations entreprises
+          <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </a>
+      </div>
+
+
+
+      <p class="pricing-footer-note reveal">
+        Toutes les formations sont dispensées en présentiel, distanciel ou e-learning.<br>
+        <strong>Certifié Qualiopi</strong> — finançable sur budget formation entreprise via votre OPCO. Non éligible CPF (dossier EDOF en cours). <strong>Profitez du tarif lancement avant augmentation.</strong>
+      </p>
     </div>
-    <div class="analysis-card">
-      <h3>⚠️ Risques identifiés</h3>
-      <ul>
-        <li>Cycle de vente Platinum long (6-10 sem) → difficile d'atteindre 10 Platinum avant 31/07</li>
-        <li>Dépendance forte à la V2 plateforme (toute la stratégie bloquée si retard dev)</li>
-        <li>ROI négatif T1-T2 : budget investi avant revenus · besoin de trésorerie</li>
-        <li>Concurrents (Yoojo, Wecasa) mieux financés sur le B2C · différenciation B2B nécessaire</li>
-        <li>Équipe probablement réduite (startup) → goulot d'étranglement humain sur le closing</li>
-        <li>Churn Freemium élevé si valeur perçue insuffisante avant conversion Gold</li>
-      </ul>
+  </section>
+
+  <!-- ── À propos ──────────────────────────────────────────────── -->
+  <section id="apropos">
+    <div class="container">
+      <div class="section-label reveal"><span>À propos</span></div>
+
+      <div class="apropos-layout">
+
+        <!-- Colonne gauche : texte -->
+        <div class="apropos-text reveal">
+          <h2>Un entrepreneur qui forme<br /><span style="color:var(--accent)">des entrepreneurs</span></h2>
+          <p style="font-size:0.9rem;color:var(--primary);font-weight:600;margin-bottom:24px;border-left:3px solid var(--primary);padding-left:12px;">Chaque formation est construite à partir d'expériences réelles — pas de théorie descendante, pas de slides récités.</p>
+
+          <p>Je suis <strong>Gabriel Vanderbecken</strong>, formateur et entrepreneur basé dans le <strong>Grand Est</strong>. Je ne transmets pas ce que j'ai lu — <strong>je transmets ce que j'ai construit</strong>. J'ai fondé deux entreprises et accompagné plus de <strong>1 500 porteurs de projet</strong>. Quand j'ai lancé Clindit, la V1 ne correspondait pas au marché — comme YouTube qui a démarré comme un site de rencontres. On a écouté, pivoté, et construit ce que le terrain nous demandait. C'est cette discipline que j'enseigne.</p>
+
+          
+
+          <p>Ma méthode est simple : d'abord, on valide que votre projet est en adéquation avec le marché et vos moyens. Ensuite seulement, on automatise et on pérennise avec l'IA. Aujourd'hui, l'information est gratuite — ce qui manque aux entrepreneurs, c'est <strong>l'expérience terrain</strong>. C'est ça que je transmets. <strong>C'est dans cet ordre que ça fonctionne.</strong></p>
+          
+
+          <div class="apropos-cta">
+            <a href="https://www.linkedin.com/in/gabriel-vanderbecken/" target="_blank" rel="noopener noreferrer" class="btn-linkedin">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 0 1-2.063-2.065 2.064 2.064 0 1 1 2.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
+              </svg>
+              Me retrouver sur LinkedIn →
+            </a>
+          </div>
+        </div>
+
+        <!-- Colonne droite : compétences liées aux formations -->
+        <div class="apropos-realisations reveal reveal-delay-2">
+
+          <!-- Bloc 1: Création d'entreprise -->
+          <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:20px;margin-bottom:14px;">
+            <div style="font-size:0.72rem;font-weight:800;letter-spacing:0.1em;text-transform:uppercase;color:var(--primary);margin-bottom:10px;">→ Création d'entreprise</div>
+            <div class="realisation-item" style="border:none;padding:6px 0;">
+              <div class="realisation-icon">📋</div>
+              <div class="realisation-text">1 500+ porteurs de projet accompagnés<span>En cabinet comptable &amp; en formation</span></div>
+            </div>
+            <div class="realisation-item" style="border:none;padding:6px 0;">
+              <div class="realisation-icon">🏢</div>
+              <div class="realisation-text">2 entreprises créées &amp; dirigées<span>Clindit &amp; Gains Analyses B2B</span></div>
+            </div>
+            <div class="realisation-item" style="border:none;padding:6px 0;">
+              <div class="realisation-icon">💰</div>
+              <div class="realisation-text">10 000€ économisés/an pour un client<span>Optimisation de statut juridique</span></div>
+            </div>
+          </div>
+
+          <!-- Bloc 2: Vente, négociation & prospection -->
+          <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:20px;margin-bottom:14px;">
+            <div style="font-size:0.72rem;font-weight:800;letter-spacing:0.1em;text-transform:uppercase;color:var(--accent);margin-bottom:10px;">→ Vente, négociation &amp; prospection</div>
+            <div class="realisation-item" style="border:none;padding:6px 0;">
+              <div class="realisation-icon">🎯</div>
+              <div class="realisation-text">+100 RDV qualifiés/mois<span>Système de prospection automatisé créé par mes soins</span></div>
+            </div>
+            <div class="realisation-item" style="border:none;padding:6px 0;">
+              <div class="realisation-icon">🤝</div>
+              <div class="realisation-text">Partenariats grands comptes négociés<span>Dont Derichebourg — closing terrain</span></div>
+            </div>
+            <div class="realisation-item" style="border:none;padding:6px 0;">
+              <div class="realisation-icon">🎓</div>
+              <div class="realisation-text">Modules négociation &amp; prospection<span>Enseignés en entreprise &amp; à ECM Nancy</span></div>
+            </div>
+          </div>
+
+          <!-- Bloc 3: Prise de parole, management & IA -->
+          <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:20px;">
+            <div style="font-size:0.72rem;font-weight:800;letter-spacing:0.1em;text-transform:uppercase;color:#7a9fff;margin-bottom:10px;">→ Prise de parole, management &amp; IA</div>
+            <div class="realisation-item" style="border:none;padding:6px 0;">
+              <div class="realisation-icon">🎤</div>
+              <div class="realisation-text">3 conférences publiques<span>Go Entrepreneur, France Travail, ECM Nancy</span></div>
+            </div>
+            <div class="realisation-item" style="border:none;padding:6px 0;">
+              <div class="realisation-icon">👥</div>
+              <div class="realisation-text">+10 personnes managées<span>En cabinet et dans mes entreprises</span></div>
+            </div>
+            <div class="realisation-item" style="border:none;padding:6px 0;">
+              <div class="realisation-icon">⚡</div>
+              <div class="realisation-text">5h gagnées/semaine grâce à l'IA<span>Automatisation appliquée sur mes propres entreprises</span></div>
+            </div>
+          </div>
+
+        </div>
+      </div>
     </div>
-    <div class="analysis-card">
-      <h3>🎯 Recommandations prioritaires</h3>
-      <ul>
-        <li><strong>R1 :</strong> Valider la V2 plateforme au plus tard le 28 Fév (marge avant jalon 31 Mars)</li>
-        <li><strong>R2 :</strong> Démarrer la prospection Platinum dès Janvier (cycles longs = pipeline long)</li>
-        <li><strong>R3 :</strong> Créer un "pack lancement" Gold/Platinum avec offre early-bird (prix réduit 3 mois)</li>
-        <li><strong>R4 :</strong> Prioriser les partenariats apporteurs dès T1 (ROI le plus rapide sur abonnements)</li>
-        <li><strong>R5 :</strong> Mettre en place un tableau de bord hebdomadaire (pas trimestriel) pour la montée Gold+Plat</li>
-        <li><strong>R6 :</strong> Prévoir un trigger d'alerte à 15 abonnés payants le 31/05 (mi-parcours)</li>
-      </ul>
+  </section>
+
+  <!-- ── Chiffres clés ─────────────────────────────────────────── -->
+  <section id="chiffres">
+    <div class="chiffres-bg"></div>
+    <div class="container">
+      <div class="chiffres-grid reveal">
+        <div class="chiffre-item">
+          <div class="chiffre-num accent">1 500+</div>
+          <div class="chiffre-label">Porteurs de projet<br>accompagnés</div>
+        </div>
+        <div class="chiffre-item">
+          <div class="chiffre-num accent">2</div>
+          <div class="chiffre-label">Entreprises créées<br>&amp; dirigées</div>
+        </div>
+        <div class="chiffre-item">
+          <div class="chiffre-num accent">6</div>
+          <div class="chiffre-label">Modules enseignés<br>en entreprise &amp; école de commerce</div>
+        </div>
+        <div class="chiffre-item">
+          <div class="chiffre-num accent">3</div>
+          <div class="chiffre-label">Conférences publiques<br>Go Entrepreneur, France Travail, ECM</div>
+        </div>
+      </div>
     </div>
-    <div class="analysis-card">
-      <h3>🏁 Benchmarks marché 2026</h3>
-      <ul>
-        <li>Marché nettoyage pro France : 17 Md€ · +3%/an · 15 000 entreprises</li>
-        <li>Taux adoption SaaS B2B nettoyage : ~8% (forte marge de progression)</li>
-        <li>Benchmark conversion Freemium→Payant B2B : 10-25% selon secteur</li>
-        <li>Panier moyen prestation nettoyage professionnel : 120-200€ HT</li>
-        <li>Taux de récurrence clients B2B nettoyage : 60-75% (fidélité forte)</li>
-        <li>CAC moyen marketplace B2B services : 100-250€ selon canal acquisition</li>
-      </ul>
+  </section>
+
+
+  <!-- ── Comment ça marche ──────────────────────────────────────── -->
+  <section id="methode" style="padding:50px 0;position:relative;">
+    <div style="content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.08),transparent);"></div>
+    <div class="container">
+      <div class="section-label reveal"><span>Votre parcours</span></div>
+      <h2 class="section-title reveal">Comment ça marche</h2>
+      <p class="section-sub reveal">Un accompagnement structuré en 4 étapes — de la prise de contact au lancement de votre activité.</p>
+
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:24px;position:relative;" class="reveal">
+        <!-- Ligne de connexion -->
+        <div style="position:absolute;top:48px;left:calc(12.5% + 24px);right:calc(12.5% + 24px);height:2px;background:linear-gradient(90deg,#1A3CFF,#10B981);opacity:0.3;z-index:0;"></div>
+
+        <div style="text-align:center;position:relative;z-index:1;">
+          <div style="width:96px;height:96px;border-radius:50%;background:rgba(26,60,255,0.15);border:2px solid rgba(26,60,255,0.3);display:flex;align-items:center;justify-content:center;margin:0 auto 20px;font-size:2rem;">📞</div>
+          <div style="font-size:0.75rem;font-weight:800;color:#1A3CFF;letter-spacing:0.1em;text-transform:uppercase;margin-bottom:8px;">Étape 1</div>
+          <h3 style="font-size:1.05rem;font-weight:700;margin-bottom:8px;color:var(--text);">Appel découverte gratuit</h3>
+          <p style="font-size:0.88rem;color:var(--muted);line-height:1.6;">On échange 20 min sur votre projet, vos objectifs et vos freins. Sans engagement.</p>
+        </div>
+
+        <div style="text-align:center;position:relative;z-index:1;">
+          <div style="width:96px;height:96px;border-radius:50%;background:rgba(26,60,255,0.15);border:2px solid rgba(26,60,255,0.3);display:flex;align-items:center;justify-content:center;margin:0 auto 20px;font-size:2rem;">🎯</div>
+          <div style="font-size:0.75rem;font-weight:800;color:#1A3CFF;letter-spacing:0.1em;text-transform:uppercase;margin-bottom:8px;">Étape 2</div>
+          <h3 style="font-size:1.05rem;font-weight:700;margin-bottom:8px;color:var(--text);">Programme personnalisé</h3>
+          <p style="font-size:0.88rem;color:var(--muted);line-height:1.6;">Je construis un programme adapté à votre situation, votre rythme et vos priorités.</p>
+        </div>
+
+        <div style="text-align:center;position:relative;z-index:1;">
+          <div style="width:96px;height:96px;border-radius:50%;background:rgba(16,185,129,0.15);border:2px solid rgba(16,185,129,0.3);display:flex;align-items:center;justify-content:center;margin:0 auto 20px;font-size:2rem;">🚀</div>
+          <div style="font-size:0.75rem;font-weight:800;color:#10B981;letter-spacing:0.1em;text-transform:uppercase;margin-bottom:8px;">Étape 3</div>
+          <h3 style="font-size:1.05rem;font-weight:700;margin-bottom:8px;color:var(--text);">Accompagnement terrain</h3>
+          <p style="font-size:0.88rem;color:var(--muted);line-height:1.6;">On avance ensemble, étape par étape. Business plan, statut, financement, premières ventes.</p>
+        </div>
+
+        <div style="text-align:center;position:relative;z-index:1;">
+          <div style="width:96px;height:96px;border-radius:50%;background:rgba(16,185,129,0.15);border:2px solid rgba(16,185,129,0.3);display:flex;align-items:center;justify-content:center;margin:0 auto 20px;font-size:2rem;">🏆</div>
+          <div style="font-size:0.75rem;font-weight:800;color:#10B981;letter-spacing:0.1em;text-transform:uppercase;margin-bottom:8px;">Étape 4</div>
+          <h3 style="font-size:1.05rem;font-weight:700;margin-bottom:8px;color:var(--text);">Lancement &amp; premiers clients</h3>
+          <p style="font-size:0.88rem;color:var(--muted);line-height:1.6;">Votre entreprise est créée, votre offre est en ligne et vos premiers clients sont signés.</p>
+        </div>
+      </div>
+
+      <div style="text-align:center;margin-top:48px;" class="reveal">
+        <a href="https://calendly.com/gabriel-ia-entrepreneur/decouverte" target="_blank" rel="noopener noreferrer" style="display:inline-flex;align-items:center;gap:8px;padding:14px 28px;border-radius:50px;font-weight:700;font-size:0.95rem;background:#10B981;color:#fff;border:none;cursor:pointer;box-shadow:0 4px 24px rgba(16,185,129,0.35);transition:transform 0.2s,box-shadow 0.2s;text-decoration:none;position:relative;z-index:2;" onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='0 8px 32px rgba(16,185,129,0.5)'" onmouseout="this.style.transform='translateY(0)';this.style.boxShadow='0 4px 24px rgba(16,185,129,0.35)'">
+          Réserver mon appel gratuit
+          <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M22 2L11 13M22 2L15 22l-4-9-9-4 20-7z"/></svg>
+        </a>
+      </div>
     </div>
-  </div>
+  </section>
 
-  <!-- SCENARIO COMPARISON -->
-  <div class="title-section">📊 Comparaison Scénarios — Abonnés Gold+Platinum au 31/07/2026</div>
-  <div class="gantt-wrap" style="margin-bottom:20px;">
-  <table class="scenario">
-    <thead>
-      <tr>
-        <th>Scénario</th>
-        <th>Gold (31/07)</th>
-        <th>Platinum (31/07)</th>
-        <th>Total G+P</th>
-        <th>Conditions requises</th>
-        <th>Probabilité estimée</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr style="background:#ffebee;">
-        <td><strong>🔴 Pessimiste (objectif pivot)</strong></td>
-        <td class="center">20</td>
-        <td class="center">10</td>
-        <td class="center" style="color:#e53935;font-weight:800;">30</td>
-        <td>V2 livrée à temps · SDR actif · 2 salons · 10 apporteurs</td>
-        <td class="center"><strong>65%</strong></td>
-      </tr>
-      <tr style="background:#fff3e0;">
-        <td><strong>🟡 Réaliste (scénario cible)</strong></td>
-        <td class="center">30</td>
-        <td class="center">12</td>
-        <td class="center" style="color:#e65100;font-weight:800;">42</td>
-        <td>+ Vidéo virale + 2 articles presse + réseau apporteurs complet</td>
-        <td class="center"><strong>40%</strong></td>
-      </tr>
-      <tr style="background:#e8f5e9;">
-        <td><strong>🟢 Optimiste</strong></td>
-        <td class="center">40</td>
-        <td class="center">20</td>
-        <td class="center" style="color:var(--green);font-weight:800;">60</td>
-        <td>+ Partenariat institutionnel + article BFM + early-bird pricing</td>
-        <td class="center"><strong>20%</strong></td>
-      </tr>
-    </tbody>
-  </table>
-  </div>
 
-  <!-- ROADMAP CRITIQUE -->
-  <div class="title-section">🚨 Chemin Critique — 100 Jours vers le Jalon 31/07/2026</div>
-  <div class="gantt-wrap">
-  <table class="scenario">
-    <thead>
-      <tr>
-        <th>Semaine</th>
-        <th>Période</th>
-        <th>Action prioritaire</th>
-        <th>Responsable</th>
-        <th>Abonnés payants cibles</th>
-        <th>Point de vigilance</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr><td class="center">S1-S4</td><td>Jan 2026</td><td>Dev V2 · Setup CRM · Lancement Meta Ads · Recrutement SDR</td><td>CTO + CEO</td><td class="center">0 → 1</td><td>Plateforme pas encore live</td></tr>
-      <tr><td class="center">S5-S8</td><td>Fév 2026</td><td>Bêta testeurs Freemium · Séquences email rédaction · Vidéo prod.</td><td>CM + CTO</td><td class="center">1 → 2</td><td>Recrutement 30 premiers pros</td></tr>
-      <tr><td class="center">S9-S13</td><td>Mars 2026</td><td>🔴 V2 LIVE 31/03 · Lancement Google Ads · CP Presse #1</td><td>CEO + CTO</td><td class="center">2 → 5</td><td>Jalon V2 non négociable</td></tr>
-      <tr><td class="center">S14-S18</td><td>Avr 2026</td><td>Salon BTP · SDR 100 app/sem · Email automation live · LinkedIn Ads</td><td>SDR + CM</td><td class="center">5 → 10</td><td>Salon = 50+ leads qualifiés en 2 jours</td></tr>
-      <tr><td class="center">S19-S22</td><td>Mai 2026</td><td>🏅 Jalon 10 Gold · Closing Platinum pipeline · Parrainage actif</td><td>Commercial</td><td class="center">10 → 18</td><td>Alerte si < 8 Gold au 15 Mai</td></tr>
-      <tr><td class="center">S23-S26</td><td>Juin 2026</td><td>💎 Jalon 5 Platinum · Salon Conciergerie · CP Presse #2</td><td>CEO + Acc.Mgr</td><td class="center">18 → 25</td><td>Alerte si < 5 Platinum au 15 Juin</td></tr>
-      <tr class="highlight"><td class="center">S27-S30</td><td>Juil 2026</td><td>🎯 SPRINT FINAL vers 30 · Relances CRM · Offre flash été · Parrainage</td><td>ÉQUIPE</td><td class="center">25 → ≥30</td><td>⚑ JALON 31 JUILLET 2026</td></tr>
-    </tbody>
-  </table>
-  </div>
+  <!-- ── Accompagnement en action ───────────────────────────────── -->
+  <section style="padding:50px 0;position:relative;overflow:hidden;">
+    <div style="position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.08),transparent);"></div>
+    <div class="container">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:40px;align-items:center;" class="reveal">
+        <div>
+          <div class="section-label"><span>Accompagnement terrain</span></div>
+          <h2 style="font-size:clamp(1.5rem,3vw,2.2rem);font-weight:800;line-height:1.2;margin-bottom:20px;">Pas de la théorie.<br><span style="color:var(--primary);">De la pratique.</span></h2>
+          <p style="font-size:1rem;color:var(--muted);line-height:1.85;margin-bottom:16px;">Chaque séance, on avance ensemble sur <strong style="color:var(--text);">votre</strong> projet. On ouvre votre laptop, on construit votre business plan, on rédige vos statuts, on prépare votre dossier de financement — en direct.</p>
+          <p style="font-size:1rem;color:var(--muted);line-height:1.85;margin-bottom:28px;">Ce n'est pas un cours magistral. C'est un <strong style="color:var(--text);">coaching opérationnel</strong> où vous repartez à chaque étape avec des livrables concrets et actionnables.</p>
+          <a href="https://calendly.com/gabriel-ia-entrepreneur/decouverte" target="_blank" rel="noopener noreferrer" style="display:inline-flex;align-items:center;gap:8px;padding:14px 28px;border-radius:50px;font-weight:700;font-size:0.95rem;background:#1A3CFF;color:#fff;box-shadow:0 4px 24px rgba(26,60,255,0.4);transition:transform 0.2s,box-shadow 0.2s;text-decoration:none;" onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='0 8px 32px rgba(26,60,255,0.55)'" onmouseout="this.style.transform='translateY(0)';this.style.boxShadow='0 4px 24px rgba(26,60,255,0.4)'">
+            Réserver mon appel gratuit
+            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M22 2L11 13M22 2L15 22l-4-9-9-4 20-7z"/></svg>
+          </a>
+        </div>
+        <div style="position:relative;">
+          <div style="position:absolute;inset:-16px;border-radius:24px;background:rgba(26,60,255,0.15);filter:blur(30px);z-index:0;"></div>
+          <img src="https://images.unsplash.com/photo-1559136555-9303baea8ebd?w=800&q=80&auto=format&fit=crop" alt="Coaching entrepreneuriat individuel - IA-Entrepreneur" style="position:relative;z-index:1;width:100%;border-radius:20px;box-shadow:0 20px 60px rgba(10,15,44,0.12);" />
+        </div>
+      </div>
+    </div>
+  </section>
 
-  <div class="footer-note" style="margin-top:16px;">
-    <strong>💡 Verdict Expert :</strong> Le scénario de 30 abonnés Gold+Platinum au 31/07/2026 est <strong>atteignable mais tendu</strong>. La contrainte principale n'est pas budgétaire (85 600€ est un budget solide pour ce stade) — c'est la <strong>livraison de la V2 plateforme avant fin mars</strong> et la <strong>longueur des cycles de vente Platinum</strong> (6-10 semaines). La stratégie recommandée est de démarrer le pipeline Platinum dès Janvier (même sans plateforme live), d'activer les apporteurs d'affaires en priorité (ROI le plus rapide), et d'utiliser un pricing early-bird pour les 30 premiers abonnés. La concentration géographique sur le Grand Est est un avantage compétitif réel pour le terrain.
-  </div>
+  <!-- ── Témoignages ───────────────────────────────────────────── -->
+  <section id="temoignages">
+    <div class="container">
+      <div class="section-label reveal"><span>Ils témoignent</span></div>
+      <h2 class="section-title reveal">Ce que disent ceux<br />qui ont <span style="color:var(--accent)">franchi le cap</span></h2>
+      <p class="section-sub reveal">Des centaines d'entrepreneurs ont transformé leur projet grâce à nos formations. Voici quelques retours d'expérience.</p>
 
-</div>
-</div>
+      <div class="temoignages-grid">
 
-<!-- ===================== JS ===================== -->
-<script>
-function showTab(name) {
-  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
-  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-  document.getElementById('tab-' + name).classList.add('active');
-  event.target.classList.add('active');
-}
-</script>
+        <div class="temoignage-card reveal reveal-delay-1">
+          <div class="quote-icon">"</div>
+          <div class="stars">
+            <span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span>
+          </div>
+          <p class="temoignage-text">
+            "Grâce à Gabriel, j'ai arrêté de procrastiner et j'ai lancé ma boutique en ligne en 3 mois. Sa méthode est ultra-concrète — on passe directement à l'action. Les modules sur l'IA m'ont permis de gérer seule mon contenu, mes réseaux et mon service client."
+          </p>
+          <div class="temoignage-author">
+            <div class="author-avatar" style="background:rgba(16,185,129,0.15);color:var(--accent);">SA</div>
+            <div class="author-info">
+              <strong>Sophie A.</strong>
+              <span>Fondatrice d'une boutique e-commerce mode</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="temoignage-card reveal reveal-delay-2">
+          <div class="quote-icon">"</div>
+          <div class="stars">
+            <span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span>
+          </div>
+          <p class="temoignage-text">
+            "La formation IA pour TPE a littéralement changé ma façon de travailler. En 2 semaines j'ai automatisé mes devis, mes relances et mes posts LinkedIn. Je récupère facilement 8h par semaine que je réinvestis dans mon cœur de métier."
+          </p>
+          <div class="temoignage-author">
+            <div class="author-avatar" style="background:rgba(26,60,255,0.15);color:#7a9fff;">TM</div>
+            <div class="author-info">
+              <strong>Thomas M.</strong>
+              <span>Gérant d'une TPE en plomberie-chauffage</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="temoignage-card reveal reveal-delay-3">
+          <div class="quote-icon">"</div>
+          <div class="stars">
+            <span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span>
+          </div>
+          <p class="temoignage-text">
+            "J'avais une idée floue, Gabriel m'a aidé à la structurer en business plan solide en quelques séances. Son accompagnement personnalisé m'a donné la clarté et la confiance nécessaires pour décrocher un financement Bpifrance. Résultat : mon agence est lancée !"
+          </p>
+          <div class="temoignage-author">
+            <div class="author-avatar" style="background:rgba(139,92,246,0.15);color:#a78bfa;">CR</div>
+            <div class="author-info">
+              <strong>Camille R.</strong>
+              <span>Créatrice d'une agence de communication digitale</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Blog ─────────────────────────────────────────────────── -->
+  <section id="blog">
+    <div class="container">
+      <div class="section-label reveal"><span>Ressources &amp; conseils</span></div>
+      <h2 class="section-title reveal">Le blog des entrepreneurs<br /><span style="color:var(--primary)">qui passent à l'action</span></h2>
+      <p class="section-sub reveal">Articles pratiques, retours d'expérience et outils concrets pour avancer dans votre projet — semaine après semaine.</p>
+
+      <div class="blog-grid">
+
+        <div class="blog-card reveal reveal-delay-1">
+          <div class="blog-thumbnail">
+            <img
+              src="https://images.unsplash.com/photo-1556761175-b413da4baf72?w=600&q=80"
+              alt="Les 7 étapes pour créer son entreprise en 2026"
+              loading="lazy"
+            />
+            <div class="blog-thumbnail-overlay"></div>
+          </div>
+          <div class="blog-body">
+            <div class="blog-meta">
+              <span class="blog-cat">Création d'entreprise</span>
+              <span class="blog-date">5 mars 2026</span>
+            </div>
+            <h3>Les 7 étapes incontournables pour créer son entreprise en 2026</h3>
+            <p>De la validation de votre idée à votre premier client payant : voici le chemin exact que j'ai vu parcourir les entrepreneurs qui réussissent. Un guide sans jargon, orienté action.</p>
+            <a href="/blog/7-etapes-creer-son-entreprise-2026.html" class="btn-blog">
+              Lire la suite
+              <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                <path d="M5 12h14M12 5l7 7-7 7"/>
+              </svg>
+            </a>
+          </div>
+        </div>
+
+        <div class="blog-card reveal reveal-delay-2">
+          <div class="blog-thumbnail">
+            <img
+              src="https://images.unsplash.com/photo-1559136555-9303baea8ebd?w=600&q=80"
+              alt="5 erreurs fatales des porteurs de projet"
+              loading="lazy"
+            />
+            <div class="blog-thumbnail-overlay"></div>
+          </div>
+          <div class="blog-body">
+            <div class="blog-meta">
+              <span class="blog-cat">Création d'entreprise</span>
+              <span class="blog-date">20 février 2026</span>
+            </div>
+            <h3>5 erreurs fatales qui tuent les projets de création d'entreprise</h3>
+            <p>Après avoir accompagné +1 500 porteurs de projet, je vois toujours les mêmes erreurs revenir. Voici celles qui font la différence entre un projet qui décolle et un projet qui s'enlise.</p>
+            <a href="/blog/5-erreurs-porteurs-de-projet.html" class="btn-blog">
+              Lire la suite
+              <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                <path d="M5 12h14M12 5l7 7-7 7"/>
+              </svg>
+            </a>
+          </div>
+        </div>
+
+        <div class="blog-card reveal reveal-delay-3">
+          <div class="blog-thumbnail">
+            <img
+              src="https://images.unsplash.com/photo-1589829545856-d10d557cf95f?w=600&q=80"
+              alt="Quel statut juridique choisir pour créer son entreprise"
+              loading="lazy"
+            />
+            <div class="blog-thumbnail-overlay"></div>
+          </div>
+          <div class="blog-body">
+            <div class="blog-meta">
+              <span class="blog-cat">Statut juridique</span>
+              <span class="blog-date">12 février 2026</span>
+            </div>
+            <h3>Quel statut juridique choisir pour créer son entreprise en 2026 ?</h3>
+            <p>Micro-entreprise, EURL, SASU, SAS… Le choix du statut paralyse beaucoup de créateurs. Voici un comparatif clair et des critères concrets pour faire le bon choix rapidement.</p>
+            <a href="/blog/quel-statut-juridique-choisir-2026.html" class="btn-blog">
+              Lire la suite
+              <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                <path d="M5 12h14M12 5l7 7-7 7"/>
+              </svg>
+            </a>
+          </div>
+        </div>
+
+        <div class="blog-card reveal reveal-delay-4">
+          <div class="blog-thumbnail">
+            <img
+              src="https://images.unsplash.com/photo-1554224155-6726b3ff858f?w=600&q=80"
+              alt="Aides et financements création entreprise 2026"
+              loading="lazy"
+            />
+            <div class="blog-thumbnail-overlay"></div>
+          </div>
+          <div class="blog-body">
+            <div class="blog-meta">
+              <span class="blog-cat">Financements</span>
+              <span class="blog-date">28 janvier 2026</span>
+            </div>
+            <h3>Aides et financements pour créer son entreprise en 2026 : le guide complet</h3>
+            <p>ACRE, ARCE, prêts d'honneur, subventions régionales… La France est l'un des pays les plus généreux pour les créateurs. Encore faut-il connaître les aides et les demander au bon moment.</p>
+            <a href="/blog/aides-financements-creation-entreprise-2026.html" class="btn-blog">
+              Lire la suite
+              <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                <path d="M5 12h14M12 5l7 7-7 7"/>
+              </svg>
+            </a>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Contact ───────────────────────────────────────────────── -->
+  <section id="contact">
+    <div class="container">
+      <div class="contact-wrapper">
+
+        <div class="contact-info">
+          <div class="section-label reveal"><span>Parlons de votre projet</span></div>
+          <h2 class="section-title reveal">Prêt à<br /><span style="color:var(--accent)">franchir le cap ?</span></h2>
+          <p class="reveal">Que vous ayez une question sur mes formations, un projet à structurer ou simplement envie d'échanger — je réponds à tous les messages sous 24h.</p>
+
+          <div class="contact-items">
+            <div class="contact-item reveal reveal-delay-1">
+              <div class="contact-item-icon">✉️</div>
+              <div class="contact-item-text">
+                <strong>E-mail</strong>
+                <a href="mailto:gabriel@ia-entrepreneur.fr">gabriel@ia-entrepreneur.fr</a>
+              </div>
+            </div>
+            <div class="contact-item reveal reveal-delay-2">
+              <div class="contact-item-icon">📞</div>
+              <div class="contact-item-text">
+                <strong>Téléphone</strong>
+                <a href="tel:+33699250344">06 99 25 03 44</a>
+              </div>
+            </div>
+            <div class="contact-item reveal reveal-delay-2">
+              <div class="contact-item-icon">📍</div>
+              <div class="contact-item-text">
+                <strong>Zone d'intervention</strong>
+                <span>Grand Est &amp; France entière — présentiel, distanciel, e-learning</span>
+              </div>
+            </div>
+            <div class="contact-item reveal reveal-delay-3">
+              <div class="contact-item-icon">⚡</div>
+              <div class="contact-item-text">
+                <strong>Réponse rapide</strong>
+                <span>Sous 24h en jours ouvrés</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="contact-form reveal reveal-delay-2">
+          <form
+            action="https://formspree.io/f/meepgzgr"
+            method="POST"
+            id="contact-form"
+          >
+            <div class="form-row">
+              <div class="form-group">
+                <label for="prenom">Prénom</label>
+                <input type="text" id="prenom" name="prenom" placeholder="Jean" required />
+              </div>
+              <div class="form-group">
+                <label for="nom">Nom</label>
+                <input type="text" id="nom" name="nom" placeholder="Dupont" required />
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="email">Adresse e-mail</label>
+              <input type="email" id="email" name="email" placeholder="jean.dupont@email.com" required />
+            </div>
+
+            <div class="form-group">
+              <label for="sujet">Sujet</label>
+              <select id="sujet" name="sujet" required>
+                <option value="" disabled selected>Choisissez un sujet</option>
+                <option>Accompagnement Création d'entreprise</option>
+                <option>Formation IA &amp; Automatisation</option>
+                <option>Intervention en école / organisme</option>
+                <option>Autre demande</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="message">Votre message</label>
+              <textarea id="message" name="message" placeholder="Décrivez brièvement votre projet ou votre question..." required></textarea>
+            </div>
+
+            <button type="submit" class="btn btn-accent form-submit">
+              Envoyer mon message
+              <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                <path d="M22 2L11 13M22 2L15 22l-4-9-9-4 20-7z"/>
+              </svg>
+            </button>
+            <p class="form-note">Aucun spam. Vos données restent confidentielles.</p>
+          </form>
+          <div class="form-success" id="form-success">
+            ✅ Message envoyé ! Je vous réponds sous 24h.
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Footer ───────────────────────────────────────────────── -->
+  <footer>
+    <div class="container">
+
+      <!-- Bande Qualiopi -->
+      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:20px;padding:28px 0;border-bottom:1px solid var(--border);margin-bottom:32px;">
+        <div style="display:flex;align-items:center;gap:20px;flex-wrap:wrap;">
+          <!-- Logo Qualiopi : remplacer l'img src par le chemin du logo officiel PNG téléchargé sur qualiopi.fr -->
+          <img src="qualiopi-logo.png" alt="Logo Qualiopi - Processus certifié" style="height:52px;width:auto;" onerror="this.style.display='none'" />
+          <div>
+            <div style="font-size:0.92rem;font-weight:800;color:var(--text);">Certifié Qualiopi — Processus certifié</div>
+            <div style="font-size:0.78rem;color:var(--muted);margin-top:3px;">Certificat n° 883211-1 · Délivré par Certifopac · Valable jusqu'au 23/04/2029</div>
+            <div style="font-size:0.78rem;color:var(--muted);">Organisme enregistré sous le NDA : 44 54 04871 54 · Accrédité Cofrac n° 5-0620</div>
+          </div>
+        </div>
+        <a href="/qualiopi-certificat.pdf" target="_blank" rel="noopener noreferrer" style="display:inline-flex;align-items:center;gap:8px;padding:10px 20px;border-radius:50px;font-weight:700;font-size:0.82rem;color:var(--primary);border:1.5px solid rgba(26,60,255,0.25);background:rgba(26,60,255,0.05);transition:all 0.2s;text-decoration:none;white-space:nowrap;" onmouseover="this.style.background='rgba(26,60,255,0.10)';this.style.borderColor='var(--primary)'" onmouseout="this.style.background='rgba(26,60,255,0.05)';this.style.borderColor='rgba(26,60,255,0.25)'">
+          <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg>
+          Télécharger le certificat
+        </a>
+      </div>
+
+      <div class="footer-inner">
+        <div class="footer-logo">IA<span>-</span>Entrepreneur</div>
+
+        <div class="footer-center">
+          <div class="footer-links">
+            <a href="#accueil">Accueil</a>
+            <a href="#services">Création d'entreprise</a>
+            <a href="#apropos">À propos</a>
+            <a href="/formations-entreprises.html">Formations entreprises</a>
+            <a href="#blog">Blog</a>
+            <a href="#contact">Contact</a>
+          </div>
+          <a
+            href="https://www.linkedin.com/in/gabriel-vanderbecken/"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="footer-linkedin"
+            aria-label="LinkedIn Gabriel Vanderbecken"
+          >
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 0 1-2.063-2.065 2.064 2.064 0 1 1 2.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
+            </svg>
+            Gabriel Vanderbecken sur LinkedIn
+          </a>
+        </div>
+
+        <div class="footer-right">
+          <p class="footer-copy">© 2026 IA-Entrepreneur — Gabriel Vanderbecken. Tous droits réservés.</p>
+          <p class="footer-tagline">Formation entrepreneuriat France | Formateur IA TPE | Grand Est</p>
+          <p class="footer-tagline">N° de déclaration d'activité : 44 54 04871 54</p>
+        </div>
+      </div><!-- /.footer-inner -->
+    </div><!-- /.container -->
+  </footer>
+
+  <!-- ── JavaScript ────────────────────────────────────────────── -->
+  <script>
+    // ── Header scroll ─────────────────────────────────────────
+    const header = document.getElementById('header');
+    window.addEventListener('scroll', () => {
+      header.classList.toggle('scrolled', window.scrollY > 20);
+    }, { passive: true });
+
+    // ── Progress bar ──────────────────────────────────────────
+    const progressBar = document.getElementById('progress-bar');
+    window.addEventListener('scroll', () => {
+      const scrolled = window.scrollY;
+      const max = document.documentElement.scrollHeight - window.innerHeight;
+      progressBar.style.width = (scrolled / max * 100) + '%';
+    }, { passive: true });
+
+    // ── Back to top ───────────────────────────────────────────
+    const backTop = document.getElementById('back-top');
+    window.addEventListener('scroll', () => {
+      backTop.classList.toggle('visible', window.scrollY > 500);
+    }, { passive: true });
+    backTop.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+
+    // ── Mobile menu ───────────────────────────────────────────
+    const hamburger = document.getElementById('hamburger');
+    const mobileMenu = document.getElementById('mobile-menu');
+    hamburger.addEventListener('click', () => {
+      hamburger.classList.toggle('open');
+      mobileMenu.classList.toggle('open');
+    });
+    mobileMenu.querySelectorAll('a').forEach(link => {
+      link.addEventListener('click', () => {
+        hamburger.classList.remove('open');
+        mobileMenu.classList.remove('open');
+      });
+    });
+
+    // ── Scroll reveal ─────────────────────────────────────────
+    const revealObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+          revealObserver.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
+
+    document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
+
+    // ── Counter animation ─────────────────────────────────────
+    function animateCounter(el, target, suffix) {
+      let current = 0;
+      const duration = 1800;
+      const step = target / (duration / 16);
+      const timer = setInterval(() => {
+        current = Math.min(current + step, target);
+        if (suffix === '+') {
+          el.textContent = Math.floor(current).toLocaleString('fr-FR') + (current >= target ? '+' : '');
+        } else {
+          el.textContent = Math.floor(current) + suffix;
+        }
+        if (current >= target) clearInterval(timer);
+      }, 16);
+    }
+
+    const chiffresSection = document.getElementById('chiffres');
+    let countersStarted = false;
+    const chiffresObserver = new IntersectionObserver((entries) => {
+      if (entries[0].isIntersecting && !countersStarted) {
+        countersStarted = true;
+        const nums = document.querySelectorAll('.chiffre-num');
+        animateCounter(nums[0], 1500, '+');
+        if (nums[1]) nums[1].textContent = '2';
+        if (nums[2]) { animateCounter(nums[2], 6, ''); }
+        if (nums[3]) nums[3].textContent = '3';
+      }
+    }, { threshold: 0.3 });
+    chiffresObserver.observe(chiffresSection);
+
+    // ── Form AJAX submission ──────────────────────────────────
+    const form = document.getElementById('contact-form');
+    const formSuccess = document.getElementById('form-success');
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const btn = form.querySelector('button[type="submit"]');
+      btn.textContent = 'Envoi en cours…';
+      btn.disabled = true;
+
+      try {
+        const response = await fetch(form.action, {
+          method: 'POST',
+          body: new FormData(form),
+          headers: { 'Accept': 'application/json' }
+        });
+
+        if (response.ok) {
+          form.style.display = 'none';
+          formSuccess.style.display = 'block';
+        } else {
+          btn.textContent = 'Réessayer';
+          btn.disabled = false;
+          alert('Une erreur est survenue. Veuillez réessayer.');
+        }
+      } catch {
+        btn.textContent = 'Réessayer';
+        btn.disabled = false;
+        alert('Problème de connexion. Veuillez réessayer.');
+      }
+    });
+
+    // ── Active nav link on scroll ─────────────────────────────
+    const sections = document.querySelectorAll('section[id]');
+    const navLinks = document.querySelectorAll('nav a[href^="#"]');
+
+    const activeObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          navLinks.forEach(link => {
+            link.style.color = '';
+            if (link.getAttribute('href') === '#' + entry.target.id) {
+              link.style.color = 'var(--text)';
+            }
+          });
+        }
+      });
+    }, { threshold: 0.4 });
+
+    sections.forEach(s => activeObserver.observe(s));
+
+    // ── Hero Carousel ─────────────────────────────────────────
+    const carouselTrack = document.getElementById('heroCarouselTrack');
+    const carouselDots = document.querySelectorAll('.hero-carousel-dot');
+    let currentSlide = 0;
+    const totalSlides = 4;
+
+    function goToSlide(index) {
+      currentSlide = index;
+      carouselTrack.style.transform = `translateX(-${index * 100}%)`;
+      carouselDots.forEach((dot, i) => dot.classList.toggle('active', i === index));
+    }
+
+    carouselDots.forEach(dot => {
+      dot.addEventListener('click', () => goToSlide(parseInt(dot.dataset.index)));
+    });
+
+    setInterval(() => {
+      goToSlide((currentSlide + 1) % totalSlides);
+    }, 4000);
+  </script>
+
+<script></script>
 </body>
 </html>
