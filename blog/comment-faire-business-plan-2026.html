@@ -206,10 +206,147 @@
       nav { display: none !important; }
       .hamburger { display: flex !important; }
     }
+
+    /* ══ THÈME BLANC ══════════════════════════════════════════════ */
+    :root {
+      --bg:        #FFFFFF;
+      --bg2:       #F5F7FF;
+      --bg3:       #EEF2FF;
+      --primary:   #1A3CFF;
+      --primary-h: #2d4fff;
+      --accent:    #10B981;
+      --accent-h:  #0ea372;
+      --text:      #0A0F2C;
+      --muted:     #525880;
+      --border:    rgba(10,15,44,0.10);
+      --card:      rgba(10,15,44,0.04);
+      --radius:    14px;
+    }
+
+    body { background: var(--bg) !important; color: var(--text) !important; }
+
+    /* ── Header ────────────────────────────────────────────────── */
+    header {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      background: rgba(255,255,255,0.92);
+      backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px);
+      border-bottom: 1px solid var(--border);
+      box-shadow: 0 2px 24px rgba(10,15,44,0.06);
+    }
+    .header-inner { display: flex; align-items: center; justify-content: space-between; height: 68px; gap: 16px; }
+    .logo { font-size: 1rem; font-weight: 800; color: var(--text) !important; letter-spacing: -0.02em; flex-shrink: 0; line-height: 1.2; text-decoration: none; }
+    .logo span { color: var(--primary); }
+    nav { display: flex; align-items: center; gap: 2px; }
+    nav a { padding: 6px 10px; border-radius: 8px; font-size: 0.78rem; font-weight: 600; color: var(--muted); transition: color 0.2s, background 0.2s; white-space: nowrap; text-decoration: none; }
+    nav a:hover { color: var(--text); background: var(--card); }
+    .nav-cta { background: var(--accent) !important; color: #fff !important; border-radius: 50px !important; padding: 8px 16px !important; font-size: 0.8rem !important; box-shadow: 0 3px 16px rgba(16,185,129,0.35) !important; white-space: nowrap !important; text-decoration: none !important; }
+    nav a.nav-cta, header a.nav-cta, .header-inner a.nav-cta { background: var(--accent) !important; color: #fff !important; }
+    .hamburger { display: none; flex-direction: column; gap: 5px; padding: 8px; background: none; border: none; cursor: pointer; }
+    .hamburger span { display: block; width: 24px; height: 2px; background: var(--text); border-radius: 2px; }
+    .mobile-menu { display: none; flex-direction: column; gap: 4px; padding: 16px 24px 20px; background: rgba(255,255,255,0.98); border-top: 1px solid var(--border); box-shadow: 0 8px 24px rgba(10,15,44,0.08); }
+    .mobile-menu.open { display: flex; }
+    .mobile-menu a { padding: 12px 16px; border-radius: var(--radius); font-weight: 600; color: var(--muted); transition: color 0.2s, background 0.2s; text-decoration: none; }
+    .mobile-menu a:hover { color: var(--text); background: var(--card); }
+
+    /* ── Typographie article ────────────────────────────────────── */
+    /* Texte courant : sombre et lisible */
+    p, li, td, th, dd, dt {
+      color: #1a1f3a !important;
+      line-height: 1.85 !important;
+    }
+    /* Paragraphes dans le corps de l'article */
+    .article-body p,
+    .post-content p,
+    .prose p,
+    .content p,
+    article p,
+    main p,
+    .article-content p {
+      color: #1a1f3a !important;
+      font-size: 1.05rem;
+      line-height: 1.9;
+      margin-bottom: 1.4em;
+    }
+    /* Titres */
+    h1, h2, h3, h4, h5, h6 {
+      color: var(--text) !important;
+    }
+    /* Liens dans le contenu */
+    article a, .article-body a, .prose a, main a:not(.nav-cta):not(.btn) {
+      color: var(--primary);
+      text-decoration: underline;
+      text-decoration-color: rgba(26,60,255,0.3);
+      text-underline-offset: 3px;
+    }
+    article a:hover, .article-body a:hover {
+      text-decoration-color: var(--primary);
+    }
+    /* Blockquote / citation */
+    blockquote {
+      border-left: 3px solid var(--accent);
+      padding: 16px 20px;
+      background: rgba(16,185,129,0.05);
+      border-radius: 0 var(--radius) var(--radius) 0;
+      margin: 24px 0;
+    }
+    blockquote p { color: #1a1f3a !important; font-style: italic; }
+    /* Encarts conseil / tip */
+    .conseil, .tip, .conseil-terrain, .conseil-box,
+    [class*="conseil"], [class*="tip"], [class*="callout"] {
+      background: rgba(16,185,129,0.06) !important;
+      border: 1px solid rgba(16,185,129,0.2) !important;
+      border-radius: var(--radius) !important;
+      color: #1a1f3a !important;
+    }
+    [class*="conseil"] *, [class*="tip"] *, [class*="callout"] * {
+      color: #1a1f3a !important;
+    }
+    /* Listes */
+    ul li, ol li { color: #1a1f3a !important; margin-bottom: 6px; }
+    /* Strong / em */
+    strong { color: var(--text) !important; font-weight: 700; }
+    /* Fil d'ariane / breadcrumb */
+    .breadcrumb a, .breadcrumb span, nav.breadcrumb * { color: var(--muted) !important; }
+    /* Tags / badges */
+    .tag, .badge, .category, [class*="tag"], [class*="badge"], [class*="category"] {
+      background: rgba(26,60,255,0.08) !important;
+      color: var(--primary) !important;
+      border: 1px solid rgba(26,60,255,0.2) !important;
+    }
+    /* Meta (date, temps lecture) */
+    .meta, .post-meta, [class*="meta"] { color: var(--muted) !important; }
+    /* CTA en fin d'article */
+    .article-cta, .post-cta, [class*="cta"] {
+      background: linear-gradient(135deg, rgba(26,60,255,0.05), rgba(16,185,129,0.05)) !important;
+      border: 1px solid var(--border) !important;
+    }
+    [class*="cta"] h2, [class*="cta"] h3, [class*="cta"] p {
+      color: var(--text) !important;
+    }
+    /* Sections alternées */
+    section, .section, [class*="section"] {
+      background: var(--bg) !important;
+    }
+    section:nth-child(even), .bg-alt, [class*="bg2"], [class*="alt"] {
+      background: var(--bg2) !important;
+    }
+    /* Image hero article */
+    .article-hero, .post-hero, .hero-image, [class*="hero"] {
+      margin-top: 68px;
+    }
+    /* Footer */
+    footer { background: var(--bg) !important; border-top: 1px solid var(--border); }
+    footer * { color: var(--muted) !important; }
+    footer a:hover { color: var(--text) !important; }
+
+    @media (max-width: 768px) {
+      nav { display: none !important; }
+      .hamburger { display: flex !important; }
+    }
 </style>
 </head>
 <body>
-      <header>
+        <header>
     <div class="container">
       <div class="header-inner">
         <a href="/" class="logo" style="line-height:1.2;">
@@ -352,7 +489,7 @@
     </div>
   </div>
 
-      <footer>
+        <footer>
     <div class="container">
       <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:20px;padding:24px 0;border-bottom:1px solid var(--border);margin-bottom:28px;">
         <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap;">

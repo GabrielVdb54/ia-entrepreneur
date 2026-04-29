@@ -110,7 +110,8 @@ INJECTED_CSS = '''
     nav { display: flex; align-items: center; gap: 2px; }
     nav a { padding: 6px 10px; border-radius: 8px; font-size: 0.78rem; font-weight: 600; color: var(--muted); transition: color 0.2s, background 0.2s; white-space: nowrap; text-decoration: none; }
     nav a:hover { color: var(--text); background: var(--card); }
-    .nav-cta { background: var(--accent) !important; color: #fff !important; border-radius: 50px !important; padding: 8px 16px !important; font-size: 0.8rem !important; box-shadow: 0 3px 16px rgba(16,185,129,0.35); white-space: nowrap; }
+    .nav-cta { background: var(--accent) !important; color: #fff !important; border-radius: 50px !important; padding: 8px 16px !important; font-size: 0.8rem !important; box-shadow: 0 3px 16px rgba(16,185,129,0.35) !important; white-space: nowrap !important; text-decoration: none !important; }
+    nav a.nav-cta, header a.nav-cta, .header-inner a.nav-cta { background: var(--accent) !important; color: #fff !important; }
     .hamburger { display: none; flex-direction: column; gap: 5px; padding: 8px; background: none; border: none; cursor: pointer; }
     .hamburger span { display: block; width: 24px; height: 2px; background: var(--text); border-radius: 2px; }
     .mobile-menu { display: none; flex-direction: column; gap: 4px; padding: 16px 24px 20px; background: rgba(255,255,255,0.98); border-top: 1px solid var(--border); box-shadow: 0 8px 24px rgba(10,15,44,0.08); }
