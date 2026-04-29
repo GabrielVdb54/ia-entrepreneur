@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Formation Création d'Entreprise | IA-Entrepreneur</title>
-  <meta name="description" content="Formations création d'entreprise pour porteurs de projet et entrepreneurs. Statut juridique, business plan, premiers clients, IA pour TPE. Certifié Qualiopi. Accompagnement individuel ou collectif partout en France." />
+  <meta name="description" content="Accompagnement création d'entreprise : statut juridique, business plan, financement, premiers clients. Certifié Qualiopi. Moins de 5% d'échec parmi nos accompagnés." />
   <link rel="icon" type="image/png" href="favicon.png" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
@@ -15,16 +15,20 @@
     body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);line-height:1.6}
     a{color:inherit;text-decoration:none}
     .container{max-width:1120px;margin:0 auto;padding:0 24px}
+    .reveal{opacity:0;transform:translateY(32px);transition:opacity 0.65s ease,transform 0.65s ease}
+    .reveal.visible{opacity:1;transform:translateY(0)}
+    .reveal-delay-1{transition-delay:0.1s}
+    .reveal-delay-2{transition-delay:0.2s}
+    .reveal-delay-3{transition-delay:0.3s}
 
-    /* Header */
     header{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(255,255,255,0.92);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);border-bottom:1px solid var(--border);box-shadow:0 2px 24px rgba(10,15,44,0.06)}
-    .header-inner{display:flex;align-items:center;justify-content:space-between;height:68px;gap:24px}
-    .logo{font-size:1.15rem;font-weight:800;color:var(--text);letter-spacing:-0.02em;line-height:1.2}
+    .header-inner{display:flex;align-items:center;justify-content:space-between;height:68px;gap:16px}
+    .logo{font-size:1rem;font-weight:800;color:var(--text);letter-spacing:-0.02em;flex-shrink:0;line-height:1.2}
     .logo span{color:var(--primary)}
-    nav{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
-    nav a{padding:7px 14px;border-radius:8px;font-size:0.85rem;font-weight:600;color:var(--muted);transition:color 0.2s,background 0.2s}
+    nav{display:flex;align-items:center;gap:2px}
+    nav a{padding:6px 10px;border-radius:8px;font-size:0.78rem;font-weight:600;color:var(--muted);transition:color 0.2s,background 0.2s;white-space:nowrap}
     nav a:hover{color:var(--text);background:var(--card)}
-    .nav-cta{background:var(--accent)!important;color:#fff!important;border-radius:50px!important;padding:9px 20px!important;box-shadow:0 3px 16px rgba(16,185,129,0.35)}
+    .nav-cta{background:var(--accent)!important;color:#fff!important;border-radius:50px!important;padding:8px 16px!important;font-size:0.8rem!important;box-shadow:0 3px 16px rgba(16,185,129,0.35);white-space:nowrap}
     .hamburger{display:none;flex-direction:column;gap:5px;padding:8px;background:none;border:none;cursor:pointer}
     .hamburger span{display:block;width:24px;height:2px;background:var(--text);border-radius:2px;transition:transform 0.3s,opacity 0.3s}
     .mobile-menu{display:none;flex-direction:column;gap:4px;padding:16px 24px 20px;background:rgba(255,255,255,0.98);border-top:1px solid var(--border);box-shadow:0 8px 24px rgba(10,15,44,0.08)}
@@ -32,77 +36,68 @@
     .mobile-menu a{padding:12px 16px;border-radius:var(--radius);font-weight:600;color:var(--muted);transition:color 0.2s,background 0.2s}
     .mobile-menu a:hover{color:var(--text);background:var(--card)}
 
-    /* Hero */
-    .page-hero{margin-top:68px;padding:80px 0 60px;text-align:center;position:relative;overflow:hidden;background:linear-gradient(180deg,var(--bg2) 0%,var(--bg) 100%)}
-    .page-hero::after{content:'';position:absolute;top:0;left:0;right:0;bottom:0;background:radial-gradient(ellipse 60% 60% at 50% 30%,rgba(16,185,129,0.08),transparent 70%);pointer-events:none}
-    .page-hero-badge{display:inline-flex;align-items:center;gap:8px;padding:6px 16px;background:rgba(16,185,129,0.08);border:1px solid rgba(16,185,129,0.25);border-radius:50px;font-size:0.82rem;font-weight:600;color:var(--accent);margin-bottom:20px;position:relative}
-    .page-hero h1{font-size:clamp(2rem,4vw,3rem);font-weight:800;line-height:1.15;margin-bottom:16px;position:relative}
+    .section-label{display:flex;align-items:center;gap:10px;margin-bottom:16px}
+    .section-label span{font-size:0.78rem;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--accent)}
+    .section-label::before{content:'';display:block;width:28px;height:2px;background:var(--accent);border-radius:2px}
+    h2.section-title{font-size:clamp(1.75rem,4vw,2.6rem);font-weight:800;line-height:1.2;margin-bottom:14px}
+    p.section-sub{font-size:1rem;color:var(--muted);max-width:580px;margin-bottom:48px;line-height:1.8}
+
+    .btn{display:inline-flex;align-items:center;gap:8px;padding:14px 28px;border-radius:50px;font-weight:700;font-size:0.95rem;cursor:pointer;transition:transform 0.2s,box-shadow 0.2s,background 0.2s;border:none;text-decoration:none}
+    .btn-accent{background:var(--accent);color:#fff;box-shadow:0 4px 24px rgba(16,185,129,0.35)}
+    .btn-accent:hover{background:var(--accent-h);transform:translateY(-2px);box-shadow:0 8px 32px rgba(16,185,129,0.5)}
+    .btn-outline{background:transparent;color:var(--text);border:1.5px solid var(--border)}
+    .btn-outline:hover{border-color:var(--primary);color:var(--primary);transform:translateY(-2px)}
+
+    .pricing-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;align-items:stretch}
+    .pricing-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:40px 32px 36px;position:relative;display:flex;flex-direction:column;transition:border-color 0.3s,transform 0.3s,box-shadow 0.3s}
+    .pricing-card:hover{transform:translateY(-6px);box-shadow:0 20px 50px rgba(10,15,44,0.10)}
+    .pricing-card.featured{border:2px solid var(--primary);background:linear-gradient(165deg,rgba(26,60,255,0.08) 0%,var(--card) 40%);transform:scale(1.04);z-index:2}
+    .pricing-card.featured:hover{transform:scale(1.04) translateY(-6px);box-shadow:0 24px 60px rgba(26,60,255,0.2)}
+    .pricing-badge{position:absolute;top:-14px;left:50%;transform:translateX(-50%);padding:6px 20px;border-radius:50px;font-size:0.75rem;font-weight:800;letter-spacing:0.1em;text-transform:uppercase;background:var(--primary);color:#fff;box-shadow:0 4px 16px rgba(26,60,255,0.4);white-space:nowrap}
+    .pricing-icon{font-size:2rem;margin-bottom:16px}
+    .pricing-name{font-size:1.3rem;font-weight:800;margin-bottom:6px}
+    .pricing-desc{font-size:0.88rem;color:var(--muted);line-height:1.6;margin-bottom:24px}
+    .pricing-price{font-size:2.4rem;font-weight:800;color:var(--accent);letter-spacing:-0.03em;margin-bottom:4px}
+    .pricing-price-note{font-size:0.78rem;color:var(--muted);margin-bottom:28px;line-height:1.5}
+    .pricing-features{list-style:none;display:flex;flex-direction:column;gap:12px;margin-bottom:32px;flex:1}
+    .pricing-features li{font-size:0.9rem;color:var(--muted);display:flex;align-items:flex-start;gap:10px;line-height:1.5}
+    .pricing-features li::before{content:'✓';color:var(--accent);font-weight:800;font-size:0.85rem;flex-shrink:0;margin-top:2px}
+    .pricing-cta{display:flex;align-items:center;justify-content:center;gap:8px;padding:14px 24px;border-radius:50px;font-weight:700;font-size:0.95rem;cursor:pointer;transition:transform 0.2s,box-shadow 0.2s;text-decoration:none;border:none;text-align:center}
+    .pricing-cta-primary{background:var(--primary);color:#fff;box-shadow:0 4px 24px rgba(26,60,255,0.4)}
+    .pricing-cta-primary:hover{transform:translateY(-2px);box-shadow:0 8px 32px rgba(26,60,255,0.55)}
+    .pricing-cta-outline{background:transparent;color:var(--text);border:1.5px solid var(--border)}
+    .pricing-cta-outline:hover{border-color:var(--primary);color:var(--primary);transform:translateY(-2px)}
+    .pricing-footer-note{text-align:center;margin-top:32px;font-size:0.82rem;color:var(--muted);line-height:1.6}
+
+    .valeur-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+    .valeur-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:28px 24px;transition:border-color 0.3s,transform 0.3s}
+    .valeur-card:hover{border-color:rgba(16,185,129,0.3);transform:translateY(-4px)}
+    .valeur-icon{font-size:1.8rem;margin-bottom:12px}
+    .valeur-card h4{font-size:1rem;font-weight:700;margin-bottom:8px}
+    .valeur-card p{font-size:0.86rem;color:var(--muted);line-height:1.65}
+
+    .methode-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:32px;position:relative}
+    .methode-grid::before{content:'';position:absolute;top:36px;left:12%;right:12%;height:2px;background:linear-gradient(90deg,var(--accent),var(--primary));opacity:0.12;z-index:0}
+    .methode-step{text-align:center;position:relative;z-index:1}
+    .methode-num{width:72px;height:72px;border-radius:50%;background:var(--bg2);border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:1.6rem;margin:0 auto 16px}
+    .methode-step h4{font-size:1rem;font-weight:700;margin-bottom:8px}
+    .methode-step p{font-size:0.86rem;color:var(--muted);line-height:1.65}
+
+    .page-hero{margin-top:68px;padding:80px 0 64px;background:linear-gradient(180deg,var(--bg2) 0%,var(--bg) 100%);position:relative;overflow:hidden}
+    .page-hero::after{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 60% 60% at 50% 0%,rgba(16,185,129,0.08),transparent 70%);pointer-events:none}
+    .page-hero-inner{position:relative}
+    .page-hero-badge{display:inline-flex;align-items:center;gap:8px;padding:6px 16px;background:rgba(16,185,129,0.08);border:1px solid rgba(16,185,129,0.25);border-radius:50px;font-size:0.82rem;font-weight:600;color:var(--accent);margin-bottom:20px}
+    .page-hero h1{font-size:clamp(2rem,4.5vw,3.2rem);font-weight:800;line-height:1.12;margin-bottom:20px}
     .page-hero h1 .gradient{background:linear-gradient(135deg,#1A3CFF 0%,#2d4fff 50%,#10B981 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
-    .page-hero p{font-size:1rem;color:var(--muted);max-width:640px;margin:0 auto 32px;line-height:1.75;position:relative}
-    .page-hero-actions{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;position:relative}
+    .page-hero p{font-size:1.05rem;color:var(--muted);max-width:620px;line-height:1.8;margin-bottom:36px}
+    .page-hero-actions{display:flex;gap:14px;flex-wrap:wrap}
 
-    /* Boutons */
-    .btn{display:inline-flex;align-items:center;gap:8px;padding:13px 28px;border-radius:50px;font-weight:700;font-size:0.92rem;transition:all 0.25s;cursor:pointer;text-decoration:none;border:none}
-    .btn-accent{background:var(--accent);color:#fff;box-shadow:0 4px 20px rgba(16,185,129,0.35)}
-    .btn-accent:hover{background:var(--accent-h);transform:translateY(-2px);box-shadow:0 8px 28px rgba(16,185,129,0.45)}
-    .btn-outline{background:transparent;color:var(--text);border:2px solid var(--border)}
-    .btn-outline:hover{border-color:var(--primary);color:var(--primary);background:rgba(26,60,255,0.04)}
-
-    /* Bandeau confiance */
-    .trust-bar{background:rgba(16,185,129,0.04);border-top:1px solid rgba(16,185,129,0.12);border-bottom:1px solid rgba(16,185,129,0.12);padding:14px 0}
-    .trust-bar-inner{display:flex;flex-wrap:wrap;gap:20px;justify-content:center;align-items:center}
-    .trust-item{display:flex;align-items:center;gap:7px;font-size:0.82rem;font-weight:600;color:var(--text)}
-
-    /* Section */
-    section{padding:64px 0}
-    .section-label{font-size:0.72rem;font-weight:800;letter-spacing:0.1em;text-transform:uppercase;color:var(--accent);margin-bottom:12px;display:flex;align-items:center;gap:8px}
-    .section-label::before{content:'';display:block;width:28px;height:2px;background:var(--accent)}
-    .section-title{font-size:clamp(1.6rem,3vw,2.2rem);font-weight:800;line-height:1.2;margin-bottom:12px}
-    .section-sub{font-size:0.97rem;color:var(--muted);line-height:1.8;max-width:600px;margin-bottom:40px}
-
-    /* Grille formations */
-    .formations-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px}
-    .formation-card{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:32px 28px;transition:border-color 0.3s,transform 0.3s,box-shadow 0.3s;display:flex;flex-direction:column}
-    .formation-card:hover{border-color:rgba(16,185,129,0.3);transform:translateY(-5px);box-shadow:0 16px 40px rgba(16,185,129,0.08)}
-    .formation-card.featured{border-color:rgba(26,60,255,0.25);background:rgba(26,60,255,0.03)}
-    .formation-icon{font-size:2rem;margin-bottom:16px}
-    .formation-badge{display:inline-block;padding:3px 10px;border-radius:50px;font-size:0.7rem;font-weight:700;background:rgba(26,60,255,0.08);color:var(--primary);border:1px solid rgba(26,60,255,0.2);margin-bottom:10px}
-    .formation-card h3{font-size:1.1rem;font-weight:700;margin-bottom:10px;line-height:1.3}
-    .formation-card p{font-size:0.88rem;color:var(--muted);line-height:1.75;margin-bottom:16px;flex-grow:1}
-    .formation-tags{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:20px}
-    .formation-tag{padding:4px 10px;border-radius:50px;font-size:0.72rem;font-weight:700;background:rgba(26,60,255,0.07);color:var(--primary);border:1px solid rgba(26,60,255,0.15)}
-    .formation-cta{display:inline-flex;align-items:center;gap:6px;margin-top:auto;padding:10px 20px;border-radius:50px;font-size:0.82rem;font-weight:700;color:var(--accent);border:1.5px solid rgba(16,185,129,0.3);transition:all 0.2s;text-decoration:none}
-    .formation-cta:hover{background:rgba(16,185,129,0.08);border-color:var(--accent)}
-
-    /* Pricing */
-    .pricing-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px}
-    .pricing-card{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:32px 28px;text-align:center;transition:border-color 0.3s,transform 0.3s}
-    .pricing-card.popular{border-color:rgba(26,60,255,0.3);background:rgba(26,60,255,0.03);position:relative}
-    .pricing-popular-badge{position:absolute;top:-12px;left:50%;transform:translateX(-50%);background:var(--primary);color:#fff;font-size:0.72rem;font-weight:700;padding:4px 16px;border-radius:50px;white-space:nowrap}
-    .pricing-name{font-size:0.82rem;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted);margin-bottom:8px}
-    .pricing-price{font-size:2.2rem;font-weight:800;color:var(--text);line-height:1}
-    .pricing-price span{font-size:0.9rem;font-weight:500;color:var(--muted)}
-    .pricing-desc{font-size:0.85rem;color:var(--muted);margin:12px 0 20px;line-height:1.6}
-    .pricing-features{list-style:none;text-align:left;margin-bottom:28px;display:flex;flex-direction:column;gap:8px}
-    .pricing-features li{font-size:0.85rem;color:var(--muted);display:flex;align-items:flex-start;gap:8px}
-    .pricing-features li::before{content:'✓';color:var(--accent);font-weight:700;flex-shrink:0;margin-top:1px}
-
-    /* Process */
-    .process-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:20px;position:relative}
-    .process-grid::before{content:'';position:absolute;top:36px;left:10%;right:10%;height:2px;background:linear-gradient(90deg,var(--accent),var(--primary));opacity:0.15;z-index:0}
-    .process-item{text-align:center;position:relative;z-index:1}
-    .process-num{width:72px;height:72px;border-radius:50%;background:linear-gradient(135deg,rgba(26,60,255,0.1),rgba(16,185,129,0.1));border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:1.5rem;margin:0 auto 16px}
-    .process-item h4{font-size:0.95rem;font-weight:700;margin-bottom:6px}
-    .process-item p{font-size:0.82rem;color:var(--muted);line-height:1.6}
-
-    /* CTA section */
-    .cta-section{padding:80px 0;text-align:center;background:linear-gradient(135deg,rgba(26,60,255,0.04),rgba(16,185,129,0.04));border-top:1px solid var(--border)}
+    .cta-section{padding:80px 0;text-align:center;background:linear-gradient(135deg,rgba(26,60,255,0.04),rgba(16,185,129,0.04));border-top:1px solid var(--border);border-bottom:1px solid var(--border)}
     .cta-section h2{font-size:clamp(1.5rem,3vw,2.2rem);font-weight:800;margin-bottom:14px}
-    .cta-section p{color:var(--muted);font-size:0.95rem;max-width:520px;margin:0 auto 32px;line-height:1.75}
+    .cta-section p{color:var(--muted);font-size:0.97rem;max-width:520px;margin:0 auto 32px;line-height:1.8}
 
-    /* Footer */
     footer{padding:40px 0 24px;border-top:1px solid var(--border)}
-    .footer-inner{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:20px;margin-bottom:24px}
+    .footer-inner{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:20px;margin-bottom:20px}
     .footer-logo{font-size:1.1rem;font-weight:800;letter-spacing:-0.02em}
     .footer-logo span{color:var(--primary)}
     .footer-links{display:flex;gap:20px;flex-wrap:wrap}
@@ -111,278 +106,222 @@
     .footer-copy{font-size:0.75rem;color:var(--muted);opacity:0.7}
     .footer-tagline{font-size:0.75rem;color:var(--muted);opacity:0.6}
 
-    @media(max-width:900px){
-      .formations-grid{grid-template-columns:1fr 1fr}
-      .pricing-grid{grid-template-columns:1fr}
-      .process-grid{grid-template-columns:1fr 1fr;gap:24px}
-      .process-grid::before{display:none}
+    @media(max-width:1024px){
+      .pricing-grid{grid-template-columns:1fr;max-width:480px;margin:0 auto}
+      .pricing-card.featured{transform:scale(1)}
+      .pricing-card.featured:hover{transform:translateY(-6px)}
+      .methode-grid{grid-template-columns:repeat(2,1fr)}
+      .methode-grid::before{display:none}
+      .valeur-grid{grid-template-columns:repeat(2,1fr)}
     }
-    @media(max-width:640px){
+    @media(max-width:768px){
       nav{display:none}
       .hamburger{display:flex}
-      .formations-grid{grid-template-columns:1fr}
-      .process-grid{grid-template-columns:1fr}
+      .valeur-grid{grid-template-columns:1fr}
+      .methode-grid{grid-template-columns:1fr}
       .page-hero{padding:60px 0 40px}
+      .page-hero h1{font-size:clamp(1.8rem,7vw,2.4rem)}
     }
   </style>
 </head>
 <body>
 
   <header>
-    <div class="container"><div class="header-inner">
-      <a href="/" class="logo" style="line-height:1.2;">
-        IA<span>-</span>Entrepreneur
-        <span style="display:block;font-size:0.58rem;font-weight:500;color:var(--muted);letter-spacing:0.03em;margin-top:2px;">Organisme de formation certifié Qualiopi</span>
-      </a>
-      <nav>
-        <a href="/">Accueil</a>
-        <a href="/formations-creation.html" style="color:var(--primary);font-weight:700;">Création d'entreprise</a>
-        <a href="/formations-entreprises.html">Formations entreprises</a>
-        <a href="/#apropos">À propos</a>
-        <a href="/#blog">Blog</a>
-        <a href="mailto:contact@ia-entrepreneur.fr" style="display:flex;align-items:center;gap:5px;">
-          <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,12 2,6"/></svg>
-          contact@ia-entrepreneur.fr
+    <div class="container">
+      <div class="header-inner">
+        <a href="/" class="logo" style="line-height:1.2;">
+          IA<span>-</span>Entrepreneur
+          <span style="display:block;font-size:0.58rem;font-weight:500;color:var(--muted);letter-spacing:0.03em;margin-top:2px;">Organisme de formation certifié Qualiopi</span>
         </a>
-        <a href="https://calendly.com/gabriel-ia-entrepreneur/decouverte" target="_blank" rel="noopener noreferrer" class="nav-cta">Appel gratuit</a>
-      </nav>
-      <button class="hamburger" id="hamburger" aria-label="Menu"><span></span><span></span><span></span></button>
-    </div></div>
+        <nav>
+          <a href="/">Accueil</a>
+          <a href="/formations-creation.html" style="color:var(--primary);font-weight:700;">Création d'entreprise</a>
+          <a href="/formations-entreprises.html">Formations entreprises</a>
+          <a href="/#apropos">À propos</a>
+          <a href="/#blog">Blog</a>
+          <a href="mailto:contact@ia-entrepreneur.fr" style="display:flex;align-items:center;gap:4px;">
+            <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,12 2,6"/></svg>
+            contact@ia-entrepreneur.fr
+          </a>
+          <a href="https://calendly.com/gabriel-ia-entrepreneur/decouverte" target="_blank" rel="noopener noreferrer" class="nav-cta">Appel gratuit</a>
+        </nav>
+        <button class="hamburger" id="hamburger" aria-label="Menu"><span></span><span></span><span></span></button>
+      </div>
+    </div>
     <div class="mobile-menu" id="mobile-menu">
       <a href="/">Accueil</a>
       <a href="/formations-creation.html">Création d'entreprise</a>
       <a href="/formations-entreprises.html">Formations entreprises</a>
       <a href="/#apropos">À propos</a>
       <a href="/#blog">Blog</a>
-      <a href="mailto:contact@ia-entrepreneur.fr">✉️ contact@ia-entrepreneur.fr</a>
-      <a href="https://calendly.com/gabriel-ia-entrepreneur/decouverte" target="_blank" rel="noopener noreferrer" style="background:var(--accent);color:#fff;text-align:center;border-radius:var(--radius);margin-top:8px;padding:14px;">Réserver un appel gratuit</a>
+      <a href="mailto:contact@ia-entrepreneur.fr">contact@ia-entrepreneur.fr</a>
+      <a href="https://calendly.com/gabriel-ia-entrepreneur/decouverte" target="_blank" rel="noopener noreferrer" style="background:var(--accent);color:#fff;text-align:center;border-radius:var(--radius);margin-top:8px;padding:14px;display:block;font-weight:700;">Réserver un appel gratuit</a>
     </div>
   </header>
 
-  <!-- Hero -->
   <div class="page-hero">
-    <div class="container">
-      <div class="page-hero-badge">🚀 Pour porteurs de projet et créateurs d'entreprise</div>
-      <h1>Créez votre entreprise avec <span class="gradient">les bonnes méthodes</span></h1>
-      <p>De la validation de votre idée à vos premiers clients, on vous accompagne étape par étape. Formations individuelles ou collectives, avec des formateurs qui ont eux-mêmes créé et développé leurs entreprises.</p>
+    <div class="container page-hero-inner">
+      <div class="page-hero-badge">Pour porteurs de projet et créateurs d'entreprise</div>
+      <h1>Créez votre entreprise<br />avec les <span class="gradient">bonnes méthodes</span></h1>
+      <p>Accompagnement personnalisé de l'idée au lancement. Nos formateurs ont eux-mêmes créé et géré leurs entreprises. Moins de 5% d'échec parmi nos accompagnés, contre 50% de moyenne nationale.</p>
       <div class="page-hero-actions">
-        <a href="https://calendly.com/gabriel-ia-entrepreneur/decouverte" target="_blank" rel="noopener noreferrer" class="btn btn-accent">Réserver un appel gratuit</a>
-        <a href="#formations" class="btn btn-outline">Voir les formations</a>
+        <a href="https://calendly.com/gabriel-ia-entrepreneur/decouverte" target="_blank" rel="noopener noreferrer" class="btn btn-accent">
+          Réserver un appel gratuit
+          <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </a>
+        <a href="#offres" class="btn btn-outline">Voir les offres</a>
       </div>
     </div>
   </div>
 
-  <!-- Bandeau confiance -->
-  <div class="trust-bar">
+  <section style="padding:64px 0;background:var(--bg2);border-bottom:1px solid var(--border);">
     <div class="container">
-      <div class="trust-bar-inner">
-        <div class="trust-item">
-          <svg width="14" height="14" fill="none" stroke="var(--accent)" stroke-width="2.5" viewBox="0 0 24 24"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-          1 500+ porteurs de projet accompagnés
+      <div class="section-label reveal"><span>Pourquoi nous choisir</span></div>
+      <h2 class="section-title reveal">Ce qui change quand vous êtes <span style="color:var(--accent)">bien accompagné</span></h2>
+      <p class="section-sub reveal">Créer une entreprise seul, c'est possible. Le faire avec les bonnes personnes et les bons outils, c'est une autre histoire.</p>
+      <div class="valeur-grid">
+        <div class="valeur-card reveal reveal-delay-1">
+          <div class="valeur-icon">🛡️</div>
+          <h4>Moins de 5% d'échec</h4>
+          <p>Parmi les porteurs de projet accompagnés, moins de 5% abandonnent leur lancement. Contre 50% en moyenne nationale. La différence : une méthode structurée et un suivi humain.</p>
         </div>
-        <div class="trust-item">
-          <svg width="14" height="14" fill="none" stroke="var(--accent)" stroke-width="2.5" viewBox="0 0 24 24"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-          Certifié Qualiopi
+        <div class="valeur-card reveal reveal-delay-2">
+          <div class="valeur-icon">🗺️</div>
+          <h4>Un projet monté de A à Z</h4>
+          <p>Statut juridique, business plan, financement, premiers clients, présence en ligne. Chaque étape est préparée avec vous, dans l'ordre, sans rien oublier.</p>
         </div>
-        <div class="trust-item">
-          <svg width="14" height="14" fill="none" stroke="var(--accent)" stroke-width="2.5" viewBox="0 0 24 24"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-          Formateurs praticiens actifs
+        <div class="valeur-card reveal reveal-delay-3">
+          <div class="valeur-icon">💰</div>
+          <h4>Des milliers d'euros économisés</h4>
+          <p>Le mauvais choix de statut peut coûter 5 000 à 10 000 euros de fiscalité inutile la première année. Bien orienté dès le départ, vous évitez les erreurs qui sont difficiles à corriger.</p>
         </div>
-        <div class="trust-item">
-          <svg width="14" height="14" fill="none" stroke="var(--accent)" stroke-width="2.5" viewBox="0 0 24 24"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-          Présentiel, distanciel ou en ligne
+        <div class="valeur-card reveal reveal-delay-1">
+          <div class="valeur-icon">⚡</div>
+          <h4>Lancé en quelques semaines</h4>
+          <p>Notre méthode permet à la plupart des porteurs de projet de lancer leur activité en 4 à 8 semaines, avec une vraie structure derrière eux.</p>
         </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Formations -->
-  <section id="formations">
-    <div class="container">
-      <div class="section-label">Nos formations</div>
-      <h2 class="section-title">Des formations pour chaque <span style="color:var(--accent)">étape de votre projet</span></h2>
-      <p class="section-sub">Que vous ayez juste une idée ou que vous soyez prêt à vous lancer, on a une formation adaptée à votre situation.</p>
-
-      <div class="formations-grid">
-
-        <div class="formation-card featured">
-          <div class="formation-badge">La plus demandée</div>
-          <div class="formation-icon">🏗️</div>
-          <h3>Créer son entreprise de A à Z</h3>
-          <p>Le parcours complet pour passer de l'idée au lancement. Validation de concept, choix du statut juridique, business plan, financement, premiers clients. On construit votre projet avec vous, pas à votre place.</p>
-          <div class="formation-tags">
-            <span class="formation-tag">Statut juridique</span>
-            <span class="formation-tag">Business plan</span>
-            <span class="formation-tag">Financement</span>
-            <span class="formation-tag">Premiers clients</span>
-          </div>
-          <a href="https://calendly.com/gabriel-ia-entrepreneur/decouverte" target="_blank" rel="noopener noreferrer" class="formation-cta">Je veux me lancer</a>
+        <div class="valeur-card reveal reveal-delay-2">
+          <div class="valeur-icon">🤝</div>
+          <h4>Des formateurs qui ont vécu ça</h4>
+          <p>Nos formateurs ne récitent pas des manuels. Ils ont créé leurs propres entreprises, connu les galères et les succès. Ils transmettent ce qu'ils auraient voulu savoir au départ.</p>
         </div>
-
-        <div class="formation-card">
-          <div class="formation-icon">🤖</div>
-          <h3>IA pour créateurs d'entreprise</h3>
-          <p>Gagnez un temps précieux dès le départ. ChatGPT, Claude, automatisation : vous apprenez à utiliser les outils IA pour faire en solo ce qu'une équipe ferait en trois. Idéal pour les solopreneurs et micro-entreprises.</p>
-          <div class="formation-tags">
-            <span class="formation-tag">ChatGPT</span>
-            <span class="formation-tag">Automatisation</span>
-            <span class="formation-tag">Marketing IA</span>
-            <span class="formation-tag">Productivité</span>
-          </div>
-          <a href="https://calendly.com/gabriel-ia-entrepreneur/decouverte" target="_blank" rel="noopener noreferrer" class="formation-cta">En savoir plus</a>
+        <div class="valeur-card reveal reveal-delay-3">
+          <div class="valeur-icon">📈</div>
+          <h4>Prêt à chercher des clients dès le jour 1</h4>
+          <p>Créer l'entreprise c'est 20% du chemin. Les 80% restants, c'est trouver des clients. Nos offres incluent une stratégie d'acquisition dès le début.</p>
         </div>
-
-        <div class="formation-card">
-          <div class="formation-icon">📣</div>
-          <h3>Trouver ses premiers clients</h3>
-          <p>Le plus grand blocage des créateurs. Cette formation vous donne une méthode concrète pour identifier vos cibles, prendre contact, pitcher votre offre et signer vos premiers contrats, même sans réseau au départ.</p>
-          <div class="formation-tags">
-            <span class="formation-tag">Prospection</span>
-            <span class="formation-tag">Pitch</span>
-            <span class="formation-tag">Réseaux sociaux</span>
-            <span class="formation-tag">Closing</span>
-          </div>
-          <a href="https://calendly.com/gabriel-ia-entrepreneur/decouverte" target="_blank" rel="noopener noreferrer" class="formation-cta">En savoir plus</a>
-        </div>
-
-        <div class="formation-card">
-          <div class="formation-icon">📋</div>
-          <h3>Choisir son statut juridique</h3>
-          <p>Auto-entrepreneur, SASU, SARL, SAS... Le bon choix au départ vous évite des milliers d'euros de fiscalité inutile et des complications à l'avenir. Atelier court, pratique, avec une recommandation adaptée à votre situation.</p>
-          <div class="formation-tags">
-            <span class="formation-tag">Micro-entreprise</span>
-            <span class="formation-tag">SASU / SAS</span>
-            <span class="formation-tag">SARL</span>
-            <span class="formation-tag">Fiscalité</span>
-          </div>
-          <a href="https://calendly.com/gabriel-ia-entrepreneur/decouverte" target="_blank" rel="noopener noreferrer" class="formation-cta">En savoir plus</a>
-        </div>
-
-        <div class="formation-card">
-          <div class="formation-icon">💼</div>
-          <h3>Construire son business plan</h3>
-          <p>Un business plan que vous comprenez vraiment, que vous pouvez défendre devant une banque ou un investisseur, et qui reste utile une fois l'entreprise créée. On part de votre projet, pas d'un modèle générique.</p>
-          <div class="formation-tags">
-            <span class="formation-tag">Prévisionnel</span>
-            <span class="formation-tag">Financement</span>
-            <span class="formation-tag">Banque</span>
-            <span class="formation-tag">BPI</span>
-          </div>
-          <a href="https://calendly.com/gabriel-ia-entrepreneur/decouverte" target="_blank" rel="noopener noreferrer" class="formation-cta">En savoir plus</a>
-        </div>
-
-        <div class="formation-card">
-          <div class="formation-icon">🎤</div>
-          <h3>Pitcher son projet avec impact</h3>
-          <p>Banquier, investisseur, client, partenaire : savoir présenter son projet clairement et avec conviction fait toute la différence. Vous repartez avec un pitch structuré et testé, que vous pouvez utiliser immédiatement.</p>
-          <div class="formation-tags">
-            <span class="formation-tag">Pitch deck</span>
-            <span class="formation-tag">Prise de parole</span>
-            <span class="formation-tag">Storytelling</span>
-            <span class="formation-tag">Investisseurs</span>
-          </div>
-          <a href="https://calendly.com/gabriel-ia-entrepreneur/decouverte" target="_blank" rel="noopener noreferrer" class="formation-cta">En savoir plus</a>
-        </div>
-
       </div>
     </div>
   </section>
 
-  <!-- Tarifs -->
-  <section style="padding:64px 0;background:var(--bg2);border-top:1px solid var(--border);">
+  <section id="offres" style="padding:72px 0;">
     <div class="container">
-      <div class="section-label">Tarifs</div>
-      <h2 class="section-title">Une formule adaptée à <span style="color:var(--primary)">votre situation</span></h2>
-      <p class="section-sub">Pas de reste à charge pour les demandeurs d'emploi accompagnés via France Travail. Pour les salariés en reconversion, nous vous aidons à identifier les financements disponibles.</p>
+      <div class="section-label reveal"><span>Nos offres</span></div>
+      <h2 class="section-title reveal">Choisissez <span style="color:var(--primary)">votre formule</span></h2>
+      <p class="section-sub reveal">Trois niveaux d'accompagnement selon votre situation, votre budget et vos ambitions. Tous incluent un suivi humain et des livrables concrets.</p>
+
+      <div style="text-align:center;margin-bottom:40px;" class="reveal">
+        <a href="/#blog" style="display:inline-flex;align-items:center;gap:8px;padding:10px 22px;border-radius:50px;font-size:0.85rem;font-weight:600;color:var(--primary);background:rgba(26,60,255,0.06);border:1px solid rgba(26,60,255,0.18);transition:all 0.2s;" onmouseover="this.style.background='rgba(26,60,255,0.12)'" onmouseout="this.style.background='rgba(26,60,255,0.06)'">
+          📊 Combien coûte réellement la création d'une entreprise ?
+          <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </a>
+      </div>
 
       <div class="pricing-grid">
-
-        <div class="pricing-card">
-          <div class="pricing-name">Essentiel</div>
-          <div class="pricing-price">300€<span> / session</span></div>
-          <div class="pricing-desc">Pour cadrer votre projet et repartir avec un plan d'action clair.</div>
+        <div class="pricing-card reveal reveal-delay-1">
+          <div class="pricing-icon">⚡</div>
+          <h3 class="pricing-name">Essentiel</h3>
+          <p class="pricing-desc">Vous avez votre idée, vous savez où vous allez : il vous faut le bon statut et la bonne structure pour démarrer.</p>
+          <div class="pricing-price">300€</div>
+          <p class="pricing-price-note">*Frais de tiers non inclus (frais de greffe &amp; annonce légale, environ 200€)</p>
           <ul class="pricing-features">
-            <li>1 session individuelle de 3h</li>
-            <li>Analyse de votre projet</li>
-            <li>Recommandation statut juridique</li>
-            <li>Plan d'action personnalisé</li>
-            <li>Accès aux ressources formations</li>
+            <li>Conseil personnalisé sur le choix du statut juridique (micro, EURL, SASU)</li>
+            <li>Création complète de votre société : rédaction des statuts, dépôt de capital, dépôt du dossier &amp; obtention du Kbis : certifié par un expert-comptable</li>
+            <li>Orientation vers les aides disponibles (ACRE, ARCE)</li>
+            <li>Accompagnement par un entrepreneur expérimenté</li>
           </ul>
-          <a href="https://calendly.com/gabriel-ia-entrepreneur/decouverte" target="_blank" rel="noopener noreferrer" class="btn btn-outline" style="width:100%;justify-content:center;">Réserver</a>
+          <a href="https://calendly.com/gabriel-ia-entrepreneur/decouverte" target="_blank" rel="noopener noreferrer" class="pricing-cta pricing-cta-outline">Réserver mon appel gratuit</a>
         </div>
 
-        <div class="pricing-card popular">
-          <div class="pricing-popular-badge">Le plus choisi</div>
-          <div class="pricing-name">Pro</div>
-          <div class="pricing-price">1 000€<span> / parcours</span></div>
-          <div class="pricing-desc">Le parcours complet pour lancer votre entreprise dans les meilleures conditions.</div>
+        <div class="pricing-card featured reveal reveal-delay-2">
+          <div class="pricing-badge">Le + populaire</div>
+          <div class="pricing-icon">🚀</div>
+          <h3 class="pricing-name">Pro</h3>
+          <p class="pricing-desc">Le parcours complet pour créer votre entreprise de A à Z : de l'idée au premier client.</p>
+          <div class="pricing-price">1 000€</div>
+          <p class="pricing-price-note">*Frais de tiers non inclus (frais de greffe &amp; annonce légale, environ 200€) : Offre de lancement, places limitées</p>
           <ul class="pricing-features">
-            <li>5 sessions individuelles</li>
-            <li>Business plan clé en main</li>
-            <li>Choix du statut et démarches</li>
-            <li>Stratégie premiers clients</li>
-            <li>Formation IA incluse</li>
-            <li>Suivi 1 mois après lancement</li>
+            <li style="color:var(--accent);font-weight:700;border-bottom:1px solid var(--border);padding-bottom:12px;margin-bottom:4px;">✦ Tout ce qui est inclus dans l'offre Essentiel</li>
+            <li>Étude de marché complète : concurrence, positionnement &amp; produit/service</li>
+            <li>Business plan avec 3 scénarios (pessimiste, réaliste, optimiste)</li>
+            <li>Dossier de financement complet (ACRE, ARCE, prêt d'honneur, aides régionales)</li>
+            <li>Stratégie premières ventes &amp; acquisition clients</li>
+            <li>Kit de lancement marketing (Google My Business + site web)</li>
           </ul>
-          <a href="https://calendly.com/gabriel-ia-entrepreneur/decouverte" target="_blank" rel="noopener noreferrer" class="btn btn-accent" style="width:100%;justify-content:center;">Je commence</a>
+          <a href="https://calendly.com/gabriel-ia-entrepreneur/decouverte" target="_blank" rel="noopener noreferrer" class="pricing-cta pricing-cta-primary">
+            Réserver mon appel gratuit
+            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M22 2L11 13M22 2L15 22l-4-9-9-4 20-7z"/></svg>
+          </a>
         </div>
 
-        <div class="pricing-card">
-          <div class="pricing-name">Premium</div>
-          <div class="pricing-price">3 000€<span> / accompagnement</span></div>
-          <div class="pricing-desc">Accompagnement complet de l'idée aux 6 premiers mois d'activité.</div>
+        <div class="pricing-card reveal reveal-delay-3">
+          <div class="pricing-icon">👑</div>
+          <h3 class="pricing-name">Premium</h3>
+          <p class="pricing-desc">L'accompagnement individuel et exclusif : je construis votre entreprise avec vous, en one-to-one.</p>
+          <div class="pricing-price">3 000€</div>
+          <p class="pricing-price-note">*Frais de tiers non inclus (frais de greffe &amp; annonce légale, environ 200€)</p>
           <ul class="pricing-features">
-            <li>Accompagnement sur 6 mois</li>
-            <li>Sessions illimitées</li>
-            <li>Toutes les formations incluses</li>
-            <li>Assistance levée de fonds</li>
-            <li>Accès à notre réseau partenaires</li>
-            <li>Hotline entrepreneur</li>
+            <li style="color:var(--accent);font-weight:700;border-bottom:1px solid var(--border);padding-bottom:12px;margin-bottom:4px;">✦ Tout ce qui est inclus dans l'offre Pro</li>
+            <li>Accompagnement 100% individuel (one-to-one, pas en groupe)</li>
+            <li>Accès direct par téléphone &amp; WhatsApp pendant 3 mois</li>
+            <li>3 sessions de suivi post-création (à 1, 2 et 3 mois)</li>
+            <li>Relecture et validation personnelle de tous vos documents</li>
+            <li>Stratégie d'acquisition clients sur mesure avec mise en place opérationnelle</li>
           </ul>
-          <a href="https://calendly.com/gabriel-ia-entrepreneur/decouverte" target="_blank" rel="noopener noreferrer" class="btn btn-outline" style="width:100%;justify-content:center;">Réserver un appel</a>
+          <a href="https://calendly.com/gabriel-ia-entrepreneur/decouverte" target="_blank" rel="noopener noreferrer" class="pricing-cta pricing-cta-outline">Réserver mon appel gratuit</a>
         </div>
-
       </div>
 
-      <p style="text-align:center;font-size:0.82rem;color:var(--muted);margin-top:28px;max-width:600px;margin-left:auto;margin-right:auto;">Certifié Qualiopi. Des financements peuvent être mobilisés selon votre situation (demandeur d'emploi, salarié en reconversion, bénéficiaire RSA). Contactez-nous pour étudier votre dossier.</p>
+      <p class="pricing-footer-note reveal">
+        Toutes les sessions sont disponibles en présentiel, distanciel ou e-learning.<br>
+        Certifié Qualiopi. Des financements peuvent être mobilisés selon votre situation. <strong>Profitez du tarif lancement avant augmentation.</strong>
+      </p>
     </div>
   </section>
 
-  <!-- Comment ça marche -->
-  <section>
+  <section style="padding:72px 0;background:var(--bg2);border-top:1px solid var(--border);">
     <div class="container">
-      <div class="section-label">Notre méthode</div>
-      <h2 class="section-title" style="margin-bottom:40px;">De l'idée au <span style="color:var(--accent)">premier client</span></h2>
-      <div class="process-grid">
-        <div class="process-item">
-          <div class="process-num">📞</div>
+      <div class="section-label reveal"><span>Votre parcours</span></div>
+      <h2 class="section-title reveal" style="margin-bottom:48px;">De l'idée au <span style="color:var(--accent)">premier client</span></h2>
+      <div class="methode-grid">
+        <div class="methode-step reveal reveal-delay-1">
+          <div class="methode-num">📞</div>
           <h4>Appel découverte</h4>
           <p>20 minutes pour comprendre votre projet, votre situation et vos objectifs. Gratuit et sans engagement.</p>
         </div>
-        <div class="process-item">
-          <div class="process-num">🗺️</div>
-          <h4>Feuille de route</h4>
-          <p>On définit ensemble les étapes clés, le programme de formation adapté et le planning réaliste pour votre lancement.</p>
+        <div class="methode-step reveal reveal-delay-2">
+          <div class="methode-num">🗺️</div>
+          <h4>Programme personnalisé</h4>
+          <p>On définit ensemble les étapes clés, la formule adaptée et le planning réaliste pour votre lancement.</p>
         </div>
-        <div class="process-item">
-          <div class="process-num">🚀</div>
-          <h4>Formation et accompagnement</h4>
-          <p>Sessions individuelles ou collectives, supports concrets, exercices pratiques. On avance à votre rythme.</p>
+        <div class="methode-step reveal reveal-delay-3">
+          <div class="methode-num">🚀</div>
+          <h4>Accompagnement terrain</h4>
+          <p>Sessions individuelles, supports concrets, livrables à chaque étape. On avance à votre rythme.</p>
         </div>
-        <div class="process-item">
-          <div class="process-num">🏆</div>
+        <div class="methode-step reveal reveal-delay-3">
+          <div class="methode-num">🏆</div>
           <h4>Lancement et suivi</h4>
-          <p>Votre entreprise est créée, vos premiers clients sont identifiés. On reste disponibles pour vous accompagner dans la durée.</p>
+          <p>Votre entreprise est créée, vos premiers clients identifiés. Nous restons disponibles pour la suite.</p>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- CTA -->
   <section class="cta-section">
     <div class="container">
-      <h2>Votre projet mérite mieux qu'un tutoriel YouTube</h2>
-      <p>Un appel de 20 minutes suffit pour savoir si notre accompagnement est fait pour vous. Gratuit, sans engagement, sans pression.</p>
+      <h2>Votre projet mérite un vrai accompagnement</h2>
+      <p>Un appel de 20 minutes suffit pour savoir si notre accompagnement est fait pour vous. Sans engagement, sans pression.</p>
       <a href="https://calendly.com/gabriel-ia-entrepreneur/decouverte" target="_blank" rel="noopener noreferrer" class="btn btn-accent" style="font-size:1rem;padding:16px 36px;">
         Réserver mon appel gratuit
         <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
@@ -390,18 +329,18 @@
     </div>
   </section>
 
-  <!-- Footer -->
   <footer>
     <div class="container">
       <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:20px;padding:24px 0;border-bottom:1px solid var(--border);margin-bottom:28px;">
         <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap;">
-          <img src="qualiopi-logo.png" alt="Logo Qualiopi" style="height:44px;width:auto;" onerror="this.style.display='none'" />
+          <img src="qualiopi-logo.png" alt="Logo Qualiopi - Processus certifié" style="height:48px;width:auto;" onerror="this.style.display='none'" />
           <div>
             <div style="font-size:0.88rem;font-weight:800;color:var(--text);">Certifié Qualiopi — Processus certifié</div>
             <div style="font-size:0.75rem;color:var(--muted);margin-top:2px;">Certificat n° 883211-1 · Certifopac · Valable jusqu'au 23/04/2029</div>
+            <div style="font-size:0.75rem;color:var(--muted);">NDA : 44 54 04871 54 · Cofrac n° 5-0620</div>
           </div>
         </div>
-        <a href="/qualiopi-certificat.pdf" target="_blank" rel="noopener noreferrer" style="display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:50px;font-size:0.78rem;font-weight:700;color:var(--primary);border:1.5px solid rgba(26,60,255,0.2);background:rgba(26,60,255,0.04);text-decoration:none;">
+        <a href="/qualiopi-certificat.pdf" target="_blank" rel="noopener noreferrer" style="display:inline-flex;align-items:center;gap:6px;padding:9px 18px;border-radius:50px;font-size:0.8rem;font-weight:700;color:var(--primary);border:1.5px solid rgba(26,60,255,0.2);background:rgba(26,60,255,0.04);text-decoration:none;">
           <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
           Voir le certificat
         </a>
@@ -418,8 +357,8 @@
         </div>
       </div>
       <div style="margin-top:16px;padding-top:16px;border-top:1px solid var(--border);">
-        <p class="footer-copy">© 2026 IA-Entrepreneur — Clindit SAS. Tous droits réservés.</p>
-        <p class="footer-tagline">NDA : 44 54 04871 54 — Formation entrepreneuriat France | IA pour TPE | Grand Est</p>
+        <p class="footer-copy">© 2026 IA-Entrepreneur — Clindit. Tous droits réservés.</p>
+        <p class="footer-tagline">NDA : 44 54 04871 54 · Formation entrepreneuriat France | IA pour TPE | Grand Est</p>
       </div>
     </div>
   </footer>
@@ -427,16 +366,10 @@
   <script>
     const hamburger = document.getElementById('hamburger');
     const mobileMenu = document.getElementById('mobile-menu');
-    hamburger.addEventListener('click', () => {
-      hamburger.classList.toggle('open');
-      mobileMenu.classList.toggle('open');
-    });
-    mobileMenu.querySelectorAll('a').forEach(link => {
-      link.addEventListener('click', () => {
-        hamburger.classList.remove('open');
-        mobileMenu.classList.remove('open');
-      });
-    });
+    hamburger.addEventListener('click', () => { hamburger.classList.toggle('open'); mobileMenu.classList.toggle('open'); });
+    mobileMenu.querySelectorAll('a').forEach(link => { link.addEventListener('click', () => { hamburger.classList.remove('open'); mobileMenu.classList.remove('open'); }); });
+    const observer = new IntersectionObserver((entries) => { entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); }); }, { threshold: 0.1 });
+    document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
   </script>
 </body>
 </html>
