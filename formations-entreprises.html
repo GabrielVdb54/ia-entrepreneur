@@ -1,12 +1,20 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
+  <!-- Google Analytics GA4 -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-SZG9XPNNNC"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-SZG9XPNNNC');
+</script>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="icon" type="image/png" href="/favicon.png" />
   <title>Formations Entreprises : Vente, Management, IA & Prise de parole | IA-Entrepreneur</title>
-  <meta name="description" content="Formations sur mesure pour entreprises et salariés : prospection, négociation, vente, management, prise de parole en public, IA & automatisation. Intervenant : Gabriel Vanderbecken." />
-  <meta name="keywords" content="formation entreprise vente, formation management équipe, formation prise de parole, formation IA entreprise, formation négociation commerciale" />
+  <meta name="description" content="Formation IA ChatGPT pour entreprises, prospection commerciale, management, techniques de vente et prise de parole. Sur mesure, présentiel ou distanciel. Certifié Qualiopi — finançable OPCO." />
+  <meta name="keywords" content="formation ia entreprise, formation chatgpt entreprise, formation management, formation prospection commerciale, formation négociation commerciale, formation prise de parole en public, formation vente" />
   <link rel="canonical" href="https://ia-entrepreneur.fr/formations-entreprises.html" />
   <meta property="og:title" content="Formations Entreprises sur mesure | IA-Entrepreneur" />
   <meta property="og:description" content="Formations pour entreprises : vente, management, IA, prise de parole. Par Gabriel Vanderbecken." />
@@ -17,12 +25,12 @@
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
   <style>
     *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-    :root{--bg:#0A0F2C;--bg2:#0D1340;--primary:#1A3CFF;--primary-h:#2d4fff;--accent:#10B981;--accent-h:#0ea372;--text:#F0F2FF;--muted:#8A91B4;--border:rgba(255,255,255,0.08);--card:rgba(255,255,255,0.04);--radius:14px}
+    :root{--bg:#FFFFFF;--bg2:#F5F7FF;--primary:#1A3CFF;--primary-h:#2d4fff;--accent:#10B981;--accent-h:#0ea372;--text:#0A0F2C;--muted:#525880;--border:rgba(10,15,44,0.10);--card:rgba(10,15,44,0.04);--radius:14px}
     html{scroll-behavior:smooth}
     body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(--text);line-height:1.65;overflow-x:hidden}
     a{color:inherit;text-decoration:none}img{display:block;max-width:100%}
     .container{width:100%;max-width:1140px;margin:0 auto;padding:0 24px}
-    header{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(10,15,44,0.85);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);border-bottom:1px solid var(--border)}
+    header{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(255,255,255,0.92);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);border-bottom:1px solid var(--border);box-shadow:0 2px 24px rgba(10,15,44,0.06)}
     .header-inner{display:flex;align-items:center;justify-content:space-between;height:70px}
     .logo{font-size:1.3rem;font-weight:800;letter-spacing:-0.03em}.logo span{color:var(--accent)}
     nav{display:flex;align-items:center;gap:8px}
@@ -32,13 +40,13 @@
     .hamburger{display:none;flex-direction:column;gap:5px;background:none;border:none;cursor:pointer;padding:4px}
     .hamburger span{display:block;width:24px;height:2px;background:var(--text);border-radius:2px;transition:transform 0.3s,opacity 0.3s}
     .hamburger.open span:nth-child(1){transform:translateY(7px) rotate(45deg)}.hamburger.open span:nth-child(2){opacity:0}.hamburger.open span:nth-child(3){transform:translateY(-7px) rotate(-45deg)}
-    .mobile-menu{display:none;flex-direction:column;gap:4px;padding:16px 24px 20px;background:rgba(10,15,44,0.98);border-top:1px solid var(--border)}.mobile-menu.open{display:flex}
+    .mobile-menu{display:none;flex-direction:column;gap:4px;padding:16px 24px 20px;background:rgba(255,255,255,0.98);border-top:1px solid var(--border);box-shadow:0 8px 24px rgba(10,15,44,0.08)}.mobile-menu.open{display:flex}
     .mobile-menu a{padding:12px 16px;border-radius:var(--radius);font-weight:600;color:var(--muted)}
 
     .page-hero{margin-top:70px;padding:80px 0 60px;text-align:center;position:relative;overflow:hidden}
     .page-hero::after{content:'';position:absolute;top:0;left:0;right:0;bottom:0;background:radial-gradient(ellipse 60% 60% at 50% 30%,rgba(26,60,255,0.1),transparent 70%);pointer-events:none}
     .page-hero h1{font-size:clamp(2rem,4vw,3rem);font-weight:800;line-height:1.15;margin-bottom:16px;position:relative}
-    .page-hero h1 .gradient{background:linear-gradient(135deg,#7a9fff 0%,#1A3CFF 40%,#10B981 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+    .page-hero h1 .gradient{background:linear-gradient(135deg,#1A3CFF 0%,#2d4fff 50%,#10B981 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
     .page-hero p{font-size:1.05rem;color:var(--muted);max-width:600px;margin:0 auto;line-height:1.7;position:relative}
 
     .formations-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;padding:60px 0}
@@ -48,7 +56,7 @@
     .formation-card h3{font-size:1.15rem;font-weight:700;margin-bottom:10px}
     .formation-card p{font-size:0.9rem;color:var(--muted);line-height:1.7;margin-bottom:16px}
     .formation-tags{display:flex;flex-wrap:wrap;gap:6px}
-    .formation-tag{padding:4px 12px;border-radius:50px;font-size:0.72rem;font-weight:700;background:rgba(26,60,255,0.1);color:#7a9fff;border:1px solid rgba(26,60,255,0.2)}
+    .formation-tag{padding:4px 12px;border-radius:50px;font-size:0.72rem;font-weight:700;background:rgba(26,60,255,0.08);color:var(--primary);border:1px solid rgba(26,60,255,0.2)}
 
     .method-section{padding:80px 0;background:var(--bg2);border-top:1px solid var(--border);border-bottom:1px solid var(--border)}
     .method-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:28px;margin-top:48px}
@@ -69,7 +77,7 @@
     .footer-links{display:flex;gap:20px;flex-wrap:wrap}
     .footer-links a{font-size:0.88rem;color:var(--muted);font-weight:500;transition:color 0.2s}.footer-links a:hover{color:var(--text)}
     .footer-copy{font-size:0.8rem;color:var(--muted)}
-    .footer-tagline{font-size:0.75rem;color:rgba(138,145,180,0.5)}
+    .footer-tagline{font-size:0.75rem;color:var(--muted);opacity:0.6}
 
     @media(max-width:768px){
       nav{display:none}.hamburger{display:flex}
@@ -78,6 +86,63 @@
       .footer-inner{flex-direction:column;align-items:flex-start}
     }
     @media(max-width:480px){.method-grid{grid-template-columns:1fr}}
+
+
+
+
+    /* ── Formations compact mobile ─────────────────────────── */
+    @media (max-width: 768px) {
+      .formations-grid {
+        grid-template-columns: 1fr !important;
+        gap: 14px !important;
+      }
+      .formation-card {
+        padding: 20px 18px !important;
+        display: flex !important;
+        flex-direction: column !important;
+      }
+      .formation-card .formation-icon {
+        font-size: 1.6rem !important;
+        margin-bottom: 8px !important;
+      }
+      .formation-card h3 {
+        font-size: 1rem !important;
+        margin-bottom: 6px !important;
+      }
+      .formation-card p {
+        font-size: 0.82rem !important;
+        line-height: 1.5 !important;
+        margin-bottom: 10px !important;
+      }
+      .formation-tags {
+        margin-bottom: 10px !important;
+      }
+      .formation-tag {
+        font-size: 0.68rem !important;
+        padding: 3px 8px !important;
+      }
+      .page-hero {
+        padding: 60px 0 32px !important;
+      }
+      .page-hero h1 {
+        font-size: 1.6rem !important;
+      }
+      .page-hero p {
+        font-size: 0.9rem !important;
+      }
+      .method-grid {
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 16px !important;
+      }
+      .cta-section {
+        padding: 48px 0 !important;
+      }
+    }
+    @media (max-width: 480px) {
+      .method-grid {
+        grid-template-columns: 1fr !important;
+      }
+    }
   </style>
 </head>
 <body>
@@ -106,7 +171,7 @@
   <div class="page-hero">
     <div class="container">
       <h1>Formations <span class="gradient">sur mesure</span> pour les entreprises</h1>
-      <p>Développez les compétences commerciales, managériales et technologiques de vos équipes avec un formateur-entrepreneur qui applique ce qu'il enseigne.</p>
+      <p>Formations IA, prospection, management et vente pour vos équipes — par un formateur-entrepreneur qui applique ce qu'il enseigne sur le terrain. <strong>Certifié Qualiopi</strong> — finançable sur votre budget formation via OPCO.</p>
     </div>
   </div>
 
@@ -115,73 +180,82 @@
       <div class="formations-grid">
 
         <div class="formation-card">
+          <div class="formation-icon">🤖</div>
+          <h3>IA &amp; ChatGPT pour entreprises</h3>
+          <p>Gagnez du temps au quotidien en intégrant ChatGPT, Claude et les outils IA dans votre activité. Vos équipes apprennent à automatiser les tâches répétitives, rédiger plus vite et prendre de meilleures décisions — sans compétences techniques.</p>
+          <div class="formation-tags">
+            <span class="formation-tag">ChatGPT</span>
+            <span class="formation-tag">Automatisation</span>
+            <span class="formation-tag">Productivité</span>
+            <span class="formation-tag">Prompting</span>
+          </div>
+          <a href="https://calendly.com/gabriel-ia-entrepreneur/decouverte" target="_blank" rel="noopener noreferrer" style="display:inline-flex;align-items:center;gap:6px;margin-top:16px;padding:10px 20px;border-radius:50px;font-size:0.82rem;font-weight:700;color:var(--accent);border:1.5px solid rgba(16,185,129,0.3);transition:all 0.2s;text-decoration:none;" onmouseover="this.style.background='rgba(16,185,129,0.1)';this.style.borderColor='var(--accent)'" onmouseout="this.style.background='transparent';this.style.borderColor='rgba(16,185,129,0.3)'">Demander un devis →</a>
+        </div>
+
+        <div class="formation-card">
           <div class="formation-icon">🎯</div>
-          <h3>Prospection commerciale</h3>
-          <p>Apprenez à identifier vos prospects idéaux, structurer votre approche et générer des rendez-vous qualifiés de manière systématique — en utilisant les outils IA pour accélérer.</p>
+          <h3>Prospection commerciale &amp; IA</h3>
+          <p>Structurez votre prospection et générez des rendez-vous qualifiés grâce aux méthodes terrain et aux outils IA. De l'identification des cibles à la prise de rendez-vous, vos commerciaux apprennent à prospecter plus efficacement.</p>
           <div class="formation-tags">
             <span class="formation-tag">Ciblage</span>
             <span class="formation-tag">LinkedIn</span>
             <span class="formation-tag">Emailing</span>
             <span class="formation-tag">IA</span>
           </div>
-        </div>
-
-        <div class="formation-card">
-          <div class="formation-icon">🤝</div>
-          <h3>Négociation & closing</h3>
-          <p>Maîtrisez les techniques de négociation qui fonctionnent sur le terrain. Apprenez à défendre vos prix, traiter les objections et transformer un "je vais réfléchir" en signature.</p>
-          <div class="formation-tags">
-            <span class="formation-tag">Objections</span>
-            <span class="formation-tag">Closing</span>
-            <span class="formation-tag">Pricing</span>
-          </div>
-        </div>
-
-        <div class="formation-card">
-          <div class="formation-icon">📈</div>
-          <h3>Vente & vente additionnelle</h3>
-          <p>Structurez votre processus de vente de A à Z et apprenez à maximiser la valeur de chaque client grâce à l'upsell et au cross-sell — sans forcer.</p>
-          <div class="formation-tags">
-            <span class="formation-tag">Process de vente</span>
-            <span class="formation-tag">Upsell</span>
-            <span class="formation-tag">Fidélisation</span>
-          </div>
+          <a href="https://calendly.com/gabriel-ia-entrepreneur/decouverte" target="_blank" rel="noopener noreferrer" style="display:inline-flex;align-items:center;gap:6px;margin-top:16px;padding:10px 20px;border-radius:50px;font-size:0.82rem;font-weight:700;color:var(--accent);border:1.5px solid rgba(16,185,129,0.3);transition:all 0.2s;text-decoration:none;" onmouseover="this.style.background='rgba(16,185,129,0.1)';this.style.borderColor='var(--accent)'" onmouseout="this.style.background='transparent';this.style.borderColor='rgba(16,185,129,0.3)'">Demander un devis →</a>
         </div>
 
         <div class="formation-card">
           <div class="formation-icon">👥</div>
-          <h3>Management des équipes</h3>
-          <p>Développez votre leadership, apprenez à motiver vos collaborateurs, gérer les conflits et construire une équipe performante et autonome.</p>
+          <h3>Management &amp; leadership</h3>
+          <p>Développez le leadership de vos managers, apprenez-leur à motiver leurs collaborateurs, gérer les conflits et construire une équipe performante et autonome. Formation basée sur l'expérience terrain, pas sur la théorie.</p>
           <div class="formation-tags">
             <span class="formation-tag">Leadership</span>
             <span class="formation-tag">Motivation</span>
             <span class="formation-tag">Gestion de conflits</span>
           </div>
+          <a href="https://calendly.com/gabriel-ia-entrepreneur/decouverte" target="_blank" rel="noopener noreferrer" style="display:inline-flex;align-items:center;gap:6px;margin-top:16px;padding:10px 20px;border-radius:50px;font-size:0.82rem;font-weight:700;color:var(--accent);border:1.5px solid rgba(16,185,129,0.3);transition:all 0.2s;text-decoration:none;" onmouseover="this.style.background='rgba(16,185,129,0.1)';this.style.borderColor='var(--accent)'" onmouseout="this.style.background='transparent';this.style.borderColor='rgba(16,185,129,0.3)'">Demander un devis →</a>
+        </div>
+
+        <div class="formation-card">
+          <div class="formation-icon">📈</div>
+          <h3>Techniques de vente &amp; closing</h3>
+          <p>Structurez votre processus de vente de A à Z : de la découverte client au closing. Apprenez à maximiser la valeur de chaque client grâce à l'upsell et au cross-sell, défendre vos prix et transformer les objections en opportunités.</p>
+          <div class="formation-tags">
+            <span class="formation-tag">Process de vente</span>
+            <span class="formation-tag">Closing</span>
+            <span class="formation-tag">Upsell</span>
+            <span class="formation-tag">Objections</span>
+          </div>
+          <a href="https://calendly.com/gabriel-ia-entrepreneur/decouverte" target="_blank" rel="noopener noreferrer" style="display:inline-flex;align-items:center;gap:6px;margin-top:16px;padding:10px 20px;border-radius:50px;font-size:0.82rem;font-weight:700;color:var(--accent);border:1.5px solid rgba(16,185,129,0.3);transition:all 0.2s;text-decoration:none;" onmouseover="this.style.background='rgba(16,185,129,0.1)';this.style.borderColor='var(--accent)'" onmouseout="this.style.background='transparent';this.style.borderColor='rgba(16,185,129,0.3)'">Demander un devis →</a>
+        </div>
+
+        <div class="formation-card">
+          <div class="formation-icon">🤝</div>
+          <h3>Négociation commerciale</h3>
+          <p>Maîtrisez les techniques de négociation qui fonctionnent sur le terrain. Apprenez à défendre vos marges, traiter les objections et transformer un "je vais réfléchir" en signature. Méthodes éprouvées sur des deals grands comptes.</p>
+          <div class="formation-tags">
+            <span class="formation-tag">Négociation</span>
+            <span class="formation-tag">Pricing</span>
+            <span class="formation-tag">Grands comptes</span>
+          </div>
+          <a href="https://calendly.com/gabriel-ia-entrepreneur/decouverte" target="_blank" rel="noopener noreferrer" style="display:inline-flex;align-items:center;gap:6px;margin-top:16px;padding:10px 20px;border-radius:50px;font-size:0.82rem;font-weight:700;color:var(--accent);border:1.5px solid rgba(16,185,129,0.3);transition:all 0.2s;text-decoration:none;" onmouseover="this.style.background='rgba(16,185,129,0.1)';this.style.borderColor='var(--accent)'" onmouseout="this.style.background='transparent';this.style.borderColor='rgba(16,185,129,0.3)'">Demander un devis →</a>
         </div>
 
         <div class="formation-card">
           <div class="formation-icon">🎤</div>
           <h3>Prise de parole en public</h3>
-          <p>Apprenez à capter l'attention, structurer un message percutant et convaincre votre audience — que ce soit en réunion, en pitch ou en conférence.</p>
+          <p>Apprenez à capter l'attention, structurer un message percutant et convaincre votre audience — que ce soit en réunion, en pitch ou en conférence. Méthode issue de 3 conférences publiques (Go Entrepreneur, France Travail, ECM Nancy).</p>
           <div class="formation-tags">
             <span class="formation-tag">Pitch</span>
             <span class="formation-tag">Storytelling</span>
             <span class="formation-tag">Confiance</span>
           </div>
-        </div>
-
-        <div class="formation-card">
-          <div class="formation-icon">🤖</div>
-          <h3>IA & Automatisation</h3>
-          <p>Gagnez 10h par semaine en automatisant vos tâches répétitives. Intégrez ChatGPT, Claude et les outils IA dans votre activité — sans compétences techniques.</p>
-          <div class="formation-tags">
-            <span class="formation-tag">ChatGPT</span>
-            <span class="formation-tag">Automatisation</span>
-            <span class="formation-tag">Productivité</span>
-          </div>
+          <a href="https://calendly.com/gabriel-ia-entrepreneur/decouverte" target="_blank" rel="noopener noreferrer" style="display:inline-flex;align-items:center;gap:6px;margin-top:16px;padding:10px 20px;border-radius:50px;font-size:0.82rem;font-weight:700;color:var(--accent);border:1.5px solid rgba(16,185,129,0.3);transition:all 0.2s;text-decoration:none;" onmouseover="this.style.background='rgba(16,185,129,0.1)';this.style.borderColor='var(--accent)'" onmouseout="this.style.background='transparent';this.style.borderColor='rgba(16,185,129,0.3)'">Demander un devis →</a>
         </div>
 
       </div>
+    </div>
     </div>
   </section>
 
@@ -221,25 +295,46 @@
         Réserver un échange gratuit
         <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M22 2L11 13M22 2L15 22l-4-9-9-4 20-7z"/></svg>
       </a>
-      <p style="margin-top:16px;font-size:0.82rem;color:var(--muted);">Certification Qualiopi en cours — financement OPCO possible prochainement</p>
+      <p style="margin-top:16px;font-size:0.82rem;color:var(--muted);"><strong>Certifié Qualiopi</strong> — finançable via votre OPCO sur budget formation entreprise. Non éligible CPF (dossier EDOF en cours).</p>
     </div>
   </section>
 
   <footer>
-    <div class="container"><div class="footer-inner">
+    <div class="container">
+
+      <!-- Bande Qualiopi -->
+      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:20px;padding:28px 0;border-bottom:1px solid var(--border);margin-bottom:32px;">
+        <div style="display:flex;align-items:center;gap:20px;flex-wrap:wrap;">
+          <img src="qualiopi-logo.png" alt="Logo Qualiopi - Processus certifié" style="height:52px;width:auto;" onerror="this.style.display='none'" />
+          <div>
+            <div style="font-size:0.92rem;font-weight:800;color:var(--text);">Certifié Qualiopi — Processus certifié</div>
+            <div style="font-size:0.78rem;color:var(--muted);margin-top:3px;">Certificat n° 883211-1 · Délivré par Certifopac · Valable jusqu'au 23/04/2029</div>
+            <div style="font-size:0.78rem;color:var(--muted);">Organisme enregistré sous le NDA : 44 54 04871 54 · Accrédité Cofrac n° 5-0620</div>
+          </div>
+        </div>
+        <a href="/qualiopi-certificat.pdf" target="_blank" rel="noopener noreferrer" style="display:inline-flex;align-items:center;gap:8px;padding:10px 20px;border-radius:50px;font-weight:700;font-size:0.82rem;color:var(--primary);border:1.5px solid rgba(26,60,255,0.25);background:rgba(26,60,255,0.05);transition:all 0.2s;text-decoration:none;white-space:nowrap;" onmouseover="this.style.background='rgba(26,60,255,0.10)';this.style.borderColor='var(--primary)'" onmouseout="this.style.background='rgba(26,60,255,0.05)';this.style.borderColor='rgba(26,60,255,0.25)'">
+          <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg>
+          Télécharger le certificat
+        </a>
+      </div>
+
+      <div class="footer-inner">
       <div class="footer-logo">IA<span>-</span>Entrepreneur</div>
       <div class="footer-links"><a href="/">Accueil</a><a href="/#services">Services</a><a href="/#apropos">À propos</a><a href="/#blog">Blog</a><a href="/#contact">Contact</a></div>
       <div>
         <p class="footer-copy">© 2026 IA-Entrepreneur — Gabriel Vanderbecken. Tous droits réservés.</p>
         <p class="footer-tagline">Formation entrepreneuriat France | Formateur IA TPE | Grand Est</p>
       </div>
-    </div></div>
+    </div><!-- /.footer-inner -->
+    </div><!-- /.container -->
   </footer>
 
   <script>
     const hamburger=document.getElementById('hamburger');const mobileMenu=document.getElementById('mobile-menu');
     hamburger.addEventListener('click',()=>{hamburger.classList.toggle('open');mobileMenu.classList.toggle('open');});
     mobileMenu.querySelectorAll('a').forEach(link=>{link.addEventListener('click',()=>{hamburger.classList.remove('open');mobileMenu.classList.remove('open');});});
+  
+
   </script>
 </body>
 </html>
