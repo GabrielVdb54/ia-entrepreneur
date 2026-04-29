@@ -53,9 +53,14 @@
       },
       "contactPoint": {
         "@type": "ContactPoint",
-        "telephone": "+33699250344",
+        "email": "contact@ia-entrepreneur.fr",
         "contactType": "customer service",
         "availableLanguage": "French"
+      },
+      "hasCredential": {
+        "@type": "EducationalOccupationalCredential",
+        "name": "Certification Qualiopi",
+        "credentialCategory": "Certification qualité organisme de formation"
       }
     },
     {
@@ -94,19 +99,19 @@
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      --bg:        #0A0F2C;
-      --bg2:       #0D1340;
-      --bg3:       #111847;
+      --bg:        #FFFFFF;
+      --bg2:       #F5F7FF;
+      --bg3:       #EEF2FF;
       --primary:   #1A3CFF;
       --primary-h: #2d4fff;
       --accent:    #10B981;
       --accent-h:  #0ea372;
-      --text:      #F0F2FF;
-      --muted:     #8A91B4;
-      --border:    rgba(255,255,255,0.08);
-      --card:      rgba(255,255,255,0.04);
+      --text:      #0A0F2C;
+      --muted:     #525880;
+      --border:    rgba(10,15,44,0.10);
+      --card:      rgba(10,15,44,0.04);
       --radius:    14px;
-      --shadow:    0 8px 40px rgba(0,0,0,0.5);
+      --shadow:    0 8px 40px rgba(0,0,0,0.10);
     }
 
     html { scroll-behavior: smooth; }
@@ -210,9 +215,9 @@
       font-weight: 700;
       letter-spacing: 0.08em;
       text-transform: uppercase;
-      background: rgba(26,60,255,0.15);
-      color: #7a9fff;
-      border: 1px solid rgba(26,60,255,0.3);
+      background: rgba(26,60,255,0.08);
+      color: var(--primary);
+      border: 1px solid rgba(26,60,255,0.2);
       margin-bottom: 16px;
     }
 
@@ -277,10 +282,11 @@
       border-bottom: 1px solid transparent;
     }
     header.scrolled {
-      background: rgba(10,15,44,0.85);
+      background: rgba(255,255,255,0.92);
       backdrop-filter: blur(18px);
       -webkit-backdrop-filter: blur(18px);
       border-color: var(--border);
+      box-shadow: 0 2px 24px rgba(10,15,44,0.08);
     }
     .header-inner {
       display: flex;
@@ -351,8 +357,9 @@
       flex-direction: column;
       gap: 4px;
       padding: 16px 24px 20px;
-      background: rgba(10,15,44,0.98);
+      background: rgba(255,255,255,0.98);
       border-top: 1px solid var(--border);
+      box-shadow: 0 8px 24px rgba(10,15,44,0.08);
     }
     .mobile-menu.open { display: flex; }
     .mobile-menu a {
@@ -385,8 +392,8 @@
       position: absolute;
       inset: 0;
       background-image:
-        linear-gradient(rgba(26,60,255,0.07) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(26,60,255,0.07) 1px, transparent 1px);
+        linear-gradient(rgba(26,60,255,0.05) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(26,60,255,0.05) 1px, transparent 1px);
       background-size: 60px 60px;
       mask-image: radial-gradient(ellipse 80% 70% at 50% 40%, black 30%, transparent 100%);
     }
@@ -400,12 +407,12 @@
     }
     .blob-1 {
       width: 600px; height: 600px;
-      background: rgba(26,60,255,0.2);
+      background: rgba(26,60,255,0.08);
       top: -200px; right: -150px;
     }
     .blob-2 {
       width: 400px; height: 400px;
-      background: rgba(16,185,129,0.12);
+      background: rgba(16,185,129,0.07);
       bottom: -100px; left: -100px;
     }
 
@@ -438,7 +445,7 @@
       right: 10%;
       bottom: 0;
       border-radius: 50%;
-      background: rgba(26,60,255,0.25);
+      background: rgba(26,60,255,0.10);
       filter: blur(60px);
       z-index: 0;
       animation: float 3s ease-in-out infinite;
@@ -454,6 +461,87 @@
       animation: float 3s ease-in-out infinite;
       filter: drop-shadow(0 20px 40px rgba(26,60,255,0.3));
     }
+
+    /* ── Hero Carousel ─────────────────────────────────────────── */
+    .hero-carousel {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      max-width: 420px;
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: 0 24px 64px rgba(26,60,255,0.15), 0 8px 24px rgba(0,0,0,0.08);
+      aspect-ratio: 4/3;
+    }
+    .hero-carousel-track {
+      display: flex;
+      height: 100%;
+      transition: transform 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .hero-carousel-slide {
+      flex: 0 0 100%;
+      height: 100%;
+      overflow: hidden;
+    }
+    .hero-carousel-slide img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+    .hero-carousel-dots {
+      position: absolute;
+      bottom: 14px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 6px;
+      z-index: 2;
+    }
+    .hero-carousel-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.5);
+      transition: background 0.3s, width 0.3s;
+      cursor: pointer;
+    }
+    .hero-carousel-dot.active {
+      background: #fff;
+      width: 20px;
+      border-radius: 3px;
+    }
+    /* Caption overlay */
+    .hero-carousel-caption {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      padding: 28px 20px 40px;
+      background: linear-gradient(transparent, rgba(10,15,44,0.7));
+      color: #fff;
+      font-size: 0.82rem;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      z-index: 1;
+    }
+
+    /* ── Qualiopi Badge ────────────────────────────────────────── */
+    .qualiopi-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 5px 14px 5px 8px;
+      background: rgba(26,60,255,0.07);
+      border: 1px solid rgba(26,60,255,0.2);
+      border-radius: 50px;
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: var(--primary);
+      letter-spacing: 0.04em;
+      margin-top: 8px;
+    }
+    .qualiopi-badge svg { flex-shrink: 0; }
     @keyframes float {
       0%, 100% { transform: translateY(0); }
       50% { transform: translateY(-8px); }
@@ -464,13 +552,13 @@
       align-items: center;
       gap: 8px;
       padding: 6px 16px;
-      background: rgba(16,185,129,0.1);
-      border: 1px solid rgba(16,185,129,0.3);
+      background: rgba(16,185,129,0.08);
+      border: 1px solid rgba(16,185,129,0.25);
       border-radius: 50px;
       font-size: 0.82rem;
       font-weight: 600;
       color: var(--accent);
-      margin-bottom: 28px;
+      margin-bottom: 16px;
     }
     .hero-badge::before {
       content: '';
@@ -492,7 +580,7 @@
       margin-bottom: 24px;
     }
     .hero-title .gradient {
-      background: linear-gradient(135deg, #7a9fff 0%, #1A3CFF 40%, #10B981 100%);
+      background: linear-gradient(135deg, #1A3CFF 0%, #2d4fff 50%, #10B981 100%);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
@@ -568,9 +656,9 @@
       transition: opacity 0.3s;
     }
     .service-card:hover {
-      border-color: rgba(26,60,255,0.4);
+      border-color: rgba(26,60,255,0.3);
       transform: translateY(-6px);
-      box-shadow: 0 20px 50px rgba(0,0,0,0.4), 0 0 0 1px rgba(26,60,255,0.1);
+      box-shadow: 0 20px 50px rgba(10,15,44,0.10), 0 0 0 1px rgba(26,60,255,0.08);
     }
     .service-card:hover::before { opacity: 1; }
 
@@ -808,7 +896,7 @@
 
     .temoignage-text {
       font-size: 0.95rem;
-      color: #c8cfe8;
+      color: var(--muted);
       line-height: 1.75;
       margin-bottom: 24px;
       font-style: italic;
@@ -1447,7 +1535,7 @@
     }
     .pricing-features li {
       font-size: 0.9rem;
-      color: #c8cfe8;
+      color: var(--muted);
       display: flex;
       align-items: flex-start;
       gap: 10px;
@@ -1542,7 +1630,7 @@
           <a href="/formations-entreprises.html">Formations entreprises</a>
           <a href="#apropos">À propos</a>
           <a href="#blog">Blog</a>
-          <a href="tel:+33699250344" style="display:flex;align-items:center;gap:5px;"><svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6A19.79 19.79 0 012.12 4.18 2 2 0 014.11 2h3a2 2 0 012 1.72c.127.96.362 1.903.7 2.81a2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.338 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg>06 99 25 03 44</a>
+          <a href="mailto:contact@ia-entrepreneur.fr" style="display:flex;align-items:center;gap:5px;"><svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,12 2,6"/></svg>contact@ia-entrepreneur.fr</a>
           <a href="https://calendly.com/gabriel-ia-entrepreneur/decouverte" target="_blank" rel="noopener noreferrer" class="nav-cta" style="background:var(--accent);box-shadow:0 3px 16px rgba(16,185,129,0.35);">Appel gratuit</a>
         </nav>
         <button class="hamburger" id="hamburger" aria-label="Menu">
@@ -1556,7 +1644,7 @@
       <a href="/formations-entreprises.html">Formations entreprises</a>
       <a href="#apropos">À propos</a>
       <a href="#blog">Blog</a>
-      <a href="tel:+33699250344">📞 06 99 25 03 44</a>
+      <a href="mailto:contact@ia-entrepreneur.fr">✉️ contact@ia-entrepreneur.fr</a>
       <a href="#contact">Me contacter</a>
       <a href="https://calendly.com/gabriel-ia-entrepreneur/decouverte" target="_blank" rel="noopener noreferrer" style="background:var(--accent);color:#fff;text-align:center;border-radius:var(--radius);margin-top:8px;padding:14px;">Réserver un appel gratuit</a>
     </div>
@@ -1572,7 +1660,13 @@
 
         <!-- Colonne gauche : texte -->
         <div class="hero-content">
-          <div class="hero-badge">Formateur &amp; Expert IA pour TPE</div>
+          <div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:28px;">
+            <div class="hero-badge" style="margin-bottom:0;">Formateur &amp; Expert IA pour TPE</div>
+            <div class="qualiopi-badge">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+              Certifié Qualiopi
+            </div>
+          </div>
 
           <h1 class="hero-title">
             Formation <span class="gradient">entrepreneuriat</span><br />
@@ -1611,16 +1705,36 @@
           </div>
         </div>
 
-        <!-- Colonne droite : photo -->
+        <!-- Colonne droite : carousel photos -->
         <div class="hero-photo-col">
-          <div class="hero-photo-wrapper">
+          <div class="hero-photo-wrapper" style="width:100%;max-width:420px;">
             <div class="hero-photo-glow"></div>
-            <img
-              src="gabriel-hero.png"
-              alt="Gabriel Vanderbecken formateur entrepreneuriat et IA France"
-              class="hero-photo"
-              loading="eager"
-            />
+            <div class="hero-carousel" id="heroCarousel">
+              <div class="hero-carousel-track" id="heroCarouselTrack">
+                <div class="hero-carousel-slide">
+                  <img src="https://images.unsplash.com/photo-1524178232363-1fb2b075b655?w=840&q=80&auto=format&fit=crop" alt="Formation entrepreneuriat en salle" loading="eager" />
+                  <div class="hero-carousel-caption">Formation création d'entreprise</div>
+                </div>
+                <div class="hero-carousel-slide">
+                  <img src="https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=840&q=80&auto=format&fit=crop" alt="Conférence entrepreneuriat" loading="lazy" />
+                  <div class="hero-carousel-caption">Conférence &amp; prise de parole publique</div>
+                </div>
+                <div class="hero-carousel-slide">
+                  <img src="https://images.unsplash.com/photo-1557804506-669a67965ba0?w=840&q=80&auto=format&fit=crop" alt="Coaching individuel entrepreneur" loading="lazy" />
+                  <div class="hero-carousel-caption">Accompagnement individuel</div>
+                </div>
+                <div class="hero-carousel-slide">
+                  <img src="https://images.unsplash.com/photo-1552664730-d307ca884978?w=840&q=80&auto=format&fit=crop" alt="Formation équipe en entreprise" loading="lazy" />
+                  <div class="hero-carousel-caption">Formations en entreprise</div>
+                </div>
+              </div>
+              <div class="hero-carousel-dots" id="heroCarouselDots">
+                <div class="hero-carousel-dot active" data-index="0"></div>
+                <div class="hero-carousel-dot" data-index="1"></div>
+                <div class="hero-carousel-dot" data-index="2"></div>
+                <div class="hero-carousel-dot" data-index="3"></div>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -1737,7 +1851,7 @@
             <span style="font-size:1.4rem;">🏢</span>
             <h3 style="font-size:1.15rem;font-weight:800;color:var(--text);">Vous êtes une entreprise ?</h3>
           </div>
-          <p style="font-size:0.92rem;color:var(--muted);max-width:520px;line-height:1.6;">Formations sur mesure pour vos équipes : prospection, négociation, vente, management, prise de parole en public et IA appliquée. Éligible Qualiopi (en cours de certification).</p>
+          <p style="font-size:0.92rem;color:var(--muted);max-width:520px;line-height:1.6;">Formations sur mesure pour vos équipes : prospection, négociation, vente, management, prise de parole en public et IA appliquée. <strong style="color:var(--accent);">Certifié Qualiopi</strong> — finançable sur budget formation entreprise (OPCO). Non éligible CPF.</p>
         </div>
         <a href="/formations-entreprises.html" style="display:inline-flex;align-items:center;gap:8px;padding:12px 24px;border-radius:50px;font-weight:700;font-size:0.9rem;background:transparent;color:var(--text);border:1.5px solid var(--border);cursor:pointer;transition:all 0.2s;text-decoration:none;white-space:nowrap;" onmouseover="this.style.borderColor='var(--primary)';this.style.color='var(--primary)';this.style.transform='translateY(-2px)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text)';this.style.transform='translateY(0)'">
           Découvrir nos formations entreprises
@@ -1749,7 +1863,7 @@
 
       <p class="pricing-footer-note reveal">
         Toutes les formations sont dispensées en présentiel, distanciel ou e-learning.<br>
-        Non éligible CPF — certification Qualiopi en cours. <strong>Profitez du tarif lancement avant augmentation.</strong>
+        <strong>Certifié Qualiopi</strong> — finançable sur budget formation entreprise via votre OPCO. Non éligible CPF (dossier EDOF en cours). <strong>Profitez du tarif lancement avant augmentation.</strong>
       </p>
     </div>
   </section>
@@ -1883,29 +1997,29 @@
         <div style="text-align:center;position:relative;z-index:1;">
           <div style="width:96px;height:96px;border-radius:50%;background:rgba(26,60,255,0.15);border:2px solid rgba(26,60,255,0.3);display:flex;align-items:center;justify-content:center;margin:0 auto 20px;font-size:2rem;">📞</div>
           <div style="font-size:0.75rem;font-weight:800;color:#1A3CFF;letter-spacing:0.1em;text-transform:uppercase;margin-bottom:8px;">Étape 1</div>
-          <h3 style="font-size:1.05rem;font-weight:700;margin-bottom:8px;color:#F0F2FF;">Appel découverte gratuit</h3>
-          <p style="font-size:0.88rem;color:#8A91B4;line-height:1.6;">On échange 20 min sur votre projet, vos objectifs et vos freins. Sans engagement.</p>
+          <h3 style="font-size:1.05rem;font-weight:700;margin-bottom:8px;color:var(--text);">Appel découverte gratuit</h3>
+          <p style="font-size:0.88rem;color:var(--muted);line-height:1.6;">On échange 20 min sur votre projet, vos objectifs et vos freins. Sans engagement.</p>
         </div>
 
         <div style="text-align:center;position:relative;z-index:1;">
           <div style="width:96px;height:96px;border-radius:50%;background:rgba(26,60,255,0.15);border:2px solid rgba(26,60,255,0.3);display:flex;align-items:center;justify-content:center;margin:0 auto 20px;font-size:2rem;">🎯</div>
           <div style="font-size:0.75rem;font-weight:800;color:#1A3CFF;letter-spacing:0.1em;text-transform:uppercase;margin-bottom:8px;">Étape 2</div>
-          <h3 style="font-size:1.05rem;font-weight:700;margin-bottom:8px;color:#F0F2FF;">Programme personnalisé</h3>
-          <p style="font-size:0.88rem;color:#8A91B4;line-height:1.6;">Je construis un programme adapté à votre situation, votre rythme et vos priorités.</p>
+          <h3 style="font-size:1.05rem;font-weight:700;margin-bottom:8px;color:var(--text);">Programme personnalisé</h3>
+          <p style="font-size:0.88rem;color:var(--muted);line-height:1.6;">Je construis un programme adapté à votre situation, votre rythme et vos priorités.</p>
         </div>
 
         <div style="text-align:center;position:relative;z-index:1;">
           <div style="width:96px;height:96px;border-radius:50%;background:rgba(16,185,129,0.15);border:2px solid rgba(16,185,129,0.3);display:flex;align-items:center;justify-content:center;margin:0 auto 20px;font-size:2rem;">🚀</div>
           <div style="font-size:0.75rem;font-weight:800;color:#10B981;letter-spacing:0.1em;text-transform:uppercase;margin-bottom:8px;">Étape 3</div>
-          <h3 style="font-size:1.05rem;font-weight:700;margin-bottom:8px;color:#F0F2FF;">Accompagnement terrain</h3>
-          <p style="font-size:0.88rem;color:#8A91B4;line-height:1.6;">On avance ensemble, étape par étape. Business plan, statut, financement, premières ventes.</p>
+          <h3 style="font-size:1.05rem;font-weight:700;margin-bottom:8px;color:var(--text);">Accompagnement terrain</h3>
+          <p style="font-size:0.88rem;color:var(--muted);line-height:1.6;">On avance ensemble, étape par étape. Business plan, statut, financement, premières ventes.</p>
         </div>
 
         <div style="text-align:center;position:relative;z-index:1;">
           <div style="width:96px;height:96px;border-radius:50%;background:rgba(16,185,129,0.15);border:2px solid rgba(16,185,129,0.3);display:flex;align-items:center;justify-content:center;margin:0 auto 20px;font-size:2rem;">🏆</div>
           <div style="font-size:0.75rem;font-weight:800;color:#10B981;letter-spacing:0.1em;text-transform:uppercase;margin-bottom:8px;">Étape 4</div>
-          <h3 style="font-size:1.05rem;font-weight:700;margin-bottom:8px;color:#F0F2FF;">Lancement &amp; premiers clients</h3>
-          <p style="font-size:0.88rem;color:#8A91B4;line-height:1.6;">Votre entreprise est créée, votre offre est en ligne et vos premiers clients sont signés.</p>
+          <h3 style="font-size:1.05rem;font-weight:700;margin-bottom:8px;color:var(--text);">Lancement &amp; premiers clients</h3>
+          <p style="font-size:0.88rem;color:var(--muted);line-height:1.6;">Votre entreprise est créée, votre offre est en ligne et vos premiers clients sont signés.</p>
         </div>
       </div>
 
@@ -1927,8 +2041,8 @@
         <div>
           <div class="section-label"><span>Accompagnement terrain</span></div>
           <h2 style="font-size:clamp(1.5rem,3vw,2.2rem);font-weight:800;line-height:1.2;margin-bottom:20px;">Pas de la théorie.<br><span style="color:var(--primary);">De la pratique.</span></h2>
-          <p style="font-size:1rem;color:#8A91B4;line-height:1.85;margin-bottom:16px;">Chaque séance, on avance ensemble sur <strong style="color:#F0F2FF;">votre</strong> projet. On ouvre votre laptop, on construit votre business plan, on rédige vos statuts, on prépare votre dossier de financement — en direct.</p>
-          <p style="font-size:1rem;color:#8A91B4;line-height:1.85;margin-bottom:28px;">Ce n'est pas un cours magistral. C'est un <strong style="color:#F0F2FF;">coaching opérationnel</strong> où vous repartez à chaque étape avec des livrables concrets et actionnables.</p>
+          <p style="font-size:1rem;color:var(--muted);line-height:1.85;margin-bottom:16px;">Chaque séance, on avance ensemble sur <strong style="color:var(--text);">votre</strong> projet. On ouvre votre laptop, on construit votre business plan, on rédige vos statuts, on prépare votre dossier de financement — en direct.</p>
+          <p style="font-size:1rem;color:var(--muted);line-height:1.85;margin-bottom:28px;">Ce n'est pas un cours magistral. C'est un <strong style="color:var(--text);">coaching opérationnel</strong> où vous repartez à chaque étape avec des livrables concrets et actionnables.</p>
           <a href="https://calendly.com/gabriel-ia-entrepreneur/decouverte" target="_blank" rel="noopener noreferrer" style="display:inline-flex;align-items:center;gap:8px;padding:14px 28px;border-radius:50px;font-weight:700;font-size:0.95rem;background:#1A3CFF;color:#fff;box-shadow:0 4px 24px rgba(26,60,255,0.4);transition:transform 0.2s,box-shadow 0.2s;text-decoration:none;" onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='0 8px 32px rgba(26,60,255,0.55)'" onmouseout="this.style.transform='translateY(0)';this.style.boxShadow='0 4px 24px rgba(26,60,255,0.4)'">
             Réserver mon appel gratuit
             <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M22 2L11 13M22 2L15 22l-4-9-9-4 20-7z"/></svg>
@@ -1936,7 +2050,7 @@
         </div>
         <div style="position:relative;">
           <div style="position:absolute;inset:-16px;border-radius:24px;background:rgba(26,60,255,0.15);filter:blur(30px);z-index:0;"></div>
-          <img src="gabriel-coaching.jpg" alt="Gabriel Vanderbecken en séance d'accompagnement avec un entrepreneur" style="position:relative;z-index:1;width:100%;border-radius:20px;box-shadow:0 20px 60px rgba(0,0,0,0.5);" />
+          <img src="https://images.unsplash.com/photo-1559136555-9303baea8ebd?w=800&q=80&auto=format&fit=crop" alt="Coaching entrepreneuriat individuel - IA-Entrepreneur" style="position:relative;z-index:1;width:100%;border-radius:20px;box-shadow:0 20px 60px rgba(10,15,44,0.12);" />
         </div>
       </div>
     </div>
@@ -2219,6 +2333,24 @@
   <!-- ── Footer ───────────────────────────────────────────────── -->
   <footer>
     <div class="container">
+
+      <!-- Bande Qualiopi -->
+      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:20px;padding:28px 0;border-bottom:1px solid var(--border);margin-bottom:32px;">
+        <div style="display:flex;align-items:center;gap:20px;flex-wrap:wrap;">
+          <!-- Logo Qualiopi : remplacer l'img src par le chemin du logo officiel PNG téléchargé sur qualiopi.fr -->
+          <img src="qualiopi-logo.png" alt="Logo Qualiopi - Processus certifié" style="height:52px;width:auto;" onerror="this.style.display='none'" />
+          <div>
+            <div style="font-size:0.92rem;font-weight:800;color:var(--text);">Certifié Qualiopi — Processus certifié</div>
+            <div style="font-size:0.78rem;color:var(--muted);margin-top:3px;">Certificat n° 883211-1 · Délivré par Certifopac · Valable jusqu'au 23/04/2029</div>
+            <div style="font-size:0.78rem;color:var(--muted);">Organisme enregistré sous le NDA : 44 54 04871 54 · Accrédité Cofrac n° 5-0620</div>
+          </div>
+        </div>
+        <a href="/qualiopi-certificat.pdf" target="_blank" rel="noopener noreferrer" style="display:inline-flex;align-items:center;gap:8px;padding:10px 20px;border-radius:50px;font-weight:700;font-size:0.82rem;color:var(--primary);border:1.5px solid rgba(26,60,255,0.25);background:rgba(26,60,255,0.05);transition:all 0.2s;text-decoration:none;white-space:nowrap;" onmouseover="this.style.background='rgba(26,60,255,0.10)';this.style.borderColor='var(--primary)'" onmouseout="this.style.background='rgba(26,60,255,0.05)';this.style.borderColor='rgba(26,60,255,0.25)'">
+          <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg>
+          Télécharger le certificat
+        </a>
+      </div>
+
       <div class="footer-inner">
         <div class="footer-logo">IA<span>-</span>Entrepreneur</div>
 
@@ -2250,8 +2382,8 @@
           <p class="footer-tagline">Formation entrepreneuriat France | Formateur IA TPE | Grand Est</p>
           <p class="footer-tagline">N° de déclaration d'activité : 44 54 04871 54</p>
         </div>
-      </div>
-    </div>
+      </div><!-- /.footer-inner -->
+    </div><!-- /.container -->
   </footer>
 
   <!-- ── JavaScript ────────────────────────────────────────────── -->
@@ -2383,6 +2515,26 @@
     }, { threshold: 0.4 });
 
     sections.forEach(s => activeObserver.observe(s));
+
+    // ── Hero Carousel ─────────────────────────────────────────
+    const carouselTrack = document.getElementById('heroCarouselTrack');
+    const carouselDots = document.querySelectorAll('.hero-carousel-dot');
+    let currentSlide = 0;
+    const totalSlides = 4;
+
+    function goToSlide(index) {
+      currentSlide = index;
+      carouselTrack.style.transform = `translateX(-${index * 100}%)`;
+      carouselDots.forEach((dot, i) => dot.classList.toggle('active', i === index));
+    }
+
+    carouselDots.forEach(dot => {
+      dot.addEventListener('click', () => goToSlide(parseInt(dot.dataset.index)));
+    });
+
+    setInterval(() => {
+      goToSlide((currentSlide + 1) % totalSlides);
+    }, 4000);
   </script>
 
 <script></script>
