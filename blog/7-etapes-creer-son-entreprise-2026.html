@@ -49,31 +49,17 @@
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
 
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-    :root {
-      --bg:        #0A0F2C;
-      --bg2:       #0D1340;
-      --bg3:       #111847;
-      --primary:   #1A3CFF;
-      --primary-h: #2d4fff;
-      --accent:    #10B981;
-      --accent-h:  #0ea372;
-      --text:      #F0F2FF;
-      --muted:     #8A91B4;
-      --border:    rgba(255,255,255,0.08);
-      --card:      rgba(255,255,255,0.04);
-      --radius:    14px;
-      --shadow:    0 8px 40px rgba(0,0,0,0.5);
-    }
+    
 
     html { scroll-behavior: smooth; }
 
     body {
-      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-family: 'Inter', sans-serif;
       background: var(--bg);
       color: var(--text);
       line-height: 1.65;
@@ -95,7 +81,7 @@
       position: fixed;
       top: 0; left: 0; right: 0;
       z-index: 100;
-      background: rgba(10,15,44,0.85);
+      background: rgba(255,255,255,0.92);
       backdrop-filter: blur(18px);
       -webkit-backdrop-filter: blur(18px);
       border-bottom: 1px solid var(--border);
@@ -165,7 +151,7 @@
       flex-direction: column;
       gap: 4px;
       padding: 16px 24px 20px;
-      background: rgba(10,15,44,0.98);
+      background: rgba(255,255,255,0.98);
       border-top: 1px solid var(--border);
     }
     .mobile-menu.open { display: flex; }
@@ -497,35 +483,82 @@
       .footer-inner { flex-direction: column; align-items: flex-start; }
       .footer-right { align-items: flex-start; }
     }
-  </style>
+  
+    /* ── Variables thème blanc ── */
+    :root {
+      --bg:        #FFFFFF;
+      --bg2:       #F5F7FF;
+      --bg3:       #EEF2FF;
+      --primary:   #1A3CFF;
+      --primary-h: #2d4fff;
+      --accent:    #10B981;
+      --accent-h:  #0ea372;
+      --text:      #0A0F2C;
+      --muted:     #525880;
+      --border:    rgba(10,15,44,0.10);
+      --card:      rgba(10,15,44,0.04);
+      --radius:    14px;
+      --shadow:    0 8px 40px rgba(0,0,0,0.10);
+    }
+
+    /* ── Header ── */
+    header { position: fixed; top: 0; left: 0; right: 0; z-index: 100; background: rgba(255,255,255,0.92); backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px); border-bottom: 1px solid var(--border); box-shadow: 0 2px 24px rgba(10,15,44,0.06); }
+    .header-inner { display: flex; align-items: center; justify-content: space-between; height: 68px; gap: 16px; }
+    .logo { font-size: 1rem; font-weight: 800; color: var(--text); letter-spacing: -0.02em; flex-shrink: 0; line-height: 1.2; text-decoration: none; }
+    .logo span { color: var(--primary); }
+    nav { display: flex; align-items: center; gap: 2px; }
+    nav a { padding: 6px 10px; border-radius: 8px; font-size: 0.78rem; font-weight: 600; color: var(--muted); transition: color 0.2s, background 0.2s; white-space: nowrap; text-decoration: none; }
+    nav a:hover { color: var(--text); background: var(--card); }
+    .nav-cta { background: var(--accent) !important; color: #fff !important; border-radius: 50px !important; padding: 8px 16px !important; font-size: 0.8rem !important; box-shadow: 0 3px 16px rgba(16,185,129,0.35); white-space: nowrap; }
+    .hamburger { display: none; flex-direction: column; gap: 5px; padding: 8px; background: none; border: none; cursor: pointer; }
+    .hamburger span { display: block; width: 24px; height: 2px; background: var(--text); border-radius: 2px; transition: transform 0.3s, opacity 0.3s; }
+    .mobile-menu { display: none; flex-direction: column; gap: 4px; padding: 16px 24px 20px; background: rgba(255,255,255,0.98); border-top: 1px solid var(--border); box-shadow: 0 8px 24px rgba(10,15,44,0.08); }
+    .mobile-menu.open { display: flex; }
+    .mobile-menu a { padding: 12px 16px; border-radius: var(--radius); font-weight: 600; color: var(--muted); transition: color 0.2s, background 0.2s; text-decoration: none; }
+    .mobile-menu a:hover { color: var(--text); background: var(--card); }
+
+    /* ── Footer ── */
+    footer { padding: 40px 0 24px; border-top: 1px solid var(--border); background: var(--bg); }
+
+    @media (max-width: 768px) {
+      nav { display: none; }
+      .hamburger { display: flex; }
+    }
+</style>
 </head>
 <body>
 
   <!-- ── Header ───────────────────────────────────────────────── -->
-  <header>
+    <header>
     <div class="container">
       <div class="header-inner">
-        <a href="/" class="logo">IA<span>-</span>Entrepreneur</a>
+        <a href="/" class="logo" style="line-height:1.2;">
+          IA<span>-</span>Entrepreneur
+          <span style="display:block;font-size:0.58rem;font-weight:500;color:var(--muted);letter-spacing:0.03em;margin-top:2px;">Organisme de formation certifié Qualiopi</span>
+        </a>
         <nav>
           <a href="/">Accueil</a>
-          <a href="/#services">Services</a>
+          <a href="/formations-creation.html">Création d'entreprise</a>
+          <a href="/formations-entreprises.html">Formations entreprises</a>
           <a href="/#apropos">À propos</a>
-          <a href="/#temoignages">Témoignages</a>
           <a href="/#blog">Blog</a>
-          <a href="/#contact" class="nav-cta">Me contacter</a>
+          <a href="mailto:contact@ia-entrepreneur.fr" style="display:flex;align-items:center;gap:4px;">
+            <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,12 2,6"/></svg>
+            contact@ia-entrepreneur.fr
+          </a>
+          <a href="https://calendly.com/gabriel-ia-entrepreneur/decouverte" target="_blank" rel="noopener noreferrer" class="nav-cta">Appel gratuit</a>
         </nav>
-        <button class="hamburger" id="hamburger" aria-label="Menu">
-          <span></span><span></span><span></span>
-        </button>
+        <button class="hamburger" id="hamburger" aria-label="Menu"><span></span><span></span><span></span></button>
       </div>
     </div>
     <div class="mobile-menu" id="mobile-menu">
       <a href="/">Accueil</a>
-      <a href="/#services">Services</a>
+      <a href="/formations-creation.html">Création d'entreprise</a>
+      <a href="/formations-entreprises.html">Formations entreprises</a>
       <a href="/#apropos">À propos</a>
-      <a href="/#temoignages">Témoignages</a>
       <a href="/#blog">Blog</a>
-      <a href="/#contact">Me contacter</a>
+      <a href="mailto:contact@ia-entrepreneur.fr">contact@ia-entrepreneur.fr</a>
+      <a href="https://calendly.com/gabriel-ia-entrepreneur/decouverte" target="_blank" rel="noopener noreferrer" style="background:var(--accent);color:#fff;text-align:center;border-radius:var(--radius);margin-top:8px;padding:14px;display:block;font-weight:700;">Réserver un appel gratuit</a>
     </div>
   </header>
 
@@ -554,32 +587,32 @@
 
       <h1 class="article-title">Les 7 étapes incontournables pour <span class="gradient">créer son entreprise</span> en 2026</h1>
 
-      <p class="article-excerpt">De la validation de votre idée à votre premier client payant : voici le chemin exact que j'ai vu parcourir les entrepreneurs qui réussissent. Un guide sans jargon, orienté action — forgé après l'accompagnement de plus de 1 500 porteurs de projet.</p>
+      <p class="article-excerpt">De la validation de votre idée à votre premier client payant : voici le chemin exact que j'ai vu parcourir les entrepreneurs qui réussissent. Un guide sans jargon, orienté action : forgé après l'accompagnement de plus de 1 500 porteurs de projet.</p>
     </div>
 
     <!-- ── Article Body ───────────────────────────────────────── -->
     <div class="article-body">
 
-      <p>Créer son entreprise en France, c'est une aventure que j'ai vue se jouer plus de 1 500 fois. En tant que formateur en entrepreneuriat et fondateur de deux entreprises, je vous partage ici les 7 étapes que je considère absolument incontournables — celles que les entrepreneurs qui réussissent suivent (presque) toujours dans le bon ordre.</p>
+      <p>Créer son entreprise en France, c'est une aventure que j'ai vue se jouer plus de 1 500 fois. En tant que formateur en entrepreneuriat et fondateur de deux entreprises, je vous partage ici les 7 étapes que je considère absolument incontournables : celles que les entrepreneurs qui réussissent suivent (presque) toujours dans le bon ordre.</p>
 
-      <h2>Étape 1 — Valider votre idée avant d'investir un centime</h2>
+      <h2>Étape 1 : Valider votre idée avant d'investir un centime</h2>
 
       <p>La première erreur que je vois chez les porteurs de projet ? Passer des mois à peaufiner un business plan sans avoir vérifié qu'il existe une vraie demande. Avant tout, vous devez <strong>confronter votre idée au marché</strong>.</p>
 
-      <p>Concrètement, ça veut dire parler à vos futurs clients potentiels. Pas votre famille, pas vos amis — des vrais inconnus qui pourraient payer pour votre produit ou service. L'objectif est de comprendre leurs besoins réels, leurs frustrations, et ce qu'ils utilisent aujourd'hui pour résoudre le problème que vous voulez adresser.</p>
+      <p>Concrètement, ça veut dire parler à vos futurs clients potentiels. Pas votre famille, pas vos amis : des vrais inconnus qui pourraient payer pour votre produit ou service. L'objectif est de comprendre leurs besoins réels, leurs frustrations, et ce qu'ils utilisent aujourd'hui pour résoudre le problème que vous voulez adresser.</p>
 
       <div class="tip-box">
         <strong>💡 Conseil terrain</strong>
         <p>Réalisez au minimum 20 entretiens avec des clients potentiels avant de vous lancer. Posez des questions ouvertes : « Comment gérez-vous [ce problème] aujourd'hui ? » plutôt que « Est-ce que vous achèteriez mon produit ? »</p>
       </div>
 
-      <h2>Étape 2 — Réaliser votre étude de marché ciblée</h2>
+      <h2>Étape 2 : Réaliser votre étude de marché ciblée</h2>
 
       <p>Une étude de marché ne doit pas être un document de 80 pages que personne ne lit. Elle doit répondre à trois questions simples : <strong>qui sont vos clients</strong>, <strong>combien ils sont prêts à payer</strong>, et <strong>qui sont vos concurrents</strong>.</p>
 
       <p>Utilisez les outils gratuits à votre disposition : Google Trends pour mesurer l'intérêt, les pages jaunes et annuaires professionnels pour identifier la concurrence locale, et les réseaux sociaux pour observer les discussions de votre cible. En 2026, l'IA peut vous aider à analyser ces données bien plus vite qu'avant.</p>
 
-      <h2>Étape 3 — Choisir le bon statut juridique</h2>
+      <h2>Étape 3 : Choisir le bon statut juridique</h2>
 
       <p>Micro-entreprise, EURL, SASU, SAS… Le choix du statut est souvent le point qui bloque le plus les porteurs de projet. Pourtant, il ne devrait pas vous ralentir si vous comprenez les critères clés.</p>
 
@@ -590,52 +623,52 @@
         <p>Ne perdez pas 3 mois sur le statut. 80% des créateurs démarrent en micro-entreprise et évoluent ensuite. Le statut parfait au départ est celui qui vous permet de commencer vite.</p>
       </div>
 
-      <h2>Étape 4 — Construire un business plan solide (mais pas interminable)</h2>
+      <h2>Étape 4 : Construire un business plan solide (mais pas interminable)</h2>
 
-      <p>Le business plan n'est pas un exercice académique — c'est votre boussole. Il doit vous permettre de savoir <strong>combien vous devez vendre pour vivre</strong>, et convaincre vos partenaires (banques, associés, investisseurs) que votre projet est viable.</p>
+      <p>Le business plan n'est pas un exercice académique : c'est votre boussole. Il doit vous permettre de savoir <strong>combien vous devez vendre pour vivre</strong>, et convaincre vos partenaires (banques, associés, investisseurs) que votre projet est viable.</p>
 
       <p>Concentrez-vous sur 8 éléments essentiels : le résumé exécutif, votre proposition de valeur, l'analyse de marché, votre modèle économique, la stratégie commerciale, l'équipe, le plan financier sur 3 ans, et le plan d'action des 90 premiers jours.</p>
 
-      <h2>Étape 5 — Trouver vos financements et aides</h2>
+      <h2>Étape 5 : Trouver vos financements et aides</h2>
 
       <p>En 2026, la France reste l'un des pays les plus généreux en matière d'aides à la création d'entreprise. Encore faut-il les connaître. Entre l'ACRE (exonération de charges), l'ARCE (capital versé par France Travail), les prêts d'honneur, le microcrédit, et les subventions régionales, le montant total peut atteindre <strong>plusieurs dizaines de milliers d'euros</strong>.</p>
 
       <p>La clé est d'identifier les aides auxquelles vous êtes éligible AVANT de vous immatriculer, car certaines doivent être demandées en amont. Je vois trop d'entrepreneurs passer à côté de financements simplement parce qu'ils ont créé leur structure trop tôt.</p>
 
-      <h2>Étape 6 — Immatriculer votre entreprise</h2>
+      <h2>Étape 6 : Immatriculer votre entreprise</h2>
 
       <p>Depuis 2023, toutes les formalités passent par le <strong>guichet unique de l'INPI</strong> (formalites.entreprises.gouv.fr). Le processus est 100% en ligne et prend entre 1 et 3 semaines selon votre statut.</p>
 
       <p>Pour une micro-entreprise, c'est rapide : quelques formulaires, une pièce d'identité, et vous recevez votre numéro SIRET sous quelques jours. Pour une société (SASU, SAS, SARL), il faudra rédiger des statuts, déposer un capital social, publier une annonce légale, et déposer votre dossier complet.</p>
 
-      <h2>Étape 7 — Trouver vos premiers clients (avant de tout optimiser)</h2>
+      <h2>Étape 7 : Trouver vos premiers clients (avant de tout optimiser)</h2>
 
-      <p>C'est l'étape que beaucoup repoussent — et c'est pourtant la plus importante. Votre entreprise n'existe vraiment qu'à partir du moment où quelqu'un paie pour ce que vous proposez.</p>
+      <p>C'est l'étape que beaucoup repoussent : et c'est pourtant la plus importante. Votre entreprise n'existe vraiment qu'à partir du moment où quelqu'un paie pour ce que vous proposez.</p>
 
-      <p>Ne tombez pas dans le piège du site web parfait, du logo idéal ou des cartes de visite impeccables. <strong>Votre priorité absolue est de signer votre premier client.</strong> Utilisez votre réseau, LinkedIn, le bouche-à-oreille, les marketplaces, les petites annonces. L'IA peut vous aider à prospecter plus efficacement — mais rien ne remplace le contact humain direct.</p>
+      <p>Ne tombez pas dans le piège du site web parfait, du logo idéal ou des cartes de visite impeccables. <strong>Votre priorité absolue est de signer votre premier client.</strong> Utilisez votre réseau, LinkedIn, le bouche-à-oreille, les marketplaces, les petites annonces. L'IA peut vous aider à prospecter plus efficacement : mais rien ne remplace le contact humain direct.</p>
 
       <div class="tip-box">
         <strong>💡 Conseil terrain</strong>
-        <p>Fixez-vous un objectif simple : trouver votre premier client payant dans les 30 premiers jours. Ce n'est pas un objectif de chiffre d'affaires — c'est un objectif de validation. Un client qui paie, c'est la preuve que votre offre a de la valeur.</p>
+        <p>Fixez-vous un objectif simple : trouver votre premier client payant dans les 30 premiers jours. Ce n'est pas un objectif de chiffre d'affaires : c'est un objectif de validation. Un client qui paie, c'est la preuve que votre offre a de la valeur.</p>
       </div>
 
       <h2>En résumé</h2>
 
-      <p>Ces 7 étapes ne sont pas de la théorie. Ce sont les étapes que j'ai vu fonctionner concrètement chez les 1 500+ porteurs de projet que j'ai accompagnés. L'ordre compte : validez d'abord, structurez ensuite, et vendez le plus vite possible. Le reste — le logo, le site, les cartes de visite — peut attendre.</p>
+      <p>Ces 7 étapes ne sont pas de la théorie. Ce sont les étapes que j'ai vu fonctionner concrètement chez les 1 500+ porteurs de projet que j'ai accompagnés. L'ordre compte : validez d'abord, structurez ensuite, et vendez le plus vite possible. Le reste : le logo, le site, les cartes de visite : peut attendre.</p>
 
       <!-- ── Author Box ─────────────────────────────────────── -->
       <div class="author-box">
         <img src="https://ia-entrepreneur.fr/gabriel.png" alt="Gabriel Vanderbecken" class="author-box-avatar" />
         <div class="author-box-info">
           <h4>Gabriel Vanderbecken</h4>
-          <p>Formateur en entrepreneuriat & IA, fondateur de 2 entreprises. <span class="author-stat">+1 500 porteurs de projet accompagnés</span> partout en France — en présentiel, distanciel et e-learning.</p>
+          <p>Formateur en entrepreneuriat & IA, fondateur de 2 entreprises. <span class="author-stat">+1 500 porteurs de projet accompagnés</span> partout en France : en présentiel, distanciel et e-learning.</p>
         </div>
       </div>
 
       <!-- ── CTA ────────────────────────────────────────────── -->
       <div class="article-cta">
         <h3>Vous avez un projet de création d'entreprise ?</h3>
-        <p>Je vous accompagne de A à Z pour structurer votre projet et passer à l'action. Échangeons sur vos besoins — c'est sans engagement.</p>
+        <p>Je vous accompagne de A à Z pour structurer votre projet et passer à l'action. Échangeons sur vos besoins : c'est sans engagement.</p>
         <a href="/#contact" class="btn btn-accent">
           Me contacter
           <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
@@ -648,24 +681,36 @@
   </div>
 
   <!-- ── Footer ───────────────────────────────────────────────── -->
-  <footer>
+    <footer>
     <div class="container">
-      <div class="footer-inner">
-        <div class="footer-logo">IA<span>-</span>Entrepreneur</div>
-        <div class="footer-center">
-          <div class="footer-links">
-            <a href="/">Accueil</a>
-            <a href="/#services">Services</a>
-            <a href="/#apropos">À propos</a>
-            <a href="/#temoignages">Témoignages</a>
-            <a href="/#blog">Blog</a>
-            <a href="/#contact">Contact</a>
+      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:20px;padding:24px 0;border-bottom:1px solid var(--border);margin-bottom:28px;">
+        <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap;">
+          <img src="/qualiopi-logo.png" alt="Logo Qualiopi - Processus certifié" style="height:44px;width:auto;" onerror="this.style.display='none'" />
+          <div>
+            <div style="font-size:0.88rem;font-weight:800;color:var(--text);">Certifié Qualiopi — Processus certifié</div>
+            <div style="font-size:0.75rem;color:var(--muted);margin-top:2px;">Certificat n° 883211-1 · Certifopac · Valable jusqu'au 23/04/2029</div>
+            <div style="font-size:0.75rem;color:var(--muted);">NDA : 44 54 04871 54 · Cofrac n° 5-0620</div>
           </div>
         </div>
-        <div class="footer-right">
-          <p class="footer-copy">© 2026 IA-Entrepreneur — Gabriel Vanderbecken. Tous droits réservés.</p>
-          <p class="footer-tagline">Formation entrepreneuriat France | Formateur IA TPE | Grand Est</p>
+        <a href="/qualiopi-certificat.pdf" target="_blank" rel="noopener noreferrer" style="display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:50px;font-size:0.78rem;font-weight:700;color:var(--primary);border:1.5px solid rgba(26,60,255,0.2);background:rgba(26,60,255,0.04);text-decoration:none;">
+          <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+          Voir le certificat
+        </a>
+      </div>
+      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:20px;margin-bottom:20px;">
+        <div style="font-size:1.1rem;font-weight:800;letter-spacing:-0.02em;">IA<span style="color:var(--primary);">-</span>Entrepreneur</div>
+        <div style="display:flex;gap:20px;flex-wrap:wrap;">
+          <a href="/" style="font-size:0.82rem;color:var(--muted);">Accueil</a>
+          <a href="/formations-creation.html" style="font-size:0.82rem;color:var(--muted);">Création d'entreprise</a>
+          <a href="/formations-entreprises.html" style="font-size:0.82rem;color:var(--muted);">Formations entreprises</a>
+          <a href="/#apropos" style="font-size:0.82rem;color:var(--muted);">À propos</a>
+          <a href="/#blog" style="font-size:0.82rem;color:var(--muted);">Blog</a>
+          <a href="/#contact" style="font-size:0.82rem;color:var(--muted);">Contact</a>
         </div>
+      </div>
+      <div style="padding-top:16px;border-top:1px solid var(--border);">
+        <p style="font-size:0.75rem;color:var(--muted);opacity:0.7;">© 2026 IA-Entrepreneur — Clindit. Tous droits réservés.</p>
+        <p style="font-size:0.75rem;color:var(--muted);opacity:0.6;">NDA : 44 54 04871 54 · Formation entrepreneuriat France | IA pour TPE | Grand Est</p>
       </div>
     </div>
   </footer>
