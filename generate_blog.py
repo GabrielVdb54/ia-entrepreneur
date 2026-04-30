@@ -155,10 +155,9 @@ def main():
     # Remplacer tout le contenu entre les balises blog-grid
     new_grid = f'<div class="blog-grid" id="blogGrid">\n{cards_html}\n      </div>'
     output = re.sub(
-        r'<div class="blog-grid" id="blogGrid">.*?</div>',
-        new_grid,
-        template,
-        flags=re.DOTALL
+        r'<div class="blog-grid" id="blogGrid">[\s\S]*?(?=\s*<div class="no-results")',
+        new_grid + '\n      ',
+        template
     )
 
     # Écrire le fichier final
