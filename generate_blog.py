@@ -148,12 +148,18 @@ def main():
     # Générer les cards
     cards_html = "\n".join([generate_card(a, i+1) for i, a in enumerate(articles)])
 
-    # Lire le template blog.html
-    with open(TEMPLATE_FILE, 'r', encoding='utf-8') as f:
+    # Lire le template blog.html et remplacer le bloc blog-grid entier
+    with open(OUTPUT_FILE, 'r', encoding='utf-8') as f:
         template = f.read()
 
-    # Remplacer le placeholder
-    output = template.replace("        <!-- ARTICLES_PLACEHOLDER -->", cards_html)
+    # Remplacer tout le contenu entre les balises blog-grid
+    new_grid = f'<div class="blog-grid" id="blogGrid">\n{cards_html}\n      </div>'
+    output = re.sub(
+        r'<div class="blog-grid" id="blogGrid">.*?</div>',
+        new_grid,
+        template,
+        flags=re.DOTALL
+    )
 
     # Écrire le fichier final
     with open(OUTPUT_FILE, 'w', encoding='utf-8') as f:
