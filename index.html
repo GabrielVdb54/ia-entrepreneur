@@ -294,6 +294,13 @@
       justify-content: space-between;
       height: 70px;
     }
+    @media (max-width: 768px) {
+      .header-inner {
+        height: auto;
+        min-height: 60px;
+        padding: 10px 0;
+      }
+    }
     .logo {
       font-size: 1.3rem;
       font-weight: 800;
@@ -1817,14 +1824,13 @@
     /* ── Conteneurs généraux ── */
     @media (max-width: 768px) {
       .container { padding: 0 16px; }
-
-      /* ── Header logo sous-titre masqué sur mobile ── */
-      .logo-subtitle { display: none !important; }
-      .header-inner { height: 60px; }
-
+      
       /* ── Hero layout ── */
       .hero-layout { grid-template-columns: 1fr !important; gap: 0; }
-      #accueil { min-height: auto; padding: 70px 0 40px; }
+      #accueil { min-height: auto; padding: 85px 0 40px; }
+
+      /* ── Carousel swipe iOS ── */
+      .hero-carousel { touch-action: pan-y; }
       
       /* ── Sections générales ── */
       section { padding: 48px 0 !important; }
@@ -1960,7 +1966,7 @@
       <div class="header-inner">
         <a href="#accueil" class="logo" style="line-height:1.2;">
           IA<span>-</span>Entrepreneur
-          <span class="logo-subtitle" style="display:block;font-size:0.58rem;font-weight:500;color:var(--muted);letter-spacing:0.03em;margin-top:2px;text-decoration:none;">Organisme de formation certifié Qualiopi</span>
+          <span style="display:block;font-size:0.58rem;font-weight:500;color:var(--muted);letter-spacing:0.03em;margin-top:2px;text-decoration:none;">Organisme de formation certifié Qualiopi</span>
         </a>
         <nav>
           <a href="#accueil">Accueil</a>
@@ -2877,57 +2883,39 @@
     const carouselDots = document.querySelectorAll('.hero-carousel-dot');
     let currentSlide = 0;
     const totalSlides = 4;
-    let autoPlayTimer;
+    let autoTimer;
 
     function goToSlide(index) {
-      currentSlide = (index + totalSlides) % totalSlides;
+      currentSlide = ((index % totalSlides) + totalSlides) % totalSlides;
       carouselTrack.style.transform = `translateX(-${currentSlide * 100}%)`;
       carouselDots.forEach((dot, i) => dot.classList.toggle('active', i === currentSlide));
     }
 
+    function startAuto() {
+      clearInterval(autoTimer);
+      autoTimer = setInterval(() => goToSlide(currentSlide + 1), 4000);
+    }
+
     carouselDots.forEach(dot => {
-      dot.addEventListener('click', () => {
-        clearInterval(autoPlayTimer);
-        goToSlide(parseInt(dot.dataset.index));
-        startAutoPlay();
-      });
+      dot.addEventListener('click', () => { goToSlide(parseInt(dot.dataset.index)); startAuto(); });
     });
 
-    function startAutoPlay() {
-      autoPlayTimer = setInterval(() => goToSlide(currentSlide + 1), 4000);
-    }
-    startAutoPlay();
+    startAuto();
 
-    // ── Swipe touch sur mobile ────────────────────────────────
+    // ── Swipe touch (iOS Safari compatible) ──────────────────
     const carousel = document.getElementById('heroCarousel');
-    let touchStartX = 0;
-    let touchStartY = 0;
-    let isDragging = false;
+    let txStart = 0;
 
-    carousel.addEventListener('touchstart', (e) => {
-      touchStartX = e.touches[0].clientX;
-      touchStartY = e.touches[0].clientY;
-      isDragging = true;
+    carousel.addEventListener('touchstart', e => {
+      txStart = e.touches[0].clientX;
     }, { passive: true });
 
-    carousel.addEventListener('touchmove', (e) => {
-      if (!isDragging) return;
-      const dx = e.touches[0].clientX - touchStartX;
-      const dy = e.touches[0].clientY - touchStartY;
-      // Si le mouvement est plus horizontal que vertical, bloquer le scroll vertical
-      if (Math.abs(dx) > Math.abs(dy)) e.preventDefault();
-    }, { passive: false });
-
-    carousel.addEventListener('touchend', (e) => {
-      if (!isDragging) return;
-      isDragging = false;
-      const dx = e.changedTouches[0].clientX - touchStartX;
-      const dy = e.changedTouches[0].clientY - touchStartY;
-      // Swipe valide : horizontal > 40px ET plus horizontal que vertical
-      if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy)) {
-        clearInterval(autoPlayTimer);
+    carousel.addEventListener('touchend', e => {
+      const dx = e.changedTouches[0].clientX - txStart;
+      if (Math.abs(dx) > 40) {
+        clearInterval(autoTimer);
         goToSlide(dx < 0 ? currentSlide + 1 : currentSlide - 1);
-        startAutoPlay();
+        startAuto();
       }
     }, { passive: true });
   </script>
