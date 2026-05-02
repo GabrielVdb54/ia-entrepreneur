@@ -1808,7 +1808,126 @@
       .pricing-card.featured { transform: scale(1); }
       .pricing-card.featured:hover { transform: translateY(-6px); }
     }
-  </style>
+  
+    /* ═══════════════════════════════════════════════════
+       RESPONSIVE MOBILE — CORRECTIFS COMPLETS
+       Breakpoints: 480px (xs), 768px (sm), 1024px (md)
+    ═══════════════════════════════════════════════════ */
+
+    /* ── Conteneurs généraux ── */
+    @media (max-width: 768px) {
+      .container { padding: 0 16px; }
+      
+      /* ── Hero layout ── */
+      .hero-layout { grid-template-columns: 1fr !important; gap: 0; }
+      #accueil { min-height: auto; padding: 90px 0 40px; }
+      
+      /* ── Sections générales ── */
+      section { padding: 48px 0 !important; }
+      .section-title { font-size: clamp(1.6rem, 6vw, 2rem) !important; }
+      .section-sub { font-size: 0.92rem !important; }
+
+      /* ── Pricing grid ── */
+      .pricing-grid { grid-template-columns: 1fr !important; gap: 16px !important; }
+      .pricing-card.featured { transform: scale(1) !important; }
+      .pricing-card.featured:hover { transform: translateY(-4px) !important; }
+
+      /* ── 2 expertises / services cards ── */
+      [style*="grid-template-columns: 1fr 1fr"],
+      [style*="grid-template-columns:1fr 1fr"],
+      [style*="grid-template-columns: repeat(2"],
+      [style*="grid-template-columns:repeat(2"] { 
+        grid-template-columns: 1fr !important; 
+      }
+
+      /* ── Hero layout 60/40 ── */
+      [style*="grid-template-columns: 60%"],
+      [style*="grid-template-columns:60%"] {
+        grid-template-columns: 1fr !important;
+      }
+
+      /* ── Layout 340px sidebar ── */
+      [style*="grid-template-columns: 340px"],
+      [style*="grid-template-columns:340px"] {
+        grid-template-columns: 1fr !important;
+      }
+
+      /* ── 3 et 4 colonnes → 1 colonne ── */
+      [style*="grid-template-columns: repeat(3"],
+      [style*="grid-template-columns:repeat(3"],
+      [style*="grid-template-columns: repeat(4"],
+      [style*="grid-template-columns:repeat(4"] {
+        grid-template-columns: 1fr !important;
+      }
+
+      /* ── Stats row ── */
+      .stats-row, [style*="display:flex"][style*="gap"] {
+        flex-wrap: wrap;
+      }
+
+      /* ── Blog grid ── */
+      .blog-grid { grid-template-columns: 1fr !important; }
+
+      /* ── Équipe cards ── */
+      .team-grid, [class*="team"] { grid-template-columns: 1fr !important; }
+
+      /* ── Testimonials ── */
+      .testimonials-grid, [class*="temoignage"] { grid-template-columns: 1fr !important; }
+
+      /* ── Carousel ── */
+      .carousel-slide, [class*="carousel"] img { 
+        height: 260px !important; 
+        border-radius: 12px !important;
+      }
+
+      /* ── À propos ── */
+      .apropos-histoire { grid-template-columns: 1fr !important; gap: 32px !important; }
+      .apropos-stats { grid-template-columns: repeat(2, 1fr) !important; }
+
+      /* ── CTA sections ── */
+      [style*="display:flex"][style*="justify-content:space-between"] {
+        flex-direction: column !important;
+        align-items: flex-start !important;
+        gap: 16px !important;
+      }
+
+      /* ── Boutons côte à côte ── */
+      .hero-ctas, [class*="ctas"] {
+        flex-direction: column !important;
+        width: 100%;
+      }
+      .hero-ctas a, [class*="ctas"] a {
+        width: 100%;
+        text-align: center;
+        justify-content: center;
+      }
+
+      /* ── Footer ── */
+      .footer-inner { flex-direction: column; gap: 20px; }
+      .footer-links { flex-wrap: wrap; gap: 12px; }
+
+      /* ── Qualiopi bande ── */
+      [style*="display:flex"][style*="align-items:center"][style*="justify-content:space-between"] {
+        flex-direction: column !important;
+        align-items: flex-start !important;
+        gap: 12px !important;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .container { padding: 0 12px; }
+      .section-title { font-size: clamp(1.4rem, 7vw, 1.8rem) !important; }
+      .apropos-stats { grid-template-columns: repeat(2, 1fr) !important; }
+      .pricing-price { font-size: 2.4rem !important; }
+      .btn-primary, .btn-accent, .btn-outline { 
+        width: 100% !important; 
+        text-align: center !important;
+        justify-content: center !important;
+        margin-left: 0 !important;
+        margin-top: 8px !important;
+      }
+    }
+</style>
 <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-SZG9XPNNNC"></script>
 <script>

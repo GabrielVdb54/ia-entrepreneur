@@ -122,7 +122,47 @@
       .page-hero{padding:60px 0 40px}
       .page-hero h1{font-size:clamp(1.8rem,7vw,2.4rem)}
     }
-  </style>
+  
+    /* ═══════════════════════════════════════════════════
+       RESPONSIVE MOBILE — formations-creation.html
+    ═══════════════════════════════════════════════════ */
+    @media (max-width: 1024px) {
+      .pricing-grid { grid-template-columns: 1fr !important; }
+      .valeur-grid { grid-template-columns: repeat(2, 1fr) !important; }
+    }
+    @media (max-width: 768px) {
+      .container { padding: 0 16px; }
+      section { padding: 48px 0 !important; }
+      .page-hero h1 { font-size: clamp(1.7rem, 7vw, 2.2rem) !important; }
+      .pricing-grid { grid-template-columns: 1fr !important; gap: 16px !important; }
+      .pricing-card.featured { transform: scale(1) !important; }
+      .valeur-grid { grid-template-columns: 1fr !important; }
+      .methode-grid { grid-template-columns: 1fr !important; }
+      .process-grid, [style*="grid-template-columns:repeat(4"] { 
+        grid-template-columns: repeat(2, 1fr) !important; 
+      }
+      [style*="grid-template-columns: repeat(3"],
+      [style*="grid-template-columns:repeat(3"] {
+        grid-template-columns: 1fr !important;
+      }
+      [style*="display:flex"][style*="justify-content:space-between"] {
+        flex-direction: column !important;
+        gap: 16px !important;
+      }
+      .footer-inner { flex-direction: column; gap: 20px; }
+      .footer-links { flex-wrap: wrap; gap: 12px; }
+      .btn-primary, .btn-accent { 
+        width: 100% !important; 
+        text-align: center !important;
+        justify-content: center !important;
+      }
+    }
+    @media (max-width: 480px) {
+      .container { padding: 0 12px; }
+      .process-grid { grid-template-columns: 1fr !important; }
+      .pricing-price { font-size: 2.2rem !important; }
+    }
+</style>
 </head>
 <body>
 

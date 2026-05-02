@@ -143,7 +143,41 @@
         grid-template-columns: 1fr !important;
       }
     }
-  </style>
+  
+    /* ═══════════════════════════════════════════════════
+       RESPONSIVE MOBILE — formations-entreprises.html
+    ═══════════════════════════════════════════════════ */
+    @media (max-width: 1024px) {
+      .formations-grid { grid-template-columns: repeat(2, 1fr) !important; }
+      .trust-grid, [style*="repeat(4"] { grid-template-columns: repeat(2, 1fr) !important; }
+    }
+    @media (max-width: 768px) {
+      .container { padding: 0 16px; }
+      section { padding: 48px 0 !important; }
+      .formations-grid { grid-template-columns: 1fr !important; }
+      .method-grid { grid-template-columns: 1fr !important; }
+      .trust-grid, [style*="repeat(4"] { grid-template-columns: repeat(2, 1fr) !important; }
+      [style*="grid-template-columns: repeat(3"],
+      [style*="grid-template-columns:repeat(3"] {
+        grid-template-columns: 1fr !important;
+      }
+      [style*="display:flex"][style*="justify-content:space-between"] {
+        flex-direction: column !important;
+        gap: 16px !important;
+      }
+      .footer-inner { flex-direction: column; gap: 20px; }
+      .footer-links { flex-wrap: wrap; gap: 12px; }
+      .btn-primary, .btn-accent {
+        width: 100% !important;
+        text-align: center !important;
+        justify-content: center !important;
+      }
+    }
+    @media (max-width: 480px) {
+      .container { padding: 0 12px; }
+      .trust-grid { grid-template-columns: 1fr !important; }
+    }
+</style>
 </head>
 <body>
 
