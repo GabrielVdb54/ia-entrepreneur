@@ -378,7 +378,7 @@
       display: flex;
       align-items: center;
       overflow: hidden;
-      padding: 70px 0 40px;
+      padding: 90px 0 60px;
     }
     @media (max-width: 768px) {
       #accueil {
@@ -444,9 +444,9 @@
     .hero-layout {
       position: relative;
       display: grid;
-      grid-template-columns: 55% 45%;
-      gap: 40px;
-      align-items: center;
+      grid-template-columns: 50% 50%;
+      gap: 48px;
+      align-items: start;
       width: 100%;
     }
 
@@ -456,7 +456,8 @@
     .hero-photo-col {
       display: flex;
       justify-content: center;
-      align-items: center;
+      align-items: flex-start;
+      padding-top: 8px;
     }
     .hero-photo-wrapper {
       position: relative;
@@ -491,11 +492,11 @@
       position: relative;
       z-index: 1;
       width: 100%;
-      max-width: 540px;
+      max-width: 100%;
       border-radius: 20px;
       overflow: hidden;
       box-shadow: 0 24px 64px rgba(26,60,255,0.15), 0 8px 24px rgba(0,0,0,0.08);
-      aspect-ratio: 4/3;
+      aspect-ratio: 3/2;
     }
     .hero-carousel-track {
       display: flex;
@@ -599,7 +600,7 @@
     }
 
     .hero-title {
-      font-size: clamp(2.4rem, 5vw, 3.6rem);
+      font-size: clamp(2rem, 4vw, 3rem);
       font-weight: 800;
       line-height: 1.1;
       letter-spacing: -0.03em;
@@ -624,8 +625,8 @@
 
     .hero-stats {
       display: flex;
-      gap: 32px;
-      flex-wrap: wrap;
+      gap: 24px;
+      flex-wrap: nowrap;
     }
     .hero-stat {
       display: flex;
@@ -2040,7 +2041,7 @@
 
         <!-- Colonne droite : carousel photos -->
         <div class="hero-photo-col">
-          <div class="hero-photo-wrapper" style="width:100%;max-width:420px;">
+          <div class="hero-photo-wrapper" style="width:100%;">
             <div class="hero-photo-glow"></div>
             <div class="hero-carousel" id="heroCarousel">
               <div class="hero-carousel-track" id="heroCarouselTrack">
