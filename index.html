@@ -294,7 +294,9 @@
       justify-content: space-between;
       height: 70px;
     }
-    @media (max-width: 768px) { .header-inner { height: auto; padding: 10px 0; } }
+    @media (max-width: 768px) {
+      .header-inner { height: auto !important; min-height: 60px; padding: 10px 0; }
+    }
     .logo {
       font-size: 1.3rem;
       font-weight: 800;
@@ -1821,7 +1823,7 @@
       
       /* ── Hero layout ── */
       .hero-layout { grid-template-columns: 1fr !important; gap: 0; }
-      #accueil { min-height: auto; padding: 110px 0 40px; }
+      #accueil { min-height: auto; padding: 120px 0 40px; }
       
       /* ── Sections générales ── */
       section { padding: 48px 0 !important; }
@@ -2876,19 +2878,19 @@
     const totalSlides = 4;
     let autoTimer;
 
-    function goToSlide(n) {
-      currentSlide = (n + totalSlides) % totalSlides;
-      carouselTrack.style.transform = 'translateX(-' + (currentSlide * 100) + '%)';
-      carouselDots.forEach((d, i) => d.classList.toggle('active', i === currentSlide));
+    function goToSlide(index) {
+      currentSlide = ((index % totalSlides) + totalSlides) % totalSlides;
+      carouselTrack.style.transform = `translateX(-${currentSlide * 100}%)`;
+      carouselDots.forEach((dot, i) => dot.classList.toggle('active', i === currentSlide));
     }
 
     function startAuto() {
       clearInterval(autoTimer);
-      autoTimer = setInterval(function(){ goToSlide(currentSlide + 1); }, 4000);
+      autoTimer = setInterval(() => goToSlide(currentSlide + 1), 4000);
     }
 
-    carouselDots.forEach(function(dot) {
-      dot.addEventListener('click', function() {
+    carouselDots.forEach(dot => {
+      dot.addEventListener('click', () => {
         clearInterval(autoTimer);
         goToSlide(parseInt(dot.dataset.index));
         startAuto();
@@ -2897,16 +2899,30 @@
 
     startAuto();
 
-    // Swipe iOS Safari — events sur le track (pas sur overflow:hidden parent)
-    var swipeX = 0, swipeY = 0;
-    carouselTrack.addEventListener('touchstart', function(e) {
-      swipeX = e.touches[0].pageX;
-      swipeY = e.touches[0].pageY;
+    // ── Swipe iOS Safari ───────────────────────────────────────
+    // preventDefault sur touchmove horizontal = empêche Safari
+    // d'intercepter le geste comme un scroll de page
+    let swipeX = 0, swipeY = 0, isHorizontal = false;
+
+    carouselTrack.addEventListener('touchstart', e => {
+      swipeX = e.touches[0].clientX;
+      swipeY = e.touches[0].clientY;
+      isHorizontal = false;
     }, { passive: true });
-    carouselTrack.addEventListener('touchend', function(e) {
-      var dx = e.changedTouches[0].pageX - swipeX;
-      var dy = e.changedTouches[0].pageY - swipeY;
-      if (Math.abs(dx) > 35 && Math.abs(dx) > Math.abs(dy)) {
+
+    carouselTrack.addEventListener('touchmove', e => {
+      const dx = Math.abs(e.touches[0].clientX - swipeX);
+      const dy = Math.abs(e.touches[0].clientY - swipeY);
+      if (dx > dy && dx > 8) {
+        isHorizontal = true;
+        e.preventDefault(); // bloque le scroll vertical de Safari
+      }
+    }, { passive: false });
+
+    carouselTrack.addEventListener('touchend', e => {
+      if (!isHorizontal) return;
+      const dx = e.changedTouches[0].clientX - swipeX;
+      if (Math.abs(dx) > 30) {
         clearInterval(autoTimer);
         goToSlide(dx < 0 ? currentSlide + 1 : currentSlide - 1);
         startAuto();
