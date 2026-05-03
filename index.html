@@ -295,11 +295,7 @@
       height: 70px;
     }
     @media (max-width: 768px) {
-      .header-inner {
-        height: auto;
-        min-height: 60px;
-        padding: 10px 0;
-      }
+      .header-inner { height: auto; padding: 12px 0; }
     }
     .logo {
       font-size: 1.3rem;
@@ -1827,10 +1823,7 @@
       
       /* ── Hero layout ── */
       .hero-layout { grid-template-columns: 1fr !important; gap: 0; }
-      #accueil { min-height: auto; padding: 85px 0 40px; }
-
-      /* ── Carousel swipe iOS ── */
-      .hero-carousel { touch-action: pan-y; }
+      #accueil { min-height: auto; padding: 110px 0 40px; }
       
       /* ── Sections générales ── */
       section { padding: 48px 0 !important; }
@@ -2880,6 +2873,7 @@
 
     // ── Hero Carousel ─────────────────────────────────────────
     const carouselTrack = document.getElementById('heroCarouselTrack');
+    const carouselEl   = document.getElementById('heroCarousel');
     const carouselDots = document.querySelectorAll('.hero-carousel-dot');
     let currentSlide = 0;
     const totalSlides = 4;
@@ -2902,17 +2896,29 @@
 
     startAuto();
 
-    // ── Swipe touch (iOS Safari compatible) ──────────────────
-    const carousel = document.getElementById('heroCarousel');
-    let txStart = 0;
+    // ── Swipe touch — écouté sur document pour contourner
+    //    le bug iOS Safari + overflow:hidden ─────────────────
+    let txStart = 0, tyStart = 0, swipeActive = false;
 
-    carousel.addEventListener('touchstart', e => {
-      txStart = e.touches[0].clientX;
+    document.addEventListener('touchstart', e => {
+      const t = e.touches[0];
+      const r = carouselEl.getBoundingClientRect();
+      if (t.clientX >= r.left && t.clientX <= r.right &&
+          t.clientY >= r.top  && t.clientY <= r.bottom) {
+        txStart = t.clientX;
+        tyStart = t.clientY;
+        swipeActive = true;
+      } else {
+        swipeActive = false;
+      }
     }, { passive: true });
 
-    carousel.addEventListener('touchend', e => {
+    document.addEventListener('touchend', e => {
+      if (!swipeActive) return;
+      swipeActive = false;
       const dx = e.changedTouches[0].clientX - txStart;
-      if (Math.abs(dx) > 40) {
+      const dy = e.changedTouches[0].clientY - tyStart;
+      if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy)) {
         clearInterval(autoTimer);
         goToSlide(dx < 0 ? currentSlide + 1 : currentSlide - 1);
         startAuto();
