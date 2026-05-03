@@ -2874,10 +2874,13 @@
     let currentSlide = 0;
     const totalSlides = 4;
 
+    const carouselEl = document.getElementById('heroCarousel');
+
     function goToSlide(index) {
-      currentSlide = index;
-      carouselTrack.style.transform = `translateX(-${index * 100}%)`;
-      carouselDots.forEach((dot, i) => dot.classList.toggle('active', i === index));
+      currentSlide = ((index % totalSlides) + totalSlides) % totalSlides;
+      const w = carouselEl.offsetWidth;
+      carouselTrack.style.transform = 'translateX(-' + (currentSlide * w) + 'px)';
+      carouselDots.forEach((dot, i) => dot.classList.toggle('active', i === currentSlide));
     }
 
     carouselDots.forEach(dot => {
@@ -2885,7 +2888,7 @@
     });
 
     setInterval(() => {
-      goToSlide((currentSlide + 1) % totalSlides);
+      goToSlide(currentSlide + 1);
     }, 4000);
   </script>
 
