@@ -2815,7 +2815,7 @@
         if (nums[3]) nums[3].textContent = '3';
       }
     }, { threshold: 0.3 });
-    chiffresObserver.observe(chiffresSection);
+    if (chiffresSection) chiffresObserver.observe(chiffresSection);
 
     // ── Form AJAX submission ──────────────────────────────────
     const form = document.getElementById('contact-form');
