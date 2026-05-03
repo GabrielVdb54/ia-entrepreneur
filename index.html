@@ -487,6 +487,14 @@
       filter: drop-shadow(0 20px 40px rgba(26,60,255,0.3));
     }
 
+
+    /* ── Carousel mobile uniquement ─────────────────────────── */
+    #carouselMobileWrap { display: none; }
+    @media (max-width: 768px) {
+      #carouselMobileWrap { display: block; }
+      #carouselMobileWrap .container { padding: 0 16px; }
+    }
+
     /* ── Hero Carousel ─────────────────────────────────────────── */
     .hero-photo-col { padding-right: 8px; }
     .hero-carousel-arrow {
@@ -2129,6 +2137,43 @@
     </div>
   </div>
 
+
+  <!-- ── Carousel mobile uniquement ──────────────────────────── -->
+  <div id="carouselMobileWrap" style="padding:24px 0 8px;">
+    <div class="hero-carousel" id="heroCarouselMobile" style="max-width:100%;border-radius:16px;aspect-ratio:4/3;">
+      <div class="hero-carousel-track" id="heroCarouselTrackMobile">
+        <div class="hero-carousel-slide">
+          <img src="/images/formation-2.jpg" alt="Formation création d'entreprise" loading="lazy" />
+          <div class="hero-carousel-caption">Formation création d'entreprise</div>
+        </div>
+        <div class="hero-carousel-slide">
+          <img src="https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=840&q=80&auto=format&fit=crop" alt="Conférence entrepreneuriat" loading="lazy" />
+          <div class="hero-carousel-caption">Conférence &amp; prise de parole publique</div>
+        </div>
+        <div class="hero-carousel-slide">
+          <img src="https://images.unsplash.com/photo-1557804506-669a67965ba0?w=840&q=80&auto=format&fit=crop" alt="Accompagnement individuel" loading="lazy" />
+          <div class="hero-carousel-caption">Accompagnement individuel</div>
+        </div>
+        <div class="hero-carousel-slide">
+          <img src="https://images.unsplash.com/photo-1552664730-d307ca884978?w=840&q=80&auto=format&fit=crop" alt="Formations en entreprise" loading="lazy" />
+          <div class="hero-carousel-caption">Formations en entreprise</div>
+        </div>
+      </div>
+      <button class="hero-carousel-arrow prev" id="carouselMobilePrev" aria-label="Précédent">
+        <svg width="14" height="14" fill="none" stroke="#0A0F2C" stroke-width="2.5" viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg>
+      </button>
+      <button class="hero-carousel-arrow next" id="carouselMobileNext" aria-label="Suivant">
+        <svg width="14" height="14" fill="none" stroke="#0A0F2C" stroke-width="2.5" viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg>
+      </button>
+      <div class="hero-carousel-dots" id="heroCarouselDotsMobile">
+        <div class="hero-carousel-dot active" data-index="0"></div>
+        <div class="hero-carousel-dot" data-index="1"></div>
+        <div class="hero-carousel-dot" data-index="2"></div>
+        <div class="hero-carousel-dot" data-index="3"></div>
+      </div>
+    </div>
+  </div>
+
   <!-- ── Nos 2 expertises ──────────────────────────────────────── -->
   <section style="padding:64px 0 40px;">
     <div class="container">
@@ -2919,6 +2964,30 @@
     });
     document.getElementById('carouselPrev').addEventListener('click', () => goToSlide(currentSlide - 1));
     document.getElementById('carouselNext').addEventListener('click', () => goToSlide(currentSlide + 1));
+
+    // ── Carousel mobile ──────────────────────────────────────
+    const mTrack = document.getElementById('heroCarouselTrackMobile');
+    const mDots  = document.querySelectorAll('#heroCarouselDotsMobile .hero-carousel-dot');
+    const mEl    = document.getElementById('heroCarouselMobile');
+    let mSlide = 0;
+    let mTimer;
+
+    function mGoTo(n) {
+      mSlide = ((n % 4) + 4) % 4;
+      const w = mEl.offsetWidth;
+      mTrack.style.transform = 'translateX(-' + (mSlide * w) + 'px)';
+      mDots.forEach((d, i) => d.classList.toggle('active', i === mSlide));
+    }
+
+    function mStartAuto() {
+      clearInterval(mTimer);
+      mTimer = setInterval(() => mGoTo(mSlide + 1), 4000);
+    }
+
+    mDots.forEach(d => d.addEventListener('click', () => { mGoTo(parseInt(d.dataset.index)); mStartAuto(); }));
+    document.getElementById('carouselMobilePrev').addEventListener('click', () => { mGoTo(mSlide - 1); mStartAuto(); });
+    document.getElementById('carouselMobileNext').addEventListener('click', () => { mGoTo(mSlide + 1); mStartAuto(); });
+    mStartAuto();
 
     setInterval(() => {
       goToSlide(currentSlide + 1);
