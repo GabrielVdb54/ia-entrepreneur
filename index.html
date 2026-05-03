@@ -378,7 +378,7 @@
       display: flex;
       align-items: center;
       overflow: hidden;
-      padding: 90px 0 60px;
+      padding: 80px 0 48px;
     }
     @media (max-width: 768px) {
       #accueil {
@@ -444,9 +444,9 @@
     .hero-layout {
       position: relative;
       display: grid;
-      grid-template-columns: 50% 50%;
-      gap: 48px;
-      align-items: start;
+      grid-template-columns: 58% 42%;
+      gap: 40px;
+      align-items: center;
       width: 100%;
     }
 
@@ -456,8 +456,7 @@
     .hero-photo-col {
       display: flex;
       justify-content: center;
-      align-items: flex-start;
-      padding-top: 8px;
+      align-items: center;
     }
     .hero-photo-wrapper {
       position: relative;
@@ -496,7 +495,7 @@
       border-radius: 20px;
       overflow: hidden;
       box-shadow: 0 24px 64px rgba(26,60,255,0.15), 0 8px 24px rgba(0,0,0,0.08);
-      aspect-ratio: 3/2;
+      aspect-ratio: 16/9;
     }
     .hero-carousel-track {
       display: flex;
@@ -600,7 +599,7 @@
     }
 
     .hero-title {
-      font-size: clamp(2rem, 4vw, 3rem);
+      font-size: clamp(1.9rem, 3.5vw, 2.8rem);
       font-weight: 800;
       line-height: 1.1;
       letter-spacing: -0.03em;
@@ -624,9 +623,9 @@
     .hero-actions { display: flex; gap: 14px; flex-wrap: wrap; margin-bottom: 28px; }
 
     .hero-stats {
-      display: flex;
-      gap: 24px;
-      flex-wrap: nowrap;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
     }
     .hero-stat {
       display: flex;
@@ -639,9 +638,10 @@
       letter-spacing: -0.03em;
     }
     .hero-stat span {
-      font-size: 0.82rem;
+      font-size: 0.75rem;
       color: var(--muted);
       font-weight: 500;
+      line-height: 1.3;
     }
 
     /* ── Services ───────────────────────────────────────────── */
