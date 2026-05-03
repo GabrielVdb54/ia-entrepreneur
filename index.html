@@ -122,6 +122,7 @@
       color: var(--text);
       line-height: 1.65;
       overflow-x: hidden;
+      max-width: 100vw;
     }
 
     /* ── Texte justifié ────────────────────────────────────── */
@@ -673,7 +674,6 @@
       color: var(--muted);
       font-weight: 500;
       line-height: 1.3;
-      white-space: nowrap;
     }
 
     /* ── Services ───────────────────────────────────────────── */
@@ -1563,11 +1563,13 @@
         height: 160px;
       }
       .hero-photo-glow { display: none; }
-      .hero-title { font-size: 1.8rem; }
-      .hero-stats { gap: 20px; }
-      .hero-badge { margin-bottom: 16px; }
-      .hero-desc { font-size: 0.95rem; margin-bottom: 24px; }
-      .hero-actions { margin-bottom: 32px; }
+      .hero-title { font-size: clamp(1.6rem, 7vw, 2rem) !important; white-space: normal !important; }
+      .hero-stats { grid-template-columns: 1fr 1fr; gap: 12px; }
+      .hero-stat span { white-space: normal; }
+      .hero-badge { margin-bottom: 12px; }
+      .hero-desc { font-size: 0.9rem; margin-bottom: 20px; }
+      .hero-actions { margin-bottom: 24px; flex-direction: column; width: 100%; }
+      .hero-actions a, .hero-actions button { width: 100% !important; text-align: center; box-sizing: border-box; }
 
       /* Sections padding mobile */
       #services, #apropos, #chiffres, #temoignages, #blog, #contact { padding: 60px 0; }
@@ -1846,7 +1848,7 @@
 
     /* ── Conteneurs généraux ── */
     @media (max-width: 768px) {
-      .container { padding: 0 16px; }
+      .container { padding: 0 16px; max-width: 100%; box-sizing: border-box; }
       
       /* ── Hero layout ── */
       .hero-layout { grid-template-columns: 1fr !important; gap: 0; }
