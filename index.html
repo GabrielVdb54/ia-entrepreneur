@@ -90,7 +90,6 @@
   ]
   </script>
 
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
@@ -490,7 +489,7 @@
       filter: drop-shadow(0 20px 40px rgba(26,60,255,0.3));
     }
 
-    /* ── Hero Carousel — Swiper.js ──────────────────────────────── */
+    /* ── Hero Carousel ─────────────────────────────────────────── */
     .hero-carousel {
       position: relative;
       z-index: 1;
@@ -501,8 +500,14 @@
       box-shadow: 0 24px 64px rgba(26,60,255,0.15), 0 8px 24px rgba(0,0,0,0.08);
       aspect-ratio: 4/3;
     }
-    .hero-carousel .swiper-wrapper { height: 100%; }
+    .hero-carousel-track {
+      display: flex;
+      height: 100%;
+      transition: transform 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+      will-change: transform;
+    }
     .hero-carousel-slide {
+      flex: 0 0 100%;
       height: 100%;
       overflow: hidden;
       position: relative;
@@ -1818,7 +1823,7 @@
       
       /* ── Hero layout ── */
       .hero-layout { grid-template-columns: 1fr !important; gap: 0; }
-      #accueil { min-height: auto; padding: 120px 0 40px; }
+      #accueil { min-height: auto; padding: 110px 0 40px; }
       
       /* ── Sections générales ── */
       section { padding: 48px 0 !important; }
@@ -2040,26 +2045,31 @@
         <div class="hero-photo-col">
           <div class="hero-photo-wrapper" style="width:100%;max-width:420px;">
             <div class="hero-photo-glow"></div>
-            <div class="hero-carousel swiper" id="heroCarousel">
-              <div class="swiper-wrapper hero-carousel-track">
-                <div class="swiper-slide hero-carousel-slide">
+            <div class="hero-carousel" id="heroCarousel">
+              <div class="hero-carousel-track" id="heroCarouselTrack">
+                <div class="hero-carousel-slide">
                   <img src="https://images.unsplash.com/photo-1524178232363-1fb2b075b655?w=840&q=80&auto=format&fit=crop" alt="Formation entrepreneuriat en salle" loading="eager" />
                   <div class="hero-carousel-caption">Formation création d'entreprise</div>
                 </div>
-                <div class="swiper-slide hero-carousel-slide">
+                <div class="hero-carousel-slide">
                   <img src="https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=840&q=80&auto=format&fit=crop" alt="Conférence entrepreneuriat" loading="lazy" />
                   <div class="hero-carousel-caption">Conférence &amp; prise de parole publique</div>
                 </div>
-                <div class="swiper-slide hero-carousel-slide">
+                <div class="hero-carousel-slide">
                   <img src="https://images.unsplash.com/photo-1557804506-669a67965ba0?w=840&q=80&auto=format&fit=crop" alt="Coaching individuel entrepreneur" loading="lazy" />
                   <div class="hero-carousel-caption">Accompagnement individuel</div>
                 </div>
-                <div class="swiper-slide hero-carousel-slide">
+                <div class="hero-carousel-slide">
                   <img src="https://images.unsplash.com/photo-1552664730-d307ca884978?w=840&q=80&auto=format&fit=crop" alt="Formation équipe en entreprise" loading="lazy" />
                   <div class="hero-carousel-caption">Formations en entreprise</div>
                 </div>
               </div>
-              <div class="swiper-pagination hero-carousel-dots"></div>
+              <div class="hero-carousel-dots" id="heroCarouselDots">
+                <div class="hero-carousel-dot active" data-index="0"></div>
+                <div class="hero-carousel-dot" data-index="1"></div>
+                <div class="hero-carousel-dot" data-index="2"></div>
+                <div class="hero-carousel-dot" data-index="3"></div>
+              </div>
             </div>
           </div>
         </div>
@@ -2861,27 +2871,27 @@
 
     sections.forEach(s => activeObserver.observe(s));
 
-    // ── Hero Carousel — Swiper.js ─────────────────────────────
-    new Swiper('#heroCarousel', {
-      loop: true,
-      speed: 700,
-      autoplay: { delay: 4000, disableOnInteraction: false },
-      pagination: {
-        el: '.swiper-pagination',
-        clickable: true,
-        renderBullet: (i, cls) =>
-          `<span class="${cls} hero-carousel-dot"></span>`
-      },
-      on: {
-        init(s) { s.el.querySelectorAll('.hero-carousel-dot')[0]?.classList.add('active'); },
-        slideChange(s) {
-          s.el.querySelectorAll('.hero-carousel-dot').forEach((d,i) =>
-            d.classList.toggle('active', i === s.realIndex));
-        }
-      }
+    // ── Hero Carousel ─────────────────────────────────────────
+    const carouselTrack = document.getElementById('heroCarouselTrack');
+    const carouselDots = document.querySelectorAll('.hero-carousel-dot');
+    let currentSlide = 0;
+    const totalSlides = 4;
+
+    function goToSlide(index) {
+      currentSlide = index;
+      carouselTrack.style.transform = `translateX(-${index * 100}%)`;
+      carouselDots.forEach((dot, i) => dot.classList.toggle('active', i === index));
+    }
+
+    carouselDots.forEach(dot => {
+      dot.addEventListener('click', () => goToSlide(parseInt(dot.dataset.index)));
     });
+
+    setInterval(() => {
+      goToSlide((currentSlide + 1) % totalSlides);
+    }, 4000);
   </script>
 
-<script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+<script></script>
 </body>
 </html>
