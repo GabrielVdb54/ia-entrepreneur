@@ -295,7 +295,7 @@
       height: 70px;
     }
     @media (max-width: 768px) {
-      .header-inner { height: auto; padding: 12px 0; }
+      .header-inner { height: auto; padding: 10px 0; }
     }
     .logo {
       font-size: 1.3rem;
@@ -490,7 +490,7 @@
     }
 
     /* ── Hero Carousel ─────────────────────────────────────────── */
-    .hero-carousel {
+    .hero-carousel-wrapper {
       position: relative;
       z-index: 1;
       width: 100%;
@@ -500,17 +500,27 @@
       box-shadow: 0 24px 64px rgba(26,60,255,0.15), 0 8px 24px rgba(0,0,0,0.08);
       aspect-ratio: 4/3;
     }
+    .hero-carousel {
+      width: 100%;
+      height: 100%;
+      overflow-x: scroll;
+      overflow-y: hidden;
+      scroll-snap-type: x mandatory;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+    }
+    .hero-carousel::-webkit-scrollbar { display: none; }
     .hero-carousel-track {
       display: flex;
       height: 100%;
-      transition: transform 0.7s cubic-bezier(0.4, 0, 0.2, 1);
-      will-change: transform;
     }
     .hero-carousel-slide {
-      flex: 0 0 100%;
+      min-width: 100%;
       height: 100%;
       overflow: hidden;
       position: relative;
+      scroll-snap-align: start;
+      flex-shrink: 0;
     }
     .hero-carousel-slide img {
       width: 100%;
@@ -525,7 +535,8 @@
       transform: translateX(-50%);
       display: flex;
       gap: 6px;
-      z-index: 2;
+      z-index: 10;
+      pointer-events: auto;
     }
     .hero-carousel-dot {
       width: 6px;
@@ -2043,33 +2054,36 @@
 
         <!-- Colonne droite : carousel photos -->
         <div class="hero-photo-col">
-          <div class="hero-photo-wrapper" style="width:100%;max-width:420px;">
+          <div class="hero-photo-wrapper" style="width:100%;max-width:420px;position:relative;">
             <div class="hero-photo-glow"></div>
-            <div class="hero-carousel" id="heroCarousel">
-              <div class="hero-carousel-track" id="heroCarouselTrack">
-                <div class="hero-carousel-slide">
-                  <img src="https://images.unsplash.com/photo-1524178232363-1fb2b075b655?w=840&q=80&auto=format&fit=crop" alt="Formation entrepreneuriat en salle" loading="eager" />
-                  <div class="hero-carousel-caption">Formation création d'entreprise</div>
-                </div>
-                <div class="hero-carousel-slide">
-                  <img src="https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=840&q=80&auto=format&fit=crop" alt="Conférence entrepreneuriat" loading="lazy" />
-                  <div class="hero-carousel-caption">Conférence &amp; prise de parole publique</div>
-                </div>
-                <div class="hero-carousel-slide">
-                  <img src="https://images.unsplash.com/photo-1557804506-669a67965ba0?w=840&q=80&auto=format&fit=crop" alt="Coaching individuel entrepreneur" loading="lazy" />
-                  <div class="hero-carousel-caption">Accompagnement individuel</div>
-                </div>
-                <div class="hero-carousel-slide">
-                  <img src="https://images.unsplash.com/photo-1552664730-d307ca884978?w=840&q=80&auto=format&fit=crop" alt="Formation équipe en entreprise" loading="lazy" />
-                  <div class="hero-carousel-caption">Formations en entreprise</div>
+            <div class="hero-carousel-wrapper">
+              <div class="hero-carousel" id="heroCarousel">
+                <div class="hero-carousel-track" id="heroCarouselTrack">
+                  <div class="hero-carousel-slide">
+                    <img src="https://images.unsplash.com/photo-1524178232363-1fb2b075b655?w=840&q=80&auto=format&fit=crop" alt="Formation entrepreneuriat en salle" loading="eager" />
+                    <div class="hero-carousel-caption">Formation création d'entreprise</div>
+                  </div>
+                  <div class="hero-carousel-slide">
+                    <img src="https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=840&q=80&auto=format&fit=crop" alt="Conférence entrepreneuriat" loading="lazy" />
+                    <div class="hero-carousel-caption">Conférence &amp; prise de parole publique</div>
+                  </div>
+                  <div class="hero-carousel-slide">
+                    <img src="https://images.unsplash.com/photo-1557804506-669a67965ba0?w=840&q=80&auto=format&fit=crop" alt="Coaching individuel entrepreneur" loading="lazy" />
+                    <div class="hero-carousel-caption">Accompagnement individuel</div>
+                  </div>
+                  <div class="hero-carousel-slide">
+                    <img src="https://images.unsplash.com/photo-1552664730-d307ca884978?w=840&q=80&auto=format&fit=crop" alt="Formation équipe en entreprise" loading="lazy" />
+                    <div class="hero-carousel-caption">Formations en entreprise</div>
+                  </div>
                 </div>
               </div>
-              <div class="hero-carousel-dots" id="heroCarouselDots">
-                <div class="hero-carousel-dot active" data-index="0"></div>
-                <div class="hero-carousel-dot" data-index="1"></div>
-                <div class="hero-carousel-dot" data-index="2"></div>
-                <div class="hero-carousel-dot" data-index="3"></div>
-              </div>
+            </div>
+            <!-- Dots hors du scroll container -->
+            <div class="hero-carousel-dots" id="heroCarouselDots">
+              <div class="hero-carousel-dot active" data-index="0"></div>
+              <div class="hero-carousel-dot" data-index="1"></div>
+              <div class="hero-carousel-dot" data-index="2"></div>
+              <div class="hero-carousel-dot" data-index="3"></div>
             </div>
           </div>
         </div>
@@ -2871,8 +2885,7 @@
 
     sections.forEach(s => activeObserver.observe(s));
 
-    // ── Hero Carousel ─────────────────────────────────────────
-    const carouselTrack = document.getElementById('heroCarouselTrack');
+    // ── Hero Carousel (scroll-snap natif — fonctionne sur iOS Safari) ──
     const carouselEl   = document.getElementById('heroCarousel');
     const carouselDots = document.querySelectorAll('.hero-carousel-dot');
     let currentSlide = 0;
@@ -2881,8 +2894,12 @@
 
     function goToSlide(index) {
       currentSlide = ((index % totalSlides) + totalSlides) % totalSlides;
-      carouselTrack.style.transform = `translateX(-${currentSlide * 100}%)`;
-      carouselDots.forEach((dot, i) => dot.classList.toggle('active', i === currentSlide));
+      carouselEl.scrollTo({ left: currentSlide * carouselEl.offsetWidth, behavior: 'smooth' });
+      updateDots(currentSlide);
+    }
+
+    function updateDots(index) {
+      carouselDots.forEach((dot, i) => dot.classList.toggle('active', i === index));
     }
 
     function startAuto() {
@@ -2890,40 +2907,26 @@
       autoTimer = setInterval(() => goToSlide(currentSlide + 1), 4000);
     }
 
-    carouselDots.forEach(dot => {
-      dot.addEventListener('click', () => { goToSlide(parseInt(dot.dataset.index)); startAuto(); });
-    });
-
-    startAuto();
-
-    // ── Swipe touch — écouté sur document pour contourner
-    //    le bug iOS Safari + overflow:hidden ─────────────────
-    let txStart = 0, tyStart = 0, swipeActive = false;
-
-    document.addEventListener('touchstart', e => {
-      const t = e.touches[0];
-      const r = carouselEl.getBoundingClientRect();
-      if (t.clientX >= r.left && t.clientX <= r.right &&
-          t.clientY >= r.top  && t.clientY <= r.bottom) {
-        txStart = t.clientX;
-        tyStart = t.clientY;
-        swipeActive = true;
-      } else {
-        swipeActive = false;
-      }
-    }, { passive: true });
-
-    document.addEventListener('touchend', e => {
-      if (!swipeActive) return;
-      swipeActive = false;
-      const dx = e.changedTouches[0].clientX - txStart;
-      const dy = e.changedTouches[0].clientY - tyStart;
-      if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy)) {
+    // Mise à jour des dots lors du swipe natif
+    carouselEl.addEventListener('scroll', () => {
+      const idx = Math.round(carouselEl.scrollLeft / carouselEl.offsetWidth);
+      if (idx !== currentSlide) {
+        currentSlide = idx;
+        updateDots(currentSlide);
         clearInterval(autoTimer);
-        goToSlide(dx < 0 ? currentSlide + 1 : currentSlide - 1);
         startAuto();
       }
     }, { passive: true });
+
+    carouselDots.forEach(dot => {
+      dot.addEventListener('click', () => {
+        clearInterval(autoTimer);
+        goToSlide(parseInt(dot.dataset.index));
+        startAuto();
+      });
+    });
+
+    startAuto();
   </script>
 
 <script></script>
