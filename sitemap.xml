@@ -1,56 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <!-- Page principale -->
-  <url>
-    <loc>https://ia-entrepreneur.fr/</loc>
-    <lastmod>2026-04-04</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>1.0</priority>
-  </url>
-
-  <!-- Formations entreprises -->
-  <url>
-    <loc>https://ia-entrepreneur.fr/formations-entreprises.html</loc>
-    <lastmod>2026-04-04</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.9</priority>
-  </url>
-
-  <!-- Blog -->
-  <url>
-    <loc>https://ia-entrepreneur.fr/blog/7-etapes-creer-son-entreprise-2026.html</loc>
-    <lastmod>2026-03-28</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://ia-entrepreneur.fr/blog/5-erreurs-porteurs-de-projet.html</loc>
-    <lastmod>2026-03-28</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://ia-entrepreneur.fr/blog/quel-statut-juridique-choisir-2026.html</loc>
-    <lastmod>2026-03-28</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://ia-entrepreneur.fr/blog/aides-financements-creation-entreprise-2026.html</loc>
-    <lastmod>2026-03-28</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://ia-entrepreneur.fr/blog/comment-faire-business-plan-2026.html</loc>
-    <lastmod>2026-03-28</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://ia-entrepreneur.fr/blog/combien-coute-creation-entreprise-2026.html</loc>
-    <lastmod>2026-03-30</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
+  <url><loc>https://ia-entrepreneur.fr/</loc><changefreq>weekly</changefreq><priority>1.0</priority></url>
+  <url><loc>https://ia-entrepreneur.fr/formations-creation.html</loc><changefreq>monthly</changefreq><priority>0.9</priority></url>
+  <url><loc>https://ia-entrepreneur.fr/formations-entreprises.html</loc><changefreq>monthly</changefreq><priority>0.9</priority></url>
+  <url><loc>https://ia-entrepreneur.fr/apropos.html</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://ia-entrepreneur.fr/formation-ia-automatisation.html</loc><changefreq>monthly</changefreq><priority>0.85</priority></url>
+  <url><loc>https://ia-entrepreneur.fr/formation-prospection-commerciale.html</loc><changefreq>monthly</changefreq><priority>0.85</priority></url>
+  <url><loc>https://ia-entrepreneur.fr/formation-management-leadership.html</loc><changefreq>monthly</changefreq><priority>0.85</priority></url>
+  <url><loc>https://ia-entrepreneur.fr/formation-techniques-vente-closing.html</loc><changefreq>monthly</changefreq><priority>0.85</priority></url>
+  <url><loc>https://ia-entrepreneur.fr/formation-negociation-commerciale.html</loc><changefreq>monthly</changefreq><priority>0.85</priority></url>
+  <url><loc>https://ia-entrepreneur.fr/formation-prise-de-parole.html</loc><changefreq>monthly</changefreq><priority>0.85</priority></url>
+  <url><loc>https://ia-entrepreneur.fr/blog/business-plan-guide-complet-2026.html</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://ia-entrepreneur.fr/blog/creer-micro-entreprise-2026-guide-complet.html</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://ia-entrepreneur.fr/mentions-legales.html</loc><changefreq>yearly</changefreq><priority>0.3</priority></url>
+  <url><loc>https://ia-entrepreneur.fr/cgv.html</loc><changefreq>yearly</changefreq><priority>0.3</priority></url>
 </urlset>
