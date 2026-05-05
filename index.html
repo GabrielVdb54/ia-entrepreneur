@@ -92,12 +92,7 @@
     }
   ]
   </script>
-
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link rel="preload" as="style" onload="this.onload=null;this.rel='stylesheet'" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
-
-  <style>
+<style>
     /* ── Reset & Base ─────────────────────────────────────────── */
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -1977,6 +1972,11 @@
   <meta name="twitter:description" content="Formation et accompagnement création d'entreprise + formations IA, vente et management pour équipes. Certifié Qualiopi, finançable OPCO. +1 500 entrepreneurs accompagnés." />
   <meta name="twitter:image" content="https://ia-entrepreneur.fr/images/formation-2.jpg" />
   <script type="application/ld+json">{"@context":"https://schema.org","@type":"LocalBusiness","@id":"https://ia-entrepreneur.fr/#local","name":"IA-Entrepreneur","description":"Organisme de formation et d'accompagnement certifié Qualiopi. Formation création d'entreprise et formations entreprises en IA, vente, management.","url":"https://ia-entrepreneur.fr","telephone":"","address":{"@type":"PostalAddress","addressCountry":"FR","addressRegion":"Grand Est"},"geo":{"@type":"GeoCoordinates","latitude":48.6921,"longitude":6.1844},"openingHoursSpecification":{"@type":"OpeningHoursSpecification","dayOfWeek":["Monday","Tuesday","Wednesday","Thursday","Friday"],"opens":"09:00","closes":"18:00"},"priceRange":"€€","currenciesAccepted":"EUR","paymentAccepted":"Virement, Chèque, OPCO","areaServed":{"@type":"Country","name":"France"},"hasCredential":{"@type":"EducationalOccupationalCredential","name":"Certification Qualiopi n° 883211-1"}}</script>
+  <!-- Fonts asynchrones — non bloquantes -->
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" media="print" onload="this.media='all'" />
+  <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" /></noscript>
 </head>
 <body>
 
@@ -2085,19 +2085,19 @@
             <div class="hero-carousel" id="heroCarousel">
               <div class="hero-carousel-track" id="heroCarouselTrack">
                 <div class="hero-carousel-slide">
-                  <img src="/images/formation-2.jpg" alt="Formation création d'entreprise" loading="eager" />
+                  <img src="/images/formation-2.jpg" alt="Formation création d'entreprise" width="840" height="630" loading="eager" />
                   <div class="hero-carousel-caption">Formation création d'entreprise</div>
                 </div>
                 <div class="hero-carousel-slide">
-                  <img src="https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=840&q=80&auto=format&fit=crop" alt="Conférence entrepreneuriat" loading="lazy" />
+                  <img src="https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=840&q=80&auto=format&fit=crop" alt="Conférence entrepreneuriat" width="840" height="630" loading="lazy" />
                   <div class="hero-carousel-caption">Conférence &amp; prise de parole publique</div>
                 </div>
                 <div class="hero-carousel-slide">
-                  <img src="https://images.unsplash.com/photo-1557804506-669a67965ba0?w=840&q=80&auto=format&fit=crop" alt="Coaching individuel entrepreneur" loading="lazy" />
+                  <img src="https://images.unsplash.com/photo-1557804506-669a67965ba0?w=840&q=80&auto=format&fit=crop" alt="Coaching individuel entrepreneur" width="840" height="630" loading="lazy" />
                   <div class="hero-carousel-caption">Accompagnement individuel</div>
                 </div>
                 <div class="hero-carousel-slide">
-                  <img src="https://images.unsplash.com/photo-1552664730-d307ca884978?w=840&q=80&auto=format&fit=crop" alt="Formation équipe en entreprise" loading="lazy" />
+                  <img src="https://images.unsplash.com/photo-1552664730-d307ca884978?w=840&q=80&auto=format&fit=crop" alt="Formation équipe en entreprise" width="840" height="630" loading="lazy" />
                   <div class="hero-carousel-caption">Formations en entreprise</div>
                 </div>
               </div>
@@ -2154,15 +2154,15 @@
           <div class="hero-carousel-caption">Formation création d'entreprise</div>
         </div>
         <div class="hero-carousel-slide">
-          <img src="https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=840&q=80&auto=format&fit=crop" alt="Conférence entrepreneuriat" loading="lazy" />
+          <img src="https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=840&q=80&auto=format&fit=crop" alt="Conférence entrepreneuriat" width="840" height="630" loading="lazy" />
           <div class="hero-carousel-caption">Conférence &amp; prise de parole publique</div>
         </div>
         <div class="hero-carousel-slide">
-          <img src="https://images.unsplash.com/photo-1557804506-669a67965ba0?w=840&q=80&auto=format&fit=crop" alt="Accompagnement individuel" loading="lazy" />
+          <img src="https://images.unsplash.com/photo-1557804506-669a67965ba0?w=840&q=80&auto=format&fit=crop" alt="Accompagnement individuel" width="840" height="630" loading="lazy" />
           <div class="hero-carousel-caption">Accompagnement individuel</div>
         </div>
         <div class="hero-carousel-slide">
-          <img src="https://images.unsplash.com/photo-1552664730-d307ca884978?w=840&q=80&auto=format&fit=crop" alt="Formations en entreprise" loading="lazy" />
+          <img src="https://images.unsplash.com/photo-1552664730-d307ca884978?w=840&q=80&auto=format&fit=crop" alt="Formations en entreprise" width="840" height="630" loading="lazy" />
           <div class="hero-carousel-caption">Formations en entreprise</div>
         </div>
       </div>
