@@ -1,0 +1,37 @@
+# IA-Entrepreneur
+> Organisme de formation et d'accompagnement certifié Qualiopi, spécialisé en création d'entreprise et intelligence artificielle appliquée.
+
+IA-Entrepreneur est fondé par Gabriel Vanderbecken, formateur praticien ayant accompagné plus de 1 500 porteurs de projet. L'organisme propose des formations et un accompagnement personnalisé pour les créateurs d'entreprise et les équipes d'entreprise.
+
+## Formations proposées
+
+### Création d'entreprise
+- Accompagnement de A à Z : statut juridique, business plan, financement, premiers clients
+- Moins de 5% d'échec parmi les accompagnés
+- Certifié Qualiopi, finançable OPCO
+
+### Formations entreprises (sur mesure, finançables OPCO)
+- Formation IA & Automatisation : ChatGPT, n8n, Make, automatisation des process
+- Formation Prospection Commerciale : LinkedIn, emailing, phoning, closing
+- Formation Management & Leadership : délégation, feedback, gestion des conflits
+- Formation Techniques de Vente & Closing : taux de transformation, défense des marges
+- Formation Négociation Commerciale : concessions, grands comptes, posture
+- Formation Prise de Parole en Public : pitcher, convaincre, gérer le stress
+
+## Informations légales
+- Raison sociale : Clindit SASU — IA-Entrepreneur est une marque de Clindit
+- SIRET : 944 539 410 00018
+- Certification Qualiopi n° 883211-1 (valable 24/04/2026 – 23/04/2029)
+- NDA : 44 54 04871 54
+
+## Contact
+- Site : https://ia-entrepreneur.fr
+- Email : contact@ia-entrepreneur.fr
+- Prise de rendez-vous : https://calendly.com/gabriel-ia-entrepreneur/decouverte
+
+## Pages principales
+- Accueil : https://ia-entrepreneur.fr/
+- Formation création d'entreprise : https://ia-entrepreneur.fr/formations-creation.html
+- Formations entreprises : https://ia-entrepreneur.fr/formations-entreprises.html
+- À propos : https://ia-entrepreneur.fr/apropos.html
+- Blog : https://ia-entrepreneur.fr/blog.html
