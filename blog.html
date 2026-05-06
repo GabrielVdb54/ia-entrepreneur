@@ -12,8 +12,18 @@
   <meta property="og:url" content="https://ia-entrepreneur.fr/blog.html" />
   <meta property="og:type" content="website" />
   <link rel="icon" type="image/png" href="/favicon.png" />
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-SZG9XPNNNC"></script>
-  <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-SZG9XPNNNC');</script>
+  <script>
+    window.addEventListener('load', function() {
+      var s = document.createElement('script');
+      s.async = true;
+      s.src = 'https://www.googletagmanager.com/gtag/js?id=G-SZG9XPNNNC';
+      document.head.appendChild(s);
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-SZG9XPNNNC', {'send_page_view': true});
+    });
+  </script>
   <style>
     :root{--bg:#FFFFFF;--bg2:#F5F7FF;--primary:#1A3CFF;--accent:#10B981;--text:#0A0F2C;--muted:#525880;--border:rgba(10,15,44,0.10);--card:rgba(10,15,44,0.04);--radius:14px}
     *{margin:0;padding:0;box-sizing:border-box}html{scroll-behavior:smooth}
@@ -93,9 +103,10 @@
   <meta name="twitter:title" content="Blog Entrepreneuriat & IA | Guides Pratiques | IA-Entrepreneur" />
   <meta name="twitter:description" content="Articles pratiques sur la création d'entreprise, l'IA pour TPE, la prospection et le management. Guides terrain par IA-Entrepreneur, certifié Qualiopi." />
   <meta name="twitter:image" content="https://ia-entrepreneur.fr/images/formation-2.jpg" />
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" media="print" onload="this.media='all'" />
+  <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" /></noscript>
 </head>
 <body>
   <header>
@@ -156,11 +167,35 @@
   <section class="blog-section">
     <div class="container">
       <div class="blog-grid" id="blogGrid">
-        <!-- Article : Fermer son entreprise -->
+        <!-- Article : Créer son entreprise en 2026 -->
+        <div class="blog-card" data-cat="Création d'entreprise">
+          <a href="/blog/creer-son-entreprise-guide-2026.html" style="display:contents;">
+            <div class="blog-thumbnail">
+              <img src="https://srmmlwvumrqcpdwwrxjh.supabase.co/storage/v1/object/public/ia-entrepreneur-blog/article-creer-son-entreprise-guide-2026-1778050887720.webp" alt="Créer son entreprise en 2026 : le guide complet" loading="lazy" />
+              <div class="blog-thumbnail-overlay"></div>
+            </div>
+          </a>
+          <div class="blog-body">
+            <div class="blog-meta">
+              <span class="blog-cat">Création d'entreprise</span>
+              <span class="blog-date">6 mai 2026</span>
+            </div>
+            <h3>Créer son entreprise en 2026 : le guide complet des statuts, aides et outils</h3>
+            <p>Micro-entreprise, SASU, EURL, business plan, ACRE, outils IA : toutes les clés pour créer votre entreprise en 2026 et démarrer sur des bases solides.</p>
+            <a href="/blog/creer-son-entreprise-guide-2026.html" class="btn-blog">
+              Lire la suite
+              <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+            </a>
+          </div>
+        </div>
+
+
+
+        <!-- ARTICLE : Fermer son entreprise en 2026 -->
         <div class="blog-card" data-cat="Création d'entreprise">
           <a href="/blog/fermer-entreprise-guide-2026.html" style="display:contents;">
             <div class="blog-thumbnail">
-              <img src="https://srmmlwvumrqcpdwwrxjh.supabase.co/storage/v1/object/public/ia-entrepreneur-blog/article-fermer-entreprise-guide-2026-1777983171457.webp" alt="Fermer son entreprise en 2026 : le guide complet" loading="lazy" width="800" height="450" />
+              <img src="https://srmmlwvumrqcpdwwrxjh.supabase.co/storage/v1/object/public/ia-entrepreneur-blog/article-fermer-entreprise-guide-2026-1777983171457.webp" alt="Fermer son entreprise en 2026 : le guide complet pour TPE/PME" loading="lazy" />
               <div class="blog-thumbnail-overlay"></div>
             </div>
           </a>
@@ -170,7 +205,7 @@
               <span class="blog-date">5 mai 2026</span>
             </div>
             <h3>Fermer son entreprise en 2026 : le guide complet pour TPE/PME</h3>
-            <p>Fermer son entreprise n'est pas un échec, mais une étape qui se prépare. Micro-entreprise ou société : procédures, coûts, délais et pièges à éviter.</p>
+            <p>Fermer son entreprise n'est pas un échec, mais une étape qui se prépare. Micro-entreprise, SARL, SAS : démarches, coûts et délais pour une clôture sereine.</p>
             <a href="/blog/fermer-entreprise-guide-2026.html" class="btn-blog">
               Lire la suite
               <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
@@ -178,8 +213,7 @@
           </div>
         </div>
 
-
-        <!-- NOUVEL ARTICLE -->
+        <!-- ARTICLE : Créer en zone rurale ou QPV -->
         <div class="blog-card" data-cat="Financement">
           <a href="/blog/creer-entreprise-zone-rurale-qpv-aides-2026.html" style="display:contents;">
             <div class="blog-thumbnail">
@@ -213,7 +247,7 @@
               <span class="blog-cat">Création d'entreprise</span>
               <span class="blog-date">30 avril 2026</span>
             </div>
-            <h3>Formation Gestion d'Entreprise : Le Guide Complet 2026 pour Piloter sa TPE</h3>
+            <h3>Formation gestion d'entreprise : le guide complet 2026 pour piloter sa TPE</h3>
             <p>En 2026, de nombreux dirigeants de TPE se sentent dépassés par la gestion de leur activité. Entre la trésorerie à surveiller, l'administratif à gérer et les équipes à motiver...</p>
             <a href="/blog/formation-gestion-entreprise-guide-2026-tpe.html" class="btn-blog">Lire la suite <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg></a>
           </div>
@@ -247,7 +281,7 @@
               <span class="blog-cat">Création d'entreprise</span>
               <span class="blog-date">30 avril 2026</span>
             </div>
-            <h3>SASU ou EURL en 2026 : Le guide complet pour choisir sans vous tromper</h3>
+            <h3>SASU ou EURL en 2026 : le guide complet pour choisir sans vous tromper</h3>
             <p>En 2026, choisir entre SASU et EURL est une décision stratégique qui impacte directement votre rémunération, votre protection sociale et votre fiscalité.</p>
             <a href="/blog/sasu-ou-eurl-guide-2026.html" class="btn-blog">Lire la suite <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg></a>
           </div>
