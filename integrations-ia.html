@@ -1,0 +1,919 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Intégrations IA clé en main pour TPE/PME | IA-Entrepreneur</title>
+  <meta name="description" content="Chatbot client, réponses email automatiques, génération de contenu SEO : on installe l'IA dans votre entreprise. Résultats prouvés, paiement en 3 fois sans frais." />
+  <meta name="robots" content="index, follow" />
+  <link rel="canonical" href="https://ia-entrepreneur.fr/integrations-ia.html" />
+  <meta property="og:title" content="Intégrations IA clé en main | IA-Entrepreneur" />
+  <meta property="og:description" content="On installe l'IA dans votre entreprise. Vous en récoltez les bénéfices. Paiement en 3 fois sans frais." />
+  <meta property="og:url" content="https://ia-entrepreneur.fr/integrations-ia.html" />
+  <meta property="og:type" content="website" />
+  <link rel="icon" type="image/png" href="/favicon.png" />
+  <script>
+    window.addEventListener('load', function() {
+      var s = document.createElement('script'); s.async = true;
+      s.src = 'https://www.googletagmanager.com/gtag/js?id=G-SZG9XPNNNC';
+      document.head.appendChild(s);
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date()); gtag('config', 'G-SZG9XPNNNC', {'send_page_view': true});
+    });
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <style>
+    :root{--bg:#FFFFFF;--bg2:#F5F7FF;--primary:#1A3CFF;--accent:#10B981;--text:#0A0F2C;--muted:#525880;--border:rgba(10,15,44,0.10);--card:rgba(10,15,44,0.04);--radius:14px}
+    *{margin:0;padding:0;box-sizing:border-box}html{scroll-behavior:smooth}
+    body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);line-height:1.6}
+    a{color:inherit;text-decoration:none}
+    .container{max-width:1120px;margin:0 auto;padding:0 24px}
+
+    /* HEADER */
+    header{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(255,255,255,0.92);backdrop-filter:blur(18px);border-bottom:1px solid var(--border);box-shadow:0 2px 24px rgba(10,15,44,0.06)}
+    .header-inner{display:flex;align-items:center;justify-content:space-between;height:68px;gap:16px}
+    .logo{font-size:1rem;font-weight:800;color:var(--text);letter-spacing:-0.02em;flex-shrink:0;line-height:1.2}
+    .logo span{color:var(--primary)}
+    nav{display:flex;align-items:center;gap:2px}
+    nav a{padding:6px 10px;border-radius:8px;font-size:0.78rem;font-weight:600;color:var(--muted);transition:color 0.2s,background 0.2s;white-space:nowrap}
+    nav a:hover{color:var(--text);background:var(--card)}
+    nav a.active{color:var(--primary)}
+    .nav-cta{background:var(--accent)!important;color:#fff!important;border-radius:50px!important;padding:8px 16px!important;font-size:0.8rem!important;box-shadow:0 3px 16px rgba(16,185,129,0.35)!important}
+    .hamburger{display:none;flex-direction:column;gap:5px;padding:8px;background:none;border:none;cursor:pointer}
+    .hamburger span{display:block;width:24px;height:2px;background:var(--text);border-radius:2px}
+    .mobile-menu{display:none;flex-direction:column;gap:4px;padding:16px 24px 20px;background:rgba(255,255,255,0.98);border-top:1px solid var(--border);box-shadow:0 8px 24px rgba(10,15,44,0.08)}
+    .mobile-menu.open{display:flex}
+    .mobile-menu a{padding:12px 16px;border-radius:var(--radius);font-weight:600;color:var(--muted)}
+
+    /* HERO */
+    .page-hero{margin-top:68px;padding:80px 0 64px;background:linear-gradient(160deg,#F0F3FF 0%,#fff 60%);border-bottom:1px solid var(--border)}
+    .hero-badge{display:inline-flex;align-items:center;gap:8px;padding:6px 16px;border-radius:50px;background:rgba(16,185,129,0.08);border:1px solid rgba(16,185,129,0.2);font-size:0.78rem;font-weight:700;color:var(--accent);margin-bottom:24px}
+    .page-hero h1{font-size:clamp(2.2rem,4.5vw,3.4rem);font-weight:900;line-height:1.08;margin-bottom:20px;letter-spacing:-0.02em}
+    .gradient{background:linear-gradient(135deg,#1A3CFF 0%,#10B981 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+    .page-hero p{font-size:1.05rem;color:var(--muted);max-width:580px;line-height:1.8;margin-bottom:16px}
+    .hero-proof{display:inline-flex;align-items:center;gap:8px;font-size:0.82rem;font-weight:600;color:var(--text);background:rgba(26,60,255,0.05);border:1px solid rgba(26,60,255,0.12);border-radius:50px;padding:6px 16px;margin-bottom:32px}
+    .hero-ctas{display:flex;gap:12px;flex-wrap:wrap;align-items:center}
+    .btn{display:inline-flex;align-items:center;gap:8px;padding:14px 28px;border-radius:50px;font-weight:700;font-size:0.92rem;transition:all 0.2s;text-decoration:none;cursor:pointer}
+    .btn-primary{background:var(--primary);color:#fff;box-shadow:0 4px 20px rgba(26,60,255,0.3)}
+    .btn-primary:hover{transform:translateY(-2px);box-shadow:0 8px 28px rgba(26,60,255,0.45)}
+    .btn-accent{background:var(--accent);color:#fff;box-shadow:0 4px 20px rgba(16,185,129,0.3)}
+    .btn-accent:hover{transform:translateY(-2px);box-shadow:0 8px 28px rgba(16,185,129,0.45)}
+    .btn-outline{background:transparent;color:var(--text);border:1.5px solid var(--border)}
+    .btn-outline:hover{border-color:var(--primary);color:var(--primary)}
+    .pay3x{font-size:0.78rem;color:var(--muted);font-weight:500;margin-top:12px}
+    .pay3x strong{color:var(--accent)}
+
+    /* PROOF BAR */
+    .proof-bar{background:var(--primary);padding:20px 0}
+    .proof-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:24px;}
+    .proof-item{text-align:center}
+    .proof-num{font-size:1.6rem;font-weight:900;color:#fff;line-height:1}
+    .proof-label{font-size:0.72rem;color:rgba(255,255,255,0.7);margin-top:3px;font-weight:500;max-width:120px}
+    .proof-source{font-size:0.62rem;color:rgba(255,255,255,0.4);margin-top:2px}
+
+    /* CASE STUDY */
+    .case-section{padding:72px 0;background:var(--bg2)}
+    .case-inner{display:grid;grid-template-columns:1fr 1fr;gap:64px;align-items:center}
+    .case-label{font-size:0.72rem;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--accent);margin-bottom:12px}
+    .case-inner h2{font-size:clamp(1.6rem,3vw,2.2rem);font-weight:800;line-height:1.2;margin-bottom:16px}
+    .case-inner p{font-size:0.95rem;color:var(--muted);line-height:1.8;margin-bottom:24px}
+    .case-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+    .case-stat{background:#fff;border-radius:12px;padding:20px 16px;text-align:center;border:1px solid var(--border)}
+    .case-stat-num{font-size:1.6rem;font-weight:900;color:var(--primary);line-height:1}
+    .case-stat-label{font-size:0.75rem;color:var(--muted);margin-top:4px;line-height:1.4}
+    .case-visual{background:#fff;border-radius:20px;border:1px solid var(--border);padding:32px;box-shadow:0 8px 40px rgba(10,15,44,0.06)}
+    .case-tag{display:inline-block;padding:4px 12px;border-radius:50px;font-size:0.7rem;font-weight:700;background:rgba(16,185,129,0.08);color:var(--accent);border:1px solid rgba(16,185,129,0.2);margin-bottom:20px}
+    .case-metric{display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid var(--border)}
+    .case-metric:last-child{border-bottom:none}
+    .case-metric-label{font-size:0.84rem;color:var(--muted);font-weight:500}
+    .case-metric-value{font-size:0.95rem;font-weight:800;color:var(--text)}
+    .case-metric-value.positive{color:var(--accent)}
+
+    /* PRODUCTS */
+    .products-section{padding:80px 0}
+    .section-label{font-size:0.72rem;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--accent);margin-bottom:12px}
+    .section-title{font-size:clamp(1.7rem,3vw,2.4rem);font-weight:800;line-height:1.2;margin-bottom:8px}
+    .section-sub{font-size:1rem;color:var(--muted);line-height:1.75;max-width:560px;margin-bottom:48px}
+
+    /* FEATURED PRODUCTS */
+    .featured-products{display:flex;flex-direction:column;gap:40px;margin-bottom:48px}
+    .product-featured{display:grid;grid-template-columns:1fr 1fr;gap:0;border-radius:20px;border:1px solid var(--border);overflow:hidden;transition:box-shadow 0.3s}
+    .product-featured:hover{box-shadow:0 16px 60px rgba(10,15,44,0.10)}
+    .product-featured.reverse{direction:rtl}
+    .product-featured.reverse > *{direction:ltr}
+    .product-content{padding:40px 40px 40px 40px;display:flex;flex-direction:column;justify-content:space-between}
+    .product-visual{background:linear-gradient(135deg,var(--bg2) 0%,rgba(26,60,255,0.04) 100%);padding:40px;display:flex;flex-direction:column;justify-content:center;gap:16px}
+    .product-featured.accent-green .product-visual{background:linear-gradient(135deg,rgba(16,185,129,0.04) 0%,rgba(16,185,129,0.08) 100%)}
+    .product-num{font-size:0.7rem;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted);margin-bottom:8px}
+    .product-tag{display:inline-block;padding:4px 12px;border-radius:50px;font-size:0.7rem;font-weight:700;margin-bottom:16px}
+    .tag-blue{background:rgba(26,60,255,0.08);color:var(--primary);border:1px solid rgba(26,60,255,0.15)}
+    .tag-green{background:rgba(16,185,129,0.08);color:var(--accent);border:1px solid rgba(16,185,129,0.2)}
+    .product-content h3{font-size:1.4rem;font-weight:800;line-height:1.2;margin-bottom:12px}
+    .product-content > p{font-size:0.9rem;color:var(--muted);line-height:1.8;margin-bottom:24px;flex:1}
+    .product-proof{display:flex;gap:20px;margin-bottom:24px;flex-wrap:wrap}
+    .proof-pill{display:flex;flex-direction:column;background:var(--bg2);border-radius:10px;padding:12px 16px;min-width:90px}
+    .proof-pill-num{font-size:1.1rem;font-weight:900;color:var(--primary);line-height:1}
+    .proof-pill.green .proof-pill-num{color:var(--accent)}
+    .proof-pill-label{font-size:0.68rem;color:var(--muted);margin-top:3px;line-height:1.3}
+    .product-price-row{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px}
+    .product-price{font-size:1.3rem;font-weight:900;color:var(--text)}
+    .product-price small{font-size:0.75rem;font-weight:500;color:var(--muted)}
+    .product-price .pay3x-inline{display:block;font-size:0.72rem;font-weight:600;color:var(--accent);margin-top:2px}
+    .btn-sm{padding:10px 20px;font-size:0.84rem;border-radius:50px;font-weight:700;display:inline-flex;align-items:center;gap:6px;transition:all 0.2s;text-decoration:none}
+    .btn-sm-primary{background:var(--primary);color:#fff}
+    .btn-sm-primary:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(26,60,255,0.35)}
+    .btn-sm-accent{background:var(--accent);color:#fff}
+    .btn-sm-accent:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(16,185,129,0.35)}
+
+    /* metric cards in visual */
+    .metric-card{background:#fff;border-radius:12px;padding:16px 20px;border:1px solid var(--border)}
+    .metric-card-num{font-size:1.4rem;font-weight:900;color:var(--primary);line-height:1}
+    .metric-card.green .metric-card-num{color:var(--accent)}
+    .metric-card-label{font-size:0.75rem;color:var(--muted);margin-top:4px;line-height:1.4}
+    .metric-card-source{font-size:0.62rem;color:rgba(82,88,128,0.6);margin-top:2px}
+
+    /* SECONDARY GRID */
+    .secondary-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:20px}
+    .product-card{background:var(--bg);border:1px solid var(--border);border-radius:var(--radius);padding:28px;display:flex;flex-direction:column;transition:border-color 0.2s,transform 0.2s,box-shadow 0.2s}
+    .product-card:hover{border-color:rgba(26,60,255,0.25);transform:translateY(-4px);box-shadow:0 12px 40px rgba(10,15,44,0.08)}
+    .product-card-icon{font-size:1.6rem;margin-bottom:14px}
+    .product-card h3{font-size:1rem;font-weight:800;margin-bottom:8px}
+    .product-card > p{font-size:0.84rem;color:var(--muted);line-height:1.7;flex:1;margin-bottom:20px}
+    .card-proof{display:flex;gap:12px;margin-bottom:20px;flex-wrap:wrap}
+    .card-proof-item{font-size:0.75rem;font-weight:700;color:var(--primary);background:rgba(26,60,255,0.06);padding:4px 10px;border-radius:6px}
+    .card-footer{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px}
+    .card-price{font-size:1rem;font-weight:800}
+    .card-price small{font-size:0.7rem;font-weight:500;color:var(--muted)}
+
+    /* INCLUDES */
+    .includes-section{padding:64px 0;background:var(--bg2)}
+    .includes-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;margin-top:40px}
+    .include-item{display:flex;gap:14px;align-items:flex-start;background:#fff;border-radius:12px;padding:20px;border:1px solid var(--border)}
+    .include-icon{width:36px;height:36px;border-radius:8px;background:rgba(26,60,255,0.08);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:1rem}
+    .include-item h4{font-size:0.9rem;font-weight:700;margin-bottom:4px}
+    .include-item p{font-size:0.8rem;color:var(--muted);line-height:1.6}
+
+    /* PACKS */
+    .packs-section{padding:72px 0}
+    .packs-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:24px;margin-top:48px}
+    .pack-card{border-radius:20px;padding:36px;border:1px solid var(--border);position:relative;overflow:hidden}
+    .pack-card.featured{background:var(--primary);border-color:var(--primary)}
+    .pack-badge{position:absolute;top:16px;right:16px;background:var(--accent);color:#fff;font-size:0.65rem;font-weight:700;padding:4px 10px;border-radius:50px;letter-spacing:0.06em;text-transform:uppercase}
+    .pack-card h3{font-size:1.15rem;font-weight:800;margin-bottom:6px}
+    .pack-card.featured h3{color:#fff}
+    .pack-price{font-size:2.2rem;font-weight:900;color:var(--primary);line-height:1;margin-bottom:4px}
+    .pack-card.featured .pack-price{color:#fff}
+    .pack-price small{font-size:0.82rem;font-weight:500;color:var(--muted)}
+    .pack-card.featured .pack-price small{color:rgba(255,255,255,0.65)}
+    .pack-desc{font-size:0.84rem;color:var(--muted);margin-bottom:20px;line-height:1.6}
+    .pack-card.featured .pack-desc{color:rgba(255,255,255,0.75)}
+    .pack-promo{font-size:0.78rem;font-weight:700;color:var(--accent);background:rgba(16,185,129,0.08);border-radius:8px;padding:8px 14px;margin-bottom:24px;display:inline-block}
+    .pack-card.featured .pack-promo{background:rgba(255,255,255,0.12);color:#fff}
+    .pack-list{list-style:none;display:flex;flex-direction:column;gap:10px;margin-bottom:28px}
+    .pack-list li{font-size:0.84rem;color:var(--muted);display:flex;align-items:flex-start;gap:8px;line-height:1.5}
+    .pack-card.featured .pack-list li{color:rgba(255,255,255,0.85)}
+    .pack-list li::before{content:'✓';color:var(--accent);font-weight:700;flex-shrink:0;margin-top:1px}
+    .btn-pack{display:block;text-align:center;padding:13px 20px;border-radius:50px;font-weight:700;font-size:0.88rem;transition:all 0.2s}
+    .btn-pack-outline{border:1.5px solid rgba(26,60,255,0.25);color:var(--primary)}
+    .btn-pack-outline:hover{background:rgba(26,60,255,0.05)}
+    .btn-pack-white{background:#fff;color:var(--primary)}
+    .btn-pack-white:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(0,0,0,0.12)}
+
+    /* ROI CALC */
+    .roi-section{padding:72px 0;background:var(--bg2)}
+    .roi-inner{background:var(--primary);border-radius:24px;padding:56px;display:grid;grid-template-columns:1fr 1fr;gap:56px;align-items:start}
+    .roi-content h2{font-size:clamp(1.5rem,3vw,2rem);font-weight:800;color:#fff;line-height:1.2;margin-bottom:16px}
+    .roi-content p{font-size:0.92rem;color:rgba(255,255,255,0.78);line-height:1.85;margin-bottom:12px}
+    .roi-disclaimer{font-size:0.72rem;color:rgba(255,255,255,0.4);margin-top:16px}
+    .roi-calc{display:flex;flex-direction:column;gap:16px}
+    .roi-row{background:rgba(255,255,255,0.06);border-radius:12px;padding:18px 20px;border:1px solid rgba(255,255,255,0.1)}
+    .roi-row-title{font-size:0.78rem;font-weight:700;color:rgba(255,255,255,0.6);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:6px}
+    .roi-row-value{font-size:1.3rem;font-weight:900;color:#fff;line-height:1}
+    .roi-row-sub{font-size:0.75rem;color:rgba(255,255,255,0.5);margin-top:4px}
+    .roi-row.highlight{background:rgba(16,185,129,0.15);border-color:rgba(16,185,129,0.3)}
+    .roi-row.highlight .roi-row-value{color:#10B981}
+
+    /* PROCESS */
+    .process-section{padding:72px 0}
+    .process-steps{display:grid;grid-template-columns:repeat(4,1fr);gap:24px;margin-top:48px;position:relative}
+    .process-step{text-align:center;padding:24px 16px}
+    .step-num{width:52px;height:52px;border-radius:50%;background:var(--primary);color:#fff;font-size:1.15rem;font-weight:900;display:flex;align-items:center;justify-content:center;margin:0 auto 16px}
+    .process-step h3{font-size:0.95rem;font-weight:700;margin-bottom:8px}
+    .process-step p{font-size:0.82rem;color:var(--muted);line-height:1.7}
+
+    /* CTA */
+    .cta-section{padding:80px 0;text-align:center}
+    .cta-inner{background:linear-gradient(135deg,rgba(26,60,255,0.05),rgba(16,185,129,0.05));border:1px solid var(--border);border-radius:24px;padding:64px}
+    .cta-inner h2{font-size:clamp(1.6rem,3vw,2.4rem);font-weight:800;margin-bottom:16px}
+    .cta-inner p{font-size:1rem;color:var(--muted);max-width:480px;margin:0 auto 32px;line-height:1.75}
+    .cta-buttons{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+    .cta-note{font-size:0.78rem;color:var(--muted);margin-top:16px}
+
+    /* FOOTER */
+    footer{padding:36px 0 24px;border-top:1px solid var(--border)}
+    .footer-inner{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px;margin-bottom:20px}
+    .footer-logo{font-size:1rem;font-weight:800;letter-spacing:-0.02em}
+    .footer-logo span{color:var(--primary)}
+    .footer-links{display:flex;gap:16px;flex-wrap:wrap}
+    .footer-links a{font-size:0.8rem;color:var(--muted);transition:color 0.2s}
+    .footer-links a:hover{color:var(--text)}
+    .footer-copy{font-size:0.73rem;color:var(--muted);opacity:0.7}
+
+    @media(max-width:1024px){
+      .product-featured,.case-inner,.roi-inner{grid-template-columns:1fr}
+      .product-featured.reverse{direction:ltr}
+      .secondary-grid{grid-template-columns:1fr}
+      .packs-grid{grid-template-columns:1fr}
+      .includes-grid{grid-template-columns:repeat(2,1fr)}
+    }
+    @media(max-width:768px){
+      nav{display:none}.hamburger{display:flex}
+      .proof-grid{grid-template-columns:repeat(2,1fr);gap:16px}
+      .proof-grid{gap:24px}
+      .process-steps{grid-template-columns:repeat(2,1fr)}
+      .case-stats{grid-template-columns:repeat(3,1fr)}
+      .includes-grid{grid-template-columns:1fr}
+      .roi-inner{padding:32px 24px;gap:32px}
+      .cta-inner{padding:40px 24px}
+      .product-content{padding:28px 24px}
+      .product-visual{padding:28px 24px}
+    }
+    @media(max-width:480px){
+      .process-steps{grid-template-columns:1fr}
+      .case-stats{grid-template-columns:1fr}
+      .proof-product{flex-direction:column}
+    }
+
+    details summary::-webkit-details-marker { display: none; }
+    details[open] summary svg { transform: rotate(180deg); }
+    details summary svg { transition: transform 0.2s; flex-shrink: 0; }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="container">
+      <div class="header-inner">
+        <a href="/" class="logo" style="line-height:1.2;">
+          IA<span>-</span>Entrepreneur
+          <span style="display:block;font-size:0.58rem;font-weight:500;color:var(--muted);letter-spacing:0.03em;margin-top:2px;">Organisme de formation certifié Qualiopi</span>
+        </a>
+        <nav>
+          <a href="/">Accueil</a>
+          <a href="/formations-creation.html">Création d'entreprise</a>
+          <a href="/formations-entreprises.html">Formations entreprises</a>
+          <a href="/integrations-ia.html" class="active">Intégrations IA</a>
+          <a href="/apropos.html">À propos</a>
+          <a href="/blog.html">Blog</a>
+          <a href="mailto:contact@ia-entrepreneur.fr" style="display:flex;align-items:center;gap:4px;">
+            <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,12 2,6"/></svg>
+            contact@ia-entrepreneur.fr
+          </a>
+          <a href="https://calendly.com/gabriel-ia-entrepreneur/decouverte" target="_blank" rel="noopener noreferrer" class="nav-cta">Appel gratuit</a>
+        </nav>
+        <button class="hamburger" id="hamburger" aria-label="Menu"><span></span><span></span><span></span></button>
+      </div>
+    </div>
+    <div class="mobile-menu" id="mobile-menu">
+      <a href="/">Accueil</a>
+      <a href="/formations-creation.html">Création d'entreprise</a>
+      <a href="/formations-entreprises.html">Formations entreprises</a>
+      <a href="/integrations-ia.html">Intégrations IA</a>
+      <a href="/apropos.html">À propos</a>
+      <a href="/blog.html">Blog</a>
+      <a href="mailto:contact@ia-entrepreneur.fr">contact@ia-entrepreneur.fr</a>
+      <a href="https://calendly.com/gabriel-ia-entrepreneur/decouverte" target="_blank" rel="noopener noreferrer" style="background:var(--accent);color:#fff;text-align:center;border-radius:var(--radius);margin-top:8px;padding:14px;display:block;font-weight:700;">Réserver un appel gratuit</a>
+    </div>
+  </header>
+
+  <!-- HERO -->
+  <section class="page-hero">
+    <div class="container">
+      <div class="hero-badge">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+        Résultats prouvés · Opérationnel en 48h · Bugs inclus
+      </div>
+      <h1>L'IA dans votre entreprise.<br /><span class="gradient">Sans vous en occuper.</span></h1>
+      <p>Vous ne voulez pas apprendre à utiliser l'IA. Vous voulez que votre chatbot réponde à vos clients la nuit, que vos emails se trient tout seuls, que vos articles SEO se publient chaque semaine.</p>
+      <div class="hero-proof">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+        Testé sur IA-Entrepreneur : 31 articles publiés automatiquement, 44 URLs indexées sur Google
+      </div>
+      <div class="hero-ctas">
+        <a href="https://calendly.com/gabriel-ia-entrepreneur/decouverte" target="_blank" rel="noopener noreferrer" class="btn btn-primary">
+          <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+          Appel gratuit de 15 min
+        </a>
+        <a href="#offres" class="btn btn-outline">Voir les intégrations</a>
+      </div>
+      <p class="pay3x">Toutes nos installations sont payables en <strong>3 fois sans frais</strong>. Bugs corrigés inclus.</p>
+    </div>
+  </section>
+
+  <!-- PROOF BAR -->
+  <div class="proof-bar">
+    <div class="container">
+      <div class="proof-grid">
+        <div class="proof-item">
+          <div class="proof-num">24 000 €</div>
+          <div class="proof-label">économisés par an en moyenne par une PME avec un chatbot</div>
+          <div class="proof-source">Source : Juniper Research 2025</div>
+        </div>
+        <div class="proof-item">
+          <div class="proof-num">+35%</div>
+          <div class="proof-label">de visiteurs convertis en contacts qualifiés</div>
+          <div class="proof-source">Source : entreprise-plus.com 2026</div>
+        </div>
+        <div class="proof-item">
+          <div class="proof-num">40h</div>
+          <div class="proof-label">économisées par mois sur la création de contenu</div>
+          <div class="proof-source">Testé sur IA-Entrepreneur</div>
+        </div>
+        <div class="proof-item">
+          <div class="proof-num">48h</div>
+          <div class="proof-label">pour avoir votre outil opérationnel chez vous</div>
+          <div class="proof-source">Garanti par IA-Entrepreneur</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CASE STUDY -->
+  <section class="case-section">
+    <div class="container">
+      <div class="case-inner">
+        <div>
+          <div class="case-label">Preuve par l'exemple</div>
+          <h2>Ce qu'on a construit pour IA-Entrepreneur, et qu'on reproduit chez vous</h2>
+          <p>Avant de vendre cette intégration, on l'a construite et testée sur notre propre site. Le workflow génère automatiquement des articles SEO, les publie sur GitHub, met à jour le sitemap et informe Google à chaque publication.</p>
+          <p>Ce n'est pas une démonstration. C'est notre quotidien depuis plusieurs semaines. Vous pouvez vérifier les résultats en direct sur ia-entrepreneur.fr/blog.html.</p>
+          <div class="case-stats">
+            <div class="case-stat">
+              <div class="case-stat-num">31</div>
+              <div class="case-stat-label">articles publiés automatiquement</div>
+            </div>
+            <div class="case-stat">
+              <div class="case-stat-num">44</div>
+              <div class="case-stat-label">URLs indexées sur Google</div>
+            </div>
+            <div class="case-stat">
+              <div class="case-stat-num">40h</div>
+              <div class="case-stat-label">économisées par mois vs rédaction manuelle</div>
+            </div>
+          </div>
+        </div>
+        <div class="case-visual">
+          <div class="case-tag">Workflow actif · IA-Entrepreneur</div>
+          <div class="case-metric">
+            <span class="case-metric-label">Fréquence de publication</span>
+            <span class="case-metric-value">5 articles / semaine</span>
+          </div>
+          <div class="case-metric">
+            <span class="case-metric-label">Intervention humaine requise</span>
+            <span class="case-metric-value positive">Zéro</span>
+          </div>
+          <div class="case-metric">
+            <span class="case-metric-label">Mise à jour sitemap Google</span>
+            <span class="case-metric-value positive">Automatique</span>
+          </div>
+          <div class="case-metric">
+            <span class="case-metric-label">Coût mensuel en API</span>
+            <span class="case-metric-value">~ 30 €</span>
+          </div>
+          <div class="case-metric">
+            <span class="case-metric-label">Temps économisé / mois</span>
+            <span class="case-metric-value positive">12 à 20 heures</span>
+          </div>
+          <div class="case-metric">
+            <span class="case-metric-label">Délai de mise en place</span>
+            <span class="case-metric-value">48h</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- INCLUDES -->
+  <section class="includes-section">
+    <div class="container">
+      <div class="section-label">Ce qui est inclus</div>
+      <h2 class="section-title">Sans surprise, sans frais cachés</h2>
+      <div class="includes-grid">
+        <div class="include-item">
+          <div class="include-icon">⚡</div>
+          <div>
+            <h4>Installation complète</h4>
+            <p>Configuration, tests, mise en production. Vous recevez une démonstration avant le lancement.</p>
+          </div>
+        </div>
+        <div class="include-item">
+          <div class="include-icon">🔧</div>
+          <div>
+            <h4>Correction des bugs incluse</h4>
+            <p>Si quelque chose ne fonctionne pas après l'installation, on corrige sans facturer. Pas de surprises.</p>
+          </div>
+        </div>
+        <div class="include-item">
+          <div class="include-icon">💳</div>
+          <div>
+            <h4>Paiement en 3 fois sans frais</h4>
+            <p>1 200 € devient 400 €/mois. Zéro frais, zéro intérêt. On s'adapte à votre trésorerie.</p>
+          </div>
+        </div>
+        <div class="include-item">
+          <div class="include-icon">🎯</div>
+          <div>
+            <h4>Adapté à votre secteur</h4>
+            <p>On configure l'outil avec votre vocabulaire, vos process, vos types de clients. Pas une solution générique.</p>
+          </div>
+        </div>
+        <div class="include-item">
+          <div class="include-icon">📋</div>
+          <div>
+            <h4>Formation rapide incluse</h4>
+            <p>30 minutes pour comprendre comment utiliser et superviser votre outil. On reste disponibles.</p>
+          </div>
+        </div>
+        <div class="include-item">
+          <div class="include-icon">📞</div>
+          <div>
+            <h4>Support réactif</h4>
+            <p>Une question ? Un problème ? Réponse sous 24h ouvrées. Pas de ticket perdu dans un CRM.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- PRODUCTS -->
+  <section class="products-section" id="offres">
+    <div class="container">
+      <div class="section-label">Nos intégrations</div>
+      <h2 class="section-title">Choisissez ce dont vous avez besoin</h2>
+      <p class="section-sub">Installation unique, bugs corrigés inclus, payable en 3 fois sans frais. Les 3 produits ci-dessous sont les plus demandés et les mieux documentés en termes de résultats.</p>
+
+      <!-- FEATURED 1 : CHATBOT -->
+      <div class="featured-products">
+        <div class="product-featured">
+          <div class="product-content">
+            <div>
+              <div class="product-num">Intégration n°1</div>
+              <div class="product-tag tag-blue">⭐ Le plus demandé</div>
+              <h3>Chatbot client sur votre site</h3>
+              <p>Vos visiteurs posent des questions la nuit, le week-end, pendant que vous êtes en chantier. Sans chatbot, ces demandes restent sans réponse et le prospect appelle votre concurrent. Le chatbot répond en moins de 3 secondes, qualifie le lead et prend un rendez-vous, 24h/24.</p>
+              <div class="product-proof">
+                <div class="proof-pill">
+                  <span class="proof-pill-num">24 000 €</span>
+                  <span class="proof-pill-label">économisés par an en moyenne</span>
+                </div>
+                <div class="proof-pill">
+                  <span class="proof-pill-num">+35%</span>
+                  <span class="proof-pill-label">de visiteurs convertis en contacts</span>
+                </div>
+                <div class="proof-pill">
+                  <span class="proof-pill-num">3 mois</span>
+                  <span class="proof-pill-label">pour atteindre le seuil de rentabilité</span>
+                </div>
+              </div>
+            </div>
+            <div class="product-price-row">
+              <div class="product-price">
+                à partir de 1 500 €
+                <small>installation unique, bugs inclus</small>
+                <span class="pay3x-inline">✓ Payable en 3× sans frais</span>
+              </div>
+              <a href="https://calendly.com/gabriel-ia-entrepreneur/decouverte" target="_blank" rel="noopener noreferrer" class="btn-sm btn-sm-primary">
+                En savoir plus
+                <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+              </a>
+            </div>
+          </div>
+          <div class="product-visual">
+            <div class="metric-card">
+              <div class="metric-card-num">30h</div>
+              <div class="metric-card-label">économisées par mois pour une PME traitant 300 demandes clients, soit 12 000 € d'économies annuelles</div>
+              <div class="metric-card-source">Source : L'Agence Sauvage, 2026</div>
+            </div>
+            <div class="metric-card green">
+              <div class="metric-card-num">3 sec</div>
+              <div class="metric-card-label">Temps de réponse du chatbot, contre 4h pour un email sans réponse auto</div>
+              <div class="metric-card-source">Source : Aurora Inbox, 2026</div>
+            </div>
+            <div class="metric-card">
+              <div class="metric-card-num">21×</div>
+              <div class="metric-card-label">plus de chances de qualifier un lead si réponse en moins de 5 min</div>
+              <div class="metric-card-source">Source : Harvard Business Review</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- FEATURED 2 : EMAILS -->
+        <div class="product-featured reverse accent-green">
+          <div class="product-visual">
+            <div class="metric-card green">
+              <div class="metric-card-num">2h30</div>
+              <div class="metric-card-label">passées sur les emails par jour en moyenne pour un dirigeant</div>
+              <div class="metric-card-source">Source : McKinsey Global Institute</div>
+            </div>
+            <div class="metric-card">
+              <div class="metric-card-num">60-70%</div>
+              <div class="metric-card-label">des emails traitables automatiquement sans intervention humaine</div>
+              <div class="metric-card-source">Source : Superprompt.com, 2026</div>
+            </div>
+            <div class="metric-card green">
+              <div class="metric-card-num">1h30</div>
+              <div class="metric-card-label">récupérées par jour, soit 30h par mois à consacrer à votre cœur de métier</div>
+              <div class="metric-card-source">Estimation conservatrice</div>
+            </div>
+          </div>
+          <div class="product-content">
+            <div>
+              <div class="product-num">Intégration n°2</div>
+              <div class="product-tag tag-green">⚡ Résultats immédiats</div>
+              <h3>Zéro email sans réponse</h3>
+              <p>Vos emails entrants sont triés, classés par type de demande, et une réponse adaptée au contexte est rédigée par l'IA. Vous ne voyez que les cas qui nécessitent vraiment votre attention. Les demandes courantes sont traitées en quelques secondes.</p>
+              <div class="product-proof">
+                <div class="proof-pill green">
+                  <span class="proof-pill-num">30h</span>
+                  <span class="proof-pill-label">économisées par mois</span>
+                </div>
+                <div class="proof-pill green">
+                  <span class="proof-pill-num">ROI +</span>
+                  <span class="proof-pill-label">dès le 1er mois</span>
+                </div>
+                <div class="proof-pill green">
+                  <span class="proof-pill-num">100%</span>
+                  <span class="proof-pill-label">des emails traités sous 3 secondes</span>
+                </div>
+              </div>
+            </div>
+            <div class="product-price-row">
+              <div class="product-price">
+                à partir de 800 €
+                <small>installation unique, bugs inclus</small>
+                <span class="pay3x-inline">✓ Payable en 3× sans frais</span>
+              </div>
+              <a href="https://calendly.com/gabriel-ia-entrepreneur/decouverte" target="_blank" rel="noopener noreferrer" class="btn-sm btn-sm-accent">
+                En savoir plus
+                <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <!-- FEATURED 3 : CONTENU -->
+        <div class="product-featured">
+          <div class="product-content">
+            <div>
+              <div class="product-num">Intégration n°3</div>
+              <div class="product-tag tag-blue">📈 Prouvé sur notre propre site</div>
+              <h3>Génération de contenu SEO automatique</h3>
+              <p>Chaque semaine, des articles optimisés pour Google sont générés sur la thématique de votre métier, publiés sur votre site et soumis à Google automatiquement. Vous gagnez en visibilité sans écrire une seule ligne. On l'a construit pour IA-Entrepreneur. Le résultat est visible en ligne.</p>
+              <div class="product-proof">
+                <div class="proof-pill">
+                  <span class="proof-pill-num">31</span>
+                  <span class="proof-pill-label">articles sur IA-Entrepreneur en production</span>
+                </div>
+                <div class="proof-pill">
+                  <span class="proof-pill-num">5/sem</span>
+                  <span class="proof-pill-label">publications automatiques</span>
+                </div>
+                <div class="proof-pill">
+                  <span class="proof-pill-num">40h</span>
+                  <span class="proof-pill-label">économisées par mois</span>
+                </div>
+              </div>
+            </div>
+            <div class="product-price-row">
+              <div class="product-price">
+                à partir de 800 €
+                <small>installation unique, bugs inclus</small>
+                <span class="pay3x-inline">✓ Payable en 3× sans frais</span>
+              </div>
+              <a href="https://calendly.com/gabriel-ia-entrepreneur/decouverte" target="_blank" rel="noopener noreferrer" class="btn-sm btn-sm-primary">
+                En savoir plus
+                <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+              </a>
+            </div>
+          </div>
+          <div class="product-visual">
+            <div class="metric-card">
+              <div class="metric-card-num">80 à 150 €</div>
+              <div class="metric-card-label">Prix d'un article rédigé par un freelance SEO. 10 articles = 800 à 1 500 €/mois</div>
+              <div class="metric-card-source">Tarif marché France 2026</div>
+            </div>
+            <div class="metric-card green">
+              <div class="metric-card-num">~30 €</div>
+              <div class="metric-card-label">Coût mensuel en API pour 20 articles générés et publiés automatiquement</div>
+              <div class="metric-card-source">Testé sur IA-Entrepreneur</div>
+            </div>
+            <div class="metric-card">
+              <div class="metric-card-num">6 à 12 mois</div>
+              <div class="metric-card-label">Délai avant positionnement Google sur vos mots-clés métier</div>
+              <div class="metric-card-source">Benchmark SEO standard</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SECONDARY PRODUCTS -->
+      <div class="secondary-grid">
+        <div class="product-card">
+          <div class="product-card-icon">📊</div>
+          <h3>Rapport performance hebdo</h3>
+          <p>Synthèse automatique de vos KPIs envoyée par email chaque semaine. Vous pilotez votre activité sans passer du temps à compiler des données.</p>
+          <div class="card-proof">
+            <span class="card-proof-item">Gain : 3-5h/semaine</span>
+            <span class="card-proof-item">Décisions plus rapides</span>
+          </div>
+          <div class="card-footer">
+            <div class="card-price">à partir de 600 € <small>· 3× sans frais</small></div>
+            <a href="https://calendly.com/gabriel-ia-entrepreneur/decouverte" target="_blank" rel="noopener noreferrer" class="btn-sm btn-sm-primary">Découvrir</a>
+          </div>
+        </div>
+        <div class="product-card">
+          <div class="product-card-icon">🔍</div>
+          <h3>Veille concurrentielle automatisée</h3>
+          <p>Monitoring de vos concurrents, synthèse IA envoyée deux fois par mois. Vous savez ce qu'ils font. Eux ne savent pas ce que vous préparez.</p>
+          <div class="card-proof">
+            <span class="card-proof-item">2 rapports / mois</span>
+            <span class="card-proof-item">Avantage concurrentiel</span>
+          </div>
+          <div class="card-footer">
+            <div class="card-price">à partir de 800 € <small>· 3× sans frais</small></div>
+            <a href="https://calendly.com/gabriel-ia-entrepreneur/decouverte" target="_blank" rel="noopener noreferrer" class="btn-sm btn-sm-primary">Découvrir</a>
+          </div>
+        </div>
+        <div class="product-card">
+          <div class="product-card-icon">🎙️</div>
+          <h3>Compte-rendu de réunion automatique</h3>
+          <p>Transcription, résumé et liste d'actions extraits automatiquement après chaque appel. Compatible Zoom, Teams et Google Meet.</p>
+          <div class="card-proof">
+            <span class="card-proof-item">Compatible Teams/Zoom</span>
+            <span class="card-proof-item">Zéro prise de notes</span>
+          </div>
+          <div class="card-footer">
+            <div class="card-price">à partir de 600 € <small>· 3× sans frais</small></div>
+            <a href="https://calendly.com/gabriel-ia-entrepreneur/decouverte" target="_blank" rel="noopener noreferrer" class="btn-sm btn-sm-primary">Découvrir</a>
+          </div>
+        </div>
+        <div class="product-card">
+          <div class="product-card-icon">💼</div>
+          <h3>Assistant prospection LinkedIn</h3>
+          <p>Messages personnalisés par l'IA, suivi des relances, gestion des réponses. Votre prospection devient plus régulière et mieux ciblée, dans le respect des CGU LinkedIn.</p>
+          <div class="card-proof">
+            <span class="card-proof-item">Personnalisation IA</span>
+            <span class="card-proof-item">Suivi automatisé</span>
+          </div>
+          <div class="card-footer">
+            <div class="card-price">à partir de 1 000 € <small>· 3× sans frais</small></div>
+            <a href="https://calendly.com/gabriel-ia-entrepreneur/decouverte" target="_blank" rel="noopener noreferrer" class="btn-sm btn-sm-primary">Découvrir</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PACKS MAINTENANCE -->
+  <section class="packs-section" id="maintenance">
+    <div class="container">
+      <div class="section-label">Maintenance et évolution</div>
+      <h2 class="section-title">Vos outils restent au niveau</h2>
+      <p class="section-sub" style="margin-top:8px;">L'IA évolue vite. Un outil non maintenu devient rapidement moins performant. Nos packs garantissent que vous restez toujours à jour.</p>
+      <div class="packs-grid">
+        <div class="pack-card">
+          <h3>Pack Sérénité Starter</h3>
+          <div class="pack-price">179 € <small>/ mois</small></div>
+          <p class="pack-desc">Pour une intégration à maintenir avec un usage stable.</p>
+          <div class="pack-promo">Engagement 3 mois : installation à -30%</div>
+          <ul class="pack-list">
+            <li>Maintenance d'un outil IA</li>
+            <li>Évolutions mineures incluses</li>
+            <li>Correction des bugs</li>
+            <li>Support sous 48h</li>
+            <li>Rapport mensuel de fonctionnement</li>
+          </ul>
+          <a href="https://calendly.com/gabriel-ia-entrepreneur/decouverte" target="_blank" rel="noopener noreferrer" class="btn-pack btn-pack-outline">Démarrer</a>
+        </div>
+        <div class="pack-card featured">
+          <div class="pack-badge">Le plus choisi</div>
+          <h3>Pack Sérénité Business</h3>
+          <div class="pack-price">399 € <small>/ mois</small></div>
+          <p class="pack-desc">Pour les entreprises qui veulent plusieurs outils et une progression continue.</p>
+          <div class="pack-promo">Engagement 12 mois : installation offerte</div>
+          <ul class="pack-list">
+            <li>Jusqu'à 3 outils maintenus</li>
+            <li>Évolutions incluses chaque mois</li>
+            <li>Ajout de fonctionnalités</li>
+            <li>Support prioritaire</li>
+            <li>Point mensuel de 30 min</li>
+            <li>Propositions d'optimisation proactives</li>
+          </ul>
+          <a href="https://calendly.com/gabriel-ia-entrepreneur/decouverte" target="_blank" rel="noopener noreferrer" class="btn-pack btn-pack-white">Démarrer</a>
+        </div>
+      </div>
+      <p style="font-size:0.78rem;color:var(--muted);margin-top:20px;padding:14px 20px;background:var(--bg2);border-radius:10px;border-left:3px solid var(--border);">
+        <strong>Note :</strong> En plus de la prestation, prévoir 30 à 100 €/mois d'abonnements outils selon le niveau d'automatisation (API Claude/GPT, n8n Cloud, etc.). Détaillé avant toute signature.
+      </p>
+    </div>
+  </section>
+
+  <!-- ROI -->
+  <section class="roi-section">
+    <div class="container">
+      <div class="roi-inner">
+        <div class="roi-content">
+          <h2>Le calcul que font vos concurrents. Faites-le avant eux.</h2>
+          <p>Un freelance SEO coûte 80 à 150 € par article. 10 articles par mois = 800 à 1 500 €. Notre intégration coûte 1 000 € une fois, puis ~30 €/mois en API. En 2 mois vous avez rentabilisé l'investissement.</p>
+          <p>Pour le chatbot : si vous recevez 20 demandes par mois hors heures ouvrables et que votre panier moyen est de 2 000 €, convertir 2 de ces demandes rembourse votre chatbot 2 fois. Dès le premier mois.</p>
+          <p class="roi-disclaimer">Estimations basées sur des benchmarks sectoriels documentés. Les résultats varient selon votre secteur et votre volume de trafic.</p>
+        </div>
+        <div class="roi-calc">
+          <div class="roi-row">
+            <div class="roi-row-title">Freelance SEO · 10 articles/mois</div>
+            <div class="roi-row-value">800 à 1 500 € / mois</div>
+            <div class="roi-row-sub">Récurrent. Chaque mois.</div>
+          </div>
+          <div class="roi-row">
+            <div class="roi-row-title">Notre intégration · 20 articles/mois</div>
+            <div class="roi-row-value">1 000 € une fois + ~30 €/mois</div>
+            <div class="roi-row-sub">Installation unique. Bugs inclus. 3× sans frais.</div>
+          </div>
+          <div class="roi-row highlight">
+            <div class="roi-row-title">Économie sur 12 mois</div>
+            <div class="roi-row-value">8 600 à 16 600 €</div>
+            <div class="roi-row-sub">Pour le double de publications</div>
+          </div>
+          <div class="roi-row">
+            <div class="roi-row-title">Chatbot · délai de rentabilité</div>
+            <div class="roi-row-value">3 mois en moyenne</div>
+            <div class="roi-row-sub">Source : entreprise-plus.com, 2026</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PROCESS -->
+  <section class="process-section">
+    <div class="container">
+      <div class="section-label">Comment ça se passe</div>
+      <h2 class="section-title">De l'appel à l'outil opérationnel en 4 étapes</h2>
+      <div class="process-steps">
+        <div class="process-step">
+          <div class="step-num">1</div>
+          <h3>Appel de 15 min</h3>
+          <p>On comprend votre situation, vos outils actuels, votre secteur. On vous dit exactement ce qu'on peut faire et ce que ça coûte. Gratuit, sans engagement.</p>
+        </div>
+        <div class="process-step">
+          <div class="step-num">2</div>
+          <h3>Devis en 24h</h3>
+          <p>Devis précis, sans fourchette floue. Vous validez et choisissez le paiement en 1 ou 3 fois. On commence.</p>
+        </div>
+        <div class="process-step">
+          <div class="step-num">3</div>
+          <h3>Opérationnel en 48h</h3>
+          <p>On configure, on teste, on vous fait une démonstration. Vous validez avant la mise en production. Les bugs éventuels sont corrigés sans frais supplémentaires.</p>
+        </div>
+        <div class="process-step">
+          <div class="step-num">4</div>
+          <h3>Ça tourne</h3>
+          <p>Votre outil fonctionne. On surveille, on maintient. Vous gérez votre entreprise. On gère la technique.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- FAQ -->
+  <section style="padding:72px 0;background:var(--bg2);">
+    <div class="container">
+      <div class="section-label">Questions fréquentes</div>
+      <h2 class="section-title">Les vraies questions qu'on nous pose</h2>
+      <div style="display:flex;flex-direction:column;gap:12px;margin-top:40px;max-width:800px;">
+
+        <details style="background:#fff;border:1px solid var(--border);border-radius:12px;overflow:hidden;">
+          <summary style="padding:20px 24px;font-size:0.95rem;font-weight:700;cursor:pointer;list-style:none;display:flex;justify-content:space-between;align-items:center;">
+            Est-ce que ça marche avec mon site Wordpress, Wix ou Shopify ?
+            <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg>
+          </summary>
+          <div style="padding:0 24px 20px;font-size:0.9rem;color:var(--muted);line-height:1.8;">
+            Oui pour la majorité des CMS courants. Le chatbot s'intègre via un simple script à coller dans votre site : Wordpress, Wix, Shopify, Webflow, site statique. On vérifie la compatibilité lors de l'appel gratuit de 15 min avant tout engagement.
+          </div>
+        </details>
+
+        <details style="background:#fff;border:1px solid var(--border);border-radius:12px;overflow:hidden;">
+          <summary style="padding:20px 24px;font-size:0.95rem;font-weight:700;cursor:pointer;list-style:none;display:flex;justify-content:space-between;align-items:center;">
+            Que se passe-t-il si ça ne fonctionne pas comme prévu ?
+            <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg>
+          </summary>
+          <div style="padding:0 24px 20px;font-size:0.9rem;color:var(--muted);line-height:1.8;">
+            Les bugs sont inclus dans l'installation, sans limite de temps. Si l'outil ne se comporte pas comme prévu après la mise en production, on corrige sans facturer. Vous recevez une démonstration complète avant le lancement et vous validez avant que ça parte en production.
+          </div>
+        </details>
+
+        <details style="background:#fff;border:1px solid var(--border);border-radius:12px;overflow:hidden;">
+          <summary style="padding:20px 24px;font-size:0.95rem;font-weight:700;cursor:pointer;list-style:none;display:flex;justify-content:space-between;align-items:center;">
+            Combien de temps ça prend vraiment à mettre en place ?
+            <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg>
+          </summary>
+          <div style="padding:0 24px 20px;font-size:0.9rem;color:var(--muted);line-height:1.8;">
+            48h à compter de votre validation du devis pour les intégrations standard (chatbot, réponse email, génération de contenu). Pour les cas plus complexes avec des outils sur mesure, on vous prévient en amont avec un délai précis. Pas de "ça dépend" sans explication.
+          </div>
+        </details>
+
+        <details style="background:#fff;border:1px solid var(--border);border-radius:12px;overflow:hidden;">
+          <summary style="padding:20px 24px;font-size:0.95rem;font-weight:700;cursor:pointer;list-style:none;display:flex;justify-content:space-between;align-items:center;">
+            Est-ce que je dois m'occuper de la technique après l'installation ?
+            <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg>
+          </summary>
+          <div style="padding:0 24px 20px;font-size:0.9rem;color:var(--muted);line-height:1.8;">
+            Non. C'est exactement pour ça qu'on existe. On vous forme en 30 minutes à superviser l'outil, mais vous n'avez pas à toucher au code, aux API ou aux configurations. Si quelque chose change (mise à jour d'un outil, évolution de l'IA), on s'en occupe. Vous gérez votre métier, pas la technique.
+          </div>
+        </details>
+
+        <details style="background:#fff;border:1px solid var(--border);border-radius:12px;overflow:hidden;">
+          <summary style="padding:20px 24px;font-size:0.95rem;font-weight:700;cursor:pointer;list-style:none;display:flex;justify-content:space-between;align-items:center;">
+            Y a-t-il des coûts cachés en plus du prix affiché ?
+            <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg>
+          </summary>
+          <div style="padding:0 24px 20px;font-size:0.9rem;color:var(--muted);line-height:1.8;">
+            Un seul coût à prévoir en plus : les abonnements aux outils que votre intégration utilise (API Claude ou GPT, n8n Cloud). En général entre 30 et 100 €/mois selon le volume. On vous détaille exactement ce montant lors de l'appel, avant toute signature. Pas de surprise le mois d'après.
+          </div>
+        </details>
+
+        <details style="background:#fff;border:1px solid var(--border);border-radius:12px;overflow:hidden;">
+          <summary style="padding:20px 24px;font-size:0.95rem;font-weight:700;cursor:pointer;list-style:none;display:flex;justify-content:space-between;align-items:center;">
+            Comment fonctionne le paiement en 3 fois sans frais ?
+            <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg>
+          </summary>
+          <div style="padding:0 24px 20px;font-size:0.9rem;color:var(--muted);line-height:1.8;">
+            Simple : vous payez un tiers à la commande, un tiers à la livraison (mise en production), un tiers 30 jours après. Zéro frais, zéro intérêt. On installe dès le premier versement. Disponible sur toutes nos intégrations.
+          </div>
+        </details>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="cta-section">
+    <div class="container">
+      <div class="cta-inner">
+        <h2>15 minutes pour savoir si c'est fait pour vous</h2>
+        <p>On analyse votre situation, on vous dit ce qu'on peut faire et ce que ça va changer concrètement. Gratuit. Sans engagement. Sans présentation PowerPoint de 40 slides.</p>
+        <div class="cta-buttons">
+          <a href="https://calendly.com/gabriel-ia-entrepreneur/decouverte" target="_blank" rel="noopener noreferrer" class="btn btn-accent">
+            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+            Réserver un appel gratuit
+          </a>
+          <a href="mailto:contact@ia-entrepreneur.fr" class="btn btn-outline">Poser une question par email</a>
+        </div>
+        <p class="cta-note">Paiement en 3 fois sans frais · Bugs corrigés inclus · Opérationnel en 48h</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="container">
+      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px;padding:20px 0;border-bottom:1px solid var(--border);margin-bottom:24px;">
+        <div style="display:flex;align-items:center;gap:12px;">
+          <img src="/qualiopi-logo.png" alt="Qualiopi" style="height:40px;width:auto;" onerror="this.style.display='none'" />
+          <div>
+            <div style="font-size:0.84rem;font-weight:800;">Certifié Qualiopi · Certificat n° 883211-1</div>
+            <div style="font-size:0.73rem;color:var(--muted);">NDA : 44 54 04871 54 · Cofrac n° 5-0620</div>
+          </div>
+        </div>
+        <a href="/qualiopi-certificat.pdf" target="_blank" rel="noopener noreferrer" style="font-size:0.78rem;font-weight:700;color:var(--primary);border:1px solid rgba(26,60,255,0.2);padding:7px 14px;border-radius:50px;background:rgba(26,60,255,0.04);">Voir le certificat</a>
+      </div>
+      <div class="footer-inner">
+        <div class="footer-logo">IA<span>-</span>Entrepreneur</div>
+        <div class="footer-links">
+          <a href="/">Accueil</a>
+          <a href="/formations-creation.html">Création d'entreprise</a>
+          <a href="/formations-entreprises.html">Formations entreprises</a>
+          <a href="/integrations-ia.html">Intégrations IA</a>
+          <a href="/apropos.html">À propos</a>
+          <a href="/blog.html">Blog</a>
+          <a href="/mentions-legales.html">Mentions légales</a>
+          <a href="/cgv.html">CGV</a>
+          <a href="mailto:contact@ia-entrepreneur.fr">Contact</a>
+        </div>
+      </div>
+      <p class="footer-copy">© 2026 IA-Entrepreneur · Clindit. Tous droits réservés. | NDA : 44 54 04871 54</p>
+    </div>
+  </footer>
+
+  <script>
+    const hamburger = document.getElementById('hamburger');
+    const mobileMenu = document.getElementById('mobile-menu');
+    hamburger.addEventListener('click', () => { hamburger.classList.toggle('open'); mobileMenu.classList.toggle('open'); });
+    mobileMenu.querySelectorAll('a').forEach(l => l.addEventListener('click', () => { hamburger.classList.remove('open'); mobileMenu.classList.remove('open'); }));
+  </script>
+</body>
+</html>
