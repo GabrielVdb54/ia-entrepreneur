@@ -83,7 +83,6 @@
     .niveau-modules{list-style:none;display:flex;flex-direction:column;gap:8px}
     .niveau-modules li{font-size:0.84rem;color:var(--muted);display:flex;align-items:flex-start;gap:8px;line-height:1.5}
     .niveau-modules li::before{content:'✓';color:var(--accent);font-weight:700;flex-shrink:0}
-    .garantie-badge{display:flex;align-items:center;gap:8px;background:rgba(16,185,129,0.06);border:1px solid rgba(16,185,129,0.2);border-radius:10px;padding:10px 14px;font-size:0.8rem;font-weight:600;color:var(--accent)}
 
     /* CALENDAR */
     .calendar-section{padding:56px 0;background:var(--bg2)}
@@ -254,33 +253,36 @@
         <div class="resultats-grid">
           <div class="resultat-card">
             <div class="resultat-level">Après IA Essentiel</div>
-            <h4>Vous maîtrisez les outils IA du quotidien</h4>
+            <h4>Environ 1h30 récupérées chaque jour dès la première semaine</h4>
+            <p style="font-size:0.79rem;font-weight:700;color:var(--primary);margin-bottom:10px;padding:6px 10px;background:rgba(26,60,255,0.05);border-radius:8px;">Environ 30h récupérées par mois · Payé sur lui-même en moins d'un mois</p>
             <ul class="resultat-list">
-              <li>Rédiger des prompts qui produisent des résultats fiables à chaque fois</li>
+              <li>Rédiger des prompts fiables sur vos propres cas, sans recommencer dix fois</li>
               <li>Combiner ChatGPT, Claude et Canva IA sur une même tâche</li>
-              <li>Automatiser la transcription de vos réunions sans coder</li>
-              <li>Avoir une bibliothèque de 10 prompts testés sur vos vrais cas</li>
+              <li>Transcrire vos réunions automatiquement, zéro prise de notes</li>
+              <li>Partir avec 10 prompts testés utilisables dès le lendemain</li>
               <li>Appliquer une routine IA dans votre semaine type</li>
             </ul>
           </div>
           <div class="resultat-card">
             <div class="resultat-level">Après IA Pro M1 · Automatisation</div>
-            <h4>Vos workflows tournent sans vous</h4>
+            <h4>10h économisées par semaine, sans toucher votre planning</h4>
+            <p style="font-size:0.79rem;font-weight:700;color:var(--primary);margin-bottom:10px;padding:6px 10px;background:rgba(26,60,255,0.05);border-radius:8px;">Environ 40h économisées par mois · Payé sur lui-même dès le premier mois</p>
             <ul class="resultat-list">
-              <li>Créer un workflow n8n qui répond automatiquement à vos emails entrants</li>
-              <li>Automatiser vos relances commerciales sans y penser</li>
-              <li>Déployer un chatbot FAQ sur votre site en moins d'une journée</li>
-              <li>Repartir avec un workflow opérationnel qui tourne dès le soir</li>
+              <li>Votre workflow répond automatiquement à vos emails entrants</li>
+              <li>Vos relances commerciales partent seules, vous n'y pensez plus</li>
+              <li>Votre chatbot FAQ répond à vos clients 24h/24</li>
+              <li>Vous repartez avec un workflow opérationnel qui tourne dès le soir</li>
             </ul>
           </div>
           <div class="resultat-card">
             <div class="resultat-level">Après IA Pro M3 · Contenus visuels</div>
-            <h4>Vous produisez du contenu pro sans graphiste</h4>
+            <h4>Ce qui prenait une journée avec un graphiste prend maintenant 30 minutes</h4>
+            <p style="font-size:0.79rem;font-weight:700;color:var(--primary);margin-bottom:10px;padding:6px 10px;background:rgba(26,60,255,0.05);border-radius:8px;">Entre 500 et 1 500 € économisés par mois par rapport à un graphiste</p>
             <ul class="resultat-list">
-              <li>Créer votre calendrier éditorial LinkedIn complet avec l'IA</li>
-              <li>Générer des visuels à votre charte en 5 minutes avec Canva IA</li>
-              <li>Produire une présentation commerciale depuis un brief en 10 min</li>
-              <li>Repartir avec 5 visuels prêts à publier</li>
+              <li>Votre calendrier éditorial LinkedIn d'un mois généré en 15 minutes</li>
+              <li>Visuels à votre charte créés en 5 min avec Canva IA</li>
+              <li>Présentation commerciale depuis un brief en 10 min avec Gamma</li>
+              <li>5 visuels prêts à publier à la fin de la formation</li>
             </ul>
           </div>
         </div>
@@ -314,10 +316,6 @@
               <li>Bibliothèque de 10 prompts personnels testés</li>
               <li>Routine IA pour votre semaine type</li>
             </ul>
-            <div class="garantie-badge">
-              <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
-              Si à la fin du Jour 1 la formation ne vous convient pas, on vous rembourse.
-            </div>
             <button class="btn btn-accent" onclick="openModal('essentiel')">S'inscrire à une session <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg></button>
           </div>
 
@@ -325,7 +323,7 @@
             <div class="niveau-badge badge-blue">Niveau 2 · Prérequis : Niveau 1</div>
             <h3>IA Pro</h3>
             <p class="niveau-sub">Faites travailler l'IA à votre place</p>
-            <p>3 modules indépendants au choix. Vous choisissez selon vos priorités. Pas besoin de faire les 3 — un seul module suffit pour repartir opérationnel.</p>
+            <p>3 modules indépendants au choix. Vous choisissez selon vos priorités. Pas besoin de faire les 3 : un seul module suffit pour repartir opérationnel.</p>
             <div class="niveau-details">
               <span class="niveau-detail">16h · 2 jours</span>
               <span class="niveau-detail">Visio live</span>
@@ -338,11 +336,7 @@
               <li><strong>M2 Agents IA :</strong> n8n + appels API, agents autonomes</li>
               <li><strong>M3 Contenus visuels :</strong> Canva IA, Gemini, Firefly, Gamma, Copilot</li>
             </ul>
-            <p style="font-size:0.82rem;color:var(--muted);background:rgba(26,60,255,0.04);border-radius:8px;padding:10px 12px;border-left:3px solid rgba(26,60,255,0.2);">Pas encore fait le Niveau 1 ? Commencez par IA Essentiel — c'est la bonne porte d'entrée.</p>
-            <div class="garantie-badge">
-              <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
-              Si à la fin du Jour 1 la formation ne vous convient pas, on vous rembourse.
-            </div>
+            <p style="font-size:0.82rem;color:var(--muted);background:rgba(26,60,255,0.04);border-radius:8px;padding:10px 12px;border-left:3px solid rgba(26,60,255,0.2);">Pas encore fait le Niveau 1 ? Commencez par IA Essentiel : c'est la bonne porte d'entrée.</p>
             <button class="btn btn-primary" onclick="openModal('pro')">S'inscrire à une session <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg></button>
           </div>
 
@@ -540,12 +534,9 @@
         </details>
         <details>
           <summary>Que se passe-t-il après mon inscription en ligne ?<svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></summary>
-          <div class="faq-answer">Vous recevez un email de confirmation sous 24h avec le lien de visio, les instructions de connexion et les informations sur le financement si vous l'avez demandé. Aucun paiement n'est demandé au moment de l'inscription en ligne — la convention de formation et le règlement se font avant le démarrage de la session.</div>
+          <div class="faq-answer">Vous recevez un email de confirmation sous 24h avec le lien de visio, les instructions de connexion et les informations sur le financement si vous l'avez demandé. Le paiement intégral est requis avant le démarrage de la session, par virement ou carte. Pour les financements FAF/OPCO, le dossier doit être déposé minimum 15 jours avant. On vous envoie la convention et les instructions de règlement sous 24h après confirmation de votre inscription.</div>
         </details>
-        <details>
-          <summary>En quoi consiste la garantie remboursement J+1 ?<svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></summary>
-          <div class="faq-answer">Si à la fin de la première journée de formation vous estimez que le contenu ne correspond pas à ce qui était annoncé, vous pouvez demander un remboursement intégral. Aucune justification requise. Valable pour les paiements directs — pour les financements FAF/OPCO, les conditions de remboursement dépendent de l'organisme financeur.</div>
-        </details>
+        
         <details>
           <summary>Quels outils faut-il avoir pour suivre la formation ?<svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></summary>
           <div class="faq-answer">Un ordinateur avec connexion internet. Tous les outils utilisés sont accessibles gratuitement ou en version d'essai. Aucune installation complexe, aucun prérequis technique pour le Niveau 1.</div>
@@ -653,7 +644,7 @@
           </select>
         </div>
         <button type="submit" class="btn btn-accent" style="width:100%;justify-content:center;">Confirmer mon inscription</button>
-        <p style="font-size:0.72rem;color:var(--muted);text-align:center;">Aucun paiement maintenant. Convention de formation envoyée après confirmation.</p>
+        <p style="font-size:0.72rem;color:var(--muted);text-align:center;">Aucun paiement à l'inscription. Convention et instructions de règlement envoyées sous 24h. Paiement complet requis avant le démarrage de la session.</p>
       </form>
     </div>
   </div>
