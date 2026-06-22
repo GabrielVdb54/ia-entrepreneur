@@ -13,6 +13,65 @@
   <meta property="og:url" content="https://ia-entrepreneur.fr/integrations-ia.html" />
   <meta property="og:type" content="website" />
   <link rel="icon" type="image/png" href="/favicon.png" />
+
+  <!-- Schema FAQPage -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "Combien coûte l'installation d'un chatbot IA sur mon site ?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Le prix d'une intégration chatbot IA clé en main dépend de la complexité : scénarios simples (FAQ, qualification de leads, prise de rendez-vous) à partir de 900 € HT, chatbots multicanaux avec connexion CRM ou base de données sur devis. Le paiement est disponible en 3 fois sans frais. Tous les bugs sont inclus sans limite de temps après installation."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Combien de temps faut-il pour installer l'IA dans mon entreprise ?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "48 heures à compter de la validation du devis pour les intégrations standard : chatbot client, réponse email automatique, génération de contenu SEO. Pour les automatisations sur mesure (connexions CRM, outils métiers spécifiques), nous précisons le délai avant toute signature."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Est-ce que ça marche avec mon site Wordpress, Wix ou Shopify ?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Oui pour la majorité des CMS courants. Le chatbot s'intègre via un simple script à coller dans votre site : Wordpress, Wix, Shopify, Webflow, site statique. La compatibilité est vérifiée lors de l'appel gratuit de 15 min avant tout engagement."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Que se passe-t-il si ça ne fonctionne pas comme prévu ?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Les bugs sont inclus dans l'installation, sans limite de temps. Si l'outil ne se comporte pas comme prévu après la mise en production, on corrige sans facturer. Vous recevez une démonstration complète avant le lancement et vous validez avant que ça parte en production."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Y a-t-il des coûts cachés en plus du prix affiché ?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Un seul coût à prévoir en plus : les abonnements aux outils utilisés par votre intégration (API Claude ou GPT, n8n Cloud). En général entre 30 et 100 €/mois selon le volume. Ce montant est détaillé avant toute signature."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Dois-je gérer la technique après l'installation ?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Non. Vous êtes formé en 30 minutes pour superviser l'outil, mais vous ne touchez pas au code, aux API ou aux configurations. Si quelque chose change (mise à jour d'un outil, évolution de l'IA), nous nous en occupons. Vous gérez votre métier, pas la technique."
+        }
+      }
+    ]
+  }
+  </script>
+
   <script>
     window.addEventListener('load', function() {
       var s = document.createElement('script'); s.async = true;
@@ -796,6 +855,16 @@
       <div class="section-label">Questions fréquentes</div>
       <h2 class="section-title">Les vraies questions qu'on nous pose</h2>
       <div style="display:flex;flex-direction:column;gap:12px;margin-top:40px;max-width:800px;">
+
+        <details style="background:#fff;border:1px solid var(--border);border-radius:12px;overflow:hidden;">
+          <summary style="padding:20px 24px;font-size:0.95rem;font-weight:700;cursor:pointer;list-style:none;display:flex;justify-content:space-between;align-items:center;">
+            Combien coûte l'installation d'une intégration IA ?
+            <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg>
+          </summary>
+          <div style="padding:0 24px 20px;font-size:0.9rem;color:var(--muted);line-height:1.8;">
+            Les intégrations standard (chatbot client, réponse email automatique, génération de contenu SEO) sont disponibles à partir de 900 € HT, paiement en 3 fois sans frais. Le prix exact dépend du nombre de scénarios et de la connexion à vos outils existants. On vous envoie un devis précis sous 24h après l'appel de 15 minutes.
+          </div>
+        </details>
 
         <details style="background:#fff;border:1px solid var(--border);border-radius:12px;overflow:hidden;">
           <summary style="padding:20px 24px;font-size:0.95rem;font-weight:700;cursor:pointer;list-style:none;display:flex;justify-content:space-between;align-items:center;">
