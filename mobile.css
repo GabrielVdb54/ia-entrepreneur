@@ -58,7 +58,8 @@
   /* ════════════════════════════════════════════
      HERO SECTIONS — réduction des paddings
      ════════════════════════════════════════════ */
-  .page-hero {
+  .page-hero,
+  .hero-apropos {
     padding-top: 36px !important;
     padding-bottom: 28px !important;
   }
