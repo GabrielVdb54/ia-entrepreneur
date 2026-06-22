@@ -200,8 +200,18 @@
       .concerne-grid{grid-template-columns:1fr}
       .form-row{grid-template-columns:1fr}
       .cta-inner{padding:36px 24px}
+      /* Hero padding mobile */
+      .page-hero{padding:36px 0 28px!important}
+      /* Stats row 1 col */
+      .stats-row{grid-template-columns:1fr!important;gap:16px!important}
+      .stat-num{font-size:1.8rem!important}
+      /* Timeline dot size */
+      .timeline-dot{width:44px!important;height:44px!important;font-size:0.95rem!important}
+      /* Offre features */
+      .offre-inner{gap:28px!important}
     }
   </style>
+  <link rel="stylesheet" href="/mobile.css" />
 </head>
 <body>
 
@@ -580,5 +590,14 @@
       }
     }
   </script>
+
+  <!-- Sticky CTA mobile -->
+  <div class="mobile-sticky-cta" id="mobileStickyBar">
+    <a href="https://calendly.com/gabriel-ia-entrepreneur/decouverte" target="_blank" rel="noopener noreferrer" class="mobile-sticky-cta-link">
+      <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+      Réserver un appel gratuit
+    </a>
+    <button class="mobile-sticky-cta-close" onclick="this.closest('.mobile-sticky-cta').style.display='none';document.body.style.paddingBottom='0';" aria-label="Fermer">✕</button>
+  </div>
 </body>
 </html>

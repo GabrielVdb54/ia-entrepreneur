@@ -1,0 +1,273 @@
+/*
+ * mobile.css — ia-entrepreneur.fr
+ * Optimisations responsive mobile, chargé après les styles inline de chaque page.
+ * Cibles : 768px (mobile), 480px (petits mobiles)
+ */
+
+/* ════════════════════════════════════════════
+   STICKY CTA BAR — visible uniquement mobile
+   ════════════════════════════════════════════ */
+.mobile-sticky-cta { display: none; }
+
+@media (max-width: 768px) {
+
+  .mobile-sticky-cta {
+    display: flex;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 500;
+    background: #10B981;
+    box-shadow: 0 -3px 20px rgba(16,185,129,0.30);
+    border-top: 1px solid rgba(255,255,255,0.18);
+    align-items: stretch;
+  }
+  .mobile-sticky-cta-link {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 15px 14px;
+    color: #fff;
+    font-family: 'Inter','Plus Jakarta Sans',sans-serif;
+    font-weight: 700;
+    font-size: 0.92rem;
+    text-decoration: none;
+    letter-spacing: -0.01em;
+  }
+  .mobile-sticky-cta-close {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 48px;
+    flex-shrink: 0;
+    background: rgba(0,0,0,0.12);
+    border: none;
+    border-left: 1px solid rgba(255,255,255,0.2);
+    color: rgba(255,255,255,0.75);
+    font-size: 0.95rem;
+    cursor: pointer;
+    font-family: inherit;
+  }
+
+  /* Espace pour la barre sticky */
+  body { padding-bottom: 58px !important; }
+
+  /* ════════════════════════════════════════════
+     HERO SECTIONS — réduction des paddings
+     ════════════════════════════════════════════ */
+  .page-hero {
+    padding-top: 36px !important;
+    padding-bottom: 28px !important;
+  }
+  .hero-badge {
+    font-size: 0.71rem !important;
+    padding: 5px 11px !important;
+    margin-bottom: 12px !important;
+    white-space: normal !important;
+  }
+
+  /* Bannière financement — évite le débordement */
+  .financement-banner {
+    white-space: normal !important;
+    font-size: 0.74rem !important;
+    padding: 7px 12px !important;
+    display: flex !important;
+    flex-wrap: wrap !important;
+    line-height: 1.5 !important;
+  }
+
+  /* ════════════════════════════════════════════
+     HERO TABS (formations-entreprises)
+     ════════════════════════════════════════════ */
+  .hero-tabs {
+    flex-direction: column !important;
+    gap: 8px !important;
+    width: 100% !important;
+  }
+  .hero-tab {
+    width: 100% !important;
+    text-align: center !important;
+    justify-content: center !important;
+    padding: 14px 16px !important;
+    font-size: 0.88rem !important;
+  }
+
+  /* ════════════════════════════════════════════
+     GROUPES DE CTA HERO — full-width
+     ════════════════════════════════════════════ */
+  .hero-ctas {
+    flex-direction: column !important;
+    gap: 10px !important;
+    width: 100% !important;
+  }
+  .hero-ctas .btn,
+  .hero-ctas a {
+    width: 100% !important;
+    justify-content: center !important;
+    text-align: center !important;
+    box-sizing: border-box !important;
+  }
+
+  /* ════════════════════════════════════════════
+     iOS ZOOM FIX — inputs min 16px
+     ════════════════════════════════════════════ */
+  .form-group input,
+  .form-group select,
+  .form-group textarea,
+  input[type="text"],
+  input[type="email"],
+  input[type="tel"],
+  select,
+  textarea {
+    font-size: 16px !important;
+    min-height: 44px !important;
+  }
+
+  /* ════════════════════════════════════════════
+     BLOCS CTA FINAUX
+     ════════════════════════════════════════════ */
+  .cta-inner {
+    padding: 32px 20px !important;
+    border-radius: 16px !important;
+  }
+  .cta-inner h2 {
+    font-size: clamp(1.2rem, 6vw, 1.5rem) !important;
+    line-height: 1.3 !important;
+    margin-bottom: 10px !important;
+  }
+  .cta-inner p {
+    font-size: 0.88rem !important;
+  }
+  .cta-inner .btn,
+  .cta-inner a.btn,
+  .cta-inner > a[href] {
+    width: 100% !important;
+    justify-content: center !important;
+    box-sizing: border-box !important;
+  }
+  .cta-note {
+    font-size: 0.68rem !important;
+    margin-top: 10px !important;
+  }
+
+  /* ════════════════════════════════════════════
+     ESPACEMENTS SECTIONS COMMUNES
+     ════════════════════════════════════════════ */
+  .niveaux-section,
+  .resultats-section,
+  .calendar-section,
+  .waiting-section,
+  .financement-section,
+  .entreprises-section,
+  .faq-section,
+  .cta-section,
+  .timeline-section,
+  .concerne-section,
+  .offre-section {
+    padding-top: 40px !important;
+    padding-bottom: 40px !important;
+  }
+
+  /* ════════════════════════════════════════════
+     FAQ
+     ════════════════════════════════════════════ */
+  details summary {
+    font-size: 0.86rem !important;
+    padding: 14px 16px !important;
+    gap: 10px !important;
+    line-height: 1.4 !important;
+  }
+  .faq-answer {
+    padding: 0 16px 14px !important;
+    font-size: 0.84rem !important;
+  }
+
+  /* ════════════════════════════════════════════
+     CARTES PROGRAMME
+     ════════════════════════════════════════════ */
+  .niveau-card {
+    padding: 22px 18px !important;
+    gap: 12px !important;
+  }
+  .niveau-price {
+    font-size: 1.3rem !important;
+  }
+  .niveau-details {
+    gap: 4px !important;
+  }
+  .niveau-detail {
+    font-size: 0.7rem !important;
+  }
+
+  /* ════════════════════════════════════════════
+     SECTION HEADER (label + titre + sous-titre)
+     ════════════════════════════════════════════ */
+  .section-title {
+    font-size: clamp(1.35rem, 6vw, 1.75rem) !important;
+    line-height: 1.25 !important;
+  }
+  .section-sub {
+    font-size: 0.88rem !important;
+  }
+
+  /* ════════════════════════════════════════════
+     BOUTON RETOUR EN HAUT
+     ════════════════════════════════════════════ */
+  #back-top {
+    bottom: 70px !important;
+    right: 14px !important;
+  }
+
+  /* ════════════════════════════════════════════
+     ENCARTS MAILLAGE (border-left vert)
+     ════════════════════════════════════════════ */
+  [style*="border-left:4px solid #10B981"][style*="display:flex"],
+  [style*="border-left:4px solid var(--accent)"][style*="display:flex"] {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 14px !important;
+  }
+  [style*="border-left:4px solid #10B981"] a[style*="background:#10B981"],
+  [style*="border-left:4px solid var(--accent)"] a[style*="background:#10B981"],
+  [style*="border-left:4px solid var(--accent)"] a[style*="background:var(--primary)"] {
+    width: 100% !important;
+    text-align: center !important;
+    justify-content: center !important;
+    box-sizing: border-box !important;
+  }
+
+  /* ════════════════════════════════════════════
+     WAITING / DEVIS FORMS (intérieur)
+     ════════════════════════════════════════════ */
+  .waiting-inner,
+  .devis-form {
+    padding: 24px 18px !important;
+  }
+}
+
+/* ════════════════════════════════════════════
+   480px — petits mobiles
+   ════════════════════════════════════════════ */
+@media (max-width: 480px) {
+  .mobile-sticky-cta-link {
+    font-size: 0.86rem;
+    padding: 14px 10px;
+  }
+  .container {
+    padding-left: 14px !important;
+    padding-right: 14px !important;
+  }
+  .cta-inner {
+    padding: 26px 14px !important;
+  }
+  .page-hero {
+    padding-top: 28px !important;
+    padding-bottom: 20px !important;
+  }
+  .niveau-card {
+    padding: 18px 14px !important;
+  }
+}
