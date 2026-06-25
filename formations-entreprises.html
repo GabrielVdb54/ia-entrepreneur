@@ -14,6 +14,9 @@
   <meta property="og:image" content="https://ia-entrepreneur.fr/images/formation-2.jpg" />
   <meta property="og:url" content="https://ia-entrepreneur.fr/formations-entreprises.html" />
   <link rel="icon" type="image/png" href="/favicon.png" />
+  <!-- Google Ads conversion tracking -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=AW-18076082295"></script>
+  <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','AW-18076082295');</script>
   <!-- Schema FAQPage · questions à forte intention d'achat -->
   <script type="application/ld+json">
   {
@@ -1030,6 +1033,7 @@
       btn.textContent = 'Envoi en cours...'; btn.disabled = true;
       try {
         await fetch(form.action, {method:'POST', body:new FormData(form), headers:{Accept:'application/json'}});
+        if (typeof gtag === 'function') { gtag('event', 'conversion', {'send_to': 'AW-18076082295/zkV0CPrKmcUcEPfArKtD'}); }
         document.getElementById('modal-form').style.display = 'none';
         document.getElementById('modal-success').style.display = 'block';
       } catch(err) {
@@ -1043,6 +1047,7 @@
       btn.textContent = 'Envoi...'; btn.disabled = true;
       try {
         await fetch(form.action, {method:'POST', body:new FormData(form), headers:{Accept:'application/json'}});
+        if (typeof gtag === 'function') { gtag('event', 'conversion', {'send_to': 'AW-18076082295/zkV0CPrKmcUcEPfArKtD'}); }
         document.getElementById('waiting-success').style.display = 'block';
         form.reset(); btn.textContent = 'Me prévenir en priorité'; btn.disabled = false;
       } catch(err) {
@@ -1056,6 +1061,7 @@
       btn.textContent = 'Envoi...'; btn.disabled = true;
       try {
         await fetch(form.action, {method:'POST', body:new FormData(form), headers:{Accept:'application/json'}});
+        if (typeof gtag === 'function') { gtag('event', 'conversion', {'send_to': 'AW-18076082295/zkV0CPrKmcUcEPfArKtD'}); }
         document.getElementById('devis-success').style.display = 'block';
         form.reset(); btn.textContent = 'Envoyer ma demande de devis'; btn.disabled = false;
       } catch(err) {
