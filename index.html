@@ -290,19 +290,22 @@
       align-items: center;
       justify-content: space-between;
       height: 70px;
+      gap: 16px;
     }
     .logo {
-      font-size: 1.3rem;
+      font-size: 1rem;
       font-weight: 800;
-      letter-spacing: -0.03em;
+      letter-spacing: -0.02em;
+      flex-shrink: 0;
+      line-height: 1.2;
     }
     .logo span { color: var(--accent); }
 
-    nav { display: flex; align-items: center; gap: 4px; }
+    nav { display: flex; align-items: center; gap: 2px; }
     nav a {
-      padding: 7px 12px;
-      border-radius: 50px;
-      font-size: 0.84rem;
+      padding: 6px 10px;
+      border-radius: 8px;
+      font-size: 0.78rem;
       font-weight: 600;
       color: var(--muted);
       transition: color 0.2s, background 0.2s;
