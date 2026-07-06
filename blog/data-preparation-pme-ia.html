@@ -32,7 +32,7 @@
 .article-body tr:nth-child(even) td{background:var(--bg2)}
     :root{--bg:#FFFFFF;--bg2:#F5F7FF;--primary:#1A3CFF;--accent:#10B981;--text:#0A0F2C;--muted:#525880;--border:rgba(10,15,44,0.10);--card:rgba(10,15,44,0.04);--radius:14px}
     *{margin:0;padding:0;box-sizing:border-box}html{scroll-behavior:smooth}
-    body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);line-height:1.7}
+    body{overflow-x:hidden;font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);line-height:1.7}
     a{color:inherit;text-decoration:none}
     .container{max-width:1120px;margin:0 auto;padding:0 24px}
     header{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(255,255,255,0.92);backdrop-filter:blur(18px);border-bottom:1px solid var(--border);box-shadow:0 2px 24px rgba(10,15,44,0.06)}
@@ -184,7 +184,7 @@
 <h2>Quels outils pour un entrepreneur qui démarre avec la data preparation ?</h2>
 <p>La bonne nouvelle, c'est que vous n'avez pas besoin d'investir des milliers d'euros dans des <a href="/blog/ia-embarquee-logiciels-entreprise.html">logiciels</a> complexes. Les outils que vous utilisez probablement déjà sont très puissants pour commencer.</p>
 <h3>Tableau comparatif des outils de préparation de données pour TPE/PME</h3>
-<table style="width:100%;border-collapse:collapse;">
+<div style="overflow-x:auto;-webkit-overflow-scrolling:touch;margin:24px 0"><table style="width:100%;border-collapse:collapse;">
   <thead>
     <tr style="background-color:rgba(26,60,255,0.05);">
       <th style="padding:12px;border:1px solid #ddd;text-align:left;">Outil</th>
@@ -213,7 +213,7 @@
       <td style="padding:12px;border:1px solid #ddd;">Coût mensuel, moins adapté pour un grand nettoyage ponctuel.</td>
     </tr>
   </tbody>
-</table>
+</table></div>
 <p>Le conseil pour bien démarrer est simple : commencez avec ce que vous connaissez. Maîtrisez la suppression des doublons, les fonctions `SUPPRESPACE` (TRIM) pour enlever les espaces superflus, et les `RECHERCHEV` (VLOOKUP) dans votre tableur. C'est déjà un pas de géant vers des données de meilleure qualité.</p>
 
 <h2>FAQ : Vos questions sur la préparation de données</h2>

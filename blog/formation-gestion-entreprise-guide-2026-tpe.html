@@ -31,7 +31,7 @@
 .article-body tr:nth-child(even) td{background:var(--bg2)}
     :root{--bg:#FFFFFF;--bg2:#F5F7FF;--primary:#1A3CFF;--accent:#10B981;--text:#0A0F2C;--muted:#525880;--border:rgba(10,15,44,0.10);--card:rgba(10,15,44,0.04);--radius:14px}
     *{margin:0;padding:0;box-sizing:border-box}html{scroll-behavior:smooth}
-    body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);line-height:1.7}
+    body{overflow-x:hidden;font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);line-height:1.7}
     a{color:inherit;text-decoration:none}
     .container{max-width:1120px;margin:0 auto;padding:0 24px}
     header{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(255,255,255,0.92);backdrop-filter:blur(18px);border-bottom:1px solid var(--border);box-shadow:0 2px 24px rgba(10,15,44,0.06)}
@@ -174,7 +174,7 @@
 <h2>Comparatif : 4 profils de formation en gestion pour TPE/PME</h2>
 <p>Pour illustrer notre propos, voici un tableau comparatif de quatre archétypes de formations en gestion que vous pourriez trouver sur le marché en 2026. Cela vous aidera à mieux situer les offres que vous rencontrerez.</p>
 
-<table style="width:100%;border-collapse:collapse;">
+<div style="overflow-x:auto;-webkit-overflow-scrolling:touch;margin:24px 0"><table style="width:100%;border-collapse:collapse;">
 <thead>
 <tr style="background-color:#f4f5f7;">
 <th style="border:1px solid #ddd;padding:12px;text-align:left;">Type de formation</th>
@@ -209,7 +209,7 @@
 <td style="border:1px solid #ddd;padding:12px;">Nécessite une certaine maturité sur les fondamentaux de la gestion. Moins adapté aux débutants complets.</td>
 </tr>
 </tbody>
-</table>
+</table></div>
 
 <p>Prenons l'exemple de Sophie, qui dirige une agence de communication de 5 personnes à Bordeaux. Son problème n'est pas la finance, qu'elle suit de près, mais le fait de passer son temps à gérer les urgences de son équipe. Pour elle, une formation de type "Le Spécialiste Management" serait bien plus pertinente qu'un parcours 360° qui reprendrait des bases qu'elle maîtrise déjà. A l'inverse, un artisan qui se lance seul aura tout intérêt à suivre un parcours "Fondamental" ou "360°" pour acquérir une vision complète.</p>
 
