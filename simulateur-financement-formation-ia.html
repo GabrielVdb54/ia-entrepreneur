@@ -27,6 +27,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="/mobile.css"/>
 
 <style>
   *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
@@ -270,7 +271,6 @@
     .sim-page .ob-links{flex-direction:column}
   }
 </style>
-<link rel="stylesheet" href="/mobile.css"/>
 </head>
 <body>
 
@@ -613,8 +613,9 @@
 </footer>
 
 <script>
-  var h=document.getElementById('hamburger'),m=document.getElementById('mobile-menu');
-  if(h&&m){h.addEventListener('click',function(){h.classList.toggle('open');m.classList.toggle('open');});}
+  var h = document.getElementById('hamburger');
+  var m = document.getElementById('mobile-menu');
+  h.addEventListener('click', function(){ h.classList.toggle('open'); m.classList.toggle('open'); });
 </script>
 
 <script>

@@ -292,7 +292,7 @@
   </footer>
   <script>
     var h=document.getElementById('hamburger'),m=document.getElementById('mobile-menu');
-    if(h&&m)h.addEventListener('click',function(){h.classList.toggle('open');m.classList.toggle('open');});
+    if(h)h.addEventListener('click',function(){h.classList.toggle('open');m.classList.toggle('open');});
     m&&m.querySelectorAll('a').forEach(function(l){l.addEventListener('click',function(){h.classList.remove('open');m.classList.remove('open');});});
   </script>
   <div class="mobile-sticky-cta" id="mobileStickyBar">

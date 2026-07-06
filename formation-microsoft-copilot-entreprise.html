@@ -70,6 +70,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="/mobile.css"/>
 <style>
   *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
   :root{--bg:#FFFFFF;--bg2:#F5F7FF;--primary:#1A3CFF;--accent:#10B981;--text:#0A0F2C;--muted:#525880;--border:rgba(10,15,44,0.10);--card:rgba(10,15,44,0.04);--radius:14px}
@@ -166,7 +167,6 @@
   }
   @media(max-width:480px){.container{padding:0 16px}.financement-grid{grid-template-columns:1fr}}
 </style>
-<link rel="stylesheet" href="/mobile.css"/>
 </head>
 <body>
 
@@ -443,8 +443,9 @@
 </footer>
 
 <script>
-  var h=document.getElementById('hamburger'),m=document.getElementById('mobile-menu');
-  if(h&&m){h.addEventListener('click',function(){h.classList.toggle('open');m.classList.toggle('open');});}
+  var h = document.getElementById('hamburger');
+  var m = document.getElementById('mobile-menu');
+  h.addEventListener('click', function(){ h.classList.toggle('open'); m.classList.toggle('open'); });
 </script>
 
 <div class="mobile-sticky-cta" id="mobileStickyBar">

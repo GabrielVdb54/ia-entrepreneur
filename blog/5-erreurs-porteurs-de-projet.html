@@ -605,8 +605,10 @@
     </div>
   </footer>
   <script>
-    const hamburger=document.getElementById('hamburger'),mobileMenu=document.getElementById('mobile-menu');
-  if(hamburger&&mobileMenu){hamburger.addEventListener('click',()=>{hamburger.classList.toggle('open');mobileMenu.classList.toggle('open');});mobileMenu.querySelectorAll('a').forEach(link => { link.addEventListener('click', () => { hamburger.classList.remove('open');} mobileMenu.classList.remove('open'); }); });
+    const hamburger = document.getElementById('hamburger');
+    const mobileMenu = document.getElementById('mobile-menu');
+    hamburger.addEventListener('click', () => { hamburger.classList.toggle('open'); mobileMenu.classList.toggle('open'); });
+    mobileMenu.querySelectorAll('a').forEach(link => { link.addEventListener('click', () => { hamburger.classList.remove('open'); mobileMenu.classList.remove('open'); }); });
   </script>
   <div class="mobile-sticky-cta" id="mobileStickyBar">
     <a href="https://calendly.com/gabriel-ia-entrepreneur/decouverte" target="_blank" rel="noopener noreferrer" class="mobile-sticky-cta-link">
