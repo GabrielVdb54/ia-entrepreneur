@@ -17,7 +17,7 @@
    ════════════════════════════════════════════ */
 @media (max-width: 900px) {
   nav { display: none !important; }
-  .hamburger { display: flex !important; }
+  .hamburger { display: flex !important; margin-left: auto !important; }
 
   /* Hero homepage 2-col → 1-col quand nav hamburger */
   .hero-layout {

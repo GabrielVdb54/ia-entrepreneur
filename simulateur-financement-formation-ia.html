@@ -263,12 +263,13 @@
   .sim-page .privacy{font-size:10px;color:var(--muted2);text-align:center;margin-top:7px}
 
   .sim-page .hidden{display:none!important}
-  @media(max-width:460px){
+  @media(max-width:768px){
     .sim-page .card{padding:20px 14px}
-    .sim-page .col2{grid-template-columns:1fr}
-    .sim-page .cta-pair{grid-template-columns:1fr}
-    .sim-page .ef-grid{grid-template-columns:1fr}
+    .sim-page .col2{grid-template-columns:1fr!important}
+    .sim-page .cta-pair{grid-template-columns:1fr!important}
+    .sim-page .ef-grid{grid-template-columns:1fr!important}
     .sim-page .ob-links{flex-direction:column}
+    .sim-page .choices.col2 button[style*="grid-column"]{grid-column:span 1!important;width:100%}
   }
 </style>
 </head>
