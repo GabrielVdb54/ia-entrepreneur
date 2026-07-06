@@ -1040,10 +1040,8 @@
   </footer>
 
   <script>
-    const hamburger = document.getElementById('hamburger');
-    const mobileMenu = document.getElementById('mobile-menu');
-    hamburger.addEventListener('click', () => { hamburger.classList.toggle('open'); mobileMenu.classList.toggle('open'); });
-    mobileMenu.querySelectorAll('a').forEach(l => l.addEventListener('click', () => { hamburger.classList.remove('open'); mobileMenu.classList.remove('open'); }));
+    const hamburger=document.getElementById('hamburger'),mobileMenu=document.getElementById('mobile-menu');
+  if(hamburger&&mobileMenu){hamburger.addEventListener('click',()=>{hamburger.classList.toggle('open');mobileMenu.classList.toggle('open');});mobileMenu.querySelectorAll('a').forEach(l => l.addEventListener('click', () => { hamburger.classList.remove('open');} mobileMenu.classList.remove('open'); }));
   </script>
 
   <!-- Sticky CTA mobile -->

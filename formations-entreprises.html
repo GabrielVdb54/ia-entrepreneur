@@ -898,7 +898,7 @@
   <script>
     // Nav
     const h=document.getElementById('hamburger'),m=document.getElementById('mobile-menu');
-    h.addEventListener('click',()=>{h.classList.toggle('open');m.classList.toggle('open');});
+  if(h&&m){h.addEventListener('click',()=>{h.classList.toggle('open');m.classList.toggle('open');});}
     m.querySelectorAll('a').forEach(l=>l.addEventListener('click',()=>{h.classList.remove('open');m.classList.remove('open');}));
 
     // Tabs

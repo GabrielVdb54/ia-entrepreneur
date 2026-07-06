@@ -2811,15 +2811,10 @@
     backTop.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
 
     // ── Mobile menu ───────────────────────────────────────────
-    const hamburger = document.getElementById('hamburger');
-    const mobileMenu = document.getElementById('mobile-menu');
-    hamburger.addEventListener('click', () => {
-      hamburger.classList.toggle('open');
-      mobileMenu.classList.toggle('open');
-    });
-    mobileMenu.querySelectorAll('a').forEach(link => {
+    const hamburger=document.getElementById('hamburger'),mobileMenu=document.getElementById('mobile-menu');
+  if(hamburger&&mobileMenu){hamburger.addEventListener('click',()=>{hamburger.classList.toggle('open');mobileMenu.classList.toggle('open');});mobileMenu.querySelectorAll('a').forEach(link => {
       link.addEventListener('click', () => {
-        hamburger.classList.remove('open');
+        hamburger.classList.remove('open');}
         mobileMenu.classList.remove('open');
       });
     });
