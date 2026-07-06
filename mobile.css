@@ -12,11 +12,18 @@
 /* ════════════════════════════════════════════
    900px — tablettes étroites
    On cache la nav et on montre le hamburger
-   dès 900px pour éviter le débordement.
+   dès 900px pour éviter le débordement (8 items).
+   Le hero-layout collapse aussi pour cohérence.
    ════════════════════════════════════════════ */
 @media (max-width: 900px) {
   nav { display: none !important; }
   .hamburger { display: flex !important; }
+
+  /* Hero homepage 2-col → 1-col quand nav hamburger */
+  .hero-layout {
+    grid-template-columns: 1fr !important;
+    gap: 24px !important;
+  }
 }
 
 /* ════════════════════════════════════════════
@@ -24,7 +31,9 @@
    ════════════════════════════════════════════ */
 @media (max-width: 768px) {
 
-  /* Barre sticky CTA verte */
+  /* ════════════════════════════════════════════
+     STICKY CTA BAR — visible uniquement mobile
+     ════════════════════════════════════════════ */
   .mobile-sticky-cta {
     display: flex;
     position: fixed;
@@ -234,6 +243,7 @@
   #back-top {
     bottom: 70px !important;
     right: 14px !important;
+    z-index: 499 !important;
   }
 
   /* ════════════════════════════════════════════
@@ -297,6 +307,37 @@
     height: auto;
   }
 
+  /* ════════════════════════════════════════════
+     SIMULATEUR — grilles choix en 1 colonne
+     (.col2 couvre 461-767px phones non capturés
+     par le breakpoint interne à 460px)
+     ════════════════════════════════════════════ */
+  .sim-page .col2,
+  .sim-page .cta-pair,
+  .sim-page .ef-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* ════════════════════════════════════════════
+     TABLEAUX — cellules compactes sur mobile
+     ════════════════════════════════════════════ */
+  table th,
+  table td {
+    padding: 8px 10px !important;
+    font-size: 0.8rem !important;
+    line-height: 1.4 !important;
+  }
+
+  /* ════════════════════════════════════════════
+     FOOTER — touch targets 44px minimum
+     ════════════════════════════════════════════ */
+  .footer-links a {
+    padding: 10px 8px !important;
+    min-height: 44px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+  }
+
 }
 
 /* ════════════════════════════════════════════
@@ -336,5 +377,16 @@
   /* Titre article adapté */
   .article-title {
     font-size: 1.4rem !important;
+  }
+
+  /* Footer links pleine largeur sur très petits écrans */
+  .footer-links {
+    flex-direction: column !important;
+    gap: 0 !important;
+  }
+  .footer-links a {
+    width: 100% !important;
+    padding: 10px 0 !important;
+    border-bottom: 1px solid rgba(10,15,44,0.06) !important;
   }
 }
