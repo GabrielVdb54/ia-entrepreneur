@@ -1,16 +1,30 @@
 /*
  * mobile.css — ia-entrepreneur.fr
  * Optimisations responsive mobile, chargé après les styles inline de chaque page.
- * Cibles : 768px (mobile), 480px (petits mobiles)
+ * Breakpoints : 900px (tablettes étroites), 768px (mobile), 480px (petits mobiles)
  */
 
 /* ════════════════════════════════════════════
-   STICKY CTA BAR — visible uniquement mobile
+   STICKY CTA BAR — caché par défaut (desktop)
    ════════════════════════════════════════════ */
 .mobile-sticky-cta { display: none; }
 
+/* ════════════════════════════════════════════
+   900px — tablettes étroites
+   On cache la nav et on montre le hamburger
+   dès 900px pour éviter le débordement.
+   ════════════════════════════════════════════ */
+@media (max-width: 900px) {
+  nav { display: none !important; }
+  .hamburger { display: flex !important; }
+}
+
+/* ════════════════════════════════════════════
+   768px — mobile
+   ════════════════════════════════════════════ */
 @media (max-width: 768px) {
 
+  /* Barre sticky CTA verte */
   .mobile-sticky-cta {
     display: flex;
     position: fixed;
@@ -247,16 +261,27 @@
   .devis-form {
     padding: 24px 18px !important;
   }
-}
 
   /* ════════════════════════════════════════════
-     BLOG — boutons CTA footer article
+     BLOG — article hero hauteur
+     ════════════════════════════════════════════ */
+  .article-hero {
+    height: 260px !important;
+  }
+  .article-hero-content {
+    padding: 20px 18px !important;
+  }
+
+  /* ════════════════════════════════════════════
+     BLOG — boutons footer article (stack vertical)
      ════════════════════════════════════════════ */
   .btn-accent {
     margin-left: 0 !important;
   }
-  .article-footer-cta .btn-cta,
-  .article-footer-cta a[href] {
+  .article-footer-cta {
+    padding: 28px 20px !important;
+  }
+  .article-footer-cta .btn-cta {
     display: block !important;
     width: 100% !important;
     text-align: center !important;
@@ -265,14 +290,13 @@
   }
 
   /* ════════════════════════════════════════════
-     ARTICLE HERO — hauteur réduite sur mobile
+     IMAGES — sécurité globale
      ════════════════════════════════════════════ */
-  .article-hero {
-    height: 260px !important;
+  img {
+    max-width: 100% !important;
+    height: auto;
   }
-  .article-hero-content {
-    padding: 20px 18px !important;
-  }
+
 }
 
 /* ════════════════════════════════════════════
@@ -298,12 +322,12 @@
     padding: 18px 14px !important;
   }
 
-  /* Article hero encore plus compact sur petits écrans */
+  /* Article hero compact sur petits écrans */
   .article-hero {
     height: 200px !important;
   }
 
-  /* Grids financement 1 colonne */
+  /* Grids en 1 colonne */
   .financement-grid,
   .pricing-grid {
     grid-template-columns: 1fr !important;
