@@ -264,12 +264,39 @@
 
   .sim-page .hidden{display:none!important}
   @media(max-width:768px){
+    /* Layout général */
+    .sim-page{padding-top:72px}
     .sim-page .card{padding:20px 14px}
+
+    /* Grilles → 1 colonne */
     .sim-page .col2{grid-template-columns:1fr!important}
     .sim-page .cta-pair{grid-template-columns:1fr!important}
     .sim-page .ef-grid{grid-template-columns:1fr!important}
     .sim-page .ob-links{flex-direction:column}
     .sim-page .choices.col2 button[style*="grid-column"]{grid-column:span 1!important;width:100%}
+
+    /* Touch targets : boutons principaux ≥ 48px */
+    .sim-page .btn{padding:15px 18px;min-height:48px;font-size:15px}
+    .sim-page .cta-btn{min-height:56px;padding:16px 12px}
+
+    /* Stepper +/- : 44px minimum */
+    .sim-page .sbtn{width:44px;height:44px;border-radius:10px;font-size:20px}
+
+    /* Choices : plus d'air pour le tap */
+    .sim-page .choice{padding:16px 14px}
+    .sim-page .choice.big{padding:22px 16px}
+
+    /* Résultats : montant principal lisible */
+    .sim-page .ra-range{gap:8px}
+    .sim-page .ra-col.main .amt{font-size:clamp(30px,9vw,44px)}
+    .sim-page .ra-col.sec .amt{font-size:clamp(20px,5vw,30px)}
+  }
+  @media(max-width:480px){
+    .sim-page{padding-top:68px}
+    .sim-page .card{padding:16px 12px}
+    .sim-page .card h2{font-size:16px}
+    .sim-page .pline{width:20px}
+    .sim-page .choices{gap:7px}
   }
 </style>
 </head>
