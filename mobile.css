@@ -249,6 +249,32 @@
   }
 }
 
+  /* ════════════════════════════════════════════
+     BLOG — boutons CTA footer article
+     ════════════════════════════════════════════ */
+  .btn-accent {
+    margin-left: 0 !important;
+  }
+  .article-footer-cta .btn-cta,
+  .article-footer-cta a[href] {
+    display: block !important;
+    width: 100% !important;
+    text-align: center !important;
+    box-sizing: border-box !important;
+    margin: 0 0 10px !important;
+  }
+
+  /* ════════════════════════════════════════════
+     ARTICLE HERO — hauteur réduite sur mobile
+     ════════════════════════════════════════════ */
+  .article-hero {
+    height: 260px !important;
+  }
+  .article-hero-content {
+    padding: 20px 18px !important;
+  }
+}
+
 /* ════════════════════════════════════════════
    480px — petits mobiles
    ════════════════════════════════════════════ */
@@ -270,5 +296,21 @@
   }
   .niveau-card {
     padding: 18px 14px !important;
+  }
+
+  /* Article hero encore plus compact sur petits écrans */
+  .article-hero {
+    height: 200px !important;
+  }
+
+  /* Grids financement 1 colonne */
+  .financement-grid,
+  .pricing-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* Titre article adapté */
+  .article-title {
+    font-size: 1.4rem !important;
   }
 }
