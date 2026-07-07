@@ -273,6 +273,26 @@
   }
   .overlay.open { display: flex; }
 
+  /* ── Search bar ── */
+  .search-wrap{margin-bottom:32px}
+  .search-box{position:relative;max-width:520px;margin:0 auto}
+  .search-box .search-icon{position:absolute;left:16px;top:50%;transform:translateY(-50%);color:var(--text-muted);pointer-events:none}
+  #searchInput{width:100%;padding:13px 44px 13px 46px;border:1.5px solid var(--border);border-radius:50px;font-size:0.95rem;font-family:inherit;color:var(--navy);background:var(--bg);transition:border-color 0.2s;outline:none}
+  #searchInput:focus{border-color:#1A3CFF}
+  #searchInput::placeholder{color:var(--text-muted)}
+  .search-clear{position:absolute;right:14px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--text-muted);font-size:1rem;display:none;padding:4px;line-height:1}
+  .no-results{display:none;flex-direction:column;align-items:center;text-align:center;padding:48px 24px;color:var(--text-muted)}
+  .no-results svg{margin-bottom:14px;opacity:0.35}
+  .no-results p{font-size:0.95rem;margin:0}
+  .no-results strong{color:var(--navy)}
+
+  /* ── Card restructured (photo left + text right in top row) ── */
+  .card-top{display:flex;align-items:center;gap:14px;margin-bottom:14px}
+  .card-top .photo{width:64px;height:64px;border-radius:50%;object-fit:cover;flex-shrink:0;margin-bottom:0}
+  .card-head{flex:1;min-width:0}
+  .card-head h3{margin:0 0 3px;font-size:17px;font-weight:700;color:var(--navy)}
+  .card-head .role{color:var(--blue);font-weight:600;font-size:12px;margin:0;white-space:normal}
+
   .modal {
     background: var(--bg);
     border-radius: 16px;
@@ -358,16 +378,36 @@
     gap: 28px;
     margin-bottom: 24px;
   }
-  @media (max-width: 600px) {
-    .detail-grid { grid-template-columns: 1fr; }
-    .modal { padding: 24px 16px; }
-    .pill { font-size: 11px !important; padding: 4px 8px !important; }
-    .ref-tag { font-size: 11px; padding: 4px 8px; }
-    .stats-row { grid-template-columns: repeat(2, 1fr); }
-    .wrap { padding: 88px 16px 80px; }
-    .modal-header { flex-direction: column; align-items: flex-start; gap: 16px; }
-    .modal-header .identite-row { gap: 14px; }
-    .cta-rappel { font-size: 13px; padding: 9px 16px; }
+  @media (max-width: 768px) {
+    /* Bottom sheet modal */
+    .overlay{align-items:flex-end!important;padding:0!important}
+    .modal{
+      border-radius:20px 20px 0 0!important;
+      max-height:88vh!important;
+      overflow-y:auto!important;
+      padding:8px 20px 40px!important;
+      animation:slideUp 0.28s cubic-bezier(0.32,0.72,0,1)!important;
+      width:100%!important;
+    }
+    @keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+    .modal::before{content:'';display:block;width:36px;height:4px;background:var(--border);border-radius:2px;margin:12px auto 20px}
+    .modal .close{top:16px;right:16px}
+    /* Grid, wrap */
+    .wrap{padding:88px 16px 80px}
+    .grid{grid-template-columns:1fr!important}
+    /* Detail grid */
+    .detail-grid{grid-template-columns:1fr}
+    /* Pills */
+    .pill{font-size:11px!important;padding:4px 10px!important}
+    .ref-tag{font-size:11px;padding:4px 8px}
+    /* Stats */
+    .stats-row{grid-template-columns:repeat(2,1fr)}
+    /* Modal header */
+    .modal-header{flex-direction:column;align-items:flex-start;gap:16px}
+    .modal-header .identite-row{gap:14px}
+    .cta-rappel{font-size:13px;padding:9px 16px}
+    /* Search */
+    #searchInput{font-size:16px;padding:13px 44px 13px 44px}
   }
 
   .detail-block h3 {
@@ -540,6 +580,18 @@
     Une équipe de formateurs et consultants en intelligence artificielle, tous experts praticiens dans leur domaine. Formations Qualiopi finançables OPCO. Cliquez sur un profil pour découvrir les compétences, références et tarifs.
   </p>
 
+  <div class="search-wrap">
+    <div class="search-box">
+      <svg class="search-icon" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <input type="search" id="searchInput" placeholder="Rechercher par nom, compétence, outil…" autocomplete="off" aria-label="Rechercher un formateur">
+      <button id="searchClear" class="search-clear" aria-label="Effacer la recherche">✕</button>
+    </div>
+  </div>
+  <div id="noResults" class="no-results">
+    <svg width="40" height="40" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+    <p>Aucun formateur ne correspond à « <strong id="noResultsQuery"></strong> ».<br><span style="font-size:0.85rem">Essayez "SEO", "Copilot", "vente"…</span></p>
+  </div>
+
   <div class="grid" id="grid"></div>
 
   <div class="card placeholder">
@@ -707,9 +759,13 @@ function renderCards() {
     card.className = 'card';
     if (f.externalUrl) card.href = f.externalUrl;
     card.innerHTML = `
-      <img class="photo" src="${f.photo}" alt="${f.nom}, ${f.role}"${f.photoPosition ? ` style="object-position:${f.photoPosition}"` : ''}>
-      <h3>${f.nom}</h3>
-      <p class="role">${f.role.split(' · ')[0]}</p>
+      <div class="card-top">
+        <img class="photo" src="${f.photo}" alt="${f.nom}"${f.photoPosition ? ` style="object-position:${f.photoPosition}"` : ''}>
+        <div class="card-head">
+          <h3>${f.nom}</h3>
+          <p class="role">${f.role.split(' · ')[0]}</p>
+        </div>
+      </div>
       <p class="pitch">${f.pitch}</p>
       <div class="pills">
         ${f.specialites.map(s => `<span class="pill">${s}</span>`).join('')}
@@ -905,6 +961,47 @@ document.addEventListener('keydown', (e) => {
 renderCards();
 renderProfiles();
 
+// ── Search ──
+const searchInput = document.getElementById('searchInput');
+const searchClear = document.getElementById('searchClear');
+const noResultsEl = document.getElementById('noResults');
+const noResultsQuery = document.getElementById('noResultsQuery');
+const placeholderCard = document.querySelector('.card.placeholder');
+
+function getSearchableText(f) {
+  return [
+    f.nom, f.role, f.pitch, f.bio || '',
+    (f.specialites || []).join(' '),
+    (f.outils || []).join(' '),
+    (f.public || []).join(' '),
+    (f.references || []).join(' '),
+    f.loc || ''
+  ].join(' ').toLowerCase();
+}
+
+const cardEls = Array.from(grid.querySelectorAll('.card:not(.placeholder)'));
+
+searchInput.addEventListener('input', () => {
+  const q = searchInput.value.trim().toLowerCase();
+  searchClear.style.display = q ? 'flex' : 'none';
+  let visible = 0;
+  cardEls.forEach((card, i) => {
+    const matches = !q || getSearchableText(formateurs[i]).includes(q);
+    card.style.display = matches ? '' : 'none';
+    if (matches) visible++;
+  });
+  const noMatch = visible === 0 && q;
+  noResultsEl.style.display = noMatch ? 'flex' : 'none';
+  noResultsQuery.textContent = searchInput.value.trim();
+  if (placeholderCard) placeholderCard.style.display = noMatch ? 'none' : '';
+});
+
+searchClear.addEventListener('click', () => {
+  searchInput.value = '';
+  searchInput.dispatchEvent(new Event('input'));
+  searchInput.focus();
+});
+
 // Si l'URL contient #nom-du-formateur (lien partagé, résultat de recherche), on ouvre
 // directement son profil au chargement.
 if (location.hash) {
@@ -944,19 +1041,18 @@ if (location.hash) {
   </footer>
 
 <script>
-  const h = document.getElementById('hamburger');
-  const m = document.getElementById('mobile-menu');
-  if(h && m){
-    h.addEventListener('click', () => {
+  const h=document.getElementById('hamburger'),m=document.getElementById('mobile-menu');
+  if(h&&m){
+    h.addEventListener('click',()=>{
       h.classList.toggle('open');
       m.classList.toggle('open');
+      document.body.style.overflow=m.classList.contains('open')?'hidden':'';
     });
-    m.querySelectorAll('a').forEach(link => {
-      link.addEventListener('click', () => {
-        h.classList.remove('open');
-        m.classList.remove('open');
-      });
-    });
+    m.querySelectorAll('a').forEach(l=>l.addEventListener('click',()=>{
+      h.classList.remove('open');
+      m.classList.remove('open');
+      document.body.style.overflow='';
+    }));
   }
 </script>
 
