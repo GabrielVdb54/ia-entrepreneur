@@ -22,6 +22,7 @@
 <meta property="og:url" content="https://ia-entrepreneur.fr/nos-formateurs.html">
 <meta property="og:image" content="https://ia-entrepreneur.fr/images/nos-formateurs-og.jpg">
 <meta property="og:locale" content="fr_FR">
+<meta property="og:site_name" content="IA-Entrepreneur">
 <meta name="twitter:card" content="summary_large_image">
 <script type="application/ld+json">
 {
@@ -46,7 +47,7 @@
       "jobTitle": "Fondateur et formateur principal, IA-Entrepreneur",
       "description": "Fondateur d'IA-Entrepreneur et de Clindit, formateur IA, commerce et entrepreneuriat, plus de 1 500 professionnels accompagnés.",
       "image": "https://ia-entrepreneur.fr/images/gabriel-vanderbecken.jpg",
-      "url": "https://ia-entrepreneur.fr/a-propos.html",
+      "url": "https://ia-entrepreneur.fr/apropos.html",
       "knowsAbout": ["Intelligence artificielle appliquée", "Commerce et négociation", "Entrepreneuriat", "Management"],
       "worksFor": { "@type": "Organization", "name": "IA-Entrepreneur" }
     },
@@ -268,7 +269,7 @@
     justify-content: center;
     padding: 48px 16px;
     overflow-y: auto;
-    z-index: 100;
+    z-index: 600;
   }
   .overlay.open { display: flex; }
 
@@ -287,8 +288,8 @@
     right: 20px;
     background: var(--bg-soft);
     border: none;
-    width: 32px;
-    height: 32px;
+    width: 44px;
+    height: 44px;
     border-radius: 50%;
     font-size: 16px;
     color: var(--navy);
@@ -359,7 +360,14 @@
   }
   @media (max-width: 600px) {
     .detail-grid { grid-template-columns: 1fr; }
-    .modal { padding: 28px; }
+    .modal { padding: 24px 16px; }
+    .pill { font-size: 11px !important; padding: 4px 8px !important; }
+    .ref-tag { font-size: 11px; padding: 4px 8px; }
+    .stats-row { grid-template-columns: repeat(2, 1fr); }
+    .wrap { padding: 88px 16px 80px; }
+    .modal-header { flex-direction: column; align-items: flex-start; gap: 16px; }
+    .modal-header .identite-row { gap: 14px; }
+    .cta-rappel { font-size: 13px; padding: 9px 16px; }
   }
 
   .detail-block h3 {
@@ -527,10 +535,9 @@
 
 <div class="wrap">
 
-  <h1>Nos formateurs</h1>
+  <h1>Nos formateurs IA certifiés Qualiopi</h1>
   <p class="intro">
-    Une équipe de professionnels en activité, chacun expert dans son domaine.
-    Cliquez sur un profil pour voir le détail.
+    Une équipe de formateurs et consultants en intelligence artificielle, tous experts praticiens dans leur domaine. Formations Qualiopi finançables OPCO. Cliquez sur un profil pour découvrir les compétences, références et tarifs.
   </p>
 
   <div class="grid" id="grid"></div>
@@ -607,7 +614,7 @@ const formateurs = [
       "Formation à un usage efficace de l'IA (GEO, AEO)"
     ],
     public: ["TPE", "PME", "Artisans", "Professions libérales", "Associations"],
-    outils: ["Ahrefs", "Google Search Console", "Google Analytics", "Ranxplorer", "Ubersuggest", "1.fr", "PageSpeed Insights", "WordPress", "Brevo"],
+    outils: ["Ahrefs", "Google Search Console", "Google Analytics", "WordPress", "Brevo", "Ranxplorer"],
     references: ["Vici Real Estate (Dubaï)", "Elite Premium (Nancy)", "La Maison Ani by Chef Izu (Dubaï)", "Green Opinion, Formaverse, Webcolors"],
     temoignage: {
       texte: "Céline nous a délivré un travail qui correspondait à nos demandes et dans les temps. Très bonne communication, nous allons poursuivre la collaboration.",
@@ -630,6 +637,7 @@ const formateurs = [
     role: "Formatrice & consultante en intelligence artificielle",
     loc: "Paris & distanciel · Interventions en français et en anglais",
     photo: "images/ghozlane-yahiaoui.jpg",
+    photoPosition: "top center",
     pitch: "Fait passer les équipes de licences IA sous-utilisées à un vrai gain de temps, d'argent et de maîtrise.",
     specialites: ["Copilot Microsoft 365", "ChatGPT, Claude, Gemini", "Agents & automatisation"],
     bio: "Ghozlane a passé six ans dans un grand cabinet de conseil international, en management et en data/IA, au contact des directions comme des équipes opérationnelles. Elle a accompagné des clients du secteur bancaire et financier sur leurs projets data et IA, dans des environnements exigeants en conformité et confidentialité, et a contribué au développement des offres IA de son cabinet. Elle forme aussi bien un comité de direction qui découvre l'IA qu'une équipe data qui veut aller plus loin, en français comme en anglais.",
@@ -647,8 +655,8 @@ const formateurs = [
       "Analyse de données en langage naturel avec Excel et Copilot",
       "Sensibilisation dirigeants : cas d'usage rentables, RGPD, AI Act européen, sécurité des données"
     ],
-    public: ["Comités de direction", "Équipes data", "Équipes RH", "Salariés en entreprise", "Secteur bancaire et financier"],
-    outils: ["Microsoft 365 Copilot", "Copilot Studio", "Agent Builder", "ChatGPT", "Claude", "Gemini", "Excel"],
+    public: ["Comités de direction", "Équipes data & RH", "Salariés en entreprise", "Banque & finance", "Dirigeants"],
+    outils: ["M365 Copilot", "Copilot Studio", "ChatGPT", "Claude", "Gemini", "Excel"],
     references: ["Clients du secteur bancaire et financier", "Grand cabinet de conseil international"],
     temoignage: {
       texte: "L'IA n'est utile que si vos équipes savent vraiment s'en servir. Mon travail commence là où s'arrêtent les licences, à l'usage.",
@@ -679,7 +687,7 @@ const formateurs = [
       "Jury de licence et master en commerce"
     ],
     public: ["Commerciaux", "Managers d'équipe", "TPE, PME", "Banque & assurance", "Étudiants en commerce"],
-    outils: ["ChatGPT", "Copilot", "CRM", "LinkedIn (social selling)", "Pack Office"],
+    outils: ["ChatGPT", "Copilot", "CRM", "LinkedIn Sales", "Pack Office"],
     references: ["ECM Nancy", "IUT Thionville-Yutz", "Pigier", "Aflor Actimum"],
     temoignage: {
       texte: "Je serai votre ambassadeur, votre motivateur, votre facilitateur et le développeur de votre entreprise.",
@@ -699,7 +707,7 @@ function renderCards() {
     card.className = 'card';
     if (f.externalUrl) card.href = f.externalUrl;
     card.innerHTML = `
-      <img class="photo" src="${f.photo}" alt="${f.nom}, ${f.role}">
+      <img class="photo" src="${f.photo}" alt="${f.nom}, ${f.role}"${f.photoPosition ? ` style="object-position:${f.photoPosition}"` : ''}>
       <h3>${f.nom}</h3>
       <p class="role">${f.role.split(' · ')[0]}</p>
       <p class="pitch">${f.pitch}</p>
@@ -730,7 +738,7 @@ function renderProfiles() {
     section.innerHTML = `
       <div class="modal-header">
         <div class="identite-row">
-          <img class="photo" src="${f.photo}" alt="${f.nom}, ${f.role}">
+          <img class="photo" src="${f.photo}" alt="${f.nom}, ${f.role}"${f.photoPosition ? ` style="object-position:${f.photoPosition}"` : ''}>
           <div>
             <h2>${f.nom}</h2>
             <p class="role">${f.role}</p>
@@ -745,7 +753,7 @@ function renderProfiles() {
       </div>
       <div class="detail-grid">
         <div class="detail-block">
-          <h3>Ce qu'elle gère</h3>
+          <h3>Compétences clés</h3>
           <ul class="simple">${f.competences.map(c => `<li>${c}</li>`).join('')}</ul>
         </div>
         <div class="detail-block">
