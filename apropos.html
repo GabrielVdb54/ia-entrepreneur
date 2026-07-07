@@ -118,7 +118,7 @@
 <header>
     <div class="container">
       <div class="header-inner">
-        <a href="/" class="logo" style="line-height:1.2;">
+        <a href="/" class="logo" style="line-height:1.2;white-space:nowrap;">
           IA<span>-</span>Entrepreneur
           <span style="display:block;font-size:0.58rem;font-weight:500;color:var(--muted);letter-spacing:0.03em;margin-top:2px;">Organisme de formation certifié Qualiopi</span>
         </a>
@@ -127,6 +127,7 @@
         <a href="/formations-entreprises.html">Formations IA</a>
         <a href="/integrations-ia.html">Intégrations IA</a>
         <a href="/apropos.html">À propos</a>
+        <a href="/nos-formateurs.html">Nos formateurs</a>
         <a href="/blog.html">Blog</a>
         <a href="mailto:contact@ia-entrepreneur.fr" style="display:flex;align-items:center;gap:5px;"><svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,12 2,6"/></svg>Écrire</a>
         <a href="/simulateur-financement-formation-ia.html" style="display:inline-flex;align-items:center;gap:5px;padding:7px 14px;border-radius:50px;border:1.5px solid rgba(26,60,255,0.35);color:var(--primary);font-weight:700;font-size:0.78rem;background:rgba(26,60,255,0.04);transition:background 0.2s,border-color 0.2s;" onmouseover="this.style.background='rgba(26,60,255,0.10)';this.style.borderColor='var(--primary)'" onmouseout="this.style.background='rgba(26,60,255,0.04)';this.style.borderColor='rgba(26,60,255,0.35)'">💶 Financer ma formation</a>
@@ -140,6 +141,7 @@
     <a href="/formations-entreprises.html">Formations IA</a>
     <a href="/integrations-ia.html">Intégrations IA</a>
     <a href="/apropos.html">À propos</a>
+    <a href="/nos-formateurs.html">Nos formateurs</a>
     <a href="/blog.html">Blog</a>
     <a href="mailto:contact@ia-entrepreneur.fr">✉ Écrire un email</a>
     <a href="/simulateur-financement-formation-ia.html" style="display:inline-flex;align-items:center;gap:5px;padding:7px 14px;border-radius:50px;border:1.5px solid rgba(26,60,255,0.35);color:var(--primary);font-weight:700;font-size:0.78rem;background:rgba(26,60,255,0.04);transition:background 0.2s,border-color 0.2s;" onmouseover="this.style.background='rgba(26,60,255,0.10)';this.style.borderColor='var(--primary)'" onmouseout="this.style.background='rgba(26,60,255,0.04)';this.style.borderColor='rgba(26,60,255,0.35)'">💶 Financer ma formation</a>
@@ -336,35 +338,46 @@
 </section>
 
 <footer>
-  <div class="container">
-    <div class="footer-inner">
-      <div>
+    <div class="container">
+      <div class="footer-inner">
         <div class="footer-logo">IA<span>-</span>Entrepreneur</div>
-        <div style="font-size:0.75rem;color:var(--muted);opacity:0.6;margin-top:6px;">Formateur IA certifié Qualiopi | Expert automatisation IA | France entière</div>
-      </div>
-      <div class="footer-links">
-        <a href="/">Accueil</a>
-        <a href="/formations-entreprises.html">Formations IA</a>
-        <a href="/integrations-ia.html">Intégrations IA</a>
-        <a href="/apropos.html">À propos</a>
-        <a href="/blog.html">Blog</a>
-        <a href="/simulateur-financement-formation-ia.html">Simulateur de financement</a>
-        <a href="/mentions-legales.html">Mentions légales</a>
-        <a href="/cgv.html">CGV</a>
-          <a href="/politique-confidentialite.html">Politique de confidentialité</a>
-        <a href="/#contact">Contact</a>
-      </div>
-      <div>
-        <p class="footer-copy">© 2026 IA-Entrepreneur · Clindit SASU. Tous droits réservés. · NDA : 44 54 04871 54</p>
+        <div class="footer-center">
+          <div class="footer-links">
+            <a href="/">Accueil</a>
+            <a href="/apropos.html">À propos</a>
+            <a href="/nos-formateurs.html">Nos formateurs</a>
+            <a href="/formations-entreprises.html">Formations IA</a>
+            <a href="/integrations-ia.html">Intégrations IA</a>
+            <a href="/blog.html">Blog</a>
+            <a href="/simulateur-financement-formation-ia.html">Simulateur de financement</a>
+            <a href="#contact">Contact</a>
+            <a href="/mentions-legales.html">Mentions légales</a>
+            <a href="/cgv.html">CGV</a>
+            <a href="/politique-confidentialite.html">Politique de confidentialité</a>
+          </div>
+        </div>
+        <div class="footer-right">
+          <p class="footer-copy">© 2026 IA-Entrepreneur · Clindit SASU. Tous droits réservés. · NDA : 44 54 04871 54</p>
+        </div>
       </div>
     </div>
-  </div>
-</footer>
+  </footer>
 
 <script>
-  var h=document.getElementById('hamburger');
-  var m=document.getElementById('mobile-menu');
-  h.addEventListener('click',function(){h.classList.toggle('open');m.classList.toggle('open');});
+  const h = document.getElementById('hamburger');
+  const m = document.getElementById('mobile-menu');
+  if(h && m){
+    h.addEventListener('click', () => {
+      h.classList.toggle('open');
+      m.classList.toggle('open');
+    });
+    m.querySelectorAll('a').forEach(link => {
+      link.addEventListener('click', () => {
+        h.classList.remove('open');
+        m.classList.remove('open');
+      });
+    });
+  }
 </script>
 
   <!-- Sticky CTA mobile -->
