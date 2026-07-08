@@ -34,7 +34,12 @@
     top: 68px;
     left: 0;
     right: 0;
-    bottom: 0;
+    /* height (pas bottom:0) : le header a un backdrop-filter, ce qui en fait
+       le containing block de ce fixed enfant. bottom:0 se résoudrait alors
+       par rapport à la hauteur du header (~69px) et non du viewport, et le
+       menu se réduirait à une bande vide. calc(100vh - 68px) est immunisé
+       contre ce piège car les unités vh restent relatives au viewport réel. */
+    height: calc(100vh - 68px) !important;
     z-index: 99 !important;
     overflow-y: auto !important;
     background: rgba(255,255,255,0.98) !important;
