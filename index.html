@@ -906,75 +906,32 @@
       color: var(--muted);
       margin-bottom: 40px;
     }
-    .equipe-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 20px;
-    }
-    .equipe-card {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 20px;
-      padding: 28px 24px;
-      text-align: center;
-      transition: border-color 0.3s, transform 0.3s, box-shadow 0.3s;
-    }
-    .equipe-card:hover {
-      border-color: rgba(26,60,255,0.25);
-      transform: translateY(-4px);
-      box-shadow: 0 16px 40px rgba(26,60,255,0.08);
-    }
-    .equipe-card.fondateur {
-      border-color: rgba(26,60,255,0.2);
-      background: rgba(26,60,255,0.03);
-    }
-    .equipe-avatar {
-      width: 72px;
-      height: 72px;
-      border-radius: 50%;
-      margin: 0 auto 16px;
-      overflow: hidden;
-      background: var(--bg2);
+    .equipe-band {
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 1.8rem;
-      border: 2px solid var(--border);
+      flex-wrap: wrap;
+      gap: 0;
+      margin-bottom: 4px;
     }
-    .equipe-avatar img {
+    .equipe-band-avatar {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      overflow: hidden;
+      border: 3px solid var(--bg);
+      box-shadow: 0 2px 10px rgba(10,15,44,0.14);
+      margin-left: -14px;
+      background: var(--bg2);
+    }
+    .equipe-band-avatar:first-child {
+      margin-left: 0;
+    }
+    .equipe-band-avatar img {
       width: 100%;
       height: 100%;
       object-fit: cover;
       object-position: center top;
-    }
-    .equipe-nom {
-      font-size: 1rem;
-      font-weight: 800;
-      color: var(--text);
-      margin-bottom: 4px;
-    }
-    .equipe-role {
-      font-size: 0.78rem;
-      font-weight: 700;
-      color: var(--primary);
-      text-transform: uppercase;
-      letter-spacing: 0.06em;
-      margin-bottom: 12px;
-    }
-    .equipe-specialites {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 6px;
-      justify-content: center;
-    }
-    .equipe-tag {
-      padding: 3px 10px;
-      border-radius: 50px;
-      font-size: 0.72rem;
-      font-weight: 600;
-      background: rgba(26,60,255,0.07);
-      color: var(--primary);
-      border: 1px solid rgba(26,60,255,0.15);
     }
 
     .apropos-text h2 {
@@ -1038,7 +995,7 @@
     @media (max-width: 900px) {
       .apropos-histoire { grid-template-columns: 1fr; gap: 40px; }
       .apropos-photo-col { max-width: 300px; margin: 0 auto; }
-      .equipe-grid { grid-template-columns: 1fr; max-width: 380px; margin: 0 auto; }
+      .equipe-band-avatar { width: 46px; height: 46px; margin-left: -10px; }
     }
 
     /* ── Chiffres ───────────────────────────────────────────── */
@@ -2245,31 +2202,6 @@
     </div>
   </section>
 
-  <!-- ── Chiffres clés
-    <div class="chiffres-bg"></div>
-    <div class="container">
-      <div class="chiffres-grid reveal">
-        <div class="chiffre-item">
-          <div class="chiffre-num accent">1 500+</div>
-          <div class="chiffre-label">Porteurs de projet<br>accompagnés</div>
-        </div>
-        <div class="chiffre-item">
-          <div class="chiffre-num accent">300+</div>
-          <div class="chiffre-label">Salariés formés<br>en entreprise</div>
-        </div>
-        <div class="chiffre-item">
-          <div class="chiffre-num accent">3</div>
-          <div class="chiffre-label">Formateurs<br>praticiens actifs</div>
-        </div>
-        <div class="chiffre-item">
-          <div class="chiffre-num accent">6</div>
-          <div class="chiffre-label">Modules de formation<br>entreprise & école de commerce</div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-
   <!-- ── Comment ça marche ──────────────────────────────────────── -->
   <section id="methode" style="padding:50px 0;position:relative;">
     <div style="content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.08),transparent);"></div>
@@ -2329,7 +2261,7 @@
         <div>
           <div class="section-label"><span>Pourquoi ça marche</span></div>
           <h2 style="font-size:clamp(1.5rem,3vw,2.2rem);font-weight:800;line-height:1.2;margin-bottom:20px;">On enseigne ce qu'on fait.<br><span style="color:var(--primary);">Pas de la théorie.</span></h2>
-          <p style="font-size:1rem;color:var(--muted);line-height:1.85;margin-bottom:16px;">Notre site ia-entrepreneur.fr tourne lui-même sur les outils qu'on vous installe : des articles générés et publiés automatiquement au rythme de 5 par semaine, 44 URLs indexées sur Google, zéro intervention manuelle. On vous montre ce qu'on a construit pour nous.</p>
+          <p style="font-size:1rem;color:var(--muted);line-height:1.85;margin-bottom:16px;">Notre site ia-entrepreneur.fr tourne lui-même sur les outils qu'on vous installe : des articles générés avec l'IA, supervisés et publiés au fil de l'eau, plus de 100 pages indexées sur Google. On vous montre ce qu'on a construit pour nous.</p>
           <p style="font-size:1rem;color:var(--muted);line-height:1.85;margin-bottom:28px;">Chaque formation ou intégration s'appuie sur des outils qu'on utilise en production. Pas des slides. Des workflows qui tournent.</p>
           <div style="display:flex;gap:10px;flex-wrap:wrap;">
             <a href="https://calendly.com/gabriel-ia-entrepreneur/decouverte" target="_blank" rel="noopener noreferrer" style="display:inline-flex;align-items:center;gap:8px;padding:13px 26px;border-radius:50px;font-weight:700;font-size:0.92rem;background:#1A3CFF;color:#fff;box-shadow:0 4px 24px rgba(26,60,255,0.4);transition:transform 0.2s,box-shadow 0.2s;text-decoration:none;" onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='0 8px 32px rgba(26,60,255,0.55)'" onmouseout="this.style.transform='translateY(0)';this.style.boxShadow='0 4px 24px rgba(26,60,255,0.4)'" >
@@ -2347,20 +2279,16 @@
             <div style="font-size:0.72rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--accent);margin-bottom:16px;">Workflow actif sur ia-entrepreneur.fr</div>
             <div style="display:flex;flex-direction:column;gap:0;">
               <div style="display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid var(--border);">
-                <span style="font-size:0.84rem;color:var(--muted);">Fréquence de publication</span>
-                <span style="font-size:0.9rem;font-weight:800;">5 articles / semaine</span>
-              </div>
-              <div style="display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid var(--border);">
                 <span style="font-size:0.84rem;color:var(--muted);">Intervention humaine requise</span>
-                <span style="font-size:0.9rem;font-weight:800;color:var(--accent);">Zéro</span>
+                <span style="font-size:0.9rem;font-weight:800;color:var(--accent);">Supervision légère</span>
               </div>
               <div style="display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid var(--border);">
-                <span style="font-size:0.84rem;color:var(--muted);">Articles publiés automatiquement</span>
-                <span style="font-size:0.9rem;font-weight:800;">31</span>
+                <span style="font-size:0.84rem;color:var(--muted);">Articles publiés</span>
+                <span style="font-size:0.9rem;font-weight:800;">68</span>
               </div>
               <div style="display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid var(--border);">
-                <span style="font-size:0.84rem;color:var(--muted);">URLs indexées sur Google</span>
-                <span style="font-size:0.9rem;font-weight:800;">44</span>
+                <span style="font-size:0.84rem;color:var(--muted);">Pages indexées sur Google</span>
+                <span style="font-size:0.9rem;font-weight:800;">100</span>
               </div>
               <div style="display:flex;justify-content:space-between;align-items:center;padding:12px 0;">
                 <span style="font-size:0.84rem;color:var(--muted);">Coût mensuel en API</span>
@@ -2433,59 +2361,19 @@
 
       <!-- Équipe -->
       <div class="apropos-equipe reveal">
-        <h3 class="apropos-equipe-title">Notre équipe de formateurs</h3>
-        <p class="apropos-equipe-sub">Des praticiens actifs : ils enseignent ce qu'ils font au quotidien.</p>
+        <h3 class="apropos-equipe-title">Une équipe de formateurs-praticiens</h3>
+        <p class="apropos-equipe-sub">6 experts actifs dans leur domaine : IA, automatisation, SEO, data, vente & management.</p>
 
-        <div class="equipe-grid">
-
-          <!-- Gabriel -->
-          <div class="equipe-card fondateur">
-            <div class="equipe-avatar">
-              <img src="gabriel-about.png" alt="Gabriel Vanderbecken" />
-            </div>
-            <div class="equipe-nom">Gabriel Vanderbecken</div>
-            <div class="equipe-role">Fondateur & Formateur principal</div>
-            <div class="equipe-specialites">
-              <span class="equipe-tag">Formation IA</span>
-              <span class="equipe-tag">IA & Automatisation</span>
-              <span class="equipe-tag">Prise de parole</span>
-              <span class="equipe-tag">Entrepreneuriat</span>
-            </div>
-          </div>
-
-          <!-- Charly -->
-          <div class="equipe-card">
-            <div class="equipe-avatar">🎯</div>
-            <div class="equipe-nom">Charly M.</div>
-            <div class="equipe-role">Formateur associé</div>
-            <div class="equipe-specialites">
-              <span class="equipe-tag">Formation IA</span>
-              <span class="equipe-tag">Marketing</span>
-              <span class="equipe-tag">Stratégie commerciale</span>
-            </div>
-          </div>
-
-          <!-- Ryad -->
-          <div class="equipe-card">
-            <div class="equipe-avatar">🚀</div>
-            <div class="equipe-nom">Ryad M.</div>
-            <div class="equipe-role">Formateur associé</div>
-            <div class="equipe-specialites">
-              <span class="equipe-tag">Prospection</span>
-              <span class="equipe-tag">Vente & Closing</span>
-              <span class="equipe-tag">Management</span>
-              <span class="equipe-tag">Développement personnel</span>
-            </div>
-          </div>
-
+        <div class="equipe-band">
+          <div class="equipe-band-avatar"><img src="images/achille-brial.jpg" alt="Achille Brial" /></div>
+          <div class="equipe-band-avatar"><img src="images/celine-herment.jpg" alt="Céline Herment" /></div>
+          <div class="equipe-band-avatar"><img src="images/ghozlane-yahiaoui.jpg" alt="Ghozlane Yahiaoui" /></div>
+          <div class="equipe-band-avatar"><img src="images/sina-movaghar.jpg" alt="Sina Movaghar" /></div>
+          <div class="equipe-band-avatar"><img src="images/gilles-idoux.jpg" alt="Gilles Idoux" /></div>
+          <div class="equipe-band-avatar"><img src="images/charly-michel.jpg" alt="Charly Michel" /></div>
         </div>
 
-        <!-- Hint autres membres -->
-        <div style="text-align:center;margin-top:28px;padding:18px 24px;background:var(--card);border:1px solid var(--border);border-radius:var(--radius);max-width:500px;margin-left:auto;margin-right:auto;">
-          <p style="font-size:0.88rem;color:var(--muted);margin:0;">Notre équipe s'agrandit selon les besoins et les thématiques. <strong style="color:var(--text);">Chaque intervenant est sélectionné pour son expertise terrain</strong>, pas uniquement pour ses diplômes.</p>
-        </div>
-
-        <div style="text-align:center;margin-top:28px;">
+        <div style="text-align:center;margin-top:24px;">
           <a href="/nos-formateurs.html" style="display:inline-flex;align-items:center;gap:8px;padding:12px 28px;border-radius:50px;font-weight:700;font-size:0.9rem;color:var(--primary);border:2px solid rgba(26,60,255,0.2);background:rgba(26,60,255,0.04);transition:all 0.2s;text-decoration:none;" onmouseover="this.style.background='rgba(26,60,255,0.10)';this.style.borderColor='var(--primary)'" onmouseout="this.style.background='rgba(26,60,255,0.04)';this.style.borderColor='rgba(26,60,255,0.2)'">
             Découvrir tous nos formateurs IA certifiés →
           </a>
@@ -2571,17 +2459,17 @@
 
         <div class="blog-card reveal reveal-delay-1">
           <div class="blog-thumbnail">
-            <img src="https://images.unsplash.com/photo-1677442135703-1787eea5ce01?w=600&q=80" alt="IA en TPE/PME en 2026" loading="lazy" />
+            <img src="/images/formation-2.jpg" alt="Littératie IA en entreprise : le socle de compétences à bâtir en 2026" loading="lazy" />
             <div class="blog-thumbnail-overlay"></div>
           </div>
           <div class="blog-body">
             <div class="blog-meta">
               <span class="blog-cat">Intelligence Artificielle</span>
-              <span class="blog-date">26 mai 2026</span>
+              <span class="blog-date">9 juillet 2026</span>
             </div>
-            <h3>L'IA embarquée : votre meilleur employé se cache déjà dans vos logiciels</h3>
-            <p>Vous utilisez déjà l'IA sans le savoir. Découvrez comment tirer parti des fonctionnalités IA intégrées dans vos outils du quotidien pour gagner en productivité.</p>
-            <a href="/blog/ia-embarquee-logiciels-entreprise.html" class="btn-blog">
+            <h3>Littératie IA en entreprise : le socle de compétences à bâtir en 2026</h3>
+            <p>Littératie IA : ce que c'est, comment adapter le niveau par profil et construire un plan qui tient. Donnez à vos équipes un usage lucide et sûr de l'IA.</p>
+            <a href="/blog/litteratie-ia-entreprise.html" class="btn-blog">
               Lire la suite
               <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
             </a>
@@ -2590,17 +2478,17 @@
 
         <div class="blog-card reveal reveal-delay-2">
           <div class="blog-thumbnail">
-            <img src="https://images.unsplash.com/photo-1620712943543-bcc4688e7485?w=600&q=80" alt="Financer IA TPE PME" loading="lazy" />
+            <img src="/images/formation-1.jpg" alt="Formation Gemini en entreprise : exploiter l'IA déjà dans vos outils" loading="lazy" />
             <div class="blog-thumbnail-overlay"></div>
           </div>
           <div class="blog-body">
             <div class="blog-meta">
-              <span class="blog-cat">Financement</span>
-              <span class="blog-date">26 mai 2026</span>
+              <span class="blog-cat">Intelligence Artificielle</span>
+              <span class="blog-date">9 juillet 2026</span>
             </div>
-            <h3>Financer l'IA en 2026 : le guide complet pour les TPE et PME</h3>
-            <p>OPCO, aides publiques, crédit impôt innovation : comment financer l'adoption de l'IA dans votre TPE/PME sans y laisser votre trésorerie.</p>
-            <a href="/blog/financer-ia-tpe-pme-guide-2026.html" class="btn-blog">
+            <h3>Formation Gemini en entreprise : exploiter l'IA déjà dans vos outils</h3>
+            <p>Formation Gemini entreprise : compétences visées, coût, financement et format. Transformez l'outil ignoré en heures gagnées chaque semaine par vos équipes.</p>
+            <a href="/blog/formation-gemini-entreprise.html" class="btn-blog">
               Lire la suite
               <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
             </a>
@@ -2628,7 +2516,7 @@
         <div class="contact-info">
           <div class="section-label reveal"><span>Parlons de votre projet</span></div>
           <h2 class="section-title reveal">Prêt à<br /><span style="color:var(--accent)">franchir le cap ?</span></h2>
-          <p class="reveal">Que vous ayez une question sur mes formations, un projet à structurer ou simplement envie d'échanger : je réponds à tous les messages sous 24h.</p>
+          <p class="reveal">Que vous ayez une question sur nos formations, un projet à structurer ou simplement envie d'échanger : nous répondons à tous les messages sous 24h.</p>
 
           <div class="contact-items">
             <div class="contact-item reveal reveal-delay-1">
@@ -2763,6 +2651,7 @@
           <div class="footer-links">
             <a href="/">Accueil</a>
             <a href="/apropos.html">À propos</a>
+            <a href="/nos-formateurs.html">Nos formateurs</a>
             <a href="/formations-entreprises.html">Formations IA</a>
           <a href="/integrations-ia.html">Intégrations IA</a>
             <a href="/blog.html">Blog</a>
