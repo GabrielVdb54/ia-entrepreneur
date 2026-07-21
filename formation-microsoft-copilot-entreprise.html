@@ -50,7 +50,7 @@
         "name": "Combien coûte cette formation et est-elle finançable OPCO ?",
         "acceptedAnswer": {
           "@type": "Answer",
-          "text": "La formation Microsoft Copilot est proposée en intra-entreprise à partir de 1 200 € HT par jour pour un groupe de 4 à 12 participants. Elle est certifiée Qualiopi et finançable via votre OPCO, potentiellement à 100 % pour les entreprises de moins de 50 salariés. Nous vous accompagnons dans le montage du dossier de financement."
+          "text": "La formation Microsoft Copilot est proposée en intra-entreprise à partir de 450 € HT par personne, dès 3 salariés. Elle est certifiée Qualiopi et finançable via votre OPCO, potentiellement à 100 % pour les entreprises de moins de 50 salariés. Nous vous accompagnons dans le montage du dossier de financement."
         }
       },
       {
@@ -107,6 +107,9 @@
   .trust-pills{display:flex;gap:16px;flex-wrap:wrap;margin-top:36px}
   .trust-pill{display:flex;align-items:center;gap:6px;font-size:0.8rem;font-weight:600;color:var(--muted)}
   .trust-pill .check{color:var(--accent);font-weight:900}
+    .price-banner{display:flex;align-items:baseline;flex-wrap:wrap;gap:8px;margin-top:28px;padding:16px 24px;background:#fff;border:1.5px solid rgba(26,60,255,0.2);border-radius:var(--radius);width:fit-content}
+    .price-banner .amount{font-size:1.6rem;font-weight:900;color:var(--primary)}
+    .price-banner .detail{font-size:0.82rem;color:var(--muted)}
   .section-label{font-size:0.75rem;font-weight:800;letter-spacing:0.12em;text-transform:uppercase;color:var(--accent);margin-bottom:12px;display:flex;align-items:center;gap:8px}
   .section-label::before{content:'';display:block;width:28px;height:2px;background:var(--accent)}
   .section-title{font-size:clamp(1.6rem,3vw,2.2rem);font-weight:800;line-height:1.2;margin-bottom:12px}
@@ -230,6 +233,10 @@
       <span class="trust-pill"><span class="check">✓</span> Finançable OPCO, sans reste à charge</span>
       <span class="trust-pill"><span class="check">✓</span> Microsoft 365 & Copilot Pro</span>
       <span class="trust-pill"><span class="check">✓</span> Présentiel ou distanciel</span>
+    </div>
+    <div class="price-banner">
+      <span class="amount">à partir de 450 €</span>
+      <span class="detail">HT / personne · 1 journée · dès 3 salariés · Finançable OPCO</span>
     </div>
   </div>
 </section>
@@ -381,7 +388,7 @@
       </details>
       <details style="background:var(--bg2);border:1px solid var(--border);border-radius:12px;overflow:hidden;">
         <summary style="padding:20px 24px;font-size:0.95rem;font-weight:700;cursor:pointer;list-style:none;display:flex;justify-content:space-between;align-items:center;">Combien coûte la formation et est-elle finançable OPCO ?<svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></summary>
-        <div style="padding:0 24px 20px;font-size:0.9rem;color:var(--muted);line-height:1.8;">La formation est proposée en intra-entreprise à partir de 1 200 € HT par jour pour un groupe de 4 à 12 participants. Elle est certifiée Qualiopi et finançable via votre OPCO, potentiellement à 100 % pour les entreprises de moins de 50 salariés. Nous vous accompagnons dans le montage du dossier de financement.</div>
+        <div style="padding:0 24px 20px;font-size:0.9rem;color:var(--muted);line-height:1.8;">La formation est proposée en intra-entreprise à partir de 450 € HT par personne, dès 3 salariés. Elle est certifiée Qualiopi et finançable via votre OPCO, potentiellement à 100 % pour les entreprises de moins de 50 salariés. Nous vous accompagnons dans le montage du dossier de financement.</div>
       </details>
       <details style="background:var(--bg2);border:1px solid var(--border);border-radius:12px;overflow:hidden;">
         <summary style="padding:20px 24px;font-size:0.95rem;font-weight:700;cursor:pointer;list-style:none;display:flex;justify-content:space-between;align-items:center;">En combien de temps mes équipes seront-elles opérationnelles ?<svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></summary>
@@ -411,7 +418,7 @@
       <div>
         <div style="font-size:0.72rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--accent);margin-bottom:6px;">Financement</div>
         <strong style="font-size:1rem;font-weight:800;color:var(--text);">Combien pouvez-vous obtenir pour financer cette formation ?</strong>
-        <p style="font-size:0.85rem;color:var(--muted);margin-top:4px;">CPF · OPCO · AGEFICE · FIF-PL — résultat immédiat selon votre statut</p>
+        <p style="font-size:0.85rem;color:var(--muted);margin-top:4px;">CPF · OPCO · AGEFICE · FIF-PL, résultat immédiat selon votre statut</p>
       </div>
       <a href="/simulateur-financement-formation-ia.html" style="display:inline-flex;align-items:center;gap:8px;padding:12px 24px;background:var(--primary);color:#fff;border-radius:50px;font-weight:700;font-size:0.88rem;text-decoration:none;box-shadow:0 4px 16px rgba(26,60,255,0.25);">Simuler mon financement CPF/OPCO →</a>
     </div>
