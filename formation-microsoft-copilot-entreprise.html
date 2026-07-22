@@ -107,6 +107,15 @@
   .trust-pills{display:flex;gap:16px;flex-wrap:wrap;margin-top:36px}
   .trust-pill{display:flex;align-items:center;gap:6px;font-size:0.8rem;font-weight:600;color:var(--muted)}
   .trust-pill .check{color:var(--accent);font-weight:900}
+  .faq-section{padding:80px 0;background:var(--bg2)}
+  .faq-list{display:flex;flex-direction:column;gap:14px}
+  .faq-list details{background:#fff;border:1px solid var(--border);border-radius:var(--radius);padding:20px 24px}
+  .faq-list summary{cursor:pointer;list-style:none;display:flex;justify-content:space-between;align-items:center;gap:16px;font-weight:700;font-size:0.95rem}
+  .faq-list summary::-webkit-details-marker{display:none}
+  .faq-list summary svg{flex-shrink:0;transition:transform 0.2s}
+  .faq-list details[open] summary svg{transform:rotate(180deg)}
+  .faq-answer{margin-top:14px;font-size:0.88rem;color:var(--muted);line-height:1.7}
+
     .price-banner{display:flex;align-items:baseline;flex-wrap:wrap;gap:8px;margin-top:28px;padding:16px 24px;background:#fff;border:1.5px solid rgba(26,60,255,0.2);border-radius:var(--radius);width:fit-content}
     .price-banner .amount{font-size:1.6rem;font-weight:900;color:var(--primary)}
     .price-banner .detail{font-size:0.82rem;color:var(--muted)}
@@ -398,6 +407,31 @@
         <summary style="padding:20px 24px;font-size:0.95rem;font-weight:700;cursor:pointer;list-style:none;display:flex;justify-content:space-between;align-items:center;">La formation couvre-t-elle l'obligation AI Act ?<svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></summary>
         <div style="padding:0 24px 20px;font-size:0.9rem;color:var(--muted);line-height:1.8;">Oui. L'article 4 de l'AI Act impose depuis février 2025 que tout collaborateur utilisant l'IA soit formé. Notre formation inclut un module bonnes pratiques et sécurité, et chaque participant reçoit une attestation individuelle conforme aux exigences réglementaires. <a href="/formation-ia-obligatoire-ai-act.html" style="color:var(--primary);font-weight:700;">En savoir plus sur l'obligation AI Act →</a></div>
       </details>
+    </div>
+  </div>
+</section>
+
+<section class="faq-section">
+  <div class="container">
+    <div class="section-label">Questions fréquentes</div>
+    <h2 class="section-title">Ce que les entreprises nous demandent</h2>
+    <div class="faq-list">
+        <details open>
+          <summary>Qu'est-ce que Microsoft Copilot et à quoi ça sert en entreprise ?<svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></summary>
+          <div class="faq-answer">Copilot est l'IA intégrée à Microsoft 365 (Word, Excel, Teams, Outlook, PowerPoint). Il permet de rédiger des documents, analyser des données, résumer des réunions et répondre aux emails automatiquement. En entreprise, il fait gagner en moyenne 2 à 3 heures par semaine par collaborateur selon les études Microsoft.</div>
+        </details>
+        <details>
+          <summary>Faut-il avoir une licence Microsoft 365 Copilot pour suivre la formation ?<svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></summary>
+          <div class="faq-answer">Non obligatoirement. Nous utilisons les fonctions IA disponibles dans les versions standard Microsoft 365, complétées par des outils gratuits équivalents. Si vous avez déjà la licence Copilot Pro ou Copilot for Microsoft 365, la formation s'adapte pour en exploiter toutes les fonctionnalités.</div>
+        </details>
+        <details>
+          <summary>Combien coûte cette formation et est-elle finançable OPCO ?<svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></summary>
+          <div class="faq-answer">La formation Microsoft Copilot est proposée en intra-entreprise à partir de 450 € HT par personne, dès 3 salariés. Elle est certifiée Qualiopi et finançable via votre OPCO, potentiellement à 100 % pour les entreprises de moins de 50 salariés. Nous vous accompagnons dans le montage du dossier de financement.</div>
+        </details>
+        <details>
+          <summary>En combien de temps mes équipes seront-elles opérationnelles sur Copilot ?<svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></summary>
+          <div class="faq-answer">Dès la fin de la journée de formation, vos collaborateurs utilisent Copilot sur leurs vrais documents et leurs vrais emails. Le format est 100 % pratique : pas de slides, des ateliers sur vos fichiers Word, Excel et Teams réels. La plupart des participants décrivent un usage quotidien dès J+1.</div>
+        </details>
     </div>
   </div>
 </section>

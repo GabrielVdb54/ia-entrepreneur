@@ -107,6 +107,15 @@
   .trust-pills{display:flex;gap:16px;flex-wrap:wrap;margin-top:36px}
   .trust-pill{display:flex;align-items:center;gap:6px;font-size:0.8rem;font-weight:600;color:var(--muted)}
   .trust-pill .check{color:var(--accent);font-weight:900}
+  .faq-section{padding:80px 0;background:var(--bg2)}
+  .faq-list{display:flex;flex-direction:column;gap:14px}
+  .faq-list details{background:#fff;border:1px solid var(--border);border-radius:var(--radius);padding:20px 24px}
+  .faq-list summary{cursor:pointer;list-style:none;display:flex;justify-content:space-between;align-items:center;gap:16px;font-weight:700;font-size:0.95rem}
+  .faq-list summary::-webkit-details-marker{display:none}
+  .faq-list summary svg{flex-shrink:0;transition:transform 0.2s}
+  .faq-list details[open] summary svg{transform:rotate(180deg)}
+  .faq-answer{margin-top:14px;font-size:0.88rem;color:var(--muted);line-height:1.7}
+
   .section-label{font-size:0.75rem;font-weight:800;letter-spacing:0.12em;text-transform:uppercase;color:var(--accent);margin-bottom:12px;display:flex;align-items:center;gap:8px}
   .section-label::before{content:'';display:block;width:28px;height:2px;background:var(--accent)}
   .section-title{font-size:clamp(1.6rem,3vw,2.2rem);font-weight:800;line-height:1.2;margin-bottom:12px}
@@ -391,6 +400,31 @@
         <summary style="padding:20px 24px;font-size:0.95rem;font-weight:700;cursor:pointer;list-style:none;display:flex;justify-content:space-between;align-items:center;">La formation couvre-t-elle l'obligation AI Act Article 4 ?<svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></summary>
         <div style="padding:0 24px 20px;font-size:0.9rem;color:var(--muted);line-height:1.8;">Oui. L'article 4 de l'AI Act impose que tout collaborateur utilisant l'IA soit formé. Notre formation inclut un module dédié à la sécurité et à la conformité, et chaque participant reçoit une attestation individuelle conforme aux exigences réglementaires. <a href="/formation-ia-obligatoire-ai-act.html" style="color:var(--accent);font-weight:700;">En savoir plus sur l'obligation AI Act →</a></div>
       </details>
+    </div>
+  </div>
+</section>
+
+<section class="faq-section">
+  <div class="container">
+    <div class="section-label">Questions fréquentes</div>
+    <h2 class="section-title">Ce que les entreprises nous demandent</h2>
+    <div class="faq-list">
+        <details open>
+          <summary>Quelle est la différence entre ChatGPT gratuit et ChatGPT Plus pour les entreprises ?<svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></summary>
+          <div class="faq-answer">ChatGPT gratuit (GPT-4o) est suffisant pour la plupart des usages en entreprise : rédaction, synthèse, analyse de documents. ChatGPT Plus (20 $/mois) donne accès aux derniers modèles, à la navigation web en temps réel et aux GPTs personnalisés. En formation, on part de la version que vos collaborateurs utilisent déjà, et on leur montre comment en tirer le maximum dans leur métier.</div>
+        </details>
+        <details>
+          <summary>ChatGPT est-il sécurisé pour les données de mon entreprise ?<svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></summary>
+          <div class="faq-answer">Par défaut, OpenAI peut utiliser les conversations pour améliorer ses modèles. Il faut désactiver cette option dans les paramètres et ne jamais saisir de données personnelles, financières ou confidentielles. Nous couvrons ces bonnes pratiques dans la formation et fournissons une politique d'usage IA simple à déployer, conforme au RGPD et à l'AI Act.</div>
+        </details>
+        <details>
+          <summary>La formation ChatGPT est-elle finançable via mon OPCO ?<svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></summary>
+          <div class="faq-answer">Oui. Notre formation ChatGPT est certifiée Qualiopi, ce qui la rend éligible à la prise en charge par votre OPCO sur votre plan de développement des compétences. Pour les entreprises de moins de 50 salariés, la prise en charge peut être totale (0 € de reste à charge). Nous vous accompagnons dans toutes les démarches.</div>
+        </details>
+        <details>
+          <summary>Combien de temps faut-il pour former ses équipes à ChatGPT ?<svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></summary>
+          <div class="faq-answer">Une journée de formation (7h) suffit pour donner à vos collaborateurs une maîtrise opérationnelle de ChatGPT : prompting efficace, cas d'usage par métier, sécurité des données. Pour les équipes souhaitant aller plus loin (automatisation, intégration avec leurs outils), une deuxième journée est recommandée.</div>
+        </details>
     </div>
   </div>
 </section>

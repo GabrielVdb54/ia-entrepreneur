@@ -60,6 +60,18 @@
     .trust-pills{display:flex;gap:16px;flex-wrap:wrap;margin-top:36px}
     .trust-pill{display:flex;align-items:center;gap:6px;font-size:0.8rem;font-weight:600;color:var(--muted)}
     .trust-pill .check{color:var(--accent);font-weight:900}
+    .faq-section{padding:80px 0;background:var(--bg2)}
+    .faq-list{display:flex;flex-direction:column;gap:14px}
+    .faq-list details{background:#fff;border:1px solid var(--border);border-radius:var(--radius);padding:20px 24px}
+    .faq-list summary{cursor:pointer;list-style:none;display:flex;justify-content:space-between;align-items:center;gap:16px;font-weight:700;font-size:0.95rem}
+    .faq-list summary::-webkit-details-marker{display:none}
+    .faq-list summary svg{flex-shrink:0;transition:transform 0.2s}
+    .faq-list details[open] summary svg{transform:rotate(180deg)}
+    .faq-answer{margin-top:14px;font-size:0.88rem;color:var(--muted);line-height:1.7}
+    .example-card{background:#fff;border:1.5px solid rgba(16,185,129,0.25);border-radius:var(--radius);padding:28px;margin-top:32px}
+    .example-card .example-label{font-size:0.72rem;font-weight:800;letter-spacing:0.1em;text-transform:uppercase;color:var(--accent);margin-bottom:10px}
+    .example-card p{font-size:0.9rem;color:var(--text);line-height:1.75}
+
     .price-banner{display:flex;align-items:baseline;gap:10px;margin-top:28px;padding:16px 24px;background:#fff;border:1.5px solid rgba(26,60,255,0.2);border-radius:var(--radius);width:fit-content}
     .price-banner .amount{font-size:1.6rem;font-weight:900;color:var(--primary)}
     .price-banner .detail{font-size:0.82rem;color:var(--muted)}
@@ -133,6 +145,7 @@
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" media="print" onload="this.media='all'" />
   <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" /></noscript>
   <link rel="stylesheet" href="/mobile.css">
+  <script type="application/ld+json">{"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "Combien de séances faut-il avant de voir des résultats concrets ?", "acceptedAnswer": {"@type": "Answer", "text": "La plupart des dirigeants constatent un vrai gain de temps dès la 2e ou 3e séance sur au moins un cas d'usage précis (rédaction d'emails, préparation de rendez-vous, analyse de documents). L'autonomie complète sur plusieurs cas d'usage prend généralement 6 à 8 séances, mais chaque séance apporte une valeur immédiatement exploitable, pas seulement à la fin du parcours."}}, {"@type": "Question", "name": "Le coaching individuel est-il finançable comme une formation classique ?", "acceptedAnswer": {"@type": "Answer", "text": "Pas systématiquement de la même façon qu'une formation collective. Selon votre statut (indépendant, dirigeant salarié, profession libérale), d'autres dispositifs peuvent s'appliquer. On regarde ça ensemble dès le premier échange pour vous dire précisément à quoi vous avez droit, plutôt que de promettre un financement qui ne s'appliquerait pas à votre cas."}}, {"@type": "Question", "name": "Puis-je arrêter à tout moment ?", "acceptedAnswer": {"@type": "Answer", "text": "Oui. Il n'y a pas d'engagement sur un nombre de séances fixe. Vous réservez séance par séance ou par petit forfait, et vous arrêtez quand vous sentez que vous avez l'autonomie recherchée. Beaucoup de dirigeants espacent naturellement les séances après quelques mois plutôt que d'arrêter net."}}, {"@type": "Question", "name": "Quelle est la différence avec une formation collective ?", "acceptedAnswer": {"@type": "Answer", "text": "La formation collective est pensée pour transmettre un socle commun à plusieurs personnes en même temps, avec un programme largement fixé à l'avance. Le coaching individuel part uniquement de votre activité à vous : vos dossiers, votre secteur, votre rythme. C'est plus lent à l'échelle d'une équipe, mais plus profond pour une seule personne."}}]}</script>
 </head>
 <body>
 <header>
@@ -226,6 +239,35 @@
       <div class="financement-item"><div class="fi-icon">📅</div><h4>Délai de paiement</h4><p>30 jours fin de mois</p></div>
       <div class="financement-item"><div class="fi-icon">🧾</div><h4>Prix HT</h4><p>Régime micro-entreprise, pas de TVA appliquée</p></div>
       <div class="financement-item"><div class="fi-icon">💶</div><h4>Simulateur CPF</h4><p>Certains statuts peuvent mobiliser d'autres financements, on vérifie ça ensemble</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="faq-section">
+  <div class="container">
+    <div class="section-label">Questions fréquentes</div>
+    <h2 class="section-title">Ce qu'on nous demande le plus souvent</h2>
+    <div class="faq-list">
+        <details open>
+          <summary>Combien de séances faut-il avant de voir des résultats concrets ?<svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></summary>
+          <div class="faq-answer">La plupart des dirigeants constatent un vrai gain de temps dès la 2e ou 3e séance sur au moins un cas d'usage précis (rédaction d'emails, préparation de rendez-vous, analyse de documents). L'autonomie complète sur plusieurs cas d'usage prend généralement 6 à 8 séances, mais chaque séance apporte une valeur immédiatement exploitable, pas seulement à la fin du parcours.</div>
+        </details>
+        <details>
+          <summary>Le coaching individuel est-il finançable comme une formation classique ?<svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></summary>
+          <div class="faq-answer">Pas systématiquement de la même façon qu'une formation collective. Selon votre statut (indépendant, dirigeant salarié, profession libérale), d'autres dispositifs peuvent s'appliquer. On regarde ça ensemble dès le premier échange pour vous dire précisément à quoi vous avez droit, plutôt que de promettre un financement qui ne s'appliquerait pas à votre cas.</div>
+        </details>
+        <details>
+          <summary>Puis-je arrêter à tout moment ?<svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></summary>
+          <div class="faq-answer">Oui. Il n'y a pas d'engagement sur un nombre de séances fixe. Vous réservez séance par séance ou par petit forfait, et vous arrêtez quand vous sentez que vous avez l'autonomie recherchée. Beaucoup de dirigeants espacent naturellement les séances après quelques mois plutôt que d'arrêter net.</div>
+        </details>
+        <details>
+          <summary>Quelle est la différence avec une formation collective ?<svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></summary>
+          <div class="faq-answer">La formation collective est pensée pour transmettre un socle commun à plusieurs personnes en même temps, avec un programme largement fixé à l'avance. Le coaching individuel part uniquement de votre activité à vous : vos dossiers, votre secteur, votre rythme. C'est plus lent à l'échelle d'une équipe, mais plus profond pour une seule personne.</div>
+        </details>
+    </div>
+    <div class="example-card">
+      <div class="example-label">Cas concret</div>
+      <p>Julien est consultant indépendant en RH à Nantes, seul dans son activité. Il utilisait ChatGPT de façon basique depuis un an sans vraiment gagner de temps. En quatre séances de coaching, il a mis en place un système de templates de prompts pour ses comptes-rendus d'entretien, appris à faire analyser des CV en masse avec des critères précis, et structuré une routine hebdomadaire de veille automatisée sur son secteur. Il estime aujourd'hui récupérer environ 4 heures par semaine, du temps qu'il consacre désormais à prospecter de nouveaux clients.</p>
     </div>
   </div>
 </section>

@@ -60,6 +60,18 @@
     .trust-pills{display:flex;gap:16px;flex-wrap:wrap;margin-top:36px}
     .trust-pill{display:flex;align-items:center;gap:6px;font-size:0.8rem;font-weight:600;color:var(--muted)}
     .trust-pill .check{color:var(--accent);font-weight:900}
+    .faq-section{padding:80px 0;background:var(--bg2)}
+    .faq-list{display:flex;flex-direction:column;gap:14px}
+    .faq-list details{background:#fff;border:1px solid var(--border);border-radius:var(--radius);padding:20px 24px}
+    .faq-list summary{cursor:pointer;list-style:none;display:flex;justify-content:space-between;align-items:center;gap:16px;font-weight:700;font-size:0.95rem}
+    .faq-list summary::-webkit-details-marker{display:none}
+    .faq-list summary svg{flex-shrink:0;transition:transform 0.2s}
+    .faq-list details[open] summary svg{transform:rotate(180deg)}
+    .faq-answer{margin-top:14px;font-size:0.88rem;color:var(--muted);line-height:1.7}
+    .example-card{background:#fff;border:1.5px solid rgba(16,185,129,0.25);border-radius:var(--radius);padding:28px;margin-top:32px}
+    .example-card .example-label{font-size:0.72rem;font-weight:800;letter-spacing:0.1em;text-transform:uppercase;color:var(--accent);margin-bottom:10px}
+    .example-card p{font-size:0.9rem;color:var(--text);line-height:1.75}
+
     .price-banner{display:flex;align-items:baseline;gap:10px;margin-top:28px;padding:16px 24px;background:#fff;border:1.5px solid rgba(26,60,255,0.2);border-radius:var(--radius);width:fit-content}
     .price-banner .amount{font-size:1.6rem;font-weight:900;color:var(--primary)}
     .price-banner .detail{font-size:0.82rem;color:var(--muted)}
@@ -135,6 +147,7 @@
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" media="print" onload="this.media='all'" />
   <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" /></noscript>
   <link rel="stylesheet" href="/mobile.css">
+  <script type="application/ld+json">{"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "Combien de temps ça prend vraiment, pas juste sur le papier ?", "acceptedAnswer": {"@type": "Answer", "text": "Le forfait couvre 3 jours de travail effectif de notre côté (entretiens, cartographie, chiffrage, restitution), généralement répartis sur 1 à 2 semaines pour laisser le temps de recueillir les bonnes informations sans mobiliser votre équipe en continu. Vous n'avez besoin de bloquer que quelques heures d'entretiens et la restitution finale."}}, {"@type": "Question", "name": "Suis-je obligé de continuer avec vous après l'audit ?", "acceptedAnswer": {"@type": "Answer", "text": "Non. La feuille de route vous appartient et reste exploitable même si vous choisissez de la mettre en œuvre seul, avec une autre équipe ou avec nous. On ne conditionne pas l'audit à un engagement ultérieur. Dans les faits, la plupart des entreprises enchaînent sur une formation ou un déploiement parce que la feuille de route rend le choix évident, pas parce qu'elles y sont obligées."}}, {"@type": "Question", "name": "L'audit remplace-t-il une formation ?", "acceptedAnswer": {"@type": "Answer", "text": "Non, les deux répondent à des besoins différents. L'audit vous dit quoi faire et dans quel ordre. La formation apprend à vos équipes à le faire elles-mêmes. Beaucoup de nos clients commencent par l'audit pour prioriser, puis enchaînent sur une ou deux formations ciblées sur les cas d'usage identifiés comme prioritaires."}}, {"@type": "Question", "name": "Le forfait 3 jours suffit-il pour une entreprise avec plusieurs sites ou filiales ?", "acceptedAnswer": {"@type": "Answer", "text": "Pas toujours. Le forfait de 1 600 € convient à une PME ou un périmètre ciblé (un service, un site). Au-delà, on chiffre sur devis, avec des missions observées de 1 à 4 semaines selon le nombre de sites, de métiers et d'interlocuteurs à couvrir."}}]}</script>
 </head>
 <body>
 <header>
@@ -228,6 +241,35 @@
       <div class="financement-item"><div class="fi-icon">📅</div><h4>Délai de paiement</h4><p>30 jours fin de mois</p></div>
       <div class="financement-item"><div class="fi-icon">🧾</div><h4>Prix HT</h4><p>Régime micro-entreprise, pas de TVA appliquée</p></div>
       <div class="financement-item"><div class="fi-icon">🤝</div><h4>Sur devis au-delà</h4><p>Périmètre complexe ou multi-filiales : devis personnalisé</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="faq-section">
+  <div class="container">
+    <div class="section-label">Questions fréquentes</div>
+    <h2 class="section-title">Ce qu'on nous demande le plus souvent</h2>
+    <div class="faq-list">
+        <details open>
+          <summary>Combien de temps ça prend vraiment, pas juste sur le papier ?<svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></summary>
+          <div class="faq-answer">Le forfait couvre 3 jours de travail effectif de notre côté (entretiens, cartographie, chiffrage, restitution), généralement répartis sur 1 à 2 semaines pour laisser le temps de recueillir les bonnes informations sans mobiliser votre équipe en continu. Vous n'avez besoin de bloquer que quelques heures d'entretiens et la restitution finale.</div>
+        </details>
+        <details>
+          <summary>Suis-je obligé de continuer avec vous après l'audit ?<svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></summary>
+          <div class="faq-answer">Non. La feuille de route vous appartient et reste exploitable même si vous choisissez de la mettre en œuvre seul, avec une autre équipe ou avec nous. On ne conditionne pas l'audit à un engagement ultérieur. Dans les faits, la plupart des entreprises enchaînent sur une formation ou un déploiement parce que la feuille de route rend le choix évident, pas parce qu'elles y sont obligées.</div>
+        </details>
+        <details>
+          <summary>L'audit remplace-t-il une formation ?<svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></summary>
+          <div class="faq-answer">Non, les deux répondent à des besoins différents. L'audit vous dit quoi faire et dans quel ordre. La formation apprend à vos équipes à le faire elles-mêmes. Beaucoup de nos clients commencent par l'audit pour prioriser, puis enchaînent sur une ou deux formations ciblées sur les cas d'usage identifiés comme prioritaires.</div>
+        </details>
+        <details>
+          <summary>Le forfait 3 jours suffit-il pour une entreprise avec plusieurs sites ou filiales ?<svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></summary>
+          <div class="faq-answer">Pas toujours. Le forfait de 1 600 € convient à une PME ou un périmètre ciblé (un service, un site). Au-delà, on chiffre sur devis, avec des missions observées de 1 à 4 semaines selon le nombre de sites, de métiers et d'interlocuteurs à couvrir.</div>
+        </details>
+    </div>
+    <div class="example-card">
+      <div class="example-label">Cas concret</div>
+      <p>Fatou dirige une entreprise de logistique de 22 salariés près de Lille. Elle savait que l'IA pouvait l'aider mais hésitait entre former ses équipes au prompt, automatiser le suivi des livraisons, ou les deux. Trois jours d'audit plus tard, la priorité est devenue évidente : automatiser d'abord la génération des bordereaux et des relances clients (un gain estimé à 6 heures par semaine), puis former les équipes commerciales sur la prospection assistée par IA dans un second temps. Sans cette feuille de route, elle aurait probablement commencé par la formation, la piste la moins rentable pour son cas.</p>
     </div>
   </div>
 </section>
