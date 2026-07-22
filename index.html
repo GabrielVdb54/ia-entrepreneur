@@ -232,6 +232,14 @@
       color: var(--accent);
     }
 
+    .faq-list { display: flex; flex-direction: column; gap: 14px; }
+    .faq-list details { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px 24px; }
+    .faq-list summary { cursor: pointer; list-style: none; display: flex; justify-content: space-between; align-items: center; gap: 16px; font-weight: 700; font-size: 0.95rem; }
+    .faq-list summary::-webkit-details-marker { display: none; }
+    .faq-list summary svg { flex-shrink: 0; transition: transform 0.2s; }
+    .faq-list details[open] summary svg { transform: rotate(180deg); }
+    .faq-answer { margin-top: 14px; font-size: 0.88rem; color: var(--muted); line-height: 1.7; }
+
     h2.section-title {
       font-size: clamp(1.75rem, 4vw, 2.6rem);
       font-weight: 800;
@@ -2497,6 +2505,34 @@
         </a>
       </div>
 
+    </div>
+  </section>
+
+  <!-- ── FAQ ──────────────────────────────────────────────────── -->
+  <section id="faq">
+    <div class="container">
+      <div class="section-label reveal"><span>Questions fréquentes</span></div>
+      <h2 class="section-title reveal">Ce qu'on nous<br />demande le <span style="color:var(--primary)">plus souvent</span></h2>
+      <p class="section-sub reveal">Les réponses aux questions qu'on nous pose à chaque premier échange.</p>
+
+      <div class="faq-list reveal">
+        <details open>
+          <summary>Combien coûte une intégration IA pour mon entreprise ?<svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></summary>
+          <div class="faq-answer">Nos intégrations IA démarrent à partir de 600 € pour un compte-rendu de réunion automatique, jusqu'à 2 000 € pour un chatbot client complet. Toutes nos installations sont payables en 3 fois sans frais et incluent la correction des bugs. Opérationnel en 48h.</div>
+        </details>
+        <details>
+          <summary>Les formations IA sont-elles finançables par l'OPCO ?<svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></summary>
+          <div class="faq-answer">Oui. IA-Entrepreneur est certifié Qualiopi, condition indispensable pour tout financement OPCO ou FAF. Nos formations IA Essentiel (800 €/apprenant) et IA Pro (1 000 €/apprenant) sont éligibles au financement via votre OPCO, avec zéro reste à charge possible pour l'entreprise.</div>
+        </details>
+        <details>
+          <summary>Quelle est la différence entre une formation IA et une intégration IA clé en main ?<svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></summary>
+          <div class="faq-answer">La formation IA permet à vos équipes de maîtriser et utiliser les outils IA elles-mêmes. L'intégration clé en main, c'est nous qui installons et maintenons l'outil pour vous, vous n'avez rien à apprendre. Les deux approches sont complémentaires.</div>
+        </details>
+        <details>
+          <summary>Combien de temps faut-il pour installer un chatbot sur mon site ?<svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></summary>
+          <div class="faq-answer">48h à compter de votre validation du devis. Compatible Wordpress, Wix, Shopify, Webflow et sites statiques. Bugs corrigés inclus. Vous recevez une démonstration avant la mise en production.</div>
+        </details>
+      </div>
     </div>
   </section>
 
