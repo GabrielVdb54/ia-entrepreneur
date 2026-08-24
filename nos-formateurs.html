@@ -24,6 +24,7 @@
 <meta property="og:locale" content="fr_FR">
 <meta property="og:site_name" content="IA-Entrepreneur">
 <meta name="twitter:card" content="summary_large_image">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Accueil","item":"https://ia-entrepreneur.fr/"},{"@type":"ListItem","position":2,"name":"Nos formateurs","item":"https://ia-entrepreneur.fr/nos-formateurs.html"}]}</script>
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -105,6 +106,17 @@
       "image": "https://ia-entrepreneur.fr/images/charly-michel.jpg",
       "url": "https://ia-entrepreneur.fr/nos-formateurs.html#charly-michel",
       "knowsAbout": ["Intelligence artificielle générative", "Stratégie commerciale", "Lead generation", "Marketing digital", "Création d'entreprise"],
+      "worksFor": { "@type": "Organization", "name": "IA-Entrepreneur" }
+    },
+    {
+      "@type": "Person",
+      "position": 8,
+      "name": "Mathieu Lemoine",
+      "jobTitle": "Formateur IA générative, commercial et développement d'entreprise",
+      "description": "Formateur en intelligence artificielle générative, plus de vingt ans d'expérience en prospection et développement commercial, diplômé Chef de Projet en Intelligence Artificielle.",
+      "image": "https://ia-entrepreneur.fr/images/mathieu-lemoine.jpg",
+      "url": "https://ia-entrepreneur.fr/nos-formateurs.html#mathieu-lemoine",
+      "knowsAbout": ["Intelligence artificielle générative", "Prospection commerciale", "Techniques de vente", "CRM", "Automatisation"],
       "worksFor": { "@type": "Organization", "name": "IA-Entrepreneur" }
     }
   ]
@@ -640,6 +652,7 @@
     <a href="/formateur-gilles-idoux.html">Gilles Idoux</a>
     <a href="/formateur-charly-michel.html">Charly Michel</a>
     <a href="/formateur-dorian-didiot.html">Dorian Didiot</a>
+    <a href="/formateur-mathieu-lemoine.html">Mathieu Lemoine</a>
   </div>
 
   <div class="search-wrap">
@@ -940,6 +953,37 @@ const formateurs = [
     temoignage: {
       texte: "Je recommande Dorian à 100 %. Je collabore avec lui sur différents projets et je suis toujours impressionnée par son professionnalisme. Il est réactif, pertinent dans ses propositions, à l'écoute de nos besoins et fait preuve d'un excellent sens de la relation client.",
       auteur: "Camille Dargot, fondatrice de Sparky Marketing"
+    }
+  },
+  {
+    id: "mathieu-lemoine",
+    nom: "Mathieu Lemoine",
+    role: "Formateur IA générative · Commercial & développement d'entreprise",
+    loc: "Bourg-en-Bresse, Auvergne-Rhône-Alpes · Distanciel pour toute la France",
+    photo: "images/mathieu-lemoine.jpg",
+    pitch: "Vingt ans de terrain commercial avant l'IA : Mathieu rend l'intelligence artificielle générative concrète, utile et immédiatement applicable, en entreprise comme au quotidien.",
+    specialites: ["IA générative appliquée au commerce", "Techniques de vente & prospection", "Automatisation & CRM"],
+    bio: "Commercial depuis plus de vingt ans, Mathieu a construit son expérience sur le terrain : prospection, développement commercial, gestion de portefeuilles clients et management d'équipes, d'abord en BtoC puis en BtoB. Cette pratique du terrain l'a naturellement conduit vers la formation, avec une approche centrée sur l'écoute, le conseil et la performance commerciale. Prospection, techniques de vente, organisation commerciale, usage d'un CRM au quotidien : il aime transmettre des méthodes concrètes, directement applicables dans le quotidien professionnel, et c'est au contact des apprenants qu'il a développé un vrai goût pour la pédagogie et l'accompagnement. Passionné par les nouvelles technologies, il s'est ensuite spécialisé dans l'intelligence artificielle jusqu'à obtenir un diplôme de Chef de Projet en Intelligence Artificielle. Il conçoit et anime aujourd'hui des formations autour de l'IA générative avec un objectif simple : rendre ces outils accessibles et montrer comment les intégrer concrètement dans l'entreprise comme dans la vie quotidienne, des premiers usages à la création de prompts efficaces, jusqu'à l'automatisation de certaines tâches.",
+    stats: [
+      { num: "20 ans", label: "D'expérience en prospection et développement commercial" },
+      { num: "Chef de Projet IA", label: "Diplôme en intelligence artificielle" },
+      { num: "BtoC → BtoB", label: "Parcours commercial complet, du terrain à l'accompagnement" },
+      { num: "3", label: "Univers formés : prospection, vente, IA générative" }
+    ],
+    competences: [
+      "Prospection commerciale et développement de portefeuille clients",
+      "Techniques de vente et négociation",
+      "Organisation commerciale et management d'équipes",
+      "Utilisation d'un CRM au quotidien",
+      "Formation à l'IA générative appliquée au commerce et à l'entreprise",
+      "Création de prompts efficaces et automatisation de tâches"
+    ],
+    public: ["Commerciaux", "Équipes commerciales", "TPE, PME", "Entrepreneurs", "Managers"],
+    outils: ["ChatGPT", "Claude", "CRM", "LinkedIn", "Automatisation (no-code)"],
+    references: ["Accompagnement d'entreprises et de professionnels", "Secteur commercial BtoC & BtoB"],
+    temoignage: {
+      texte: "Mon expérience commerciale me sert de boussole : je ne montre jamais un outil IA sans expliquer comment il change concrètement le travail au quotidien.",
+      auteur: "Mathieu Lemoine"
     }
   }
 ];

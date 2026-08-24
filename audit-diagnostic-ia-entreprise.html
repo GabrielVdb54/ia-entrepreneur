@@ -136,7 +136,14 @@
       .footer-inner{flex-direction:column;align-items:flex-start}.footer-right{text-align:left}
     }
     @media(max-width:480px){.container{padding:0 16px}.financement-grid{grid-template-columns:1fr}}
+    .formateur-band{padding:0 0 40px}
+    .formateur-card{display:flex;align-items:center;gap:20px;max-width:640px;padding:22px 26px;border-radius:var(--radius);border:1.5px solid var(--border);background:var(--bg2)}
+    .formateur-card img{width:76px;height:76px;border-radius:50%;object-fit:cover;flex-shrink:0}
+    .formateur-card h3{font-size:1rem;font-weight:800;margin-bottom:4px;color:var(--text)}
+    .formateur-card p{font-size:0.88rem;color:var(--muted);line-height:1.6;margin:0}
+    @media(max-width:600px){.formateur-card{flex-direction:column;text-align:center}}
 </style>
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Accueil","item":"https://ia-entrepreneur.fr/"},{"@type":"ListItem","position":2,"name":"Audit IA entreprise","item":"https://ia-entrepreneur.fr/audit-diagnostic-ia-entreprise.html"}]}</script>
   <script type="application/ld+json">{"@context":"https://schema.org","@type":"Service","name":"Audit IA entreprise","description":"Audit et diagnostic IA pour entreprises : cartographie des cas d'usage, priorisation et chiffrage du ROI potentiel.","provider":{"@type":"Organization","name":"IA-Entrepreneur","url":"https://ia-entrepreneur.fr"},"url":"https://ia-entrepreneur.fr/audit-diagnostic-ia-entreprise.html","offers":{"@type":"Offer","priceCurrency":"EUR","price":"1600","availability":"https://schema.org/InStock"}}</script>
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="Audit IA Entreprise : Diagnostic & Feuille de Route | IA-Entrepreneur" />
@@ -201,6 +208,18 @@
     <div class="price-banner">
       <span class="amount">à partir de 1 600 €</span>
       <span class="detail">HT · forfait 3 jours · sur devis si périmètre complexe (1 à 4 semaines)</span>
+    </div>
+  </div>
+</section>
+
+<section class="formateur-band">
+  <div class="container">
+    <div class="formateur-card">
+      <img src="/images/gabriel-vanderbecken.jpg" alt="Gabriel Vanderbecken" loading="lazy" />
+      <div>
+        <h3>Gabriel Vanderbecken</h3>
+        <p>Fondateur d'IA-Entrepreneur, formateur IA certifié Qualiopi. C'est lui qui réalise personnellement chaque audit, du terrain jusqu'à la feuille de route.</p>
+      </div>
     </div>
   </div>
 </section>

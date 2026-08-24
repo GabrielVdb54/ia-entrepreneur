@@ -17,6 +17,8 @@
   <!-- Google Ads conversion tracking -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=AW-18076082295"></script>
   <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','AW-18076082295');</script>
+  <!-- Schema BreadcrumbList -->
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Accueil","item":"https://ia-entrepreneur.fr/"},{"@type":"ListItem","position":2,"name":"Formations IA entreprises","item":"https://ia-entrepreneur.fr/formations-entreprises.html"}]}</script>
   <!-- Schema FAQPage · questions à forte intention d'achat -->
   <script type="application/ld+json">
   {
@@ -69,6 +71,14 @@
         "acceptedAnswer": {
           "@type": "Answer",
           "text": "Chaque participant reçoit une attestation de formation individuelle précisant les compétences acquises et les outils travaillés. Cette attestation est conforme aux exigences de l'article 4 de l'AI Act (obligation de formation IA depuis le 2 février 2025). Pour les entreprises qui ont besoin d'un registre de conformité AI Act complet, nous le fournissons en option."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Vos formations sont-elles accessibles aux personnes en situation de handicap ?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Oui. Gabriel Vanderbecken, référent handicap d'IA-Entrepreneur, étudie avec chaque participant concerné les adaptations nécessaires avant la formation : rythme et durée des sessions, supports pédagogiques adaptés, aménagement du poste (présentiel ou distanciel). Contactez-nous à contact@ia-entrepreneur.fr dès votre demande de devis pour que ces adaptations soient prises en compte dans le programme."
         }
       }
     ]
@@ -272,7 +282,16 @@
     .footer-links a:hover{color:var(--text)}
 
     @media(max-width:1024px){.niveaux-grid,.niveaux-grid-3,.entreprises-inner,.waiting-inner,.resultats-grid{grid-template-columns:1fr}.niveaux-grid>*,.niveaux-grid-3>*,.entreprises-inner>*,.waiting-inner>*,.resultats-grid>*{min-width:0}.financement-grid{grid-template-columns:repeat(2,1fr)}.week-sessions{grid-template-columns:1fr}.session-slot{border-right:none;border-bottom:1px solid var(--border)}.session-slot:last-child{border-bottom:none}}
-    @media(max-width:768px){nav{display:none}.hamburger{display:flex}.financement-grid{grid-template-columns:1fr}.form-row{grid-template-columns:1fr}.cta-inner{padding:36px 24px}.calendar-header{flex-direction:column;align-items:flex-start}.pricing-recap-grid{grid-template-columns:1fr!important}}
+    @media(max-width:768px){nav{display:none}.hamburger{display:flex}.financement-grid{grid-template-columns:1fr}.form-row{grid-template-columns:1fr}.cta-inner{padding:36px 24px}.calendar-header{flex-direction:column;align-items:flex-start}.pricing-recap-grid{grid-template-columns:1fr!important}.formateurs-band-inner{flex-direction:column;text-align:center}}
+
+    .formateurs-band{padding:0 0 40px}
+    .formateurs-band-inner{display:flex;align-items:center;gap:20px;max-width:640px;padding:22px 26px;border-radius:var(--radius);border:1.5px solid var(--border);background:var(--bg2)}
+    .formateurs-band-avatars{display:flex;flex-shrink:0}
+    .formateurs-band-avatars img{width:52px;height:52px;border-radius:50%;object-fit:cover;object-position:center top;border:3px solid var(--bg2);margin-left:-14px;box-shadow:0 2px 10px rgba(10,15,44,0.14)}
+    .formateurs-band-avatars img:first-child{margin-left:0}
+    .formateurs-band-inner h3{font-size:1rem;font-weight:800;margin-bottom:4px;color:var(--text)}
+    .formateurs-band-inner p{font-size:0.88rem;color:var(--muted);line-height:1.6;margin:0}
+    .formateurs-band-inner a{color:var(--primary);font-weight:700}
   </style>
   <link rel="stylesheet" href="/mobile.css" />
 </head>
@@ -336,6 +355,23 @@
       <div class="hero-tabs">
         <button class="hero-tab" onclick="switchTab('inter', this)">Je suis freelance / indépendant</button>
         <button class="hero-tab active" onclick="switchTab('entreprise', this)">Je suis une entreprise</button>
+      </div>
+    </div>
+  </section>
+
+  <section class="formateurs-band">
+    <div class="container">
+      <div class="formateurs-band-inner">
+        <div class="formateurs-band-avatars">
+          <img src="/images/gabriel-vanderbecken.jpg" alt="Gabriel Vanderbecken" loading="lazy" />
+          <img src="/images/achille-brial.jpg" alt="Achille Brial" loading="lazy" />
+          <img src="/images/celine-herment.jpg" alt="Céline Herment" loading="lazy" />
+          <img src="/images/sina-movaghar.jpg" alt="Sina Movaghar" loading="lazy" />
+        </div>
+        <div>
+          <h3>Une équipe de formateurs-praticiens</h3>
+          <p>Vos sessions sont animées par des experts actifs dans leur domaine, pas des intervenants génériques. <a href="/nos-formateurs.html">Découvrir l'équipe →</a></p>
+        </div>
       </div>
     </div>
   </section>
@@ -816,6 +852,10 @@
         <details>
           <summary>Quelle est la politique d'annulation ?<svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></summary>
           <div class="faq-answer">Annulation sans frais jusqu'à J-7. En dessous de 7 jours, la session est due. Un report vers une autre session est toujours possible sans frais, validé par Gabriel.</div>
+        </details>
+        <details>
+          <summary>Vos formations sont-elles accessibles aux personnes en situation de handicap ?<svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></summary>
+          <div class="faq-answer">Oui. Gabriel Vanderbecken, référent handicap d'IA-Entrepreneur, étudie avec chaque participant concerné les adaptations nécessaires avant la formation : rythme et durée des sessions, supports pédagogiques adaptés, aménagement du poste (présentiel ou distanciel). <a href="mailto:contact@ia-entrepreneur.fr" style="color:var(--primary);font-weight:700;">Contactez-nous</a> dès votre demande de devis pour que ces adaptations soient prises en compte dans le programme.</div>
         </details>
       </div>
     </div>
