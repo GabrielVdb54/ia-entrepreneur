@@ -16,12 +16,12 @@ OUTPUT_FILE = Path(__file__).parent / "blog.html"
 
 # Images de fallback par catégorie
 FALLBACK_IMAGES = {
-    "Création d'entreprise": "https://images.unsplash.com/photo-1556761175-b413da4baf72?w=600&q=80",
-    "Intelligence Artificielle": "https://images.unsplash.com/photo-1677442135703-1787eea5ce01?w=600&q=80",
-    "Développement commercial": "https://images.unsplash.com/photo-1552664730-d307ca884978?w=600&q=80",
-    "Management": "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=600&q=80",
-    "Financement": "https://images.unsplash.com/photo-1554224155-6726b3ff858f?w=600&q=80",
-    "default": "https://images.unsplash.com/photo-1559136555-9303baea8ebd?w=600&q=80"
+    "Création d'entreprise": "/images/blog-creation-entreprise.jpg",
+    "Intelligence Artificielle": "/images/blog-intelligence-artificielle.jpg",
+    "Développement commercial": "/images/formation-ia-equipes.jpg",
+    "Management": "/images/blog-management.jpg",
+    "Financement": "/images/blog-financement.jpg",
+    "default": "/images/blog-default.jpg"
 }
 
 def extract_meta(html_content, tag, attr="content"):
