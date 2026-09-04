@@ -245,19 +245,19 @@
     .btn-pack-white{background:#fff;color:var(--primary)}
     .btn-pack-white:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(0,0,0,0.12)}
 
-    /* ROI CALC */
-    .roi-section{padding:72px 0;background:var(--bg2)}
-    .roi-inner{background:var(--primary);border-radius:24px;padding:56px;display:grid;grid-template-columns:1fr 1fr;gap:56px;align-items:start}
-    .roi-content h2{font-size:clamp(1.5rem,3vw,2rem);font-weight:800;color:#fff;line-height:1.2;margin-bottom:16px}
-    .roi-content p{font-size:0.92rem;color:rgba(255,255,255,0.78);line-height:1.85;margin-bottom:12px}
-    .roi-disclaimer{font-size:0.72rem;color:rgba(255,255,255,0.4);margin-top:16px}
-    .roi-calc{display:flex;flex-direction:column;gap:16px}
-    .roi-row{background:rgba(255,255,255,0.06);border-radius:12px;padding:18px 20px;border:1px solid rgba(255,255,255,0.1)}
-    .roi-row-title{font-size:0.78rem;font-weight:700;color:rgba(255,255,255,0.6);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:6px}
-    .roi-row-value{font-size:1.3rem;font-weight:900;color:#fff;line-height:1}
-    .roi-row-sub{font-size:0.75rem;color:rgba(255,255,255,0.5);margin-top:4px}
-    .roi-row.highlight{background:rgba(16,185,129,0.15);border-color:rgba(16,185,129,0.3)}
-    .roi-row.highlight .roi-row-value{color:#10B981}
+    /* COMPARATIF TEMPS */
+    .gains-section{padding:72px 0;background:var(--bg2)}
+    .gains-inner{background:var(--primary);border-radius:24px;padding:56px;display:grid;grid-template-columns:1fr 1fr;gap:56px;align-items:start}
+    .gains-content h2{font-size:clamp(1.5rem,3vw,2rem);font-weight:800;color:#fff;line-height:1.2;margin-bottom:16px}
+    .gains-content p{font-size:0.92rem;color:rgba(255,255,255,0.78);line-height:1.85;margin-bottom:12px}
+    .gains-disclaimer{font-size:0.72rem;color:rgba(255,255,255,0.4);margin-top:16px}
+    .gains-calc{display:flex;flex-direction:column;gap:16px}
+    .gains-row{background:rgba(255,255,255,0.06);border-radius:12px;padding:18px 20px;border:1px solid rgba(255,255,255,0.1)}
+    .gains-row-title{font-size:0.78rem;font-weight:700;color:rgba(255,255,255,0.6);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:6px}
+    .gains-row-value{font-size:1.3rem;font-weight:900;color:#fff;line-height:1}
+    .gains-row-sub{font-size:0.75rem;color:rgba(255,255,255,0.5);margin-top:4px}
+    .gains-row.highlight{background:rgba(16,185,129,0.15);border-color:rgba(16,185,129,0.3)}
+    .gains-row.highlight .gains-row-value{color:#10B981}
 
     /* PROCESS */
     .process-section{padding:72px 0}
@@ -286,7 +286,7 @@
     .footer-copy{font-size:0.73rem;color:var(--muted);opacity:0.7}
 
     @media(max-width:1024px){
-      .product-featured,.case-inner,.roi-inner{grid-template-columns:1fr}
+      .product-featured,.case-inner,.gains-inner{grid-template-columns:1fr}
       .product-featured.reverse{direction:ltr}
       .secondary-grid{grid-template-columns:1fr}
       .packs-grid{grid-template-columns:1fr}
@@ -299,7 +299,7 @@
       .process-steps{grid-template-columns:repeat(2,1fr)}
       .case-stats{grid-template-columns:repeat(3,1fr)}
       .includes-grid{grid-template-columns:1fr}
-      .roi-inner{padding:32px 24px;gap:32px}
+      .gains-inner{padding:32px 24px;gap:32px}
       .cta-inner{padding:40px 24px}
       .product-content{padding:28px 24px}
       .product-visual{padding:28px 24px}
@@ -569,8 +569,8 @@
                   <span class="proof-pill-label">de visiteurs convertis en contacts</span>
                 </div>
                 <div class="proof-pill">
-                  <span class="proof-pill-num">3 mois</span>
-                  <span class="proof-pill-label">pour atteindre le seuil de rentabilité</span>
+                  <span class="proof-pill-num">24/7</span>
+                  <span class="proof-pill-label">aucune demande laissée sans réponse</span>
                 </div>
               </div>
             </div>
@@ -636,8 +636,8 @@
                   <span class="proof-pill-label">économisées par mois</span>
                 </div>
                 <div class="proof-pill green">
-                  <span class="proof-pill-num">ROI +</span>
-                  <span class="proof-pill-label">dès le 1er mois</span>
+                  <span class="proof-pill-num">0 oubli</span>
+                  <span class="proof-pill-label">plus un email qui passe à la trappe</span>
                 </div>
                 <div class="proof-pill green">
                   <span class="proof-pill-num">100%</span>
@@ -860,36 +860,36 @@
     </div>
   </section>
 
-  <!-- ROI -->
-  <section class="roi-section">
+  <!-- COMPARATIF TEMPS -->
+  <section class="gains-section">
     <div class="container">
-      <div class="roi-inner">
-        <div class="roi-content">
-          <h2>Le calcul que font vos concurrents. Faites-le avant eux.</h2>
-          <p>Un freelance SEO coûte 80 à 150 € par article. 10 articles par mois = 800 à 1 500 €. Notre intégration coûte 1 000 € une fois, puis ~30 €/mois en API. En 2 mois vous avez rentabilisé l'investissement.</p>
-          <p>Pour le chatbot : si vous recevez 20 demandes par mois hors heures ouvrables et que votre panier moyen est de 2 000 €, convertir 2 de ces demandes rembourse votre chatbot 2 fois. Dès le premier mois.</p>
-          <p class="roi-disclaimer">Estimations basées sur des benchmarks sectoriels documentés. Les résultats varient selon votre secteur et votre volume de trafic.</p>
+      <div class="gains-inner">
+        <div class="gains-content">
+          <h2>Le temps que ça vous rend. Tous les mois.</h2>
+          <p>Rédiger et publier 10 articles en interne, c'est plusieurs jours de travail par mois, tous les mois, à refaire. L'intégration tourne seule : vous relisez, vous validez, vous publiez. Le temps repart sur ce que personne ne peut faire à votre place.</p>
+          <p>Pour le chatbot : les demandes qui arrivent le soir, le week-end ou pendant vos rendez-vous obtiennent une réponse tout de suite. Plus de message oublié au fond d'une boîte mail, plus de relance qui passe à la trappe.</p>
+          <p class="gains-disclaimer">Les gains varient selon votre secteur, vos volumes et vos process actuels. On les estime avec vous sur vos propres chiffres avant de lancer quoi que ce soit.</p>
         </div>
-        <div class="roi-calc">
-          <div class="roi-row">
-            <div class="roi-row-title">Freelance SEO · 10 articles/mois</div>
-            <div class="roi-row-value">800 à 1 500 € / mois</div>
-            <div class="roi-row-sub">Récurrent. Chaque mois.</div>
+        <div class="gains-calc">
+          <div class="gains-row">
+            <div class="gains-row-title">Rédaction SEO externalisée</div>
+            <div class="gains-row-value">80 à 150 € par article</div>
+            <div class="gains-row-sub">À refaire à chaque publication.</div>
           </div>
-          <div class="roi-row">
-            <div class="roi-row-title">Notre intégration · 20 articles/mois</div>
-            <div class="roi-row-value">1 000 € une fois + ~30 €/mois</div>
-            <div class="roi-row-sub">Installation unique. Bugs inclus. 3× sans frais.</div>
+          <div class="gains-row">
+            <div class="gains-row-title">Notre intégration · 20 articles/mois</div>
+            <div class="gains-row-value">1 000 € une fois + ~30 €/mois</div>
+            <div class="gains-row-sub">Installation unique. Bugs inclus. 3× sans frais.</div>
           </div>
-          <div class="roi-row highlight">
-            <div class="roi-row-title">Économie sur 12 mois</div>
-            <div class="roi-row-value">8 600 à 16 600 €</div>
-            <div class="roi-row-sub">Pour le double de publications</div>
+          <div class="gains-row highlight">
+            <div class="gains-row-title">Ce que ça vous rend</div>
+            <div class="gains-row-value">Vos heures de rédaction</div>
+            <div class="gains-row-sub">Pour le double de publications</div>
           </div>
-          <div class="roi-row">
-            <div class="roi-row-title">Chatbot · délai de rentabilité</div>
-            <div class="roi-row-value">3 mois en moyenne</div>
-            <div class="roi-row-sub">Source : entreprise-plus.com, 2026</div>
+          <div class="gains-row">
+            <div class="gains-row-title">Chatbot · couverture</div>
+            <div class="gains-row-value">24 h/24, 7 j/7</div>
+            <div class="gains-row-sub">Aucune demande laissée sans réponse</div>
           </div>
         </div>
       </div>
