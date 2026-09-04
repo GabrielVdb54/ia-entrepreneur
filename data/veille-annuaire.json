@@ -26,7 +26,7 @@
    "nom": "Gemini",
    "url": "https://gemini.google.com/",
    "statut": 302,
-   "final": "https://www.google.com/sorry/index?continue=https://gemini.google.com/&q=EhAqAcsRgCuWs3mxpeBBdpXEGL-m6tQGIjDOeFdjm0-1DL6seL_pyib3GfGv5P5Y0hTMM5E-f1U_RGQgOW47rsR92zBfTo_yUX8yBz5qY25kclJaAUM",
+   "final": "https://www.google.com/sorry/index?continue=https://gemini.google.com/&q=EhAqAcsRgCuWs3mxpeBBdpXEGJOp6tQGIjBchjtjpP3pijZaD0rAbijwyU2B9LZw_Tba9Ee4e7B81ImOytxe1J_Pv6G68RuqWosyBz5qY25kclJaAUM",
    "titre": "302 Moved",
    "protege": false,
    "redirige": false
@@ -56,7 +56,7 @@
    "nom": "NotebookLM",
    "url": "https://notebooklm.google.com/",
    "statut": 200,
-   "final": "https://accounts.google.com/v3/signin/identifier?continue=https://notebook.google.com/login?continue%3Dhttps://notebook.google.com/&followup=https://notebook.google.com/login?continue%3Dhttps://notebook.google.com/&osid=1&passive=1209600&flowName=GlifWebSignIn&flowEntry=ServiceLogin&dsh=S472533009:1788515130859031",
+   "final": "https://accounts.google.com/v3/signin/identifier?continue=https://notebook.google.com/login?continue%3Dhttps://notebook.google.com/&followup=https://notebook.google.com/login?continue%3Dhttps://notebook.google.com/&osid=1&passive=1209600&flowName=GlifWebSignIn&flowEntry=ServiceLogin&dsh=S873218258:1788515470698554",
    "titre": "",
    "protege": false,
    "redirige": false
@@ -666,7 +666,7 @@
    "nom": "Gemini — Nano Banana",
    "url": "https://gemini.google.com/",
    "statut": 302,
-   "final": "https://www.google.com/sorry/index?continue=https://gemini.google.com/&q=EhAqAcsRgCuWs3mxpeBBdpXEGMOm6tQGIjC2KOV2jjyxGZzO1bZoMv3qo2v9efsLLv01v8HbR0O2NqJ5C86Bu8S2muq_2Iemk7AyBz5qY25kclJaAUM",
+   "final": "https://www.google.com/sorry/index?continue=https://gemini.google.com/&q=EhAqAcsRgCuWs3mxpeBBdpXEGJep6tQGIjAaGhqqgl1gmZzN12hb1cVqOc-jUIEgjrH4_RL_9AOgDiXB1PpqHZt7XqiCVIYoi4YyBz5qY25kclJaAUM",
    "titre": "302 Moved",
    "protege": false,
    "redirige": false
@@ -1047,7 +1047,7 @@
    "url": "https://www.airtable.com/",
    "statut": 200,
    "final": "https://www.airtable.com/",
-   "titre": "",
+   "titre": "Airtable: Build Enterprise-ready AI Workflows, Apps &amp; Agents | Airtable",
    "protege": false,
    "redirige": false
   },
@@ -1651,6 +1651,7 @@
    "nom": "Semrush",
    "source": "https://www.semrush.com/pricing",
    "montants": [
+    "$0",
     "$10",
     "$117",
     "$139",
@@ -1944,7 +1945,6 @@
    "montants": [
     "$0.99",
     "$132",
-    "$19",
     "$29",
     "$85",
     "$99"

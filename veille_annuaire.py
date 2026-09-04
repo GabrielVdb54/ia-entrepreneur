@@ -350,9 +350,53 @@ def afficher(r):
     print()
 
 
+def a_signaler(r):
+    """Y a-t-il quelque chose qui demande une intervention humaine ?"""
+    return bool(r['liens_morts'] or r['redirections'] or r['tarifs_grilles_modifiees']
+                or r['bible_erreur'])
+
+
+def markdown(r):
+    """Rapport en Markdown, pour le corps d'une issue GitHub."""
+    l = [f"Veille automatique du {r['date']} — `veille_annuaire.py`.", '']
+    if r['liens_morts']:
+        l.append(f"### {len(r['liens_morts'])} lien(s) mort(s)")
+        l += [f"- **{x['nom']}** — HTTP {x['statut']} — {x['url']}" for x in r['liens_morts']] + ['']
+    if r['redirections']:
+        l.append(f"### {len(r['redirections'])} changement(s) de domaine")
+        l.append("Souvent un renommage ou un rachat : à répercuter dans `url`, `name`, "
+                 "`editeur` et le texte de la fiche, en gardant le slug d'origine.")
+        l += [f"- **{x['nom']}** — {x['url']} → {x['final']}\n  - titre de la page : « {x['titre']} »"
+              for x in r['redirections']] + ['']
+    if r['tarifs_grilles_modifiees']:
+        l.append(f"### {len(r['tarifs_grilles_modifiees'])} grille(s) tarifaire(s) modifiée(s)")
+        l.append("Montants extraits sans contexte : ouvrir la page avant de corriger `prixDetail`.")
+        for x in r['tarifs_grilles_modifiees']:
+            l.append(f"- **{x['nom']}** — {x['source']}")
+            if x['apparus']:
+                l.append(f"  - apparus : {', '.join(x['apparus'])}")
+            if x['disparus']:
+                l.append(f"  - disparus : {', '.join(x['disparus'])}")
+        l.append('')
+    if r['bible_erreur']:
+        l.append(f"### Concurrent illisible\n{r['bible_erreur']}\n")
+    if r['bible_ajouts_du_mois']:
+        l.append("### Ajouts du mois chez avantagedigital.fr")
+        l.append(', '.join(r['bible_ajouts_du_mois'][:30]) + '\n')
+    l.append(f"---\nTarifs relevés : {r['tarifs_lisibles']}/{r['tarifs_total']} grilles lisibles. "
+             f"Couverture : {len(r['bible_absents_chez_nous'])} outils chez le concurrent et pas chez nous.")
+    l.append("\nAprès correction de `data/ia-tools.json` : `python3 generate_og_images.py` "
+             "puis `python3 generate_ia_pages.py`.")
+    return '\n'.join(l)
+
+
 if __name__ == '__main__':
     r = rapport()
     if '--json' in sys.argv:
         print(json.dumps(r, ensure_ascii=False, indent=1))
+    elif '--markdown' in sys.argv:
+        print(markdown(r))
     else:
         afficher(r)
+    if '--code-sortie' in sys.argv:
+        sys.exit(1 if a_signaler(r) else 0)
