@@ -6,7 +6,8 @@
   "cat": "assistants-ia",
   "cats": [
    "recherche-veille",
-   "redaction-contenu"
+   "redaction-contenu",
+   "data-analyse"
   ],
   "editeur": "OpenAI",
   "pays": "États-Unis",
@@ -369,8 +370,7 @@
   "niveau": "Expert",
   "profils": [
    "Ops",
-   "Développeur",
-   "Dirigeant"
+   "Développeur"
   ],
   "tags": "anythingllm open source local rag documents prive confidentiel",
   "note": 4.1,
@@ -619,8 +619,7 @@
   "niveau": "Intermédiaire",
   "profils": [
    "Ops",
-   "Développeur",
-   "Dirigeant"
+   "Développeur"
   ],
   "tags": "n8n automatisation workflow no-code auto-heberge agents ia rgpd",
   "note": 4.8,
@@ -657,7 +656,7 @@
   "pays": "Tchéquie / États-Unis",
   "prix": "Freemium",
   "prixDetail": "Version gratuite (1 000 opérations/mois) · à partir de ~10 €/mois",
-  "niveau": "Débutant",
+  "niveau": "Intermédiaire",
   "profils": [
    "Ops",
    "Marketing",
@@ -744,8 +743,7 @@
   "niveau": "Intermédiaire",
   "profils": [
    "Ops",
-   "RH",
-   "Dirigeant"
+   "RH"
   ],
   "tags": "power automate microsoft flux sharepoint outlook approbation rpa",
   "note": 4.0,
@@ -916,7 +914,7 @@
   "pays": "États-Unis",
   "prix": "Freemium",
   "prixDetail": "Version gratuite limitée · à partir de ~30 €/mois",
-  "niveau": "Débutant",
+  "niveau": "Intermédiaire",
   "profils": [
    "Dirigeant",
    "Commercial",
@@ -1372,7 +1370,8 @@
   "cat": "redaction-contenu",
   "cats": [
    "presentations-documents",
-   "data-analyse"
+   "data-analyse",
+   "assistants-ia"
   ],
   "editeur": "Notion Labs",
   "pays": "États-Unis",
@@ -1583,7 +1582,7 @@
   "editeur": "Ahrefs",
   "pays": "Singapour",
   "prix": "Payant",
-  "prixDetail": "À partir de ~120 €/mois · outils gratuits limités",
+  "prixDetail": "À partir de ~120 €/mois · outils gratuits limités à votre propre site",
   "niveau": "Intermédiaire",
   "profils": [
    "Marketing"
@@ -1703,7 +1702,7 @@
   ],
   "editeur": "YourTextGuru",
   "pays": "France",
-  "prix": "Freemium",
+  "prix": "Payant",
   "prixDetail": "Crédits · offres à partir de ~10 €/mois",
   "niveau": "Intermédiaire",
   "profils": [
@@ -2269,7 +2268,7 @@
   ],
   "editeur": "PhantomBuster",
   "pays": "France",
-  "prix": "Freemium",
+  "prix": "Payant",
   "prixDetail": "Version d'essai · à partir de ~56 €/mois",
   "niveau": "Intermédiaire",
   "profils": [
@@ -3877,7 +3876,7 @@
   "pays": "Suède",
   "prix": "Freemium",
   "prixDetail": "Crédits gratuits quotidiens · à partir de ~25 €/mois",
-  "niveau": "Débutant",
+  "niveau": "Intermédiaire",
   "profils": [
    "Dirigeant",
    "Ops",
@@ -4080,7 +4079,7 @@
   "editeur": "WordPress (open source)",
   "pays": "Communauté open source",
   "prix": "Gratuit",
-  "prixDetail": "Logiciel gratuit · hébergement à partir de ~5 €/mois",
+  "prixDetail": "Logiciel gratuit et open source · hébergement à votre charge (~5 €/mois)",
   "niveau": "Intermédiaire",
   "profils": [
    "Marketing",
@@ -4160,7 +4159,7 @@
   "pays": "Allemagne",
   "prix": "Freemium",
   "prixDetail": "Version gratuite · à partir de ~49 €/mois",
-  "niveau": "Débutant",
+  "niveau": "Intermédiaire",
   "profils": [
    "Ops",
    "Dirigeant"
@@ -4279,7 +4278,7 @@
   "pays": "États-Unis",
   "prix": "Freemium",
   "prixDetail": "Version gratuite · à partir de ~20 €/utilisateur/mois",
-  "niveau": "Débutant",
+  "niveau": "Intermédiaire",
   "profils": [
    "Ops",
    "Marketing",
@@ -4361,12 +4360,12 @@
   ],
   "editeur": "Microsoft",
   "pays": "États-Unis",
-  "prix": "Payant",
-  "prixDetail": "Desktop gratuit · publication à partir de ~10 €/utilisateur/mois",
+  "prix": "Freemium",
+  "prixDetail": "Power BI Desktop gratuit · publication à partir de ~10 €/utilisateur/mois",
   "niveau": "Expert",
   "profils": [
    "Ops",
-   "Dirigeant"
+   "Développeur"
   ],
   "tags": "power bi tableau de bord decisionnel microsoft copilot analyse donnees",
   "note": 4.4,
@@ -4644,7 +4643,7 @@
   "niveau": "Expert",
   "profils": [
    "Formateur",
-   "RH"
+   "Développeur"
   ],
   "tags": "moodle lms open source gratuit auto-heberge formation universite",
   "note": 4.0,
@@ -4951,7 +4950,7 @@
   "pays": "France",
   "prix": "Payant",
   "prixDetail": "Sur devis",
-  "niveau": "Expert",
+  "niveau": "Intermédiaire",
   "profils": [
    "Dirigeant",
    "Ops"
@@ -5029,7 +5028,7 @@
   "pays": "France",
   "prix": "Payant",
   "prixDetail": "À partir de ~29 €/mois selon l'offre et l'expert-comptable",
-  "niveau": "Débutant",
+  "niveau": "Intermédiaire",
   "profils": [
    "Dirigeant",
    "Ops"

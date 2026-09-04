@@ -14,13 +14,31 @@ on:
   schedule:
     - cron: '0 7 1 * *'   # 1er du mois, 7h UTC (8h ou 9h à Paris selon la saison)
   workflow_dispatch:
+  push:
+    paths:                # toute modification des données relance le contrôle
+      - 'data/**'
+      - 'generate_ia_pages.py'
+      - 'verifier_coherence.py'
 
 permissions:
   contents: write
   issues: write
 
 jobs:
+  # Contrôle de cohérence des fiches : niveaux, profils, bandes tarifaires,
+  # alternatives, couverture des usages. Rapide, il tourne à chaque
+  # modification des données pour qu'aucune incohérence n'atteigne le site.
+  coherence:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+      - run: python3 verifier_coherence.py
+
   veille:
+    if: github.event_name != 'push'
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:

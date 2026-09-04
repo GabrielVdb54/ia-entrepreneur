@@ -706,9 +706,11 @@ def build_hub():
     niv = '\n'.join(
         f"""            <button class="ia-choice" type="button" aria-pressed="false" data-q="niv" data-val="{n}">{n}</button>"""
         for n in NIVEAUX)
+    # « Gratuit » et « Freemium » revenaient au même pour qui veut démarrer sans
+    # payer : deux réponses lisibles valent mieux que trois qui se recouvrent.
     bud = '\n'.join(
-        f"""            <button class="ia-choice" type="button" aria-pressed="false" data-q="prix" data-val="{p}">{p}</button>"""
-        for p in ['Gratuit', 'Freemium', 'Payant'])
+        f"""            <button class="ia-choice" type="button" aria-pressed="false" data-q="budget" data-val="{v}">{lib}</button>"""
+        for v, lib in [('sans-payer', 'Commencer sans payer'), ('budget', "J'ai un budget")])
     opts_cat = '\n'.join(f'<option value="{c["slug"]}">{e(c["nom"])}</option>' for c in CATS)
     opts_prof = '\n'.join(f'<option value="{p}">{p}</option>' for p in PROFILS)
     opts_niv = '\n'.join(f'<option value="{n}">{n}</option>' for n in NIVEAUX)
@@ -809,14 +811,15 @@ def build_hub():
 {cards}
         <div class="ia-empty" id="ia-empty" hidden>Aucun outil ne correspond. Essayez un autre mot ou réinitialisez les filtres.</div>
       </div>
-      <p class="ia-maj">Notes attribuées par l'équipe IA-Entrepreneur selon quatre critères : facilité de prise en main, utilité réelle pour une TPE-PME, rapport qualité/prix et maturité de l'outil. Les tarifs sont indicatifs et constatés en {datetime.date.today().strftime('%m/%Y')} — vérifiez-les sur le site de l'éditeur. Aucun lien de cet annuaire n'est rémunéré.</p>
+      <p class="ia-maj"><b>Niveau requis</b> — <em>Débutant</em> : on s'en sert le jour même, sans paramétrage ni vocabulaire technique. <em>Intermédiaire</em> : il faut comprendre une logique (scénarios, champs, filtres) ou compter quelques jours de prise en main. <em>Expert</em> : compétence technique requise (code, auto-hébergement, administration).<br />
+      Notes attribuées par l'équipe IA-Entrepreneur selon quatre critères : facilité de prise en main, utilité réelle pour une TPE-PME, rapport qualité/prix et maturité de l'outil. Les tarifs sont indicatifs et constatés en {datetime.date.today().strftime('%m/%Y')} — vérifiez-les sur le site de l'éditeur. Aucun lien de cet annuaire n'est rémunéré.</p>
     </div>
   </section>
 
   <section class="ia-section" id="selecteur" style="background:var(--bg2);">
     <div class="container">
       <h2>Le sélecteur : quelle IA pour votre situation ?</h2>
-      <p class="intro">Quatre questions, cinq recommandations. Le classement croise votre objectif, votre rôle, votre niveau et votre budget avec les {len(TOOLS)} outils de l'annuaire.</p>
+      <p class="intro">Quatre questions, cinq recommandations. L'usage et le niveau sont des conditions strictes : vous ne verrez jamais un outil au-dessus du niveau que vous indiquez. Le rôle et le budget affinent le classement, et le sélecteur vous dit s'il a dû élargir.</p>
       <div class="ia-selector">
         <div class="ia-q"><label>1. Qu'est-ce que vous cherchez à régler ?</label><div class="ia-choices">
 {obj}
@@ -827,7 +830,7 @@ def build_hub():
         <div class="ia-q"><label>3. Quel est le niveau de la personne concernée ?</label><div class="ia-choices">
 {niv}
         </div></div>
-        <div class="ia-q"><label>4. Quel budget acceptez-vous ?</label><div class="ia-choices">
+        <div class="ia-q"><label>4. Quel budget ?</label><div class="ia-choices">
 {bud}
         </div></div>
         <div class="ia-reco" id="ia-reco"></div>
@@ -1117,30 +1120,71 @@ def build_hub():
         recommend();
       }});
     }});
+    var RANG = {{ 'Débutant': 0, 'Intermédiaire': 1, 'Expert': 2 }};
+
     function recommend() {{
-      if (!sel.obj || !sel.prof || !sel.niv || !sel.prix) return;
-      var wanted = sel.obj.split(' ');
-      var scored = cards.map(function (c) {{
-        var s = parseFloat(c.dataset.note) || 0;
+      if (!sel.obj || !sel.prof || !sel.niv || !sel.budget) return;
+      var usages = sel.obj.split(' '), plafond = RANG[sel.niv];
+
+      // Conditions strictes, jamais relâchées : le besoin et le niveau.
+      // Proposer n8n à un débutant n'est pas une approximation acceptable.
+      var base = cards.filter(function (c) {{
         var cats = c.dataset.cat.split(' ');
-        if (wanted.some(function (w) {{ return cats.indexOf(w) >= 0; }})) s += 5;
-        if (cats[0] === wanted[0]) s += 3;  // l'outil dont c'est LE metier passe devant
-        if (c.dataset.prof.indexOf(sel.prof) >= 0) s += 2;
-        if (c.dataset.niv === sel.niv) s += 1.5;
-        if (c.dataset.prix === sel.prix) s += 2;
-        else if (sel.prix === 'Payant' && c.dataset.prix === 'Freemium') s += 1;
-        else if (sel.prix === 'Freemium' && c.dataset.prix === 'Gratuit') s += 1.5;
-        else if (sel.prix === 'Gratuit' && c.dataset.prix === 'Freemium') s += 1;  // offre gratuite limitee
-        return {{ c: c, s: s }};
-      }}).sort(function (a, b) {{ return b.s - a.s; }}).slice(0, 5);
-      hint.textContent = 'Vos 5 recommandations, classées. Cliquez pour voir la fiche complète.';
-      reco.innerHTML = scored.map(function (o, i) {{
-        var t = o.c.querySelector('strong').textContent,
-            cat = o.c.querySelector('small').textContent,
-            use = o.c.querySelector('p').textContent,
-            col = o.c.style.getPropertyValue('--tool');
-        return '<a href="' + o.c.querySelector('a').getAttribute('href') + '" style="--tool:' + col + '">' +
-          '<div class="ia-logo">' + (i + 1) + '</div><div><b>' + t + '</b><small>' + cat + ' · ' + use + '</small></div></a>';
+        return cats.some(function (x) {{ return usages.indexOf(x) >= 0; }})
+            && RANG[c.dataset.niv] <= plafond;
+      }});
+
+      function profilOk(c) {{ return c.dataset.prof.indexOf(sel.prof) >= 0; }}
+      function budgetOk(c) {{
+        return sel.budget === 'budget' || c.dataset.prix !== 'Payant';
+      }}
+
+      var res = base.filter(profilOk).filter(budgetOk), elargi = '';
+      if (res.length < 3) {{
+        res = base.filter(budgetOk);
+        elargi = 'Peu d’outils visent précisément le profil ' + sel.prof +
+                 ' sur ce besoin : voici les plus pertinents, tous profils confondus.';
+      }}
+      if (res.length < 3) {{
+        res = base.filter(profilOk);
+        elargi = 'Rien de gratuit sur ce besoin à ce niveau : ces outils sont payants.';
+      }}
+      if (res.length < 3) {{
+        res = base;
+        elargi = 'Peu de choix sur ce besoin à ce niveau : voici tout ce qui existe dans l’annuaire.';
+      }}
+
+      if (!res.length) {{
+        reco.innerHTML = '';
+        hint.innerHTML = 'Aucun outil de ce besoin n’est accessible à un niveau « ' + sel.niv +
+          ' ». Essayez le niveau au-dessus, ou <a href="#annuaire" style="color:var(--primary);font-weight:700;">parcourez l’annuaire</a>.';
+        return;
+      }}
+
+      res.forEach(function (c) {{
+        var s = parseFloat(c.dataset.note);
+        if (c.dataset.cat.split(' ')[0] === usages[0]) s += 3;   // c'est son metier
+        else if (usages.indexOf(c.dataset.cat.split(' ')[0]) >= 0) s += 2;
+        if (profilOk(c)) s += 2;
+        if (c.dataset.niv === sel.niv) s += 1;                   // pile au niveau demande
+        if (c.dataset.prix !== 'Payant') s += 0.5;
+        c._reco = s;
+      }});
+      res = res.sort(function (a, b) {{ return b._reco - a._reco; }}).slice(0, 5);
+
+      hint.innerHTML = elargi ||
+        ('Vos 5 recommandations, du plus adapté au moins adapté. Aucune ne dépasse le niveau « ' +
+         sel.niv + ' ».');
+      reco.innerHTML = res.map(function (c, i) {{
+        var t = c.querySelector('strong').textContent,
+            cat = c.querySelector('small').textContent,
+            use = c.querySelector('p').textContent,
+            col = c.style.getPropertyValue('--tool');
+        return '<a href="' + c.querySelector('a').getAttribute('href') + '" style="--tool:' + col + '">' +
+          '<div class="ia-logo">' + (i + 1) + '</div><div><b>' + t + '</b>' +
+          '<small>' + cat + ' · ' + use + '</small>' +
+          '<span class="ia-pills" style="margin-top:6px;"><span class="ia-pill">' + c.dataset.niv +
+          '</span><span class="ia-pill">' + c.dataset.prix + '</span></span></div></a>';
       }}).join('');
     }}
   }})();
