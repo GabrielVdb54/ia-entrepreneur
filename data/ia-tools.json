@@ -2024,7 +2024,7 @@
   "editeur": "Pharow",
   "pays": "France",
   "prix": "Payant",
-  "prixDetail": "À partir de ~99 €/mois",
+  "prixDetail": "À partir de ~90 € HT/mois avec engagement annuel · ~105 €/mois sans engagement",
   "niveau": "Intermédiaire",
   "profils": [
    "Commercial",
@@ -2106,7 +2106,7 @@
   "editeur": "Humanlinker",
   "pays": "France",
   "prix": "Freemium",
-  "prixDetail": "Version gratuite limitée · à partir de ~59 €/mois",
+  "prixDetail": "Version gratuite limitée · à partir de ~47 €/mois",
   "niveau": "Débutant",
   "profils": [
    "Commercial"
@@ -2228,7 +2228,7 @@
   "editeur": "Brevo",
   "pays": "France",
   "prix": "Freemium",
-  "prixDetail": "Version gratuite (300 e-mails/jour) · à partir de ~9 €/mois",
+  "prixDetail": "Version gratuite (300 e-mails/jour) · à partir de ~7 €/mois",
   "niveau": "Débutant",
   "profils": [
    "Marketing",
@@ -2312,7 +2312,7 @@
   "editeur": "Dropcontact",
   "pays": "France",
   "prix": "Payant",
-  "prixDetail": "À partir de ~24 €/mois",
+  "prixDetail": "À partir de ~79 €/mois selon le volume d'enrichissements",
   "niveau": "Débutant",
   "profils": [
    "Commercial",
