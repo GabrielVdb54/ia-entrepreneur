@@ -1,0 +1,5254 @@
+[
+ {
+  "slug": "chatgpt",
+  "name": "ChatGPT",
+  "url": "https://chatgpt.com/",
+  "cat": "assistants-ia",
+  "cats": [
+   "recherche-veille",
+   "redaction-contenu"
+  ],
+  "editeur": "OpenAI",
+  "pays": "États-Unis",
+  "prix": "Freemium",
+  "prixDetail": "Version gratuite complète · Plus ~23 €/mois · Team ~28 €/utilisateur/mois",
+  "niveau": "Débutant",
+  "profils": [
+   "Dirigeant",
+   "Marketing",
+   "Commercial",
+   "RH",
+   "Ops",
+   "Formateur"
+  ],
+  "tags": "chatgpt gpt openai assistant redaction analyse traduction resume gpts",
+  "note": 4.8,
+  "resume": "L'assistant IA généraliste le plus complet : rédiger, analyser un document, traduire, préparer une réunion, créer des assistants sur mesure.",
+  "forces": [
+   "La prise en main la plus simple du marché : on écrit comme on parle",
+   "Traite aussi bien du texte que des PDF, des tableurs, des images et de la voix",
+   "Les GPTs personnalisés permettent de figer vos process (ton, trame de devis, méthode commerciale) sans coder"
+  ],
+  "limites": [
+   "La version gratuite est bridée sur les modèles les plus récents et les documents volumineux",
+   "Les données transitent hors UE : à proscrire tel quel pour des données sensibles sans encadrement écrit"
+  ],
+  "gain": "2 à 5 h par semaine sur la rédaction, les réponses aux e-mails et la synthèse de documents.",
+  "conformite": "Hébergement États-Unis. Sur les offres Team et Entreprise, les échanges ne sont pas utilisés pour entraîner les modèles — à activer et à documenter dans votre registre AI Act.",
+  "alternatives": [
+   "claude",
+   "mistral-le-chat",
+   "gemini"
+  ],
+  "cas": [
+   "Réécrire une proposition commerciale à partir de notes brutes",
+   "Résumer un appel d'offres de 80 pages en une note d'une page",
+   "Créer un GPT qui répond aux e-mails clients avec le ton de l'entreprise"
+  ]
+ },
+ {
+  "slug": "claude",
+  "name": "Claude",
+  "url": "https://claude.ai/",
+  "cat": "assistants-ia",
+  "cats": [
+   "redaction-contenu",
+   "juridique-conformite"
+  ],
+  "editeur": "Anthropic",
+  "pays": "États-Unis",
+  "prix": "Freemium",
+  "prixDetail": "Version gratuite · Pro ~19 €/mois · Team ~25 €/utilisateur/mois",
+  "niveau": "Débutant",
+  "profils": [
+   "Dirigeant",
+   "Marketing",
+   "RH",
+   "Ops",
+   "Formateur"
+  ],
+  "tags": "claude anthropic redaction analyse documents long contexte projets",
+  "note": 4.7,
+  "resume": "L'assistant de référence pour les documents longs et la rédaction : il tient le fil sur des centaines de pages sans perdre le contexte.",
+  "forces": [
+   "Excellent sur l'analyse de contrats, rapports et documents longs",
+   "Un style d'écriture plus naturel et moins « marketing » que la moyenne",
+   "Les Projects gardent en mémoire vos documents de référence d'une session à l'autre"
+  ],
+  "limites": [
+   "Moins d'intégrations tierces et d'extensions que ChatGPT",
+   "Pas de génération d'images"
+  ],
+  "gain": "Une analyse de contrat ou de rapport qui prenait une demi-journée passe à 20 minutes de lecture guidée.",
+  "conformite": "Hébergement États-Unis. Anthropic n'entraîne pas ses modèles sur les échanges professionnels par défaut ; à vérifier dans votre contrat avant tout usage sur données clients.",
+  "alternatives": [
+   "chatgpt",
+   "mistral-le-chat",
+   "gemini"
+  ],
+  "cas": [
+   "Analyser un bail commercial et en sortir les points de vigilance",
+   "Réécrire tout un site web en gardant une cohérence de ton",
+   "Préparer un support de formation à partir de 200 pages de documentation interne"
+  ]
+ },
+ {
+  "slug": "gemini",
+  "name": "Gemini",
+  "url": "https://gemini.google.com/",
+  "cat": "assistants-ia",
+  "cats": [
+   "presentations-documents",
+   "recherche-veille"
+  ],
+  "editeur": "Google",
+  "pays": "États-Unis",
+  "prix": "Freemium",
+  "prixDetail": "Version gratuite · inclus dans les forfaits Google Workspace Business",
+  "niveau": "Débutant",
+  "profils": [
+   "Dirigeant",
+   "Marketing",
+   "Commercial",
+   "Ops"
+  ],
+  "tags": "gemini google workspace gmail docs sheets assistant",
+  "note": 4.5,
+  "resume": "L'assistant de Google, intégré directement dans Gmail, Docs, Sheets et Meet : l'IA vient à vous plutôt que l'inverse.",
+  "forces": [
+   "Intégré à Google Workspace : rédaction dans Gmail, formules dans Sheets, résumés dans Drive",
+   "Très bon sur l'analyse d'images, de vidéos et de fichiers volumineux",
+   "Compris dans l'abonnement Workspace de nombreuses entreprises — souvent déjà payé"
+  ],
+  "limites": [
+   "La qualité rédactionnelle en français reste en retrait face à ChatGPT et Claude",
+   "L'intégration Workspace suppose que toute l'entreprise soit sur Google"
+  ],
+  "gain": "1 à 3 h par semaine pour les équipes déjà sur Google Workspace, sans changer d'outil.",
+  "conformite": "Hébergement États-Unis, avec options de résidence des données en UE sur certains forfaits Workspace. À vérifier avec votre administrateur.",
+  "alternatives": [
+   "chatgpt",
+   "microsoft-copilot",
+   "mistral-le-chat"
+  ],
+  "cas": [
+   "Rédiger une réponse client directement dans Gmail",
+   "Générer un tableau de suivi et ses formules dans Sheets",
+   "Obtenir le compte rendu automatique d'une visio Meet"
+  ]
+ },
+ {
+  "slug": "microsoft-copilot",
+  "name": "Microsoft 365 Copilot",
+  "url": "https://www.microsoft.com/microsoft-365/copilot",
+  "cat": "assistants-ia",
+  "cats": [
+   "presentations-documents",
+   "data-analyse"
+  ],
+  "editeur": "Microsoft",
+  "pays": "États-Unis",
+  "prix": "Payant",
+  "prixDetail": "~30 €/utilisateur/mois en supplément d'un abonnement Microsoft 365",
+  "niveau": "Débutant",
+  "profils": [
+   "Dirigeant",
+   "Ops",
+   "RH",
+   "Commercial"
+  ],
+  "tags": "copilot microsoft 365 word excel outlook teams powerpoint",
+  "note": 4.3,
+  "resume": "L'IA de Microsoft dans Word, Excel, Outlook, Teams et PowerPoint : elle travaille sur vos propres fichiers d'entreprise.",
+  "forces": [
+   "Accède au contexte de votre entreprise (mails, fichiers SharePoint, réunions Teams)",
+   "Le compte rendu de réunion Teams et le tri d'Outlook justifient souvent l'abonnement à eux seuls",
+   "Cadre contractuel et administrable adapté aux entreprises structurées"
+  ],
+  "limites": [
+   "Tarif élevé et engagement, pour une qualité de rédaction en deçà de ChatGPT",
+   "Le gain dépend fortement du rangement de vos fichiers : sur un SharePoint en désordre, les résultats déçoivent"
+  ],
+  "gain": "3 à 6 h par mois et par salarié sur la messagerie, les réunions et la mise en forme de documents.",
+  "conformite": "Vos données restent dans le périmètre de votre tenant Microsoft 365 et ne servent pas à entraîner les modèles. C'est l'option la plus simple à défendre auprès d'un DPO.",
+  "alternatives": [
+   "gemini",
+   "chatgpt",
+   "mistral-le-chat"
+  ],
+  "cas": [
+   "Obtenir le compte rendu et les actions d'une réunion Teams sans prendre de notes",
+   "Faire analyser un fichier Excel de ventes en langage naturel",
+   "Générer un premier jet de PowerPoint à partir d'un document Word"
+  ]
+ },
+ {
+  "slug": "mistral-le-chat",
+  "name": "Mistral — Le Chat",
+  "url": "https://chat.mistral.ai/",
+  "cat": "assistants-ia",
+  "cats": [
+   "juridique-conformite",
+   "redaction-contenu"
+  ],
+  "editeur": "Mistral AI",
+  "pays": "France",
+  "prix": "Freemium",
+  "prixDetail": "Version gratuite · Pro ~15 €/mois · offres entreprise avec déploiement dédié",
+  "niveau": "Débutant",
+  "profils": [
+   "Dirigeant",
+   "Ops",
+   "Marketing",
+   "Commercial"
+  ],
+  "tags": "mistral le chat france europe souverainete rgpd assistant francais",
+  "note": 4.4,
+  "resume": "L'assistant IA français : des performances proches des leaders américains, avec un hébergement européen et un éditeur soumis au droit de l'UE.",
+  "forces": [
+   "Éditeur français, hébergement UE : l'argument décisif pour les données sensibles ou le secteur public",
+   "Très rapide, et excellent en français",
+   "Déploiement possible sur votre propre infrastructure pour les entreprises exigeantes"
+  ],
+  "limites": [
+   "Écosystème d'extensions et de connecteurs plus jeune que celui d'OpenAI",
+   "Moins à l'aise que Claude sur les très longs documents"
+  ],
+  "gain": "Les mêmes gains qu'un assistant généraliste, sans la question « où partent nos données ? » à chaque usage.",
+  "conformite": "Hébergement en Union européenne, éditeur français. C'est le choix le plus simple à justifier dans un registre AI Act et auprès d'un DPO.",
+  "alternatives": [
+   "chatgpt",
+   "claude",
+   "gemini"
+  ],
+  "cas": [
+   "Faire travailler l'IA sur des dossiers clients sans transfert hors UE",
+   "Rédiger des documents internes dans un cadre RGPD maîtrisé",
+   "Déployer un assistant interne sur l'infrastructure de l'entreprise"
+  ]
+ },
+ {
+  "slug": "notebooklm",
+  "name": "NotebookLM",
+  "url": "https://notebooklm.google.com/",
+  "cat": "assistants-ia",
+  "cats": [
+   "recherche-veille",
+   "rh-formation"
+  ],
+  "editeur": "Google",
+  "pays": "États-Unis",
+  "prix": "Freemium",
+  "prixDetail": "Gratuit · version Plus incluse dans certains forfaits Google Workspace",
+  "niveau": "Débutant",
+  "profils": [
+   "Dirigeant",
+   "Formateur",
+   "RH",
+   "Ops"
+  ],
+  "tags": "notebooklm google documents sources synthese podcast audio recherche",
+  "note": 4.6,
+  "resume": "Un assistant qui ne répond qu'à partir des documents que vous lui donnez : idéal pour interroger vos procédures, vos rapports ou votre documentation.",
+  "forces": [
+   "Chaque réponse est sourcée et renvoie au passage exact du document : très peu d'inventions",
+   "Transforme un corpus documentaire en synthèse, en FAQ ou en résumé audio de type podcast",
+   "Gratuit et immédiatement utilisable"
+  ],
+  "limites": [
+   "Ne sait pas chercher hors de vos documents",
+   "Volume de sources limité par carnet"
+  ],
+  "gain": "Une base documentaire interne devient interrogeable en quelques minutes au lieu d'être un dossier que personne n'ouvre.",
+  "conformite": "Hébergement États-Unis. Sur un compte Workspace professionnel, les contenus ne sont pas utilisés pour l'entraînement.",
+  "alternatives": [
+   "claude",
+   "anythingllm",
+   "chatgpt"
+  ],
+  "cas": [
+   "Interroger les 300 pages de procédures internes en langage naturel",
+   "Préparer un support de formation à partir de la documentation métier",
+   "Créer une FAQ interne à partir des comptes rendus de comité de direction"
+  ]
+ },
+ {
+  "slug": "grok",
+  "name": "Grok",
+  "url": "https://grok.com/",
+  "cat": "assistants-ia",
+  "cats": [
+   "recherche-veille"
+  ],
+  "editeur": "xAI",
+  "pays": "États-Unis",
+  "prix": "Freemium",
+  "prixDetail": "Version gratuite limitée · inclus dans l'abonnement X Premium+",
+  "niveau": "Débutant",
+  "profils": [
+   "Marketing",
+   "Dirigeant"
+  ],
+  "tags": "grok xai x twitter temps reel actualite",
+  "note": 3.8,
+  "resume": "L'assistant de xAI, branché en direct sur le réseau X : utile pour capter une tendance ou une actualité en temps réel.",
+  "forces": [
+   "Accès direct aux publications X pour la veille et les tendances",
+   "Génération d'images peu bridée",
+   "Ton moins aseptisé que ses concurrents"
+  ],
+  "limites": [
+   "Peu adapté à un usage professionnel structuré : cadre entreprise et garanties de confidentialité limités",
+   "Qualité en français inférieure aux leaders"
+  ],
+  "gain": "Utile ponctuellement en veille sociale, rarement au cœur d'un process d'entreprise.",
+  "conformite": "Hébergement États-Unis, cadre entreprise peu documenté. À éviter sur des données clients.",
+  "alternatives": [
+   "perplexity",
+   "chatgpt",
+   "gemini"
+  ],
+  "cas": [
+   "Suivre en direct ce qui se dit sur un secteur ou une marque",
+   "Tester une accroche marketing sur une tendance du moment"
+  ]
+ },
+ {
+  "slug": "deepseek",
+  "name": "DeepSeek",
+  "url": "https://www.deepseek.com/",
+  "cat": "assistants-ia",
+  "cats": [
+   "sites-apps-nocode"
+  ],
+  "editeur": "DeepSeek",
+  "pays": "Chine",
+  "prix": "Freemium",
+  "prixDetail": "Gratuit en ligne · API à très bas coût · modèles ouverts auto-hébergeables",
+  "niveau": "Intermédiaire",
+  "profils": [
+   "Ops",
+   "Développeur"
+  ],
+  "tags": "deepseek open source raisonnement api low cost chine",
+  "note": 3.9,
+  "resume": "Un modèle très performant en raisonnement et en code, à un coût d'API sans équivalent — mais dont l'éditeur est chinois.",
+  "forces": [
+   "Rapport performance/prix imbattable pour un usage via API",
+   "Modèles ouverts : installables sur votre propre serveur, donc sans fuite de données",
+   "Bon niveau en logique, mathématiques et code"
+  ],
+  "limites": [
+   "La version en ligne envoie vos données en Chine : à proscrire pour tout contenu d'entreprise",
+   "Support et cadre contractuel très limités pour un usage professionnel"
+  ],
+  "gain": "Pertinent pour diviser le coût d'une automatisation à fort volume, à condition de l'auto-héberger.",
+  "conformite": "L'application grand public héberge les données en Chine, hors cadre RGPD. Seule la version auto-hébergée est défendable en entreprise.",
+  "alternatives": [
+   "mistral-le-chat",
+   "ollama",
+   "chatgpt"
+  ],
+  "cas": [
+   "Faire tourner une automatisation à fort volume sans exploser le budget API",
+   "Installer un modèle performant en interne, sur un serveur de l'entreprise"
+  ]
+ },
+ {
+  "slug": "anythingllm",
+  "name": "AnythingLLM",
+  "url": "https://anythingllm.com/",
+  "cat": "assistants-ia",
+  "cats": [
+   "juridique-conformite"
+  ],
+  "editeur": "Mintplex Labs",
+  "pays": "États-Unis (logiciel open source)",
+  "prix": "Gratuit",
+  "prixDetail": "Open source et gratuit en auto-hébergement · offre cloud payante",
+  "niveau": "Expert",
+  "profils": [
+   "Ops",
+   "Développeur",
+   "Dirigeant"
+  ],
+  "tags": "anythingllm open source local rag documents prive confidentiel",
+  "note": 4.1,
+  "resume": "Un ChatGPT privé installé sur votre machine ou votre serveur, qui interroge vos documents sans qu'aucune donnée ne sorte.",
+  "forces": [
+   "Aucune donnée envoyée à l'extérieur si vous le couplez à un modèle local",
+   "Interroge vos documents internes (RAG) avec gestion des accès par équipe",
+   "Gratuit, open source, sans abonnement par utilisateur"
+  ],
+  "limites": [
+   "Installation et maintenance techniques : ce n'est pas un outil pour un dirigeant seul",
+   "Qualité des réponses dépendante du modèle local choisi, en retrait des leaders du cloud"
+  ],
+  "gain": "Débloque les usages IA sur les dossiers confidentiels qui n'auraient jamais pu partir dans le cloud.",
+  "conformite": "En auto-hébergement avec un modèle local, aucune donnée ne quitte votre infrastructure : la réponse la plus solide à un enjeu de confidentialité.",
+  "alternatives": [
+   "ollama",
+   "mistral-le-chat",
+   "notebooklm"
+  ],
+  "cas": [
+   "Donner accès aux dossiers clients confidentiels à une IA, sans transfert externe",
+   "Créer un assistant interne sur la documentation technique d'un bureau d'études"
+  ]
+ },
+ {
+  "slug": "ollama",
+  "name": "Ollama",
+  "url": "https://ollama.com/",
+  "cat": "assistants-ia",
+  "cats": [
+   "juridique-conformite"
+  ],
+  "editeur": "Ollama",
+  "pays": "États-Unis (logiciel open source)",
+  "prix": "Gratuit",
+  "prixDetail": "Gratuit, open source",
+  "niveau": "Expert",
+  "profils": [
+   "Développeur",
+   "Ops"
+  ],
+  "tags": "ollama local llm hors ligne prive mistral llama gratuit",
+  "note": 4.0,
+  "resume": "Faire tourner un modèle d'IA directement sur votre ordinateur ou votre serveur, hors ligne et sans abonnement.",
+  "forces": [
+   "Confidentialité totale : rien ne sort de la machine, même sans connexion",
+   "Gratuit, quel que soit le volume d'utilisation",
+   "Installe en une commande les modèles ouverts (Mistral, Llama, Qwen…)"
+  ],
+  "limites": [
+   "Demande une machine correctement équipée et des compétences techniques",
+   "Performances en dessous des modèles cloud de dernière génération"
+  ],
+  "gain": "Supprime le coût par utilisateur et le risque de fuite sur les usages internes répétitifs.",
+  "conformite": "Exécution 100 % locale : aucun transfert de données, aucun sous-traitant à déclarer.",
+  "alternatives": [
+   "anythingllm",
+   "mistral-le-chat",
+   "deepseek"
+  ],
+  "cas": [
+   "Analyser des documents confidentiels sur un poste isolé",
+   "Alimenter une automatisation interne sans coût d'API"
+  ]
+ },
+ {
+  "slug": "perplexity",
+  "name": "Perplexity",
+  "url": "https://www.perplexity.ai/",
+  "cat": "recherche-veille",
+  "cats": [
+   "assistants-ia",
+   "seo-visibilite"
+  ],
+  "editeur": "Perplexity AI",
+  "pays": "États-Unis",
+  "prix": "Freemium",
+  "prixDetail": "Version gratuite · Pro ~20 €/mois",
+  "niveau": "Débutant",
+  "profils": [
+   "Dirigeant",
+   "Marketing",
+   "Commercial"
+  ],
+  "tags": "perplexity recherche sources veille moteur reponse citations",
+  "note": 4.6,
+  "resume": "Un moteur de recherche qui répond en citant ses sources : la façon la plus rapide de se documenter sérieusement sur un sujet.",
+  "forces": [
+   "Chaque affirmation renvoie à sa source : vérifiable, contrairement à un chatbot classique",
+   "Le mode recherche approfondie produit une vraie note de synthèse en quelques minutes",
+   "Remplace efficacement une heure de navigation entre dix onglets"
+  ],
+  "limites": [
+   "Sur des sujets de niche, les sources retenues sont parfois faibles : la vérification reste nécessaire",
+   "Moins bon que ChatGPT ou Claude pour rédiger un document abouti"
+  ],
+  "gain": "1 à 2 h gagnées sur chaque dossier à instruire : étude de marché, veille réglementaire, préparation de rendez-vous.",
+  "conformite": "Hébergement États-Unis. Convient à la recherche d'informations publiques, pas au traitement de données clients.",
+  "alternatives": [
+   "genspark",
+   "chatgpt",
+   "feedly"
+  ],
+  "cas": [
+   "Préparer un rendez-vous client en 10 minutes avec des sources vérifiables",
+   "Instruire une question réglementaire avant d'appeler son conseil",
+   "Comparer trois fournisseurs sur des critères factuels"
+  ]
+ },
+ {
+  "slug": "feedly",
+  "name": "Feedly",
+  "url": "https://feedly.com/",
+  "cat": "recherche-veille",
+  "cats": [
+   "seo-visibilite"
+  ],
+  "editeur": "Feedly",
+  "pays": "États-Unis",
+  "prix": "Freemium",
+  "prixDetail": "Version gratuite · Pro à partir de ~8 €/mois · IA (Leo) sur les offres supérieures",
+  "niveau": "Débutant",
+  "profils": [
+   "Dirigeant",
+   "Marketing",
+   "Commercial"
+  ],
+  "tags": "feedly veille flux rss actualite concurrents leo alertes",
+  "note": 4.2,
+  "resume": "Le poste de veille : tous vos flux d'actualité, de concurrents et de réglementation au même endroit, filtrés par une IA.",
+  "forces": [
+   "L'assistant Leo apprend à écarter le bruit et ne remonte que ce qui vous concerne",
+   "Centralise presse, blogs, communiqués et alertes réglementaires",
+   "S'exporte facilement vers Slack, Teams ou un tableau de bord"
+  ],
+  "limites": [
+   "Les fonctions IA sont réservées aux forfaits les plus chers",
+   "Demande un paramétrage initial sérieux pour être utile"
+  ],
+  "gain": "30 à 45 min par jour de veille dispersée remplacées par 10 minutes de lecture ciblée.",
+  "conformite": "Traite des contenus publics : peu d'enjeu de données personnelles.",
+  "alternatives": [
+   "perplexity",
+   "genspark"
+  ],
+  "cas": [
+   "Surveiller les publications et recrutements de cinq concurrents",
+   "Être alerté sur les évolutions réglementaires de son secteur",
+   "Alimenter la revue de presse hebdomadaire de l'équipe commerciale"
+  ]
+ },
+ {
+  "slug": "genspark",
+  "name": "Genspark",
+  "url": "https://www.genspark.ai/",
+  "cat": "recherche-veille",
+  "cats": [
+   "automatisation",
+   "presentations-documents"
+  ],
+  "editeur": "MainFunc",
+  "pays": "États-Unis",
+  "prix": "Freemium",
+  "prixDetail": "Version gratuite généreuse · offre payante ~25 €/mois",
+  "niveau": "Intermédiaire",
+  "profils": [
+   "Marketing",
+   "Dirigeant",
+   "Ops"
+  ],
+  "tags": "genspark agent recherche synthese comparatif pages generees",
+  "note": 4.0,
+  "resume": "Un agent de recherche qui ne se contente pas de répondre : il produit une page de synthèse, un comparatif ou un dossier complet.",
+  "forces": [
+   "Génère de vrais livrables (comparatifs, dossiers, présentations) et pas seulement des réponses",
+   "Combine recherche, rédaction et mise en forme en une seule étape",
+   "Version gratuite réellement utilisable"
+  ],
+  "limites": [
+   "Plus récent et moins stable que Perplexity",
+   "Les livrables demandent toujours une relecture métier"
+  ],
+  "gain": "Un comparatif fournisseurs ou une étude préparatoire en 15 minutes au lieu d'une demi-journée.",
+  "conformite": "Hébergement États-Unis. À réserver aux informations publiques.",
+  "alternatives": [
+   "perplexity",
+   "chatgpt",
+   "gamma"
+  ],
+  "cas": [
+   "Produire un comparatif de solutions avant un choix d'investissement",
+   "Préparer un dossier de marché pour un comité de direction"
+  ]
+ },
+ {
+  "slug": "elicit",
+  "name": "Elicit",
+  "url": "https://elicit.com/",
+  "cat": "recherche-veille",
+  "cats": [],
+  "editeur": "Elicit",
+  "pays": "États-Unis",
+  "prix": "Freemium",
+  "prixDetail": "Version gratuite limitée · à partir de ~10 €/mois",
+  "niveau": "Intermédiaire",
+  "profils": [
+   "Formateur",
+   "Dirigeant"
+  ],
+  "tags": "elicit recherche scientifique publications etudes sources academiques",
+  "note": 3.9,
+  "resume": "La recherche documentaire sérieuse : interroge des millions de publications scientifiques et en extrait les résultats sous forme de tableau.",
+  "forces": [
+   "Sources académiques vérifiables : indispensable quand une affirmation doit tenir devant un client ou un jury",
+   "Extrait automatiquement méthodes et résultats sous forme de tableau comparatif",
+   "Réduit fortement le risque d'affirmation inventée"
+  ],
+  "limites": [
+   "Corpus essentiellement anglophone",
+   "Sans intérêt pour les sujets non scientifiques"
+  ],
+  "gain": "Une revue de littérature qui prenait une semaine tient en une journée.",
+  "conformite": "Sources publiques, pas de traitement de données clients.",
+  "alternatives": [
+   "perplexity",
+   "notebooklm"
+  ],
+  "cas": [
+   "Sourcer sérieusement les chiffres d'un livre blanc ou d'une formation",
+   "Vérifier une affirmation santé, technique ou environnementale avant publication"
+  ]
+ },
+ {
+  "slug": "n8n",
+  "name": "n8n",
+  "url": "https://n8n.io/",
+  "cat": "automatisation",
+  "cats": [
+   "juridique-conformite"
+  ],
+  "editeur": "n8n GmbH",
+  "pays": "Allemagne",
+  "prix": "Freemium",
+  "prixDetail": "Gratuit en auto-hébergement · cloud à partir de ~24 €/mois",
+  "niveau": "Intermédiaire",
+  "profils": [
+   "Ops",
+   "Développeur",
+   "Dirigeant"
+  ],
+  "tags": "n8n automatisation workflow no-code auto-heberge agents ia rgpd",
+  "note": 4.8,
+  "resume": "L'outil d'automatisation le plus puissant du marché : il connecte vos applications, appelle des IA et peut tourner sur vos propres serveurs.",
+  "forces": [
+   "Auto-hébergeable : vos données d'automatisation restent chez vous, argument décisif en RGPD",
+   "Bien plus souple que Zapier dès qu'un scénario sort des sentiers battus (code, boucles, conditions)",
+   "Éditeur européen, et coût qui ne dépend pas du nombre de tâches exécutées en auto-hébergement"
+  ],
+  "limites": [
+   "Courbe d'apprentissage réelle : il faut comprendre la logique de flux",
+   "La version auto-hébergée demande un minimum d'administration technique"
+  ],
+  "gain": "Un process répétitif de 20 min par jour disparaît complètement : environ 80 h par an et par process automatisé.",
+  "conformite": "Auto-hébergement possible en France ou en UE : les données ne transitent par aucun tiers. La réponse la plus solide pour automatiser sur des données clients.",
+  "alternatives": [
+   "make",
+   "zapier",
+   "power-automate"
+  ],
+  "cas": [
+   "Trier les e-mails entrants et générer des réponses à valider",
+   "Créer automatiquement devis, facture et relance à partir d'un formulaire",
+   "Alimenter un CRM depuis LinkedIn et les formulaires du site"
+  ]
+ },
+ {
+  "slug": "make",
+  "name": "Make",
+  "url": "https://www.make.com/",
+  "cat": "automatisation",
+  "cats": [],
+  "editeur": "Make (Celonis)",
+  "pays": "Tchéquie / États-Unis",
+  "prix": "Freemium",
+  "prixDetail": "Version gratuite (1 000 opérations/mois) · à partir de ~10 €/mois",
+  "niveau": "Débutant",
+  "profils": [
+   "Ops",
+   "Marketing",
+   "Dirigeant"
+  ],
+  "tags": "make integromat automatisation scenario visuel no-code connecteurs",
+  "note": 4.5,
+  "resume": "L'automatisation visuelle la plus accessible : on relie ses applications à la souris et le scénario tourne tout seul.",
+  "forces": [
+   "Interface visuelle très lisible : on comprend son scénario d'un coup d'œil",
+   "Plus de 2 000 connecteurs prêts à l'emploi",
+   "Bon compromis puissance/simplicité pour une TPE-PME sans équipe technique"
+  ],
+  "limites": [
+   "La facturation à l'opération peut grimper vite sur les gros volumes",
+   "Moins souple que n8n dès qu'il faut du sur-mesure"
+  ],
+  "gain": "Le premier scénario utile se met en place en une demi-journée et fait gagner 2 à 4 h par semaine.",
+  "conformite": "Hébergement au choix, dont l'UE. Vérifiez la zone de votre organisation à la création du compte.",
+  "alternatives": [
+   "n8n",
+   "zapier",
+   "power-automate"
+  ],
+  "cas": [
+   "Envoyer une alerte Slack et créer une tâche à chaque nouveau formulaire rempli",
+   "Synchroniser un tableur, un CRM et un outil de facturation",
+   "Publier automatiquement sur les réseaux sociaux depuis un tableau de contenus"
+  ]
+ },
+ {
+  "slug": "zapier",
+  "name": "Zapier",
+  "url": "https://zapier.com/",
+  "cat": "automatisation",
+  "cats": [],
+  "editeur": "Zapier",
+  "pays": "États-Unis",
+  "prix": "Freemium",
+  "prixDetail": "Version gratuite limitée · à partir de ~20 €/mois",
+  "niveau": "Débutant",
+  "profils": [
+   "Marketing",
+   "Ops",
+   "Commercial"
+  ],
+  "tags": "zapier automatisation zaps connecteurs saas integration",
+  "note": 4.2,
+  "resume": "Le pionnier de l'automatisation : le plus grand catalogue de connecteurs et la mise en route la plus rapide.",
+  "forces": [
+   "Plus de 7 000 applications connectées : si un outil existe, il est probablement compatible",
+   "Mise en place d'une première automatisation en quelques minutes",
+   "Documentation et communauté immenses"
+  ],
+  "limites": [
+   "Le plus cher des trois dès que les volumes montent",
+   "Peu adapté aux scénarios complexes ou aux traitements sur données sensibles"
+  ],
+  "gain": "Idéal pour supprimer les 15 recopies manuelles quotidiennes entre deux outils.",
+  "conformite": "Hébergement États-Unis. À réserver aux flux sans données personnelles sensibles.",
+  "alternatives": [
+   "make",
+   "n8n",
+   "power-automate"
+  ],
+  "cas": [
+   "Créer une fiche CRM à chaque prise de rendez-vous Calendly",
+   "Archiver automatiquement les pièces jointes des factures reçues",
+   "Ajouter chaque nouveau client à une séquence d'e-mails"
+  ]
+ },
+ {
+  "slug": "power-automate",
+  "name": "Microsoft Power Automate",
+  "url": "https://www.microsoft.com/power-platform/products/power-automate",
+  "cat": "automatisation",
+  "cats": [
+   "finance-admin"
+  ],
+  "editeur": "Microsoft",
+  "pays": "États-Unis",
+  "prix": "Payant",
+  "prixDetail": "Inclus partiellement dans Microsoft 365 · ~15 €/utilisateur/mois pour l'offre complète",
+  "niveau": "Intermédiaire",
+  "profils": [
+   "Ops",
+   "RH",
+   "Dirigeant"
+  ],
+  "tags": "power automate microsoft flux sharepoint outlook approbation rpa",
+  "note": 4.0,
+  "resume": "L'automatisation intégrée à l'univers Microsoft : circuits de validation, SharePoint, Outlook, Teams et robots de saisie.",
+  "forces": [
+   "Naturel pour une entreprise déjà sous Microsoft 365 : gouvernance et comptes déjà en place",
+   "Excellent sur les circuits de validation (congés, achats, notes de frais)",
+   "Fonctions RPA capables de piloter un vieux logiciel métier sans API"
+  ],
+  "limites": [
+   "Licences et périmètres notoirement compliqués à comprendre",
+   "Moins agréable à utiliser que Make ou n8n"
+  ],
+  "gain": "Un circuit de validation qui traînait trois jours en e-mails se règle en quelques heures.",
+  "conformite": "Données conservées dans le tenant Microsoft de l'entreprise : cadre le plus simple à faire valider en interne.",
+  "alternatives": [
+   "make",
+   "n8n",
+   "zapier"
+  ],
+  "cas": [
+   "Automatiser la validation des demandes de congés",
+   "Classer et archiver automatiquement les documents dans SharePoint",
+   "Extraire les données des factures reçues dans Outlook"
+  ]
+ },
+ {
+  "slug": "dust",
+  "name": "Dust",
+  "url": "https://dust.tt/",
+  "cat": "automatisation",
+  "cats": [
+   "assistants-ia",
+   "juridique-conformite"
+  ],
+  "editeur": "Dust",
+  "pays": "France",
+  "prix": "Payant",
+  "prixDetail": "À partir de ~29 €/utilisateur/mois",
+  "niveau": "Intermédiaire",
+  "profils": [
+   "Dirigeant",
+   "Ops",
+   "RH",
+   "Commercial"
+  ],
+  "tags": "dust france agents ia entreprise assistants internes notion slack rgpd",
+  "note": 4.4,
+  "resume": "Une plateforme française pour créer des assistants IA internes branchés sur vos outils : Notion, Drive, Slack, CRM.",
+  "forces": [
+   "Éditeur français, hébergement UE : un cadre RGPD net",
+   "Permet de créer des assistants par métier (support, RH, commercial) sans coder",
+   "Se connecte à vos sources internes pour des réponses fondées sur vos vrais documents"
+  ],
+  "limites": [
+   "Tarif par utilisateur qui pèse sur une petite structure",
+   "Suppose que votre documentation interne soit déjà à peu près à jour"
+  ],
+  "gain": "Les questions internes répétitives (« où est le modèle de contrat ? ») cessent de remonter au dirigeant.",
+  "conformite": "Éditeur français, hébergement européen, engagement contractuel de non-entraînement sur vos données.",
+  "alternatives": [
+   "mistral-le-chat",
+   "notebooklm",
+   "relevance-ai"
+  ],
+  "cas": [
+   "Créer un assistant support qui répond à partir de la base de connaissances",
+   "Donner à l'équipe commerciale un assistant qui connaît toute l'offre",
+   "Automatiser les réponses aux questions RH récurrentes"
+  ]
+ },
+ {
+  "slug": "manus",
+  "name": "Manus",
+  "url": "https://manus.im/",
+  "cat": "automatisation",
+  "cats": [
+   "recherche-veille"
+  ],
+  "editeur": "Butterfly Effect",
+  "pays": "Singapour",
+  "prix": "Payant",
+  "prixDetail": "Crédits · offres à partir de ~20 €/mois",
+  "niveau": "Intermédiaire",
+  "profils": [
+   "Dirigeant",
+   "Marketing",
+   "Ops"
+  ],
+  "tags": "manus agent autonome taches navigateur livrables recherche",
+  "note": 4.0,
+  "resume": "Un agent autonome à qui l'on confie une tâche complète : il navigue, collecte, analyse et rend un livrable sans supervision.",
+  "forces": [
+   "Va au bout d'une tâche en plusieurs étapes pendant que vous faites autre chose",
+   "Produit de vrais fichiers : tableur, présentation, site, rapport",
+   "Impressionnant sur la collecte et la mise en forme de données publiques"
+  ],
+  "limites": [
+   "Consommation de crédits difficile à anticiper",
+   "Résultat à contrôler systématiquement : un agent qui se trompe le fait sur toute la chaîne"
+  ],
+  "gain": "Une tâche de collecte et de mise en forme d'une demi-journée se lance en 2 minutes.",
+  "conformite": "Éditeur hors UE, agent qui navigue sur le web : ne lui confiez aucun identifiant ni donnée client.",
+  "alternatives": [
+   "genspark",
+   "chatgpt",
+   "relevance-ai"
+  ],
+  "cas": [
+   "Constituer une liste qualifiée de 200 entreprises cibles avec leurs coordonnées publiques",
+   "Produire une étude de marché sectorielle complète",
+   "Comparer les tarifs de dix fournisseurs et rendre un tableau"
+  ]
+ },
+ {
+  "slug": "relevance-ai",
+  "name": "Relevance AI",
+  "url": "https://relevanceai.com/",
+  "cat": "automatisation",
+  "cats": [
+   "prospection-vente"
+  ],
+  "editeur": "Relevance AI",
+  "pays": "Australie",
+  "prix": "Freemium",
+  "prixDetail": "Version gratuite limitée · à partir de ~19 €/mois",
+  "niveau": "Intermédiaire",
+  "profils": [
+   "Ops",
+   "Commercial",
+   "Marketing"
+  ],
+  "tags": "relevance ai agents equipe ia workforce automatisation sans code",
+  "note": 4.1,
+  "resume": "Constituer une « équipe » d'agents IA spécialisés (qualification, recherche, rédaction) sans écrire une ligne de code.",
+  "forces": [
+   "Approche par rôles : chaque agent a une mission, des outils et des règles claires",
+   "Se branche sur vos outils existants et déclenche des actions réelles",
+   "Accessible à un profil non technique motivé"
+  ],
+  "limites": [
+   "Il faut savoir décrire précisément un process pour que l'agent soit fiable",
+   "Coût qui monte avec le volume d'exécutions"
+  ],
+  "gain": "La qualification des demandes entrantes passe de quelques heures par semaine à un contrôle par exception.",
+  "conformite": "Hébergement hors UE : encadrez ce que l'agent a le droit de lire dans vos outils.",
+  "alternatives": [
+   "dust",
+   "n8n",
+   "crewai"
+  ],
+  "cas": [
+   "Qualifier automatiquement les leads entrants et les router au bon commercial",
+   "Faire préparer chaque matin une synthèse des demandes clients",
+   "Automatiser la recherche d'informations avant un rendez-vous"
+  ]
+ },
+ {
+  "slug": "lindy",
+  "name": "Lindy",
+  "url": "https://www.lindy.ai/",
+  "cat": "automatisation",
+  "cats": [
+   "reunions-notes",
+   "prospection-vente"
+  ],
+  "editeur": "Lindy",
+  "pays": "États-Unis",
+  "prix": "Freemium",
+  "prixDetail": "Version gratuite limitée · à partir de ~30 €/mois",
+  "niveau": "Débutant",
+  "profils": [
+   "Dirigeant",
+   "Commercial",
+   "Ops"
+  ],
+  "tags": "lindy assistant email agenda agents automatisation rendez-vous",
+  "note": 4.0,
+  "resume": "Un assistant IA qui prend en charge la messagerie, l'agenda et les relances comme le ferait un assistant de direction.",
+  "forces": [
+   "Se met en place à partir d'instructions en français, sans logique de flux à construire",
+   "Excellent sur la prise de rendez-vous et les relances commerciales",
+   "Chaîne facilement plusieurs agents entre eux"
+  ],
+  "limites": [
+   "Demande un accès large à votre boîte mail : à peser sérieusement",
+   "Facturation à la tâche qui grimpe en usage intensif"
+  ],
+  "gain": "1 à 2 h par jour rendues au dirigeant sur la gestion de la messagerie et de l'agenda.",
+  "conformite": "Accès à la messagerie et hébergement hors UE : à ne pas déployer sans analyse d'impact si vos e-mails contiennent des données sensibles.",
+  "alternatives": [
+   "n8n",
+   "zapier",
+   "fathom"
+  ],
+  "cas": [
+   "Trier la boîte mail et préparer les réponses à valider",
+   "Relancer automatiquement les devis sans retour au bout de 7 jours",
+   "Caler les rendez-vous par échange d'e-mails"
+  ]
+ },
+ {
+  "slug": "crewai",
+  "name": "CrewAI",
+  "url": "https://www.crewai.com/",
+  "cat": "automatisation",
+  "cats": [
+   "sites-apps-nocode"
+  ],
+  "editeur": "CrewAI",
+  "pays": "États-Unis (open source)",
+  "prix": "Freemium",
+  "prixDetail": "Framework open source gratuit · plateforme cloud payante",
+  "niveau": "Expert",
+  "profils": [
+   "Développeur",
+   "Ops"
+  ],
+  "tags": "crewai agents multi-agents python framework open source orchestration",
+  "note": 4.0,
+  "resume": "Le framework de référence pour faire collaborer plusieurs agents IA sur un processus métier complexe.",
+  "forces": [
+   "Contrôle total sur le comportement des agents et les modèles utilisés",
+   "Open source : pas de dépendance à un éditeur, possibilité d'auto-hébergement",
+   "Adapté aux processus longs à plusieurs étapes et plusieurs rôles"
+  ],
+  "limites": [
+   "Réservé aux profils techniques : c'est du développement Python",
+   "Fiabiliser un système multi-agents demande un vrai travail de mise au point"
+  ],
+  "gain": "Rentable sur des processus métier lourds et répétitifs, pas sur des tâches ponctuelles.",
+  "conformite": "Auto-hébergeable avec des modèles européens ou locaux : compatible avec des exigences fortes.",
+  "alternatives": [
+   "n8n",
+   "relevance-ai",
+   "dust"
+  ],
+  "cas": [
+   "Automatiser une chaîne d'analyse de dossiers en plusieurs étapes",
+   "Industrialiser la production de contenus avec relecture automatisée"
+  ]
+ },
+ {
+  "slug": "fathom",
+  "name": "Fathom",
+  "url": "https://www.fathom.ai/",
+  "cat": "reunions-notes",
+  "cats": [
+   "prospection-vente"
+  ],
+  "editeur": "Fathom",
+  "pays": "États-Unis",
+  "prix": "Freemium",
+  "prixDetail": "Version gratuite réellement utilisable · offres à partir de ~19 €/mois",
+  "niveau": "Débutant",
+  "profils": [
+   "Dirigeant",
+   "Commercial",
+   "Ops"
+  ],
+  "tags": "fathom compte rendu reunion visio transcription zoom teams meet notes",
+  "note": 4.7,
+  "resume": "Rejoint vos visios, enregistre, transcrit et livre un compte rendu structuré avec les actions à faire, minutes après la fin.",
+  "forces": [
+   "Version gratuite qui suffit à beaucoup d'indépendants et de petites structures",
+   "Comptes rendus vraiment exploitables, avec décisions et actions séparées",
+   "Fonctionne sur Zoom, Teams et Google Meet, en français"
+  ],
+  "limites": [
+   "Il faut prévenir les participants de l'enregistrement : c'est une obligation, pas une option",
+   "Résumés parfois trop lisses sur des réunions techniques"
+  ],
+  "gain": "30 à 45 min gagnées après chaque réunion, et plus aucune décision perdue faute de compte rendu.",
+  "conformite": "Enregistrement de conversations : information préalable des participants obligatoire (RGPD), et durée de conservation à définir.",
+  "alternatives": [
+   "fireflies",
+   "noota"
+  ],
+  "cas": [
+   "Envoyer le compte rendu d'un rendez-vous client dans l'heure",
+   "Garder une trace exploitable des réunions d'équipe",
+   "Alimenter le CRM avec le résumé des appels commerciaux"
+  ]
+ },
+ {
+  "slug": "fireflies",
+  "name": "Fireflies.ai",
+  "url": "https://fireflies.ai/",
+  "cat": "reunions-notes",
+  "cats": [
+   "prospection-vente"
+  ],
+  "editeur": "Fireflies.ai",
+  "pays": "États-Unis",
+  "prix": "Freemium",
+  "prixDetail": "Version gratuite · à partir de ~10 €/utilisateur/mois",
+  "niveau": "Débutant",
+  "profils": [
+   "Commercial",
+   "Ops",
+   "RH"
+  ],
+  "tags": "fireflies transcription reunion crm integration recherche conversations",
+  "note": 4.3,
+  "resume": "Un assistant de réunion orienté équipe : il transcrit, analyse les conversations et alimente automatiquement le CRM.",
+  "forces": [
+   "Recherche dans l'historique de toutes les réunions de l'entreprise",
+   "Nombreuses intégrations CRM (HubSpot, Salesforce, Pipedrive)",
+   "Analyse le temps de parole et les sujets abordés, utile en management commercial"
+  ],
+  "limites": [
+   "La transcription française reste en léger retrait sur les réunions à plusieurs voix",
+   "L'accumulation d'enregistrements crée un stock de données à gouverner"
+  ],
+  "gain": "Les commerciaux cessent de saisir leurs comptes rendus : 2 à 3 h par semaine par personne.",
+  "conformite": "Stockage durable de conversations aux États-Unis : information des participants et politique de purge indispensables.",
+  "alternatives": [
+   "fathom",
+   "noota",
+   "leexi"
+  ],
+  "cas": [
+   "Alimenter automatiquement le CRM après chaque rendez-vous",
+   "Retrouver ce qui a été promis à un client il y a six mois",
+   "Analyser les objections récurrentes en rendez-vous"
+  ]
+ },
+ {
+  "slug": "noota",
+  "name": "Noota",
+  "url": "https://www.noota.io/",
+  "cat": "reunions-notes",
+  "cats": [
+   "rh-formation",
+   "juridique-conformite"
+  ],
+  "editeur": "Noota",
+  "pays": "France",
+  "prix": "Freemium",
+  "prixDetail": "Version gratuite · à partir de ~15 €/utilisateur/mois",
+  "niveau": "Débutant",
+  "profils": [
+   "RH",
+   "Dirigeant",
+   "Commercial"
+  ],
+  "tags": "noota france rgpd compte rendu reunion recrutement entretien transcription",
+  "note": 4.3,
+  "resume": "L'alternative française aux assistants de réunion : comptes rendus, entretiens de recrutement et hébergement européen.",
+  "forces": [
+   "Éditeur français et hébergement UE : le choix évident si vos réunions abordent des sujets sensibles",
+   "Modèles de comptes rendus par métier, dont l'entretien de recrutement",
+   "Très bonne qualité de transcription en français"
+  ],
+  "limites": [
+   "Écosystème d'intégrations plus restreint que Fireflies",
+   "Notoriété moindre : prévoyez d'expliquer l'outil à vos interlocuteurs"
+  ],
+  "gain": "Un entretien de recrutement documenté et comparable sans prise de notes, en restant dans un cadre RGPD net.",
+  "conformite": "Hébergement en France/UE, éditeur soumis au RGPD : la solution la plus simple à faire valider pour des entretiens RH.",
+  "alternatives": [
+   "fathom",
+   "leexi",
+   "fireflies"
+  ],
+  "cas": [
+   "Documenter les entretiens de recrutement de façon comparable et traçable",
+   "Produire les comptes rendus de réunions abordant des données clients",
+   "Transcrire les réunions du CSE ou de direction"
+  ]
+ },
+ {
+  "slug": "leexi",
+  "name": "Leexi",
+  "url": "https://www.leexi.ai/",
+  "cat": "reunions-notes",
+  "cats": [
+   "prospection-vente"
+  ],
+  "editeur": "Leexi",
+  "pays": "Belgique",
+  "prix": "Payant",
+  "prixDetail": "À partir de ~30 €/utilisateur/mois",
+  "niveau": "Intermédiaire",
+  "profils": [
+   "Commercial",
+   "Dirigeant",
+   "RH"
+  ],
+  "tags": "leexi belgique europe conversation intelligence appels commerciaux coaching",
+  "note": 4.2,
+  "resume": "L'analyse des conversations commerciales made in Europe : transcription, comptes rendus et coaching des équipes de vente.",
+  "forces": [
+   "Éditeur belge, hébergement européen",
+   "Analyse des appels orientée performance commerciale (objections, temps de parole, étapes de vente)",
+   "Se branche sur la téléphonie et les visios"
+  ],
+  "limites": [
+   "Positionné équipe commerciale : surdimensionné pour un usage individuel",
+   "Tarif supérieur aux assistants de réunion généralistes"
+  ],
+  "gain": "Le management commercial s'appuie sur des faits plutôt que sur des ressentis, sans écouter les appels un par un.",
+  "conformite": "Hébergement européen ; l'enregistrement des appels reste soumis à l'information des interlocuteurs et à l'information du CSE.",
+  "alternatives": [
+   "fireflies",
+   "noota",
+   "fathom"
+  ],
+  "cas": [
+   "Coacher une équipe commerciale sur des appels réels",
+   "Détecter les objections qui font perdre les affaires",
+   "Documenter automatiquement les rendez-vous dans le CRM"
+  ]
+ },
+ {
+  "slug": "otter",
+  "name": "Otter.ai",
+  "url": "https://otter.ai/",
+  "cat": "reunions-notes",
+  "cats": [],
+  "editeur": "Otter.ai",
+  "pays": "États-Unis",
+  "prix": "Freemium",
+  "prixDetail": "Version gratuite (minutes limitées) · à partir de ~17 €/mois",
+  "niveau": "Débutant",
+  "profils": [
+   "Ops",
+   "Formateur",
+   "Dirigeant"
+  ],
+  "tags": "otter transcription temps reel notes reunion anglais",
+  "note": 3.9,
+  "resume": "Le vétéran de la transcription de réunion, très efficace en anglais et en temps réel.",
+  "forces": [
+   "Transcription en direct pendant la réunion, avec surlignage collaboratif",
+   "Application mobile pratique pour les entretiens en présentiel",
+   "Version gratuite suffisante pour un usage occasionnel"
+  ],
+  "limites": [
+   "Le français reste son point faible face aux concurrents récents",
+   "Interface vieillissante"
+  ],
+  "gain": "Utile pour ne plus prendre de notes en réunion, surtout en contexte anglophone.",
+  "conformite": "Hébergement États-Unis. Information des participants obligatoire.",
+  "alternatives": [
+   "fathom",
+   "noota",
+   "turboscribe"
+  ],
+  "cas": [
+   "Transcrire un entretien en présentiel depuis un téléphone",
+   "Suivre une réunion en anglais sans rien perdre"
+  ]
+ },
+ {
+  "slug": "turboscribe",
+  "name": "TurboScribe",
+  "url": "https://turboscribe.ai/",
+  "cat": "reunions-notes",
+  "cats": [
+   "video-audio"
+  ],
+  "editeur": "TurboScribe",
+  "pays": "États-Unis",
+  "prix": "Freemium",
+  "prixDetail": "3 transcriptions/jour gratuites · illimité à ~20 €/mois",
+  "niveau": "Débutant",
+  "profils": [
+   "Formateur",
+   "Marketing",
+   "Ops"
+  ],
+  "tags": "turboscribe transcription audio video sous-titres fichiers whisper",
+  "note": 4.2,
+  "resume": "Transcrire n'importe quel fichier audio ou vidéo, dans une centaine de langues, avec une précision remarquable.",
+  "forces": [
+   "Traite des fichiers longs sans découpage manuel",
+   "Exports nombreux : texte, sous-titres, tableur",
+   "Excellente qualité en français, y compris sur des enregistrements moyens"
+  ],
+  "limites": [
+   "Ne rejoint pas les visios : il faut lui fournir un fichier",
+   "Pas d'analyse ni de compte rendu structuré comme un assistant de réunion"
+  ],
+  "gain": "Une heure d'enregistrement transcrite en quelques minutes au lieu de trois heures de saisie.",
+  "conformite": "Hébergement États-Unis : pour des enregistrements contenant des données personnelles, préférez une solution européenne.",
+  "alternatives": [
+   "otter",
+   "noota",
+   "fathom"
+  ],
+  "cas": [
+   "Transcrire des interviews pour en tirer des articles",
+   "Sous-titrer des vidéos de formation",
+   "Retranscrire un atelier client enregistré au téléphone"
+  ]
+ },
+ {
+  "slug": "jasper",
+  "name": "Jasper",
+  "url": "https://www.jasper.ai/",
+  "cat": "redaction-contenu",
+  "cats": [
+   "seo-visibilite"
+  ],
+  "editeur": "Jasper",
+  "pays": "États-Unis",
+  "prix": "Payant",
+  "prixDetail": "À partir de ~39 €/mois",
+  "niveau": "Intermédiaire",
+  "profils": [
+   "Marketing"
+  ],
+  "tags": "jasper redaction marketing copywriting charte editoriale campagnes",
+  "note": 3.9,
+  "resume": "Une plateforme de rédaction marketing qui apprend la voix de votre marque et la tient sur toutes vos campagnes.",
+  "forces": [
+   "Mémorise charte éditoriale, ton et arguments produits pour toute l'équipe",
+   "Modèles prêts pour publicités, pages de vente et e-mails",
+   "Travail collaboratif avec validation, utile en agence ou en équipe marketing"
+  ],
+  "limites": [
+   "Cher au regard de ce que fait ChatGPT avec un bon prompt",
+   "Rendu français souvent trop « publicitaire américain » sans retouche"
+  ],
+  "gain": "Pertinent pour une équipe marketing qui produit beaucoup ; superflu pour un dirigeant seul.",
+  "conformite": "Hébergement États-Unis. Usage marketing sans données clients : enjeu limité.",
+  "alternatives": [
+   "chatgpt",
+   "claude"
+  ],
+  "cas": [
+   "Décliner une campagne sur dix formats sans perdre le ton de la marque",
+   "Faire produire des variantes d'annonces publicitaires à tester"
+  ]
+ },
+ {
+  "slug": "deepl",
+  "name": "DeepL",
+  "url": "https://www.deepl.com/",
+  "cat": "redaction-contenu",
+  "cats": [
+   "juridique-conformite"
+  ],
+  "editeur": "DeepL SE",
+  "pays": "Allemagne",
+  "prix": "Freemium",
+  "prixDetail": "Version gratuite · Pro à partir de ~9 €/mois",
+  "niveau": "Débutant",
+  "profils": [
+   "Dirigeant",
+   "Commercial",
+   "Marketing",
+   "Ops"
+  ],
+  "tags": "deepl traduction allemand europe documents write reformulation",
+  "note": 4.7,
+  "resume": "La meilleure traduction automatique du marché, et un correcteur-reformulateur qui muscle vos écrits professionnels.",
+  "forces": [
+   "Qualité de traduction nettement supérieure aux alternatives, surtout sur le français",
+   "Traduit des documents entiers en conservant la mise en page",
+   "Éditeur allemand, hébergement UE : un vrai atout sur les documents d'entreprise"
+  ],
+  "limites": [
+   "Les options professionnelles (glossaire, documents illimités) sont payantes",
+   "DeepL Write reste limité au français, à l'anglais et à quelques langues"
+  ],
+  "gain": "Une traduction de contrat ou de plaquette en quelques secondes, sans allers-retours avec une agence.",
+  "conformite": "Hébergement européen, et sur les offres Pro les textes ne sont pas conservés après traduction. Défendable pour des documents d'entreprise.",
+  "alternatives": [
+   "chatgpt",
+   "mistral-le-chat"
+  ],
+  "cas": [
+   "Traduire une proposition commerciale pour un client étranger",
+   "Reformuler un e-mail délicat avant envoi",
+   "Traduire une documentation technique en conservant la mise en forme"
+  ]
+ },
+ {
+  "slug": "antidote",
+  "name": "Antidote",
+  "url": "https://www.antidote.info/",
+  "cat": "redaction-contenu",
+  "cats": [],
+  "editeur": "Druide informatique",
+  "pays": "Canada (Québec)",
+  "prix": "Payant",
+  "prixDetail": "Licence à partir de ~60 €/an ou achat définitif",
+  "niveau": "Débutant",
+  "profils": [
+   "Dirigeant",
+   "Marketing",
+   "RH",
+   "Ops"
+  ],
+  "tags": "antidote correction orthographe grammaire francais style redaction",
+  "note": 4.5,
+  "resume": "La référence de la correction française : orthographe, grammaire, style et cohérence, directement dans vos logiciels.",
+  "forces": [
+   "Correction française d'un niveau que les IA généralistes n'atteignent pas encore",
+   "S'intègre à Word, Outlook, aux navigateurs et aux principaux traitements de texte",
+   "Fonctionne en local : vos textes ne partent pas dans un cloud"
+  ],
+  "limites": [
+   "Achat de licence, pas d'offre gratuite",
+   "Ne rédige pas à votre place : c'est un correcteur, pas un générateur"
+  ],
+  "gain": "Plus aucune faute dans les documents qui sortent de l'entreprise — un enjeu d'image, pas de temps.",
+  "conformite": "Correction locale sur le poste : aucun transfert de données.",
+  "alternatives": [
+   "deepl",
+   "chatgpt"
+  ],
+  "cas": [
+   "Relire les propositions commerciales avant envoi",
+   "Fiabiliser les supports de formation et documents contractuels"
+  ]
+ },
+ {
+  "slug": "notion-ai",
+  "name": "Notion AI",
+  "url": "https://www.notion.com/product/ai",
+  "cat": "redaction-contenu",
+  "cats": [
+   "presentations-documents",
+   "data-analyse"
+  ],
+  "editeur": "Notion Labs",
+  "pays": "États-Unis",
+  "prix": "Payant",
+  "prixDetail": "Notion à partir de ~10 €/utilisateur/mois, IA incluse dans les offres Business",
+  "niveau": "Débutant",
+  "profils": [
+   "Ops",
+   "Dirigeant",
+   "Marketing",
+   "RH"
+  ],
+  "tags": "notion ai wiki base de connaissances documentation projets recherche interne",
+  "note": 4.3,
+  "resume": "L'IA intégrée à votre espace de travail Notion : elle rédige, résume et cherche dans toute la documentation de l'entreprise.",
+  "forces": [
+   "Répond à partir de vos propres pages : procédures, comptes rendus, fiches clients",
+   "Supprime l'aller-retour entre l'outil de travail et un chatbot externe",
+   "Recherche transversale efficace dans un espace de travail volumineux"
+  ],
+  "limites": [
+   "Ne vaut le coût que si Notion est déjà le socle documentaire de l'entreprise",
+   "Qualité rédactionnelle inférieure à ChatGPT ou Claude"
+  ],
+  "gain": "Les informations internes se retrouvent en 10 secondes au lieu de 10 minutes de fouille.",
+  "conformite": "Hébergement États-Unis. Vérifiez ce que contient votre espace Notion avant d'activer l'IA dessus.",
+  "alternatives": [
+   "notebooklm",
+   "dust",
+   "microsoft-copilot"
+  ],
+  "cas": [
+   "Retrouver instantanément une procédure interne",
+   "Résumer un projet à partir de ses pages de suivi",
+   "Rédiger un compte rendu directement dans l'espace projet"
+  ]
+ },
+ {
+  "slug": "taplio",
+  "name": "Taplio",
+  "url": "https://taplio.com/",
+  "cat": "redaction-contenu",
+  "cats": [
+   "prospection-vente"
+  ],
+  "editeur": "Taplio (Lempire)",
+  "pays": "France",
+  "prix": "Payant",
+  "prixDetail": "À partir de ~39 €/mois",
+  "niveau": "Débutant",
+  "profils": [
+   "Dirigeant",
+   "Commercial",
+   "Marketing"
+  ],
+  "tags": "taplio linkedin personal branding posts programmation lempire france",
+  "note": 4.2,
+  "resume": "L'outil de référence pour tenir une présence LinkedIn régulière : rédaction assistée, programmation et suivi des résultats.",
+  "forces": [
+   "Éditeur français (Lempire), très au fait des usages LinkedIn",
+   "Bibliothèque de posts performants pour s'inspirer plutôt que partir de zéro",
+   "Programmation et statistiques réunies : la régularité devient tenable"
+  ],
+  "limites": [
+   "Les textes générés sonnent LinkedIn générique s'ils ne sont pas retravaillés",
+   "Tarif significatif pour un usage purement personnel"
+  ],
+  "gain": "Passer de deux posts par mois à trois par semaine sans y consacrer plus de temps.",
+  "conformite": "Éditeur français. Respectez les limites d'automatisation imposées par LinkedIn.",
+  "alternatives": [
+   "buffer",
+   "blotato",
+   "chatgpt"
+  ],
+  "cas": [
+   "Tenir un rythme de publication LinkedIn de dirigeant",
+   "Programmer un mois de contenu en une session",
+   "Repérer les sujets qui fonctionnent dans son secteur"
+  ]
+ },
+ {
+  "slug": "buffer",
+  "name": "Buffer",
+  "url": "https://buffer.com/",
+  "cat": "redaction-contenu",
+  "cats": [],
+  "editeur": "Buffer",
+  "pays": "États-Unis",
+  "prix": "Freemium",
+  "prixDetail": "Version gratuite (3 canaux) · à partir de ~6 €/canal/mois",
+  "niveau": "Débutant",
+  "profils": [
+   "Marketing",
+   "Dirigeant"
+  ],
+  "tags": "buffer reseaux sociaux programmation publication calendrier instagram linkedin",
+  "note": 4.1,
+  "resume": "La programmation de publications sur les réseaux sociaux, simple et abordable, avec assistance à la rédaction.",
+  "forces": [
+   "Version gratuite honnête, suffisante pour une TPE",
+   "Interface claire : le calendrier éditorial devient visible d'un coup d'œil",
+   "Adapte automatiquement un même contenu au format de chaque réseau"
+  ],
+  "limites": [
+   "Fonctions IA basiques face aux outils spécialisés",
+   "Statistiques légères sur les offres d'entrée"
+  ],
+  "gain": "Une session de programmation hebdomadaire remplace les publications au fil de l'eau.",
+  "conformite": "Publication de contenus publics : enjeu limité.",
+  "alternatives": [
+   "taplio",
+   "blotato"
+  ],
+  "cas": [
+   "Programmer une semaine de publications en une heure",
+   "Coordonner les publications de plusieurs comptes de l'entreprise"
+  ]
+ },
+ {
+  "slug": "blotato",
+  "name": "Blotato",
+  "url": "https://blotato.com/",
+  "cat": "redaction-contenu",
+  "cats": [
+   "video-audio",
+   "automatisation"
+  ],
+  "editeur": "Blotato",
+  "pays": "États-Unis",
+  "prix": "Payant",
+  "prixDetail": "À partir de ~29 €/mois",
+  "niveau": "Intermédiaire",
+  "profils": [
+   "Marketing"
+  ],
+  "tags": "blotato repurposing contenu multi-plateformes automatisation publication video",
+  "note": 4.0,
+  "resume": "Transformer un contenu unique en dizaines de publications adaptées à chaque réseau, en une seule opération.",
+  "forces": [
+   "Un article ou une vidéo devient automatiquement posts, extraits et visuels",
+   "Publication automatisée sur une dizaine de plateformes",
+   "Se pilote depuis n8n ou Make pour une chaîne de contenu entièrement automatique"
+  ],
+  "limites": [
+   "Résultats à relire : la déclinaison automatique produit parfois du hors-sujet",
+   "Outil jeune, encore en évolution rapide"
+  ],
+  "gain": "Un contenu produit une fois alimente un mois de publications au lieu d'être publié une seule fois.",
+  "conformite": "Contenus publics : enjeu limité.",
+  "alternatives": [
+   "buffer",
+   "taplio",
+   "opusclip"
+  ],
+  "cas": [
+   "Décliner un webinaire en 20 publications",
+   "Alimenter tous les réseaux depuis un seul article de blog"
+  ]
+ },
+ {
+  "slug": "semrush",
+  "name": "Semrush",
+  "url": "https://www.semrush.com/",
+  "cat": "seo-visibilite",
+  "cats": [
+   "recherche-veille"
+  ],
+  "editeur": "Semrush",
+  "pays": "États-Unis",
+  "prix": "Payant",
+  "prixDetail": "À partir de ~130 €/mois",
+  "niveau": "Intermédiaire",
+  "profils": [
+   "Marketing",
+   "Dirigeant"
+  ],
+  "tags": "semrush seo mots-cles concurrents positions backlinks audit",
+  "note": 4.5,
+  "resume": "La suite SEO la plus complète : mots-clés, positions, concurrents, backlinks et audit technique dans un seul outil.",
+  "forces": [
+   "Données de mots-clés françaises fiables et profondes",
+   "Analyse concurrentielle redoutable : on voit exactement sur quoi se positionnent les autres",
+   "Suivi des positions et audit technique intégrés"
+  ],
+  "limites": [
+   "Tarif difficile à justifier pour une TPE sans stratégie SEO active",
+   "Interface dense : quelques heures avant d'être à l'aise"
+  ],
+  "gain": "Évite de produire du contenu sur des mots-clés que personne ne tape : le vrai gain est en contenus non écrits.",
+  "conformite": "Données publiques de référencement.",
+  "alternatives": [
+   "ahrefs",
+   "ubersuggest",
+   "google-search-console"
+  ],
+  "cas": [
+   "Identifier les mots-clés sur lesquels un concurrent capte le trafic",
+   "Auditer les problèmes techniques qui bloquent le référencement",
+   "Suivre l'évolution des positions mois après mois"
+  ]
+ },
+ {
+  "slug": "ahrefs",
+  "name": "Ahrefs",
+  "url": "https://ahrefs.com/",
+  "cat": "seo-visibilite",
+  "cats": [],
+  "editeur": "Ahrefs",
+  "pays": "Singapour",
+  "prix": "Payant",
+  "prixDetail": "À partir de ~120 €/mois · outils gratuits limités",
+  "niveau": "Intermédiaire",
+  "profils": [
+   "Marketing"
+  ],
+  "tags": "ahrefs seo backlinks autorite domaine mots-cles analyse",
+  "note": 4.5,
+  "resume": "La référence sur les liens entrants et l'autorité de domaine, avec d'excellents outils de recherche de mots-clés.",
+  "forces": [
+   "Le meilleur index de backlinks du marché",
+   "Explorateur de mots-clés très précis sur les intentions de recherche",
+   "Outils gratuits (Webmaster Tools) utilisables sans abonnement sur son propre site"
+  ],
+  "limites": [
+   "Tarif élevé, sans version d'essai gratuite",
+   "Moins complet que Semrush sur la publicité et les réseaux sociaux"
+  ],
+  "gain": "Comprendre pourquoi un concurrent est devant vous — souvent une question de liens, pas de contenu.",
+  "conformite": "Données publiques.",
+  "alternatives": [
+   "semrush",
+   "google-search-console",
+   "ubersuggest"
+  ],
+  "cas": [
+   "Analyser d'où viennent les liens des concurrents",
+   "Trouver des sujets à faible concurrence et fort potentiel"
+  ]
+ },
+ {
+  "slug": "google-search-console",
+  "name": "Google Search Console",
+  "url": "https://search.google.com/search-console",
+  "cat": "seo-visibilite",
+  "cats": [
+   "data-analyse"
+  ],
+  "editeur": "Google",
+  "pays": "États-Unis",
+  "prix": "Gratuit",
+  "prixDetail": "Gratuit",
+  "niveau": "Débutant",
+  "profils": [
+   "Marketing",
+   "Dirigeant"
+  ],
+  "tags": "search console google seo positions impressions indexation gratuit",
+  "note": 4.8,
+  "resume": "Les données officielles de Google sur votre site : requêtes réelles, positions, clics et problèmes d'indexation.",
+  "forces": [
+   "Gratuit, et c'est la seule source de vérité sur ce que Google voit de votre site",
+   "Révèle les requêtes sur lesquelles vous apparaissez déjà sans le savoir",
+   "Signale les pages non indexées, souvent la cause d'une absence de trafic"
+  ],
+  "limites": [
+   "Pas de données sur les concurrents",
+   "Interface qui demande un peu d'habitude pour être lue correctement"
+  ],
+  "gain": "Le premier réflexe SEO : la majorité des gains rapides sont visibles ici, gratuitement.",
+  "conformite": "Outil Google sur des données de trafic agrégées.",
+  "alternatives": [
+   "semrush",
+   "ahrefs"
+  ],
+  "cas": [
+   "Trouver les pages en position 11-20 à pousser pour passer en page 1",
+   "Vérifier qu'une nouvelle page est bien indexée",
+   "Repérer les requêtes réelles des clients, souvent différentes du jargon interne"
+  ]
+ },
+ {
+  "slug": "surfer-seo",
+  "name": "Surfer SEO",
+  "url": "https://surferseo.com/",
+  "cat": "seo-visibilite",
+  "cats": [
+   "redaction-contenu"
+  ],
+  "editeur": "Surfer",
+  "pays": "Pologne",
+  "prix": "Payant",
+  "prixDetail": "À partir de ~89 €/mois",
+  "niveau": "Intermédiaire",
+  "profils": [
+   "Marketing"
+  ],
+  "tags": "surfer seo optimisation contenu redaction score semantique brief",
+  "note": 4.2,
+  "resume": "L'assistant d'optimisation de contenu : il indique quoi écrire pour qu'un article ait une chance de se positionner.",
+  "forces": [
+   "Transforme le SEO éditorial en check-list concrète",
+   "Génère des briefs exploitables directement par un rédacteur ou une IA",
+   "Éditeur européen"
+  ],
+  "limites": [
+   "Suivre le score à la lettre produit des textes mécaniques : le jugement humain reste indispensable",
+   "Tarif élevé pour un site qui publie peu"
+  ],
+  "gain": "Un article optimisé dès le premier jet plutôt que réécrit trois mois plus tard.",
+  "conformite": "Données de contenus publics.",
+  "alternatives": [
+   "yourtextguru",
+   "semrush",
+   "chatgpt"
+  ],
+  "cas": [
+   "Cadrer un article avant de le confier à un rédacteur",
+   "Réoptimiser d'anciens articles qui stagnent en page 2"
+  ]
+ },
+ {
+  "slug": "yourtextguru",
+  "name": "YourTextGuru",
+  "url": "https://yourtext.guru/",
+  "cat": "seo-visibilite",
+  "cats": [
+   "redaction-contenu"
+  ],
+  "editeur": "YourTextGuru",
+  "pays": "France",
+  "prix": "Freemium",
+  "prixDetail": "Crédits · offres à partir de ~10 €/mois",
+  "niveau": "Intermédiaire",
+  "profils": [
+   "Marketing"
+  ],
+  "tags": "yourtextguru seo semantique francais guide redaction optimisation",
+  "note": 4.2,
+  "resume": "L'outil d'optimisation sémantique français : il analyse ce que Google attend sur une requête en français et guide la rédaction.",
+  "forces": [
+   "Conçu pour le français, contrairement à la plupart des concurrents",
+   "Facturation à l'usage, accessible à une petite structure",
+   "Guides de rédaction directement exploitables"
+  ],
+  "limites": [
+   "Interface austère",
+   "Périmètre limité à la sémantique : ni backlinks, ni audit technique"
+  ],
+  "gain": "Le meilleur rapport qualité/prix pour optimiser du contenu francophone.",
+  "conformite": "Éditeur français, données de contenus publics.",
+  "alternatives": [
+   "surfer-seo",
+   "semrush"
+  ],
+  "cas": [
+   "Optimiser un article français sur une requête concurrentielle",
+   "Vérifier qu'un contenu couvre bien le champ sémantique attendu"
+  ]
+ },
+ {
+  "slug": "ubersuggest",
+  "name": "Ubersuggest",
+  "url": "https://neilpatel.com/ubersuggest/",
+  "cat": "seo-visibilite",
+  "cats": [],
+  "editeur": "NP Digital",
+  "pays": "États-Unis",
+  "prix": "Freemium",
+  "prixDetail": "Quelques recherches gratuites/jour · à partir de ~29 €/mois ou licence à vie",
+  "niveau": "Débutant",
+  "profils": [
+   "Dirigeant",
+   "Marketing"
+  ],
+  "tags": "ubersuggest seo mots-cles pas cher debutant idees contenu",
+  "note": 3.8,
+  "resume": "L'entrée de gamme du SEO : idées de mots-clés et analyse de site à un tarif accessible à une TPE.",
+  "forces": [
+   "Beaucoup moins cher que Semrush ou Ahrefs, avec une licence à vie possible",
+   "Interface simple, pensée pour les non-spécialistes",
+   "Suffisant pour trouver des sujets d'articles"
+  ],
+  "limites": [
+   "Données moins fiables et moins profondes que les leaders",
+   "Fonctions avancées limitées"
+  ],
+  "gain": "Permet de démarrer une démarche SEO sans engager 130 €/mois.",
+  "conformite": "Données publiques.",
+  "alternatives": [
+   "semrush",
+   "google-search-console",
+   "ahrefs"
+  ],
+  "cas": [
+   "Trouver 20 sujets d'articles pour l'année",
+   "Vérifier rapidement le potentiel d'un mot-clé"
+  ]
+ },
+ {
+  "slug": "screamingfrog",
+  "name": "Screaming Frog",
+  "url": "https://www.screamingfrog.co.uk/seo-spider/",
+  "cat": "seo-visibilite",
+  "cats": [],
+  "editeur": "Screaming Frog",
+  "pays": "Royaume-Uni",
+  "prix": "Freemium",
+  "prixDetail": "Gratuit jusqu'à 500 URL · licence ~239 €/an",
+  "niveau": "Expert",
+  "profils": [
+   "Développeur",
+   "Marketing"
+  ],
+  "tags": "screaming frog crawl audit technique seo balises redirections",
+  "note": 4.4,
+  "resume": "Le scanner technique du SEO : il explore votre site comme Google et remonte tout ce qui cloche.",
+  "forces": [
+   "Détecte liens cassés, doublons, balises manquantes et redirections fautives",
+   "Gratuit jusqu'à 500 pages, ce qui couvre la plupart des sites de PME",
+   "Logiciel installé en local : rapide, sans limite d'usage"
+  ],
+  "limites": [
+   "Sortie très technique : sans compétence SEO, les rapports restent illisibles",
+   "Interface datée"
+  ],
+  "gain": "Un audit technique complet en une heure, là où une agence le facture plusieurs centaines d'euros.",
+  "conformite": "Analyse locale de votre propre site.",
+  "alternatives": [
+   "semrush",
+   "google-search-console"
+  ],
+  "cas": [
+   "Contrôler un site après refonte avant la mise en ligne",
+   "Repérer les pages sans balise title ou description"
+  ]
+ },
+ {
+  "slug": "answerthepublic",
+  "name": "AnswerThePublic",
+  "url": "https://answerthepublic.com/",
+  "cat": "seo-visibilite",
+  "cats": [
+   "redaction-contenu"
+  ],
+  "editeur": "NP Digital",
+  "pays": "Royaume-Uni",
+  "prix": "Freemium",
+  "prixDetail": "Quelques recherches gratuites/jour · à partir de ~9 €/mois",
+  "niveau": "Débutant",
+  "profils": [
+   "Marketing",
+   "Dirigeant"
+  ],
+  "tags": "answerthepublic questions clients requetes idees contenu faq",
+  "note": 3.9,
+  "resume": "Toutes les questions que vos clients tapent réellement sur Google, classées et prêtes à devenir du contenu.",
+  "forces": [
+   "Fait remonter les vraies formulations des clients, souvent éloignées du jargon interne",
+   "Matière première idéale pour une FAQ — et pour être cité par les IA",
+   "Prise en main immédiate"
+  ],
+  "limites": [
+   "Données françaises moins riches qu'en anglais",
+   "Peu utile au-delà de la phase d'idéation"
+  ],
+  "gain": "Une FAQ complète et un an de sujets d'articles trouvés en une seule session.",
+  "conformite": "Données de recherche agrégées et publiques.",
+  "alternatives": [
+   "ubersuggest",
+   "semrush",
+   "perplexity"
+  ],
+  "cas": [
+   "Construire une FAQ qui répond aux vraies questions des prospects",
+   "Trouver les angles d'articles auxquels les concurrents ne répondent pas"
+  ]
+ },
+ {
+  "slug": "lemlist",
+  "name": "Lemlist",
+  "url": "https://www.lemlist.com/",
+  "cat": "prospection-vente",
+  "cats": [
+   "redaction-contenu"
+  ],
+  "editeur": "Lempire",
+  "pays": "France",
+  "prix": "Payant",
+  "prixDetail": "À partir de ~55 €/utilisateur/mois",
+  "niveau": "Intermédiaire",
+  "profils": [
+   "Commercial",
+   "Dirigeant",
+   "Marketing"
+  ],
+  "tags": "lemlist cold email prospection sequences linkedin personnalisation france",
+  "note": 4.5,
+  "resume": "La prospection multicanale à la française : séquences e-mail + LinkedIn, personnalisation automatique et base de contacts intégrée.",
+  "forces": [
+   "Éditeur français, interface en français, support réactif",
+   "Personnalisation poussée (images, variables, IA) qui change réellement les taux de réponse",
+   "Base de contacts B2B et vérification des e-mails incluses"
+  ],
+  "limites": [
+   "Tarif significatif pour un indépendant",
+   "La prospection à froid reste encadrée : sans ciblage sérieux, on brûle son domaine"
+  ],
+  "gain": "Une séquence de prospection tourne seule pendant que vous êtes en rendez-vous.",
+  "conformite": "Éditeur français. La prospection B2B par e-mail est possible sans consentement préalable si l'objet concerne l'activité professionnelle du destinataire, avec information et droit d'opposition (position CNIL).",
+  "alternatives": [
+   "lagrowthmachine",
+   "waalaxy",
+   "apollo"
+  ],
+  "cas": [
+   "Lancer une campagne de prospection sur 200 comptes cibles",
+   "Relancer automatiquement les devis sans réponse",
+   "Combiner e-mail et LinkedIn dans une même séquence"
+  ]
+ },
+ {
+  "slug": "waalaxy",
+  "name": "Waalaxy",
+  "url": "https://www.waalaxy.com/",
+  "cat": "prospection-vente",
+  "cats": [],
+  "editeur": "Waapi",
+  "pays": "France",
+  "prix": "Freemium",
+  "prixDetail": "Version gratuite limitée · à partir de ~21 €/mois",
+  "niveau": "Débutant",
+  "profils": [
+   "Commercial",
+   "Dirigeant"
+  ],
+  "tags": "waalaxy linkedin prospection invitations messages automatisation france",
+  "note": 4.3,
+  "resume": "L'automatisation LinkedIn la plus simple à prendre en main : invitations, messages et séquences, depuis le navigateur.",
+  "forces": [
+   "Prise en main en une heure, sans compétence technique",
+   "Version gratuite suffisante pour tester la démarche",
+   "Éditeur français, très au fait des limites imposées par LinkedIn"
+  ],
+  "limites": [
+   "Automatiser LinkedIn comporte toujours un risque de restriction de compte",
+   "Ciblage moins fin que des outils comme Clay ou Pharow"
+  ],
+  "gain": "20 à 30 prises de contact qualifiées par jour sans y consacrer de temps.",
+  "conformite": "Éditeur français. Restez dans les volumes raisonnables : l'automatisation LinkedIn est tolérée, pas autorisée.",
+  "alternatives": [
+   "lemlist",
+   "lagrowthmachine",
+   "phantombuster"
+  ],
+  "cas": [
+   "Développer son réseau LinkedIn sur une cible précise",
+   "Enchaîner invitation, message et relance automatiquement"
+  ]
+ },
+ {
+  "slug": "lagrowthmachine",
+  "name": "LaGrowthMachine",
+  "url": "https://lagrowthmachine.com/",
+  "cat": "prospection-vente",
+  "cats": [
+   "automatisation"
+  ],
+  "editeur": "LaGrowthMachine",
+  "pays": "France",
+  "prix": "Payant",
+  "prixDetail": "À partir de ~60 €/mois",
+  "niveau": "Intermédiaire",
+  "profils": [
+   "Commercial",
+   "Marketing"
+  ],
+  "tags": "lagrowthmachine prospection multicanal linkedin email enrichissement france",
+  "note": 4.3,
+  "resume": "La prospection multicanale automatisée avec enrichissement des contacts intégré : LinkedIn, e-mail et Twitter dans un même scénario.",
+  "forces": [
+   "Enrichit automatiquement les contacts (e-mail pro, téléphone) sans outil tiers",
+   "Scénarios conditionnels réellement intelligents selon le comportement du prospect",
+   "Éditeur français, données hébergées en UE"
+  ],
+  "limites": [
+   "Plus complexe que Waalaxy : il faut penser ses scénarios",
+   "Tarif orienté équipe commerciale"
+  ],
+  "gain": "Un pipeline alimenté en continu sans que personne ne prospecte manuellement.",
+  "conformite": "Éditeur français, hébergement UE. Documentez la source de vos contacts : c'est ce que la CNIL contrôle en premier.",
+  "alternatives": [
+   "lemlist",
+   "waalaxy",
+   "apollo"
+  ],
+  "cas": [
+   "Enchaîner visite de profil, invitation, message et e-mail selon les réactions",
+   "Enrichir une liste de comptes cibles avec les bons contacts"
+  ]
+ },
+ {
+  "slug": "apollo",
+  "name": "Apollo.io",
+  "url": "https://www.apollo.io/",
+  "cat": "prospection-vente",
+  "cats": [
+   "recherche-veille"
+  ],
+  "editeur": "Apollo.io",
+  "pays": "États-Unis",
+  "prix": "Freemium",
+  "prixDetail": "Version gratuite · à partir de ~45 €/utilisateur/mois",
+  "niveau": "Intermédiaire",
+  "profils": [
+   "Commercial"
+  ],
+  "tags": "apollo base contacts b2b prospection emails sequences crm donnees",
+  "note": 4.2,
+  "resume": "Une base de plus de 200 millions de contacts B2B couplée à un outil de séquences : trouver et contacter au même endroit.",
+  "forces": [
+   "Volume de données inégalé, y compris hors de France",
+   "Filtres de ciblage très fins (effectif, technologies, levées de fonds, recrutements)",
+   "Version gratuite qui permet de tester sérieusement"
+  ],
+  "limites": [
+   "Qualité des données françaises inférieure aux bases spécialisées comme Pharow",
+   "Base constituée hors du cadre européen : à manier avec précaution en RGPD"
+  ],
+  "gain": "Une liste de 500 prospects qualifiés constituée en une heure au lieu d'une semaine.",
+  "conformite": "Base américaine : vérifiez l'origine des données et informez les personnes contactées de leur droit d'opposition, comme l'exige le RGPD.",
+  "alternatives": [
+   "pharow",
+   "clay",
+   "lemlist"
+  ],
+  "cas": [
+   "Constituer une liste de cibles sur un nouveau marché",
+   "Identifier les décideurs d'un compte stratégique"
+  ]
+ },
+ {
+  "slug": "pharow",
+  "name": "Pharow",
+  "url": "https://www.pharow.com/",
+  "cat": "prospection-vente",
+  "cats": [
+   "recherche-veille"
+  ],
+  "editeur": "Pharow",
+  "pays": "France",
+  "prix": "Payant",
+  "prixDetail": "À partir de ~99 €/mois",
+  "niveau": "Intermédiaire",
+  "profils": [
+   "Commercial",
+   "Dirigeant"
+  ],
+  "tags": "pharow prospection france base entreprises ciblage signaux donnees legales",
+  "note": 4.4,
+  "resume": "La base de prospection française : ciblage sur des données d'entreprises réelles (effectif, croissance, recrutements, technologies) plutôt que sur du déclaratif.",
+  "forces": [
+   "Données françaises nettement plus fiables que les bases américaines",
+   "Ciblage par signaux : entreprises qui recrutent, qui lèvent, qui déménagent",
+   "Éditeur français, conçu dans le cadre RGPD"
+  ],
+  "limites": [
+   "Réservé au marché français : inutile à l'international",
+   "Tarif d'entrée élevé pour un indépendant"
+  ],
+  "gain": "On arrête de prospecter large : le taux de réponse double quand la liste est vraiment ciblée.",
+  "conformite": "Éditeur français, sources légales françaises. Le choix le plus défendable pour de la prospection B2B en France.",
+  "alternatives": [
+   "apollo",
+   "clay",
+   "dropcontact"
+  ],
+  "cas": [
+   "Cibler les PME industrielles de 20 à 50 salariés qui recrutent",
+   "Détecter les entreprises qui viennent de lever des fonds",
+   "Construire une liste de comptes cibles régionale"
+  ]
+ },
+ {
+  "slug": "clay",
+  "name": "Clay",
+  "url": "https://www.clay.com/",
+  "cat": "prospection-vente",
+  "cats": [
+   "automatisation",
+   "data-analyse"
+  ],
+  "editeur": "Clay",
+  "pays": "États-Unis",
+  "prix": "Freemium",
+  "prixDetail": "Version gratuite limitée · à partir de ~130 €/mois",
+  "niveau": "Expert",
+  "profils": [
+   "Commercial",
+   "Ops"
+  ],
+  "tags": "clay enrichissement donnees prospection tableur agents ia scoring",
+  "note": 4.4,
+  "resume": "Un tableur augmenté qui enrichit, qualifie et personnalise vos listes de prospects avec des dizaines de sources et de l'IA.",
+  "forces": [
+   "Enchaîne 50+ sources d'enrichissement pour retrouver ce qu'aucun outil seul ne trouve",
+   "Personnalisation à grande échelle : chaque message s'appuie sur une donnée réelle",
+   "Extrêmement puissant entre de bonnes mains"
+  ],
+  "limites": [
+   "Complexe et cher : il faut un vrai profil growth pour le rentabiliser",
+   "Consommation de crédits difficile à maîtriser au début"
+  ],
+  "gain": "Une personnalisation de niveau artisanal appliquée à 1 000 prospects.",
+  "conformite": "Multiplication des sources de données : documentez précisément l'origine de chaque donnée collectée.",
+  "alternatives": [
+   "apollo",
+   "pharow",
+   "lagrowthmachine"
+  ],
+  "cas": [
+   "Scorer automatiquement 2 000 prospects selon leur potentiel",
+   "Générer une accroche personnalisée à partir de l'actualité de chaque entreprise"
+  ]
+ },
+ {
+  "slug": "humanlinker",
+  "name": "Humanlinker",
+  "url": "https://www.humanlinker.com/",
+  "cat": "prospection-vente",
+  "cats": [],
+  "editeur": "Humanlinker",
+  "pays": "France",
+  "prix": "Freemium",
+  "prixDetail": "Version gratuite limitée · à partir de ~59 €/mois",
+  "niveau": "Débutant",
+  "profils": [
+   "Commercial"
+  ],
+  "tags": "humanlinker personnalisation disc profil prospect linkedin france vente",
+  "note": 4.0,
+  "resume": "Analyse le profil psychologique d'un prospect (méthode DISC) et adapte l'argumentaire commercial en conséquence.",
+  "forces": [
+   "Angle original : c'est la façon de parler au prospect qui est personnalisée, pas seulement le prénom",
+   "Éditeur français",
+   "Utile pour préparer un rendez-vous important en 5 minutes"
+  ],
+  "limites": [
+   "L'analyse de personnalité automatique reste indicative : à prendre comme une hypothèse",
+   "Périmètre plus étroit que les plateformes de prospection complètes"
+  ],
+  "gain": "Une préparation de rendez-vous sérieuse en 5 minutes au lieu de 30.",
+  "conformite": "Profilage de personnes : usage à réserver au B2B et à ne pas conserver dans le CRM sans réflexion RGPD.",
+  "alternatives": [
+   "lemlist",
+   "clay",
+   "lagrowthmachine"
+  ],
+  "cas": [
+   "Préparer un rendez-vous avec un décideur qu'on ne connaît pas",
+   "Adapter le ton d'une séquence selon le profil du contact"
+  ]
+ },
+ {
+  "slug": "hubspot",
+  "name": "HubSpot",
+  "url": "https://www.hubspot.fr/",
+  "cat": "prospection-vente",
+  "cats": [
+   "relation-client",
+   "redaction-contenu"
+  ],
+  "editeur": "HubSpot",
+  "pays": "États-Unis",
+  "prix": "Freemium",
+  "prixDetail": "CRM gratuit complet · modules payants à partir de ~20 €/utilisateur/mois",
+  "niveau": "Débutant",
+  "profils": [
+   "Commercial",
+   "Marketing",
+   "Dirigeant"
+  ],
+  "tags": "hubspot crm gratuit marketing automation pipeline contacts ia",
+  "note": 4.4,
+  "resume": "Le CRM gratuit le plus complet du marché, avec des fonctions IA intégrées pour la rédaction, le résumé et la prévision.",
+  "forces": [
+   "Un CRM réellement gratuit et illimité en contacts pour démarrer",
+   "Écosystème complet : marketing, vente, support et site web",
+   "Fonctions IA natives (rédaction d'e-mails, résumé d'échanges, scoring)"
+  ],
+  "limites": [
+   "Le coût explose dès que l'on active les modules avancés",
+   "Migration difficile une fois installé : on s'y attache durablement"
+  ],
+  "gain": "Un pipeline commercial enfin visible, sans tableur ni relance oubliée.",
+  "conformite": "Hébergement avec option européenne selon le contrat. Point de vigilance : le CRM devient le principal fichier de données personnelles de l'entreprise.",
+  "alternatives": [
+   "pipedrive",
+   "brevo"
+  ],
+  "cas": [
+   "Structurer le suivi commercial sans budget logiciel",
+   "Automatiser les relances et le scoring des prospects",
+   "Centraliser marketing, vente et support"
+  ]
+ },
+ {
+  "slug": "pipedrive",
+  "name": "Pipedrive",
+  "url": "https://www.pipedrive.com/fr",
+  "cat": "prospection-vente",
+  "cats": [],
+  "editeur": "Pipedrive",
+  "pays": "Estonie",
+  "prix": "Payant",
+  "prixDetail": "À partir de ~15 €/utilisateur/mois",
+  "niveau": "Débutant",
+  "profils": [
+   "Commercial",
+   "Dirigeant"
+  ],
+  "tags": "pipedrive crm pipeline vente simple europe assistant ia",
+  "note": 4.3,
+  "resume": "Le CRM le plus simple à faire adopter par une équipe commerciale : un pipeline visuel et rien de superflu.",
+  "forces": [
+   "Adoption immédiate par des commerciaux réfractaires aux outils",
+   "Éditeur européen (Estonie), hébergement UE",
+   "Assistant IA qui priorise les affaires et suggère les prochaines actions"
+  ],
+  "limites": [
+   "Moins complet que HubSpot sur le marketing",
+   "Fonctions avancées réservées aux forfaits supérieurs"
+  ],
+  "gain": "Fini les affaires oubliées : le taux de relance effective grimpe dès le premier mois.",
+  "conformite": "Éditeur et hébergement européens : cadre RGPD simple.",
+  "alternatives": [
+   "hubspot",
+   "brevo"
+  ],
+  "cas": [
+   "Suivre les devis en cours et les relancer au bon moment",
+   "Donner au dirigeant une vision claire du chiffre d'affaires à venir"
+  ]
+ },
+ {
+  "slug": "brevo",
+  "name": "Brevo",
+  "url": "https://www.brevo.com/fr/",
+  "cat": "prospection-vente",
+  "cats": [
+   "relation-client",
+   "redaction-contenu"
+  ],
+  "editeur": "Brevo",
+  "pays": "France",
+  "prix": "Freemium",
+  "prixDetail": "Version gratuite (300 e-mails/jour) · à partir de ~9 €/mois",
+  "niveau": "Débutant",
+  "profils": [
+   "Marketing",
+   "Commercial",
+   "Dirigeant"
+  ],
+  "tags": "brevo sendinblue emailing newsletter sms crm france rgpd automation",
+  "note": 4.4,
+  "resume": "La plateforme française d'e-mailing, SMS et automatisation marketing, avec un CRM léger inclus.",
+  "forces": [
+   "Éditeur français, hébergement UE : le choix par défaut pour une base clients française",
+   "Version gratuite très généreuse pour démarrer",
+   "Rédaction assistée par IA et automatisations sans surcoût majeur"
+  ],
+  "limites": [
+   "Délivrabilité correcte mais en dessous des spécialistes haut de gamme",
+   "Interface parfois lente sur les grosses bases"
+  ],
+  "gain": "Une newsletter et des scénarios de relance en place en une journée, sans dépendance à un éditeur américain.",
+  "conformite": "Éditeur français, hébergement UE, outils de gestion du consentement intégrés : la réponse la plus simple pour l'e-mailing RGPD.",
+  "alternatives": [
+   "hubspot",
+   "lemlist"
+  ],
+  "cas": [
+   "Envoyer une newsletter clients sans transférer sa base hors UE",
+   "Automatiser les relances après un devis",
+   "Envoyer des SMS de rappel de rendez-vous"
+  ]
+ },
+ {
+  "slug": "phantombuster",
+  "name": "PhantomBuster",
+  "url": "https://phantombuster.com/",
+  "cat": "prospection-vente",
+  "cats": [
+   "automatisation"
+  ],
+  "editeur": "PhantomBuster",
+  "pays": "France",
+  "prix": "Freemium",
+  "prixDetail": "Version d'essai · à partir de ~56 €/mois",
+  "niveau": "Intermédiaire",
+  "profils": [
+   "Commercial",
+   "Marketing",
+   "Ops"
+  ],
+  "tags": "phantombuster extraction linkedin scraping automatisation listes france",
+  "note": 4.0,
+  "resume": "Extraire et automatiser des actions sur LinkedIn, Instagram ou Google Maps sans écrire de code.",
+  "forces": [
+   "Des dizaines de scénarios prêts à l'emploi pour constituer des listes",
+   "Éditeur français",
+   "Se combine parfaitement avec n8n ou Make"
+  ],
+  "limites": [
+   "L'extraction de données publiques reste juridiquement encadrée : à utiliser avec discernement",
+   "Les plateformes cibles font évoluer leurs protections, ce qui casse parfois les scénarios"
+  ],
+  "gain": "Une liste de prospects extraite en quelques minutes au lieu d'un après-midi de copier-coller.",
+  "conformite": "Collecter des données personnelles publiques ne dispense pas d'informer les personnes ni de justifier l'intérêt légitime. Point de vigilance réel.",
+  "alternatives": [
+   "clay",
+   "apollo",
+   "waalaxy"
+  ],
+  "cas": [
+   "Extraire les participants d'un événement LinkedIn",
+   "Constituer une liste d'entreprises depuis Google Maps"
+  ]
+ },
+ {
+  "slug": "dropcontact",
+  "name": "Dropcontact",
+  "url": "https://www.dropcontact.com/",
+  "cat": "prospection-vente",
+  "cats": [
+   "juridique-conformite"
+  ],
+  "editeur": "Dropcontact",
+  "pays": "France",
+  "prix": "Payant",
+  "prixDetail": "À partir de ~24 €/mois",
+  "niveau": "Débutant",
+  "profils": [
+   "Commercial",
+   "Ops"
+  ],
+  "tags": "dropcontact enrichissement email verification rgpd france donnees crm",
+  "note": 4.4,
+  "resume": "L'enrichissement et la vérification d'e-mails professionnels sans base de données personnelles : conçu pour être conforme au RGPD.",
+  "forces": [
+   "Ne stocke aucune donnée personnelle : les e-mails sont reconstitués par algorithme, pas achetés",
+   "Argument RGPD imparable face à une base de données achetée",
+   "Nettoie et dédoublonne aussi le CRM"
+  ],
+  "limites": [
+   "Périmètre volontairement limité à l'enrichissement",
+   "Taux de découverte inférieur aux bases massives sur certains secteurs"
+  ],
+  "gain": "Un fichier de prospection propre et défendable en cas de contrôle.",
+  "conformite": "Solution française spécifiquement conçue pour le RGPD : aucune base de données personnelles constituée. À privilégier si la conformité est un sujet.",
+  "alternatives": [
+   "apollo",
+   "pharow",
+   "clay"
+  ],
+  "cas": [
+   "Nettoyer et enrichir une base CRM vieillissante",
+   "Retrouver les e-mails professionnels d'une liste d'entreprises sans acheter de fichier"
+  ]
+ },
+ {
+  "slug": "crisp",
+  "name": "Crisp",
+  "url": "https://crisp.chat/fr/",
+  "cat": "relation-client",
+  "cats": [
+   "automatisation"
+  ],
+  "editeur": "Crisp",
+  "pays": "France",
+  "prix": "Freemium",
+  "prixDetail": "Version gratuite · à partir de ~25 €/mois",
+  "niveau": "Débutant",
+  "profils": [
+   "Dirigeant",
+   "Commercial",
+   "Ops"
+  ],
+  "tags": "crisp chat site support client chatbot france rgpd messagerie",
+  "note": 4.5,
+  "resume": "La messagerie client française : chat sur le site, WhatsApp, e-mail et chatbot IA réunis dans une seule boîte de réception.",
+  "forces": [
+   "Éditeur français, hébergement UE, interface en français",
+   "Regroupe tous les canaux (site, WhatsApp, Messenger, e-mail) au même endroit",
+   "Chatbot IA nourri par votre base de connaissances, à un tarif accessible"
+  ],
+  "limites": [
+   "Moins riche qu'Intercom sur les scénarios marketing avancés",
+   "La base de connaissances doit être alimentée sérieusement pour que le bot soit utile"
+  ],
+  "gain": "Les questions répétitives ne remontent plus à l'équipe : 30 à 50 % des demandes traitées automatiquement.",
+  "conformite": "Éditeur français, hébergement en France/UE : le choix évident pour un chat qui collecte des données clients.",
+  "alternatives": [
+   "intercom",
+   "chatbase",
+   "zendesk"
+  ],
+  "cas": [
+   "Installer un chat sur le site qui répond aux questions courantes 24h/24",
+   "Centraliser WhatsApp et e-mails clients dans une seule boîte",
+   "Qualifier les demandes entrantes avant transfert à un commercial"
+  ]
+ },
+ {
+  "slug": "intercom",
+  "name": "Intercom",
+  "url": "https://www.intercom.com/",
+  "cat": "relation-client",
+  "cats": [],
+  "editeur": "Intercom",
+  "pays": "États-Unis",
+  "prix": "Payant",
+  "prixDetail": "À partir de ~29 €/utilisateur/mois · résolutions IA facturées à l'unité",
+  "niveau": "Intermédiaire",
+  "profils": [
+   "Ops",
+   "Marketing"
+  ],
+  "tags": "intercom support client chatbot fin ia resolution tickets saas",
+  "note": 4.3,
+  "resume": "La plateforme de support client la plus avancée, dont l'agent IA résout seul une grande partie des demandes.",
+  "forces": [
+   "Agent IA parmi les plus performants du marché pour résoudre sans intervention humaine",
+   "Scénarios d'accompagnement et de vente intégrés au support",
+   "Statistiques de résolution très fines"
+  ],
+  "limites": [
+   "Le plus cher de sa catégorie, avec une facturation à la résolution qui surprend",
+   "Surdimensionné pour une TPE"
+  ],
+  "gain": "Une équipe support qui absorbe deux fois plus de demandes sans recruter.",
+  "conformite": "Hébergement États-Unis avec options UE selon contrat. Le support traite des données clients : à cadrer.",
+  "alternatives": [
+   "crisp",
+   "zendesk",
+   "chatbase"
+  ],
+  "cas": [
+   "Automatiser la résolution des demandes de niveau 1",
+   "Accompagner les nouveaux utilisateurs d'un logiciel"
+  ]
+ },
+ {
+  "slug": "zendesk",
+  "name": "Zendesk",
+  "url": "https://www.zendesk.fr/",
+  "cat": "relation-client",
+  "cats": [],
+  "editeur": "Zendesk",
+  "pays": "États-Unis",
+  "prix": "Payant",
+  "prixDetail": "À partir de ~55 €/agent/mois",
+  "niveau": "Intermédiaire",
+  "profils": [
+   "Ops",
+   "RH"
+  ],
+  "tags": "zendesk ticketing support client helpdesk ia sla",
+  "note": 4.1,
+  "resume": "Le standard du service client structuré : gestion de tickets, engagements de service et IA d'assistance aux agents.",
+  "forces": [
+   "Robuste et éprouvé sur de gros volumes",
+   "Gestion fine des SLA, escalades et rapports",
+   "IA qui suggère les réponses et classe automatiquement les tickets"
+  ],
+  "limites": [
+   "Lourd à paramétrer et cher pour une petite structure",
+   "Expérience utilisateur moins moderne que ses concurrents récents"
+  ],
+  "gain": "Structure un service client qui déborde, avec des délais tenus et mesurés.",
+  "conformite": "Hébergement avec option européenne. Volume important de données clients : gouvernance nécessaire.",
+  "alternatives": [
+   "crisp",
+   "intercom",
+   "gorgias"
+  ],
+  "cas": [
+   "Structurer un service client de plusieurs personnes",
+   "Suivre les délais de réponse et les respecter"
+  ]
+ },
+ {
+  "slug": "chatbase",
+  "name": "Chatbase",
+  "url": "https://www.chatbase.co/",
+  "cat": "relation-client",
+  "cats": [
+   "automatisation",
+   "sites-apps-nocode"
+  ],
+  "editeur": "Chatbase",
+  "pays": "États-Unis",
+  "prix": "Freemium",
+  "prixDetail": "Version gratuite limitée · à partir de ~40 €/mois",
+  "niveau": "Débutant",
+  "profils": [
+   "Dirigeant",
+   "Marketing",
+   "Ops"
+  ],
+  "tags": "chatbase chatbot site documents entrainement personnalise widget",
+  "note": 4.2,
+  "resume": "Créer en 15 minutes un chatbot entraîné sur vos propres documents et l'installer sur votre site.",
+  "forces": [
+   "Mise en route immédiate : on dépose ses documents, le bot est prêt",
+   "Widget intégrable sur n'importe quel site, sans développement",
+   "Tarif accessible à une TPE"
+  ],
+  "limites": [
+   "Peu de contrôle fin sur les scénarios complexes",
+   "Répond mal aux questions hors de sa base : à cadrer par un message clair"
+  ],
+  "gain": "Un premier chatbot opérationnel dans la journée plutôt qu'un projet de trois mois.",
+  "conformite": "Hébergement États-Unis. Ne lui confiez que des documents publics ou destinés aux clients.",
+  "alternatives": [
+   "crisp",
+   "botpress",
+   "voiceflow"
+  ],
+  "cas": [
+   "Mettre un assistant sur le site qui répond à partir du catalogue et des CGV",
+   "Créer un assistant interne sur les procédures de l'entreprise"
+  ]
+ },
+ {
+  "slug": "botpress",
+  "name": "Botpress",
+  "url": "https://botpress.com/",
+  "cat": "relation-client",
+  "cats": [
+   "automatisation"
+  ],
+  "editeur": "Botpress",
+  "pays": "Canada",
+  "prix": "Freemium",
+  "prixDetail": "Version gratuite avec crédits · usage facturé ensuite",
+  "niveau": "Intermédiaire",
+  "profils": [
+   "Ops",
+   "Développeur"
+  ],
+  "tags": "botpress chatbot agent conversationnel whatsapp scenarios open source",
+  "note": 4.2,
+  "resume": "Une plateforme de création d'agents conversationnels avancés, déployables sur site, WhatsApp, Instagram ou Teams.",
+  "forces": [
+   "Contrôle fin des scénarios et des actions déclenchées (créer un ticket, consulter un stock)",
+   "Déploiement multicanal, dont WhatsApp Business",
+   "Version auto-hébergeable pour les contextes sensibles"
+  ],
+  "limites": [
+   "Demande une vraie phase de conception : ce n'est pas un bot en 15 minutes",
+   "Facturation à l'usage à surveiller"
+  ],
+  "gain": "Un agent qui ne se contente pas de répondre mais agit : prise de rendez-vous, création de commande, suivi de dossier.",
+  "conformite": "Auto-hébergement possible : intéressant si le bot manipule des données clients.",
+  "alternatives": [
+   "voiceflow",
+   "chatbase",
+   "crisp"
+  ],
+  "cas": [
+   "Automatiser la prise de rendez-vous sur WhatsApp",
+   "Créer un assistant qui consulte un stock ou un planning en direct"
+  ]
+ },
+ {
+  "slug": "voiceflow",
+  "name": "Voiceflow",
+  "url": "https://www.voiceflow.com/",
+  "cat": "relation-client",
+  "cats": [
+   "automatisation"
+  ],
+  "editeur": "Voiceflow",
+  "pays": "Canada",
+  "prix": "Freemium",
+  "prixDetail": "Version gratuite · à partir de ~50 €/mois",
+  "niveau": "Intermédiaire",
+  "profils": [
+   "Ops",
+   "Marketing"
+  ],
+  "tags": "voiceflow agent conversationnel design scenario vocal collaboration",
+  "note": 4.1,
+  "resume": "L'atelier de conception d'agents conversationnels : on dessine le parcours à plusieurs avant de le mettre en production.",
+  "forces": [
+   "Conception visuelle collaborative, idéale quand plusieurs services doivent valider le discours",
+   "Gère aussi bien le texte que le vocal",
+   "Tests et versions intégrés"
+  ],
+  "limites": [
+   "Orienté conception : la mise en production demande souvent un développeur",
+   "Moins direct que Chatbase pour un besoin simple"
+  ],
+  "gain": "Évite de refaire trois fois un chatbot mal cadré : le parcours est validé avant d'être construit.",
+  "conformite": "Hébergement hors UE : à cadrer si l'agent collecte des données personnelles.",
+  "alternatives": [
+   "botpress",
+   "chatbase",
+   "crisp"
+  ],
+  "cas": [
+   "Concevoir un parcours d'assistance validé par le service client et le juridique",
+   "Créer un serveur vocal intelligent"
+  ]
+ },
+ {
+  "slug": "gorgias",
+  "name": "Gorgias",
+  "url": "https://www.gorgias.com/",
+  "cat": "relation-client",
+  "cats": [],
+  "editeur": "Gorgias",
+  "pays": "États-Unis / France",
+  "prix": "Payant",
+  "prixDetail": "À partir de ~10 €/mois puis facturation au ticket",
+  "niveau": "Intermédiaire",
+  "profils": [
+   "Ops",
+   "Marketing"
+  ],
+  "tags": "gorgias ecommerce support shopify tickets ia commandes retours",
+  "note": 4.2,
+  "resume": "Le service client pensé pour l'e-commerce : il voit les commandes du client et traite retours et suivis automatiquement.",
+  "forces": [
+   "Intégration native Shopify, WooCommerce et Magento : la commande s'affiche dans le ticket",
+   "Automatise les demandes de suivi et de retour, l'essentiel des sollicitations e-commerce",
+   "Fondé par des Français, présence forte en France"
+  ],
+  "limites": [
+   "Sans intérêt hors e-commerce",
+   "Facturation au ticket qui grimpe en forte saison"
+  ],
+  "gain": "60 à 70 % des demandes « où est ma commande ? » traitées sans intervention humaine.",
+  "conformite": "Traite des données de commande : à intégrer au registre des traitements.",
+  "alternatives": [
+   "crisp",
+   "zendesk",
+   "intercom"
+  ],
+  "cas": [
+   "Automatiser les demandes de suivi de commande",
+   "Traiter les retours produits sans intervention manuelle"
+  ]
+ },
+ {
+  "slug": "canva",
+  "name": "Canva",
+  "url": "https://www.canva.com/fr_fr/",
+  "cat": "images-design",
+  "cats": [
+   "presentations-documents",
+   "video-audio"
+  ],
+  "editeur": "Canva",
+  "pays": "Australie",
+  "prix": "Freemium",
+  "prixDetail": "Version gratuite complète · Pro ~12 €/mois · Teams à partir de ~10 €/utilisateur/mois",
+  "niveau": "Débutant",
+  "profils": [
+   "Marketing",
+   "Dirigeant",
+   "RH",
+   "Formateur"
+  ],
+  "tags": "canva design visuels presentation reseaux sociaux modeles magic studio",
+  "note": 4.7,
+  "resume": "L'outil de création graphique que tout le monde sait utiliser : visuels, présentations, documents et vidéos, avec l'IA intégrée partout.",
+  "forces": [
+   "Prise en main immédiate, y compris par des profils non créatifs",
+   "Kit de marque : logo, couleurs et polices appliqués automatiquement à tous les documents",
+   "Suite IA intégrée (génération d'images, retouche, rédaction, traduction) sans outil supplémentaire"
+  ],
+  "limites": [
+   "Rendu vite reconnaissable si l'on reste sur les modèles par défaut",
+   "Moins précis qu'Illustrator ou InDesign pour du design professionnel exigeant"
+  ],
+  "gain": "Un visuel professionnel en 10 minutes plutôt qu'un aller-retour de trois jours avec un graphiste.",
+  "conformite": "Hébergement hors UE. Attention aux documents internes sensibles déposés dans les espaces partagés.",
+  "alternatives": [
+   "microsoft-designer",
+   "adobe-firefly",
+   "gamma"
+  ],
+  "cas": [
+   "Produire les visuels des réseaux sociaux à partir d'un kit de marque",
+   "Mettre en forme un support de formation ou une plaquette",
+   "Créer des documents commerciaux homogènes pour toute l'équipe"
+  ]
+ },
+ {
+  "slug": "midjourney",
+  "name": "Midjourney",
+  "url": "https://www.midjourney.com/",
+  "cat": "images-design",
+  "cats": [],
+  "editeur": "Midjourney",
+  "pays": "États-Unis",
+  "prix": "Payant",
+  "prixDetail": "À partir de ~10 €/mois",
+  "niveau": "Intermédiaire",
+  "profils": [
+   "Marketing",
+   "Formateur"
+  ],
+  "tags": "midjourney generation image qualite artistique illustration style",
+  "note": 4.6,
+  "resume": "La qualité esthétique de référence en génération d'images : c'est encore lui qu'on choisit quand le rendu doit être beau.",
+  "forces": [
+   "Rendu artistique nettement supérieur à la moyenne",
+   "Styles cohérents et réutilisables d'une image à l'autre",
+   "Communauté immense : la matière pour apprendre est abondante"
+  ],
+  "limites": [
+   "Pas de version gratuite",
+   "Texte dans les images encore approximatif, et respect exact d'une consigne parfois capricieux"
+  ],
+  "gain": "Des visuels sur mesure sans banque d'images ni séance photo.",
+  "conformite": "Vérifiez les conditions d'usage commercial de votre offre. Ne générez pas de visuels imitant des personnes réelles.",
+  "alternatives": [
+   "flux",
+   "ideogram",
+   "adobe-firefly"
+  ],
+  "cas": [
+   "Illustrer un site ou un article avec des images uniques",
+   "Créer un univers visuel de marque cohérent"
+  ]
+ },
+ {
+  "slug": "chatgpt-images",
+  "name": "ChatGPT — Images",
+  "url": "https://chatgpt.com/",
+  "cat": "images-design",
+  "cats": [
+   "assistants-ia"
+  ],
+  "editeur": "OpenAI",
+  "pays": "États-Unis",
+  "prix": "Freemium",
+  "prixDetail": "Quelques images gratuites/jour · illimité sur l'offre Plus",
+  "niveau": "Débutant",
+  "profils": [
+   "Marketing",
+   "Dirigeant",
+   "Formateur"
+  ],
+  "tags": "chatgpt image generation dall-e schema infographie texte dans image",
+  "note": 4.5,
+  "resume": "La génération d'images la plus simple : on la demande en français, dans la même conversation, et on la fait corriger jusqu'au bon résultat.",
+  "forces": [
+   "Compréhension des consignes complexes largement supérieure aux outils spécialisés",
+   "Gère correctement le texte dans l'image : affiches, schémas, infographies",
+   "Retouche par simple demande, sans repartir de zéro"
+  ],
+  "limites": [
+   "Rendu esthétique un cran en dessous de Midjourney",
+   "Filtres parfois excessifs sur des demandes pourtant anodines"
+  ],
+  "gain": "Un schéma explicatif ou un visuel de post prêt en 3 minutes, sans logiciel de design.",
+  "conformite": "Les images générées sont utilisables commercialement selon les conditions d'OpenAI. Ne déposez pas de photos de salariés ou de clients.",
+  "alternatives": [
+   "gemini-image",
+   "canva",
+   "ideogram"
+  ],
+  "cas": [
+   "Produire un schéma pédagogique pour une formation",
+   "Créer le visuel d'un post LinkedIn avec du texte lisible"
+  ]
+ },
+ {
+  "slug": "gemini-image",
+  "name": "Gemini — Nano Banana",
+  "url": "https://gemini.google.com/",
+  "cat": "images-design",
+  "cats": [
+   "assistants-ia"
+  ],
+  "editeur": "Google",
+  "pays": "États-Unis",
+  "prix": "Freemium",
+  "prixDetail": "Inclus dans Gemini, version gratuite disponible",
+  "niveau": "Débutant",
+  "profils": [
+   "Marketing",
+   "Dirigeant"
+  ],
+  "tags": "gemini nano banana image retouche edition photo coherence personnage",
+  "note": 4.5,
+  "resume": "Le modèle d'image de Google, imbattable pour retoucher une photo existante en gardant les personnes et les décors cohérents.",
+  "forces": [
+   "Retouche d'image conversationnelle d'une précision remarquable",
+   "Conserve l'identité des personnes et des objets d'une image à l'autre",
+   "Disponible gratuitement dans Gemini"
+  ],
+  "limites": [
+   "Moins de contrôle stylistique que Midjourney",
+   "Restrictions strictes sur les visages de personnes réelles"
+  ],
+  "gain": "Une photo produit détourée, recadrée et remise en scène en quelques secondes.",
+  "conformite": "Attention au droit à l'image : ne modifiez pas la photo d'une personne réelle sans son accord écrit.",
+  "alternatives": [
+   "chatgpt-images",
+   "photoroom",
+   "adobe-firefly"
+  ],
+  "cas": [
+   "Détourer et remettre en scène des photos produits",
+   "Adapter un visuel existant à un nouveau format ou une nouvelle saison"
+  ]
+ },
+ {
+  "slug": "adobe-firefly",
+  "name": "Adobe Firefly",
+  "url": "https://firefly.adobe.com/",
+  "cat": "images-design",
+  "cats": [],
+  "editeur": "Adobe",
+  "pays": "États-Unis",
+  "prix": "Freemium",
+  "prixDetail": "Crédits gratuits mensuels · inclus dans les abonnements Creative Cloud",
+  "niveau": "Débutant",
+  "profils": [
+   "Marketing"
+  ],
+  "tags": "adobe firefly image generation droits commerciaux photoshop entreprise",
+  "note": 4.3,
+  "resume": "La génération d'images d'Adobe, entraînée sur des contenus sous licence : le choix quand l'usage commercial doit être juridiquement propre.",
+  "forces": [
+   "Entraîné sur la banque Adobe Stock : le risque de contrefaçon est le plus faible du marché",
+   "Intégré à Photoshop et Illustrator",
+   "Adobe garantit contractuellement l'usage commercial sur ses offres entreprise"
+  ],
+  "limites": [
+   "Rendu moins spectaculaire que Midjourney",
+   "Système de crédits qui s'épuise rapidement"
+  ],
+  "gain": "Des visuels commerciaux sans zone grise juridique — un critère décisif pour certains secteurs.",
+  "conformite": "Le meilleur choix quand la provenance des images doit être justifiable (secteur réglementé, marché public, grand compte).",
+  "alternatives": [
+   "midjourney",
+   "canva",
+   "chatgpt-images"
+  ],
+  "cas": [
+   "Produire des visuels pour une campagne où le juridique valide chaque élément",
+   "Étendre ou nettoyer une photo directement dans Photoshop"
+  ]
+ },
+ {
+  "slug": "ideogram",
+  "name": "Ideogram",
+  "url": "https://ideogram.ai/",
+  "cat": "images-design",
+  "cats": [],
+  "editeur": "Ideogram",
+  "pays": "États-Unis",
+  "prix": "Freemium",
+  "prixDetail": "Version gratuite quotidienne · à partir de ~7 €/mois",
+  "niveau": "Débutant",
+  "profils": [
+   "Marketing"
+  ],
+  "tags": "ideogram texte dans image affiche logo typographie generation",
+  "note": 4.2,
+  "resume": "Le spécialiste du texte dans l'image : affiches, packagings et visuels typographiques réellement lisibles.",
+  "forces": [
+   "Meilleur rendu typographique de sa catégorie",
+   "Version gratuite quotidienne généreuse",
+   "Idéal pour les affiches, flyers et visuels d'annonce"
+  ],
+  "limites": [
+   "Moins polyvalent que les généralistes",
+   "Qualité photoréaliste en retrait"
+  ],
+  "gain": "Une affiche ou un visuel promotionnel prêt sans passer par un graphiste.",
+  "conformite": "Vérifiez les droits d'usage commercial selon votre offre.",
+  "alternatives": [
+   "chatgpt-images",
+   "canva",
+   "midjourney"
+  ],
+  "cas": [
+   "Créer une affiche d'événement avec un slogan lisible",
+   "Générer des visuels de promotion avec prix et mentions"
+  ]
+ },
+ {
+  "slug": "leonardo-ai",
+  "name": "Leonardo AI",
+  "url": "https://leonardo.ai/",
+  "cat": "images-design",
+  "cats": [],
+  "editeur": "Leonardo (Canva)",
+  "pays": "Australie",
+  "prix": "Freemium",
+  "prixDetail": "Crédits gratuits quotidiens · à partir de ~10 €/mois",
+  "niveau": "Intermédiaire",
+  "profils": [
+   "Marketing"
+  ],
+  "tags": "leonardo generation image controle modeles personnalises styles",
+  "note": 4.1,
+  "resume": "La génération d'images avec un vrai contrôle : modèles entraînables, guidage par croquis et cohérence de style.",
+  "forces": [
+   "Contrôle avancé (pose, composition, référence de style)",
+   "Possibilité d'entraîner un modèle sur votre univers de marque",
+   "Crédits gratuits quotidiens"
+  ],
+  "limites": [
+   "Interface plus technique que ses concurrents grand public",
+   "Demande du temps d'apprentissage pour dépasser le résultat moyen"
+  ],
+  "gain": "Une identité visuelle générée en série, cohérente d'un visuel à l'autre.",
+  "conformite": "Usage commercial autorisé selon l'offre : à vérifier avant diffusion.",
+  "alternatives": [
+   "midjourney",
+   "flux",
+   "adobe-firefly"
+  ],
+  "cas": [
+   "Décliner des dizaines de visuels dans un style de marque unique",
+   "Générer des variations à partir d'un croquis"
+  ]
+ },
+ {
+  "slug": "flux",
+  "name": "FLUX",
+  "url": "https://bfl.ai/",
+  "cat": "images-design",
+  "cats": [],
+  "editeur": "Black Forest Labs",
+  "pays": "Allemagne",
+  "prix": "Freemium",
+  "prixDetail": "Modèles ouverts gratuits · versions hébergées facturées à l'image",
+  "niveau": "Expert",
+  "profils": [
+   "Développeur",
+   "Marketing"
+  ],
+  "tags": "flux black forest labs open source image photorealisme allemagne api",
+  "note": 4.4,
+  "resume": "Le modèle d'image open source de référence, développé en Allemagne : photoréalisme de haut niveau, intégrable dans vos propres outils.",
+  "forces": [
+   "Éditeur européen, modèles ouverts installables sur votre infrastructure",
+   "Photoréalisme parmi les meilleurs du marché",
+   "S'intègre facilement dans une automatisation n8n ou Make"
+  ],
+  "limites": [
+   "Pas d'interface grand public : passe par une plateforme tierce ou une installation",
+   "Réservé à un usage un peu technique"
+  ],
+  "gain": "Industrialise la production d'images (catalogue, fiches produits) sans coût par visuel.",
+  "conformite": "Modèle européen auto-hébergeable : intéressant quand les visuels contiennent des éléments confidentiels.",
+  "alternatives": [
+   "midjourney",
+   "leonardo-ai",
+   "adobe-firefly"
+  ],
+  "cas": [
+   "Générer automatiquement des visuels pour des centaines de fiches produits",
+   "Intégrer la génération d'images dans un workflow automatisé"
+  ]
+ },
+ {
+  "slug": "recraft",
+  "name": "Recraft",
+  "url": "https://www.recraft.ai/",
+  "cat": "images-design",
+  "cats": [],
+  "editeur": "Recraft",
+  "pays": "États-Unis",
+  "prix": "Freemium",
+  "prixDetail": "Crédits gratuits quotidiens · à partir de ~10 €/mois",
+  "niveau": "Intermédiaire",
+  "profils": [
+   "Marketing"
+  ],
+  "tags": "recraft vectoriel svg logo icones illustration style marque",
+  "note": 4.2,
+  "resume": "La génération d'images vectorielles : logos, icônes et illustrations exportables en SVG, redimensionnables à l'infini.",
+  "forces": [
+   "Sortie vectorielle réellement exploitable, rare chez les générateurs d'images",
+   "Cohérence de style sur des séries d'icônes ou d'illustrations",
+   "Utile pour habiller un site ou une présentation"
+  ],
+  "limites": [
+   "Moins bon en photoréalisme",
+   "Interface qui demande un peu d'habitude"
+  ],
+  "gain": "Une série d'icônes ou d'illustrations sur mesure sans budget graphiste.",
+  "conformite": "Vérifiez les droits commerciaux selon l'offre souscrite.",
+  "alternatives": [
+   "canva",
+   "adobe-firefly",
+   "ideogram"
+  ],
+  "cas": [
+   "Créer une série d'icônes cohérente pour un site",
+   "Générer des illustrations vectorielles pour un support de formation"
+  ]
+ },
+ {
+  "slug": "microsoft-designer",
+  "name": "Microsoft Designer",
+  "url": "https://designer.microsoft.com/",
+  "cat": "images-design",
+  "cats": [
+   "presentations-documents"
+  ],
+  "editeur": "Microsoft",
+  "pays": "États-Unis",
+  "prix": "Freemium",
+  "prixDetail": "Gratuit avec un compte Microsoft · fonctions étendues avec Microsoft 365",
+  "niveau": "Débutant",
+  "profils": [
+   "Marketing",
+   "Dirigeant"
+  ],
+  "tags": "microsoft designer visuels gratuit modeles reseaux sociaux office",
+  "note": 4.0,
+  "resume": "L'alternative gratuite à Canva chez Microsoft : visuels, publications et supports générés à partir d'une simple description.",
+  "forces": [
+   "Gratuit et sans limite bloquante pour un usage courant",
+   "Cohérent avec l'univers Microsoft 365 déjà utilisé en entreprise",
+   "Génération d'images incluse"
+  ],
+  "limites": [
+   "Bibliothèque de modèles plus pauvre que Canva",
+   "Moins de fonctions collaboratives"
+  ],
+  "gain": "Couvre le besoin visuel courant sans ajouter un abonnement.",
+  "conformite": "Compte Microsoft d'entreprise : cadre déjà connu de votre DSI.",
+  "alternatives": [
+   "canva",
+   "adobe-firefly"
+  ],
+  "cas": [
+   "Produire rapidement des visuels de publication",
+   "Créer une invitation ou une affiche interne"
+  ]
+ },
+ {
+  "slug": "photoroom",
+  "name": "PhotoRoom",
+  "url": "https://www.photoroom.com/fr",
+  "cat": "images-design",
+  "cats": [],
+  "editeur": "PhotoRoom",
+  "pays": "France",
+  "prix": "Freemium",
+  "prixDetail": "Version gratuite · Pro à partir de ~10 €/mois",
+  "niveau": "Débutant",
+  "profils": [
+   "Marketing",
+   "Commercial"
+  ],
+  "tags": "photoroom detourage fond photo produit ecommerce france mobile",
+  "note": 4.4,
+  "resume": "Le détourage et la mise en scène de photos produits, en un clic, depuis un téléphone. Éditeur français.",
+  "forces": [
+   "Détourage automatique d'une précision remarquable",
+   "Éditeur français, application mobile excellente",
+   "Traitement en lot : des centaines de photos produits en une opération"
+  ],
+  "limites": [
+   "Périmètre volontairement étroit : photo produit et détourage",
+   "Les meilleurs fonds sont réservés à l'offre payante"
+  ],
+  "gain": "Un catalogue de 200 produits photographié et détouré en une journée au lieu d'une semaine.",
+  "conformite": "Éditeur français. Traitement de photos : évitez les visages sans autorisation.",
+  "alternatives": [
+   "gemini-image",
+   "canva",
+   "adobe-firefly"
+  ],
+  "cas": [
+   "Préparer les visuels d'une boutique en ligne",
+   "Uniformiser les photos produits d'un catalogue"
+  ]
+ },
+ {
+  "slug": "looka",
+  "name": "Looka",
+  "url": "https://looka.com/",
+  "cat": "images-design",
+  "cats": [],
+  "editeur": "Looka",
+  "pays": "Canada",
+  "prix": "Payant",
+  "prixDetail": "Logo à partir de ~20 € · kit de marque ~65 €",
+  "niveau": "Débutant",
+  "profils": [
+   "Dirigeant"
+  ],
+  "tags": "looka logo identite visuelle creation entreprise kit de marque",
+  "note": 3.7,
+  "resume": "La création de logo et d'identité visuelle assistée, pour une entreprise qui démarre sans budget agence.",
+  "forces": [
+   "Un logo et un kit de marque complet en une heure",
+   "Décline automatiquement cartes de visite, signatures et documents",
+   "Coût sans commune mesure avec une agence"
+  ],
+  "limites": [
+   "Rendu générique : peu de chances de sortir du lot",
+   "Achat à l'unité, sans accompagnement stratégique"
+  ],
+  "gain": "Une identité visuelle correcte le jour de la création de l'entreprise, à améliorer plus tard.",
+  "conformite": "Vérifiez l'antériorité de votre logo auprès de l'INPI avant de le déposer : un générateur ne fait pas cette recherche.",
+  "alternatives": [
+   "canva",
+   "recraft"
+  ],
+  "cas": [
+   "Créer un logo au démarrage d'une activité",
+   "Décliner une identité visuelle sur tous les supports"
+  ]
+ },
+ {
+  "slug": "heygen",
+  "name": "HeyGen",
+  "url": "https://www.heygen.com/",
+  "cat": "video-audio",
+  "cats": [
+   "rh-formation"
+  ],
+  "editeur": "HeyGen",
+  "pays": "États-Unis",
+  "prix": "Freemium",
+  "prixDetail": "Version gratuite limitée · à partir de ~24 €/mois",
+  "niveau": "Débutant",
+  "profils": [
+   "Marketing",
+   "Formateur",
+   "RH"
+  ],
+  "tags": "heygen avatar video presentateur doublage traduction multilingue",
+  "note": 4.5,
+  "resume": "Créer des vidéos avec un présentateur virtuel — y compris votre propre avatar — et les traduire en 40 langues avec synchronisation labiale.",
+  "forces": [
+   "Qualité d'avatar et de doublage la plus convaincante du marché",
+   "Traduction vidéo avec les lèvres synchronisées : bluffant pour l'export",
+   "Un avatar personnel se crée à partir de deux minutes de vidéo"
+  ],
+  "limites": [
+   "Rendu qui reste perceptible comme artificiel sur les formats longs",
+   "Tarif qui monte vite avec le volume de minutes"
+  ],
+  "gain": "Un module de formation vidéo produit sans tournage, et modifiable en 5 minutes quand le contenu change.",
+  "conformite": "Créer un avatar d'une personne exige son consentement écrit explicite. L'AI Act impose d'informer que le contenu est généré par IA.",
+  "alternatives": [
+   "synthesia",
+   "elevenlabs",
+   "descript"
+  ],
+  "cas": [
+   "Produire des modules de formation interne sans studio",
+   "Traduire une vidéo commerciale pour un marché étranger",
+   "Personnaliser une vidéo de prospection à grande échelle"
+  ]
+ },
+ {
+  "slug": "synthesia",
+  "name": "Synthesia",
+  "url": "https://www.synthesia.io/",
+  "cat": "video-audio",
+  "cats": [
+   "rh-formation"
+  ],
+  "editeur": "Synthesia",
+  "pays": "Royaume-Uni",
+  "prix": "Payant",
+  "prixDetail": "À partir de ~29 €/mois",
+  "niveau": "Débutant",
+  "profils": [
+   "Formateur",
+   "RH"
+  ],
+  "tags": "synthesia avatar video formation entreprise elearning multilingue",
+  "note": 4.4,
+  "resume": "La référence de la vidéo à avatar en entreprise, particulièrement installée dans la formation et la communication interne.",
+  "forces": [
+   "Éditeur européen, cadre contractuel solide pour les grands comptes",
+   "Bibliothèque d'avatars et de modèles pensée pour la formation",
+   "Mise à jour d'une vidéo sans retourner : on modifie le texte"
+  ],
+  "limites": [
+   "Pas de version gratuite",
+   "Moins souple que HeyGen sur la traduction de vidéos existantes"
+  ],
+  "gain": "Un catalogue de formation vidéo maintenu à jour sans coût de retournage.",
+  "conformite": "Éditeur britannique avec engagements RGPD. Mention obligatoire du caractère généré par IA (AI Act).",
+  "alternatives": [
+   "heygen",
+   "canva",
+   "elevenlabs"
+  ],
+  "cas": [
+   "Produire un parcours e-learning en plusieurs langues",
+   "Diffuser une communication interne du dirigeant sans le mobiliser"
+  ]
+ },
+ {
+  "slug": "elevenlabs",
+  "name": "ElevenLabs",
+  "url": "https://elevenlabs.io/",
+  "cat": "video-audio",
+  "cats": [
+   "rh-formation"
+  ],
+  "editeur": "ElevenLabs",
+  "pays": "États-Unis / Pologne",
+  "prix": "Freemium",
+  "prixDetail": "Version gratuite limitée · à partir de ~5 €/mois",
+  "niveau": "Débutant",
+  "profils": [
+   "Marketing",
+   "Formateur"
+  ],
+  "tags": "elevenlabs voix synthese doublage podcast narration clonage vocal",
+  "note": 4.7,
+  "resume": "La meilleure synthèse vocale du marché : des voix françaises naturelles, et le clonage de votre propre voix.",
+  "forces": [
+   "Qualité de voix française sans équivalent, y compris sur l'intonation",
+   "Clonage vocal à partir de quelques minutes d'enregistrement",
+   "Doublage automatique de vidéos avec conservation de la voix d'origine"
+  ],
+  "limites": [
+   "Le clonage vocal ouvre un risque d'usurpation à prendre au sérieux",
+   "Facturation aux caractères, à surveiller sur les gros volumes"
+  ],
+  "gain": "Une voix off professionnelle en 2 minutes au lieu d'un studio et d'un comédien.",
+  "conformite": "Cloner une voix sans le consentement écrit de la personne est illégal. L'AI Act impose d'indiquer qu'une voix est générée.",
+  "alternatives": [
+   "heygen",
+   "descript",
+   "synthesia"
+  ],
+  "cas": [
+   "Créer la voix off de modules de formation",
+   "Doubler une vidéo dans une autre langue",
+   "Transformer des articles en version audio"
+  ]
+ },
+ {
+  "slug": "runway",
+  "name": "Runway",
+  "url": "https://runway.com/",
+  "cat": "video-audio",
+  "cats": [],
+  "editeur": "Runway",
+  "pays": "États-Unis",
+  "prix": "Freemium",
+  "prixDetail": "Crédits gratuits · à partir de ~15 €/mois",
+  "niveau": "Intermédiaire",
+  "profils": [
+   "Marketing"
+  ],
+  "tags": "runway generation video montage effets image vers video creation",
+  "note": 4.3,
+  "resume": "Le studio de génération et de retouche vidéo : transformer une image en séquence, effacer un élément, changer un décor.",
+  "forces": [
+   "Boîte à outils vidéo très complète au-delà de la simple génération",
+   "Outils de retouche (suppression d'objet, incrustation) qui font gagner un temps considérable en montage",
+   "Communauté professionnelle et ressources abondantes"
+  ],
+  "limites": [
+   "Consommation de crédits rapide",
+   "Résultats inégaux : il faut plusieurs essais pour une séquence exploitable"
+  ],
+  "gain": "Des plans d'illustration produits sans tournage ni banque d'images vidéo.",
+  "conformite": "Mention du caractère généré par IA obligatoire sur les contenus diffusés (AI Act).",
+  "alternatives": [
+   "kling",
+   "google-veo",
+   "sora"
+  ],
+  "cas": [
+   "Créer des plans d'illustration pour une vidéo d'entreprise",
+   "Retirer un élément gênant d'un rush vidéo"
+  ]
+ },
+ {
+  "slug": "google-veo",
+  "name": "Google Veo",
+  "url": "https://deepmind.google/technologies/veo/",
+  "cat": "video-audio",
+  "cats": [],
+  "editeur": "Google DeepMind",
+  "pays": "États-Unis",
+  "prix": "Payant",
+  "prixDetail": "Inclus dans les abonnements Google AI avancés",
+  "niveau": "Intermédiaire",
+  "profils": [
+   "Marketing"
+  ],
+  "tags": "veo google generation video son integre qualite cinema",
+  "note": 4.5,
+  "resume": "Le générateur vidéo de Google, qui produit des séquences avec le son et les dialogues synchronisés.",
+  "forces": [
+   "Qualité d'image et cohérence des mouvements parmi les meilleures",
+   "Génère aussi l'ambiance sonore et les dialogues",
+   "Respecte finement des consignes de cadrage et de style"
+  ],
+  "limites": [
+   "Accès conditionné à un abonnement Google avancé",
+   "Durée des séquences encore limitée"
+  ],
+  "gain": "Une séquence de qualité diffusable sans tournage ni équipe.",
+  "conformite": "Marquage SynthID intégré par Google. Signalez le caractère généré du contenu.",
+  "alternatives": [
+   "runway",
+   "kling",
+   "sora"
+  ],
+  "cas": [
+   "Produire un spot court pour les réseaux sociaux",
+   "Illustrer un concept impossible à filmer"
+  ]
+ },
+ {
+  "slug": "sora",
+  "name": "Sora",
+  "url": "https://sora.chatgpt.com/",
+  "cat": "video-audio",
+  "cats": [],
+  "editeur": "OpenAI",
+  "pays": "États-Unis",
+  "prix": "Payant",
+  "prixDetail": "Inclus dans les abonnements ChatGPT Plus et Pro",
+  "niveau": "Intermédiaire",
+  "profils": [
+   "Marketing"
+  ],
+  "tags": "sora openai video generation scenes remix creation",
+  "note": 4.2,
+  "resume": "Le générateur vidéo d'OpenAI, inclus dans l'abonnement ChatGPT : pratique quand on y est déjà abonné.",
+  "forces": [
+   "Inclus dans un abonnement souvent déjà payé",
+   "Compréhension des consignes en français très bonne",
+   "Outils de remix pour décliner une séquence"
+  ],
+  "limites": [
+   "Restrictions fortes sur les personnes et les marques",
+   "Qualité encore variable selon les scènes"
+  ],
+  "gain": "Un test vidéo sans coût supplémentaire si vous êtes déjà sur ChatGPT.",
+  "conformite": "Métadonnées d'origine intégrées. Ne générez pas de contenus imitant des personnes réelles.",
+  "alternatives": [
+   "google-veo",
+   "runway",
+   "kling"
+  ],
+  "cas": [
+   "Tester un concept vidéo avant d'engager un tournage",
+   "Produire des séquences courtes pour les réseaux"
+  ]
+ },
+ {
+  "slug": "kling",
+  "name": "Kling AI",
+  "url": "https://kling.ai/",
+  "cat": "video-audio",
+  "cats": [],
+  "editeur": "Kuaishou",
+  "pays": "Chine",
+  "prix": "Freemium",
+  "prixDetail": "Crédits gratuits quotidiens · offres à partir de ~7 €/mois",
+  "niveau": "Intermédiaire",
+  "profils": [
+   "Marketing"
+  ],
+  "tags": "kling video generation image vers video mouvement chine credits",
+  "note": 4.2,
+  "resume": "Un générateur vidéo au rapport qualité/prix redoutable, très bon pour animer une image fixe.",
+  "forces": [
+   "Crédits gratuits quotidiens qui permettent de produire réellement",
+   "Excellent sur l'animation d'une photo ou d'un visuel produit",
+   "Tarif bien inférieur aux concurrents américains"
+  ],
+  "limites": [
+   "Éditeur chinois : ne déposez aucun contenu confidentiel",
+   "Interface et support en anglais approximatif"
+  ],
+  "gain": "Animer un catalogue de visuels produits pour les réseaux, à coût quasi nul.",
+  "conformite": "Hébergement en Chine, hors cadre RGPD. À réserver à des contenus marketing publics.",
+  "alternatives": [
+   "runway",
+   "google-veo",
+   "sora"
+  ],
+  "cas": [
+   "Animer des photos produits pour Instagram ou TikTok",
+   "Produire des visuels animés pour une campagne"
+  ]
+ },
+ {
+  "slug": "capcut",
+  "name": "CapCut",
+  "url": "https://www.capcut.com/",
+  "cat": "video-audio",
+  "cats": [],
+  "editeur": "ByteDance",
+  "pays": "Chine / Singapour",
+  "prix": "Freemium",
+  "prixDetail": "Version gratuite très complète · Pro à partir de ~8 €/mois",
+  "niveau": "Débutant",
+  "profils": [
+   "Marketing"
+  ],
+  "tags": "capcut montage video sous-titres automatiques reseaux sociaux gratuit",
+  "note": 4.3,
+  "resume": "Le montage vidéo gratuit le plus utilisé pour les réseaux sociaux : sous-titres automatiques, recadrage et effets en un clic.",
+  "forces": [
+   "Sous-titres automatiques français de bonne qualité, gratuits",
+   "Version gratuite réellement complète",
+   "Modèles adaptés aux formats verticaux"
+  ],
+  "limites": [
+   "Éditeur ByteDance (TikTok) : prudence sur les contenus d'entreprise sensibles",
+   "Conditions d'utilisation qui ont déjà évolué de façon discutable"
+  ],
+  "gain": "Une vidéo sous-titrée et publiable en 20 minutes, sans logiciel de montage professionnel.",
+  "conformite": "Éditeur chinois : n'y montez pas de contenus internes confidentiels.",
+  "alternatives": [
+   "descript",
+   "opusclip",
+   "submagic"
+  ],
+  "cas": [
+   "Monter et sous-titrer des vidéos pour LinkedIn ou Instagram",
+   "Recadrer une vidéo horizontale en format vertical"
+  ]
+ },
+ {
+  "slug": "descript",
+  "name": "Descript",
+  "url": "https://www.descript.com/",
+  "cat": "video-audio",
+  "cats": [
+   "reunions-notes"
+  ],
+  "editeur": "Descript",
+  "pays": "États-Unis",
+  "prix": "Freemium",
+  "prixDetail": "Version gratuite limitée · à partir de ~19 €/mois",
+  "niveau": "Intermédiaire",
+  "profils": [
+   "Marketing",
+   "Formateur"
+  ],
+  "tags": "descript montage par texte podcast video suppression hesitations studio",
+  "note": 4.4,
+  "resume": "Monter une vidéo ou un podcast en corrigeant le texte de la transcription : supprimer une phrase supprime l'image correspondante.",
+  "forces": [
+   "Le montage par le texte divise par trois le temps de post-production",
+   "Suppression automatique des « euh » et des silences",
+   "Correction de la voix sans réenregistrer"
+  ],
+  "limites": [
+   "Interface en anglais",
+   "Qualité du montage automatique en français légèrement inférieure à l'anglais"
+  ],
+  "gain": "Un podcast d'une heure monté en 30 minutes au lieu d'une demi-journée.",
+  "conformite": "Hébergement États-Unis : évitez d'y traiter des enregistrements contenant des données clients.",
+  "alternatives": [
+   "capcut",
+   "opusclip",
+   "turboscribe"
+  ],
+  "cas": [
+   "Monter un podcast d'entreprise sans compétence audio",
+   "Nettoyer une vidéo de formation enregistrée d'une traite"
+  ]
+ },
+ {
+  "slug": "opusclip",
+  "name": "OpusClip",
+  "url": "https://www.opus.pro/",
+  "cat": "video-audio",
+  "cats": [
+   "redaction-contenu"
+  ],
+  "editeur": "Opus",
+  "pays": "États-Unis",
+  "prix": "Freemium",
+  "prixDetail": "Crédits gratuits mensuels · à partir de ~19 €/mois",
+  "niveau": "Débutant",
+  "profils": [
+   "Marketing"
+  ],
+  "tags": "opusclip extraits courts video longue shorts reels sous-titres viral",
+  "note": 4.3,
+  "resume": "Découpe automatiquement une vidéo longue en extraits courts sous-titrés et recadrés, prêts pour les réseaux.",
+  "forces": [
+   "Repère seul les passages les plus percutants d'un webinaire ou d'une conférence",
+   "Recadrage automatique qui suit le visage",
+   "Sous-titres dynamiques inclus"
+  ],
+  "limites": [
+   "Sélection des extraits parfois discutable : une relecture reste nécessaire",
+   "Sous-titres français à corriger sur le vocabulaire métier"
+  ],
+  "gain": "Un webinaire d'une heure devient 15 publications en 10 minutes.",
+  "conformite": "Ne déposez que des contenus destinés à être publics.",
+  "alternatives": [
+   "submagic",
+   "capcut",
+   "blotato"
+  ],
+  "cas": [
+   "Transformer un webinaire en série de posts vidéo",
+   "Alimenter les réseaux à partir d'un podcast existant"
+  ]
+ },
+ {
+  "slug": "submagic",
+  "name": "Submagic",
+  "url": "https://www.submagic.co/",
+  "cat": "video-audio",
+  "cats": [],
+  "editeur": "Submagic",
+  "pays": "France",
+  "prix": "Freemium",
+  "prixDetail": "Essai gratuit · à partir de ~20 €/mois",
+  "niveau": "Débutant",
+  "profils": [
+   "Marketing"
+  ],
+  "tags": "submagic sous-titres dynamiques video courte france montage reseaux",
+  "note": 4.3,
+  "resume": "Les sous-titres dynamiques et le montage de vidéos courtes, par un éditeur français : le rendu « réseaux sociaux » en un clic.",
+  "forces": [
+   "Éditeur français, fondé par un créateur qui connaît le format",
+   "Sous-titres français précis et animés, sans réglage",
+   "Ajoute automatiquement zooms, effets sonores et emojis"
+  ],
+  "limites": [
+   "Abonnement au tarif élevé pour un usage occasionnel",
+   "Style marqué qui ne convient pas à toutes les marques"
+  ],
+  "gain": "Le rendu d'un monteur spécialisé sans monteur, sur chaque vidéo courte.",
+  "conformite": "Éditeur français. Contenus destinés à la publication.",
+  "alternatives": [
+   "opusclip",
+   "capcut",
+   "descript"
+  ],
+  "cas": [
+   "Sous-titrer et dynamiser des vidéos LinkedIn ou TikTok",
+   "Produire une série de vidéos courtes avec un rendu homogène"
+  ]
+ },
+ {
+  "slug": "suno",
+  "name": "Suno",
+  "url": "https://suno.com/",
+  "cat": "video-audio",
+  "cats": [],
+  "editeur": "Suno",
+  "pays": "États-Unis",
+  "prix": "Freemium",
+  "prixDetail": "Crédits gratuits quotidiens · à partir de ~9 €/mois",
+  "niveau": "Débutant",
+  "profils": [
+   "Marketing"
+  ],
+  "tags": "suno musique generation jingle habillage sonore libre de droits",
+  "note": 4.1,
+  "resume": "Générer une musique ou un jingle original à partir d'une description : l'habillage sonore sans banque de musique.",
+  "forces": [
+   "Musique originale, sans recherche de licence",
+   "Qualité surprenante y compris avec des paroles en français",
+   "Version gratuite quotidienne utilisable"
+  ],
+  "limites": [
+   "Droits commerciaux réservés aux offres payantes : à vérifier avant diffusion",
+   "Résultat parfois générique sur les styles complexes"
+  ],
+  "gain": "Un jingle ou une musique de fond sur mesure en 2 minutes, sans licence à gérer.",
+  "conformite": "Les droits commerciaux dépendent de l'offre souscrite : vérifiez avant toute diffusion publique ou publicitaire.",
+  "alternatives": [
+   "elevenlabs",
+   "canva"
+  ],
+  "cas": [
+   "Créer le jingle d'un podcast d'entreprise",
+   "Habiller musicalement une vidéo institutionnelle"
+  ]
+ },
+ {
+  "slug": "gamma",
+  "name": "Gamma",
+  "url": "https://gamma.app/",
+  "cat": "presentations-documents",
+  "cats": [
+   "redaction-contenu"
+  ],
+  "editeur": "Gamma",
+  "pays": "États-Unis",
+  "prix": "Freemium",
+  "prixDetail": "Crédits gratuits · à partir de ~9 €/mois",
+  "niveau": "Débutant",
+  "profils": [
+   "Dirigeant",
+   "Marketing",
+   "Formateur",
+   "Commercial"
+  ],
+  "tags": "gamma presentation slides generation document site web design automatique",
+  "note": 4.6,
+  "resume": "Décrire un sujet en une phrase et obtenir une présentation complète, mise en page et illustrée, en moins de deux minutes.",
+  "forces": [
+   "Le meilleur rapport temps/qualité pour une présentation : le design est fait pour vous",
+   "Produit aussi des documents et des mini-sites à partir du même contenu",
+   "Export PowerPoint et PDF sans perte de mise en forme"
+  ],
+  "limites": [
+   "Style Gamma reconnaissable si l'on ne personnalise pas le thème",
+   "Sur un sujet pointu, le contenu généré reste à réécrire"
+  ],
+  "gain": "Une présentation client passe de 3 h à 30 minutes, relecture comprise.",
+  "conformite": "Hébergement États-Unis : ne déposez pas de données clients dans les présentations générées.",
+  "alternatives": [
+   "beautiful-ai",
+   "canva",
+   "microsoft-copilot"
+  ],
+  "cas": [
+   "Préparer une présentation client la veille d'un rendez-vous",
+   "Transformer un document Word en support de réunion",
+   "Produire un support de formation illustré"
+  ]
+ },
+ {
+  "slug": "beautiful-ai",
+  "name": "Beautiful.ai",
+  "url": "https://www.beautiful.ai/",
+  "cat": "presentations-documents",
+  "cats": [],
+  "editeur": "Beautiful.ai",
+  "pays": "États-Unis",
+  "prix": "Payant",
+  "prixDetail": "À partir de ~12 €/mois",
+  "niveau": "Débutant",
+  "profils": [
+   "Dirigeant",
+   "Commercial"
+  ],
+  "tags": "beautiful ai presentation slides mise en page automatique charte",
+  "note": 4.0,
+  "resume": "Des présentations qui restent bien mises en page quoi qu'on y ajoute : la maquette se réajuste toute seule.",
+  "forces": [
+   "Impossible de casser la mise en page : idéal pour des équipes non designers",
+   "Charte graphique d'entreprise appliquée automatiquement",
+   "Bibliothèque de modèles professionnels sobres"
+  ],
+  "limites": [
+   "Moins spectaculaire que Gamma sur la génération à partir de zéro",
+   "Pas de version gratuite"
+  ],
+  "gain": "Des présentations commerciales homogènes dans toute l'entreprise, sans contrôle qualité.",
+  "conformite": "Hébergement États-Unis.",
+  "alternatives": [
+   "gamma",
+   "canva",
+   "microsoft-copilot"
+  ],
+  "cas": [
+   "Uniformiser les présentations d'une équipe commerciale",
+   "Produire un support de comité de direction propre en une heure"
+  ]
+ },
+ {
+  "slug": "napkin-ai",
+  "name": "Napkin AI",
+  "url": "https://www.napkin.ai/",
+  "cat": "presentations-documents",
+  "cats": [
+   "images-design"
+  ],
+  "editeur": "Napkin",
+  "pays": "États-Unis",
+  "prix": "Freemium",
+  "prixDetail": "Version gratuite · offres payantes à partir de ~10 €/mois",
+  "niveau": "Débutant",
+  "profils": [
+   "Formateur",
+   "Marketing",
+   "Dirigeant"
+  ],
+  "tags": "napkin schema visuel texte vers graphique diagramme explicatif",
+  "note": 4.3,
+  "resume": "Transformer un paragraphe en schéma clair : l'outil qui rend un concept compréhensible d'un coup d'œil.",
+  "forces": [
+   "Génère plusieurs propositions de schémas à partir d'un simple texte",
+   "Résultat éditable et exportable, cohérent avec vos couleurs",
+   "Comble le vrai manque des générateurs d'images : l'infographie explicative"
+  ],
+  "limites": [
+   "Périmètre limité aux schémas et diagrammes",
+   "Français parfois mal découpé dans les visuels"
+  ],
+  "gain": "Un concept abstrait devient un schéma présentable en 2 minutes plutôt qu'une heure sur PowerPoint.",
+  "conformite": "Contenus déposés hébergés hors UE : restez sur des contenus non sensibles.",
+  "alternatives": [
+   "canva",
+   "gamma",
+   "mermaid"
+  ],
+  "cas": [
+   "Illustrer un process interne dans un support de formation",
+   "Schématiser une offre commerciale pour une présentation"
+  ]
+ },
+ {
+  "slug": "genially",
+  "name": "Genially",
+  "url": "https://genially.com/fr/",
+  "cat": "presentations-documents",
+  "cats": [
+   "rh-formation"
+  ],
+  "editeur": "Genially",
+  "pays": "Espagne",
+  "prix": "Freemium",
+  "prixDetail": "Version gratuite · à partir de ~8 €/mois",
+  "niveau": "Intermédiaire",
+  "profils": [
+   "Formateur",
+   "RH",
+   "Marketing"
+  ],
+  "tags": "genially interactif presentation formation quiz elearning europe",
+  "note": 4.2,
+  "resume": "Des contenus interactifs pour la formation : présentations cliquables, quiz, parcours et infographies animées.",
+  "forces": [
+   "Éditeur européen (Espagne), interface en français",
+   "Interactivité qui change réellement l'engagement en formation",
+   "Générateur IA de contenus pédagogiques intégré"
+  ],
+  "limites": [
+   "Prise en main plus longue qu'un outil de présentation classique",
+   "Version gratuite qui impose un affichage Genially"
+  ],
+  "gain": "Un module de formation engageant produit en interne, sans prestataire e-learning.",
+  "conformite": "Éditeur européen : cadre RGPD favorable pour des contenus de formation.",
+  "alternatives": [
+   "canva",
+   "gamma"
+  ],
+  "cas": [
+   "Créer un quiz d'évaluation de fin de formation",
+   "Produire un parcours d'intégration interactif pour les nouveaux salariés"
+  ]
+ },
+ {
+  "slug": "mermaid",
+  "name": "Mermaid",
+  "url": "https://mermaid.js.org/",
+  "cat": "presentations-documents",
+  "cats": [
+   "sites-apps-nocode"
+  ],
+  "editeur": "Mermaid (open source)",
+  "pays": "Communauté open source",
+  "prix": "Gratuit",
+  "prixDetail": "Gratuit et open source",
+  "niveau": "Intermédiaire",
+  "profils": [
+   "Ops",
+   "Développeur",
+   "Formateur"
+  ],
+  "tags": "mermaid diagramme schema texte organigramme processus gratuit code",
+  "note": 4.2,
+  "resume": "Décrire un schéma en quelques lignes de texte et obtenir un diagramme propre : parfait en duo avec une IA.",
+  "forces": [
+   "Une IA génère le code Mermaid en une seconde : le schéma se modifie en modifiant le texte",
+   "Gratuit, sans compte, intégré dans Notion, GitHub et de nombreux outils",
+   "Idéal pour documenter des processus qui évoluent souvent"
+  ],
+  "limites": [
+   "Syntaxe à connaître, même si l'IA la produit pour vous",
+   "Rendu graphique sobre, peu adapté à un usage marketing"
+  ],
+  "gain": "Un organigramme de processus mis à jour en 30 secondes au lieu d'être refait sur PowerPoint.",
+  "conformite": "Rendu local ou dans votre outil : aucune donnée transmise.",
+  "alternatives": [
+   "napkin-ai",
+   "canva"
+  ],
+  "cas": [
+   "Documenter un processus interne appelé à évoluer",
+   "Schématiser une automatisation avant de la construire"
+  ]
+ },
+ {
+  "slug": "pandadoc",
+  "name": "PandaDoc",
+  "url": "https://www.pandadoc.com/fr/",
+  "cat": "presentations-documents",
+  "cats": [
+   "prospection-vente",
+   "finance-admin"
+  ],
+  "editeur": "PandaDoc",
+  "pays": "États-Unis",
+  "prix": "Freemium",
+  "prixDetail": "Signature électronique gratuite · offres à partir de ~35 €/utilisateur/mois",
+  "niveau": "Débutant",
+  "profils": [
+   "Commercial",
+   "Dirigeant"
+  ],
+  "tags": "pandadoc proposition commerciale devis signature electronique modeles suivi",
+  "note": 4.3,
+  "resume": "Propositions commerciales, devis et contrats : création à partir de modèles, envoi, suivi de lecture et signature électronique.",
+  "forces": [
+   "On sait quand et combien de temps le client a lu chaque page de la proposition",
+   "Signature électronique intégrée : plus d'impression-scan",
+   "Modèles réutilisables qui font gagner un temps considérable"
+  ],
+  "limites": [
+   "Tarif élevé au-delà de la signature simple",
+   "Interface française partielle"
+  ],
+  "gain": "Un devis envoyé en 15 minutes au lieu de 2 h, et signé plus vite.",
+  "conformite": "Signature électronique conforme au règlement eIDAS pour le niveau simple. Pour des contrats à enjeu, vérifiez le niveau requis.",
+  "alternatives": [
+   "yousign",
+   "hubspot",
+   "canva"
+  ],
+  "cas": [
+   "Envoyer une proposition commerciale signable en un clic",
+   "Suivre quelles propositions sont réellement lues",
+   "Standardiser les devis d'une équipe commerciale"
+  ]
+ },
+ {
+  "slug": "yousign",
+  "name": "Youtrust (ex-Yousign)",
+  "url": "https://youtrust.com/fr-fr",
+  "cat": "presentations-documents",
+  "cats": [
+   "juridique-conformite",
+   "finance-admin"
+  ],
+  "editeur": "Youtrust (ex-Yousign)",
+  "pays": "France",
+  "prix": "Payant",
+  "prixDetail": "Offre App à partir de ~9 € HT/mois/utilisateur · API à partir de ~106 € HT/mois",
+  "niveau": "Débutant",
+  "profils": [
+   "Dirigeant",
+   "RH",
+   "Commercial"
+  ],
+  "tags": "youtrust yousign signature electronique france eidas contrats rgpd conformite verification identite",
+  "note": 4.5,
+  "resume": "La signature électronique française, certifiée eIDAS : contrats, devis et documents RH signés en quelques minutes. L'éditeur a été renommé Youtrust en 2026.",
+  "forces": [
+   "Prestataire de confiance qualifié en France : valeur juridique solide",
+   "Hébergement en France, interface et support en français",
+   "S'intègre facilement dans une automatisation (n8n, Make, CRM), et couvre aussi la vérification d'identité et le cachet électronique"
+  ],
+  "limites": [
+   "Moins d'options de mise en forme des documents que PandaDoc",
+   "Facturation à l'enveloppe qui pèse sur les gros volumes"
+  ],
+  "gain": "Un contrat signé le jour même au lieu d'attendre une semaine un retour postal.",
+  "conformite": "Prestataire français qualifié eIDAS, hébergement en France : le choix le plus solide juridiquement pour signer en France. Le service est le même depuis le changement de nom Yousign → Youtrust.",
+  "alternatives": [
+   "pandadoc"
+  ],
+  "cas": [
+   "Faire signer les contrats de formation et conventions",
+   "Signer les contrats de travail et avenants RH",
+   "Automatiser l'envoi en signature depuis le CRM"
+  ]
+ },
+ {
+  "slug": "lovable",
+  "name": "Lovable",
+  "url": "https://lovable.dev/",
+  "cat": "sites-apps-nocode",
+  "cats": [
+   "automatisation"
+  ],
+  "editeur": "Lovable",
+  "pays": "Suède",
+  "prix": "Freemium",
+  "prixDetail": "Crédits gratuits quotidiens · à partir de ~25 €/mois",
+  "niveau": "Débutant",
+  "profils": [
+   "Dirigeant",
+   "Ops",
+   "Marketing"
+  ],
+  "tags": "lovable creation application web ia sans code prototype saas europe",
+  "note": 4.5,
+  "resume": "Décrire l'application dont vous avez besoin et la voir se construire : site, outil interne ou prototype, sans écrire de code.",
+  "forces": [
+   "Éditeur européen (Suède)",
+   "Passe de l'idée à une application fonctionnelle et hébergée en une soirée",
+   "Base de données et authentification gérées automatiquement"
+  ],
+  "limites": [
+   "Au-delà d'un certain niveau de complexité, l'aide d'un développeur redevient nécessaire",
+   "Consommation de crédits rapide en phase d'itération"
+  ],
+  "gain": "Un outil interne sur mesure pour le prix de deux jours de développement, en une après-midi.",
+  "conformite": "Éditeur européen. Attention aux données que vous mettez dans une application générée : la sécurité doit être vérifiée avant tout usage réel.",
+  "alternatives": [
+   "bolt",
+   "v0",
+   "bubble"
+  ],
+  "cas": [
+   "Créer un outil interne de suivi de dossiers",
+   "Prototyper une application avant de la faire développer",
+   "Monter une landing page avec formulaire connecté"
+  ]
+ },
+ {
+  "slug": "bolt",
+  "name": "Bolt.new",
+  "url": "https://bolt.new/",
+  "cat": "sites-apps-nocode",
+  "cats": [],
+  "editeur": "StackBlitz",
+  "pays": "États-Unis",
+  "prix": "Freemium",
+  "prixDetail": "Jetons gratuits quotidiens · à partir de ~20 €/mois",
+  "niveau": "Intermédiaire",
+  "profils": [
+   "Développeur",
+   "Ops"
+  ],
+  "tags": "bolt stackblitz generation application navigateur code deploiement rapide",
+  "note": 4.3,
+  "resume": "Générer une application complète dans le navigateur et la déployer immédiatement, avec accès au code produit.",
+  "forces": [
+   "Le code est visible et exportable : pas d'enfermement chez l'éditeur",
+   "Déploiement en un clic",
+   "Très rapide pour un prototype fonctionnel"
+  ],
+  "limites": [
+   "Suppose de savoir lire du code pour corriger les erreurs",
+   "Consommation de jetons élevée sur les projets qui s'étoffent"
+  ],
+  "gain": "Un prototype présentable à un client ou un associé en quelques heures.",
+  "conformite": "Vérifiez la sécurité avant de mettre une application générée en production avec de vraies données.",
+  "alternatives": [
+   "lovable",
+   "v0",
+   "replit"
+  ],
+  "cas": [
+   "Prototyper une idée d'outil métier",
+   "Créer une démonstration fonctionnelle pour un client"
+  ]
+ },
+ {
+  "slug": "v0",
+  "name": "v0 by Vercel",
+  "url": "https://v0.app/",
+  "cat": "sites-apps-nocode",
+  "cats": [
+   "images-design"
+  ],
+  "editeur": "Vercel",
+  "pays": "États-Unis",
+  "prix": "Freemium",
+  "prixDetail": "Crédits gratuits mensuels · à partir de ~20 €/mois",
+  "niveau": "Intermédiaire",
+  "profils": [
+   "Développeur",
+   "Marketing"
+  ],
+  "tags": "v0 vercel interface composants react generation ui design vers code",
+  "note": 4.3,
+  "resume": "Générer des interfaces web propres à partir d'une description ou d'une capture d'écran, directement exploitables par un développeur.",
+  "forces": [
+   "Qualité d'interface produite nettement supérieure à la moyenne",
+   "Transforme une maquette ou une capture en code fonctionnel",
+   "S'intègre au flux de travail d'une vraie équipe technique"
+  ],
+  "limites": [
+   "Orienté interface : ne gère pas la logique métier complète",
+   "Suppose un environnement technique moderne"
+  ],
+  "gain": "Une refonte d'interface maquettée et codée en une journée au lieu d'une semaine.",
+  "conformite": "Sortie technique sans traitement de données personnelles.",
+  "alternatives": [
+   "lovable",
+   "bolt",
+   "framer"
+  ],
+  "cas": [
+   "Maquetter une page produit avant développement",
+   "Moderniser l'interface d'un outil interne"
+  ]
+ },
+ {
+  "slug": "framer",
+  "name": "Framer",
+  "url": "https://www.framer.com/",
+  "cat": "sites-apps-nocode",
+  "cats": [
+   "images-design"
+  ],
+  "editeur": "Framer",
+  "pays": "Pays-Bas",
+  "prix": "Freemium",
+  "prixDetail": "Version gratuite (sous-domaine) · à partir de ~5 €/mois par site",
+  "niveau": "Intermédiaire",
+  "profils": [
+   "Marketing"
+  ],
+  "tags": "framer site web design animations landing page cms europe",
+  "note": 4.4,
+  "resume": "Créer un site vitrine au design soigné, avec animations et CMS, sans développeur. Éditeur européen.",
+  "forces": [
+   "Rendu visuel très au-dessus des constructeurs de sites classiques",
+   "Éditeur néerlandais, hébergement européen possible",
+   "Performances et référencement techniquement corrects par défaut"
+  ],
+  "limites": [
+   "Logique de design à apprendre pour un profil non graphiste",
+   "Facturation par site, qui grimpe avec plusieurs projets"
+  ],
+  "gain": "Un site vitrine professionnel en ligne en une semaine sans agence.",
+  "conformite": "Éditeur européen : cadre RGPD favorable pour un site collectant des formulaires.",
+  "alternatives": [
+   "webflow",
+   "lovable",
+   "wordpress"
+  ],
+  "cas": [
+   "Refondre un site vitrine sans agence",
+   "Créer une landing page de campagne au design soigné"
+  ]
+ },
+ {
+  "slug": "webflow",
+  "name": "Webflow",
+  "url": "https://webflow.com/",
+  "cat": "sites-apps-nocode",
+  "cats": [
+   "seo-visibilite"
+  ],
+  "editeur": "Webflow",
+  "pays": "États-Unis",
+  "prix": "Freemium",
+  "prixDetail": "Version gratuite limitée · à partir de ~14 €/mois par site",
+  "niveau": "Expert",
+  "profils": [
+   "Marketing",
+   "Développeur"
+  ],
+  "tags": "webflow site web cms professionnel seo design avance sans code",
+  "note": 4.3,
+  "resume": "Le constructeur de sites professionnel : contrôle total du design et du référencement, sans écrire de code.",
+  "forces": [
+   "Contrôle très fin du référencement technique",
+   "CMS puissant pour un site à fort volume de contenus",
+   "Code propre généré, hébergement performant inclus"
+  ],
+  "limites": [
+   "Courbe d'apprentissage réelle : c'est un outil de professionnel",
+   "Coût cumulé (site + CMS + trafic) qui monte vite"
+  ],
+  "gain": "L'autonomie éditoriale complète sur un site, sans dépendre d'un prestataire pour chaque modification.",
+  "conformite": "Hébergement principalement hors UE : à vérifier si le site collecte des données personnelles.",
+  "alternatives": [
+   "framer",
+   "wordpress",
+   "lovable"
+  ],
+  "cas": [
+   "Construire un site d'entreprise à fort enjeu SEO",
+   "Gérer un blog et des pages métier sans développeur"
+  ]
+ },
+ {
+  "slug": "wordpress",
+  "name": "WordPress",
+  "url": "https://wordpress.org/",
+  "cat": "sites-apps-nocode",
+  "cats": [
+   "seo-visibilite"
+  ],
+  "editeur": "WordPress (open source)",
+  "pays": "Communauté open source",
+  "prix": "Gratuit",
+  "prixDetail": "Logiciel gratuit · hébergement à partir de ~5 €/mois",
+  "niveau": "Intermédiaire",
+  "profils": [
+   "Marketing",
+   "Dirigeant"
+  ],
+  "tags": "wordpress cms site blog extensions seo open source hebergement france",
+  "note": 4.2,
+  "resume": "Le CMS qui fait tourner plus de 40 % du web : gratuit, extensible, et hébergeable chez un prestataire français.",
+  "forces": [
+   "Hébergement libre, y compris chez un hébergeur français : maîtrise totale des données",
+   "Écosystème d'extensions sans équivalent, dont de nombreux modules IA",
+   "Aucune dépendance à un éditeur : le site vous appartient réellement"
+  ],
+  "limites": [
+   "Maintenance et sécurité à votre charge : un WordPress non mis à jour se fait pirater",
+   "Performances médiocres si le site est mal construit"
+  ],
+  "gain": "Un site professionnel évolutif pour quelques euros par mois d'hébergement.",
+  "conformite": "Hébergeable en France (OVH, Scaleway, Infomaniak) : la solution la plus simple pour garantir un hébergement souverain.",
+  "alternatives": [
+   "webflow",
+   "framer"
+  ],
+  "cas": [
+   "Créer un site vitrine et un blog maîtrisés de bout en bout",
+   "Héberger son site chez un prestataire français pour des raisons de conformité"
+  ]
+ },
+ {
+  "slug": "bubble",
+  "name": "Bubble",
+  "url": "https://bubble.io/",
+  "cat": "sites-apps-nocode",
+  "cats": [],
+  "editeur": "Bubble",
+  "pays": "États-Unis",
+  "prix": "Freemium",
+  "prixDetail": "Version gratuite de développement · à partir de ~29 €/mois",
+  "niveau": "Expert",
+  "profils": [
+   "Ops",
+   "Développeur"
+  ],
+  "tags": "bubble no-code application web base de donnees logique metier saas",
+  "note": 4.0,
+  "resume": "La plateforme no-code la plus aboutie pour construire une vraie application métier avec base de données et droits d'accès.",
+  "forces": [
+   "Capable de porter une application d'entreprise complète, pas seulement un prototype",
+   "Gestion fine des utilisateurs et des permissions",
+   "Communauté et agences spécialisées nombreuses en France"
+  ],
+  "limites": [
+   "Courbe d'apprentissage longue : compter plusieurs semaines",
+   "Coûts qui montent avec l'usage, et dépendance forte à la plateforme"
+  ],
+  "gain": "Une application métier sur mesure pour une fraction du coût d'un développement classique.",
+  "conformite": "Hébergement principalement hors UE, option européenne sur les offres supérieures. À vérifier avant d'y stocker des données clients.",
+  "alternatives": [
+   "lovable",
+   "softr",
+   "airtable"
+  ],
+  "cas": [
+   "Construire un portail client sur mesure",
+   "Remplacer un ensemble de tableurs par une vraie application"
+  ]
+ },
+ {
+  "slug": "softr",
+  "name": "Softr",
+  "url": "https://www.softr.io/",
+  "cat": "sites-apps-nocode",
+  "cats": [
+   "data-analyse"
+  ],
+  "editeur": "Softr",
+  "pays": "Allemagne",
+  "prix": "Freemium",
+  "prixDetail": "Version gratuite · à partir de ~49 €/mois",
+  "niveau": "Débutant",
+  "profils": [
+   "Ops",
+   "Dirigeant"
+  ],
+  "tags": "softr portail client airtable interface no-code application allemagne",
+  "note": 4.1,
+  "resume": "Transformer une base Airtable ou un tableur en application ou portail client, en quelques heures et sans code.",
+  "forces": [
+   "Le plus rapide pour créer un portail client ou un espace interne",
+   "Éditeur allemand, hébergement européen",
+   "Gestion des accès et des droits sans développement"
+  ],
+  "limites": [
+   "Dépend d'une base de données tierce (Airtable, Google Sheets)",
+   "Personnalisation visuelle limitée"
+  ],
+  "gain": "Un portail client opérationnel en deux jours au lieu d'un projet de plusieurs mois.",
+  "conformite": "Éditeur allemand, hébergement UE : favorable, sous réserve de l'hébergement de la base de données sous-jacente.",
+  "alternatives": [
+   "bubble",
+   "airtable",
+   "lovable"
+  ],
+  "cas": [
+   "Donner à chaque client un espace pour suivre ses dossiers",
+   "Créer un intranet léger pour les équipes terrain"
+  ]
+ },
+ {
+  "slug": "cursor",
+  "name": "Cursor",
+  "url": "https://cursor.com/",
+  "cat": "sites-apps-nocode",
+  "cats": [],
+  "editeur": "Anysphere",
+  "pays": "États-Unis",
+  "prix": "Freemium",
+  "prixDetail": "Version gratuite limitée · Pro ~20 €/mois",
+  "niveau": "Expert",
+  "profils": [
+   "Développeur"
+  ],
+  "tags": "cursor editeur code ia developpement assistant programmation",
+  "note": 4.7,
+  "resume": "L'éditeur de code piloté par IA devenu le standard chez les développeurs : il comprend tout le projet et écrit des fonctionnalités entières.",
+  "forces": [
+   "Gain de productivité massif et documenté sur le développement",
+   "Comprend l'ensemble du dépôt, pas seulement le fichier ouvert",
+   "Choix du modèle (Claude, GPT) selon la tâche"
+  ],
+  "limites": [
+   "Réservé aux profils techniques",
+   "Code produit à relire : la vitesse ne dispense pas de la revue"
+  ],
+  "gain": "30 à 50 % de temps de développement en moins sur les tâches courantes.",
+  "conformite": "Mode confidentialité disponible pour que le code ne soit pas conservé : à activer sur du code propriétaire.",
+  "alternatives": [
+   "replit",
+   "bolt",
+   "v0"
+  ],
+  "cas": [
+   "Accélérer le développement d'une application interne",
+   "Reprendre et comprendre un code existant non documenté"
+  ]
+ },
+ {
+  "slug": "replit",
+  "name": "Replit",
+  "url": "https://replit.com/",
+  "cat": "sites-apps-nocode",
+  "cats": [],
+  "editeur": "Replit",
+  "pays": "États-Unis",
+  "prix": "Freemium",
+  "prixDetail": "Version gratuite · à partir de ~20 €/mois",
+  "niveau": "Intermédiaire",
+  "profils": [
+   "Développeur",
+   "Ops"
+  ],
+  "tags": "replit developpement navigateur agent hebergement application collaboratif",
+  "note": 4.1,
+  "resume": "Développer, héberger et partager une application depuis le navigateur, avec un agent IA qui construit à votre place.",
+  "forces": [
+   "Tout est intégré : développement, base de données et hébergement",
+   "Agent capable de construire une application complète à partir d'une description",
+   "Collaboration en direct, pratique pour la formation"
+  ],
+  "limites": [
+   "Performances limitées sur les offres d'entrée",
+   "Moins adapté à une application destinée à durer"
+  ],
+  "gain": "Un outil interne en ligne le jour même, sans configuration de serveur.",
+  "conformite": "Hébergement hors UE : à réserver aux outils sans données personnelles.",
+  "alternatives": [
+   "bolt",
+   "lovable",
+   "cursor"
+  ],
+  "cas": [
+   "Créer un petit outil interne rapidement",
+   "Faire manipuler du code en formation sans installation"
+  ]
+ },
+ {
+  "slug": "airtable",
+  "name": "Airtable",
+  "url": "https://www.airtable.com/",
+  "cat": "data-analyse",
+  "cats": [
+   "automatisation",
+   "sites-apps-nocode"
+  ],
+  "editeur": "Airtable",
+  "pays": "États-Unis",
+  "prix": "Freemium",
+  "prixDetail": "Version gratuite · à partir de ~20 €/utilisateur/mois",
+  "niveau": "Débutant",
+  "profils": [
+   "Ops",
+   "Marketing",
+   "Dirigeant"
+  ],
+  "tags": "airtable base de donnees tableur no-code automatisation champs ia",
+  "note": 4.4,
+  "resume": "Le tableur devenu base de données : structurer les données de l'entreprise et y appliquer l'IA champ par champ.",
+  "forces": [
+   "Aussi simple qu'Excel, mais avec de vraies relations entre les données",
+   "Champs IA qui résument, classent ou traduisent automatiquement chaque ligne",
+   "Socle idéal pour une automatisation n8n ou Make"
+  ],
+  "limites": [
+   "Coût par utilisateur qui pèse dès qu'on multiplie les accès",
+   "Performances limitées sur les très gros volumes"
+  ],
+  "gain": "Les tableurs éparpillés deviennent une base unique, à jour, exploitable par l'IA.",
+  "conformite": "Hébergement États-Unis : à cadrer si la base contient des données clients.",
+  "alternatives": [
+   "notion-ai",
+   "rows",
+   "softr"
+  ],
+  "cas": [
+   "Centraliser le suivi des projets et des clients",
+   "Classer et résumer automatiquement les demandes entrantes",
+   "Servir de base à un portail client Softr"
+  ]
+ },
+ {
+  "slug": "looker-studio",
+  "name": "Looker Studio",
+  "url": "https://lookerstudio.google.com/",
+  "cat": "data-analyse",
+  "cats": [
+   "seo-visibilite"
+  ],
+  "editeur": "Google",
+  "pays": "États-Unis",
+  "prix": "Gratuit",
+  "prixDetail": "Gratuit",
+  "niveau": "Intermédiaire",
+  "profils": [
+   "Marketing",
+   "Dirigeant"
+  ],
+  "tags": "looker studio data studio tableau de bord gratuit google analytics rapports",
+  "note": 4.3,
+  "resume": "Le tableau de bord gratuit de Google : connecter ses données et diffuser des rapports automatiques et partageables.",
+  "forces": [
+   "Gratuit, sans limite d'utilisateurs",
+   "Connecteurs natifs vers Analytics, Ads, Search Console et Sheets",
+   "Rapports partagés par simple lien, mis à jour en continu"
+  ],
+  "limites": [
+   "Lenteur sur les gros volumes de données",
+   "Mise en forme moins souple que Power BI"
+  ],
+  "gain": "Le reporting mensuel se fabrique une fois puis se met à jour tout seul.",
+  "conformite": "Écosystème Google : attention aux données personnelles injectées dans les rapports.",
+  "alternatives": [
+   "power-bi",
+   "metabase",
+   "rows"
+  ],
+  "cas": [
+   "Automatiser le reporting marketing mensuel",
+   "Donner au dirigeant un tableau de bord commercial toujours à jour"
+  ]
+ },
+ {
+  "slug": "power-bi",
+  "name": "Microsoft Power BI",
+  "url": "https://www.microsoft.com/power-platform/products/power-bi",
+  "cat": "data-analyse",
+  "cats": [
+   "finance-admin"
+  ],
+  "editeur": "Microsoft",
+  "pays": "États-Unis",
+  "prix": "Payant",
+  "prixDetail": "Desktop gratuit · publication à partir de ~10 €/utilisateur/mois",
+  "niveau": "Expert",
+  "profils": [
+   "Ops",
+   "Dirigeant"
+  ],
+  "tags": "power bi tableau de bord decisionnel microsoft copilot analyse donnees",
+  "note": 4.4,
+  "resume": "L'outil décisionnel de Microsoft : croiser toutes les données de l'entreprise et les interroger en langage naturel.",
+  "forces": [
+   "Puissance d'analyse sans équivalent à ce niveau de prix",
+   "Copilot intégré : on pose ses questions en français",
+   "Se connecte à la quasi-totalité des logiciels de gestion"
+  ],
+  "limites": [
+   "Prise en main longue : un vrai outil de spécialiste",
+   "Modèle de licences et de capacités complexe"
+  ],
+  "gain": "Les réunions de pilotage s'appuient sur des chiffres partagés plutôt que sur trois exports contradictoires.",
+  "conformite": "Données dans le tenant Microsoft : cadre maîtrisé, à condition de gérer les droits d'accès.",
+  "alternatives": [
+   "looker-studio",
+   "metabase"
+  ],
+  "cas": [
+   "Piloter l'activité avec un tableau de bord unique",
+   "Croiser les données comptables et commerciales"
+  ]
+ },
+ {
+  "slug": "metabase",
+  "name": "Metabase",
+  "url": "https://www.metabase.com/",
+  "cat": "data-analyse",
+  "cats": [
+   "juridique-conformite"
+  ],
+  "editeur": "Metabase",
+  "pays": "États-Unis (open source)",
+  "prix": "Freemium",
+  "prixDetail": "Version open source gratuite en auto-hébergement · cloud à partir de ~85 €/mois",
+  "niveau": "Expert",
+  "profils": [
+   "Développeur",
+   "Ops"
+  ],
+  "tags": "metabase open source auto-heberge requetes sql tableau de bord donnees",
+  "note": 4.3,
+  "resume": "Le tableau de bord open source auto-hébergeable : vos données restent chez vous et chacun peut les interroger.",
+  "forces": [
+   "Auto-hébergeable : les données ne quittent jamais votre infrastructure",
+   "Interface qui permet aux non-techniciens de poser des questions à la base",
+   "Gratuit en version open source, sans limite d'utilisateurs"
+  ],
+  "limites": [
+   "Installation et maintenance techniques",
+   "Moins abouti que Power BI sur la mise en forme"
+  ],
+  "gain": "L'accès aux chiffres sans passer par un développeur, et sans exporter la base dans un cloud tiers.",
+  "conformite": "Auto-hébergement : la meilleure réponse quand les données analysées sont sensibles.",
+  "alternatives": [
+   "power-bi",
+   "looker-studio"
+  ],
+  "cas": [
+   "Donner aux équipes un accès aux indicateurs sans export de données",
+   "Suivre l'activité d'un logiciel métier interne"
+  ]
+ },
+ {
+  "slug": "julius-ai",
+  "name": "Julius AI",
+  "url": "https://julius.ai/",
+  "cat": "data-analyse",
+  "cats": [],
+  "editeur": "Julius",
+  "pays": "États-Unis",
+  "prix": "Freemium",
+  "prixDetail": "Version gratuite limitée · à partir de ~18 €/mois",
+  "niveau": "Débutant",
+  "profils": [
+   "Dirigeant",
+   "Marketing",
+   "Ops"
+  ],
+  "tags": "julius analyse fichier excel csv graphiques statistiques langage naturel",
+  "note": 4.2,
+  "resume": "Déposer un fichier Excel et poser ses questions en français : l'analyse de données sans tableau croisé dynamique.",
+  "forces": [
+   "Comprend des questions métier complexes et produit les graphiques correspondants",
+   "Gère de gros fichiers que ChatGPT refuse",
+   "Montre les calculs effectués, ce qui permet de les vérifier"
+  ],
+  "limites": [
+   "Hébergement hors UE : à proscrire pour un export contenant des données personnelles",
+   "Résultats à contrôler : une erreur d'interprétation reste possible"
+  ],
+  "gain": "Une analyse de ventes ou de marges en 10 minutes, sans compétence Excel avancée.",
+  "conformite": "Anonymisez vos exports avant dépôt : un fichier client complet ne doit pas partir hors UE sans encadrement.",
+  "alternatives": [
+   "power-bi",
+   "chatgpt",
+   "rows"
+  ],
+  "cas": [
+   "Analyser un export de ventes pour comprendre une baisse",
+   "Croiser des fichiers clients et produits sans tableau croisé"
+  ]
+ },
+ {
+  "slug": "rows",
+  "name": "Rows",
+  "url": "https://rows.com/",
+  "cat": "data-analyse",
+  "cats": [],
+  "editeur": "Rows",
+  "pays": "Portugal / Allemagne",
+  "prix": "Freemium",
+  "prixDetail": "Version gratuite · à partir de ~15 €/utilisateur/mois",
+  "niveau": "Débutant",
+  "profils": [
+   "Marketing",
+   "Ops"
+  ],
+  "tags": "rows tableur ia europe formules integrations donnees automatique",
+  "note": 4.0,
+  "resume": "Un tableur en ligne avec l'IA intégrée et des connecteurs directs vers vos outils : le tableur qui se remplit tout seul.",
+  "forces": [
+   "Éditeur européen",
+   "Génère les formules à partir d'une demande en français",
+   "Connecteurs natifs (Analytics, LinkedIn, bases de données) sans passer par un outil d'automatisation"
+  ],
+  "limites": [
+   "Écosystème plus restreint qu'Excel ou Google Sheets",
+   "Moins adapté aux très gros fichiers"
+  ],
+  "gain": "Un tableau de suivi alimenté automatiquement plutôt que rempli à la main chaque lundi.",
+  "conformite": "Éditeur européen, hébergement UE.",
+  "alternatives": [
+   "airtable",
+   "looker-studio",
+   "julius-ai"
+  ],
+  "cas": [
+   "Suivre automatiquement les indicateurs marketing dans un tableur",
+   "Enrichir une liste de prospects directement dans une feuille"
+  ]
+ },
+ {
+  "slug": "360learning",
+  "name": "360Learning",
+  "url": "https://360learning.com/fr/",
+  "cat": "rh-formation",
+  "cats": [],
+  "editeur": "360Learning",
+  "pays": "France",
+  "prix": "Payant",
+  "prixDetail": "À partir de ~8 €/utilisateur/mois",
+  "niveau": "Intermédiaire",
+  "profils": [
+   "RH",
+   "Formateur",
+   "Dirigeant"
+  ],
+  "tags": "360learning lms formation interne collaborative france elearning ia",
+  "note": 4.4,
+  "resume": "La plateforme de formation interne française : les experts métier créent eux-mêmes les modules, l'IA les aide à les structurer.",
+  "forces": [
+   "Éditeur français, hébergement UE, interface en français",
+   "Approche collaborative : la connaissance interne devient une formation sans passer par un prestataire",
+   "Assistant IA qui transforme un document en module structuré"
+  ],
+  "limites": [
+   "Tarif orienté entreprises structurées",
+   "Suppose une culture de partage : sans animation, la plateforme reste vide"
+  ],
+  "gain": "Le savoir-faire d'un salarié expérimenté devient un module réutilisable avant son départ.",
+  "conformite": "Éditeur français, hébergement UE : cadre simple pour des données de formation de salariés.",
+  "alternatives": [
+   "didask",
+   "moodle",
+   "teachizy"
+  ],
+  "cas": [
+   "Industrialiser l'intégration des nouveaux salariés",
+   "Capitaliser le savoir-faire métier avant un départ en retraite",
+   "Diffuser une procédure à toutes les agences"
+  ]
+ },
+ {
+  "slug": "didask",
+  "name": "Didask",
+  "url": "https://www.didask.com/",
+  "cat": "rh-formation",
+  "cats": [],
+  "editeur": "Didask",
+  "pays": "France",
+  "prix": "Payant",
+  "prixDetail": "Sur devis",
+  "niveau": "Intermédiaire",
+  "profils": [
+   "Formateur",
+   "RH"
+  ],
+  "tags": "didask elearning sciences cognitives france ia pedagogie modules",
+  "note": 4.3,
+  "resume": "Le e-learning français fondé sur les sciences cognitives : l'IA génère des modules réellement pédagogiques, pas des diaporamas.",
+  "forces": [
+   "Approche pédagogique sérieuse : le module fait travailler l'apprenant, il ne défile pas",
+   "Éditeur français, issu de la recherche",
+   "Génération de modules à partir de vos documents existants"
+  ],
+  "limites": [
+   "Positionnement organisme de formation et grandes entreprises",
+   "Pas d'offre en libre-service"
+  ],
+  "gain": "Un module e-learning conçu en quelques jours au lieu de plusieurs semaines avec un prestataire.",
+  "conformite": "Éditeur français, hébergement UE.",
+  "alternatives": [
+   "360learning",
+   "teachizy",
+   "genially"
+  ],
+  "cas": [
+   "Créer un parcours e-learning à partir d'un support existant",
+   "Digitaliser une formation présentielle sans perdre en efficacité"
+  ]
+ },
+ {
+  "slug": "teachizy",
+  "name": "Teachizy",
+  "url": "https://teachizy.fr/",
+  "cat": "rh-formation",
+  "cats": [],
+  "editeur": "Teachizy",
+  "pays": "France",
+  "prix": "Freemium",
+  "prixDetail": "Version gratuite avec commission · offres à partir de ~29 €/mois",
+  "niveau": "Débutant",
+  "profils": [
+   "Formateur",
+   "Dirigeant"
+  ],
+  "tags": "teachizy plateforme formation vendre cours en ligne france qualiopi",
+  "note": 4.2,
+  "resume": "La plateforme française pour héberger et vendre ses formations en ligne, pensée pour les organismes de formation.",
+  "forces": [
+   "Éditeur français, conçu pour les contraintes des organismes de formation (émargement, suivi, Qualiopi)",
+   "Version gratuite pour démarrer, sans abonnement",
+   "Interface simple, en français"
+  ],
+  "limites": [
+   "Moins de fonctions pédagogiques avancées qu'un LMS d'entreprise",
+   "Commission sur les ventes en version gratuite"
+  ],
+  "gain": "Une formation en ligne commercialisable en une semaine, sans développement.",
+  "conformite": "Éditeur français, hébergement UE : adapté au suivi des stagiaires et aux exigences Qualiopi.",
+  "alternatives": [
+   "360learning",
+   "moodle",
+   "didask"
+  ],
+  "cas": [
+   "Vendre une formation en ligne en autonomie",
+   "Héberger les modules e-learning d'un organisme de formation"
+  ]
+ },
+ {
+  "slug": "moodle",
+  "name": "Moodle",
+  "url": "https://moodle.org/",
+  "cat": "rh-formation",
+  "cats": [
+   "juridique-conformite"
+  ],
+  "editeur": "Moodle (open source)",
+  "pays": "Australie / communauté",
+  "prix": "Gratuit",
+  "prixDetail": "Gratuit et open source · hébergement à votre charge",
+  "niveau": "Expert",
+  "profils": [
+   "Formateur",
+   "RH"
+  ],
+  "tags": "moodle lms open source gratuit auto-heberge formation universite",
+  "note": 4.0,
+  "resume": "Le LMS open source le plus répandu au monde : gratuit, complet, et hébergeable sur vos propres serveurs.",
+  "forces": [
+   "Gratuit quel que soit le nombre d'apprenants",
+   "Auto-hébergeable en France : maîtrise totale des données des stagiaires",
+   "Extrêmement complet : parcours, évaluations, certificats, traçabilité"
+  ],
+  "limites": [
+   "Interface austère et datée",
+   "Installation et maintenance techniques indispensables"
+  ],
+  "gain": "Une plateforme de formation complète sans coût de licence, même avec des centaines de stagiaires.",
+  "conformite": "Auto-hébergement en France possible : le choix le plus solide pour les données d'apprenants et la traçabilité Qualiopi.",
+  "alternatives": [
+   "360learning",
+   "teachizy",
+   "didask"
+  ],
+  "cas": [
+   "Héberger les parcours d'un organisme de formation sans coût par stagiaire",
+   "Assurer la traçabilité des formations réglementaires"
+  ]
+ },
+ {
+  "slug": "wooclap",
+  "name": "Wooclap",
+  "url": "https://www.wooclap.com/fr/",
+  "cat": "rh-formation",
+  "cats": [],
+  "editeur": "Wooclap",
+  "pays": "Belgique",
+  "prix": "Freemium",
+  "prixDetail": "Version gratuite limitée · à partir de ~7 €/mois",
+  "niveau": "Débutant",
+  "profils": [
+   "Formateur",
+   "RH"
+  ],
+  "tags": "wooclap quiz interactif formation participation sondage belgique europe",
+  "note": 4.4,
+  "resume": "Rendre une formation ou une réunion interactive : questions, sondages et nuages de mots depuis le téléphone des participants.",
+  "forces": [
+   "Éditeur belge, hébergement européen, interface en français",
+   "Transforme l'attention d'un groupe en 30 secondes",
+   "Génération de questions par IA à partir d'un support existant"
+  ],
+  "limites": [
+   "Version gratuite limitée en nombre de participants",
+   "Peu utile hors situation d'animation de groupe"
+  ],
+  "gain": "Le taux de participation en formation change du tout au tout, et l'évaluation est automatique.",
+  "conformite": "Éditeur européen : cadre RGPD favorable pour des données de participants.",
+  "alternatives": [
+   "genially"
+  ],
+  "cas": [
+   "Évaluer les acquis en fin de formation",
+   "Réveiller une réunion ou un séminaire",
+   "Recueillir l'avis des équipes de façon anonyme"
+  ]
+ },
+ {
+  "slug": "lucca",
+  "name": "Lucca",
+  "url": "https://www.lucca.fr/",
+  "cat": "rh-formation",
+  "cats": [
+   "finance-admin"
+  ],
+  "editeur": "Lucca",
+  "pays": "France",
+  "prix": "Payant",
+  "prixDetail": "Sur devis, par module et par salarié",
+  "niveau": "Intermédiaire",
+  "profils": [
+   "RH",
+   "Dirigeant"
+  ],
+  "tags": "lucca sirh france conges notes de frais entretiens paie rgpd",
+  "note": 4.4,
+  "resume": "Le SIRH français : congés, notes de frais, entretiens et dossiers du personnel, avec des automatisations qui suppriment la paperasse RH.",
+  "forces": [
+   "Éditeur français, hébergement en France : la donnée RH est la plus sensible de l'entreprise",
+   "Modules indépendants : on prend ce dont on a besoin",
+   "Automatise les tâches RH répétitives (validation, relances, préparation de paie)"
+  ],
+  "limites": [
+   "Facturation par module qui monte vite",
+   "Surdimensionné pour moins de 20 salariés"
+  ],
+  "gain": "Plusieurs jours par mois rendus au service RH sur les congés, les frais et les entretiens.",
+  "conformite": "Éditeur français, hébergement en France : le choix le plus simple à défendre pour des données RH.",
+  "alternatives": [
+   "payfit",
+   "taleez"
+  ],
+  "cas": [
+   "Dématérialiser les congés et les notes de frais",
+   "Structurer la campagne d'entretiens annuels",
+   "Fiabiliser la préparation de la paie"
+  ]
+ },
+ {
+  "slug": "taleez",
+  "name": "Taleez",
+  "url": "https://taleez.com/",
+  "cat": "rh-formation",
+  "cats": [],
+  "editeur": "Taleez",
+  "pays": "France",
+  "prix": "Payant",
+  "prixDetail": "À partir de ~59 €/mois",
+  "niveau": "Débutant",
+  "profils": [
+   "RH",
+   "Dirigeant"
+  ],
+  "tags": "taleez recrutement ats france multidiffusion candidatures tri ia",
+  "note": 4.2,
+  "resume": "Le logiciel de recrutement français : diffusion des offres, suivi des candidatures et tri assisté, sans usine à gaz.",
+  "forces": [
+   "Éditeur français, hébergement UE, tarif accessible aux PME",
+   "Multidiffusion des offres sur les jobboards en un clic",
+   "Suivi structuré des candidatures, avec réponses automatisées"
+  ],
+  "limites": [
+   "Fonctions d'analyse plus légères que les ATS internationaux",
+   "Périmètre France"
+  ],
+  "gain": "Un recrutement suivi proprement sans tableur ni candidature oubliée dans une boîte mail.",
+  "conformite": "Éditeur français. Attention : trier des candidatures par IA est un usage à risque au sens de l'AI Act — la décision doit rester humaine et documentée.",
+  "alternatives": [
+   "lucca",
+   "noota"
+  ],
+  "cas": [
+   "Diffuser une offre sur dix jobboards en une opération",
+   "Suivre les candidatures et répondre systématiquement",
+   "Structurer les entretiens de recrutement"
+  ]
+ },
+ {
+  "slug": "doctrine",
+  "name": "Doctrine",
+  "url": "https://www.doctrine.fr/",
+  "cat": "juridique-conformite",
+  "cats": [
+   "recherche-veille"
+  ],
+  "editeur": "Doctrine",
+  "pays": "France",
+  "prix": "Payant",
+  "prixDetail": "Sur devis, orienté professionnels du droit",
+  "niveau": "Intermédiaire",
+  "profils": [
+   "Dirigeant"
+  ],
+  "tags": "doctrine juridique jurisprudence recherche droit france ia avocat",
+  "note": 4.3,
+  "resume": "Le moteur de recherche juridique français : jurisprudence, textes et analyses, avec une IA qui synthétise les décisions.",
+  "forces": [
+   "Couverture de la jurisprudence française la plus complète",
+   "Synthèses IA qui font gagner un temps considérable en recherche",
+   "Sources vérifiables : chaque réponse renvoie à la décision"
+  ],
+  "limites": [
+   "Tarif conçu pour les cabinets d'avocats",
+   "Sans intérêt pour une entreprise sans besoin juridique récurrent"
+  ],
+  "gain": "Une recherche juridique de plusieurs heures ramenée à quelques minutes de lecture ciblée.",
+  "conformite": "Éditeur français, sources officielles. Ne remplace pas un avocat : c'est un outil de préparation.",
+  "alternatives": [
+   "predictice",
+   "perplexity"
+  ],
+  "cas": [
+   "Préparer un dossier contentieux avec les précédents pertinents",
+   "Vérifier l'état du droit sur une question précise"
+  ]
+ },
+ {
+  "slug": "predictice",
+  "name": "Predictice",
+  "url": "https://www.predictice.com/",
+  "cat": "juridique-conformite",
+  "cats": [],
+  "editeur": "Predictice",
+  "pays": "France",
+  "prix": "Payant",
+  "prixDetail": "Sur devis",
+  "niveau": "Intermédiaire",
+  "profils": [
+   "Dirigeant"
+  ],
+  "tags": "predictice juridique analyse decisions strategie contentieux france ia",
+  "note": 4.2,
+  "resume": "L'analyse juridique prédictive à la française : évaluer les chances de succès d'un contentieux à partir des décisions rendues.",
+  "forces": [
+   "Statistiques sur les décisions réellement rendues par juridiction",
+   "Aide à la décision avant d'engager une procédure coûteuse",
+   "Éditeur français"
+  ],
+  "limites": [
+   "Outil de professionnels du droit",
+   "Les statistiques ne sont pas une prédiction : à manier avec prudence"
+  ],
+  "gain": "Une décision d'engager ou non un contentieux prise sur des données plutôt que sur une intuition.",
+  "conformite": "Éditeur français, données de justice publiques et pseudonymisées.",
+  "alternatives": [
+   "doctrine"
+  ],
+  "cas": [
+   "Évaluer l'opportunité d'un contentieux prud'homal ou commercial",
+   "Préparer une négociation avec des ordres de grandeur réels"
+  ]
+ },
+ {
+  "slug": "dastra",
+  "name": "Dastra",
+  "url": "https://www.dastra.eu/",
+  "cat": "juridique-conformite",
+  "cats": [],
+  "editeur": "Dastra",
+  "pays": "France",
+  "prix": "Freemium",
+  "prixDetail": "Version gratuite limitée · offres à partir de ~40 €/mois",
+  "niveau": "Intermédiaire",
+  "profils": [
+   "Dirigeant",
+   "RH",
+   "Ops"
+  ],
+  "tags": "dastra rgpd registre traitements conformite dpo france aipd cartographie",
+  "note": 4.3,
+  "resume": "La plateforme française de conformité RGPD : registre des traitements, analyses d'impact et pilotage de la conformité.",
+  "forces": [
+   "Éditeur français, conçu avec des DPO : les modèles correspondent aux attentes de la CNIL",
+   "Le registre des traitements se tient enfin à jour au lieu d'être un tableur oublié",
+   "Commence à couvrir les obligations liées à l'AI Act"
+  ],
+  "limites": [
+   "Suppose de savoir ce qu'est un traitement de données : un minimum d'accompagnement est utile",
+   "Version gratuite limitée"
+  ],
+  "gain": "Un registre RGPD présentable en cas de contrôle, tenu en continu plutôt que reconstitué dans l'urgence.",
+  "conformite": "Outil de conformité français : c'est précisément son objet. Complémentaire d'un registre de conformité AI Act.",
+  "alternatives": [
+   "leto",
+   "naaia"
+  ],
+  "cas": [
+   "Tenir le registre des traitements de l'entreprise",
+   "Documenter une analyse d'impact avant de déployer une IA",
+   "Préparer un contrôle CNIL"
+  ]
+ },
+ {
+  "slug": "leto",
+  "name": "Leto",
+  "url": "https://www.leto.legal/",
+  "cat": "juridique-conformite",
+  "cats": [],
+  "editeur": "Leto",
+  "pays": "France",
+  "prix": "Payant",
+  "prixDetail": "Sur devis, orienté PME et ETI",
+  "niveau": "Débutant",
+  "profils": [
+   "Dirigeant",
+   "RH"
+  ],
+  "tags": "leto rgpd conformite pme automatisation registre france dpo",
+  "note": 4.2,
+  "resume": "La conformité RGPD automatisée pour les PME : l'outil détecte les traitements et rédige la documentation à votre place.",
+  "forces": [
+   "Pensé pour des entreprises sans DPO à plein temps",
+   "Automatise la partie la plus pénible : la documentation",
+   "Éditeur français, accompagnement inclus"
+  ],
+  "limites": [
+   "Pas d'offre en libre-service",
+   "Ne remplace pas une décision juridique sur les cas sensibles"
+  ],
+  "gain": "Une mise en conformité RGPD menée en quelques semaines au lieu de rester un projet reporté d'année en année.",
+  "conformite": "Outil français dédié à la conformité RGPD.",
+  "alternatives": [
+   "dastra",
+   "naaia"
+  ],
+  "cas": [
+   "Mettre une PME en conformité RGPD sans recruter de DPO",
+   "Documenter les traitements avant un audit client ou un appel d'offres"
+  ]
+ },
+ {
+  "slug": "naaia",
+  "name": "Naaia",
+  "url": "https://www.naaia.ai/",
+  "cat": "juridique-conformite",
+  "cats": [],
+  "editeur": "Naaia",
+  "pays": "France",
+  "prix": "Payant",
+  "prixDetail": "Sur devis",
+  "niveau": "Expert",
+  "profils": [
+   "Dirigeant",
+   "Ops"
+  ],
+  "tags": "naaia ai act conformite gouvernance ia registre systemes france europe",
+  "note": 4.0,
+  "resume": "Une plateforme française de gouvernance de la conformité à l'AI Act : recenser ses systèmes d'IA, les classer par niveau de risque et documenter.",
+  "forces": [
+   "Répond spécifiquement à l'AI Act, là où la plupart des outils s'arrêtent au RGPD",
+   "Cartographie les IA réellement utilisées dans l'entreprise, souvent bien plus nombreuses que prévu",
+   "Éditeur français"
+  ],
+  "limites": [
+   "Orienté ETI et grands comptes",
+   "Sujet neuf : le marché et les pratiques évoluent vite"
+  ],
+  "gain": "Une réponse structurée à une obligation qui s'applique déjà, plutôt qu'un audit d'urgence quand la question tombe.",
+  "conformite": "L'article 4 de l'AI Act impose depuis le 2 février 2025 un niveau suffisant de maîtrise de l'IA pour les personnes qui l'utilisent. Un outil de gouvernance complète la formation, il ne la remplace pas.",
+  "alternatives": [
+   "dastra",
+   "leto"
+  ],
+  "cas": [
+   "Recenser tous les systèmes d'IA utilisés dans l'entreprise",
+   "Classer les usages par niveau de risque au sens de l'AI Act",
+   "Documenter la conformité pour un client ou un assureur"
+  ]
+ },
+ {
+  "slug": "vanta",
+  "name": "Vanta",
+  "url": "https://www.vanta.com/",
+  "cat": "juridique-conformite",
+  "cats": [],
+  "editeur": "Vanta",
+  "pays": "États-Unis",
+  "prix": "Payant",
+  "prixDetail": "À partir de plusieurs milliers d'euros par an",
+  "niveau": "Expert",
+  "profils": [
+   "Ops",
+   "Développeur"
+  ],
+  "tags": "vanta conformite securite iso 27001 soc2 audit automatisation controles",
+  "note": 4.3,
+  "resume": "L'automatisation des certifications de sécurité (ISO 27001, SOC 2) : les contrôles sont vérifiés en continu au lieu d'être reconstitués avant l'audit.",
+  "forces": [
+   "Réduit fortement le temps de préparation d'une certification",
+   "Surveillance continue des contrôles techniques",
+   "Devenu un standard exigé par les grands comptes"
+  ],
+  "limites": [
+   "Coût élevé, justifié seulement si une certification est réellement en jeu",
+   "Orienté entreprises technologiques"
+  ],
+  "gain": "Une certification ISO 27001 préparée en quelques mois au lieu d'un an.",
+  "conformite": "Outil de conformité sécurité. Ne couvre pas le RGPD français ni l'AI Act.",
+  "alternatives": [
+   "dastra"
+  ],
+  "cas": [
+   "Obtenir une certification exigée par un grand compte",
+   "Maintenir la conformité sécurité entre deux audits"
+  ]
+ },
+ {
+  "slug": "pennylane",
+  "name": "Pennylane",
+  "url": "https://www.pennylane.com/fr/",
+  "cat": "finance-admin",
+  "cats": [
+   "data-analyse"
+  ],
+  "editeur": "Pennylane",
+  "pays": "France",
+  "prix": "Payant",
+  "prixDetail": "À partir de ~29 €/mois selon l'offre et l'expert-comptable",
+  "niveau": "Débutant",
+  "profils": [
+   "Dirigeant",
+   "Ops"
+  ],
+  "tags": "pennylane comptabilite gestion facturation expert-comptable france pilotage",
+  "note": 4.5,
+  "resume": "La plateforme comptable et financière française : facturation, pré-comptabilité automatisée et pilotage en temps réel, en lien direct avec votre expert-comptable.",
+  "forces": [
+   "Éditeur français, connecté aux banques et à la plupart des experts-comptables",
+   "Reconnaissance automatique des factures : la saisie disparaît presque entièrement",
+   "Le dirigeant voit sa situation financière en continu, pas trois mois après"
+  ],
+  "limites": [
+   "Suppose que votre expert-comptable travaille avec l'outil",
+   "Prise en main de quelques semaines"
+  ],
+  "gain": "Plusieurs heures par mois de saisie et de classement supprimées, et une visibilité financière en temps réel.",
+  "conformite": "Éditeur français, hébergement en France. Anticipe l'obligation de facturation électronique.",
+  "alternatives": [
+   "qonto",
+   "indy"
+  ],
+  "cas": [
+   "Supprimer la saisie des factures d'achat",
+   "Suivre sa trésorerie et sa rentabilité en continu",
+   "Émettre des factures conformes à la réforme de la facturation électronique"
+  ]
+ },
+ {
+  "slug": "qonto",
+  "name": "Qonto",
+  "url": "https://qonto.com/fr",
+  "cat": "finance-admin",
+  "cats": [],
+  "editeur": "Qonto",
+  "pays": "France",
+  "prix": "Payant",
+  "prixDetail": "À partir de ~11 €/mois",
+  "niveau": "Débutant",
+  "profils": [
+   "Dirigeant",
+   "Ops"
+  ],
+  "tags": "qonto banque pro france facturation notes de frais comptabilite integration",
+  "note": 4.5,
+  "resume": "La banque professionnelle française qui intègre facturation, notes de frais et rapprochement comptable automatisé.",
+  "forces": [
+   "Ouverture de compte en quelques jours, interface remarquable",
+   "Rapprochement automatique des justificatifs et des transactions",
+   "Éditeur français, établissement agréé en France"
+  ],
+  "limites": [
+   "Offre de crédit limitée face à une banque traditionnelle",
+   "Support parfois lent sur les cas complexes"
+  ],
+  "gain": "La collecte des justificatifs et le rapprochement cessent d'être une corvée mensuelle.",
+  "conformite": "Établissement français soumis à la réglementation bancaire européenne.",
+  "alternatives": [
+   "pennylane",
+   "spendesk"
+  ],
+  "cas": [
+   "Gérer les comptes et les cartes d'une équipe",
+   "Collecter automatiquement les justificatifs de dépenses",
+   "Émettre et suivre les factures clients"
+  ]
+ },
+ {
+  "slug": "payfit",
+  "name": "PayFit",
+  "url": "https://payfit.com/fr/",
+  "cat": "finance-admin",
+  "cats": [
+   "rh-formation"
+  ],
+  "editeur": "PayFit",
+  "pays": "France",
+  "prix": "Payant",
+  "prixDetail": "À partir de ~30 €/mois + par salarié",
+  "niveau": "Débutant",
+  "profils": [
+   "RH",
+   "Dirigeant"
+  ],
+  "tags": "payfit paie bulletins france dsn conges rh automatisation",
+  "note": 4.3,
+  "resume": "La paie française automatisée : bulletins, déclarations sociales et congés gérés sans cabinet spécialisé.",
+  "forces": [
+   "Éditeur français, veille réglementaire intégrée : les évolutions de paie sont appliquées automatiquement",
+   "Interface accessible à un dirigeant non spécialiste",
+   "Congés, absences et notes de frais reliés directement à la paie"
+  ],
+  "limites": [
+   "Conventions collectives complexes parfois mal couvertes",
+   "Coût qui dépasse un cabinet comptable classique sur les très petits effectifs"
+  ],
+  "gain": "La paie passe d'une journée par mois à une validation en quelques minutes.",
+  "conformite": "Éditeur français, hébergement en France. Les données de paie sont parmi les plus sensibles : le cadre compte.",
+  "alternatives": [
+   "lucca",
+   "pennylane"
+  ],
+  "cas": [
+   "Internaliser la paie d'une PME sans expertise dédiée",
+   "Relier congés, absences et bulletins automatiquement"
+  ]
+ },
+ {
+  "slug": "spendesk",
+  "name": "Spendesk",
+  "url": "https://www.spendesk.com/fr/",
+  "cat": "finance-admin",
+  "cats": [],
+  "editeur": "Spendesk",
+  "pays": "France",
+  "prix": "Payant",
+  "prixDetail": "Sur devis, orienté PME et ETI",
+  "niveau": "Intermédiaire",
+  "profils": [
+   "Ops",
+   "Dirigeant"
+  ],
+  "tags": "spendesk depenses cartes virtuelles notes de frais validation france",
+  "note": 4.3,
+  "resume": "La gestion des dépenses d'entreprise : cartes virtuelles, circuits de validation et collecte automatique des justificatifs.",
+  "forces": [
+   "Chaque dépense est rattachée à un budget et à un justificatif, automatiquement",
+   "Cartes virtuelles qui suppriment l'avance de frais par les salariés",
+   "Éditeur français"
+  ],
+  "limites": [
+   "Orienté entreprises d'au moins 20-30 salariés",
+   "Coût significatif face à une simple carte bancaire professionnelle"
+  ],
+  "gain": "La chasse aux justificatifs en fin de mois disparaît complètement.",
+  "conformite": "Éditeur français, données financières hébergées en UE.",
+  "alternatives": [
+   "qonto",
+   "pennylane"
+  ],
+  "cas": [
+   "Encadrer les dépenses des équipes sans multiplier les cartes",
+   "Automatiser la collecte des justificatifs et la validation"
+  ]
+ },
+ {
+  "slug": "agicap",
+  "name": "Agicap",
+  "url": "https://agicap.com/fr/",
+  "cat": "finance-admin",
+  "cats": [
+   "data-analyse"
+  ],
+  "editeur": "Agicap",
+  "pays": "France",
+  "prix": "Payant",
+  "prixDetail": "Sur devis, à partir de quelques centaines d'euros par mois",
+  "niveau": "Intermédiaire",
+  "profils": [
+   "Dirigeant",
+   "Ops"
+  ],
+  "tags": "agicap tresorerie prevision cash flow france pilotage financier",
+  "note": 4.4,
+  "resume": "Le pilotage de trésorerie français : prévisions automatiques à partir de vos comptes bancaires et de votre facturation.",
+  "forces": [
+   "Prévision de trésorerie fiable et actualisée automatiquement",
+   "Se connecte aux banques et aux outils de facturation français",
+   "Éditeur français (Lyon), support en français"
+  ],
+  "limites": [
+   "Tarif conçu pour des PME structurées",
+   "Nécessite des données de facturation propres pour être fiable"
+  ],
+  "gain": "Une visibilité à trois mois sur la trésorerie, au lieu d'un tableur mis à jour dans l'urgence.",
+  "conformite": "Éditeur français, connexion bancaire encadrée par la DSP2.",
+  "alternatives": [
+   "pennylane",
+   "qonto"
+  ],
+  "cas": [
+   "Anticiper une tension de trésorerie avant qu'elle n'arrive",
+   "Piloter les encaissements et les relances clients"
+  ]
+ },
+ {
+  "slug": "indy",
+  "name": "Indy",
+  "url": "https://www.indy.fr/",
+  "cat": "finance-admin",
+  "cats": [],
+  "editeur": "Indy",
+  "pays": "France",
+  "prix": "Freemium",
+  "prixDetail": "Version gratuite · offres à partir de ~12 €/mois",
+  "niveau": "Débutant",
+  "profils": [
+   "Dirigeant"
+  ],
+  "tags": "indy comptabilite independant micro-entreprise urssaf declaration france",
+  "note": 4.3,
+  "resume": "La comptabilité des indépendants et micro-entrepreneurs, automatisée : catégorisation des transactions et déclarations préremplies.",
+  "forces": [
+   "Conçu pour les indépendants français : URSSAF, TVA, déclarations comptables incluses",
+   "Catégorisation automatique des transactions bancaires",
+   "Version gratuite réellement utilisable pour une micro-entreprise"
+  ],
+  "limites": [
+   "Réservé aux petites structures : ne convient pas à une société avec salariés",
+   "Accompagnement humain limité sur les situations atypiques"
+  ],
+  "gain": "La comptabilité d'un indépendant tient en une heure par mois.",
+  "conformite": "Éditeur français, hébergement en France.",
+  "alternatives": [
+   "pennylane"
+  ],
+  "cas": [
+   "Tenir la comptabilité d'une micro-entreprise sans expert-comptable",
+   "Préparer les déclarations URSSAF et TVA automatiquement"
+  ]
+ }
+]

@@ -1,0 +1,178 @@
+[
+ {
+  "slug": "assistants-ia",
+  "nom": "Assistants IA & LLM",
+  "emoji": "🤖",
+  "couleur": "#1A3CFF",
+  "court": "Assistants IA",
+  "desc": "Écrire, analyser, résumer, traduire, raisonner : les IA généralistes qui remplacent 80 % des usages du quotidien.",
+  "question": "Quelle IA généraliste choisir pour son entreprise ?",
+  "intro": "Un assistant IA généraliste est le premier outil à installer dans une entreprise, avant tous les autres : il couvre à lui seul la rédaction, la synthèse, la traduction, l'analyse de documents et la préparation de réunions. C'est aussi celui sur lequel une équipe se forme le plus vite, parce qu'on lui parle en français, sans rien apprendre de technique. La vraie question n'est donc pas lequel est « le plus intelligent » — ils se valent largement sur les usages d'entreprise — mais lequel s'intègre à vos outils et où partent vos données.",
+  "conseil": "Prenez celui qui vit là où travaillent vos équipes : Copilot si tout se passe dans Word et Teams, Gemini si vous êtes sur Google Workspace, ChatGPT ou Claude si vous voulez le meilleur en rédaction et en analyse, Mistral si les données doivent rester en Europe. Et payez la version Team plutôt que des comptes personnels : c'est elle qui exclut contractuellement l'entraînement sur vos échanges."
+ },
+ {
+  "slug": "recherche-veille",
+  "nom": "Recherche & veille",
+  "emoji": "🔎",
+  "couleur": "#0EA5E9",
+  "court": "Recherche & veille",
+  "desc": "Chercher, sourcer, surveiller un marché ou un concurrent sans y passer ses matinées.",
+  "question": "Quelle IA utiliser pour faire de la veille concurrentielle ?",
+  "intro": "Se documenter sérieusement prend du temps : ouvrir dix onglets, recouper, vérifier. Les outils de recherche augmentée par IA font ce travail en quelques minutes et — c'est le point décisif — citent leurs sources, ce qu'un chatbot classique ne fait pas. Pour un dirigeant, c'est ce qui transforme une préparation de rendez-vous, une étude de marché ou une veille réglementaire en tâche de vingt minutes.",
+  "conseil": "Ne confondez pas recherche et rédaction : ces outils sont excellents pour trouver et recouper, moyens pour écrire. Utilisez-les pour rassembler la matière, puis un assistant généraliste pour la mettre en forme. Et gardez le réflexe de cliquer sur au moins une source avant de reprendre un chiffre à votre compte."
+ },
+ {
+  "slug": "automatisation",
+  "nom": "Automatisation & agents IA",
+  "emoji": "⚙️",
+  "couleur": "#10B981",
+  "court": "Automatisation",
+  "desc": "Connecter vos outils entre eux et déléguer les tâches répétitives à des scénarios ou des agents autonomes.",
+  "question": "Quel outil pour automatiser les tâches répétitives de mon entreprise ?",
+  "intro": "C'est de loin la catégorie où le temps gagné est le plus mesurable. Une automatisation ne fatigue pas, ne part pas en congés et ne recopie pas une donnée de travers : elle transforme une tâche de vingt minutes par jour en zéro. Les plateformes ci-dessous connectent vos outils entre eux, appellent une IA au passage quand c'est utile, et fonctionnent sans écrire de code.",
+  "conseil": "Commencez par le processus le plus répétitif et le moins ambigu — pas le plus stratégique. Un premier scénario réussi convainc l'équipe ; un projet d'automatisation trop ambitieux échoue et disqualifie la démarche pour deux ans. Si vos scénarios manipulent des données clients, privilégiez n8n auto-hébergé : les données ne transitent alors par aucun tiers."
+ },
+ {
+  "slug": "reunions-notes",
+  "nom": "Réunions, notes & transcription",
+  "emoji": "🎙️",
+  "couleur": "#8B5CF6",
+  "court": "Réunions & notes",
+  "desc": "Enregistrer, transcrire et transformer une réunion en compte rendu et en actions, automatiquement.",
+  "question": "Quelle IA pour faire un compte rendu de réunion automatique ?",
+  "intro": "Personne n'aime rédiger un compte rendu, et c'est pour cela qu'ils ne sont pas écrits. Ces outils rejoignent la visio, transcrivent, puis livrent un résumé structuré avec les décisions et les actions — en général avant que vous ayez raccroché. Sur une semaine chargée, c'est deux à trois heures récupérées, et surtout plus aucune décision perdue.",
+  "conseil": "Une obligation avant tout : prévenez les participants que la réunion est enregistrée, c'est requis par le RGPD et cela évite un malaise. Fixez aussi une durée de conservation : un an d'enregistrements de réunions constitue une base de données sensible dont personne ne s'occupe. Si vos réunions abordent des dossiers clients, choisissez un éditeur européen."
+ },
+ {
+  "slug": "redaction-contenu",
+  "nom": "Rédaction & contenu marketing",
+  "emoji": "✍️",
+  "couleur": "#F59E0B",
+  "court": "Rédaction & contenu",
+  "desc": "Produire et programmer des contenus (articles, posts, newsletters) sans y perdre votre voix.",
+  "question": "Quelle IA pour rédiger des contenus marketing ?",
+  "intro": "Produire du contenu régulièrement est un problème de temps, pas d'idées. L'IA ne remplace pas votre expertise — elle vous évite la page blanche, décline un contenu en dix formats et tient le rythme de publication que vous ne tenez pas. Le piège est connu : une IA laissée seule produit du texte lisse et interchangeable, qui ne convainc personne et que Google ne récompense plus.",
+  "conseil": "La règle qui fonctionne : vous apportez l'expérience terrain et les exemples concrets, l'IA apporte la structure et la vitesse. Donnez-lui vos notes, vos cas clients, votre façon de parler — pas un sujet vague. Un contenu qui raconte quelque chose que vous seul savez sera toujours au-dessus, quel que soit l'outil."
+ },
+ {
+  "slug": "seo-visibilite",
+  "nom": "SEO & visibilité",
+  "emoji": "📈",
+  "couleur": "#EF4444",
+  "court": "SEO & visibilité",
+  "desc": "Être trouvé sur Google et cité par les IA : mots-clés, contenu, suivi de positions.",
+  "question": "Quels outils IA pour améliorer son référencement ?",
+  "intro": "Être trouvé sur Google reste le canal d'acquisition le moins cher à long terme, et une nouvelle question s'y ajoute : être cité par ChatGPT, Perplexity et Gemini quand un prospect leur demande un prestataire. Les deux se préparent avec les mêmes outils — comprendre ce que cherchent vos clients, y répondre mieux que les autres, et vérifier que vos pages sont techniquement lisibles.",
+  "conseil": "Commencez par Google Search Console, qui est gratuit et vous dira sur quelles requêtes vous apparaissez déjà sans le savoir : les gains les plus rapides sont presque toujours là. N'investissez dans un outil à 100 €/mois que si vous publiez réellement. Et retenez ceci pour les IA : elles n'exécutent pas le JavaScript — un contenu affiché par script leur est totalement invisible."
+ },
+ {
+  "slug": "prospection-vente",
+  "nom": "Prospection, vente & CRM",
+  "emoji": "💼",
+  "couleur": "#0891B2",
+  "court": "Prospection & vente",
+  "desc": "Trouver les bons prospects, personnaliser les messages et piloter le pipeline commercial.",
+  "question": "Quelle IA pour prospecter et trouver des clients ?",
+  "intro": "La prospection est le domaine où l'IA a le plus changé les pratiques, en bien comme en mal. En bien : identifier les bonnes entreprises, retrouver le bon interlocuteur, personnaliser un message à partir d'une information réelle. En mal : l'envoi massif de messages génériques, qui a fait chuter les taux de réponse de tout le monde. Les outils ci-dessous servent les deux usages — c'est la méthode qui fait la différence.",
+  "conseil": "Ciblez moins et mieux : cent entreprises réellement qualifiées valent mieux que deux mille contacts achetés. Vérifiez surtout l'origine de vos données — c'est le premier point qu'un contrôle CNIL examine. Une base française constituée légalement, ou un enrichissement sans stockage de données personnelles, vous met à l'abri là où un fichier acheté vous expose."
+ },
+ {
+  "slug": "relation-client",
+  "nom": "Relation client & support",
+  "emoji": "💬",
+  "couleur": "#14B8A6",
+  "court": "Relation client",
+  "desc": "Répondre plus vite aux clients : chatbots, tri des demandes, réponses assistées.",
+  "question": "Quel chatbot IA installer sur son site pour ses clients ?",
+  "intro": "Un client qui attend une réponse trois jours est un client qui doute. Chatbots et outils de support IA absorbent les demandes répétitives — horaires, suivi de commande, questions sur l'offre — qui représentent souvent la moitié du volume, et laissent à vos équipes les demandes qui méritent un humain. Bien réglés, ils font gagner du temps sans dégrader l'expérience ; mal réglés, ils font fuir.",
+  "conseil": "Le facteur de réussite n'est pas l'outil mais votre base de connaissances : un chatbot ne peut répondre qu'à partir de ce que vous lui donnez. Prévoyez toujours une sortie claire vers un humain, et annoncez franchement que l'interlocuteur est une IA — l'AI Act l'impose et les clients le pardonnent bien mieux que la découverte tardive."
+ },
+ {
+  "slug": "images-design",
+  "nom": "Images & design",
+  "emoji": "🎨",
+  "couleur": "#EC4899",
+  "court": "Images & design",
+  "desc": "Créer visuels, illustrations, retouches et supports de marque sans studio graphique.",
+  "question": "Quelle IA pour générer des images professionnelles ?",
+  "intro": "Générer une image professionnelle coûte aujourd'hui quelques secondes, ce qui change surtout la vie des entreprises qui n'avaient pas de budget graphiste. Visuels de publication, illustrations, photos produits détourées, schémas explicatifs : tout ce qui bloquait une communication faute de moyens se débloque. La limite est ailleurs — dans la cohérence de marque et dans les droits d'usage.",
+  "conseil": "Deux précautions valent d'être prises. D'abord la cohérence : définissez un style et tenez-le, sinon vos visuels donneront l'impression de venir de cinq entreprises différentes. Ensuite les droits : vérifiez que votre offre autorise l'usage commercial, et ne générez jamais l'image d'une personne réelle sans son accord écrit."
+ },
+ {
+  "slug": "video-audio",
+  "nom": "Vidéo, audio & voix",
+  "emoji": "🎬",
+  "couleur": "#F43F5E",
+  "court": "Vidéo & audio",
+  "desc": "Monter, sous-titrer, doubler, générer des vidéos et des voix de qualité diffusable.",
+  "question": "Quelle IA pour créer ou monter une vidéo ?",
+  "intro": "La vidéo est le format qui convertit le mieux et celui que les entreprises produisent le moins, faute de temps et de matériel. Sous-titrage automatique, montage par le texte, voix de synthèse, avatars, découpage d'un webinaire en extraits : chacune de ces briques supprime une étape qui prenait des heures. Une formation ou une communication interne se produit désormais sans studio.",
+  "conseil": "Deux obligations à connaître : cloner une voix ou créer l'avatar d'une personne exige son consentement écrit, et l'AI Act impose d'indiquer qu'un contenu est généré par IA. Sur le fond, réservez la vidéo générée aux contenus où l'incarnation importe peu — pour parler de vous, votre visage restera toujours plus convaincant qu'un avatar."
+ },
+ {
+  "slug": "presentations-documents",
+  "nom": "Présentations & documents",
+  "emoji": "📊",
+  "couleur": "#6366F1",
+  "court": "Présentations & docs",
+  "desc": "Transformer des notes en slides, rapports, propositions commerciales et documents signés.",
+  "question": "Quelle IA pour créer une présentation PowerPoint ?",
+  "intro": "Une présentation client, une proposition commerciale, un support de formation : trois documents que tout le monde produit et que personne n'aime mettre en forme. L'IA fait aujourd'hui la structure et la mise en page en quelques minutes, ce qui déplace votre temps là où il compte — le fond, l'argumentation, les chiffres. S'y ajoutent la signature électronique et le suivi de lecture, qui accélèrent les cycles de vente.",
+  "conseil": "Attention à un piège fréquent : un support généré est beau, pas forcément juste. Relisez systématiquement les chiffres et les affirmations avant d'envoyer. Pour tout document engageant l'entreprise, préférez un prestataire de signature électronique qualifié en France : la valeur juridique n'est pas la même."
+ },
+ {
+  "slug": "sites-apps-nocode",
+  "nom": "Sites, apps & no-code",
+  "emoji": "🌐",
+  "couleur": "#3B82F6",
+  "court": "Sites & no-code",
+  "desc": "Construire un site, une appli interne ou un outil métier sans équipe de développement.",
+  "question": "Quelle IA pour créer un site internet ou une application ?",
+  "intro": "Créer un site vitrine ou un outil interne ne demande plus une agence ni trois mois. On décrit ce qu'on veut, l'IA construit, et l'on itère jusqu'au résultat. Pour une TPE-PME, cela débloque surtout les petits outils métier — suivi de dossiers, portail client, formulaire relié à un tableur — qui coûtaient trop cher pour être développés et qui vivotaient dans des tableurs.",
+  "conseil": "Une application générée en une soirée n'est pas pour autant prête à recevoir des données clients : faites vérifier la sécurité et les accès avant toute mise en production réelle. Pour un site vitrine, vérifiez aussi où il est hébergé et si vous pourrez le récupérer — la dépendance à une plateforme se paie au moment où l'on veut partir."
+ },
+ {
+  "slug": "data-analyse",
+  "nom": "Data, analyse & tableaux de bord",
+  "emoji": "📉",
+  "couleur": "#7C3AED",
+  "court": "Data & analyse",
+  "desc": "Faire parler vos fichiers, vos exports comptables et vos bases de données.",
+  "question": "Quelle IA pour analyser des données et faire des tableaux de bord ?",
+  "intro": "La plupart des entreprises ont leurs chiffres, éparpillés dans un logiciel de gestion, un CRM et six tableurs. Les outils ci-dessous font deux choses : interroger ces données en français, sans tableau croisé dynamique, et construire un tableau de bord qui se met à jour tout seul. Le gain n'est pas seulement du temps — c'est de prendre ses décisions sur des chiffres partagés plutôt que sur trois exports qui se contredisent.",
+  "conseil": "Avant d'acheter un outil décisionnel, vérifiez la qualité de vos données : un tableau de bord sur des données fausses produit des décisions fausses, plus vite. Et si vos fichiers contiennent des données clients, anonymisez-les avant de les déposer dans un service hébergé hors d'Europe — ou choisissez une solution auto-hébergée."
+ },
+ {
+  "slug": "rh-formation",
+  "nom": "RH, recrutement & formation",
+  "emoji": "👥",
+  "couleur": "#F97316",
+  "court": "RH & formation",
+  "desc": "Recruter, intégrer, former et faire monter vos équipes en compétences.",
+  "question": "Quelle IA utiliser pour les RH et le recrutement ?",
+  "intro": "Recruter, intégrer, former, faire monter en compétences : autant de processus lourds en administratif et pauvres en outils dans les PME. L'IA y apporte des gains très concrets — tri et suivi des candidatures, entretiens documentés, modules de formation produits en interne à partir de la documentation existante, savoir-faire capitalisé avant un départ.",
+  "conseil": "C'est aussi le domaine le plus encadré. L'AI Act classe le tri automatisé de candidatures parmi les usages à haut risque : la décision doit rester humaine, tracée et explicable. Côté données, la donnée RH est la plus sensible de l'entreprise — un éditeur français hébergeant en France vous évite bien des discussions avec le CSE et le DPO."
+ },
+ {
+  "slug": "juridique-conformite",
+  "nom": "Juridique, conformité & données",
+  "emoji": "🔐",
+  "couleur": "#475569",
+  "court": "Juridique & conformité",
+  "desc": "Analyser des contrats, protéger vos données et rester conforme au RGPD et à l'AI Act.",
+  "question": "Quelle IA peut-on utiliser sans risque pour des données confidentielles ?",
+  "intro": "Deux sujets se sont imposés en même temps : maîtriser où partent les données quand une équipe utilise l'IA, et se mettre en règle avec l'AI Act, dont l'article 4 s'applique depuis le 2 février 2025. Les outils ci-dessous couvrent les deux versants — analyser des contrats et de la jurisprudence d'un côté, tenir un registre RGPD et une cartographie des systèmes d'IA de l'autre.",
+  "conseil": "Le premier réflexe ne coûte rien : recensez les IA réellement utilisées dans l'entreprise. Elles sont presque toujours plus nombreuses que ce que la direction imagine, parce que les salariés s'équipent seuls. Ensuite seulement viennent l'outillage et la formation — et c'est la formation qui répond à l'article 4, pas le logiciel."
+ },
+ {
+  "slug": "finance-admin",
+  "nom": "Finance, compta & administratif",
+  "emoji": "🧾",
+  "couleur": "#059669",
+  "court": "Finance & admin",
+  "desc": "Factures, notes de frais, trésorerie, devis : la paperasse qui s'automatise.",
+  "question": "Quelle IA pour automatiser sa comptabilité et sa facturation ?",
+  "intro": "Factures, notes de frais, relances, déclarations : la paperasse est le poste où une TPE-PME perd le plus d'heures sans aucune valeur ajoutée. La reconnaissance automatique de documents et les connexions bancaires ont fait disparaître l'essentiel de la saisie. Le bénéfice se voit ailleurs aussi : une situation financière connue en temps réel, au lieu d'un bilan découvert trois mois plus tard.",
+  "conseil": "L'écosystème français est ici nettement supérieur aux alternatives internationales, parce qu'il intègre nos obligations : URSSAF, TVA, DSN, et la réforme de la facturation électronique. Choisissez surtout un outil compatible avec votre expert-comptable : un logiciel qu'il refuse d'utiliser vous fera perdre le temps qu'il devait vous faire gagner."
+ }
+]

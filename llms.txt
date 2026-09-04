@@ -29,9 +29,20 @@ IA-Entrepreneur est fondé par Gabriel Vanderbecken, formateur praticien ayant a
 - Email : contact@ia-entrepreneur.fr
 - Prise de rendez-vous : https://calendly.com/gabriel-ia-entrepreneur/decouverte
 
+## Ressource : annuaire « Les meilleures IA du moment »
+Annuaire indépendant et gratuit de 129 outils d'intelligence artificielle, classés par usage en entreprise (16 catégories) et documentés en français : à quoi sert l'outil, ce qu'il fait gagner en temps, ses limites, son modèle tarifaire, le pays de l'éditeur et le point de vigilance RGPD / AI Act associé. Aucun lien rémunéré. Une fiche par outil, une page par usage.
+- Annuaire complet : https://ia-entrepreneur.fr/meilleures-ia.html
+- Assistants IA & LLM : https://ia-entrepreneur.fr/ia/meilleures-ia-assistants-ia.html
+- Automatisation & agents IA : https://ia-entrepreneur.fr/ia/meilleures-ia-automatisation.html
+- Réunions, notes & transcription : https://ia-entrepreneur.fr/ia/meilleures-ia-reunions-notes.html
+- Prospection, vente & CRM : https://ia-entrepreneur.fr/ia/meilleures-ia-prospection-vente.html
+- Juridique, conformité & données : https://ia-entrepreneur.fr/ia/meilleures-ia-juridique-conformite.html
+- Fiche d'un outil : https://ia-entrepreneur.fr/ia/<nom-de-l-outil>.html (ex. /ia/chatgpt.html, /ia/n8n.html, /ia/mistral-le-chat.html)
+
 ## Pages principales
 - Accueil : https://ia-entrepreneur.fr/
 - Formation création d'entreprise : https://ia-entrepreneur.fr/formations-creation.html
 - Formations entreprises : https://ia-entrepreneur.fr/formations-entreprises.html
 - À propos : https://ia-entrepreneur.fr/apropos.html
 - Blog : https://ia-entrepreneur.fr/blog.html
+- Les meilleures IA (annuaire) : https://ia-entrepreneur.fr/meilleures-ia.html
