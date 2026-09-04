@@ -179,6 +179,25 @@ def valeurs(montants):
     return sorted({v for v in (valeur(m) for m in montants) if v is not None})
 
 
+def prix_entree(montants):
+    """Le plus petit montant reellement facture d'une grille.
+
+    C'est la seule valeur qui alimente `prixDetail` (« a partir de ~X »), et la
+    seule stable : les paliers superieurs bougent au gre des curseurs de volume
+    et des promotions sans qu'aucun prix n'ait change.
+    """
+    reels = [v for v in valeurs(montants) if v >= 1]
+    return reels[0] if reels else None
+
+
+def ecart_significatif(avant, apres, tolerance=0.12):
+    """Deux grilles different-elles vraiment ? Tolerance sur le prix d'entree."""
+    a, b = prix_entree(avant), prix_entree(apres)
+    if a is None or b is None:
+        return a != b
+    return abs(a - b) / max(a, b) > tolerance
+
+
 def montants_de(html):
     html = re.sub(r'(?is)<(script|style)[^>]*>.*?</\1>', ' ', html)
     texte = re.sub(r'\s+', ' ', re.sub(r'<[^>]+>', ' ', html))
@@ -283,16 +302,11 @@ def rapport():
         if not x['montants']:
             non_lisibles.append(x)
         elif (comparable and avant and avant.get('montants')
-              and valeurs(avant['montants']) != valeurs(x['montants'])):
-            # Une page de tarification bouge d'un montant d'un jour a l'autre
-            # (test A/B, promotion, bloc dynamique) : on ne signale qu'a partir
-            # de deux differences, seuil ou un vrai changement de grille se voit.
-            av, ap = valeurs(avant['montants']), valeurs(x['montants'])
-            diff = len([v for v in ap if v not in av]) + len([v for v in av if v not in ap])
-            if diff < 2:
-                continue
+              and ecart_significatif(avant['montants'], x['montants'])):
             grilles_modifiees.append({
                 **x,
+                'entree_avant': prix_entree(avant['montants']),
+                'entree_apres': prix_entree(x['montants']),
                 'avant': avant['montants'],
                 'apparus': [m for m in x['montants'] if m not in avant['montants']][:8],
                 'disparus': [m for m in avant['montants'] if m not in x['montants']][:8],
@@ -365,7 +379,8 @@ def afficher(r):
         print(f"⚠️  {len(r['tarifs_grilles_modifiees'])} grille(s) modifiée(s) depuis le dernier passage "
               "— à répercuter dans data/ia-tools.json :")
         for x in r['tarifs_grilles_modifiees']:
-            print(f"   · {x['nom']:22} {x['source']}")
+            print(f"   · {x['nom']:22} prix d'entrée {x['entree_avant']} → {x['entree_apres']}")
+            print(f"     {x['source']}")
             if x['apparus']:
                 print(f"     nouveaux montants : {', '.join(x['apparus'])}")
             if x['disparus']:
@@ -406,7 +421,8 @@ def markdown(r):
         l.append(f"### {len(r['tarifs_grilles_modifiees'])} grille(s) tarifaire(s) modifiée(s)")
         l.append("Montants extraits sans contexte : ouvrir la page avant de corriger `prixDetail`.")
         for x in r['tarifs_grilles_modifiees']:
-            l.append(f"- **{x['nom']}** — {x['source']}")
+            l.append(f"- **{x['nom']}** — prix d'entrée {x['entree_avant']} → "
+                     f"**{x['entree_apres']}** — {x['source']}")
             if x['apparus']:
                 l.append(f"  - apparus : {', '.join(x['apparus'])}")
             if x['disparus']:
