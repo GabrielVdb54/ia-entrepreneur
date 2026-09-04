@@ -32,3 +32,24 @@ Static marketing/blog site for **IA-Entrepreneur** (ia-entrepreneur.fr), a Quali
 - When adding/editing a page, match the existing pattern: inline `<style>` block with the same CSS variable names, GA4 snippet (`G-SZG9XPNNNC`), canonical/OG/Twitter meta tags, and JSON-LD where applicable (see `blog/business-plan-guide-complet-2026.html` as a reference article, or `index.html` for a landing page).
 - After adding a blog article manually (rare — normally n8n does this), run `python3 generate_blog.py` to refresh `blog.html`, and update `sitemap.xml` to keep it consistent with the git-log automation pattern (`auto: carte blog ...` + `auto: sitemap ...`).
 - Don't add a JS framework, bundler, or shared templating system unless explicitly asked — the whole site intentionally has zero build step.
+
+## Sending email on behalf of this project
+
+Emails about IA-Entrepreneur should come from `gabriel@ia-entrepreneur.fr`, not
+from `gabriel@clindit.com` (the parent company's address, wrong on anything
+IA-Entrepreneur-branded: trainers, prospects, clients, partners).
+
+**This is currently not possible, so ask Gabriel before sending.** The Gmail
+connector sends from the connected account's default send-as address and exposes
+no `from` parameter, and `gabriel@ia-entrepreneur.fr` is a separate Google mailbox
+(not an alias of the Clindit one). SendGrid can set the sender explicitly, but as
+of 2026-09-04 only `clindit.com` is domain-authenticated there — `ia-entrepreneur.fr`
+is not, and no single sender is verified, so it rejects that address with a 403.
+Fixing it would mean authenticating the domain in SendGrid (3 CNAME records);
+Gabriel has chosen not to, for now.
+
+So: never send an IA-Entrepreneur email on the assumption it will look right.
+Say which address it would actually leave from, and let Gabriel decide.
+
+To check what an already-sent message used: `get_message` with
+`messageFormat: "METADATA_ONLY"` returns the `sender` field.
