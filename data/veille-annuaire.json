@@ -1,5 +1,6 @@
 {
  "date": "2026-09-04",
+ "environnement": "ci",
  "liens": [
   {
    "slug": "chatgpt",
@@ -56,7 +57,7 @@
    "nom": "NotebookLM",
    "url": "https://notebooklm.google.com/",
    "statut": 200,
-   "final": "https://accounts.google.com/v3/signin/identifier?continue=https://notebook.google.com/login?continue%3Dhttps://notebook.google.com/&followup=https://notebook.google.com/login?continue%3Dhttps://notebook.google.com/&osid=1&passive=1209600&flowName=GlifWebSignIn&flowEntry=ServiceLogin&dsh=S-1458467188:1788516650071348",
+   "final": "https://accounts.google.com/v3/signin/identifier?continue=https://notebook.google.com/login?continue%3Dhttps://notebook.google.com/&followup=https://notebook.google.com/login?continue%3Dhttps://notebook.google.com/&osid=1&passive=1209600&flowName=GlifWebSignIn&flowEntry=ServiceLogin&dsh=S36287696:1788516907944986",
    "titre": "",
    "protege": false,
    "redirige": false
@@ -1511,10 +1512,8 @@
   {
    "slug": "crewai",
    "nom": "CrewAI",
-   "source": "https://www.crewai.com/pricing",
-   "montants": [
-    "$20"
-   ]
+   "source": null,
+   "montants": []
   },
   {
    "slug": "fathom",
@@ -1663,7 +1662,6 @@
    "nom": "Semrush",
    "source": "https://www.semrush.com/pricing",
    "montants": [
-    "$0",
     "$10",
     "$117",
     "$139",
@@ -1909,11 +1907,9 @@
    "nom": "Brevo",
    "source": "https://www.brevo.com/pricing",
    "montants": [
-    "$16",
-    "$166",
-    "$167",
-    "$168",
-    "$169"
+    "$15",
+    "$160",
+    "$161"
    ]
   },
   {
@@ -1953,6 +1949,7 @@
    "montants": [
     "$0.99",
     "$132",
+    "$19",
     "$29",
     "$85",
     "$99"
