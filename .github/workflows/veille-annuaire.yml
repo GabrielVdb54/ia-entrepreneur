@@ -1,0 +1,69 @@
+# Veille mensuelle de l'annuaire « Les meilleures IA du moment ».
+#
+# Le 1er de chaque mois, relance veille_annuaire.py : liens des éditeurs,
+# grilles tarifaires, couverture face au catalogue concurrent. S'il y a
+# quelque chose à traiter, une issue est ouverte avec le détail ; sinon rien,
+# à part la mise à jour de l'état de référence.
+#
+# Aucune dépendance : le script n'utilise que la bibliothèque standard.
+# Lançable à la main depuis l'onglet Actions (« Run workflow »).
+
+name: Veille annuaire IA
+
+on:
+  schedule:
+    - cron: '0 7 1 * *'   # 1er du mois, 7h UTC (8h ou 9h à Paris selon la saison)
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  issues: write
+
+jobs:
+  veille:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Lancer la veille
+        id: veille
+        run: |
+          set +e
+          python3 veille_annuaire.py --markdown --code-sortie > rapport.md
+          code=$?
+          set -e
+          cat rapport.md
+          if [ "$code" -eq 1 ]; then
+            echo "signalements=oui" >> "$GITHUB_OUTPUT"
+          else
+            echo "signalements=non" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Ouvrir une issue si nécessaire
+        if: steps.veille.outputs.signalements == 'oui'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh issue create \
+            --title "Veille annuaire — $(date +'%B %Y')" \
+            --body-file rapport.md \
+            --label "veille" || \
+          gh issue create \
+            --title "Veille annuaire — $(date +'%B %Y')" \
+            --body-file rapport.md
+
+      - name: Mémoriser l'état pour le mois prochain
+        run: |
+          rm -f rapport.md
+          if [ -n "$(git status --porcelain data/veille-annuaire.json)" ]; then
+            git config user.name  "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add data/veille-annuaire.json
+            git commit -m "veille annuaire : relevé $(date +'%Y-%m')"
+            git push
+          fi
