@@ -10,12 +10,13 @@
 .mobile-sticky-cta { display: none; }
 
 /* ════════════════════════════════════════════
-   900px — tablettes étroites
+   1080px — tablettes et petits portables
    On cache la nav et on montre le hamburger
-   dès 900px pour éviter le débordement (8 items).
+   dès 1080px pour éviter le débordement (la nav compte 8 entrées
+   depuis l'ajout de « Meilleures IA », plus deux boutons).
    Le hero-layout collapse aussi pour cohérence.
    ════════════════════════════════════════════ */
-@media (max-width: 900px) {
+@media (max-width: 1080px) {
   nav { display: none !important; }
   .hamburger { display: flex !important; margin-left: auto !important; }
 
@@ -410,4 +411,23 @@
     padding: 10px 0 !important;
     border-bottom: 1px solid rgba(10,15,44,0.06) !important;
   }
+}
+
+
+/* ════════════════════════════════════════════
+   ≥ 901px — nav dense
+   La nav desktop débordait déjà du conteneur avant l'ajout du lien
+   « Meilleures IA » (le débordement était simplement masqué par
+   overflow-x:hidden sur body). On retire de la barre les deux entrées
+   redondantes — e-mail et téléphone — qui restent accessibles dans le
+   menu mobile, le pied de page et la section contact, et on resserre
+   l'espacement sous 1300px.
+   ════════════════════════════════════════════ */
+@media (min-width: 901px) {
+  header nav a[href^="mailto:"],
+  header nav a[href^="tel:"] { display: none !important; }
+}
+@media (min-width: 901px) and (max-width: 1300px) {
+  header nav { gap: 2px !important; }
+  header nav a { padding: 6px 8px !important; font-size: 0.75rem !important; }
 }
