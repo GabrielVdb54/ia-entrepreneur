@@ -155,6 +155,30 @@ CHEMINS_TARIFS = ['/pricing', '/tarifs', '/fr/tarifs', '/fr/pricing', '/pricing/
 MONTANT = re.compile(r'(?:€\s?\d[\d.,]{0,6}|\$\s?\d[\d.,]{0,6}|\d[\d .,]{0,6}\s?€(?:\s?(?:HT|TTC))?)', re.I)
 
 
+def valeur(montant):
+    """« €19.50 », « 19,50€ », « $1,913 » → 19.5, 19.5, 1913.0.
+
+    La comparaison d'un mois sur l'autre porte sur les nombres et non sur les
+    symboles : une page de tarification sert des dollars à un serveur américain
+    et des euros à un visiteur français, sans que le prix ait bougé.
+    """
+    t = re.sub(r'[^\d.,]', '', montant)
+    if ',' in t and '.' in t:
+        t = t.replace(',', '')
+    elif re.search(r',\d{3}\b', t):
+        t = t.replace(',', '')
+    else:
+        t = t.replace(',', '.')
+    try:
+        return round(float(t), 2)
+    except ValueError:
+        return None
+
+
+def valeurs(montants):
+    return sorted({v for v in (valeur(m) for m in montants) if v is not None})
+
+
 def montants_de(html):
     html = re.sub(r'(?is)<(script|style)[^>]*>.*?</\1>', ' ', html)
     texte = re.sub(r'\s+', ' ', re.sub(r'<[^>]+>', ' ', html))
@@ -248,17 +272,23 @@ def rapport():
 
     tarifs = relever_tarifs(outils)
     tarifs_avant = {x['slug']: x for x in ancien.get('tarifs', [])}
+    # Les grilles ne sont comparables que d'un environnement a lui-meme : depuis
+    # un serveur americain, les memes pages servent des dollars et parfois une
+    # autre grille. Un changement d'environnement vaut donc nouveau point zero.
+    ici = 'ci' if os.environ.get('GITHUB_ACTIONS') else 'local'
+    comparable = ancien.get('environnement', ici) == ici
     grilles_modifiees, non_lisibles = [], []
     for x in tarifs:
         avant = tarifs_avant.get(x['slug'])
         if not x['montants']:
             non_lisibles.append(x)
-        elif avant and avant.get('montants') and avant['montants'] != x['montants']:
+        elif (comparable and avant and avant.get('montants')
+              and valeurs(avant['montants']) != valeurs(x['montants'])):
             # Une page de tarification bouge d'un montant d'un jour a l'autre
             # (test A/B, promotion, bloc dynamique) : on ne signale qu'a partir
             # de deux differences, seuil ou un vrai changement de grille se voit.
-            diff = (len([m for m in x['montants'] if m not in avant['montants']])
-                    + len([m for m in avant['montants'] if m not in x['montants']]))
+            av, ap = valeurs(avant['montants']), valeurs(x['montants'])
+            diff = len([v for v in ap if v not in av]) + len([v for v in av if v not in ap])
             if diff < 2:
                 continue
             grilles_modifiees.append({
@@ -282,6 +312,7 @@ def rapport():
         'bible_absents_chez_nous': sorted(nouveaux_chez_eux),
         'bible_ajouts_du_mois': inedits,
         'bible_retraits_du_mois': disparus_chez_eux,
+        'tarifs_comparables': comparable,
         'tarifs_lisibles': len(tarifs) - len(non_lisibles),
         'tarifs_total': len(tarifs),
         'tarifs_grilles_modifiees': grilles_modifiees,
@@ -290,7 +321,7 @@ def rapport():
                              'tarif': t['prixDetail']} for t in a_revoir],
     }
 
-    json.dump({'date': AUJOURD_HUI, 'liens': liens, 'tarifs': tarifs,
+    json.dump({'date': AUJOURD_HUI, 'environnement': ici, 'liens': liens, 'tarifs': tarifs,
                'bible': noms_bible or ancien.get('bible', []),
                'tarifs_verifies_le': saisie},
               open(ETAT, 'w', encoding='utf-8'), ensure_ascii=False, indent=1)
@@ -339,6 +370,9 @@ def afficher(r):
                 print(f"     nouveaux montants : {', '.join(x['apparus'])}")
             if x['disparus']:
                 print(f"     montants disparus : {', '.join(x['disparus'])}")
+    elif not r['tarifs_comparables']:
+        print("· Relevé de référence reconstruit depuis un autre environnement "
+              "(devise et grille différentes) : comparaison reprise au prochain passage.")
     else:
         print("✓ Aucune grille tarifaire modifiée depuis le dernier passage.")
 
