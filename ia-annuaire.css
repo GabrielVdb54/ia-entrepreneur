@@ -265,6 +265,7 @@ footer{
         margin-left: 0 !important;
         margin-top: 8px !important;
       }}
+    .nav-tel { display:flex; align-items:center; gap:5px; }
     .ia-hero { padding: 120px 0 40px; background: linear-gradient(180deg, var(--bg2), var(--bg)); }
     .ia-hero h1 { font-size: clamp(1.9rem, 4.4vw, 3rem); line-height: 1.15; letter-spacing: -0.02em; margin-bottom: 16px; }
     .ia-hero p.lead { font-size: 1.05rem; color: var(--muted); max-width: 720px; }
@@ -292,6 +293,7 @@ footer{
 
     .ia-grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(275px,1fr)); gap:16px; margin:26px 0 10px; }
     .ia-item { position:relative; display:flex; }
+    .ia-item[hidden] { display:none !important; }
     .ia-card { position:relative; flex:1; display:flex; flex-direction:column; gap:10px; padding:20px 46px 20px 20px; border:1px solid var(--border); border-left:4px solid var(--tool); border-radius:var(--radius); background:var(--bg); text-decoration:none; color:inherit; transition:transform .18s, box-shadow .18s, border-color .18s; }
     .ia-card:hover { transform:translateY(-3px); box-shadow:0 10px 30px rgba(10,15,44,0.10); }
     .ia-fav { position:absolute; top:10px; right:10px; z-index:2; width:32px; height:32px; border-radius:50%; border:0; background:transparent; color:var(--muted); font-size:1.15rem; line-height:1; cursor:pointer; font-family:inherit; transition:background .15s, color .15s, transform .15s; }

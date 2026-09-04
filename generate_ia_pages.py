@@ -68,7 +68,7 @@ KEEP = re.compile(
     r'^(\*|:root|html|body|a|img|h1|h2|h3|p|ul|li|'
     r'\.container|\.btn|\.btn-[a-z]+|\.gradient|'
     r'header|header\.scrolled|\.header-inner|\.header-inner nav|\.logo|\.logo span|'
-    r'nav|nav a|nav a:hover|\.nav-cta|\.nav-cta:hover|'
+    r'nav|nav a|nav a:hover|\.nav-cta|\.nav-cta:hover|\.nav-tel|'
     r'\.hamburger|\.hamburger span|\.hamburger\.open[^,]*|'
     r'\.mobile-menu|\.mobile-menu\.open|\.mobile-menu a|\.mobile-menu a:hover|'
     r'footer|\.footer-[a-z]+|\.footer-[a-z]+ [a-z:]+|\.footer-links a[^,]*|\.footer-linkedin[^,]*'
@@ -116,6 +116,7 @@ BASE_CSS = base_css()
 #  Styles propres à l'annuaire
 # ─────────────────────────────────────────────────────────────────────────────
 IA_CSS = """
+    .nav-tel { display:flex; align-items:center; gap:5px; }
     .ia-hero { padding: 120px 0 40px; background: linear-gradient(180deg, var(--bg2), var(--bg)); }
     .ia-hero h1 { font-size: clamp(1.9rem, 4.4vw, 3rem); line-height: 1.15; letter-spacing: -0.02em; margin-bottom: 16px; }
     .ia-hero p.lead { font-size: 1.05rem; color: var(--muted); max-width: 720px; }
@@ -143,6 +144,7 @@ IA_CSS = """
 
     .ia-grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(275px,1fr)); gap:16px; margin:26px 0 10px; }
     .ia-item { position:relative; display:flex; }
+    .ia-item[hidden] { display:none !important; }
     .ia-card { position:relative; flex:1; display:flex; flex-direction:column; gap:10px; padding:20px 46px 20px 20px; border:1px solid var(--border); border-left:4px solid var(--tool); border-radius:var(--radius); background:var(--bg); text-decoration:none; color:inherit; transition:transform .18s, box-shadow .18s, border-color .18s; }
     .ia-card:hover { transform:translateY(-3px); box-shadow:0 10px 30px rgba(10,15,44,0.10); }
     .ia-fav { position:absolute; top:10px; right:10px; z-index:2; width:32px; height:32px; border-radius:50%; border:0; background:transparent; color:var(--muted); font-size:1.15rem; line-height:1; cursor:pointer; font-family:inherit; transition:background .15s, color .15s, transform .15s; }
@@ -353,19 +355,34 @@ ANNUAIRE_JS = r"""/* ia-annuaire.js — genere par generate_ia_pages.py, ne pas 
 # ─────────────────────────────────────────────────────────────────────────────
 #  Entête / pied de page, repris à l'identique du reste du site
 # ─────────────────────────────────────────────────────────────────────────────
+# Barre du haut allégée (04/09/2026) : 4 liens, le téléphone et l'appel gratuit.
+# Blog, À propos, financement et e-mail vivent dans le menu mobile et le pied de
+# page — voir simplifier_nav.py pour le détail des arbitrages.
 NAV_ITEMS = [
-    ('/', 'Accueil'),
     ('/formations-entreprises.html', 'Formations IA'),
     ('/integrations-ia.html', 'Intégrations IA'),
     ('/meilleures-ia.html', 'Meilleures IA'),
-    ('/apropos.html', 'À propos'),
     ('/nos-formateurs.html', 'Nos formateurs'),
-    ('/blog.html', 'Blog'),
 ]
+
+MENU_MOBILE = NAV_ITEMS + [
+    ('/simulateur-financement-formation-ia.html', '💶 Financer ma formation'),
+    ('/blog.html', 'Blog'),
+    ('/apropos.html', 'À propos'),
+    ('mailto:contact@ia-entrepreneur.fr', '✉ Écrire un email'),
+    ('tel:+33614980713', '📞 06 14 98 07 13'),
+]
+
+TEL_SVG = ('<svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" '
+           'viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 '
+           '19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.362 '
+           '1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.338 '
+           '1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>')
+
 
 def header_html():
     nav = '\n'.join(f'        <a href="{u}">{t}</a>' for u, t in NAV_ITEMS)
-    mob = '\n'.join(f'    <a href="{u}">{t}</a>' for u, t in NAV_ITEMS)
+    mob = '\n'.join(f'    <a href="{u}">{t}</a>' for u, t in MENU_MOBILE)
     return f"""  <header id="header">
     <div class="container">
       <div class="header-inner">
@@ -375,7 +392,7 @@ def header_html():
         </a>
         <nav>
 {nav}
-        <a href="tel:+33614980713" style="display:flex;align-items:center;gap:5px;">06 14 98 07 13</a>
+        <a href="tel:+33614980713" class="nav-tel">{TEL_SVG}06 14 98 07 13</a>
         <a href="{CAL}" target="_blank" rel="noopener noreferrer" class="nav-cta">Appel gratuit</a>
       </nav>
         <button class="hamburger" id="hamburger" aria-label="Menu"><span></span><span></span><span></span></button>
@@ -383,11 +400,10 @@ def header_html():
     </div>
     <div class="mobile-menu" id="mobile-menu">
 {mob}
-    <a href="mailto:contact@ia-entrepreneur.fr">✉ Écrire un email</a>
-    <a href="tel:+33614980713">📞 06 14 98 07 13</a>
     <a href="{CAL}" target="_blank" rel="noopener noreferrer" style="background:var(--accent);color:#fff;text-align:center;border-radius:var(--radius);margin-top:8px;padding:14px;display:block;font-weight:700;">Réserver un appel gratuit</a>
   </div>
 </header>"""
+
 
 FOOTER_HTML = f"""  <footer>
     <div class="container">
@@ -823,23 +839,43 @@ def build_hub():
     }});
     var ordreInitial = cards.slice();
     var ALIAS = {{
-      'reunion': 'reunion compte rendu transcription note visio',
-      'client': 'client relation support chatbot prospection crm',
+      'reunion': 'reunion compte rendu transcription note visio entretien',
+      'client': 'client relation support chatbot prospection crm service',
       'prospect': 'prospection commercial vente crm lead client',
-      'facture': 'facture comptabilite finance devis administratif',
-      'video': 'video montage sous-titre audio avatar',
-      'image': 'image design visuel graphique photo',
-      'site': 'site web application no-code page',
+      'facture': 'facture comptabilite finance devis administratif tresorerie',
+      'video': 'video montage sous-titre audio avatar voix',
+      'image': 'image design visuel graphique photo illustration',
+      'site': 'site web application no-code page landing',
       'automatiser': 'automatisation workflow scenario agent tache repetitive',
-      'gratuit': 'gratuit freemium',
+      'linkedin': 'linkedin reseaux sociaux publication post personal branding prospection',
+      'post': 'post publication reseaux sociaux contenu redaction',
+      'poste': 'post publication reseaux sociaux contenu redaction',
       'rgpd': 'rgpd conformite donnees france europe souverainete confidentiel',
-      'email': 'email mail messagerie emailing newsletter',
-      'recrutement': 'recrutement rh candidat entretien'
+      'email': 'email mail messagerie emailing newsletter relance',
+      'recrutement': 'recrutement rh candidat entretien embauche',
+      'formation': 'formation elearning apprentissage pedagogie stagiaire',
+      'seo': 'seo referencement google visibilite mots-cles trafic',
+      'presentation': 'presentation slides powerpoint support diaporama',
+      'traduction': 'traduction traduire langue multilingue',
+      'juridique': 'juridique contrat droit conformite avocat'
     }};
-    // Mots vides francais : ils ne doivent jamais peser dans la recherche.
-    var STOP = ' de la le les du des un une mes mon ma pour avec sur dans que qui quoi est sont ai je nous vous mon notre plus comment quel quelle quels quelles ';
-    // Chaque mot de la requete devient un groupe d'alternatives (le mot + ses
-    // synonymes). Un outil est retenu s'il satisfait TOUS les groupes.
+
+    // Mots vides : articles, verbes de requete et vocabulaire de l'annuaire
+    // lui-meme. Sans eux, « je cherche la meilleure IA pour la prospection »
+    // ne conserverait aucun mot utile et ne renverrait rien.
+    var STOP = (' de des du la le les un une et ou a au aux en dans pour par sur avec sans que qui quoi ' +
+      'quel quelle quels quelles comment pourquoi est sont ete etre suis ai as ont avoir fait faire ' +
+      'je me moi mon ma mes tu te ton ta tes il elle on nous notre nos vous votre vos ils elles leur ' +
+      'ce cet cette ces son sa ses y plus tres bien tout tous toute toutes autre autres ' +
+      'cherche cherches cherchez chercher recherche rechercher trouve trouver veux voudrais aimerais ' +
+      'besoin aide utiliser servir prendre choisir conseil conseille recommande ' +
+      'meilleur meilleure meilleurs meilleures bon bonne top ' +
+      'ia intelligence artificielle outil outils logiciel logiciels solution solutions ' +
+      'application applications appli app plateforme service services truc machin ').replace(/\s+/g, ' ');
+
+    // Chaque mot utile de la requete devient un groupe : le mot lui-meme, puis
+    // ses synonymes metier. Un outil est classe selon le NOMBRE de groupes
+    // qu'il satisfait, ce qui permet de taper une phrase entiere.
     function groups(s) {{
       return norm(s).split(' ').filter(function (w) {{
         return w.length > 2 && STOP.indexOf(' ' + w + ' ') < 0;
@@ -868,33 +904,47 @@ def build_hub():
         return true;
       }});
 
-      // 2) recherche : les mots exacts d'abord. Les synonymes ne sont ouverts
-      //    que si la recherche exacte ne remonte presque rien — sans quoi un mot
-      //    comme « prospection » ramenerait la moitie de l'annuaire.
-      function match(c, avecSynonymes) {{
-        var hay = c._hay, score = 0;
-        var ok = terms.every(function (g) {{
+      // 2) recherche : chaque outil est note sur le nombre de mots de la
+      //    requete qu'il satisfait. On n'affiche que les meilleurs, en
+      //    desserrant d'un cran tant qu'il y a moins de trois resultats :
+      //    une phrase entiere donne ainsi les outils qui cochent le plus de
+      //    cases, sans jamais renvoyer une page vide.
+      function noter(c) {{
+        var hay = c._hay, score = 0, directs = 0, touches = 0;
+        terms.forEach(function (g) {{
           if (hay.indexOf(g[0]) >= 0) {{
             score += c._nom.indexOf(g[0]) === 0 ? 12 : 6;
-            if (c._cat.indexOf(g[0]) >= 0) score += 5;  // l'usage principal prime
-            return true;
-          }}
-          if (avecSynonymes && g.some(function (w) {{ return w.length > 2 && hay.indexOf(w) >= 0; }})) {{
+            if (c._cat.indexOf(g[0]) >= 0) score += 5;
+            directs++; touches++;
+          }} else if (g.some(function (w) {{ return w.length > 2 && hay.indexOf(w) >= 0; }})) {{
             score += 2;
-            return true;
+            touches++;
           }}
-          return false;
         }});
-        c._score = ok ? score + parseFloat(c.dataset.note) / 10 : 0;
-        return ok;
+        c._score = score + parseFloat(c.dataset.note) / 10;
+        // Le mot exact prime toujours sur le synonyme : sans cela, « prospection »
+        // remonterait tout ce qui parle de vente, de client ou de CRM.
+        c._rang = directs * 100 + touches;
+        return c._rang;
       }}
 
       var res = pool;
       if (terms.length) {{
-        res = pool.filter(function (c) {{ return match(c, false); }});
-        if (res.length < 5) res = pool.filter(function (c) {{ return match(c, true); }});
+        pool.forEach(noter);
+        // Rangs presents, du meilleur au moins bon : on descend d'un cran tant
+        // qu'il y a moins de trois resultats, sans jamais afficher une page vide.
+        var rangs = pool.map(function (c) {{ return c._rang; }})
+                        .filter(function (r) {{ return r > 0; }})
+                        .sort(function (a, b) {{ return b - a; }});
+        rangs = rangs.filter(function (r, i) {{ return rangs.indexOf(r) === i; }});
+        res = [];
+        for (var i = 0; i < rangs.length; i++) {{
+          res = pool.filter(function (c) {{ return c._rang >= rangs[i]; }});
+          if (res.length >= 3) break;
+        }}
         res.sort(function (a, b) {{
-          return b._score - a._score || a._nom.localeCompare(b._nom, 'fr');
+          return b._rang - a._rang || b._score - a._score
+                 || a._nom.localeCompare(b._nom, 'fr');
         }});
         res.forEach(function (c) {{ grid.appendChild(c); }});
       }} else if (ordreInitial) {{
