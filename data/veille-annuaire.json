@@ -25,9 +25,9 @@
    "slug": "gemini",
    "nom": "Gemini",
    "url": "https://gemini.google.com/",
-   "statut": 302,
-   "final": "https://www.google.com/sorry/index?continue=https://gemini.google.com/&q=EhAqAcsRgCuWs3mxpeBBdpXEGJOp6tQGIjBchjtjpP3pijZaD0rAbijwyU2B9LZw_Tba9Ee4e7B81ImOytxe1J_Pv6G68RuqWosyBz5qY25kclJaAUM",
-   "titre": "302 Moved",
+   "statut": 200,
+   "final": "https://gemini.google.com/",
+   "titre": "",
    "protege": false,
    "redirige": false
   },
@@ -36,8 +36,8 @@
    "nom": "Microsoft 365 Copilot",
    "url": "https://www.microsoft.com/microsoft-365/copilot",
    "statut": 200,
-   "final": "https://www.microsoft.com/fr-fr/microsoft-365/copilot",
-   "titre": "Your request has been blocked. This could be due to several reasons.",
+   "final": "https://www.microsoft.com/en-us/microsoft-365-copilot",
+   "titre": "Microsoft 365 Copilot | AI Productivity Tools for Work",
    "protege": false,
    "redirige": false
   },
@@ -56,7 +56,7 @@
    "nom": "NotebookLM",
    "url": "https://notebooklm.google.com/",
    "statut": 200,
-   "final": "https://accounts.google.com/v3/signin/identifier?continue=https://notebook.google.com/login?continue%3Dhttps://notebook.google.com/&followup=https://notebook.google.com/login?continue%3Dhttps://notebook.google.com/&osid=1&passive=1209600&flowName=GlifWebSignIn&flowEntry=ServiceLogin&dsh=S873218258:1788515470698554",
+   "final": "https://accounts.google.com/v3/signin/identifier?continue=https://notebook.google.com/login?continue%3Dhttps://notebook.google.com/&followup=https://notebook.google.com/login?continue%3Dhttps://notebook.google.com/&osid=1&passive=1209600&flowName=GlifWebSignIn&flowEntry=ServiceLogin&dsh=S-1458467188:1788516650071348",
    "titre": "",
    "protege": false,
    "redirige": false
@@ -125,10 +125,10 @@
    "slug": "genspark",
    "nom": "Genspark",
    "url": "https://www.genspark.ai/",
-   "statut": 403,
+   "statut": 200,
    "final": "https://www.genspark.ai/",
-   "titre": "Just a moment...",
-   "protege": true,
+   "titre": "Genspark - Votre Espace de Travail IA Tout-en-Un",
+   "protege": false,
    "redirige": false
   },
   {
@@ -176,8 +176,8 @@
    "nom": "Microsoft Power Automate",
    "url": "https://www.microsoft.com/power-platform/products/power-automate",
    "statut": 200,
-   "final": "https://www.microsoft.com/fr-fr/power-platform/products/power-automate",
-   "titre": "Power Automate : automatisation des flux de travail des processus métier | Microsoft Power Platform",
+   "final": "https://www.microsoft.com/en-us/power-platform/products/power-automate",
+   "titre": "Power Automate: Business Process Workflow Automation | Microsoft Power Platform",
    "protege": false,
    "redirige": false
   },
@@ -225,9 +225,9 @@
    "slug": "crewai",
    "nom": "CrewAI",
    "url": "https://www.crewai.com/",
-   "statut": 308,
-   "final": "https://www.crewai.com/",
-   "titre": "",
+   "statut": 200,
+   "final": "https://crewai.com/",
+   "titre": "CrewAI",
    "protege": false,
    "redirige": false
   },
@@ -355,9 +355,9 @@
    "slug": "blotato",
    "nom": "Blotato",
    "url": "https://blotato.com/",
-   "statut": 308,
-   "final": "https://blotato.com/",
-   "titre": "",
+   "statut": 200,
+   "final": "https://www.blotato.com/",
+   "titre": "Blotato | #1 Social Media APIs for AI Agents, ChatGPT, &amp; Claude",
    "protege": false,
    "redirige": false
   },
@@ -415,10 +415,10 @@
    "slug": "ubersuggest",
    "nom": "Ubersuggest",
    "url": "https://neilpatel.com/ubersuggest/",
-   "statut": 403,
+   "statut": 200,
    "final": "https://neilpatel.com/ubersuggest/",
-   "titre": "Just a moment...",
-   "protege": true,
+   "titre": "Ubersuggest: Free Keyword Research Tool - Neil Patel",
+   "protege": false,
    "redirige": false
   },
   {
@@ -645,9 +645,9 @@
    "slug": "midjourney",
    "nom": "Midjourney",
    "url": "https://www.midjourney.com/",
-   "statut": 0,
+   "statut": 403,
    "final": "https://www.midjourney.com/",
-   "titre": "",
+   "titre": "Just a moment...",
    "protege": true,
    "redirige": false
   },
@@ -665,9 +665,9 @@
    "slug": "gemini-image",
    "nom": "Gemini — Nano Banana",
    "url": "https://gemini.google.com/",
-   "statut": 302,
-   "final": "https://www.google.com/sorry/index?continue=https://gemini.google.com/&q=EhAqAcsRgCuWs3mxpeBBdpXEGJep6tQGIjAaGhqqgl1gmZzN12hb1cVqOc-jUIEgjrH4_RL_9AOgDiXB1PpqHZt7XqiCVIYoi4YyBz5qY25kclJaAUM",
-   "titre": "302 Moved",
+   "statut": 200,
+   "final": "https://gemini.google.com/",
+   "titre": "",
    "protege": false,
    "redirige": false
   },
@@ -1047,7 +1047,7 @@
    "url": "https://www.airtable.com/",
    "statut": 200,
    "final": "https://www.airtable.com/",
-   "titre": "Airtable: Build Enterprise-ready AI Workflows, Apps &amp; Agents | Airtable",
+   "titre": "",
    "protege": false,
    "redirige": false
   },
@@ -1066,8 +1066,8 @@
    "nom": "Microsoft Power BI",
    "url": "https://www.microsoft.com/power-platform/products/power-bi",
    "statut": 200,
-   "final": "https://www.microsoft.com/fr-fr/power-platform/products/power-bi",
-   "titre": "Power BI – Visualisation des données | Microsoft Power Platform",
+   "final": "https://www.microsoft.com/en-us/power-platform/products/power-bi",
+   "titre": "Power BI - Data Visualization | Microsoft Power Platform",
    "protege": false,
    "redirige": false
   },
@@ -1085,10 +1085,10 @@
    "slug": "julius-ai",
    "nom": "Julius AI",
    "url": "https://julius.ai/",
-   "statut": 403,
+   "statut": 200,
    "final": "https://julius.ai/",
-   "titre": "Just a moment...",
-   "protege": true,
+   "titre": "AI Tools for Excel, Presentations, Websites &amp; More | Julius AI",
+   "protege": false,
    "redirige": false
   },
   {
@@ -1185,10 +1185,10 @@
    "slug": "predictice",
    "nom": "Predictice",
    "url": "https://www.predictice.com/",
-   "statut": 403,
-   "final": "https://www.predictice.com/",
-   "titre": "Just a moment...",
-   "protege": true,
+   "statut": 200,
+   "final": "https://predictice.com/",
+   "titre": "Predictice propose plus de 60 millions de documents juridiques pour les professionnels du droit",
+   "protege": false,
    "redirige": false
   },
   {
@@ -1435,7 +1435,7 @@
   {
    "slug": "n8n",
    "nom": "n8n",
-   "source": "https://n8n.io/pricing/",
+   "source": "https://n8n.io/pricing",
    "montants": [
     "20€",
     "50€",
@@ -1511,8 +1511,10 @@
   {
    "slug": "crewai",
    "nom": "CrewAI",
-   "source": null,
-   "montants": []
+   "source": "https://www.crewai.com/pricing",
+   "montants": [
+    "$20"
+   ]
   },
   {
    "slug": "fathom",
@@ -1555,8 +1557,12 @@
   {
    "slug": "leexi",
    "nom": "Leexi",
-   "source": null,
-   "montants": []
+   "source": "https://www.leexi.ai/fr/tarifs",
+   "montants": [
+    "$12",
+    "$23",
+    "$39"
+   ]
   },
   {
    "slug": "otter",
@@ -1608,11 +1614,10 @@
    "nom": "Notion AI",
    "source": "https://www.notion.com/pricing",
    "montants": [
+    "$0",
     "$10",
-    "$8",
-    "€0",
-    "€19.50",
-    "€9.50"
+    "$20",
+    "$8"
    ]
   },
   {
@@ -1643,8 +1648,15 @@
   {
    "slug": "blotato",
    "nom": "Blotato",
-   "source": null,
-   "montants": []
+   "source": "https://blotato.com/pricing",
+   "montants": [
+    "$29",
+    "$30",
+    "$300",
+    "$48",
+    "$499",
+    "$97"
+   ]
   },
   {
    "slug": "semrush",
@@ -1683,11 +1695,11 @@
    "nom": "Surfer SEO",
    "source": "https://surferseo.com/pricing",
    "montants": [
-    "€120",
-    "€240",
-    "€324",
-    "€444",
-    "€720"
+    "$120",
+    "$240",
+    "$324",
+    "$444",
+    "$720"
    ]
   },
   {
@@ -1882,24 +1894,20 @@
    "nom": "Pipedrive",
    "source": "https://www.pipedrive.com/pricing",
    "montants": [
-    "13,33€",
-    "16€",
-    "32,50€",
-    "41€",
-    "€14",
-    "€168",
-    "€39",
-    "€468",
-    "€59",
-    "€708",
-    "€79",
-    "€948"
+    "$14",
+    "$168",
+    "$39",
+    "$468",
+    "$59",
+    "$708",
+    "$79",
+    "$948"
    ]
   },
   {
    "slug": "brevo",
    "nom": "Brevo",
-   "source": "https://www.brevo.com/pricing/",
+   "source": "https://www.brevo.com/pricing",
    "montants": [
     "$16",
     "$166",
@@ -2466,8 +2474,18 @@
   {
    "slug": "julius-ai",
    "nom": "Julius AI",
-   "source": null,
-   "montants": []
+   "source": "https://julius.ai/pricing",
+   "montants": [
+    "$0",
+    "$16",
+    "$166",
+    "$20",
+    "$200",
+    "$37",
+    "$375",
+    "$45",
+    "$450"
+   ]
   },
   {
    "slug": "rows",
@@ -2548,8 +2566,10 @@
   {
    "slug": "predictice",
    "nom": "Predictice",
-   "source": null,
-   "montants": []
+   "source": "https://www.predictice.com/tarifs",
+   "montants": [
+    "250€HT"
+   ]
   },
   {
    "slug": "dastra",
