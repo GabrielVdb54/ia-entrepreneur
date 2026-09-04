@@ -982,6 +982,10 @@
       <p class="lead">Il n'existe pas une « meilleure IA », mais une meilleure IA par usage. 129 outils sélectionnés et classés
       par besoin métier, niveau requis, budget réel et — c'est rare — pays d'hébergement des données.
       Cherchez, filtrez, ou laissez le sélecteur vous orienter en quatre questions.</p>
+      <p class="ia-hero-liens">
+        <a href="#annuaire">Parcourir les 129 outils</a>
+        <a href="#selecteur">Je ne sais pas par où commencer →</a>
+      </p>
       <div class="ia-stats">
         <div><b>129</b><span>outils référencés</span></div>
         <div><b>16</b><span>usages en entreprise</span></div>
@@ -995,9 +999,17 @@
     <div class="container">
       <label class="ia-search" for="ia-q">
         <svg width="17" height="17" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
-        <input id="ia-q" type="search" placeholder="Que voulez-vous faire ? (ex. : compte rendu de réunion, prospection, facture)" autocomplete="off" />
+        <input id="ia-q" type="text" inputmode="search" placeholder="Que voulez-vous faire ? (ex. : compte rendu de réunion, prospection, facture)" autocomplete="off" />
         <button class="ia-reset" type="button" id="ia-clear" aria-label="Effacer la recherche">✕</button>
       </label>
+      <div class="ia-exemples">
+        <span>Essayez :</span>
+        <button type="button" data-exemple="compte rendu de réunion">compte rendu de réunion</button>
+        <button type="button" data-exemple="prospection et posts linkedin">prospection et posts LinkedIn</button>
+        <button type="button" data-exemple="automatiser mes factures">automatiser mes factures</button>
+        <button type="button" data-exemple="créer des images gratuitement">créer des images gratuitement</button>
+        <button type="button" data-exemple="données hébergées en France">données hébergées en France</button>
+      </div>
       <div class="ia-filters">
         <select id="f-cat" aria-label="Filtrer par usage"><option value="">Tous les usages</option>
 <option value="assistants-ia">Assistants IA &amp; LLM</option>
@@ -1038,7 +1050,12 @@
         </select>
         <button class="ia-chip" type="button" id="f-fr" aria-pressed="false">🇪🇺 Éditeurs européens</button>
         <button class="ia-chip" type="button" id="f-fav" aria-pressed="false">★ Mes favoris</button>
-        <span class="ia-count" id="ia-count">129 outils affichés</span>
+        <span class="ia-count" id="ia-count" role="status" aria-live="polite">129 outils affichés</span>
+      </div>
+      <div class="ia-actifs" id="ia-actifs" hidden>
+        <span>Filtres actifs :</span>
+        <span id="ia-actifs-liste"></span>
+        <button type="button" id="ia-tout-effacer">Tout effacer</button>
       </div>
     </div>
   </div>
@@ -3005,7 +3022,7 @@
     </div>
   </section>
 
-  <section class="ia-section" style="background:var(--bg2);">
+  <section class="ia-section" id="selecteur" style="background:var(--bg2);">
     <div class="container">
       <h2>Le sélecteur : quelle IA pour votre situation ?</h2>
       <p class="intro">Quatre questions, cinq recommandations. Le classement croise votre objectif, votre rôle, votre niveau et votre budget avec les 129 outils de l'annuaire.</p>
@@ -3317,13 +3334,75 @@
       var visibles = res;
       cards.forEach(function (c) { c.hidden = visibles.indexOf(c) < 0; });
       n = visibles.length;
-      count.textContent = n + ' outil' + (n > 1 ? 's affichés' : ' affiché');
+      // Le compteur dit sur quoi il compte : « 6 outils pour "linkedin" »
+      // est infiniment plus clair que « 6 outils affichés ».
+      var libelle = n + ' outil' + (n > 1 ? 's' : '');
+      if (q.value.trim()) libelle += ' pour « ' + q.value.trim() + ' »';
+      else if (n === cards.length) libelle += ' au catalogue';
+      else libelle += ' correspondent';
+      count.textContent = libelle;
       empty.hidden = n > 0;
+      majFiltresActifs();
       empty.textContent = (fav && !favoris.length)
         ? "Vous n'avez pas encore de favori. Cliquez sur l'étoile d'une carte pour garder un outil sous la main."
         : 'Aucun outil ne correspond. Essayez un autre mot ou réinitialisez les filtres.';
       chips.forEach(function (ch) { ch.classList.toggle('is-active', ch.dataset.chip === cat); });
     }
+
+    // ── Rappel visuel de ce qui est filtré, et retrait en un clic ────────
+    var actifs = document.getElementById('ia-actifs'),
+        actifsListe = document.getElementById('ia-actifs-liste');
+
+    function libelleOption(select) {
+      return select.options[select.selectedIndex].textContent;
+    }
+
+    function majFiltresActifs() {
+      var puces = [];
+      if (q.value.trim()) puces.push(['q', 'Recherche : ' + q.value.trim()]);
+      [[fcat, 'Usage'], [fprof, 'Profil'], [fniv, 'Niveau'], [fprix, 'Tarif']].forEach(function (p) {
+        if (p[0].value) puces.push([p[0].id, p[1] + ' : ' + libelleOption(p[0])]);
+      });
+      if (ffr.getAttribute('aria-pressed') === 'true') puces.push(['f-fr', 'Éditeurs européens']);
+      if (ffav.getAttribute('aria-pressed') === 'true') puces.push(['f-fav', 'Mes favoris']);
+      actifs.hidden = !puces.length;
+      actifsListe.innerHTML = puces.map(function (p) {
+        return '<span class="ia-actif">' + p[1] +
+               '<button type="button" data-retirer="' + p[0] + '" aria-label="Retirer ce filtre">×</button></span>';
+      }).join(' ');
+    }
+
+    actifsListe.addEventListener('click', function (ev) {
+      var b = ev.target.closest('[data-retirer]');
+      if (!b) return;
+      var cible = b.dataset.retirer;
+      if (cible === 'q') q.value = '';
+      else if (cible === 'f-fr' || cible === 'f-fav') {
+        var bouton = document.getElementById(cible);
+        bouton.setAttribute('aria-pressed', 'false');
+        bouton.classList.remove('is-active');
+      } else document.getElementById(cible).value = '';
+      apply();
+    });
+
+    document.getElementById('ia-tout-effacer').addEventListener('click', function () {
+      q.value = '';
+      [fcat, fprof, fniv, fprix].forEach(function (el) { el.value = ''; });
+      [ffr, ffav].forEach(function (b) {
+        b.setAttribute('aria-pressed', 'false');
+        b.classList.remove('is-active');
+      });
+      apply();
+    });
+
+    // ── Exemples de requetes : ils enseignent la recherche en phrase ─────
+    document.querySelectorAll('[data-exemple]').forEach(function (b) {
+      b.addEventListener('click', function () {
+        q.value = b.dataset.exemple;
+        apply();
+        document.getElementById('annuaire').scrollIntoView({ behavior: 'smooth', block: 'start' });
+      });
+    });
 
     // Recherche pré-remplie depuis une autre page du site : /meilleures-ia.html?q=…
     var params = new URLSearchParams(window.location.search);

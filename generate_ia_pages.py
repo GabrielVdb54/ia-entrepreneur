@@ -137,6 +137,23 @@ IA_CSS = """
     .ia-count { font-size:0.8rem; color:var(--muted); font-weight:600; margin-left:auto; }
 
     #annuaire { scroll-margin-top: 190px; }
+    .ia-exemples { display:flex; flex-wrap:wrap; align-items:center; gap:7px; margin-top:10px; font-size:0.78rem; }
+    .ia-exemples > span { color:var(--muted); font-weight:600; }
+    .ia-exemples button { padding:5px 12px; border-radius:50px; border:1px solid var(--border); background:var(--bg); color:var(--muted); font-family:inherit; font-size:0.76rem; cursor:pointer; transition:all .15s; }
+    .ia-exemples button:hover { border-color:var(--primary); color:var(--primary); background:rgba(26,60,255,0.04); }
+
+    .ia-actifs { display:flex; flex-wrap:wrap; align-items:center; gap:8px; margin-top:10px; font-size:0.78rem; }
+    .ia-actifs > span:first-child { color:var(--muted); font-weight:600; }
+    .ia-actif { display:inline-flex; align-items:center; gap:6px; padding:4px 8px 4px 12px; border-radius:50px; background:rgba(26,60,255,0.08); color:var(--primary); font-weight:600; }
+    .ia-actif button { border:0; background:transparent; color:inherit; cursor:pointer; font-family:inherit; font-size:0.95rem; line-height:1; padding:0 2px; opacity:0.65; }
+    .ia-actif button:hover { opacity:1; }
+    #ia-tout-effacer { border:0; background:transparent; color:var(--muted); text-decoration:underline; cursor:pointer; font-family:inherit; font-size:0.76rem; }
+    #ia-tout-effacer:hover { color:var(--primary); }
+
+    .ia-hero-liens { display:flex; flex-wrap:wrap; gap:18px; margin-top:22px; font-size:0.88rem; }
+    .ia-hero-liens a { color:var(--primary); font-weight:700; text-decoration:none; }
+    .ia-hero-liens a:hover { text-decoration:underline; }
+
     .ia-chips { display:flex; flex-wrap:wrap; gap:8px; margin:22px 0 4px; }
     .ia-chip { display:inline-flex; align-items:center; gap:6px; padding:7px 14px; border-radius:50px; border:1.5px solid var(--border); background:var(--bg); font-size:0.79rem; font-weight:600; color:var(--muted); cursor:pointer; font-family:inherit; transition:all .18s; text-decoration:none; }
     .ia-chip:hover { border-color:var(--primary); color:var(--primary); }
@@ -254,6 +271,11 @@ IA_CSS = """
       .ia-cats { grid-template-columns:1fr; }
       .ia-count { margin-left:0; width:100%; }
       .ia-search-wrap { position:static; }
+      /* Seize catégories empilées mangeaient un écran entier : on les fait
+         défiler sur une ligne, comme les filtres d'une application mobile. */
+      .ia-chips, .ia-exemples { flex-wrap:nowrap; overflow-x:auto; scrollbar-width:none; padding-bottom:4px; }
+      .ia-chips::-webkit-scrollbar, .ia-exemples::-webkit-scrollbar { display:none; }
+      .ia-chip, .ia-exemples button, .ia-exemples > span { flex:0 0 auto; }
       .ia-toast { bottom:86px; }
       #annuaire { scroll-margin-top: 80px; }
       .ia-filters select { flex:1 1 calc(50% - 4px); min-width:0; }
@@ -725,6 +747,10 @@ def build_hub():
       <p class="lead">Il n'existe pas une « meilleure IA », mais une meilleure IA par usage. {len(TOOLS)} outils sélectionnés et classés
       par besoin métier, niveau requis, budget réel et — c'est rare — pays d'hébergement des données.
       Cherchez, filtrez, ou laissez le sélecteur vous orienter en quatre questions.</p>
+      <p class="ia-hero-liens">
+        <a href="#annuaire">Parcourir les {len(TOOLS)} outils</a>
+        <a href="#selecteur">Je ne sais pas par où commencer →</a>
+      </p>
       <div class="ia-stats">
         <div><b>{len(TOOLS)}</b><span>outils référencés</span></div>
         <div><b>{len(CATS)}</b><span>usages en entreprise</span></div>
@@ -738,9 +764,17 @@ def build_hub():
     <div class="container">
       <label class="ia-search" for="ia-q">
         <svg width="17" height="17" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
-        <input id="ia-q" type="search" placeholder="Que voulez-vous faire ? (ex. : compte rendu de réunion, prospection, facture)" autocomplete="off" />
+        <input id="ia-q" type="text" inputmode="search" placeholder="Que voulez-vous faire ? (ex. : compte rendu de réunion, prospection, facture)" autocomplete="off" />
         <button class="ia-reset" type="button" id="ia-clear" aria-label="Effacer la recherche">✕</button>
       </label>
+      <div class="ia-exemples">
+        <span>Essayez :</span>
+        <button type="button" data-exemple="compte rendu de réunion">compte rendu de réunion</button>
+        <button type="button" data-exemple="prospection et posts linkedin">prospection et posts LinkedIn</button>
+        <button type="button" data-exemple="automatiser mes factures">automatiser mes factures</button>
+        <button type="button" data-exemple="créer des images gratuitement">créer des images gratuitement</button>
+        <button type="button" data-exemple="données hébergées en France">données hébergées en France</button>
+      </div>
       <div class="ia-filters">
         <select id="f-cat" aria-label="Filtrer par usage"><option value="">Tous les usages</option>
 {opts_cat}
@@ -756,7 +790,12 @@ def build_hub():
         </select>
         <button class="ia-chip" type="button" id="f-fr" aria-pressed="false">🇪🇺 Éditeurs européens</button>
         <button class="ia-chip" type="button" id="f-fav" aria-pressed="false">★ Mes favoris</button>
-        <span class="ia-count" id="ia-count">{len(TOOLS)} outils affichés</span>
+        <span class="ia-count" id="ia-count" role="status" aria-live="polite">{len(TOOLS)} outils affichés</span>
+      </div>
+      <div class="ia-actifs" id="ia-actifs" hidden>
+        <span>Filtres actifs :</span>
+        <span id="ia-actifs-liste"></span>
+        <button type="button" id="ia-tout-effacer">Tout effacer</button>
       </div>
     </div>
   </div>
@@ -774,7 +813,7 @@ def build_hub():
     </div>
   </section>
 
-  <section class="ia-section" style="background:var(--bg2);">
+  <section class="ia-section" id="selecteur" style="background:var(--bg2);">
     <div class="container">
       <h2>Le sélecteur : quelle IA pour votre situation ?</h2>
       <p class="intro">Quatre questions, cinq recommandations. Le classement croise votre objectif, votre rôle, votre niveau et votre budget avec les {len(TOOLS)} outils de l'annuaire.</p>
@@ -955,13 +994,75 @@ def build_hub():
       var visibles = res;
       cards.forEach(function (c) {{ c.hidden = visibles.indexOf(c) < 0; }});
       n = visibles.length;
-      count.textContent = n + ' outil' + (n > 1 ? 's affichés' : ' affiché');
+      // Le compteur dit sur quoi il compte : « 6 outils pour "linkedin" »
+      // est infiniment plus clair que « 6 outils affichés ».
+      var libelle = n + ' outil' + (n > 1 ? 's' : '');
+      if (q.value.trim()) libelle += ' pour « ' + q.value.trim() + ' »';
+      else if (n === cards.length) libelle += ' au catalogue';
+      else libelle += ' correspondent';
+      count.textContent = libelle;
       empty.hidden = n > 0;
+      majFiltresActifs();
       empty.textContent = (fav && !favoris.length)
         ? "Vous n'avez pas encore de favori. Cliquez sur l'étoile d'une carte pour garder un outil sous la main."
         : 'Aucun outil ne correspond. Essayez un autre mot ou réinitialisez les filtres.';
       chips.forEach(function (ch) {{ ch.classList.toggle('is-active', ch.dataset.chip === cat); }});
     }}
+
+    // ── Rappel visuel de ce qui est filtré, et retrait en un clic ────────
+    var actifs = document.getElementById('ia-actifs'),
+        actifsListe = document.getElementById('ia-actifs-liste');
+
+    function libelleOption(select) {{
+      return select.options[select.selectedIndex].textContent;
+    }}
+
+    function majFiltresActifs() {{
+      var puces = [];
+      if (q.value.trim()) puces.push(['q', 'Recherche : ' + q.value.trim()]);
+      [[fcat, 'Usage'], [fprof, 'Profil'], [fniv, 'Niveau'], [fprix, 'Tarif']].forEach(function (p) {{
+        if (p[0].value) puces.push([p[0].id, p[1] + ' : ' + libelleOption(p[0])]);
+      }});
+      if (ffr.getAttribute('aria-pressed') === 'true') puces.push(['f-fr', 'Éditeurs européens']);
+      if (ffav.getAttribute('aria-pressed') === 'true') puces.push(['f-fav', 'Mes favoris']);
+      actifs.hidden = !puces.length;
+      actifsListe.innerHTML = puces.map(function (p) {{
+        return '<span class="ia-actif">' + p[1] +
+               '<button type="button" data-retirer="' + p[0] + '" aria-label="Retirer ce filtre">×</button></span>';
+      }}).join(' ');
+    }}
+
+    actifsListe.addEventListener('click', function (ev) {{
+      var b = ev.target.closest('[data-retirer]');
+      if (!b) return;
+      var cible = b.dataset.retirer;
+      if (cible === 'q') q.value = '';
+      else if (cible === 'f-fr' || cible === 'f-fav') {{
+        var bouton = document.getElementById(cible);
+        bouton.setAttribute('aria-pressed', 'false');
+        bouton.classList.remove('is-active');
+      }} else document.getElementById(cible).value = '';
+      apply();
+    }});
+
+    document.getElementById('ia-tout-effacer').addEventListener('click', function () {{
+      q.value = '';
+      [fcat, fprof, fniv, fprix].forEach(function (el) {{ el.value = ''; }});
+      [ffr, ffav].forEach(function (b) {{
+        b.setAttribute('aria-pressed', 'false');
+        b.classList.remove('is-active');
+      }});
+      apply();
+    }});
+
+    // ── Exemples de requetes : ils enseignent la recherche en phrase ─────
+    document.querySelectorAll('[data-exemple]').forEach(function (b) {{
+      b.addEventListener('click', function () {{
+        q.value = b.dataset.exemple;
+        apply();
+        document.getElementById('annuaire').scrollIntoView({{ behavior: 'smooth', block: 'start' }});
+      }});
+    }});
 
     // Recherche pré-remplie depuis une autre page du site : /meilleures-ia.html?q=…
     var params = new URLSearchParams(window.location.search);

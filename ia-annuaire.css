@@ -286,6 +286,23 @@ footer{
     .ia-count { font-size:0.8rem; color:var(--muted); font-weight:600; margin-left:auto; }
 
     #annuaire { scroll-margin-top: 190px; }
+    .ia-exemples { display:flex; flex-wrap:wrap; align-items:center; gap:7px; margin-top:10px; font-size:0.78rem; }
+    .ia-exemples > span { color:var(--muted); font-weight:600; }
+    .ia-exemples button { padding:5px 12px; border-radius:50px; border:1px solid var(--border); background:var(--bg); color:var(--muted); font-family:inherit; font-size:0.76rem; cursor:pointer; transition:all .15s; }
+    .ia-exemples button:hover { border-color:var(--primary); color:var(--primary); background:rgba(26,60,255,0.04); }
+
+    .ia-actifs { display:flex; flex-wrap:wrap; align-items:center; gap:8px; margin-top:10px; font-size:0.78rem; }
+    .ia-actifs > span:first-child { color:var(--muted); font-weight:600; }
+    .ia-actif { display:inline-flex; align-items:center; gap:6px; padding:4px 8px 4px 12px; border-radius:50px; background:rgba(26,60,255,0.08); color:var(--primary); font-weight:600; }
+    .ia-actif button { border:0; background:transparent; color:inherit; cursor:pointer; font-family:inherit; font-size:0.95rem; line-height:1; padding:0 2px; opacity:0.65; }
+    .ia-actif button:hover { opacity:1; }
+    #ia-tout-effacer { border:0; background:transparent; color:var(--muted); text-decoration:underline; cursor:pointer; font-family:inherit; font-size:0.76rem; }
+    #ia-tout-effacer:hover { color:var(--primary); }
+
+    .ia-hero-liens { display:flex; flex-wrap:wrap; gap:18px; margin-top:22px; font-size:0.88rem; }
+    .ia-hero-liens a { color:var(--primary); font-weight:700; text-decoration:none; }
+    .ia-hero-liens a:hover { text-decoration:underline; }
+
     .ia-chips { display:flex; flex-wrap:wrap; gap:8px; margin:22px 0 4px; }
     .ia-chip { display:inline-flex; align-items:center; gap:6px; padding:7px 14px; border-radius:50px; border:1.5px solid var(--border); background:var(--bg); font-size:0.79rem; font-weight:600; color:var(--muted); cursor:pointer; font-family:inherit; transition:all .18s; text-decoration:none; }
     .ia-chip:hover { border-color:var(--primary); color:var(--primary); }
@@ -403,6 +420,11 @@ footer{
       .ia-cats { grid-template-columns:1fr; }
       .ia-count { margin-left:0; width:100%; }
       .ia-search-wrap { position:static; }
+      /* Seize catégories empilées mangeaient un écran entier : on les fait
+         défiler sur une ligne, comme les filtres d'une application mobile. */
+      .ia-chips, .ia-exemples { flex-wrap:nowrap; overflow-x:auto; scrollbar-width:none; padding-bottom:4px; }
+      .ia-chips::-webkit-scrollbar, .ia-exemples::-webkit-scrollbar { display:none; }
+      .ia-chip, .ia-exemples button, .ia-exemples > span { flex:0 0 auto; }
       .ia-toast { bottom:86px; }
       #annuaire { scroll-margin-top: 80px; }
       .ia-filters select { flex:1 1 calc(50% - 4px); min-width:0; }
