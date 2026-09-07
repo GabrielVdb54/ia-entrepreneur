@@ -1,0 +1,9 @@
+{
+  "name": "ia-entrepreneur",
+  "private": true,
+  "type": "module",
+  "description": "Le site reste 100 % statique : aucun build, aucun bundler. Ce fichier n'existe que pour la fonction serverless api/conseil.js, dont Vercel installe la dépendance automatiquement. Il ne doit jamais recevoir de script build.",
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.124.0"
+  }
+}

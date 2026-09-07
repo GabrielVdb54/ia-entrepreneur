@@ -995,9 +995,10 @@
         <svg width="17" height="17" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
         <input id="ia-q" type="text" inputmode="search" placeholder="Que voulez-vous faire ? (ex. : compte rendu de réunion, prospection, facture)" autocomplete="off" />
         <button class="ia-reset" type="button" id="ia-clear" aria-label="Effacer la recherche">✕</button>
+        <button class="ia-demander" type="button" id="ia-demander">Me conseiller</button>
       </label>
       <div class="ia-exemples">
-        <span>Essayez :</span>
+        <span>Décrivez votre situation, ou essayez :</span>
         <button type="button" data-exemple="compte rendu de réunion">compte rendu de réunion</button>
         <button type="button" data-exemple="prospection et posts linkedin">prospection et posts LinkedIn</button>
         <button type="button" data-exemple="automatiser mes factures">automatiser mes factures</button>
@@ -1046,6 +1047,7 @@
         <button class="ia-chip" type="button" id="f-fav" aria-pressed="false">★ Mes favoris</button>
         <span class="ia-count" id="ia-count" role="status" aria-live="polite">129 outils affichés</span>
       </div>
+      <div class="ia-conseil" id="ia-conseil" hidden></div>
       <div class="ia-actifs" id="ia-actifs" hidden>
         <span>Filtres actifs :</span>
         <span id="ia-actifs-liste"></span>
@@ -3198,6 +3200,7 @@
 
   <script>
   (function () {
+    var CAL_URL = 'https://calendly.com/gabriel-ia-entrepreneur/decouverte';
     var grid = document.getElementById('ia-grid');
     var cards = Array.prototype.slice.call(grid.querySelectorAll('.ia-item'));
     var q = document.getElementById('ia-q'),
@@ -3402,6 +3405,243 @@
         apply();
         document.getElementById('annuaire').scrollIntoView({ behavior: 'smooth', block: 'start' });
       });
+    });
+
+    // ══ Le conseiller ══════════════════════════════════════════════════
+    // Deux étages. Le moteur local compose une réponse instantanément à partir
+    // des cartes déjà présentes dans la page ; l’appel à /api/conseil la
+    // remplace par une réponse taillée sur la situation décrite. Si l’API est
+    // absente, en panne ou saturée, le visiteur garde la réponse locale et ne
+    // voit aucune erreur.
+
+    var panneau = document.getElementById('ia-conseil'),
+        boutonConseil = document.getElementById('ia-demander');
+
+    // Chaque usage a ses mots forts (sans ambiguïté) et ses mots faibles
+    // (indices). « image » désigne à coup sûr le design ; « linkedin » peut
+    // relever de la prospection comme de la rédaction. D’où la pondération :
+    // sans elle, « générer une image pour un post LinkedIn » remontait un
+    // outil de prospection.
+    var USAGES = {
+      'automatisation':      { fort: 'automatiser automatisation workflow scenario zapier make n8n repetitif repetitive', faible: 'relance relances tache taches temps gagner' },
+      'prospection-vente':   { fort: 'prospection prospecter prospect prospects vente ventes vendre commercial commerciale crm closing signature', faible: 'client clients lead leads rendez chiffre affaires linkedin' },
+      'reunions-notes':      { fort: 'reunion reunions compte rendu transcription visio entretien entretiens', faible: 'notes prise note' },
+      'redaction-contenu':   { fort: 'rediger redaction ecrire article articles newsletter publication publier post posts', faible: 'contenu contenus texte textes reseaux sociaux linkedin' },
+      'images-design':       { fort: 'image images visuel visuels illustration illustrations logo photo photos graphique', faible: 'design creer creation' },
+      'video-audio':         { fort: 'video videos montage sous titre titres audio voix podcast avatar', faible: 'youtube tiktok reel reels shorts' },
+      'relation-client':     { fort: 'chatbot support sav ticket tickets reclamation', faible: 'questions repondre reponses messagerie client clients' },
+      'seo-visibilite':      { fort: 'seo referencement google mots cles trafic visibilite', faible: 'site web' },
+      'finance-admin':       { fort: 'facture factures facturation comptabilite comptable tresorerie devis paie urssaf', faible: 'administratif frais depenses' },
+      'data-analyse':        { fort: 'donnees analyse analyser tableau bord statistiques indicateurs excel', faible: 'chiffres export exports' },
+      'rh-formation':        { fort: 'recrutement recruter candidat candidats embauche former formation onboarding integration salaries', faible: 'equipe equipes collaborateurs rh' },
+      'juridique-conformite':{ fort: 'rgpd conformite juridique contrat contrats ai act reglementation dpo', faible: 'donnees personnelles confidentiel sensible sensibles' },
+      'presentations-documents': { fort: 'presentation presentations slides powerpoint diaporama proposition commerciale signature electronique', faible: 'document documents devis' },
+      'sites-apps-nocode':   { fort: 'site internet siteweb application appli landing page vitrine', faible: 'web outil interne' },
+      'assistants-ia':       { fort: 'assistant assistants chatgpt claude gemini copilot mistral', faible: 'resumer traduire analyser generaliste' },
+      'recherche-veille':    { fort: 'veille concurrent concurrents concurrence sourcer', faible: 'rechercher recherche marche etude' }
+    };
+
+    var ROLES = {
+      'Commercial': 'commercial commerciale vente vendeur vendeuse prospection business developer account',
+      'Marketing':  'marketing communication community manager acquisition growth',
+      'Dirigeant':  'dirigeant dirigeante gerant gerante patron patronne chef entreprise fondateur fondatrice president independant independante freelance artisan',
+      'RH':         'rh ressources humaines recrutement recruteur recruteuse',
+      'Formateur':  'formateur formatrice enseignant enseignante pedagogique organisme',
+      'Ops':        'ops operations administratif gestion office',
+      'Développeur':'developpeur developpeuse technique informatique code'
+    };
+
+    // Ce qu’un métier a besoin d’enchaîner, au-delà du mot qu’il a tapé. Un
+    // commercial qui veut vendre plus a besoin de trouver, d’écrire et de
+    // suivre : c’est cette chaîne qu’on lui compose.
+    var CHAINE_METIER = {
+      'Commercial': ['prospection-vente', 'redaction-contenu', 'reunions-notes'],
+      'Marketing':  ['redaction-contenu', 'images-design', 'seo-visibilite'],
+      'Dirigeant':  ['assistants-ia', 'automatisation', 'reunions-notes'],
+      'RH':         ['rh-formation', 'reunions-notes', 'assistants-ia'],
+      'Formateur':  ['rh-formation', 'presentations-documents', 'video-audio'],
+      'Ops':        ['automatisation', 'finance-admin', 'data-analyse'],
+      'Développeur':['sites-apps-nocode', 'automatisation', 'assistants-ia']
+    };
+
+    // Formulation du rôle de chaque outil dans la chaîne, à la place du nom de
+    // catégorie brut qui se lisait mal.
+    var ROLE_PHRASE = {
+      'automatisation': 'pour enchaîner les tâches sans y revenir',
+      'prospection-vente': 'pour trouver et contacter les bons prospects',
+      'reunions-notes': 'pour ne rien perdre de vos rendez-vous',
+      'redaction-contenu': 'pour écrire vite et bien',
+      'images-design': 'pour produire les visuels',
+      'video-audio': 'pour la vidéo et la voix',
+      'relation-client': 'pour absorber les demandes clients',
+      'seo-visibilite': 'pour être trouvé sur Google',
+      'finance-admin': 'pour la paperasse et les chiffres',
+      'data-analyse': 'pour lire vos données',
+      'rh-formation': 'pour former et faire monter vos équipes',
+      'juridique-conformite': 'pour rester en règle sur les données',
+      'presentations-documents': 'pour vos supports et vos documents',
+      'sites-apps-nocode': 'pour construire le site ou l’outil',
+      'assistants-ia': 'pour le quotidien : rédiger, résumer, analyser',
+      'recherche-veille': 'pour vous documenter avant d’agir'
+    };
+
+    var OFFRES_LOCALES = {
+      'automatisation': ['/formation-ia-automatisation.html', 'Formation IA et automatisation'],
+      'prospection-vente': ['/formation-prospection-commerciale.html', 'Formation prospection commerciale et IA'],
+      'relation-client': ['/integrations-ia.html', 'Intégration IA clé en main'],
+      'juridique-conformite': ['/formation-ia-obligatoire-ai-act.html', 'Formation IA obligatoire — article 4 de l’AI Act'],
+      'rh-formation': ['/formations-entreprises.html', 'Formation IA sur mesure pour vos équipes'],
+      'assistants-ia': ['/formation-chatgpt-entreprise.html', 'Formation ChatGPT en entreprise'],
+      'video-audio': ['/formations-entreprises.html', 'Formation IA sur mesure pour vos équipes'],
+      'defaut': ['/formations-entreprises.html', 'Formation IA sur mesure pour vos équipes']
+    };
+
+    function contient(texte, mots) {
+      var n = 0;
+      mots.split(' ').forEach(function (m) {
+        if (m.length > 2 && texte.indexOf(m) >= 0) n++;
+      });
+      return n;
+    }
+
+    function detecterRoles(texte) {
+      return Object.keys(ROLES).filter(function (r) { return contient(texte, ROLES[r]) > 0; });
+    }
+
+    function conseilLocal(question) {
+      var texte = norm(question);
+      var roles = detecterRoles(texte);
+
+      var scores = Object.keys(USAGES).map(function (u) {
+        return { u: u, s: contient(texte, USAGES[u].fort) * 3 + contient(texte, USAGES[u].faible) };
+      }).filter(function (x) { return x.s > 0; }).sort(function (a, b) { return b.s - a.s; });
+
+      var usages = scores.slice(0, 2).map(function (x) { return x.u; });
+      // On complète avec la chaîne du métier détecté, sans jamais dépasser trois
+      // outils : au-delà, personne ne passe à l’action.
+      (roles.length ? CHAINE_METIER[roles[0]] : []).forEach(function (u) {
+        if (usages.length < 3 && usages.indexOf(u) < 0) usages.push(u);
+      });
+      if (!usages.length) return null;
+      // Une chaîne d’un seul maillon n’aide personne : on complète avec ce qui
+      // sert dans presque toutes les situations.
+      ['assistants-ia', 'automatisation'].forEach(function (u) {
+        if (usages.length < 2 && usages.indexOf(u) < 0) usages.push(u);
+      });
+
+      var sansPayer = /gratuit|gratuite|sans payer|petit budget|pas de budget|budget serre/.test(texte);
+      var enFrance = /rgpd|france|francais|europe|europeen|donnees? (personnelles|clients|sensibles)|sensible|confidentiel|souverain/.test(texte);
+
+      var etapes = [], pris = {};
+      usages.forEach(function (u) {
+        var candidats = cards.filter(function (c) {
+          if (pris[c.dataset.slug]) return false;
+          if (c.dataset.cat.split(' ').indexOf(u) < 0) return false;
+          if (sansPayer && c.dataset.prix === 'Payant') return false;
+          if (enFrance && c.dataset.fr !== '1') return false;
+          return true;
+        });
+        if (!candidats.length) return;
+        // Les mots de la question départagent les outils d’un même usage :
+        // sans cela, « un visuel pour un post LinkedIn » remontait un
+        // traducteur, mieux noté mais hors sujet.
+        var motsQuestion = texte.split(' ').filter(function (m) {
+          return m.length > 3 && STOP.indexOf(' ' + m + ' ') < 0;
+        });
+        // Bonus plafonné : il départage deux outils du même usage, il ne doit
+        // pas faire remonter un outil dont ce n’est pas le métier.
+        function proximite(c) {
+          var n = 0;
+          motsQuestion.forEach(function (m) { if (c._hay.indexOf(m) >= 0) n++; });
+          return Math.min(n, 3) * 1.2;
+        }
+        candidats.sort(function (a, b) {
+          var sa = parseFloat(a.dataset.note) + proximite(a),
+              sb = parseFloat(b.dataset.note) + proximite(b);
+          if (a.dataset.cat.split(' ')[0] === u) sa += 2.5;   // c’est son métier
+          if (b.dataset.cat.split(' ')[0] === u) sb += 2.5;
+          roles.forEach(function (r) {
+            if (a.dataset.prof.indexOf(r) >= 0) sa += 1;
+            if (b.dataset.prof.indexOf(r) >= 0) sb += 1;
+          });
+          if (a.dataset.niv === 'Expert') sa -= 2;
+          if (b.dataset.niv === 'Expert') sb -= 2;
+          return sb - sa;
+        });
+        var c = candidats[0];
+        pris[c.dataset.slug] = true;
+        etapes.push({
+          slug: c.dataset.slug,
+          nom: c.querySelector('strong').textContent,
+          usage: c.querySelector('small').textContent.replace(/^\S+\s/, ''),
+          niveau: c.dataset.niv,
+          prix: c.dataset.prix,
+          url: c.querySelector('a').getAttribute('href'),
+          role: ROLE_PHRASE[u] || 'pour cet usage',
+          comment: c.querySelector('p').textContent
+        });
+      });
+      if (!etapes.length) return null;
+
+      var o = OFFRES_LOCALES[usages[0]] || OFFRES_LOCALES.defaut;
+      var intro = roles.length
+        ? 'Pour un profil ' + roles[0].toLowerCase() + ', voici la chaîne d’outils qui correspond à votre situation.'
+        : 'Voici la chaîne d’outils qui correspond à ce que vous décrivez.';
+      return {
+        source: 'local',
+        situation: intro,
+        etapes: etapes,
+        vigilance: enFrance
+          ? 'Vous évoquez des données sensibles : les outils ci-dessus sont édités en Europe ou installables chez vous.'
+          : (sansPayer ? 'Sélection limitée aux outils gratuits ou dotés d’une offre gratuite utilisable.' : ''),
+        offre: { url: o[0], titre: o[1],
+                 phrase: 'Disposer de l’outil ne suffit pas : ce qui change tout, c’est de savoir s’en servir sur vos propres dossiers.' }
+      };
+    }
+
+    function afficherConseil(r) {
+      if (!r) { panneau.hidden = true; return; }
+      var etapes = r.etapes.map(function (e, i) {
+        return '<div class="ia-etape"><div class="num">' + (i + 1) + '</div><div>' +
+          '<b><a href="' + e.url + '">' + e.nom + '</a></b> ' +
+          '<span class="role">· ' + e.role + '</span>' +
+          '<p>' + e.comment + '</p>' +
+          '<span class="ia-pills"><span class="ia-pill">' + e.usage + '</span>' +
+          '<span class="ia-pill">' + e.niveau + '</span><span class="ia-pill">' + e.prix + '</span></span>' +
+          '</div></div>';
+      }).join('');
+      var offre = r.offre ? '<div class="ia-conseil-offre"><b>' + r.offre.titre + '</b><p>' + r.offre.phrase + '</p>' +
+        '<div class="ia-conseil-actions"><a class="principal" href="' + CAL_URL + '" target="_blank" rel="noopener">Appel gratuit de 15 min</a>' +
+        '<a class="secondaire" href="' + r.offre.url + '">Voir le programme</a></div></div>' : '';
+      panneau.innerHTML =
+        '<span class="ia-conseil-source">' +
+        (r.source === 'claude' ? 'Réponse composée pour votre situation' : 'Réponse instantanée') + '</span>' +
+        '<h3>' + r.situation + '</h3>' + etapes +
+        (r.vigilance ? '<p class="ia-conseil-vigilance">' + r.vigilance + '</p>' : '') + offre;
+      panneau.hidden = false;
+    }
+
+    var enCours = 0;
+    function demanderConseil() {
+      var question = q.value.trim();
+      if (question.length < 3) return;
+      var local = conseilLocal(question);
+      afficherConseil(local);
+      var moi = ++enCours;
+      boutonConseil.disabled = true;
+      fetch('/api/conseil', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ question: question.slice(0, 500) })
+      }).then(function (r) { return r.ok ? r.json() : null; })
+        .then(function (data) { if (data && moi === enCours) afficherConseil(data); })
+        .catch(function () { /* le visiteur garde la réponse locale */ })
+        .then(function () { if (moi === enCours) boutonConseil.disabled = false; });
+    }
+
+    boutonConseil.addEventListener('click', demanderConseil);
+    q.addEventListener('keydown', function (ev) {
+      if (ev.key === 'Enter') { ev.preventDefault(); demanderConseil(); }
     });
 
     // Recherche pré-remplie depuis une autre page du site : /meilleures-ia.html?q=…

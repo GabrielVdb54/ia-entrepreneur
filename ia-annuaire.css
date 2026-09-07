@@ -286,6 +286,29 @@ footer{
     .ia-count { font-size:0.8rem; color:var(--muted); font-weight:600; margin-left:auto; }
 
     #annuaire { scroll-margin-top: 190px; }
+    .ia-demander { flex:0 0 auto; padding:8px 18px; border-radius:50px; border:0; background:var(--primary); color:#fff; font-family:inherit; font-size:0.82rem; font-weight:700; cursor:pointer; transition:background .15s; }
+    .ia-demander:hover { background:var(--primary-h); }
+    .ia-demander[disabled] { opacity:0.6; cursor:progress; }
+
+    .ia-conseil { margin-top:14px; padding:22px 24px; border-radius:16px; background:var(--bg); border:1px solid var(--border); box-shadow:0 8px 30px rgba(10,15,44,0.07); }
+    .ia-conseil h3 { font-size:1.02rem; line-height:1.4; margin-bottom:4px; }
+    .ia-conseil .ia-conseil-source { font-size:0.72rem; color:var(--muted); font-weight:600; text-transform:uppercase; letter-spacing:0.04em; margin-bottom:10px; display:block; }
+    .ia-etape { display:flex; gap:14px; padding:14px 0; border-top:1px solid var(--border); }
+    .ia-etape .num { flex:0 0 26px; height:26px; border-radius:50%; background:var(--primary); color:#fff; font-size:0.78rem; font-weight:800; display:flex; align-items:center; justify-content:center; }
+    .ia-etape b a { color:var(--text); text-decoration:none; border-bottom:2px solid rgba(26,60,255,0.25); }
+    .ia-etape b a:hover { color:var(--primary); }
+    .ia-etape .role { font-size:0.78rem; color:var(--primary); font-weight:700; }
+    .ia-etape p { font-size:0.88rem; color:var(--muted); line-height:1.55; margin:4px 0 6px; }
+    .ia-conseil-offre { margin-top:16px; padding:16px 18px; border-radius:12px; background:rgba(16,185,129,0.07); border-left:4px solid var(--accent); }
+    .ia-conseil-offre b { display:block; font-size:0.92rem; margin-bottom:4px; }
+    .ia-conseil-offre p { font-size:0.86rem; color:var(--muted); line-height:1.55; margin-bottom:10px; }
+    .ia-conseil-offre .ia-conseil-actions { display:flex; flex-wrap:wrap; gap:8px; }
+    .ia-conseil-offre a { display:inline-flex; align-items:center; padding:9px 18px; border-radius:50px; font-size:0.82rem; font-weight:700; text-decoration:none; }
+    .ia-conseil-offre a.principal { background:var(--accent); color:#fff; }
+    .ia-conseil-offre a.secondaire { border:1.5px solid var(--border); color:var(--muted); }
+    .ia-conseil-vigilance { margin-top:14px; font-size:0.85rem; color:var(--muted); padding-left:22px; position:relative; line-height:1.55; }
+    .ia-conseil-vigilance::before { content:"!"; position:absolute; left:0; top:0; width:16px; height:16px; border-radius:50%; background:#EF4444; color:#fff; font-size:0.68rem; font-weight:800; display:flex; align-items:center; justify-content:center; }
+
     .ia-exemples { display:flex; flex-wrap:wrap; align-items:center; gap:7px; margin-top:10px; font-size:0.78rem; }
     .ia-exemples > span { color:var(--muted); font-weight:600; }
     .ia-exemples button { padding:5px 12px; border-radius:50px; border:1px solid var(--border); background:var(--bg); color:var(--muted); font-family:inherit; font-size:0.76rem; cursor:pointer; transition:all .15s; }
@@ -433,6 +456,8 @@ footer{
       .ia-cats { grid-template-columns:1fr; }
       .ia-count { margin-left:0; width:100%; }
       .ia-search-wrap { position:static; }
+      .ia-demander { padding:8px 14px; font-size:0.78rem; }
+      .ia-conseil { padding:18px; }
       /* Seize catégories empilées mangeaient un écran entier : on les fait
          défiler sur une ligne, comme les filtres d'une application mobile. */
       .ia-chips, .ia-exemples { flex-wrap:nowrap; overflow-x:auto; scrollbar-width:none; padding-bottom:4px; }
