@@ -160,8 +160,11 @@ IA_CSS = """
     .ia-chip.is-active { background:var(--primary); border-color:var(--primary); color:#fff; }
 
     .ia-grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(275px,1fr)); gap:16px; margin:26px 0 10px; }
+    /* Regle de securite : tout element porteur de l'attribut hidden doit
+       disparaitre, meme si sa classe lui donne un display. C'est ce piege qui
+       avait rendu les filtres sans effet visible. */
+    [hidden] { display:none !important; }
     .ia-item { position:relative; display:flex; }
-    .ia-item[hidden] { display:none !important; }
     .ia-card { position:relative; flex:1; display:flex; flex-direction:column; gap:10px; padding:20px 46px 20px 20px; border:1px solid var(--border); border-left:4px solid var(--tool); border-radius:var(--radius); background:var(--bg); text-decoration:none; color:inherit; transition:transform .18s, box-shadow .18s, border-color .18s; }
     .ia-card:hover { transform:translateY(-3px); box-shadow:0 10px 30px rgba(10,15,44,0.10); }
     .ia-fav { position:absolute; top:10px; right:10px; z-index:2; width:32px; height:32px; border-radius:50%; border:0; background:transparent; color:var(--muted); font-size:1.15rem; line-height:1; cursor:pointer; font-family:inherit; transition:background .15s, color .15s, transform .15s; }
@@ -266,7 +269,17 @@ IA_CSS = """
       .ia-search-wrap { top:0; }
     }
     @media (max-width: 768px) {
-      .ia-hero { padding:96px 0 30px; }
+      /* Objectif : la barre de recherche visible sans faire defiler, sur un
+         ecran de 390x844. On resserre le hero et on met de cote ce qui peut
+         se lire plus bas. */
+      .ia-hero { padding:82px 0 18px; }
+      .ia-hero h1 { font-size:1.5rem; line-height:1.2; margin-bottom:10px; }
+      .ia-hero p.lead { font-size:0.92rem; }
+      .ia-lead-suite { display:none; }
+      .ia-badge { margin-bottom:12px; padding:5px 12px; font-size:0.7rem; }
+      .ia-hero-liens { margin-top:12px; font-size:0.84rem; }
+      .ia-stats { gap:18px 26px; margin-bottom:6px; }
+      .ia-stats div b { font-size:1.25rem; }
       .ia-grid { grid-template-columns:1fr; gap:12px; }
       .ia-cats { grid-template-columns:1fr; }
       .ia-count { margin-left:0; width:100%; }
@@ -746,19 +759,13 @@ def build_hub():
     <div class="container">
       <div class="ia-badge">Annuaire indépendant · mis à jour le {datetime.date.today().strftime('%d/%m/%Y')}</div>
       <h1>Les meilleures IA du moment :<br />trouvez celle qui règle <span class="gradient">votre</span> problème</h1>
-      <p class="lead">Il n'existe pas une « meilleure IA », mais une meilleure IA par usage. {len(TOOLS)} outils sélectionnés et classés
-      par besoin métier, niveau requis, budget réel et — c'est rare — pays d'hébergement des données.
-      Cherchez, filtrez, ou laissez le sélecteur vous orienter en quatre questions.</p>
+      <p class="lead">Il n'existe pas une « meilleure IA », mais une meilleure IA par usage.
+      <span class="ia-lead-suite">{len(TOOLS)} outils sélectionnés et classés par besoin métier, niveau requis,
+      budget réel et — c'est rare — pays d'hébergement des données.
+      Cherchez, filtrez, ou laissez le sélecteur vous orienter en quatre questions.</span></p>
       <p class="ia-hero-liens">
-        <a href="#annuaire">Parcourir les {len(TOOLS)} outils</a>
         <a href="#selecteur">Je ne sais pas par où commencer →</a>
       </p>
-      <div class="ia-stats">
-        <div><b>{len(TOOLS)}</b><span>outils référencés</span></div>
-        <div><b>{len(CATS)}</b><span>usages en entreprise</span></div>
-        <div><b>{nb_fr}</b><span>éditeurs européens ou open source</span></div>
-        <div><b>{sum(1 for t in TOOLS if t['prix'] in ('Gratuit', 'Freemium'))}</b><span>utilisables gratuitement</span></div>
-      </div>
     </div>
   </section>
 
@@ -804,6 +811,12 @@ def build_hub():
 
   <section class="ia-section" id="annuaire" style="padding-top:26px;">
     <div class="container">
+      <div class="ia-stats">
+        <div><b>{len(TOOLS)}</b><span>outils référencés</span></div>
+        <div><b>{len(CATS)}</b><span>usages en entreprise</span></div>
+        <div><b>{nb_fr}</b><span>éditeurs européens ou open source</span></div>
+        <div><b>{sum(1 for t in TOOLS if t['prix'] in ('Gratuit', 'Freemium'))}</b><span>utilisables gratuitement</span></div>
+      </div>
       <div class="ia-chips">
 {chips}
       </div>
