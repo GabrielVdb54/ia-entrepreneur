@@ -21,7 +21,7 @@
 
 import Anthropic from '@anthropic-ai/sdk';
 import { CATALOGUE, SLUGS } from './_catalogue.js';
-import { OFFRES, CLES_OFFRES } from './_offres.js';
+import { OFFRES, CLES_OFFRES, OFFRES_CONDITIONNEES, OFFRE_PAR_DEFAUT } from './_offres.js';
 
 // Vercel coupe une fonction Node bien avant si on ne le lui dit pas. Une
 // réponse à trois voies demande jusqu'à 25 secondes : sans cette ligne, les
@@ -381,8 +381,14 @@ export default async function handler(req, res) {
       return outils.length ? { outils, phrase: couper(v.phrase, 220) } : null;
     }
 
-    const offre = OFFRES[brut.offre] ? { ...OFFRES[brut.offre], phrase: couper(brut.phrase_offre, 340) }
-                                     : null;
+    // Une offre liée à un outil précis n'est retenue que si cet outil est
+    // effectivement dans la recommandation. Sinon on bascule sur la formation
+    // sur mesure, qui convient à toutes les situations.
+    let cleOffre = OFFRES[brut.offre] ? brut.offre : OFFRE_PAR_DEFAUT;
+    const requis = OFFRES_CONDITIONNEES[cleOffre];
+    if (requis && !etapes.some((e) => requis.includes(e.slug))) cleOffre = OFFRE_PAR_DEFAUT;
+
+    const offre = { ...OFFRES[cleOffre], phrase: couper(brut.phrase_offre, 340) };
 
     journaliser(question, etapes.map((e) => e.slug));
 

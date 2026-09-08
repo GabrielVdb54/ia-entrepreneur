@@ -89,14 +89,14 @@
     .tab-content{display:none}.tab-content.active{display:block}
     .video-section{padding:56px 0}
     .video-section.alt{background:var(--bg2)}
-    .video-layout{display:grid;grid-template-columns:minmax(0,300px) minmax(0,1fr);gap:44px;align-items:center;margin-top:30px}
-    .video-frame{position:relative;aspect-ratio:9/16;border-radius:20px;overflow:hidden;border:1px solid var(--border);box-shadow:0 18px 44px rgba(10,15,44,0.13);background:var(--bg2)}
+    .video-layout{display:grid;grid-template-columns:minmax(0,380px) minmax(0,1fr);gap:44px;align-items:center;margin-top:30px}
+    .video-frame{position:relative;aspect-ratio:4/5;border-radius:20px;overflow:hidden;border:1px solid var(--border);box-shadow:0 18px 44px rgba(10,15,44,0.13);background:var(--bg2)}
     .video-frame video{display:block;width:100%;height:100%;object-fit:cover;background:var(--bg2)}
     .video-points{list-style:none;display:grid;gap:16px}
     .video-points li{display:flex;gap:12px;align-items:flex-start;font-size:0.98rem;color:var(--text);line-height:1.6}
     .video-points svg{flex-shrink:0;margin-top:4px}
     .video-note{margin-top:20px;font-size:0.86rem;color:var(--muted);line-height:1.6}
-    @media(max-width:820px){.video-layout{grid-template-columns:1fr;gap:26px}.video-frame{max-width:300px;margin:0 auto}}
+    @media(max-width:820px){.video-layout{grid-template-columns:1fr;gap:26px}.video-frame{max-width:380px;margin:0 auto}}
     .section-label{font-size:0.72rem;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--accent);margin-bottom:12px}
     .section-title{font-size:clamp(1.6rem,3vw,2.2rem);font-weight:800;line-height:1.2;margin-bottom:12px}
     .section-sub{font-size:1rem;color:var(--muted);line-height:1.75;max-width:640px}
@@ -242,6 +242,8 @@
   </style>
   <link rel="stylesheet" href="/mobile.css" />
 
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"VideoObject","name":"Formation IA en entreprise : comment on construit un programme sur mesure","description":"En 18 secondes : pourquoi vos equipes perdent des heures que l'IA fait en minutes, comment IA-Entrepreneur construit un programme calibre sur vos process, vos outils et vos metiers, et comment le financer via votre OPCO. Organisme certifie Qualiopi.","thumbnailUrl":["https://ia-entrepreneur.fr/videos/ia-societes-4x5.jpg"],"uploadDate":"2026-09-04","duration":"PT18S","contentUrl":"https://ia-entrepreneur.fr/videos/ia-societes-4x5.mp4","publisher":{"@type":"Organization","name":"IA-Entrepreneur","url":"https://ia-entrepreneur.fr"},"inLanguage":"fr-FR","url":"https://ia-entrepreneur.fr/formations-entreprises.html"}</script>
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"VideoObject","name":"Formation IA pour independants et solopreneurs","description":"En 15 secondes : automatiser ce qui fait perdre du temps quand on travaille seul (emails, devis, contenus, reporting), rediger des prompts qui marchent sur ChatGPT, Gemini et Copilot, en petit groupe avec des formateurs-praticiens. Organisme certifie Qualiopi.","thumbnailUrl":["https://ia-entrepreneur.fr/videos/ia-independants-4x5.jpg"],"uploadDate":"2026-09-04","duration":"PT15S","contentUrl":"https://ia-entrepreneur.fr/videos/ia-independants-4x5.mp4","publisher":{"@type":"Organization","name":"IA-Entrepreneur","url":"https://ia-entrepreneur.fr"},"inLanguage":"fr-FR","url":"https://ia-entrepreneur.fr/formations-entreprises.html"}</script>
 </head>
 <body>
 
@@ -337,6 +339,32 @@
 
   <!-- ===== INTER ===== -->
   <div class="tab-content" id="tab-inter">
+
+    <!-- VIDEO DE PRESENTATION -->
+    <section class="video-section alt">
+      <div class="container">
+        <div class="section-label">En 15 secondes</div>
+        <h2 class="section-title">La formation IA pour ind&eacute;pendants, en vid&eacute;o</h2>
+        <p class="section-sub">Ce qu&rsquo;on travaille en session inter, et ce que &ccedil;a change sur votre semaine de travail.</p>
+        <div class="video-layout">
+          <div class="video-frame">
+            <video controls playsinline preload="none" width="1080" height="1350"
+                   poster="/videos/ia-independants-4x5.jpg" aria-label="Pr&eacute;sentation de la formation IA pour freelances, ind&eacute;pendants et solopreneurs">
+              <source src="/videos/ia-independants-4x5.mp4" type="video/mp4" />
+              Votre navigateur ne peut pas lire cette vid&eacute;o.
+            </video>
+          </div>
+          <div>
+            <ul class="video-points">
+              <li><svg width="20" height="20" fill="none" stroke="var(--accent)" stroke-width="2.8" viewBox="0 0 24 24" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg><span>Sessions ouvertes aux ind&eacute;pendants, en petit groupe &mdash; pas un webinaire &agrave; 200 personnes</span></li>
+              <li><svg width="20" height="20" fill="none" stroke="var(--accent)" stroke-width="2.8" viewBox="0 0 24 24" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg><span>ChatGPT, Gemini, Copilot : des prompts qui marchent vraiment, pas de la th&eacute;orie</span></li>
+              <li><svg width="20" height="20" fill="none" stroke="var(--accent)" stroke-width="2.8" viewBox="0 0 24 24" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg><span>Emails, devis, contenus, reporting : jusqu&rsquo;&agrave; 5&nbsp;h par semaine r&eacute;cup&eacute;r&eacute;es</span></li>
+            </ul>
+            <p class="video-note">Vid&eacute;o de 15 secondes, sans son n&eacute;cessaire. <a href="#sessions" style="color:var(--primary);font-weight:600;">Voir les prochaines sessions &rarr;</a></p>
+          </div>
+        </div>
+      </div>
+    </section>
 
 
     <!-- CE QUE VOUS SAUREZ FAIRE -->
@@ -546,9 +574,9 @@
         <p class="section-sub">Comment on construit un programme sur mesure pour vos &eacute;quipes, et ce que &ccedil;a change concr&egrave;tement.</p>
         <div class="video-layout">
           <div class="video-frame">
-            <video controls playsinline preload="none" width="1080" height="1920"
-                   poster="videos/ia-societes.jpg" aria-label="Pr&eacute;sentation de la formation IA en entreprise pour les &eacute;quipes">
-              <source src="videos/ia-societes.mp4" type="video/mp4" />
+            <video controls playsinline preload="none" width="1080" height="1350"
+                   poster="/videos/ia-societes-4x5.jpg" aria-label="Pr&eacute;sentation de la formation IA en entreprise pour les &eacute;quipes">
+              <source src="/videos/ia-societes-4x5.mp4" type="video/mp4" />
               Votre navigateur ne peut pas lire cette video.
             </video>
           </div>
@@ -558,7 +586,7 @@
             <li><svg width="20" height="20" fill="none" stroke="var(--accent)" stroke-width="2.8" viewBox="0 0 24 24" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg><span>Pr&eacute;sentiel ou distanciel, de la TPE au grand compte</span></li>
             <li><svg width="20" height="20" fill="none" stroke="var(--accent)" stroke-width="2.8" viewBox="0 0 24 24" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg><span>Certifi&eacute; Qualiopi &middot; finan&ccedil;able jusqu&rsquo;&agrave; 100&nbsp;% par votre OPCO, reste &agrave; charge souvent nul</span></li>
             </ul>
-            <p class="video-note">Vid&eacute;o de 15 secondes, sans son n&eacute;cessaire. <a href="#devis" style="color:var(--primary);font-weight:600;">Construire mon programme sur mesure &rarr;</a></p>
+            <p class="video-note">Vid&eacute;o de 18 secondes, sans son n&eacute;cessaire. <a href="#devis" style="color:var(--primary);font-weight:600;">Construire mon programme sur mesure &rarr;</a></p>
           </div>
         </div>
       </div>

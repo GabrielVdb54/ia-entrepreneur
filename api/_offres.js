@@ -58,3 +58,24 @@ export const OFFRES = {
 };
 
 export const CLES_OFFRES = Object.keys(OFFRES);
+
+/**
+ * Offres liées à un outil précis : elles n'ont de sens que si cet outil figure
+ * dans la recommandation. Proposer une formation ChatGPT après avoir conseillé
+ * Mistral décrédibilise toute la réponse — une consigne au modèle ne suffit
+ * pas, le serveur tranche.
+ */
+export const OFFRES_CONDITIONNEES = {
+  'formation-chatgpt': ['chatgpt', 'chatgpt-images'],
+  'formation-copilot': ['microsoft-copilot', 'power-automate', 'power-bi'],
+  'formation-automatisation': ['n8n', 'make', 'zapier', 'power-automate', 'lindy',
+                               'relevance-ai', 'crewai', 'dust', 'manus'],
+  'formation-prospection': ['lemlist', 'waalaxy', 'lagrowthmachine', 'apollo', 'pharow',
+                            'clay', 'humanlinker', 'phantombuster', 'dropcontact', 'hubspot',
+                            'pipedrive', 'brevo', 'taplio'],
+  'formation-vente': ['hubspot', 'pipedrive', 'pandadoc', 'leexi', 'humanlinker', 'fireflies'],
+  'formation-ai-act': ['dastra', 'leto', 'naaia', 'vanta', 'mistral-le-chat', 'anythingllm',
+                       'ollama', 'dropcontact', 'yousign', 'metabase', 'n8n'],
+};
+
+export const OFFRE_PAR_DEFAUT = 'formation-sur-mesure';
