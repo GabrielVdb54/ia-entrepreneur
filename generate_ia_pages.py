@@ -117,19 +117,11 @@ BASE_CSS = base_css()
 # ─────────────────────────────────────────────────────────────────────────────
 IA_CSS = """
     .nav-tel { display:flex; align-items:center; gap:5px; }
-    .ia-hero { padding: 120px 0 40px; background: linear-gradient(180deg, var(--bg2), var(--bg)); }
-    .ia-hero h1 { font-size: clamp(1.9rem, 4.4vw, 3rem); line-height: 1.15; letter-spacing: -0.02em; margin-bottom: 16px; }
-    .ia-hero p.lead { font-size: 1.05rem; color: var(--muted); max-width: 720px; }
     .ia-badge { display:inline-flex; align-items:center; gap:7px; padding:6px 14px; border-radius:50px; background:rgba(26,60,255,0.08); color:var(--primary); font-weight:700; font-size:0.76rem; margin-bottom:18px; }
     .ia-stats { display:flex; flex-wrap:wrap; gap:26px; margin-top:24px; }
     .ia-stats div b { display:block; font-size:1.5rem; font-weight:800; color:var(--text); line-height:1.2; }
     .ia-stats div span { font-size:0.8rem; color:var(--muted); }
 
-    .ia-search-wrap { position: sticky; top: 68px; z-index: 40; background: rgba(255,255,255,0.94); backdrop-filter: blur(10px); border-bottom: 1px solid var(--border); padding: 14px 0; }
-    .ia-search { display:flex; align-items:center; gap:10px; background:var(--bg); border:1.5px solid var(--border); border-radius:50px; padding:11px 18px; box-shadow:0 2px 14px rgba(10,15,44,0.05); }
-    .ia-search:focus-within { border-color: var(--primary); box-shadow: 0 4px 20px rgba(26,60,255,0.12); }
-    .ia-search input { flex:1; border:0; outline:0; background:transparent; font-family:inherit; font-size:0.95rem; color:var(--text); min-width:0; }
-    .ia-search svg { flex-shrink:0; color:var(--muted); }
     .ia-reset { border:0; background:transparent; color:var(--muted); cursor:pointer; font-family:inherit; font-size:1.1rem; line-height:1; padding:2px 4px; }
     .ia-filters { display:flex; flex-wrap:wrap; gap:8px; margin-top:12px; align-items:center; }
     .ia-filters select { font-family:inherit; font-size:0.8rem; padding:7px 12px; border-radius:50px; border:1.5px solid var(--border); background:var(--bg); color:var(--text); cursor:pointer; }
@@ -184,33 +176,14 @@ IA_CSS = """
     .ia-suivis button { min-height:44px; padding:11px 16px; border-radius:50px; border:1px solid var(--border); background:var(--bg2); color:var(--primary); font-family:inherit; font-size:0.82rem; font-weight:600; cursor:pointer; text-align:left; line-height:1.35; }
     .ia-suivis button:hover { border-color:var(--primary); }
 
-    .ia-demander { flex:0 0 auto; padding:8px 18px; border-radius:50px; border:0; background:var(--primary); color:#fff; font-family:inherit; font-size:0.82rem; font-weight:700; cursor:pointer; transition:background .15s; }
-    .ia-demander:hover { background:var(--primary-h); }
-    .ia-demander[disabled] { opacity:0.6; cursor:progress; }
 
-    .ia-conseil { margin-top:14px; padding:22px 24px; border-radius:16px; background:var(--bg); border:1px solid var(--border); box-shadow:0 8px 30px rgba(10,15,44,0.07); }
-    .ia-conseil h3 { font-size:1.02rem; line-height:1.4; margin-bottom:4px; }
-    .ia-conseil .ia-conseil-source { font-size:0.72rem; color:var(--muted); font-weight:600; text-transform:uppercase; letter-spacing:0.04em; margin-bottom:10px; display:block; }
     .ia-etape { display:flex; gap:14px; padding:14px 0; border-top:1px solid var(--border); }
     .ia-etape .num { flex:0 0 24px; height:24px; border-radius:50%; background:var(--primary); color:#fff; font-size:0.78rem; font-weight:800; display:flex; align-items:center; justify-content:center; }
     .ia-etape b a { color:var(--text); text-decoration:none; border-bottom:2px solid rgba(26,60,255,0.25); }
     .ia-etape b a:hover { color:var(--primary); }
     .ia-etape .role { font-size:0.78rem; color:var(--primary); font-weight:700; }
     .ia-etape p { font-size:0.88rem; color:var(--muted); line-height:1.55; margin:4px 0 6px; }
-    .ia-conseil-offre { margin-top:16px; padding:16px 18px; border-radius:12px; background:rgba(16,185,129,0.07); border-left:4px solid var(--accent); }
-    .ia-conseil-offre b { display:block; font-size:0.92rem; margin-bottom:4px; }
-    .ia-conseil-offre p { font-size:0.86rem; color:var(--muted); line-height:1.55; margin-bottom:10px; }
-    .ia-conseil-offre .ia-conseil-actions { display:flex; flex-wrap:wrap; gap:8px; }
-    .ia-conseil-offre a { display:inline-flex; align-items:center; padding:9px 18px; border-radius:50px; font-size:0.82rem; font-weight:700; text-decoration:none; }
-    .ia-conseil-offre a.principal { background:var(--accent); color:#fff; }
-    .ia-conseil-offre a.secondaire { border:1.5px solid var(--border); color:var(--muted); }
-    .ia-conseil-vigilance { margin-top:14px; font-size:0.85rem; color:var(--muted); padding-left:22px; position:relative; line-height:1.55; }
-    .ia-conseil-vigilance::before { content:"!"; position:absolute; left:0; top:0; width:16px; height:16px; border-radius:50%; background:#EF4444; color:#fff; font-size:0.68rem; font-weight:800; display:flex; align-items:center; justify-content:center; }
 
-    .ia-exemples { display:flex; flex-wrap:wrap; align-items:center; gap:7px; margin-top:10px; font-size:0.78rem; }
-    .ia-exemples > span { color:var(--muted); font-weight:600; }
-    .ia-exemples button { padding:5px 12px; border-radius:50px; border:1px solid var(--border); background:var(--bg); color:var(--muted); font-family:inherit; font-size:0.76rem; cursor:pointer; transition:all .15s; }
-    .ia-exemples button:hover { border-color:var(--primary); color:var(--primary); background:rgba(26,60,255,0.04); }
 
     .ia-actifs { display:flex; flex-wrap:wrap; align-items:center; gap:8px; margin-top:10px; font-size:0.78rem; }
     .ia-actifs > span:first-child { color:var(--muted); font-weight:600; }
@@ -220,9 +193,6 @@ IA_CSS = """
     #ia-tout-effacer { border:0; background:transparent; color:var(--muted); text-decoration:underline; cursor:pointer; font-family:inherit; font-size:0.76rem; }
     #ia-tout-effacer:hover { color:var(--primary); }
 
-    .ia-hero-liens { display:flex; flex-wrap:wrap; gap:18px; margin-top:22px; font-size:0.88rem; }
-    .ia-hero-liens a { color:var(--primary); font-weight:700; text-decoration:none; }
-    .ia-hero-liens a:hover { text-decoration:underline; }
 
     .ia-chips { display:flex; flex-wrap:wrap; gap:8px; margin:22px 0 4px; }
     .ia-chip { display:inline-flex; align-items:center; gap:6px; padding:7px 14px; border-radius:50px; border:1.5px solid var(--border); background:var(--bg); font-size:0.79rem; font-weight:600; color:var(--muted); cursor:pointer; font-family:inherit; transition:all .18s; text-decoration:none; }
@@ -336,24 +306,18 @@ IA_CSS = """
       .ia-aside { position:static; }
     }
     @media (max-width: 900px) {
-      .ia-search-wrap { top:0; }
     }
     @media (max-width: 768px) {
       /* Objectif : la barre de recherche visible sans faire defiler, sur un
          ecran de 390x844. On resserre le hero et on met de cote ce qui peut
          se lire plus bas. */
-      .ia-hero { padding:82px 0 18px; }
-      .ia-hero h1 { font-size:1.5rem; line-height:1.2; margin-bottom:10px; }
-      .ia-hero p.lead { font-size:0.92rem; }
       .ia-lead-suite { display:none; }
       .ia-badge { margin-bottom:12px; padding:5px 12px; font-size:0.7rem; }
-      .ia-hero-liens { margin-top:12px; font-size:0.84rem; }
       .ia-stats { gap:18px 26px; margin-bottom:6px; }
       .ia-stats div b { font-size:1.25rem; }
       .ia-grid { grid-template-columns:1fr; gap:12px; }
       .ia-cats { grid-template-columns:1fr; }
       .ia-count { margin-left:0; width:100%; }
-      .ia-search-wrap { position:static; }
       .ia-chat { padding:88px 0 30px; }
       .ia-chat h1 { font-size:1.55rem; }
       .ia-chat p.lead { font-size:0.92rem; margin-bottom:18px; }
@@ -369,13 +333,11 @@ IA_CSS = """
       .ia-questions li { font-size:0.9rem; }
       .ia-suggestions { flex-wrap:nowrap; overflow-x:auto; scrollbar-width:none; padding-bottom:4px; }
       .ia-suggestions button { flex:0 0 auto; }
-      .ia-demander { padding:8px 14px; font-size:0.78rem; }
-      .ia-conseil { padding:18px; }
       /* Seize catégories empilées mangeaient un écran entier : on les fait
          défiler sur une ligne, comme les filtres d'une application mobile. */
-      .ia-chips, .ia-exemples { flex-wrap:nowrap; overflow-x:auto; scrollbar-width:none; padding-bottom:4px; }
-      .ia-chips::-webkit-scrollbar, .ia-exemples::-webkit-scrollbar { display:none; }
-      .ia-chip, .ia-exemples button, .ia-exemples > span { flex:0 0 auto; }
+      .ia-chips { flex-wrap:nowrap; overflow-x:auto; scrollbar-width:none; padding-bottom:4px; }
+      .ia-chips::-webkit-scrollbar { display:none; }
+      .ia-chip { flex:0 0 auto; }
       .ia-toast { bottom:86px; }
       #annuaire { scroll-margin-top: 80px; }
       .ia-filters select { flex:1 1 calc(50% - 4px); min-width:0; }
@@ -772,7 +734,7 @@ HUB_FAQ = [
     ("Quelle est la meilleure IA en " + str(ANNEE) + " ?",
      "Il n'y a pas de meilleure IA dans l'absolu, seulement une meilleure IA <em>pour un usage donné</em>. Pour un usage généraliste en entreprise (rédiger, analyser, résumer), <a href='/ia/chatgpt.html'>ChatGPT</a> et <a href='/ia/claude.html'>Claude</a> sont les deux références, et <a href='/ia/mistral-le-chat.html'>Mistral Le Chat</a> s'impose dès que les données doivent rester en Europe. Pour automatiser des tâches, c'est <a href='/ia/n8n.html'>n8n</a> ou <a href='/ia/make.html'>Make</a>. Pour les comptes rendus de réunion, <a href='/ia/fathom.html'>Fathom</a> ou <a href='/ia/noota.html'>Noota</a>. Le bon réflexe est de partir du problème à résoudre, pas de l'outil."),
     ("Comment savoir quelle IA utiliser pour mon entreprise ?",
-     "Partez du temps que vous perdez. Listez les trois tâches qui vous coûtent le plus d'heures chaque semaine, puis cherchez l'outil correspondant dans cet annuaire à l'aide du sélecteur. Vérifiez ensuite trois points avant d'adopter un outil : où sont hébergées les données, ce que coûte réellement l'abonnement en usage réel, et qui, dans l'entreprise, saura s'en servir. Un outil que personne n'utilise ne fait gagner aucun temps."),
+     "Partez du temps que vous perdez. Décrivez en une phrase la tâche qui vous coûte le plus d'heures dans la zone de conversation en haut de cette page : vous recevez la chaîne d'outils qui y répond, et des questions si le contexte manque. Vérifiez ensuite trois points avant d'adopter un outil : où sont hébergées les données, ce que coûte réellement l'abonnement en usage réel, et qui, dans l'entreprise, saura s'en servir. Un outil que personne n'utilise ne fait gagner aucun temps."),
     ("Quelles IA peut-on utiliser avec des données confidentielles ?",
      "Celles dont l'éditeur est soumis au droit européen ou qui s'installent sur votre propre infrastructure : <a href='/ia/mistral-le-chat.html'>Mistral Le Chat</a> (France), <a href='/ia/dust.html'>Dust</a> (France), <a href='/ia/n8n.html'>n8n</a> en auto-hébergement, <a href='/ia/ollama.html'>Ollama</a> ou <a href='/ia/anythingllm.html'>AnythingLLM</a> en local. Sur les outils américains, les offres Team et Entreprise excluent contractuellement l'entraînement sur vos échanges : c'est ce point qu'il faut vérifier et documenter, pas la version grand public. Chaque fiche de cet annuaire indique le pays de l'éditeur et le point de vigilance associé."),
     ("Existe-t-il des IA gratuites suffisantes pour une TPE ?",
@@ -821,8 +783,8 @@ def build_hub():
         f"Les meilleures IA du moment : {len(TOOLS)} outils comparés ({ANNEE})",
         f"Les meilleures IA : {len(TOOLS)} outils comparés ({ANNEE})",
     ])
-    desc = (f"Quelle IA utiliser ? {len(TOOLS)} outils comparés par usage, niveau, prix et pays d'hébergement "
-            "des données. Moteur de recherche et sélecteur gratuits.")
+    desc = (f"Décrivez votre situation, recevez la chaîne d'outils qui y répond. {len(TOOLS)} IA comparées "
+            "par usage, niveau, prix et pays d'hébergement des données. Gratuit.")
     canonical = f"{SITE}/meilleures-ia.html"
 
     ld = [
@@ -924,8 +886,8 @@ def build_hub():
 
   <section class="ia-section" id="selecteur" style="background:var(--bg2);">
     <div class="container">
-      <h2>Le sélecteur : quelle IA pour votre situation ?</h2>
-      <p class="intro">Quatre questions, cinq recommandations. L'usage et le niveau sont des conditions strictes : vous ne verrez jamais un outil au-dessus du niveau que vous indiquez. Le rôle et le budget affinent le classement, et le sélecteur vous dit s'il a dû élargir.</p>
+      <h2>Vous préférez cocher plutôt qu'écrire ?</h2>
+      <p class="intro">Quatre questions, cinq recommandations, sans rien rédiger et sans attendre : ce sélecteur fonctionne dans votre navigateur, instantanément. L'usage et le niveau y sont des conditions strictes — vous ne verrez jamais un outil au-dessus du niveau indiqué — le rôle et le budget affinent le classement, et il vous dit s'il a dû élargir.</p>
       <div class="ia-selector">
         <div class="ia-q"><label>1. Qu'est-ce que vous cherchez à régler ?</label><div class="ia-choices">
 {obj}
