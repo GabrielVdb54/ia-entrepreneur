@@ -248,6 +248,48 @@
   </div>
 </section>
 
+<style>
+  .video-band{padding:56px 0;background:var(--bg2);border-top:1px solid var(--border);border-bottom:1px solid var(--border)}
+  .video-band-layout{display:grid;grid-template-columns:minmax(0,400px) minmax(0,1fr);gap:40px;align-items:center;margin-top:26px}
+  .video-band-frame{position:relative;aspect-ratio:1/1;border-radius:20px;overflow:hidden;border:1px solid var(--border);box-shadow:0 16px 40px rgba(10,15,44,0.12);background:var(--bg)}
+  .video-band-frame video{display:block;width:100%;height:100%;object-fit:cover;background:var(--bg)}
+  .video-band-points{list-style:none;margin:0;padding:0;display:grid;gap:14px}
+  .video-band-points li{display:flex;gap:12px;align-items:flex-start;font-size:0.96rem;color:var(--text);line-height:1.6}
+  .video-band-points svg{flex-shrink:0;margin-top:4px}
+  .video-band-note{margin-top:18px;font-size:0.85rem;color:var(--muted);line-height:1.6}
+  .video-band-note a{color:var(--primary);font-weight:700;min-height:44px;display:inline-flex;align-items:center}
+  @media (max-width:820px){
+    .video-band{padding:44px 0}
+    .video-band-layout{grid-template-columns:1fr;gap:24px}
+    .video-band-frame{max-width:400px;margin:0 auto}
+  }
+</style>
+<section class="video-band">
+  <div class="container">
+    <div class="section-label">En vid&eacute;o</div>
+    <h2 class="section-title">Comment on forme vos &eacute;quipes, concr&egrave;tement</h2>
+    <p class="section-sub">Le programme Copilot est calibr&eacute; sur votre environnement Microsoft et vos cas m&eacute;tier. La vid&eacute;o r&eacute;sume notre fa&ccedil;on de travailler en 18 secondes.</p>
+    <div class="video-band-layout">
+      <div class="video-band-frame">
+        <video controls playsinline preload="none" width="1080" height="1080"
+               poster="/videos/ia-societes-1x1.jpg" aria-label="Formation IA en entreprise : pr&eacute;sentation en vid&eacute;o">
+          <source src="/videos/ia-societes-1x1.mp4" type="video/mp4" />
+          Votre navigateur ne peut pas lire cette vid&eacute;o.
+        </video>
+      </div>
+      <div>
+        <ul class="video-band-points">
+          <li><svg width="20" height="20" fill="none" stroke="var(--accent)" stroke-width="2.8" viewBox="0 0 24 24" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg><span>Un programme calibr&eacute; sur vos process, vos outils et vos m&eacute;tiers</span></li>
+          <li><svg width="20" height="20" fill="none" stroke="var(--accent)" stroke-width="2.8" viewBox="0 0 24 24" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg><span>RGPD et AI Act ma&icirc;tris&eacute;s : vos donn&eacute;es et votre conformit&eacute; prot&eacute;g&eacute;es</span></li>
+          <li><svg width="20" height="20" fill="none" stroke="var(--accent)" stroke-width="2.8" viewBox="0 0 24 24" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg><span>Analyse de vos besoins offerte, avant m&ecirc;me de construire le programme</span></li>
+        </ul>
+        <p class="video-band-note">Vid&eacute;o de 18 secondes, sans son n&eacute;cessaire. <a href="https://calendly.com/gabriel-ia-entrepreneur/decouverte" target="_blank" rel="noopener noreferrer">R&eacute;server un appel gratuit de 15 min &rarr;</a></p>
+      </div>
+    </div>
+  </div>
+</section>
+
+
 <section class="gains-section">
   <div class="container">
     <div class="section-label">Ce que vous allez gagner</div>

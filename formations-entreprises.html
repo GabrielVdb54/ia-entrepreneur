@@ -301,8 +301,8 @@
         Finançable OPCO · Budget formation entreprise · FAF pour indépendants
       </div>
       <div class="hero-tabs">
-        <button class="hero-tab" onclick="switchTab('inter', this)">Je suis freelance / indépendant</button>
-        <button class="hero-tab active" onclick="switchTab('entreprise', this)">Je suis une entreprise</button>
+        <button class="hero-tab" id="tab-btn-inter" onclick="switchTab('inter', this)">Je suis freelance / indépendant</button>
+        <button class="hero-tab active" id="tab-btn-entreprise" onclick="switchTab('entreprise', this)">Je suis une entreprise</button>
       </div>
     </div>
   </section>
@@ -569,7 +569,7 @@
     <!-- VIDEO DE PRESENTATION -->
     <section class="video-section alt">
       <div class="container">
-        <div class="section-label">En 15 secondes</div>
+        <div class="section-label">En 18 secondes</div>
         <h2 class="section-title">La formation IA en entreprise, en vid&eacute;o</h2>
         <p class="section-sub">Comment on construit un programme sur mesure pour vos &eacute;quipes, et ce que &ccedil;a change concr&egrave;tement.</p>
         <div class="video-layout">
@@ -1104,6 +1104,26 @@
       document.getElementById('tab-'+tab).classList.add('active');
       btn.classList.add('active');
     }
+
+    // Deep link : #sessions / #liste-attente / #inter arrivent depuis d'autres pages
+    // et visent l'onglet freelance, qui est masque par defaut.
+    (function ouvrirOngletDepuisHash() {
+      const ancresInter = ['#inter', '#sessions', '#liste-attente'];
+      function appliquer() {
+        const hash = window.location.hash;
+        if (!ancresInter.includes(hash)) return;
+        const btn = document.getElementById('tab-btn-inter');
+        if (btn) switchTab('inter', btn);
+        const cible = document.getElementById(hash.slice(1));
+        if (cible) requestAnimationFrame(() => cible.scrollIntoView({ behavior: 'smooth', block: 'start' }));
+      }
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', appliquer);
+      } else {
+        appliquer();
+      }
+      window.addEventListener('hashchange', appliquer);
+    })();
 
     // Programme entreprise -> pré-remplit le devis et défile vers le formulaire
     function switchToDevis(programme) {

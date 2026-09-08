@@ -253,6 +253,19 @@
       margin-bottom: 48px;
     }
 
+    /* ── Videos de presentation ─────────────────────────────── */
+    .home-videos{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:32px;max-width:880px;margin:36px auto 0;}
+    .home-video-card{display:flex;flex-direction:column;gap:16px;}
+    .home-video-frame{position:relative;aspect-ratio:4/5;border-radius:20px;overflow:hidden;border:1px solid var(--border);box-shadow:0 18px 44px rgba(10,15,44,0.13);background:var(--bg2);}
+    .home-video-frame video{display:block;width:100%;height:100%;object-fit:cover;background:var(--bg2);}
+    .home-video-tag{font-size:0.72rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--accent);}
+    .home-video-card h3{font-size:1.05rem;font-weight:800;line-height:1.35;margin:6px 0 0;}
+    .home-video-card p{font-size:0.9rem;color:var(--muted);line-height:1.6;margin:0;text-align:left;}
+    .home-video-card a.home-video-link{display:inline-flex;align-items:center;gap:6px;font-size:0.88rem;font-weight:700;color:var(--primary);min-height:44px;}
+    @media (max-width: 820px){
+      .home-videos{grid-template-columns:1fr;gap:40px;max-width:400px;}
+    }
+
     /* ── Scroll animations ──────────────────────────────────── */
     .reveal {
       opacity: 0;
@@ -2197,6 +2210,51 @@
         </div>
       </div>
 
+    </div>
+  </section>
+
+  <!-- ── Les formations en video ────────────────────────────────── -->
+  <section id="videos" style="padding:8px 0 56px;">
+    <div class="container">
+      <div class="section-label reveal" style="margin-bottom:16px;"><span>En moins de 20 secondes</span></div>
+      <h2 class="section-title reveal" style="margin-bottom:12px;">Nos formations IA, <span style="color:var(--primary)">en vid&eacute;o</span></h2>
+      <p class="section-sub reveal" style="margin-bottom:8px;">Deux formats, deux publics. Choisissez celui qui vous ressemble : ce que &ccedil;a change pour une &eacute;quipe, ou ce que &ccedil;a change quand vous travaillez seul.</p>
+
+      <div class="home-videos reveal">
+
+        <div class="home-video-card">
+          <div class="home-video-frame">
+            <video controls playsinline preload="none" width="1080" height="1350"
+                   poster="/videos/ia-societes-4x5.jpg" aria-label="Formation IA en entreprise : pr&eacute;sentation en vid&eacute;o">
+              <source src="/videos/ia-societes-4x5.mp4" type="video/mp4" />
+              Votre navigateur ne peut pas lire cette vid&eacute;o.
+            </video>
+          </div>
+          <div>
+            <span class="home-video-tag">Vous &ecirc;tes une entreprise</span>
+            <h3>Former vos &eacute;quipes, sur vos process et vos outils</h3>
+          </div>
+          <p>Un programme calibr&eacute; sur votre r&eacute;alit&eacute; terrain, RGPD et AI Act ma&icirc;tris&eacute;s, analyse de vos besoins offerte. Certifi&eacute; Qualiopi, finan&ccedil;able OPCO.</p>
+          <a class="home-video-link" href="/formations-entreprises.html">Voir la formation entreprise &rarr;</a>
+        </div>
+
+        <div class="home-video-card">
+          <div class="home-video-frame">
+            <video controls playsinline preload="none" width="1080" height="1350"
+                   poster="/videos/ia-independants-4x5.jpg" aria-label="Formation IA pour ind&eacute;pendants et solopreneurs : pr&eacute;sentation en vid&eacute;o">
+              <source src="/videos/ia-independants-4x5.mp4" type="video/mp4" />
+              Votre navigateur ne peut pas lire cette vid&eacute;o.
+            </video>
+          </div>
+          <div>
+            <span class="home-video-tag">Vous &ecirc;tes ind&eacute;pendant</span>
+            <h3>Automatiser ce qui vous fait perdre du temps</h3>
+          </div>
+          <p>Emails, devis, contenus, reporting : jusqu&rsquo;&agrave; 5&nbsp;h par semaine r&eacute;cup&eacute;r&eacute;es. Sessions en petit groupe, anim&eacute;es par des formateurs-praticiens.</p>
+          <a class="home-video-link" href="/formations-entreprises.html#sessions">Voir les sessions ind&eacute;pendants &rarr;</a>
+        </div>
+
+      </div>
     </div>
   </section>
 
