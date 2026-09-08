@@ -82,6 +82,14 @@ On te demande autre chose, sans rapport avec le travail ou les outils : dis en u
 
 Règle de coût, stricte : jamais plus de deux tours de questions dans une conversation. En cas de doute entre questionner et recommander, recommande.
 
+TROIS FAÇONS DE FAIRE
+Chaque recommandation se décline en trois niveaux, pour que le visiteur se situe sans que tu aies à lui demander son budget.
+- La chaîne principale est le MEILLEUR RAPPORT QUALITÉ-PRIX : ce que tu conseillerais à un ami qui accepte de payer un peu si ça vaut le coup.
+- La version GRATUITE n'utilise que des outils dont l'offre gratuite suffit réellement à faire le travail. Dis franchement ce qu'on y perd.
+- La version PERFORMANCE est ce que tu prendrais si le budget n'était pas un sujet. Dis ce que l'argent achète concrètement, pas « plus de fonctionnalités ».
+Les trois peuvent partager des outils. Si la version gratuite est déjà la meilleure, dis-le : mets les mêmes outils et explique qu'il n'y a pas lieu de payer.
+Si le visiteur a annoncé son budget, respecte-le dans la chaîne principale — mais renseigne quand même les deux autres colonnes.
+
 LA CONVERSATION
 Le visiteur peut rebondir sur ta réponse précédente. Tiens compte de tout le fil : s'il précise son budget, son niveau ou son métier après coup, révise ta recommandation au lieu de la répéter. Termine toujours par deux ou trois relances que LE VISITEUR pourrait t'envoyer ensuite : elles sont écrites de son point de vue, à la première personne, et deviendront des boutons qu'il cliquera pour te répondre. Ne pose jamais de question au visiteur dans ce champ — « Quel est votre budget ? » est faux, « Mon budget est serré » est juste.
 
@@ -108,7 +116,7 @@ const OUTIL = {
       },
       etapes: {
         type: 'array',
-        description: "Deux à quatre outils, dans l'ordre où on les utilise. Vide si tu poses des questions.",
+        description: "La chaîne recommandée : le meilleur rapport qualité-prix pour cette situation. Deux à quatre outils, dans l'ordre où on les utilise. Vide si tu poses des questions.",
         items: {
           type: 'object',
           properties: {
@@ -119,6 +127,26 @@ const OUTIL = {
           required: ['outil', 'role', 'comment'],
           additionalProperties: false,
         },
+      },
+      gratuit: {
+        type: 'object',
+        description: "La façon de faire sans dépenser un euro : uniquement des outils Gratuit ou Freemium dont la version gratuite suffit vraiment. Un à trois slugs.",
+        properties: {
+          outils: { type: 'array', items: { type: 'string' } },
+          phrase: { type: 'string', description: "Ce qu'on obtient et ce qu'on perd par rapport à la recommandation, en une phrase." },
+        },
+        required: ['outils', 'phrase'],
+        additionalProperties: false,
+      },
+      performance: {
+        type: 'object',
+        description: "La façon de faire quand le budget n'est pas le sujet et qu'on veut le meilleur résultat. Un à trois slugs.",
+        properties: {
+          outils: { type: 'array', items: { type: 'string' } },
+          phrase: { type: 'string', description: "Ce que le budget supplémentaire apporte concrètement, en une phrase." },
+        },
+        required: ['outils', 'phrase'],
+        additionalProperties: false,
       },
       vigilance: {
         type: 'string',
@@ -132,7 +160,7 @@ const OUTIL = {
         items: { type: 'string' },
       },
     },
-    required: ['situation', 'questions', 'etapes', 'vigilance', 'offre', 'phrase_offre', 'suivis'],
+    required: ['situation', 'questions', 'etapes', 'gratuit', 'performance', 'vigilance', 'offre', 'phrase_offre', 'suivis'],
     additionalProperties: false,
   },
 };
@@ -210,7 +238,7 @@ export default async function handler(req, res) {
   try {
     const reponse = await client.messages.create({
       model: MODELE,
-      max_tokens: 900,
+      max_tokens: 1200,
       system: [
         {
           type: 'text',
@@ -288,6 +316,19 @@ export default async function handler(req, res) {
       });
     }
 
+    // Mêmes garde-fous que pour la chaîne principale : tout slug inconnu saute.
+    function variante(v) {
+      if (!v || !Array.isArray(v.outils)) return null;
+      const outils = v.outils
+        .filter((sl) => SLUGS.has(sl))
+        .slice(0, 3)
+        .map((sl) => {
+          const f = CATALOGUE.find((o) => o.slug === sl);
+          return { slug: f.slug, nom: f.nom, prix: f.prix, url: `/ia/${f.slug}.html` };
+        });
+      return outils.length ? { outils, phrase: couper(v.phrase, 220) } : null;
+    }
+
     const offre = OFFRES[brut.offre] ? { ...OFFRES[brut.offre], phrase: couper(brut.phrase_offre, 340) }
                                      : null;
 
@@ -302,6 +343,8 @@ export default async function handler(req, res) {
       modele: reponse.model,
       situation: couper(brut.situation, 320),
       etapes,
+      gratuit: variante(brut.gratuit),
+      performance: variante(brut.performance),
       vigilance: couper(brut.vigilance, 420),
       suivis: (Array.isArray(brut.suivis) ? brut.suivis : [])
         .filter((x) => typeof x === 'string' && x.trim())

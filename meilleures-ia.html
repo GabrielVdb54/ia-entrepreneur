@@ -3659,10 +3659,34 @@
           }).join('') + '</div>'
         : '';
 
+      // Trois façons de faire, avant le détail : le visiteur se situe sans
+      // qu'on lui ait demandé son budget.
+      function colonne(titre, sous, v, recommandee) {
+        if (!v || !v.outils || !v.outils.length) return '';
+        return '<div class="ia-voie' + (recommandee ? ' est-recommandee' : '') + '">' +
+          '<b>' + titre + '</b><em>' + sous + '</em>' +
+          '<div class="ia-voie-outils">' + v.outils.map(function (o) {
+            return '<a href="' + o.url + '">' + echapper(o.nom) + '</a>';
+          }).join('') + '</div>' +
+          '<p>' + echapper(v.phrase) + '</p></div>';
+      }
+      var colonnes = '';
+      if (r.gratuit || r.performance) {
+        colonnes = '<div class="ia-voies">' +
+          colonne('Sans payer', 'gratuit ou offre gratuite', r.gratuit, false) +
+          colonne('Recommandé', 'meilleur rapport qualité-prix', {
+            outils: r.etapes.map(function (e) { return { nom: e.nom, url: e.url }; }),
+            phrase: 'Le meilleur équilibre entre ce que ça coûte et ce que ça vous fait gagner.'
+          }, true) +
+          colonne('Performance', 'si le budget n’est pas le sujet', r.performance, false) +
+          '</div>';
+      }
+
       el.innerHTML =
-        '<span class="ia-conseil-source">' +
-        (r.source === 'claude' ? 'Réponse composée pour votre situation' : 'Réponse instantanée') +
-        '</span><h3>' + echapper(r.situation) + '</h3>' + etapes +
+        '<span class="ia-conseil-source">FindIA · ' +
+        (r.source === 'claude' ? 'réponse composée pour votre situation' : 'réponse instantanée') +
+        '</span><h3>' + echapper(r.situation) + '</h3>' + colonnes +
+        (colonnes ? '<p class="ia-voies-detail">En détail, la voie recommandée :</p>' : '') + etapes +
         (r.vigilance ? '<p class="ia-conseil-vigilance">' + echapper(r.vigilance) + '</p>' : '') +
         offre + suivis;
     }
