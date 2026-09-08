@@ -60,11 +60,19 @@ STYLE
 - Aucune promesse chiffrée de retour sur investissement. On parle de temps gagné et de fiabilité.
 - Pas de superlatif creux.
 
+QUAND TU NE SAIS PAS ASSEZ
+Si la demande est trop vague pour recommander sérieusement — « une IA pour mes cours », « un outil pour mon entreprise » — ne devine pas : pose deux à quatre questions courtes et concrètes qui te manquent vraiment pour choisir. Pour des cours par exemple : quel type de cours, en présentiel, en visio ou les deux, combien d'apprenants, faut-il produire les supports ou seulement animer.
+Dans ce cas, renvoie une liste d'étapes vide et remplis le champ des questions. Sinon, laisse les questions vides et recommande.
+
+Règle de coût, à respecter strictement : tu ne poses des questions qu'une seule fois, deux au maximum. Dès que tu as de quoi choisir, tu recommandes. Ne pose jamais de question dont la réponse ne changerait pas ta recommandation.
+
 LA CONVERSATION
 Le visiteur peut rebondir sur ta réponse précédente. Tiens compte de tout le fil : s'il précise son budget, son niveau ou son métier après coup, révise ta recommandation au lieu de la répéter. Termine toujours par deux ou trois relances que LE VISITEUR pourrait t'envoyer ensuite : elles sont écrites de son point de vue, à la première personne, et deviendront des boutons qu'il cliquera pour te répondre. Ne pose jamais de question au visiteur dans ce champ — « Quel est votre budget ? » est faux, « Mon budget est serré » est juste.
 
 L'OFFRE
-Tu termines toujours par l'offre IA-Entrepreneur la plus pertinente pour la situation décrite, choisie dans la liste fournie. Une phrase, honnête, qui relie le besoin exprimé à ce que la formation ou l'accompagnement change concrètement. L'idée à faire passer : disposer de l'outil ne suffit pas, c'est de savoir s'en servir sur ses propres cas qui fait la différence. Jamais de pression commerciale, jamais d'urgence artificielle.`;
+Tu termines toujours par l'offre IA-Entrepreneur la plus pertinente, choisie dans la liste fournie. La phrase doit être écrite POUR CETTE PERSONNE : reprends son métier, son contexte et ses propres mots, et dis ce que la formation change concrètement sur SON cas. « Une formation sur mesure » ne veut rien dire ; « deux jours sur vos propres séquences de prospection, avec votre fichier et votre CRM » veut dire quelque chose.
+
+Nomme au moins un élément concret de sa situation dans la phrase, et relie-le à un des outils que tu viens de recommander. L'idée à faire passer, jamais énoncée comme un slogan : disposer de l'outil ne suffit pas, savoir s'en servir sur ses propres dossiers fait la différence. Jamais de pression commerciale, jamais d'urgence artificielle, jamais de promesse chiffrée.`;
 
 const OUTIL = {
   name: 'recommander',
@@ -75,11 +83,16 @@ const OUTIL = {
     properties: {
       situation: {
         type: 'string',
-        description: "Reformulation du besoin en une phrase, à la deuxième personne. Exemple : « Vous voulez plus de rendez-vous qualifiés sans y passer vos matinées. »",
+        description: "Si tu recommandes : reformulation du besoin en une phrase, à la deuxième personne. Si tu poses des questions : une phrase qui dit ce qu'il te manque pour bien conseiller, sans jargon.",
+      },
+      questions: {
+        type: 'array',
+        description: "Deux à quatre questions courtes et concrètes, posées au visiteur, quand la demande est trop vague pour recommander. Vide dès que tu recommandes.",
+        items: { type: 'string' },
       },
       etapes: {
         type: 'array',
-        description: "Deux à quatre outils, dans l'ordre où on les utilise.",
+        description: "Deux à quatre outils, dans l'ordre où on les utilise. Vide si tu poses des questions.",
         items: {
           type: 'object',
           properties: {
@@ -103,7 +116,7 @@ const OUTIL = {
         items: { type: 'string' },
       },
     },
-    required: ['situation', 'etapes', 'vigilance', 'offre', 'phrase_offre', 'suivis'],
+    required: ['situation', 'questions', 'etapes', 'vigilance', 'offre', 'phrase_offre', 'suivis'],
     additionalProperties: false,
   },
 };
@@ -159,6 +172,11 @@ export default async function handler(req, res) {
     return res.status(429).json({ erreur: 'trop_de_questions' });
   }
 
+  // Plafond de dépense : trois réponses maximum par conversation. Au-delà de
+  // deux tours de questions, le conseiller doit trancher avec ce qu'il sait.
+  const toursReponse = fil.filter((m) => m.role === 'assistant').length;
+  const dernierTour = toursReponse >= 2;
+
   const client = new Anthropic({ timeout: 25000, maxRetries: 1 });
 
   try {
@@ -174,6 +192,9 @@ export default async function handler(req, res) {
           cache_control: { type: 'ephemeral' },
         },
         { type: 'text', text: INSTRUCTIONS },
+        ...(dernierTour
+          ? [{ type: 'text', text: "C'EST TON DERNIER TOUR. Tu ne poses plus aucune question : tu recommandes avec ce que tu sais déjà, quitte à préciser une hypothèse en une demi-phrase." }]
+          : []),
       ],
       tools: [OUTIL],
       tool_choice: { type: 'tool', name: 'recommander' },
@@ -202,6 +223,24 @@ export default async function handler(req, res) {
         };
       });
 
+    const questions = (Array.isArray(brut.questions) ? brut.questions : [])
+      .filter((x) => typeof x === 'string' && x.trim())
+      .slice(0, 4)
+      .map((x) => x.trim().slice(0, 160));
+
+    // Demande de précisions : pas d'outil, donc rien à valider contre le
+    // catalogue. On l'accepte seulement si ce n'est pas le dernier tour.
+    if (!etapes.length && questions.length && !dernierTour) {
+      journaliser(question, []);
+      return res.status(200).json({
+        source: 'claude',
+        modele: reponse.model,
+        mode: 'questions',
+        situation: String(brut.situation || '').slice(0, 300),
+        questions,
+      });
+    }
+
     if (!etapes.length) return res.status(502).json({ erreur: 'aucun_outil_valide' });
 
     const offre = OFFRES[brut.offre] ? { ...OFFRES[brut.offre], phrase: String(brut.phrase_offre || '').slice(0, 300) }
@@ -211,6 +250,7 @@ export default async function handler(req, res) {
 
     return res.status(200).json({
       source: 'claude',
+      mode: 'recommandation',
       // Le modele reellement utilise, tel que l'API le renvoie — pas celui
       // qu'on a demande. Permet de verifier de l'exterieur qu'aucun autre
       // modele, plus cher, n'a servi la reponse.
