@@ -151,7 +151,7 @@ Chaque recommandation se décline en trois niveaux, pour que le visiteur se situ
 - La version GRATUITE n'utilise que des outils dont l'offre gratuite suffit réellement à faire le travail. Dis franchement ce qu'on y perd.
 - La version PERFORMANCE est ce que tu prendrais si le budget n'était pas un sujet. Dis ce que l'argent achète concrètement, pas « plus de fonctionnalités ».
 Deux règles impératives sur ces colonnes.
-La phrase d'une colonne ne cite QUE des outils présents dans la liste de cette même colonne. Vanter un outil qu'on n'a pas mis dans la liste rend la colonne incompréhensible.
+La phrase d'une colonne ne cite que des outils AFFICHÉS À L'ÉCRAN : ceux de sa propre liste, ceux de la chaîne principale, ou ceux de l'autre colonne. Comparer à la recommandation principale est utile — « Otter.ai transcrit correctement, mais moins finement que TurboScribe ». Citer un outil qui n'apparaît nulle part rend la colonne incompréhensible.
 Si une colonne aboutit aux mêmes outils que la recommandation, ne répète pas la liste sans le dire : écris franchement qu'il n'y a rien de mieux à ce niveau, ou qu'il n'y a pas lieu de payer davantage.
 Si le visiteur a annoncé son budget, respecte-le dans la chaîne principale — mais renseigne quand même les deux autres colonnes.
 
@@ -377,7 +377,9 @@ export default async function handler(req, res) {
 
   const client = new Anthropic({ timeout: 50000, maxRetries: 1 });
 
-  try {
+  // L'appel, isolé pour pouvoir être rejoué. « consigneSupplementaire » sert
+  // uniquement à la seconde tentative : voir plus bas.
+  async function demander(consigneSupplementaire) {
     const reponse = await client.messages.create({
       model: MODELE,
       max_tokens: 1000,
@@ -402,18 +404,20 @@ export default async function handler(req, res) {
         ...(!dernierTour && recommandeDirectement
           ? [{ type: 'text', text: "Le visiteur a nommé une tâche précise : tu recommandes, tu ne demandes rien. Le champ « etapes » ne peut PAS rester vide — ce serait une impasse. S'il te manque un détail, prends l'interprétation la plus probable et annonce-la en une demi-phrase dans « situation » : « je pars du principe que vous voulez monter des vidéos existantes ». Reste bref : deux outils, une phrase chacun." }]
           : []),
+        ...(consigneSupplementaire ? [{ type: 'text', text: consigneSupplementaire }] : []),
       ],
       tools: [recommandeDirectement ? OUTIL_SANS_QUESTIONS : OUTIL],
       tool_choice: { type: 'tool', name: 'recommander' },
       messages: fil,
     });
-
     const bloc = reponse.content.find((b) => b.type === 'tool_use');
-    if (!bloc) return res.status(502).json({ erreur: 'reponse_illisible' });
-    const brut = bloc.input;
+    return { reponse, brut: bloc ? bloc.input : null };
+  }
 
-    // Revérification : on ne fait confiance à rien de ce qui sort du modèle.
-    const etapes = (Array.isArray(brut.etapes) ? brut.etapes : [])
+  // Revérification : on ne fait confiance à rien de ce qui sort du modèle.
+  // Tout slug absent du catalogue disparaît, silencieusement.
+  function extraireEtapes(brut) {
+    return (Array.isArray(brut?.etapes) ? brut.etapes : [])
       .filter((e) => e && SLUGS.has(e.outil))
       .slice(0, 4)
       .map((e) => {
@@ -429,6 +433,24 @@ export default async function handler(req, res) {
           comment: couper(e.comment, 500),
         };
       });
+  }
+
+  try {
+    let { reponse, brut } = await demander(null);
+    if (!brut) return res.status(502).json({ erreur: 'reponse_illisible' });
+    let etapes = extraireEtapes(brut);
+
+    // Une tâche était nommée et il n'en sort aucun outil : le modèle a compris
+    // la demande puis n'a rien proposé. C'est une impasse pour le visiteur, et
+    // c'est rare — une seconde tentative, plus directive, coûte moins cher
+    // qu'un visiteur qui repart les mains vides.
+    if (recommandeDirectement && !etapes.length) {
+      ({ reponse, brut } = await demander(
+        "Ta réponse précédente ne contenait aucun outil. C'est inacceptable : le visiteur repartirait sans rien. Choisis MAINTENANT les deux outils du catalogue les plus probables pour sa demande, même si un détail te manque, et dis l'hypothèse que tu prends dans « situation »."
+      ));
+      if (!brut) return res.status(502).json({ erreur: 'reponse_illisible' });
+      etapes = extraireEtapes(brut);
+    }
 
     const questions = (Array.isArray(brut.questions) ? brut.questions : [])
       .filter((x) => typeof x === 'string' && x.trim())
@@ -490,6 +512,24 @@ export default async function handler(req, res) {
       return outils.length ? { outils, phrase: couper(v.phrase, 220) } : null;
     }
 
+    /**
+     * Une colonne qui vante un outil absent de l'ecran laisse le visiteur
+     * chercher un nom qu'il ne verra nulle part. Comparer a la chaine
+     * principale est utile et reste permis ; citer un outil qui n'apparait
+     * dans aucune liste ne l'est pas. On retire alors la phrase fautive —
+     * une phrase en moins vaut mieux qu'une phrase qui egare.
+     */
+    function assainirColonne(col, affiches) {
+      if (!col || !col.phrase) return col;
+      const intrus = CATALOGUE.filter((o) => !affiches.has(o.slug))
+        .filter((o) => new RegExp('\\b' + o.nom.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '\\b', 'i').test(col.phrase));
+      if (!intrus.length) return col;
+      const gardees = col.phrase
+        .split(/(?<=[.!?])\s+/)
+        .filter((ph) => !intrus.some((o) => new RegExp('\\b' + o.nom.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '\\b', 'i').test(ph)));
+      return { ...col, phrase: gardees.join(' ').trim() || `${col.outils.map((o) => o.nom).join(' et ')} pour cette situation.` };
+    }
+
     // Une offre liée à un outil précis n'est retenue que si cet outil est
     // effectivement dans la recommandation. Sinon on bascule sur la formation
     // sur mesure, qui convient à toutes les situations.
@@ -499,7 +539,27 @@ export default async function handler(req, res) {
 
     // La clé accompagne l'offre : la page la renvoie telle quelle à /api/recap,
     // qui la revalide contre la même liste fermée.
-    const offre = { cle: cleOffre, ...OFFRES[cleOffre], phrase: couper(brut.phrase_offre, 340) };
+    // Le troisieme temps — Qualiopi, OPCO — saute une fois sur dix : le modele
+    // ecrit un bon argumentaire puis oublie ce qui leve le frein. C'est
+    // precisement l'information qui declenche la prise de rendez-vous, et elle
+    // est toujours vraie. On la reattache plutot que d'esperer.
+    let phraseOffre = couper(brut.phrase_offre, 340);
+    if (phraseOffre && !/qualiopi|opco|finan|prise en charge/i.test(phraseOffre)) {
+      phraseOffre = phraseOffre.replace(/\s*$/, '') +
+        (/[.!?…]$/.test(phraseOffre.trim()) ? ' ' : '. ') +
+        'Organisme certifié Qualiopi, finançable par votre OPCO.';
+    }
+    const offre = { cle: cleOffre, ...OFFRES[cleOffre], phrase: phraseOffre };
+
+    let colGratuit = variante(brut.gratuit);
+    let colPerformance = variante(brut.performance);
+    const affiches = new Set([
+      ...etapes.map((e) => e.slug),
+      ...(colGratuit?.outils || []).map((o) => o.slug),
+      ...(colPerformance?.outils || []).map((o) => o.slug),
+    ]);
+    colGratuit = assainirColonne(colGratuit, affiches);
+    colPerformance = assainirColonne(colPerformance, affiches);
 
     journaliser(question, etapes.map((e) => e.slug));
 
@@ -509,18 +569,14 @@ export default async function handler(req, res) {
       // La page n'affiche le bloc « recevoir par email » que si l'envoi est
       // réellement configuré. On ne propose pas un envoi qu'on ne sait pas faire.
       recap: Boolean(process.env.N8N_RECAP_WEBHOOK),
-      // MESURE TEMPORAIRE : savoir si le cache est lu, et combien de jetons
-      // sont reellement produits. Sans ca, optimiser la latence revient a
-      // deviner.
-      usage: reponse.usage,
       // Le modele reellement utilise, tel que l'API le renvoie — pas celui
       // qu'on a demande. Permet de verifier de l'exterieur qu'aucun autre
       // modele, plus cher, n'a servi la reponse.
       modele: reponse.model,
       situation: couper(brut.situation, 320),
       etapes,
-      gratuit: variante(brut.gratuit),
-      performance: variante(brut.performance),
+      gratuit: colGratuit,
+      performance: colPerformance,
       vigilance: couper(brut.vigilance, 420),
       suivis: (Array.isArray(brut.suivis) ? brut.suivis : [])
         .filter((x) => typeof x === 'string' && x.trim())
