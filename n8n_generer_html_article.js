@@ -133,20 +133,27 @@ html += '<header>';
 html += '<div class="container">';
 html += '<div class="header-inner">';
 html += '<a href="/" class="logo" style="line-height:1.2;">IA<span>-</span>Entrepreneur<span style="display:block;font-size:0.58rem;font-weight:500;color:var(--muted);letter-spacing:0.03em;margin-top:2px;">Organisme de formation certifié Qualiopi</span></a>';
+// Navigation identique a celle que simplifier_nav.py pose sur les 153 autres
+// pages. Quatre liens, le telephone, l'appel gratuit. Toute divergence ici se
+// voit immediatement : l'article publie n'a plus la meme barre que le reste du
+// site, et il perd le lien vers l'annuaire.
 html += '<nav>';
-html += '<a href="/">Accueil</a>';
 html += '<a href="/formations-entreprises.html">Formations IA</a>';
-html += '<a href="/apropos.html">À propos</a>';
-html += '<a href="/blog.html">Blog</a>';
-html += '<a href="mailto:contact@ia-entrepreneur.fr" style="display:flex;align-items:center;gap:4px;"><svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,12 2,6"/></svg>contact@ia-entrepreneur.fr</a>';
+html += '<a href="/integrations-ia.html">Intégrations IA</a>';
+html += '<a href="/meilleures-ia.html">Meilleures IA</a>';
+html += '<a href="/nos-formateurs.html">Nos formateurs</a>';
+html += '<a href="tel:+33614980713" class="nav-tel"><svg width=\"13\" height=\"13\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" viewBox=\"0 0 24 24\"><path d=\"M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.362 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.338 1.85.573 2.81.7A2 2 0 0 1 22 16.92z\"/></svg>06 14 98 07 13</a>';
 html += '<a href="https://calendly.com/gabriel-ia-entrepreneur/decouverte" target="_blank" rel="noopener noreferrer" class="nav-cta">Appel gratuit</a>';
 html += '</nav>';
 html += '<button class="hamburger" id="hamburger" aria-label="Menu"><span></span><span></span><span></span></button>';
 html += '</div>';
 html += '</div>';
 html += '<div class="mobile-menu" id="mobile-menu">';
-html += '<a href="/">Accueil</a><a href="/formations-entreprises.html">Formations IA</a><a href="/apropos.html">À propos</a><a href="/blog.html">Blog</a>';
-html += '<a href="mailto:contact@ia-entrepreneur.fr">contact@ia-entrepreneur.fr</a>';
+html += '<a href="/formations-entreprises.html">Formations IA</a><a href="/integrations-ia.html">Intégrations IA</a><a href="/meilleures-ia.html">Meilleures IA</a><a href="/nos-formateurs.html">Nos formateurs</a>';
+html += '<a href="/simulateur-financement-formation-ia.html">💶 Financer ma formation</a>';
+html += '<a href="/blog.html">Blog</a><a href="/apropos.html">À propos</a>';
+html += '<a href="mailto:contact@ia-entrepreneur.fr">✉ Écrire un email</a>';
+html += '<a href="tel:+33614980713">📞 06 14 98 07 13</a>';
 html += '<a href="https://calendly.com/gabriel-ia-entrepreneur/decouverte" target="_blank" rel="noopener noreferrer" style="background:var(--accent);color:#fff;text-align:center;border-radius:var(--radius);margin-top:8px;padding:14px;display:block;font-weight:700;">Réserver un appel gratuit</a>';
 html += '</div>';
 html += '</header>';
