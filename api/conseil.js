@@ -23,6 +23,11 @@ import Anthropic from '@anthropic-ai/sdk';
 import { CATALOGUE, SLUGS } from './_catalogue.js';
 import { OFFRES, CLES_OFFRES } from './_offres.js';
 
+// Vercel coupe une fonction Node bien avant si on ne le lui dit pas. Une
+// réponse à trois voies demande jusqu'à 25 secondes : sans cette ligne, les
+// prompts les plus riches échouaient précisément là où ils sont les plus utiles.
+export const maxDuration = 60;
+
 const MODELE = 'claude-haiku-4-5';
 const QUESTION_MIN = 3;
 const QUESTION_MAX = 500;
@@ -240,7 +245,7 @@ export default async function handler(req, res) {
   const toursReponse = fil.filter((m) => m.role === 'assistant').length;
   const dernierTour = toursReponse >= 2;
 
-  const client = new Anthropic({ timeout: 25000, maxRetries: 1 });
+  const client = new Anthropic({ timeout: 50000, maxRetries: 1 });
 
   try {
     const reponse = await client.messages.create({

@@ -1478,7 +1478,11 @@ def build_hub():
       var moi = ++enCours;
       boutonEnvoyer.disabled = true;
 
+      // La réponse du modèle demande dix à vingt-cinq secondes. Plutôt que de
+      // faire patienter devant un point qui clignote, on affiche tout de suite
+      // celle du moteur local, puis on la remplace quand la vraie arrive.
       var local = conseilLocal(texte);
+      if (local) rendre(bulle, local);
 
       fetch('/api/conseil', {{
         method: 'POST',
