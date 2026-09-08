@@ -3633,6 +3633,20 @@
       return el;
     }
 
+    // Reponse simple : ni outils ni questions. « Qui es-tu ? », ou une demande
+    // hors sujet a laquelle il faut repondre sans faire semblant.
+    function rendreMessage(el, r) {
+      stopAttente(el);
+      el.innerHTML = '<span class="ia-conseil-source">FindIA</span><h3>' +
+        echapper(r.situation) + '</h3>' +
+        ((r.suivis && r.suivis.length)
+          ? '<div class="ia-suivis"><span>Vous pouvez essayer</span>' +
+            r.suivis.map(function (x) {
+              return '<button type="button" data-suivi="' + echapper(x) + '">' + echapper(x) + '</button>';
+            }).join('') + '</div>'
+          : '');
+    }
+
     function rendreQuestions(el, r) {
       stopAttente(el);
       el.innerHTML =
@@ -3717,6 +3731,57 @@
     // qu’une relance ait du sens sans payer un contexte inutile.
     var historique = [], enCours = 0;
 
+    // La conversation survit à un rechargement, à un aller-retour vers une
+    // fiche outil, à une reprise le lendemain. Elle reste dans le navigateur
+    // du visiteur : rien n'est envoyé nulle part.
+    var CLE_FIL = 'findia-conversation';
+    var journal = [];
+
+    function memoriser() {
+      try {
+        localStorage.setItem(CLE_FIL, JSON.stringify({
+          date: Date.now(), journal: journal.slice(-12), historique: historique.slice(-12)
+        }));
+      } catch (e) { /* navigation privée, quota : on continue sans mémoire */ }
+    }
+
+    function restituer() {
+      var brut;
+      try { brut = JSON.parse(localStorage.getItem(CLE_FIL) || 'null'); } catch (e) { return; }
+      if (!brut || !brut.journal || !brut.journal.length) return;
+      // Au-delà de sept jours, la situation du visiteur a changé : on repart à zéro.
+      if (Date.now() - (brut.date || 0) > 7 * 24 * 3600 * 1000) {
+        try { localStorage.removeItem(CLE_FIL); } catch (e) {}
+        return;
+      }
+      journal = brut.journal;
+      historique = brut.historique || [];
+      fil.hidden = false;
+      journal.forEach(function (entree) {
+        if (entree.type === 'moi') return bulleVisiteur(entree.texte);
+        var el = document.createElement('div');
+        el.className = 'ia-msg ia-msg-ia';
+        fil.appendChild(el);
+        if (entree.r.mode === 'questions') rendreQuestions(el, entree.r);
+        else if (entree.r.mode === 'recommandation' || entree.r.etapes) rendre(el, entree.r);
+        else rendreMessage(el, entree.r);
+      });
+      var reprise = document.createElement('p');
+      reprise.className = 'ia-reprise';
+      reprise.innerHTML = 'Conversation reprise. <button type="button" id="ia-nouvelle">Nouvelle conversation</button>';
+      fil.appendChild(reprise);
+    }
+
+    document.addEventListener('click', function (ev) {
+      if (!ev.target.closest('#ia-nouvelle')) return;
+      try { localStorage.removeItem(CLE_FIL); } catch (e) {}
+      journal = []; historique = [];
+      fil.innerHTML = ''; fil.hidden = true;
+      saisie.disabled = false; boutonEnvoyer.disabled = false;
+      saisie.placeholder = 'Écrivez à FindIA…';
+      saisie.focus();
+    });
+
     function envoyer(texte) {
       texte = (texte || saisie.value).trim();
       if (texte.length < 3) return;
@@ -3724,6 +3789,7 @@
       saisie.value = '';
       saisie.style.height = 'auto';
       bulleVisiteur(texte);
+      journal.push({ type: 'moi', texte: texte });
       var bulle = bulleReponse();
       bulle.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 
@@ -3772,16 +3838,7 @@
             return;
           } else if (r.mode === 'message') {
             stopAttente(bulle);
-            // Reponse simple : ni outils ni questions. « Qui es-tu ? », ou une
-            // demande hors sujet a laquelle il faut repondre sans faire semblant.
-            bulle.innerHTML = '<span class="ia-conseil-source">FindIA</span><h3>' +
-              echapper(r.situation) + '</h3>' +
-              ((r.suivis && r.suivis.length)
-                ? '<div class="ia-suivis"><span>Vous pouvez essayer</span>' +
-                  r.suivis.map(function (x) {
-                    return '<button type="button" data-suivi="' + echapper(x) + '">' + echapper(x) + '</button>';
-                  }).join('') + '</div>'
-                : '');
+            rendreMessage(bulle, r);
             historique.push({ role: 'assistant', content: r.situation });
             saisie.focus();
           } else if (r.mode === 'questions') {
@@ -3799,10 +3856,14 @@
                        r.etapes.map(function (e) { return e.nom; }).join(', ') + '.'
             });
           }
+          if (r) journal.push({ type: 'ia', r: r });
+          memoriser();
           if (!saisie.disabled) boutonEnvoyer.disabled = false;
           bulle.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
         });
     }
+
+    restituer();
 
     formulaire.addEventListener('submit', function (ev) { ev.preventDefault(); envoyer(); });
     saisie.addEventListener('input', function () {
