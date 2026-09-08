@@ -152,8 +152,7 @@ IA_CSS = """
     .ia-reflexion i { width:7px; height:7px; border-radius:50%; background:var(--muted); animation:ia-ecrit 1.3s ease-in-out infinite; }
     .ia-reflexion i:nth-child(2) { animation-delay:0.18s; }
     .ia-reflexion i:nth-child(3) { animation-delay:0.36s; }
-    .ia-affine { display:flex; align-items:center; gap:6px; font-size:0.78rem; color:var(--muted); margin-top:14px; padding-top:12px; border-top:1px dashed var(--border); }
-    .ia-affine i { width:6px; height:6px; border-radius:50%; background:var(--primary); animation:ia-ecrit 1.3s ease-in-out infinite; flex:0 0 auto; }
+    .ia-attente-texte { font-size:0.82rem; color:var(--muted); margin-top:8px; }
     @keyframes ia-ecrit { 0%,80%,100% { opacity:0.28; transform:translateY(0); } 40% { opacity:1; transform:translateY(-3px); } }
 
     .ia-saisie { display:flex; align-items:flex-end; gap:10px; padding:10px 10px 10px 20px; border:1.5px solid var(--border); border-radius:26px; background:var(--bg); box-shadow:0 4px 22px rgba(10,15,44,0.07); }
@@ -1383,12 +1382,24 @@ def build_hub():
     function bulleReponse() {{
       var el = document.createElement('div');
       el.className = 'ia-msg ia-msg-ia';
-      el.innerHTML = '<div class="ia-reflexion"><i></i><i></i><i></i></div>';
+      el.innerHTML = '<div class="ia-reflexion"><i></i><i></i><i></i></div>' +
+                     '<p class="ia-attente-texte">FindIA lit votre situation…</p>';
+      // Le silence est long quand on attend vingt secondes : on dit où on en est.
+      var etapesAttente = ['FindIA lit votre situation…',
+                           'Elle compare les ' + cards.length + ' outils de l’annuaire…',
+                           'Elle compose la réponse…'];
+      var i = 0;
+      el._minuteur = setInterval(function () {{
+        i = Math.min(i + 1, etapesAttente.length - 1);
+        var t = el.querySelector('.ia-attente-texte');
+        if (t) t.textContent = etapesAttente[i];
+      }}, 6000);
       fil.appendChild(el);
       return el;
     }}
 
     function rendreQuestions(el, r) {{
+      stopAttente(el);
       el.innerHTML =
         '<span class="ia-conseil-source">FindIA · quelques précisions</span>' +
         '<h3>' + echapper(r.situation) + '</h3>' +
@@ -1397,7 +1408,12 @@ def build_hub():
         '</ul><p class="ia-questions-note">Répondez en une phrase, même approximative — je m’adapte.</p>';
     }}
 
+    function stopAttente(el) {{
+      if (el._minuteur) {{ clearInterval(el._minuteur); el._minuteur = null; }}
+    }}
+
     function rendre(el, r) {{
+      stopAttente(el);
       var etapes = r.etapes.map(function (e, i) {{
         return '<div class="ia-etape"><div class="num">' + (i + 1) + '</div><div>' +
           '<b><a href="' + e.url + '">' + echapper(e.nom) + '</a></b> ' +
@@ -1454,6 +1470,7 @@ def build_hub():
     }}
 
     function rendreEchec(el) {{
+      stopAttente(el);
       el.innerHTML = '<span class="ia-conseil-source">FindIA · aucune correspondance</span>' +
         '<h3>Je n’ai pas trouvé d’outil pour cette demande.</h3>' +
         '<p style="font-size:0.88rem;color:var(--muted);line-height:1.55;">Reformulez en décrivant la tâche ' +
@@ -1482,14 +1499,11 @@ def build_hub():
       // La réponse du modèle demande dix à vingt-cinq secondes. Plutôt que de
       // faire patienter devant un point qui clignote, on affiche tout de suite
       // celle du moteur local, puis on la remplace quand la vraie arrive.
+      // La réponse du moteur local ne s'affiche PLUS pendant l'attente : voir
+      // une recommandation complète se faire remplacer par des questions était
+      // déroutant et décrédibilisait l'outil. Elle est calculée d'avance, mais
+      // ne sert que si FindIA échoue.
       var local = conseilLocal(texte);
-      if (local) {{
-        rendre(bulle, local);
-        var attente = document.createElement('p');
-        attente.className = 'ia-affine';
-        attente.innerHTML = '<i></i>FindIA affine cette réponse…';
-        bulle.appendChild(attente);
-      }}
 
       fetch('/api/conseil', {{
         method: 'POST',
@@ -1508,6 +1522,7 @@ def build_hub():
           if (!r) {{
             rendreEchec(bulle);
           }} else if (r.mode === 'termine') {{
+            stopAttente(bulle);
             // Fin de conversation : le champ se ferme, on oriente vers l'appel.
             bulle.innerHTML = '<span class="ia-conseil-source">FindIA</span><h3>' +
               echapper(r.situation) + '</h3>' +
@@ -1521,6 +1536,7 @@ def build_hub():
             boutonEnvoyer.disabled = true;
             return;
           }} else if (r.mode === 'message') {{
+            stopAttente(bulle);
             // Reponse simple : ni outils ni questions. « Qui es-tu ? », ou une
             // demande hors sujet a laquelle il faut repondre sans faire semblant.
             bulle.innerHTML = '<span class="ia-conseil-source">FindIA</span><h3>' +
