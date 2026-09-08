@@ -439,7 +439,15 @@ export default async function handler(req, res) {
     // ce qui fait basculer la page sur son moteur local — lequel, lui, trouvera
     // toujours des outils video. Le visiteur obtient une reponse, pas un mur.
     if (recommandeDirectement && !etapes.length) {
-      return res.status(502).json({ erreur: 'aucune_recommandation' });
+      return res.status(502).json({
+        erreur: 'aucune_recommandation',
+        // DIAGNOSTIC TEMPORAIRE : distinguer « le modele n'a rien propose » de
+        // « il a propose des outils dont les identifiants ont ete rejetes ».
+        diag: {
+          proposes: Array.isArray(brut.etapes) ? brut.etapes.map((e) => e && e.outil) : null,
+          situation: String(brut.situation || '').slice(0, 120),
+        },
+      });
     }
 
     // Ni outil ni question : le visiteur a demandé autre chose (« qui es-tu ? »,
