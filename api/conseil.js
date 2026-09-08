@@ -38,6 +38,11 @@ const QUESTION_MAX = 500;
 // plafond de dépense est le budget mensuel du workspace Anthropic.
 // Quand elle se déclenche, la page bascule sur son moteur local : le visiteur
 // obtient une réponse, il ne voit pas d'erreur.
+// Plafond d'une conversation. Au-delà, il n'y a plus grand-chose à tirer d'un
+// échange écrit : mieux vaut un appel de quinze minutes. C'est aussi ce qui
+// empêche une conversation de dix messages de coûter dix appels au modèle.
+const MAX_REPONSES = 4;
+
 const FENETRE_MS = 10 * 60 * 1000;
 const MAX_PAR_FENETRE = 25;   // ~8 conversations complètes : un visiteur curieux ne doit pas buter dessus
 const passages = new Map();
@@ -244,6 +249,21 @@ export default async function handler(req, res) {
   // deux tours de questions, le conseiller doit trancher avec ce qu'il sait.
   const toursReponse = fil.filter((m) => m.role === 'assistant').length;
   const dernierTour = toursReponse >= 2;
+
+  // Conversation terminée : on répond sans appeler le modèle. Zéro coût, et
+  // le visiteur est orienté là où l'échange devient utile.
+  if (toursReponse >= MAX_REPONSES) {
+    return res.status(200).json({
+      source: 'local',
+      mode: 'termine',
+      situation: "Nous avons fait le tour de ce qu'un échange écrit permet. Pour aller plus loin sur votre cas précis — vos outils, vos process, ce qui bloque vraiment — quinze minutes au téléphone valent mieux que dix messages.",
+      offre: {
+        url: '/formations-entreprises.html',
+        titre: 'Parlons de votre situation',
+        phrase: "Un appel gratuit de quinze minutes, sans engagement. Et si vous préférez continuer seul, l'annuaire complet est juste en dessous.",
+      },
+    });
+  }
 
   const client = new Anthropic({ timeout: 50000, maxRetries: 1 });
 

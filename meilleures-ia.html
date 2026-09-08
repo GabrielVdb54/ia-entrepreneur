@@ -3734,6 +3734,19 @@
           var r = data || local;
           if (!r) {
             rendreEchec(bulle);
+          } else if (r.mode === 'termine') {
+            // Fin de conversation : le champ se ferme, on oriente vers l'appel.
+            bulle.innerHTML = '<span class="ia-conseil-source">FindIA</span><h3>' +
+              echapper(r.situation) + '</h3>' +
+              '<div class="ia-conseil-offre"><b>' + echapper(r.offre.titre) + '</b>' +
+              '<p>' + echapper(r.offre.phrase) + '</p><div class="ia-conseil-actions">' +
+              '<a class="principal" href="' + CAL_URL + '" target="_blank" rel="noopener">Appel gratuit de 15 min</a>' +
+              '<a class="secondaire" href="#annuaire">Parcourir l’annuaire</a></div></div>';
+            saisie.value = '';
+            saisie.disabled = true;
+            saisie.placeholder = 'Conversation terminée — rechargez la page pour recommencer';
+            boutonEnvoyer.disabled = true;
+            return;
           } else if (r.mode === 'message') {
             // Reponse simple : ni outils ni questions. « Qui es-tu ? », ou une
             // demande hors sujet a laquelle il faut repondre sans faire semblant.
@@ -3762,7 +3775,7 @@
                        r.etapes.map(function (e) { return e.nom; }).join(', ') + '.'
             });
           }
-          boutonEnvoyer.disabled = false;
+          if (!saisie.disabled) boutonEnvoyer.disabled = false;
           bulle.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
         });
     }
