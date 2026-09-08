@@ -63,6 +63,52 @@ function tropDeRequetes(empreinte) {
   return false;
 }
 
+/**
+ * Une TACHE nommee se traite directement, un CONTEXTE sans tache se clarifie.
+ *
+ * La consigne existe depuis longtemps dans le prompt, et le modele ne la suit
+ * pas de facon fiable : « quelle ia pour mes posts linkedin » repartait en
+ * interrogatoire alors que la tache est explicite. Quelqu'un qui arrive d'un
+ * lien et se fait questionner au lieu d'obtenir une reponse s'en va.
+ *
+ * On tranche donc avant l'appel, comme pour la coherence des offres : le
+ * lexique ci-dessous ne contient que des OBJETS de travail et des VERBES
+ * d'action. Aucun secteur, aucun metier — « cabinet comptable », « boite de
+ * BTP » ou « mon restaurant » doivent continuer a declencher des questions,
+ * puisqu'on ne sait pas encore ce qui prend du temps a la personne.
+ */
+const TACHES = new RegExp('\\b(?:' + [
+  'mails?', 'e-?mails?', 'courriels?', 'boite mail',
+  'posts?', 'linkedin', 'instagram', 'facebook', 'tiktok', 'reseaux sociaux', 'publications?',
+  'videos?', 'montage', 'sous-?titres?', 'podcasts?', 'voix off', 'reels?', 'shorts?',
+  'images?', 'visuels?', 'photos?', 'logos?', 'illustrations?', 'miniatures?', 'affiches?',
+  'factures?', 'devis', 'notes? de frais', 'relances?', 'impayes?', 'depenses?',
+  'contrats?', 'cgv', 'clauses?', 'rgpd', 'ai ?act', 'conformite', 'conformes?', 'registre',
+  'cv', 'offres? d.emploi', 'recrutement', 'candidatures?', 'entretiens?', 'onboarding',
+  'articles?', 'blog', 'newsletters?', 'fiches? produit', 'descriptions?',
+  'slides?', 'presentations?', 'powerpoints?', 'pitch', 'supports? de cours', 'quiz', 'formations? en ligne',
+  'sites? (?:web|internet)', 'landing', 'chatbots?', 'formulaires?', 'maquettes?',
+  'comptes? ?-?rendus?', 'reunions?', 'visios?', 'prises? de notes',
+  'seo', 'referencement', 'mots.?cles', 'netlinking', 'backlinks?',
+  'crm', 'prospection', 'prospects?', 'leads?', 'sequences?', 'cold ?(?:mail|call)',
+  'tableaux? de bord', 'dashboards?', 'reporting', 'tableurs?', 'feuilles? de calcul',
+  'documents?', 'pdf', 'rapports?', 'traductions?', 'orthographe', 'fautes?', 'contenus?',
+  'plannings?', 'agendas?', 'rendez-?vous',
+  'rediger', 'ecrire', 'publier', 'poster', 'repondre aux', 'traduire', 'transcrire', 'resumer',
+  'analyser', 'prospecter', 'relancer', 'monter', 'creer', 'generer', 'corriger', 'planifier',
+  'automatiser', 'facturer', 'signer', 'convertir', 'illustrer', 'dessiner', 'retoucher',
+  'sous-?titrer', 'synthetiser', 'classer', 'archiver', 'extraire', 'trier',
+].join('|') + ')\\b', 'i');
+
+function tacheNommee(texte) {
+  return TACHES.test(
+    String(texte)
+      .normalize('NFD').replace(/[\u0300-\u036f]/g, '')   // « rédiger » et « rediger » se valent
+      .replace(/['\u2019]/g, ' ')                          // « l'AI Act » doit se lire « l ai act »
+      .toLowerCase(),
+  );
+}
+
 const INSTRUCTIONS = `Tu es FindIA, l'assistant de l'annuaire d'outils IA de IA-Entrepreneur, organisme de formation certifié Qualiopi qui accompagne des dirigeants et des équipes de TPE-PME françaises. Si on te demande qui tu es, dis-le simplement : une IA qui connaît cet annuaire et rien d'autre.
 
 Un visiteur décrit sa situation. Tu réponds en composant une chaîne d'outils : quel outil pour quelle étape, et comment s'en servir concrètement. Deux à quatre outils, jamais plus — au-delà, personne ne passe à l'action.
@@ -302,6 +348,10 @@ export default async function handler(req, res) {
         { type: 'text', text: INSTRUCTIONS, cache_control: { type: 'ephemeral', ttl: '1h' } },
         ...(dernierTour
           ? [{ type: 'text', text: "C'EST TON DERNIER TOUR. Tu ne poses plus aucune question : tu recommandes avec ce que tu sais déjà, quitte à préciser une hypothèse en une demi-phrase." }]
+          : []),
+        // Bloc non caché, volontairement : il dépend de la question posée.
+        ...(!dernierTour && tacheNommee(question)
+          ? [{ type: 'text', text: "LE VISITEUR A NOMMÉ UNE TÂCHE PRÉCISE. Tu recommandes maintenant : le champ « etapes » est rempli, le champ « questions » reste VIDE. S'il te manque un détail, ne le demande pas — pose ton hypothèse en une demi-phrase dans la reformulation, et cite l'alternative si ce détail changeait la réponse." }]
           : []),
       ],
       tools: [OUTIL],
