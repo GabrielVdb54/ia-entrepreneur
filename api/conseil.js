@@ -509,6 +509,10 @@ export default async function handler(req, res) {
       // La page n'affiche le bloc « recevoir par email » que si l'envoi est
       // réellement configuré. On ne propose pas un envoi qu'on ne sait pas faire.
       recap: Boolean(process.env.N8N_RECAP_WEBHOOK),
+      // MESURE TEMPORAIRE : savoir si le cache est lu, et combien de jetons
+      // sont reellement produits. Sans ca, optimiser la latence revient a
+      // deviner.
+      usage: reponse.usage,
       // Le modele reellement utilise, tel que l'API le renvoie — pas celui
       // qu'on a demande. Permet de verifier de l'exterieur qu'aucun autre
       // modele, plus cher, n'a servi la reponse.
