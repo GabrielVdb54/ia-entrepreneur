@@ -242,6 +242,32 @@ const OUTIL = {
 };
 
 /**
+ * Variante de l'outil sans le champ « questions ».
+ *
+ * Demander au modele de ne pas poser de questions ne marche pas : la consigne
+ * est dans le prompt depuis longtemps, elle a ete renforcee par un bloc systeme
+ * dedie, et « quelle ia pour mes posts linkedin » repartait quand meme en
+ * interrogatoire. On ne lui demande donc plus rien : on retire le champ. Un
+ * schema strict sans « questions » rend l'interrogatoire impossible a produire.
+ *
+ * Contrepartie assumee : les outils precedent le systeme dans la cle de cache,
+ * donc les deux variantes entretiennent deux caches distincts. Le catalogue est
+ * ecrit deux fois plutot qu'une. C'est le prix d'une reponse fiable, et le
+ * visiteur qui arrive d'un lien compte plus que le cout d'une ecriture de cache.
+ */
+const OUTIL_SANS_QUESTIONS = (() => {
+  const { questions, ...proprietes } = OUTIL.input_schema.properties;
+  return {
+    ...OUTIL,
+    input_schema: {
+      ...OUTIL.input_schema,
+      properties: proprietes,
+      required: OUTIL.input_schema.required.filter((c) => c !== 'questions'),
+    },
+  };
+})();
+
+/**
  * Tronque sur une frontiere de mot. Un « ou la rela » en fin de question
  * ruine la credibilite de la reponse : mieux vaut une phrase entiere plus
  * courte qu'une phrase coupee au milieu d'un mot.
@@ -329,6 +355,10 @@ export default async function handler(req, res) {
     });
   }
 
+  // Une tache nommee se traite directement ; au dernier tour, on tranche de
+  // toute facon. Dans les deux cas, le champ « questions » disparait du schema.
+  const recommandeDirectement = dernierTour || tacheNommee(question);
+
   const client = new Anthropic({ timeout: 50000, maxRetries: 1 });
 
   try {
@@ -350,11 +380,14 @@ export default async function handler(req, res) {
           ? [{ type: 'text', text: "C'EST TON DERNIER TOUR. Tu ne poses plus aucune question : tu recommandes avec ce que tu sais déjà, quitte à préciser une hypothèse en une demi-phrase." }]
           : []),
         // Bloc non caché, volontairement : il dépend de la question posée.
-        ...(!dernierTour && tacheNommee(question)
-          ? [{ type: 'text', text: "LE VISITEUR A NOMMÉ UNE TÂCHE PRÉCISE. Tu recommandes maintenant : le champ « etapes » est rempli, le champ « questions » reste VIDE. S'il te manque un détail, ne le demande pas — pose ton hypothèse en une demi-phrase dans la reformulation, et cite l'alternative si ce détail changeait la réponse." }]
+        // Le schéma a déjà retiré le champ « questions » ; cette phrase dit au
+        // modèle quoi faire du détail qui lui manque, plutôt que de le laisser
+        // buter contre un champ absent.
+        ...(!dernierTour && recommandeDirectement
+          ? [{ type: 'text', text: "Le visiteur a nommé une tâche précise : tu recommandes, tu ne demandes rien. S'il te manque un détail, pose ton hypothèse en une demi-phrase dans la reformulation et cite l'alternative si ce détail changeait la réponse — « si vos documents contiennent des données clients, prenez plutôt X »." }]
           : []),
       ],
-      tools: [OUTIL],
+      tools: [recommandeDirectement ? OUTIL_SANS_QUESTIONS : OUTIL],
       tool_choice: { type: 'tool', name: 'recommander' },
       messages: fil,
     });
