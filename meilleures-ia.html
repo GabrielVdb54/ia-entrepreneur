@@ -3706,6 +3706,19 @@
           var r = data || local;
           if (!r) {
             rendreEchec(bulle);
+          } else if (r.mode === 'message') {
+            // Reponse simple : ni outils ni questions. « Qui es-tu ? », ou une
+            // demande hors sujet a laquelle il faut repondre sans faire semblant.
+            bulle.innerHTML = '<span class="ia-conseil-source">FindIA</span><h3>' +
+              echapper(r.situation) + '</h3>' +
+              ((r.suivis && r.suivis.length)
+                ? '<div class="ia-suivis"><span>Vous pouvez essayer</span>' +
+                  r.suivis.map(function (x) {
+                    return '<button type="button" data-suivi="' + echapper(x) + '">' + echapper(x) + '</button>';
+                  }).join('') + '</div>'
+                : '');
+            historique.push({ role: 'assistant', content: r.situation });
+            saisie.focus();
           } else if (r.mode === 'questions') {
             rendreQuestions(bulle, r);
             historique.push({

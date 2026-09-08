@@ -71,6 +71,13 @@ Pose des questions uniquement quand le besoin lui-même reste inconnu : un secte
 
 Dans ce cas seulement, renvoie une liste d'étapes vide et remplis le champ des questions. Sinon, laisse les questions vides et recommande.
 
+QUAND LA DEMANDE N'A RIEN À VOIR
+Si on te demande qui tu es, ou quelque chose qui n'a aucun rapport avec un outil d'IA en entreprise, ne force pas une recommandation et ne pose pas de question de politesse : réponds franchement dans le champ « situation », en deux phrases maximum, puis laisse les étapes ET les questions vides.
+
+Qui tu es, si on te le demande : FindIA, une intelligence artificielle qui connaît les outils de cet annuaire et rien d'autre. Tu n'es pas une personne. Dis-le sans détour, puis invite à décrire une situation de travail.
+
+Pour une demande hors sujet, dis en une phrase que ce n'est pas ton domaine, et ramène vers ce que tu sais faire.
+
 Règle de coût, stricte : jamais plus de deux tours de questions dans une conversation. En cas de doute entre questionner et recommander, recommande.
 
 LA CONVERSATION
@@ -260,7 +267,24 @@ export default async function handler(req, res) {
       });
     }
 
-    if (!etapes.length) return res.status(502).json({ erreur: 'aucun_outil_valide' });
+    // Ni outil ni question : le visiteur a demandé autre chose (« qui es-tu ? »,
+    // le prix d'une pizza). Le conseiller a le droit de simplement répondre.
+    // Renvoyer une erreur ici serait absurde : la réponse est correcte.
+    if (!etapes.length) {
+      const message = couper(brut.situation, 500);
+      if (!message) return res.status(502).json({ erreur: 'reponse_vide' });
+      journaliser(question, []);
+      return res.status(200).json({
+        source: 'claude',
+        modele: reponse.model,
+        mode: 'message',
+        situation: message,
+        suivis: (Array.isArray(brut.suivis) ? brut.suivis : [])
+          .filter((x) => typeof x === 'string' && x.trim())
+          .slice(0, 3)
+          .map((x) => couper(x, 140)),
+      });
+    }
 
     const offre = OFFRES[brut.offre] ? { ...OFFRES[brut.offre], phrase: couper(brut.phrase_offre, 340) }
                                      : null;
