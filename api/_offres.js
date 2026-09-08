@@ -8,7 +8,7 @@ export const OFFRES = {
   'formation-sur-mesure': {
     url: '/formations-entreprises.html',
     titre: 'Formation IA sur mesure pour vos équipes',
-    pour: "former une équipe sur ses propres outils et ses propres cas métier",
+    pour: "former une équipe sur SES outils et SES cas métier, quels qu'ils soient. C'est le choix par défaut dès que les outils recommandés ne correspondent pas exactement à une formation nommée.",
   },
   'coaching-dirigeant': {
     url: '/coaching-ia-dirigeant.html',
@@ -28,7 +28,7 @@ export const OFFRES = {
   'formation-chatgpt': {
     url: '/formation-chatgpt-entreprise.html',
     titre: 'Formation ChatGPT en entreprise',
-    pour: "tirer réellement parti d'un assistant généraliste au quotidien",
+    pour: "quand l'outil retenu est ChatGPT lui-même. Si vous avez recommandé Mistral, Claude, Gemini ou Copilot, prenez plutôt la formation sur mesure : proposer une formation ChatGPT après avoir conseillé un autre assistant sonne faux.",
   },
   'formation-automatisation': {
     url: '/formation-ia-automatisation.html',

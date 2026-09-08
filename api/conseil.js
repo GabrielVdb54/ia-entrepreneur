@@ -113,7 +113,18 @@ LA CONVERSATION
 Le visiteur peut rebondir sur ta réponse précédente. Tiens compte de tout le fil : s'il précise son budget, son niveau ou son métier après coup, révise ta recommandation au lieu de la répéter. Termine toujours par deux ou trois relances que LE VISITEUR pourrait t'envoyer ensuite : elles sont écrites de son point de vue, à la première personne, et deviendront des boutons qu'il cliquera pour te répondre. Ne pose jamais de question au visiteur dans ce champ — « Quel est votre budget ? » est faux, « Mon budget est serré » est juste.
 
 L'OFFRE
-Tu termines toujours par l'offre IA-Entrepreneur la plus pertinente, choisie dans la liste fournie. La phrase doit être écrite POUR CETTE PERSONNE : reprends son métier, son contexte et ses propres mots, et dis ce que la formation change concrètement sur SON cas. « Une formation sur mesure » ne veut rien dire ; « deux jours sur vos propres séquences de prospection, avec votre fichier et votre CRM » veut dire quelque chose.
+Tu termines toujours par l'offre IA-Entrepreneur la plus pertinente, choisie dans la liste fournie.
+
+COHÉRENCE, D'ABORD : l'offre doit correspondre aux outils que tu viens de recommander. Conseiller Mistral puis vendre une formation ChatGPT décrédibilise tout ce qui précède. En cas de doute, la formation sur mesure convient toujours.
+
+La phrase suit trois temps, dans cet ordre, sans jamais les nommer :
+1. Ce que la personne repart en sachant faire — un savoir-faire concret, pas « maîtriser l'IA ».
+2. Sur quoi elle s'entraîne — SES dossiers, SES clients, SES outils, repris de ce qu'elle a raconté.
+3. Ce qui lève le frein — organisme certifié Qualiopi, formation finançable par l'OPCO, souvent sans reste à charge, en présentiel ou à distance.
+
+Exemple du ton attendu, pour un commercial en téléphonie : « Deux jours pour construire vos séquences de prospection sur votre propre fichier, écrire les relances qui vous manquent et brancher le tout sur votre CRM. Organisme certifié Qualiopi, finançable par votre OPCO. »
+
+Jamais de chiffre de retour sur investissement, jamais d'urgence, jamais de superlatif. La phrase doit être écrite POUR CETTE PERSONNE : reprends son métier, son contexte et ses propres mots, et dis ce que la formation change concrètement sur SON cas. « Une formation sur mesure » ne veut rien dire ; « deux jours sur vos propres séquences de prospection, avec votre fichier et votre CRM » veut dire quelque chose.
 
 Nomme au moins un élément concret de sa situation dans la phrase, et relie-le à un des outils que tu viens de recommander. L'idée à faire passer, jamais énoncée comme un slogan : disposer de l'outil ne suffit pas, savoir s'en servir sur ses propres dossiers fait la différence. Jamais de pression commerciale, jamais d'urgence artificielle, jamais de promesse chiffrée.`;
 
@@ -135,13 +146,13 @@ const OUTIL = {
       },
       etapes: {
         type: 'array',
-        description: "La chaîne recommandée : le meilleur rapport qualité-prix pour cette situation. Deux à quatre outils, dans l'ordre où on les utilise. Vide si tu poses des questions.",
+        description: "La chaîne recommandée : le meilleur rapport qualité-prix pour cette situation. Deux ou trois outils, quatre seulement si c'est indispensable, dans l'ordre où on les utilise. Vide si tu poses des questions.",
         items: {
           type: 'object',
           properties: {
             outil: { type: 'string', description: 'Slug exact d\'un outil du catalogue.' },
             role: { type: 'string', description: "Le rôle de cet outil dans la chaîne, en quelques mots." },
-            comment: { type: 'string', description: "Comment s'en servir dans cette situation précise, une à deux phrases." },
+            comment: { type: 'string', description: "Comment s'en servir dans cette situation précise. UNE phrase, deux au maximum si la première ne suffit pas." },
           },
           required: ['outil', 'role', 'comment'],
           additionalProperties: false,
@@ -277,16 +288,18 @@ export default async function handler(req, res) {
   try {
     const reponse = await client.messages.create({
       model: MODELE,
-      max_tokens: 1200,
+      max_tokens: 1000,
       system: [
         {
           type: 'text',
           text: `CATALOGUE DES OUTILS (${CATALOGUE.length} entrées)\n${JSON.stringify(CATALOGUE)}\n\nOFFRES IA-ENTREPRENEUR\n${JSON.stringify(OFFRES)}`,
-          // Le catalogue est identique d'une requête à l'autre : mis en cache,
-          // il est facturé environ dix fois moins cher en lecture.
-          cache_control: { type: 'ephemeral' },
+          // Le catalogue et les consignes ne changent jamais d'une requête à
+          // l'autre. Cache d'une heure et non de cinq minutes : sur un site à
+          // trafic modéré, la plupart des visiteurs tombaient sur un cache
+          // expiré, donc payaient et attendaient le plein tarif.
+          cache_control: { type: 'ephemeral', ttl: '1h' },
         },
-        { type: 'text', text: INSTRUCTIONS },
+        { type: 'text', text: INSTRUCTIONS, cache_control: { type: 'ephemeral', ttl: '1h' } },
         ...(dernierTour
           ? [{ type: 'text', text: "C'EST TON DERNIER TOUR. Tu ne poses plus aucune question : tu recommandes avec ce que tu sais déjà, quitte à préciser une hypothèse en une demi-phrase." }]
           : []),
