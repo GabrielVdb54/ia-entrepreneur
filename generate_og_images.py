@@ -135,9 +135,9 @@ def main():
 
     carte(os.path.join(SORTIE, 'annuaire.png'),
           'Les meilleures IA du moment',
-          f"{len(outils)} outils comparés par usage, prix et hébergement des données",
+          f"{len(outils)} outils. FindIA compose la chaîne adaptée à votre situation.",
           'IA', PRIMAIRE,
-          [(f'{len(cats)} usages', 'primaire'), (f'{europe} éditeurs européens', 'accent'),
+          [(f'{len(cats)} usages', 'primaire'), (f'{europe} européens ou open source', 'accent'),
            (f'{gratuits} gratuits ou freemium', 'neutre')])
 
     for c in cats:

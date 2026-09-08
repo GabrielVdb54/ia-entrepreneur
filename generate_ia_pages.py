@@ -123,6 +123,10 @@ IA_CSS = """
     .ia-stats div span { font-size:0.8rem; color:var(--muted); }
 
     .ia-reset { border:0; background:transparent; color:var(--muted); cursor:pointer; font-family:inherit; font-size:1.1rem; line-height:1; padding:2px 4px; }
+    /* Zone tactile portee a 44px sans changer la taille visible ni la mise en
+       page : la croix mesurait 22x21, intouchable au pouce. */
+    .ia-reset { position:relative; }
+    .ia-reset::after { content:''; position:absolute; inset:-12px; }
     .ia-filters { display:flex; flex-wrap:wrap; gap:8px; margin-top:12px; align-items:center; }
     .ia-filters select { font-family:inherit; font-size:0.8rem; padding:7px 12px; border-radius:50px; border:1.5px solid var(--border); background:var(--bg); color:var(--text); cursor:pointer; }
     .ia-filters select:focus { outline:0; border-color:var(--primary); }
@@ -193,6 +197,29 @@ IA_CSS = """
     .ia-conseil-vigilance { margin-top:14px; font-size:0.85rem; color:var(--muted); padding-left:22px; position:relative; line-height:1.55; }
     .ia-conseil-vigilance::before { content:"!"; position:absolute; left:0; top:0; width:16px; height:16px; border-radius:50%; background:#EF4444; color:#fff; font-size:0.68rem; font-weight:800; display:flex; align-items:center; justify-content:center; }
 
+    /* Recevoir le plan par email. Volontairement discret, et placé APRES la
+       réponse complète : le plan est déjà lisible en entier à l'écran. C'est
+       une commodité offerte, jamais un péage — le site vend « sans
+       inscription » partout ailleurs, on ne se contredit pas ici. */
+    .ia-recap { margin-top:14px; padding:15px 16px; border:1px solid var(--border); border-radius:14px; background:var(--bg); }
+    .ia-recap b { display:block; font-size:0.88rem; margin-bottom:3px; }
+    .ia-recap > p { font-size:0.82rem; color:var(--muted); line-height:1.5; margin-bottom:11px; }
+    .ia-recap-champs { display:flex; flex-wrap:wrap; gap:8px; }
+    .ia-recap input[type="email"] { flex:1 1 190px; min-width:0; min-height:44px; padding:11px 14px; border:1.5px solid var(--border); border-radius:10px; font-family:inherit; font-size:0.88rem; color:var(--text); background:#fff; }
+    .ia-recap input[type="email"]:focus { outline:none; border-color:var(--primary); }
+    .ia-recap-envoi { min-height:44px; padding:11px 20px; border:none; border-radius:50px; background:var(--primary); color:#fff; font-family:inherit; font-size:0.82rem; font-weight:700; cursor:pointer; }
+    .ia-recap-envoi:disabled { opacity:0.55; cursor:default; }
+    .ia-recap-consent { display:flex; gap:9px; align-items:flex-start; margin-top:11px; font-size:0.78rem; color:var(--muted); line-height:1.5; cursor:pointer; }
+    .ia-recap-consent input { width:18px; height:18px; margin-top:1px; flex-shrink:0; accent-color:var(--primary); cursor:pointer; }
+    .ia-recap-note { font-size:0.74rem; color:var(--muted); margin-top:9px; line-height:1.5; }
+    .ia-recap-note a { color:var(--primary); font-weight:600; }
+    .ia-recap-etat { font-size:0.84rem; font-weight:600; line-height:1.5; margin-top:2px; }
+    .ia-recap-etat.ok { color:var(--accent); }
+    .ia-recap-etat.ko { color:#EF4444; }
+    /* Pot de miel : hors de l'ecran pour l'oeil, hors du parcours clavier et
+       hors de la vocalisation pour un lecteur d'ecran. Seul un robot le voit. */
+    .ia-piege { position:absolute; left:-9999px; top:auto; width:1px; height:1px; overflow:hidden; }
+
     /* Trois façons de faire, côte à côte : le visiteur se situe sans qu'on
        lui ait demandé son budget. */
     .ia-voies { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin:14px 0 6px; }
@@ -246,6 +273,8 @@ IA_CSS = """
     .ia-card { position:relative; flex:1; display:flex; flex-direction:column; gap:10px; padding:20px 46px 20px 20px; border:1px solid var(--border); border-left:4px solid var(--tool); border-radius:var(--radius); background:var(--bg); text-decoration:none; color:inherit; transition:transform .18s, box-shadow .18s, border-color .18s; }
     .ia-card:hover { transform:translateY(-3px); box-shadow:0 10px 30px rgba(10,15,44,0.10); }
     .ia-fav { position:absolute; top:10px; right:10px; z-index:2; width:32px; height:32px; border-radius:50%; border:0; background:transparent; color:var(--muted); font-size:1.15rem; line-height:1; cursor:pointer; font-family:inherit; transition:background .15s, color .15s, transform .15s; }
+    /* Meme principe pour l'etoile des favoris : 32x32 a l'oeil, 44x44 au doigt. */
+    .ia-fav::after { content:''; position:absolute; inset:-6px; border-radius:50%; }
     .ia-fav:hover { background:var(--card); color:var(--primary); transform:scale(1.12); }
     .ia-fav.is-on { color:#F59E0B; }
     .ia-fav-long { position:static; width:100%; height:auto; border-radius:50px; border:1.5px solid var(--border); padding:11px 18px; font-size:0.84rem; font-weight:700; }
@@ -372,6 +401,14 @@ IA_CSS = """
       .ia-etape { gap:10px; }
       .ia-etape .role { display:block; margin-top:3px; }
       .ia-msg-moi { max-width:92%; }
+      /* Sur 390px, champ et bouton cote a cote laissaient 90px au champ :
+         on ne voyait pas son adresse en la tapant. Ils s'empilent. */
+      .ia-recap-champs { flex-direction:column; }
+      /* En colonne, l'axe principal devient la verticale : le flex-basis de
+         190px prevu pour la largeur s'appliquait a la HAUTEUR, et le champ
+         email faisait 190px de haut. On le neutralise. */
+      .ia-recap input[type="email"] { flex:0 0 auto; width:100%; }
+      .ia-recap-envoi { width:100%; }
       .ia-questions li { font-size:0.9rem; }
       .ia-suggestions { flex-wrap:nowrap; overflow-x:auto; scrollbar-width:none; padding-bottom:4px; }
       .ia-suggestions button { flex:0 0 auto; }
@@ -1482,8 +1519,124 @@ def build_hub():
         '</span><h3>' + echapper(r.situation) + '</h3>' + colonnes +
         (colonnes ? '<p class="ia-voies-detail">En détail, la voie recommandée :</p>' : '') + etapes +
         (r.vigilance ? '<p class="ia-conseil-vigilance">' + echapper(r.vigilance) + '</p>' : '') +
-        offre + suivis;
+        offre + blocRecap(r) + suivis;
+      ajusterRecaps();
     }}
+
+    // Le visiteur a deja donne son adresse : on ne la redemande pas a chaque
+    // reponse. L'etat suit la conversation, y compris apres un rechargement.
+    var recapDonne = false;
+
+    var TEXTE_CONSENTEMENT =
+      'Je souhaite recevoir les conseils IA et les offres de formation d’IA-Entrepreneur. ' +
+      'Désinscription en un clic dans chaque email.';
+
+    // Propose seulement si l’envoi est reellement configure cote serveur
+    // (r.recap). On ne promet pas un email qu’on ne saurait pas expedier.
+    function blocRecap(r) {{
+      if (!r.recap || recapDonne || !r.etapes || !r.etapes.length) return '';
+      var slugs = r.etapes.map(function (e) {{ return e.slug; }}).join(',');
+      var combien = r.etapes.length === 1 ? 'L’outil, son rôle et son lien'
+                                          : 'Les ' + r.etapes.length + ' outils, leur rôle et leurs liens';
+      return '<div class="ia-recap" data-outils="' + slugs + '"' +
+        (r.offre && r.offre.cle ? ' data-offre="' + echapper(r.offre.cle) + '"' : '') + '>' +
+        '<b>Recevoir ce plan par email</b>' +
+        '<p>' + combien + ', dans votre boîte mail — pour y revenir au calme ou le transmettre à votre équipe.</p>' +
+        '<div class="ia-recap-champs">' +
+        '<input type="email" placeholder="votre@email.com" autocomplete="email" aria-label="Votre adresse email">' +
+        '<button type="button" class="ia-recap-envoi">Recevoir le plan</button>' +
+        '</div>' +
+        '<label class="ia-recap-consent"><input type="checkbox">' +
+        '<span>' + TEXTE_CONSENTEMENT + '</span></label>' +
+        // Pot de miel : invisible, hors du parcours clavier. Un robot le remplit,
+        // pas un visiteur ; le serveur ecarte alors la demande sans le dire.
+        '<div class="ia-piege" aria-hidden="true"><label>Laissez ce champ vide' +
+        '<input type="text" tabindex="-1" autocomplete="off"></label></div>' +
+        '<p class="ia-recap-note">Votre adresse sert à cet envoi. Elle n’alimente nos ' +
+        'communications que si vous cochez la case, et vous pouvez vous désinscrire à tout ' +
+        'moment. <a href="/politique-confidentialite.html">Politique de confidentialité</a>.</p>' +
+        '</div>';
+    }}
+
+    function etatRecap(bloc, classe, texte) {{
+      var ligne = bloc.querySelector('.ia-recap-etat');
+      if (!ligne) {{
+        ligne = document.createElement('p');
+        ligne.className = 'ia-recap-etat';
+        bloc.appendChild(ligne);
+      }}
+      ligne.className = 'ia-recap-etat ' + classe;
+      ligne.textContent = texte;
+    }}
+
+    // Un seul formulaire a l’ecran, celui de la derniere reponse : trois
+    // blocs email empiles dans le fil donneraient l’impression d’un peage.
+    function ajusterRecaps() {{
+      var blocs = fil.querySelectorAll('.ia-recap:not(.ia-recap-fait)');
+      for (var i = 0; i < blocs.length - 1; i++) blocs[i].remove();
+    }}
+
+    fil.addEventListener('click', function (ev) {{
+      var bouton = ev.target.closest('.ia-recap-envoi');
+      if (!bouton) return;
+      var bloc = bouton.closest('.ia-recap');
+      var champ = bloc.querySelector('input[type="email"]');
+      var consent = bloc.querySelector('.ia-recap-consent input');
+      var piege = bloc.querySelector('.ia-piege input');
+      var email = (champ.value || '').trim();
+      if (!/^[^@\s]+@[^@\s.]+\.[^@\s]+$/.test(email)) {{
+        etatRecap(bloc, 'ko', 'Cette adresse ne semble pas valide.');
+        champ.focus();
+        return;
+      }}
+      bouton.disabled = true;
+      bouton.textContent = 'Envoi…';
+      etatRecap(bloc, '', '');
+      fetch('/api/recap', {{
+        method: 'POST',
+        headers: {{ 'Content-Type': 'application/json' }},
+        body: JSON.stringify({{
+          email: email,
+          consentement: consent.checked === true,
+          // On n’envoie que des identifiants : le serveur reconstruit les noms,
+          // les prix et les liens depuis le catalogue. Aucun texte libre ne
+          // transite, donc le site ne peut pas servir de relais de spam.
+          outils: (bloc.dataset.outils || '').split(',').filter(Boolean),
+          offre: bloc.dataset.offre || null,
+          piege: piege ? piege.value : ''
+        }})
+      }}).then(function (rep) {{
+        if (rep.ok) return {{ ok: true }};
+        return rep.json().catch(function () {{ return {{}}; }}).then(function (d) {{
+          return {{ ok: false, statut: rep.status, code: d.erreur }};
+        }});
+      }}).catch(function () {{
+        return {{ ok: false, statut: 0 }};
+      }}).then(function (res) {{
+        if (res.ok) {{
+          recapDonne = true;
+          memoriser();
+          var autres = fil.querySelectorAll('.ia-recap');
+          for (var i = 0; i < autres.length; i++) {{
+            if (autres[i] !== bloc) autres[i].remove();
+          }}
+          bloc.classList.add('ia-recap-fait');
+          bloc.innerHTML = '<b>C’est parti ✓</b>' +
+            '<p class="ia-recap-etat ok">Le plan arrive dans quelques instants sur ' +
+            echapper(email) + '. Pensez aux indésirables s’il tarde.</p>';
+          return;
+        }}
+        bouton.disabled = false;
+        bouton.textContent = 'Recevoir le plan';
+        if (res.code === 'email_invalide') {{
+          etatRecap(bloc, 'ko', 'Cette adresse ne semble pas valide.');
+        }} else if (res.statut === 429) {{
+          etatRecap(bloc, 'ko', 'Trop de demandes depuis cette connexion. Réessayez dans quelques minutes.');
+        }} else {{
+          etatRecap(bloc, 'ko', 'L’envoi n’a pas abouti. Réessayez, ou écrivez-nous à contact@ia-entrepreneur.fr.');
+        }}
+      }});
+    }});
 
     function rendreEchec(el) {{
       stopAttente(el);
@@ -1507,7 +1660,8 @@ def build_hub():
     function memoriser() {{
       try {{
         localStorage.setItem(CLE_FIL, JSON.stringify({{
-          date: Date.now(), journal: journal.slice(-12), historique: historique.slice(-12)
+          date: Date.now(), recapDonne: recapDonne,
+          journal: journal.slice(-12), historique: historique.slice(-12)
         }}));
       }} catch (e) {{ /* navigation privée, quota : on continue sans mémoire */ }}
     }}
@@ -1523,6 +1677,9 @@ def build_hub():
       }}
       journal = brut.journal;
       historique = brut.historique || [];
+      // Avant de re-afficher les reponses : sinon le formulaire email
+      // reapparait alors que l’adresse a deja ete donnee.
+      recapDonne = brut.recapDonne === true;
       fil.hidden = false;
       journal.forEach(function (entree) {{
         if (entree.type === 'moi') return bulleVisiteur(entree.texte);
@@ -1535,14 +1692,14 @@ def build_hub():
       }});
       var reprise = document.createElement('p');
       reprise.className = 'ia-reprise';
-      reprise.innerHTML = 'Conversation reprise. <button type="button" id="ia-nouvelle">Nouvelle conversation</button>';
+      reprise.innerHTML = 'Conversation reprise. <button type="button" data-nouvelle id="ia-nouvelle">Nouvelle conversation</button>';
       fil.appendChild(reprise);
     }}
 
     document.addEventListener('click', function (ev) {{
-      if (!ev.target.closest('#ia-nouvelle')) return;
+      if (!ev.target.closest('[data-nouvelle]')) return;
       try {{ localStorage.removeItem(CLE_FIL); }} catch (e) {{}}
-      journal = []; historique = [];
+      journal = []; historique = []; recapDonne = false;
       fil.innerHTML = ''; fil.hidden = true;
       saisie.disabled = false; boutonEnvoyer.disabled = false;
       saisie.placeholder = 'Écrivez à FindIA…';
@@ -1597,10 +1754,12 @@ def build_hub():
               '<div class="ia-conseil-offre"><b>' + echapper(r.offre.titre) + '</b>' +
               '<p>' + echapper(r.offre.phrase) + '</p><div class="ia-conseil-actions">' +
               '<a class="principal" href="' + CAL_URL + '" target="_blank" rel="noopener">Appel gratuit de 15 min</a>' +
-              '<a class="secondaire" href="#annuaire">Parcourir l’annuaire</a></div></div>';
+              '<a class="secondaire" href="#annuaire">Parcourir l’annuaire</a></div></div>' +
+              '<p class="ia-reprise" style="margin-top:12px;">Une autre question ? ' +
+              '<button type="button" data-nouvelle>Nouvelle conversation</button></p>';
             saisie.value = '';
             saisie.disabled = true;
-            saisie.placeholder = 'Conversation terminée — rechargez la page pour recommencer';
+            saisie.placeholder = 'Conversation terminée — « Nouvelle conversation » pour repartir';
             boutonEnvoyer.disabled = true;
             return;
           }} else if (r.mode === 'message') {{

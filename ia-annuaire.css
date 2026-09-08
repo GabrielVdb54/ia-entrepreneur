@@ -272,6 +272,10 @@ footer{
     .ia-stats div span { font-size:0.8rem; color:var(--muted); }
 
     .ia-reset { border:0; background:transparent; color:var(--muted); cursor:pointer; font-family:inherit; font-size:1.1rem; line-height:1; padding:2px 4px; }
+    /* Zone tactile portee a 44px sans changer la taille visible ni la mise en
+       page : la croix mesurait 22x21, intouchable au pouce. */
+    .ia-reset { position:relative; }
+    .ia-reset::after { content:''; position:absolute; inset:-12px; }
     .ia-filters { display:flex; flex-wrap:wrap; gap:8px; margin-top:12px; align-items:center; }
     .ia-filters select { font-family:inherit; font-size:0.8rem; padding:7px 12px; border-radius:50px; border:1.5px solid var(--border); background:var(--bg); color:var(--text); cursor:pointer; }
     .ia-filters select:focus { outline:0; border-color:var(--primary); }
@@ -342,6 +346,29 @@ footer{
     .ia-conseil-vigilance { margin-top:14px; font-size:0.85rem; color:var(--muted); padding-left:22px; position:relative; line-height:1.55; }
     .ia-conseil-vigilance::before { content:"!"; position:absolute; left:0; top:0; width:16px; height:16px; border-radius:50%; background:#EF4444; color:#fff; font-size:0.68rem; font-weight:800; display:flex; align-items:center; justify-content:center; }
 
+    /* Recevoir le plan par email. Volontairement discret, et placé APRES la
+       réponse complète : le plan est déjà lisible en entier à l'écran. C'est
+       une commodité offerte, jamais un péage — le site vend « sans
+       inscription » partout ailleurs, on ne se contredit pas ici. */
+    .ia-recap { margin-top:14px; padding:15px 16px; border:1px solid var(--border); border-radius:14px; background:var(--bg); }
+    .ia-recap b { display:block; font-size:0.88rem; margin-bottom:3px; }
+    .ia-recap > p { font-size:0.82rem; color:var(--muted); line-height:1.5; margin-bottom:11px; }
+    .ia-recap-champs { display:flex; flex-wrap:wrap; gap:8px; }
+    .ia-recap input[type="email"] { flex:1 1 190px; min-width:0; min-height:44px; padding:11px 14px; border:1.5px solid var(--border); border-radius:10px; font-family:inherit; font-size:0.88rem; color:var(--text); background:#fff; }
+    .ia-recap input[type="email"]:focus { outline:none; border-color:var(--primary); }
+    .ia-recap-envoi { min-height:44px; padding:11px 20px; border:none; border-radius:50px; background:var(--primary); color:#fff; font-family:inherit; font-size:0.82rem; font-weight:700; cursor:pointer; }
+    .ia-recap-envoi:disabled { opacity:0.55; cursor:default; }
+    .ia-recap-consent { display:flex; gap:9px; align-items:flex-start; margin-top:11px; font-size:0.78rem; color:var(--muted); line-height:1.5; cursor:pointer; }
+    .ia-recap-consent input { width:18px; height:18px; margin-top:1px; flex-shrink:0; accent-color:var(--primary); cursor:pointer; }
+    .ia-recap-note { font-size:0.74rem; color:var(--muted); margin-top:9px; line-height:1.5; }
+    .ia-recap-note a { color:var(--primary); font-weight:600; }
+    .ia-recap-etat { font-size:0.84rem; font-weight:600; line-height:1.5; margin-top:2px; }
+    .ia-recap-etat.ok { color:var(--accent); }
+    .ia-recap-etat.ko { color:#EF4444; }
+    /* Pot de miel : hors de l'ecran pour l'oeil, hors du parcours clavier et
+       hors de la vocalisation pour un lecteur d'ecran. Seul un robot le voit. */
+    .ia-piege { position:absolute; left:-9999px; top:auto; width:1px; height:1px; overflow:hidden; }
+
     /* Trois façons de faire, côte à côte : le visiteur se situe sans qu'on
        lui ait demandé son budget. */
     .ia-voies { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin:14px 0 6px; }
@@ -395,6 +422,8 @@ footer{
     .ia-card { position:relative; flex:1; display:flex; flex-direction:column; gap:10px; padding:20px 46px 20px 20px; border:1px solid var(--border); border-left:4px solid var(--tool); border-radius:var(--radius); background:var(--bg); text-decoration:none; color:inherit; transition:transform .18s, box-shadow .18s, border-color .18s; }
     .ia-card:hover { transform:translateY(-3px); box-shadow:0 10px 30px rgba(10,15,44,0.10); }
     .ia-fav { position:absolute; top:10px; right:10px; z-index:2; width:32px; height:32px; border-radius:50%; border:0; background:transparent; color:var(--muted); font-size:1.15rem; line-height:1; cursor:pointer; font-family:inherit; transition:background .15s, color .15s, transform .15s; }
+    /* Meme principe pour l'etoile des favoris : 32x32 a l'oeil, 44x44 au doigt. */
+    .ia-fav::after { content:''; position:absolute; inset:-6px; border-radius:50%; }
     .ia-fav:hover { background:var(--card); color:var(--primary); transform:scale(1.12); }
     .ia-fav.is-on { color:#F59E0B; }
     .ia-fav-long { position:static; width:100%; height:auto; border-radius:50px; border:1.5px solid var(--border); padding:11px 18px; font-size:0.84rem; font-weight:700; }
@@ -521,6 +550,14 @@ footer{
       .ia-etape { gap:10px; }
       .ia-etape .role { display:block; margin-top:3px; }
       .ia-msg-moi { max-width:92%; }
+      /* Sur 390px, champ et bouton cote a cote laissaient 90px au champ :
+         on ne voyait pas son adresse en la tapant. Ils s'empilent. */
+      .ia-recap-champs { flex-direction:column; }
+      /* En colonne, l'axe principal devient la verticale : le flex-basis de
+         190px prevu pour la largeur s'appliquait a la HAUTEUR, et le champ
+         email faisait 190px de haut. On le neutralise. */
+      .ia-recap input[type="email"] { flex:0 0 auto; width:100%; }
+      .ia-recap-envoi { width:100%; }
       .ia-questions li { font-size:0.9rem; }
       .ia-suggestions { flex-wrap:nowrap; overflow-x:auto; scrollbar-width:none; padding-bottom:4px; }
       .ia-suggestions button { flex:0 0 auto; }

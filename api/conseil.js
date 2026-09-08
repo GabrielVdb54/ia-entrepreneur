@@ -388,13 +388,18 @@ export default async function handler(req, res) {
     const requis = OFFRES_CONDITIONNEES[cleOffre];
     if (requis && !etapes.some((e) => requis.includes(e.slug))) cleOffre = OFFRE_PAR_DEFAUT;
 
-    const offre = { ...OFFRES[cleOffre], phrase: couper(brut.phrase_offre, 340) };
+    // La clé accompagne l'offre : la page la renvoie telle quelle à /api/recap,
+    // qui la revalide contre la même liste fermée.
+    const offre = { cle: cleOffre, ...OFFRES[cleOffre], phrase: couper(brut.phrase_offre, 340) };
 
     journaliser(question, etapes.map((e) => e.slug));
 
     return res.status(200).json({
       source: 'claude',
       mode: 'recommandation',
+      // La page n'affiche le bloc « recevoir par email » que si l'envoi est
+      // réellement configuré. On ne propose pas un envoi qu'on ne sait pas faire.
+      recap: Boolean(process.env.N8N_RECAP_WEBHOOK),
       // Le modele reellement utilise, tel que l'API le renvoie — pas celui
       // qu'on a demande. Permet de verifier de l'exterieur qu'aucun autre
       // modele, plus cher, n'a servi la reponse.

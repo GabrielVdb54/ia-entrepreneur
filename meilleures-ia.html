@@ -3715,8 +3715,124 @@
         '</span><h3>' + echapper(r.situation) + '</h3>' + colonnes +
         (colonnes ? '<p class="ia-voies-detail">En détail, la voie recommandée :</p>' : '') + etapes +
         (r.vigilance ? '<p class="ia-conseil-vigilance">' + echapper(r.vigilance) + '</p>' : '') +
-        offre + suivis;
+        offre + blocRecap(r) + suivis;
+      ajusterRecaps();
     }
+
+    // Le visiteur a deja donne son adresse : on ne la redemande pas a chaque
+    // reponse. L'etat suit la conversation, y compris apres un rechargement.
+    var recapDonne = false;
+
+    var TEXTE_CONSENTEMENT =
+      'Je souhaite recevoir les conseils IA et les offres de formation d’IA-Entrepreneur. ' +
+      'Désinscription en un clic dans chaque email.';
+
+    // Propose seulement si l’envoi est reellement configure cote serveur
+    // (r.recap). On ne promet pas un email qu’on ne saurait pas expedier.
+    function blocRecap(r) {
+      if (!r.recap || recapDonne || !r.etapes || !r.etapes.length) return '';
+      var slugs = r.etapes.map(function (e) { return e.slug; }).join(',');
+      var combien = r.etapes.length === 1 ? 'L’outil, son rôle et son lien'
+                                          : 'Les ' + r.etapes.length + ' outils, leur rôle et leurs liens';
+      return '<div class="ia-recap" data-outils="' + slugs + '"' +
+        (r.offre && r.offre.cle ? ' data-offre="' + echapper(r.offre.cle) + '"' : '') + '>' +
+        '<b>Recevoir ce plan par email</b>' +
+        '<p>' + combien + ', dans votre boîte mail — pour y revenir au calme ou le transmettre à votre équipe.</p>' +
+        '<div class="ia-recap-champs">' +
+        '<input type="email" placeholder="votre@email.com" autocomplete="email" aria-label="Votre adresse email">' +
+        '<button type="button" class="ia-recap-envoi">Recevoir le plan</button>' +
+        '</div>' +
+        '<label class="ia-recap-consent"><input type="checkbox">' +
+        '<span>' + TEXTE_CONSENTEMENT + '</span></label>' +
+        // Pot de miel : invisible, hors du parcours clavier. Un robot le remplit,
+        // pas un visiteur ; le serveur ecarte alors la demande sans le dire.
+        '<div class="ia-piege" aria-hidden="true"><label>Laissez ce champ vide' +
+        '<input type="text" tabindex="-1" autocomplete="off"></label></div>' +
+        '<p class="ia-recap-note">Votre adresse sert à cet envoi. Elle n’alimente nos ' +
+        'communications que si vous cochez la case, et vous pouvez vous désinscrire à tout ' +
+        'moment. <a href="/politique-confidentialite.html">Politique de confidentialité</a>.</p>' +
+        '</div>';
+    }
+
+    function etatRecap(bloc, classe, texte) {
+      var ligne = bloc.querySelector('.ia-recap-etat');
+      if (!ligne) {
+        ligne = document.createElement('p');
+        ligne.className = 'ia-recap-etat';
+        bloc.appendChild(ligne);
+      }
+      ligne.className = 'ia-recap-etat ' + classe;
+      ligne.textContent = texte;
+    }
+
+    // Un seul formulaire a l’ecran, celui de la derniere reponse : trois
+    // blocs email empiles dans le fil donneraient l’impression d’un peage.
+    function ajusterRecaps() {
+      var blocs = fil.querySelectorAll('.ia-recap:not(.ia-recap-fait)');
+      for (var i = 0; i < blocs.length - 1; i++) blocs[i].remove();
+    }
+
+    fil.addEventListener('click', function (ev) {
+      var bouton = ev.target.closest('.ia-recap-envoi');
+      if (!bouton) return;
+      var bloc = bouton.closest('.ia-recap');
+      var champ = bloc.querySelector('input[type="email"]');
+      var consent = bloc.querySelector('.ia-recap-consent input');
+      var piege = bloc.querySelector('.ia-piege input');
+      var email = (champ.value || '').trim();
+      if (!/^[^@\s]+@[^@\s.]+\.[^@\s]+$/.test(email)) {
+        etatRecap(bloc, 'ko', 'Cette adresse ne semble pas valide.');
+        champ.focus();
+        return;
+      }
+      bouton.disabled = true;
+      bouton.textContent = 'Envoi…';
+      etatRecap(bloc, '', '');
+      fetch('/api/recap', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: email,
+          consentement: consent.checked === true,
+          // On n’envoie que des identifiants : le serveur reconstruit les noms,
+          // les prix et les liens depuis le catalogue. Aucun texte libre ne
+          // transite, donc le site ne peut pas servir de relais de spam.
+          outils: (bloc.dataset.outils || '').split(',').filter(Boolean),
+          offre: bloc.dataset.offre || null,
+          piege: piege ? piege.value : ''
+        })
+      }).then(function (rep) {
+        if (rep.ok) return { ok: true };
+        return rep.json().catch(function () { return {}; }).then(function (d) {
+          return { ok: false, statut: rep.status, code: d.erreur };
+        });
+      }).catch(function () {
+        return { ok: false, statut: 0 };
+      }).then(function (res) {
+        if (res.ok) {
+          recapDonne = true;
+          memoriser();
+          var autres = fil.querySelectorAll('.ia-recap');
+          for (var i = 0; i < autres.length; i++) {
+            if (autres[i] !== bloc) autres[i].remove();
+          }
+          bloc.classList.add('ia-recap-fait');
+          bloc.innerHTML = '<b>C’est parti ✓</b>' +
+            '<p class="ia-recap-etat ok">Le plan arrive dans quelques instants sur ' +
+            echapper(email) + '. Pensez aux indésirables s’il tarde.</p>';
+          return;
+        }
+        bouton.disabled = false;
+        bouton.textContent = 'Recevoir le plan';
+        if (res.code === 'email_invalide') {
+          etatRecap(bloc, 'ko', 'Cette adresse ne semble pas valide.');
+        } else if (res.statut === 429) {
+          etatRecap(bloc, 'ko', 'Trop de demandes depuis cette connexion. Réessayez dans quelques minutes.');
+        } else {
+          etatRecap(bloc, 'ko', 'L’envoi n’a pas abouti. Réessayez, ou écrivez-nous à contact@ia-entrepreneur.fr.');
+        }
+      });
+    });
 
     function rendreEchec(el) {
       stopAttente(el);
@@ -3740,7 +3856,8 @@
     function memoriser() {
       try {
         localStorage.setItem(CLE_FIL, JSON.stringify({
-          date: Date.now(), journal: journal.slice(-12), historique: historique.slice(-12)
+          date: Date.now(), recapDonne: recapDonne,
+          journal: journal.slice(-12), historique: historique.slice(-12)
         }));
       } catch (e) { /* navigation privée, quota : on continue sans mémoire */ }
     }
@@ -3756,6 +3873,9 @@
       }
       journal = brut.journal;
       historique = brut.historique || [];
+      // Avant de re-afficher les reponses : sinon le formulaire email
+      // reapparait alors que l’adresse a deja ete donnee.
+      recapDonne = brut.recapDonne === true;
       fil.hidden = false;
       journal.forEach(function (entree) {
         if (entree.type === 'moi') return bulleVisiteur(entree.texte);
@@ -3768,14 +3888,14 @@
       });
       var reprise = document.createElement('p');
       reprise.className = 'ia-reprise';
-      reprise.innerHTML = 'Conversation reprise. <button type="button" id="ia-nouvelle">Nouvelle conversation</button>';
+      reprise.innerHTML = 'Conversation reprise. <button type="button" data-nouvelle id="ia-nouvelle">Nouvelle conversation</button>';
       fil.appendChild(reprise);
     }
 
     document.addEventListener('click', function (ev) {
-      if (!ev.target.closest('#ia-nouvelle')) return;
+      if (!ev.target.closest('[data-nouvelle]')) return;
       try { localStorage.removeItem(CLE_FIL); } catch (e) {}
-      journal = []; historique = [];
+      journal = []; historique = []; recapDonne = false;
       fil.innerHTML = ''; fil.hidden = true;
       saisie.disabled = false; boutonEnvoyer.disabled = false;
       saisie.placeholder = 'Écrivez à FindIA…';
@@ -3830,10 +3950,12 @@
               '<div class="ia-conseil-offre"><b>' + echapper(r.offre.titre) + '</b>' +
               '<p>' + echapper(r.offre.phrase) + '</p><div class="ia-conseil-actions">' +
               '<a class="principal" href="' + CAL_URL + '" target="_blank" rel="noopener">Appel gratuit de 15 min</a>' +
-              '<a class="secondaire" href="#annuaire">Parcourir l’annuaire</a></div></div>';
+              '<a class="secondaire" href="#annuaire">Parcourir l’annuaire</a></div></div>' +
+              '<p class="ia-reprise" style="margin-top:12px;">Une autre question ? ' +
+              '<button type="button" data-nouvelle>Nouvelle conversation</button></p>';
             saisie.value = '';
             saisie.disabled = true;
-            saisie.placeholder = 'Conversation terminée — rechargez la page pour recommencer';
+            saisie.placeholder = 'Conversation terminée — « Nouvelle conversation » pour repartir';
             boutonEnvoyer.disabled = true;
             return;
           } else if (r.mode === 'message') {
