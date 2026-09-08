@@ -121,6 +121,18 @@ const OUTIL = {
   },
 };
 
+/**
+ * Tronque sur une frontiere de mot. Un « ou la rela » en fin de question
+ * ruine la credibilite de la reponse : mieux vaut une phrase entiere plus
+ * courte qu'une phrase coupee au milieu d'un mot.
+ */
+function couper(texte, maxi) {
+  const t = String(texte || '').trim();
+  if (t.length <= maxi) return t;
+  const coupe = t.slice(0, maxi).replace(/\s+\S*$/, '');
+  return (coupe || t.slice(0, maxi)) + '…';
+}
+
 async function journaliser(question, outils) {
   const url = process.env.SUPABASE_URL;
   const cle = process.env.SUPABASE_ANON_KEY;
@@ -218,15 +230,15 @@ export default async function handler(req, res) {
           niveau: fiche.niveau,
           prix: fiche.prix,
           url: `/ia/${fiche.slug}.html`,
-          role: String(e.role || '').slice(0, 200),
-          comment: String(e.comment || '').slice(0, 400),
+          role: couper(e.role, 200),
+          comment: couper(e.comment, 500),
         };
       });
 
     const questions = (Array.isArray(brut.questions) ? brut.questions : [])
       .filter((x) => typeof x === 'string' && x.trim())
       .slice(0, 4)
-      .map((x) => x.trim().slice(0, 160));
+      .map((x) => couper(x, 220));
 
     // Demande de précisions : pas d'outil, donc rien à valider contre le
     // catalogue. On l'accepte seulement si ce n'est pas le dernier tour.
@@ -236,14 +248,14 @@ export default async function handler(req, res) {
         source: 'claude',
         modele: reponse.model,
         mode: 'questions',
-        situation: String(brut.situation || '').slice(0, 300),
+        situation: couper(brut.situation, 320),
         questions,
       });
     }
 
     if (!etapes.length) return res.status(502).json({ erreur: 'aucun_outil_valide' });
 
-    const offre = OFFRES[brut.offre] ? { ...OFFRES[brut.offre], phrase: String(brut.phrase_offre || '').slice(0, 300) }
+    const offre = OFFRES[brut.offre] ? { ...OFFRES[brut.offre], phrase: couper(brut.phrase_offre, 340) }
                                      : null;
 
     journaliser(question, etapes.map((e) => e.slug));
@@ -255,13 +267,13 @@ export default async function handler(req, res) {
       // qu'on a demande. Permet de verifier de l'exterieur qu'aucun autre
       // modele, plus cher, n'a servi la reponse.
       modele: reponse.model,
-      situation: String(brut.situation || '').slice(0, 300),
+      situation: couper(brut.situation, 320),
       etapes,
-      vigilance: String(brut.vigilance || '').slice(0, 400),
+      vigilance: couper(brut.vigilance, 420),
       suivis: (Array.isArray(brut.suivis) ? brut.suivis : [])
         .filter((x) => typeof x === 'string' && x.trim())
         .slice(0, 3)
-        .map((x) => x.trim().slice(0, 120)),
+        .map((x) => couper(x, 140)),
       offre,
     });
   } catch (erreur) {
