@@ -261,7 +261,23 @@ const OUTIL_SANS_QUESTIONS = (() => {
     ...OUTIL,
     input_schema: {
       ...OUTIL.input_schema,
-      properties: proprietes,
+      properties: {
+        ...proprietes,
+        // Retirer le champ ne suffisait pas : les descriptions des deux champs
+        // suivants parlaient encore de poser des questions, et « etapes »
+        // disait explicitement « vide si tu poses des questions ». Le modele
+        // suivait la description du champ plutot que la consigne systeme, et
+        // renvoyait une reformulation lucide suivie d'une liste vide. Ces
+        // descriptions sont donc reecrites pour ce cas precis.
+        situation: {
+          type: 'string',
+          description: "Reformulation du besoin en une phrase, à la deuxième personne. S'il te manque un détail, annonce ici l'hypothèse que tu prends — « je pars du principe que vous voulez monter des vidéos existantes ». Jamais une question.",
+        },
+        etapes: {
+          ...proprietes.etapes,
+          description: "La chaîne recommandée, JAMAIS VIDE : deux ou trois outils, quatre au maximum, dans l'ordre où on les utilise. Si la demande admet plusieurs lectures, prends la plus probable et couvre la seconde avec un outil de plus.",
+        },
+      },
       required: OUTIL.input_schema.required.filter((c) => c !== 'questions'),
     },
   };
