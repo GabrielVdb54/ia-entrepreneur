@@ -154,7 +154,7 @@ IA_CSS = """
     .ia-saisie { display:flex; align-items:flex-end; gap:10px; padding:10px 10px 10px 20px; border:1.5px solid var(--border); border-radius:26px; background:var(--bg); box-shadow:0 4px 22px rgba(10,15,44,0.07); }
     .ia-saisie:focus-within { border-color:var(--primary); box-shadow:0 6px 26px rgba(26,60,255,0.14); }
     .ia-saisie textarea { flex:1; border:0; outline:0; resize:none; background:transparent; font-family:inherit; font-size:0.98rem; line-height:1.5; color:var(--text); padding:9px 0; max-height:160px; }
-    .ia-saisie button { flex:0 0 auto; width:40px; height:40px; border-radius:50%; border:0; background:var(--primary); color:#fff; cursor:pointer; display:flex; align-items:center; justify-content:center; transition:background .15s, opacity .15s; }
+    .ia-saisie button { flex:0 0 auto; width:44px; height:44px; border-radius:50%; border:0; background:var(--primary); color:#fff; cursor:pointer; display:flex; align-items:center; justify-content:center; transition:background .15s, opacity .15s; }
     .ia-saisie button:hover { background:var(--primary-h); }
     .ia-saisie button[disabled] { opacity:0.45; cursor:progress; }
 
@@ -181,7 +181,7 @@ IA_CSS = """
     .ia-conseil-offre b { display:block; font-size:0.92rem; margin-bottom:4px; }
     .ia-conseil-offre p { font-size:0.86rem; color:var(--muted); line-height:1.55; margin-bottom:10px; }
     .ia-conseil-offre .ia-conseil-actions { display:flex; flex-wrap:wrap; gap:8px; }
-    .ia-conseil-offre a { display:inline-flex; align-items:center; padding:9px 18px; border-radius:50px; font-size:0.82rem; font-weight:700; text-decoration:none; }
+    .ia-conseil-offre a { display:inline-flex; align-items:center; min-height:44px; padding:11px 20px; border-radius:50px; font-size:0.82rem; font-weight:700; text-decoration:none; }
     .ia-conseil-offre a.principal { background:var(--accent); color:#fff; }
     .ia-conseil-offre a.secondaire { border:1.5px solid var(--border); color:var(--muted); }
     .ia-conseil-vigilance { margin-top:14px; font-size:0.85rem; color:var(--muted); padding-left:22px; position:relative; line-height:1.55; }
