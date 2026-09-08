@@ -247,7 +247,12 @@ export default async function handler(req, res) {
 
   // Plafond de dépense : trois réponses maximum par conversation. Au-delà de
   // deux tours de questions, le conseiller doit trancher avec ce qu'il sait.
-  const toursReponse = fil.filter((m) => m.role === 'assistant').length;
+  // Le client n'envoie que les six derniers tours, pour ne pas payer un
+  // contexte inutile : le serveur ne peut donc pas deviner la longueur reelle
+  // de la conversation. Elle lui est transmise a part. Un client malveillant
+  // pourrait mentir, mais la limite anti-abus couvre ce cas.
+  const toursAnnonces = Number.isInteger(req.body?.tours) ? req.body.tours : 0;
+  const toursReponse = Math.max(fil.filter((m) => m.role === 'assistant').length, toursAnnonces);
   const dernierTour = toursReponse >= 2;
 
   // Conversation terminée : on répond sans appeler le modèle. Zéro coût, et

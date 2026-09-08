@@ -1487,7 +1487,12 @@ def build_hub():
       fetch('/api/conseil', {{
         method: 'POST',
         headers: {{ 'Content-Type': 'application/json' }},
-        body: JSON.stringify({{ messages: historique.slice(-6) }})
+        body: JSON.stringify({{
+          messages: historique.slice(-6),
+          // Nombre reel de reponses deja donnees : le fil envoye est tronque,
+          // le serveur ne pourrait pas le deduire seul.
+          tours: historique.filter(function (m) {{ return m.role === 'assistant'; }}).length
+        }})
       }}).then(function (r) {{ return r.ok ? r.json() : null; }})
         .catch(function () {{ return null; }})
         .then(function (data) {{
