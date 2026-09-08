@@ -191,6 +191,10 @@ export default async function handler(req, res) {
 
     return res.status(200).json({
       source: 'claude',
+      // Le modele reellement utilise, tel que l'API le renvoie — pas celui
+      // qu'on a demande. Permet de verifier de l'exterieur qu'aucun autre
+      // modele, plus cher, n'a servi la reponse.
+      modele: reponse.model,
       situation: String(brut.situation || '').slice(0, 300),
       etapes,
       vigilance: String(brut.vigilance || '').slice(0, 400),
