@@ -134,10 +134,15 @@ IA_CSS = """
     .ia-chat h1 { font-size:clamp(1.8rem,4vw,2.7rem); line-height:1.15; letter-spacing:-0.02em; margin-bottom:14px; }
     .ia-chat p.lead { font-size:1.02rem; color:var(--muted); max-width:640px; margin-bottom:26px; }
 
+    .ia-marque { color:var(--primary); }
+    .ia-avertissement { display:flex; align-items:flex-start; gap:9px; font-size:0.82rem; color:var(--muted); line-height:1.55; margin-bottom:16px; max-width:660px; }
+    .ia-avertissement b { color:var(--text); }
+    .ia-puce { flex:0 0 auto; width:22px; height:22px; border-radius:50%; background:var(--primary); color:#fff; font-size:0.58rem; font-weight:800; display:flex; align-items:center; justify-content:center; margin-top:1px; }
+
     .ia-fil { display:flex; flex-direction:column; gap:18px; margin-bottom:18px; }
     .ia-msg-moi { align-self:flex-end; max-width:min(560px,88%); padding:12px 18px; border-radius:18px 18px 4px 18px; background:var(--primary); color:#fff; font-size:0.94rem; line-height:1.5; }
     .ia-msg-ia { align-self:stretch; padding:0 0 0 34px; position:relative; }
-    .ia-msg-ia::before { content:"IA"; position:absolute; left:0; top:1px; width:24px; height:24px; border-radius:50%; background:var(--primary); color:#fff; font-size:0.6rem; font-weight:800; display:flex; align-items:center; justify-content:center; letter-spacing:0.02em; }
+    .ia-msg-ia::before { content:"F"; position:absolute; left:0; top:1px; width:24px; height:24px; border-radius:50%; background:var(--primary); color:#fff; font-size:0.6rem; font-weight:800; display:flex; align-items:center; justify-content:center; letter-spacing:0.02em; }
     .ia-msg-ia .ia-etape { border-top:0; border-left:2px solid var(--border); padding:6px 0 6px 16px; margin-bottom:10px; }
     .ia-msg-ia .ia-etape:hover { border-left-color:var(--primary); }
     .ia-msg-ia > h3 { font-size:1.02rem; line-height:1.45; margin-bottom:2px; }
@@ -807,16 +812,23 @@ def build_hub():
   <section class="ia-chat">
     <div class="container">
       <div class="ia-badge">Annuaire indépendant · {len(TOOLS)} outils · mis à jour le {datetime.date.today().strftime('%d/%m/%Y')}</div>
-      <h1>Quelle IA pour <span class="gradient">votre</span> situation ?</h1>
-      <p class="lead">Décrivez ce que vous cherchez à régler, en une phrase.
-      <span class="ia-lead-suite">Vous recevez la chaîne d'outils qui y répond : lequel pour quelle étape,
-      comment s'en servir, ce que ça coûte et où partent vos données.</span></p>
+      <h1><span class="ia-marque">FindIA</span> : quelle IA pour <span class="gradient">votre</span> situation ?</h1>
+      <p class="lead"><b>Parlez-lui comme à un collègue.</b> Décrivez ce que vous cherchez à régler, en une phrase.
+      <span class="ia-lead-suite">FindIA vous répond, vous pose des questions si le contexte lui manque,
+      et compose la chaîne d'outils qui convient : lequel pour quelle étape, comment s'en servir,
+      ce que ça coûte et où partent vos données.</span></p>
 
       <div class="ia-fil" id="ia-fil" hidden aria-live="polite"></div>
 
+      <p class="ia-avertissement">
+        <span class="ia-puce">F</span>
+        <b>FindIA est une intelligence artificielle.</b> Elle lit les {len(TOOLS)} fiches de cet annuaire et n'en
+        recommande jamais d'autres. Vérifiez les tarifs auprès de l'éditeur avant de vous engager.
+      </p>
+
       <form class="ia-saisie" id="ia-form">
         <textarea id="ia-chat-q" rows="1" maxlength="500" autocomplete="off"
-                  placeholder="Décrivez votre situation en une phrase…"></textarea>
+                  placeholder="Écrivez à FindIA… (ex. : je perds du temps sur mes devis)"></textarea>
         <button type="submit" id="ia-envoyer" aria-label="Envoyer">
           <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
         </button>
@@ -828,8 +840,8 @@ def build_hub():
         <button type="button" data-exemple="Je veux créer une image et un post pour LinkedIn">Créer du contenu</button>
         <button type="button" data-exemple="Je manipule des données clients, je veux rester conforme au RGPD">Rester conforme au RGPD</button>
       </div>
-      <p class="ia-chat-note">Réponses composées à partir des {len(TOOLS)} outils de l'annuaire, jamais inventées.
-      Aucun lien rémunéré. <a href="#annuaire">Parcourir l'annuaire complet</a></p>
+      <p class="ia-chat-note">Trois échanges suffisent en général. Aucun lien rémunéré, aucun outil inventé.
+      <a href="#annuaire">Ou parcourez l'annuaire complet</a></p>
     </div>
   </section>
 
@@ -1339,14 +1351,14 @@ def build_hub():
     function bulleReponse() {{
       var el = document.createElement('div');
       el.className = 'ia-msg ia-msg-ia';
-      el.innerHTML = '<div class="ia-reflexion"><i></i>Je cherche dans les ' + cards.length + ' outils…</div>';
+      el.innerHTML = '<div class="ia-reflexion"><i></i>FindIA cherche dans les ' + cards.length + ' outils…</div>';
       fil.appendChild(el);
       return el;
     }}
 
     function rendreQuestions(el, r) {{
       el.innerHTML =
-        '<span class="ia-conseil-source">Quelques précisions</span>' +
+        '<span class="ia-conseil-source">FindIA · quelques précisions</span>' +
         '<h3>' + echapper(r.situation) + '</h3>' +
         '<ul class="ia-questions">' +
         r.questions.map(function (q) {{ return '<li>' + echapper(q) + '</li>'; }}).join('') +
@@ -1386,7 +1398,7 @@ def build_hub():
     }}
 
     function rendreEchec(el) {{
-      el.innerHTML = '<span class="ia-conseil-source">Aucune correspondance</span>' +
+      el.innerHTML = '<span class="ia-conseil-source">FindIA · aucune correspondance</span>' +
         '<h3>Je n’ai pas trouvé d’outil pour cette demande.</h3>' +
         '<p style="font-size:0.88rem;color:var(--muted);line-height:1.55;">Reformulez en décrivant la tâche ' +
         'qui vous prend du temps — « je passe mes vendredis sur mes factures », par exemple — ou ' +
