@@ -11,12 +11,20 @@ IA-Entrepreneur est fondé par Gabriel Vanderbecken, formateur praticien ayant a
 - Certifié Qualiopi, finançable OPCO
 
 ### Formations entreprises (sur mesure, finançables OPCO)
-- Formation IA & Automatisation : ChatGPT, n8n, Make, automatisation des process
-- Formation Prospection Commerciale : LinkedIn, emailing, phoning, closing
+- Formation IA obligatoire — article 4 de l'AI Act : obligation d'alphabétisation à l'IA en vigueur depuis le 2 février 2025, inventaire des systèmes utilisés, classement par niveau de risque, documentation de la conformité — https://ia-entrepreneur.fr/formation-ia-obligatoire-ai-act.html
+- Formation ChatGPT en entreprise : rédiger, analyser un document, préparer une réunion, créer des assistants sur mesure — https://ia-entrepreneur.fr/formation-chatgpt-entreprise.html
+- Formation Microsoft Copilot : pour une entreprise déjà équipée de Microsoft 365 — https://ia-entrepreneur.fr/formation-microsoft-copilot-entreprise.html
+- Formation IA & Automatisation : ChatGPT, n8n, Make, automatisation des process — https://ia-entrepreneur.fr/formation-ia-automatisation.html
+- Formation Prospection Commerciale & IA : LinkedIn, emailing, phoning, closing — https://ia-entrepreneur.fr/formation-prospection-commerciale.html
+- Formation Techniques de Vente & Closing : taux de transformation, défense des marges — https://ia-entrepreneur.fr/formation-techniques-vente-closing.html
 - Formation Management & Leadership : délégation, feedback, gestion des conflits
-- Formation Techniques de Vente & Closing : taux de transformation, défense des marges
 - Formation Négociation Commerciale : concessions, grands comptes, posture
 - Formation Prise de Parole en Public : pitcher, convaincre, gérer le stress
+
+### Autres accompagnements
+- Coaching IA individuel pour dirigeant : avancer vite sans passer par une formation collective — https://ia-entrepreneur.fr/coaching-ia-dirigeant.html
+- Audit et diagnostic IA de l'entreprise : cadrer avant d'investir, quand on ne sait pas par où commencer — https://ia-entrepreneur.fr/audit-diagnostic-ia-entreprise.html
+- Intégration IA clé en main : obtenir le résultat sans que personne en interne ait à s'en occuper — https://ia-entrepreneur.fr/integrations-ia.html
 
 ## Informations légales
 - Raison sociale : Clindit SASU — IA-Entrepreneur est une marque de Clindit
@@ -29,7 +37,10 @@ IA-Entrepreneur est fondé par Gabriel Vanderbecken, formateur praticien ayant a
 - Email : contact@ia-entrepreneur.fr
 - Prise de rendez-vous : https://calendly.com/gabriel-ia-entrepreneur/decouverte
 
-## Ressource : annuaire « Les meilleures IA du moment »
+## Ressource : FindIA et l'annuaire « Les meilleures IA du moment »
+
+FindIA est un assistant conversationnel gratuit, en haut de la page de l'annuaire : on lui décrit une situation de travail en une phrase, il répond par une chaîne de deux à quatre outils — lequel pour quelle étape, comment s'en servir, ce que ça coûte, où partent les données — avec trois niveaux de budget (sans payer / meilleur rapport qualité-prix / performance). Il ne recommande que des outils de cet annuaire et pose des questions quand la demande ne nomme aucune tâche. Sans inscription. https://ia-entrepreneur.fr/meilleures-ia.html
+
 Annuaire indépendant et gratuit de 129 outils d'intelligence artificielle, classés par usage en entreprise (16 catégories) et documentés en français : à quoi sert l'outil, ce qu'il fait gagner en temps, ses limites, son modèle tarifaire, le pays de l'éditeur et le point de vigilance RGPD / AI Act associé. Aucun lien rémunéré. Une fiche par outil, une page par usage.
 - Annuaire complet : https://ia-entrepreneur.fr/meilleures-ia.html
 - Assistants IA & LLM : https://ia-entrepreneur.fr/ia/meilleures-ia-assistants-ia.html
