@@ -986,15 +986,9 @@
 
       <div class="ia-fil" id="ia-fil" hidden aria-live="polite"></div>
 
-      <p class="ia-avertissement">
-        <span class="ia-puce">F</span>
-        <b>FindIA est une intelligence artificielle.</b> Elle lit les 129 fiches de cet annuaire et n'en
-        recommande jamais d'autres. Vérifiez les tarifs auprès de l'éditeur avant de vous engager.
-      </p>
-
       <form class="ia-saisie" id="ia-form">
         <textarea id="ia-chat-q" rows="1" maxlength="500" autocomplete="off"
-                  placeholder="Écrivez à FindIA… (ex. : je perds du temps sur mes devis)"></textarea>
+                  placeholder="Écrivez à FindIA…"></textarea>
         <button type="submit" id="ia-envoyer" aria-label="Envoyer">
           <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
         </button>
@@ -1006,7 +1000,8 @@
         <button type="button" data-exemple="Je veux créer une image et un post pour LinkedIn">Créer du contenu</button>
         <button type="button" data-exemple="Je manipule des données clients, je veux rester conforme au RGPD">Rester conforme au RGPD</button>
       </div>
-      <p class="ia-chat-note">Trois échanges suffisent en général. Aucun lien rémunéré, aucun outil inventé.
+      <p class="ia-avertissement"><b>FindIA est une intelligence artificielle.</b> Elle lit les 129 fiches
+      de cet annuaire et n'en recommande jamais d'autres. Trois échanges suffisent en général, aucun lien rémunéré.
       <a href="#annuaire">Ou parcourez l'annuaire complet</a></p>
     </div>
   </section>
@@ -3522,16 +3517,17 @@
       }).filter(function (x) { return x.s > 0; }).sort(function (a, b) { return b.s - a.s; });
 
       var usages = scores.slice(0, 2).map(function (x) { return x.u; });
-      // On complète avec la chaîne du métier détecté, sans jamais dépasser trois
-      // outils : au-delà, personne ne passe à l’action.
+
+      // Règle décisive : sans tâche identifiée dans la phrase, le moteur local
+      // se tait et laisse FindIA répondre. Il ne doit jamais déduire un besoin
+      // d’un simple métier : « je suis gérant d’une boîte de BTP » lui faisait
+      // proposer des outils de visioconférence, parce que « gérant » déclenchait
+      // la chaîne type du dirigeant. Deviner de travers est pire que se taire.
+      if (!usages.length) return null;
+
+      // Le métier ne sert qu’à compléter une tâche déjà repérée.
       (roles.length ? CHAINE_METIER[roles[0]] : []).forEach(function (u) {
         if (usages.length < 3 && usages.indexOf(u) < 0) usages.push(u);
-      });
-      if (!usages.length) return null;
-      // Une chaîne d’un seul maillon n’aide personne : on complète avec ce qui
-      // sert dans presque toutes les situations.
-      ['assistants-ia', 'automatisation'].forEach(function (u) {
-        if (usages.length < 2 && usages.indexOf(u) < 0) usages.push(u);
       });
 
       var sansPayer = /gratuit|gratuite|sans payer|petit budget|pas de budget|budget serre/.test(texte);
@@ -3621,7 +3617,7 @@
     function bulleReponse() {
       var el = document.createElement('div');
       el.className = 'ia-msg ia-msg-ia';
-      el.innerHTML = '<div class="ia-reflexion"><i></i>FindIA cherche dans les ' + cards.length + ' outils…</div>';
+      el.innerHTML = '<div class="ia-reflexion"><i></i><i></i><i></i></div>';
       fil.appendChild(el);
       return el;
     }
@@ -3721,7 +3717,13 @@
       // faire patienter devant un point qui clignote, on affiche tout de suite
       // celle du moteur local, puis on la remplace quand la vraie arrive.
       var local = conseilLocal(texte);
-      if (local) rendre(bulle, local);
+      if (local) {
+        rendre(bulle, local);
+        var attente = document.createElement('p');
+        attente.className = 'ia-affine';
+        attente.innerHTML = '<i></i>FindIA affine cette réponse…';
+        bulle.appendChild(attente);
+      }
 
       fetch('/api/conseil', {
         method: 'POST',

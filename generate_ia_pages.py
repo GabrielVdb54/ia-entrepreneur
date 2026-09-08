@@ -135,21 +135,26 @@ IA_CSS = """
     .ia-chat p.lead { font-size:1.02rem; color:var(--muted); max-width:640px; margin-bottom:26px; }
 
     .ia-marque { color:var(--primary); }
-    .ia-avertissement { display:flex; align-items:flex-start; gap:9px; font-size:0.82rem; color:var(--muted); line-height:1.55; margin-bottom:16px; max-width:660px; }
-    .ia-avertissement b { color:var(--text); }
+    .ia-avertissement { font-size:0.78rem; color:var(--muted); line-height:1.55; margin-top:14px; max-width:700px; }
+    .ia-avertissement b { color:var(--text); font-weight:700; }
+    .ia-avertissement a { color:var(--primary); font-weight:700; text-decoration:none; }
     .ia-puce { flex:0 0 auto; width:22px; height:22px; border-radius:50%; background:var(--primary); color:#fff; font-size:0.58rem; font-weight:800; display:flex; align-items:center; justify-content:center; margin-top:1px; }
 
     .ia-fil { display:flex; flex-direction:column; gap:18px; margin-bottom:18px; }
     .ia-msg-moi { align-self:flex-end; max-width:min(560px,88%); padding:12px 18px; border-radius:18px 18px 4px 18px; background:var(--primary); color:#fff; font-size:0.94rem; line-height:1.5; }
-    .ia-msg-ia { align-self:stretch; padding:0 0 0 34px; position:relative; }
-    .ia-msg-ia::before { content:"F"; position:absolute; left:0; top:1px; width:24px; height:24px; border-radius:50%; background:var(--primary); color:#fff; font-size:0.6rem; font-weight:800; display:flex; align-items:center; justify-content:center; letter-spacing:0.02em; }
+    .ia-msg-ia { align-self:flex-start; position:relative; margin-left:36px; max-width:min(780px,100%); padding:18px 22px; border-radius:4px 18px 18px 18px; background:var(--bg); border:1px solid var(--border); box-shadow:0 2px 14px rgba(10,15,44,0.05); }
+    .ia-msg-ia::before { content:"F"; position:absolute; left:-36px; top:0; width:24px; height:24px; border-radius:50%; background:var(--primary); color:#fff; font-size:0.6rem; font-weight:800; display:flex; align-items:center; justify-content:center; letter-spacing:0.02em; }
     .ia-msg-ia .ia-etape { border-top:0; border-left:2px solid var(--border); padding:6px 0 6px 16px; margin-bottom:10px; }
     .ia-msg-ia .ia-etape:hover { border-left-color:var(--primary); }
     .ia-msg-ia > h3 { font-size:1.02rem; line-height:1.45; margin-bottom:2px; }
     .ia-msg-ia .ia-conseil-source { font-size:0.7rem; color:var(--muted); font-weight:700; text-transform:uppercase; letter-spacing:0.05em; display:block; margin-bottom:8px; }
-    .ia-reflexion { display:flex; align-items:center; gap:10px; font-size:0.86rem; color:var(--muted); padding:14px 20px; }
-    .ia-reflexion i { width:8px; height:8px; border-radius:50%; background:var(--primary); animation:ia-pulse 1.1s ease-in-out infinite; }
-    @keyframes ia-pulse { 0%,100% { opacity:0.25; transform:scale(0.8); } 50% { opacity:1; transform:scale(1.15); } }
+    .ia-reflexion { display:flex; align-items:center; gap:5px; padding:2px 0; }
+    .ia-reflexion i { width:7px; height:7px; border-radius:50%; background:var(--muted); animation:ia-ecrit 1.3s ease-in-out infinite; }
+    .ia-reflexion i:nth-child(2) { animation-delay:0.18s; }
+    .ia-reflexion i:nth-child(3) { animation-delay:0.36s; }
+    .ia-affine { display:flex; align-items:center; gap:6px; font-size:0.78rem; color:var(--muted); margin-top:14px; padding-top:12px; border-top:1px dashed var(--border); }
+    .ia-affine i { width:6px; height:6px; border-radius:50%; background:var(--primary); animation:ia-ecrit 1.3s ease-in-out infinite; flex:0 0 auto; }
+    @keyframes ia-ecrit { 0%,80%,100% { opacity:0.28; transform:translateY(0); } 40% { opacity:1; transform:translateY(-3px); } }
 
     .ia-saisie { display:flex; align-items:flex-end; gap:10px; padding:10px 10px 10px 20px; border:1.5px solid var(--border); border-radius:26px; background:var(--bg); box-shadow:0 4px 22px rgba(10,15,44,0.07); }
     .ia-saisie:focus-within { border-color:var(--primary); box-shadow:0 6px 26px rgba(26,60,255,0.14); }
@@ -356,7 +361,7 @@ IA_CSS = """
       /* Sur 390px, la pastille « IA » en marge volait 34px de largeur au
          texte : elle passe au-dessus. Et le rôle de chaque outil prend sa
          propre ligne, au lieu de se couper en plein milieu. */
-      .ia-msg-ia { padding-left:0; }
+      .ia-msg-ia { margin-left:0; padding:16px 18px; }
       .ia-msg-ia::before { position:static; margin-bottom:10px; }
       .ia-msg-ia .ia-etape { padding-left:12px; }
       /* Trois colonnes sur 390px seraient illisibles : elles s'empilent, la
@@ -851,15 +856,9 @@ def build_hub():
 
       <div class="ia-fil" id="ia-fil" hidden aria-live="polite"></div>
 
-      <p class="ia-avertissement">
-        <span class="ia-puce">F</span>
-        <b>FindIA est une intelligence artificielle.</b> Elle lit les {len(TOOLS)} fiches de cet annuaire et n'en
-        recommande jamais d'autres. Vérifiez les tarifs auprès de l'éditeur avant de vous engager.
-      </p>
-
       <form class="ia-saisie" id="ia-form">
         <textarea id="ia-chat-q" rows="1" maxlength="500" autocomplete="off"
-                  placeholder="Écrivez à FindIA… (ex. : je perds du temps sur mes devis)"></textarea>
+                  placeholder="Écrivez à FindIA…"></textarea>
         <button type="submit" id="ia-envoyer" aria-label="Envoyer">
           <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
         </button>
@@ -871,7 +870,8 @@ def build_hub():
         <button type="button" data-exemple="Je veux créer une image et un post pour LinkedIn">Créer du contenu</button>
         <button type="button" data-exemple="Je manipule des données clients, je veux rester conforme au RGPD">Rester conforme au RGPD</button>
       </div>
-      <p class="ia-chat-note">Trois échanges suffisent en général. Aucun lien rémunéré, aucun outil inventé.
+      <p class="ia-avertissement"><b>FindIA est une intelligence artificielle.</b> Elle lit les {len(TOOLS)} fiches
+      de cet annuaire et n'en recommande jamais d'autres. Trois échanges suffisent en général, aucun lien rémunéré.
       <a href="#annuaire">Ou parcourez l'annuaire complet</a></p>
     </div>
   </section>
@@ -1283,16 +1283,17 @@ def build_hub():
       }}).filter(function (x) {{ return x.s > 0; }}).sort(function (a, b) {{ return b.s - a.s; }});
 
       var usages = scores.slice(0, 2).map(function (x) {{ return x.u; }});
-      // On complète avec la chaîne du métier détecté, sans jamais dépasser trois
-      // outils : au-delà, personne ne passe à l’action.
+
+      // Règle décisive : sans tâche identifiée dans la phrase, le moteur local
+      // se tait et laisse FindIA répondre. Il ne doit jamais déduire un besoin
+      // d’un simple métier : « je suis gérant d’une boîte de BTP » lui faisait
+      // proposer des outils de visioconférence, parce que « gérant » déclenchait
+      // la chaîne type du dirigeant. Deviner de travers est pire que se taire.
+      if (!usages.length) return null;
+
+      // Le métier ne sert qu’à compléter une tâche déjà repérée.
       (roles.length ? CHAINE_METIER[roles[0]] : []).forEach(function (u) {{
         if (usages.length < 3 && usages.indexOf(u) < 0) usages.push(u);
-      }});
-      if (!usages.length) return null;
-      // Une chaîne d’un seul maillon n’aide personne : on complète avec ce qui
-      // sert dans presque toutes les situations.
-      ['assistants-ia', 'automatisation'].forEach(function (u) {{
-        if (usages.length < 2 && usages.indexOf(u) < 0) usages.push(u);
       }});
 
       var sansPayer = /gratuit|gratuite|sans payer|petit budget|pas de budget|budget serre/.test(texte);
@@ -1382,7 +1383,7 @@ def build_hub():
     function bulleReponse() {{
       var el = document.createElement('div');
       el.className = 'ia-msg ia-msg-ia';
-      el.innerHTML = '<div class="ia-reflexion"><i></i>FindIA cherche dans les ' + cards.length + ' outils…</div>';
+      el.innerHTML = '<div class="ia-reflexion"><i></i><i></i><i></i></div>';
       fil.appendChild(el);
       return el;
     }}
@@ -1482,7 +1483,13 @@ def build_hub():
       // faire patienter devant un point qui clignote, on affiche tout de suite
       // celle du moteur local, puis on la remplace quand la vraie arrive.
       var local = conseilLocal(texte);
-      if (local) rendre(bulle, local);
+      if (local) {{
+        rendre(bulle, local);
+        var attente = document.createElement('p');
+        attente.className = 'ia-affine';
+        attente.innerHTML = '<i></i>FindIA affine cette réponse…';
+        bulle.appendChild(attente);
+      }}
 
       fetch('/api/conseil', {{
         method: 'POST',
