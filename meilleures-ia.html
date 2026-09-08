@@ -1009,12 +1009,12 @@
       <h2>L'annuaire complet</h2>
       <p class="intro">129 outils classés par usage, niveau requis, budget réel et pays d'hébergement des données. Filtrez, ou cherchez par mot-clé.</p>
 
-      <label class="ia-search" for="ia-q">
-        <svg width="17" height="17" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
-        <input id="ia-q" type="text" inputmode="search" placeholder="Chercher un outil ou un usage (ex. : compte rendu, facture, image)" autocomplete="off" />
-        <button class="ia-reset" type="button" id="ia-clear" aria-label="Effacer la recherche">✕</button>
-      </label>
       <div class="ia-filters">
+        <label class="ia-filtre-texte" for="ia-q">
+          <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+          <input id="ia-q" type="text" inputmode="search" placeholder="Filtrer par mot-clé" autocomplete="off" />
+          <button class="ia-reset" type="button" id="ia-clear" aria-label="Effacer le filtre">✕</button>
+        </label>
         <select id="f-cat" aria-label="Filtrer par usage"><option value="">Tous les usages</option>
 <option value="assistants-ia">Assistants IA &amp; LLM</option>
 <option value="recherche-veille">Recherche &amp; veille</option>
@@ -3619,6 +3619,15 @@
       return el;
     }
 
+    function rendreQuestions(el, r) {
+      el.innerHTML =
+        '<span class="ia-conseil-source">Quelques précisions</span>' +
+        '<h3>' + echapper(r.situation) + '</h3>' +
+        '<ul class="ia-questions">' +
+        r.questions.map(function (q) { return '<li>' + echapper(q) + '</li>'; }).join('') +
+        '</ul><p class="ia-questions-note">Répondez en une phrase, même approximative — je m’adapte.</p>';
+    }
+
     function rendre(el, r) {
       var etapes = r.etapes.map(function (e, i) {
         return '<div class="ia-etape"><div class="num">' + (i + 1) + '</div><div>' +
@@ -3688,8 +3697,16 @@
         .then(function (data) {
           if (moi !== enCours) return;
           var r = data || local;
-          if (!r) { rendreEchec(bulle); }
-          else {
+          if (!r) {
+            rendreEchec(bulle);
+          } else if (r.mode === 'questions') {
+            rendreQuestions(bulle, r);
+            historique.push({
+              role: 'assistant',
+              content: r.situation + ' Questions posées : ' + r.questions.join(' ')
+            });
+            saisie.focus();
+          } else {
             rendre(bulle, r);
             historique.push({
               role: 'assistant',

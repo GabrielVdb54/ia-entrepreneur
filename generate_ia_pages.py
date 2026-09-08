@@ -144,7 +144,10 @@ IA_CSS = """
 
     .ia-fil { display:flex; flex-direction:column; gap:18px; margin-bottom:18px; }
     .ia-msg-moi { align-self:flex-end; max-width:min(560px,88%); padding:12px 18px; border-radius:18px 18px 4px 18px; background:var(--primary); color:#fff; font-size:0.94rem; line-height:1.5; }
-    .ia-msg-ia { align-self:stretch; padding:22px 24px; border-radius:4px 18px 18px 18px; background:var(--bg); border:1px solid var(--border); box-shadow:0 8px 30px rgba(10,15,44,0.06); }
+    .ia-msg-ia { align-self:stretch; padding:0 0 0 34px; position:relative; }
+    .ia-msg-ia::before { content:"IA"; position:absolute; left:0; top:1px; width:24px; height:24px; border-radius:50%; background:var(--primary); color:#fff; font-size:0.6rem; font-weight:800; display:flex; align-items:center; justify-content:center; letter-spacing:0.02em; }
+    .ia-msg-ia .ia-etape { border-top:0; border-left:2px solid var(--border); padding:6px 0 6px 16px; margin-bottom:10px; }
+    .ia-msg-ia .ia-etape:hover { border-left-color:var(--primary); }
     .ia-msg-ia > h3 { font-size:1.02rem; line-height:1.45; margin-bottom:2px; }
     .ia-msg-ia .ia-conseil-source { font-size:0.7rem; color:var(--muted); font-weight:700; text-transform:uppercase; letter-spacing:0.05em; display:block; margin-bottom:8px; }
     .ia-reflexion { display:flex; align-items:center; gap:10px; font-size:0.86rem; color:var(--muted); padding:14px 20px; }
@@ -164,6 +167,16 @@ IA_CSS = """
     .ia-chat-note { font-size:0.78rem; color:var(--muted); margin-top:16px; }
     .ia-chat-note a { color:var(--primary); font-weight:700; text-decoration:none; }
 
+    .ia-filtre-texte { display:inline-flex; align-items:center; gap:7px; padding:6px 12px; border-radius:50px; border:1.5px solid var(--border); background:var(--bg); min-width:230px; }
+    .ia-filtre-texte:focus-within { border-color:var(--primary); }
+    .ia-filtre-texte svg { flex-shrink:0; color:var(--muted); }
+    .ia-filtre-texte input { border:0; outline:0; background:transparent; font-family:inherit; font-size:0.8rem; color:var(--text); width:100%; min-width:0; }
+
+    .ia-questions { margin:10px 0 4px; padding-left:2px; }
+    .ia-questions li { position:relative; padding-left:20px; margin-bottom:8px; font-size:0.92rem; line-height:1.55; color:var(--text); list-style:none; }
+    .ia-questions li::before { content:"?"; position:absolute; left:0; top:1px; width:14px; height:14px; border-radius:50%; background:rgba(26,60,255,0.12); color:var(--primary); font-size:0.62rem; font-weight:800; display:flex; align-items:center; justify-content:center; }
+    .ia-questions-note { font-size:0.83rem; color:var(--muted); margin-top:10px; }
+
     .ia-suivis { display:flex; flex-wrap:wrap; gap:8px; margin-top:16px; padding-top:14px; border-top:1px solid var(--border); }
     .ia-suivis span { font-size:0.78rem; color:var(--muted); font-weight:700; width:100%; margin-bottom:2px; }
     .ia-suivis button { padding:7px 14px; border-radius:50px; border:1px solid var(--border); background:var(--bg2); color:var(--primary); font-family:inherit; font-size:0.8rem; font-weight:600; cursor:pointer; }
@@ -177,7 +190,7 @@ IA_CSS = """
     .ia-conseil h3 { font-size:1.02rem; line-height:1.4; margin-bottom:4px; }
     .ia-conseil .ia-conseil-source { font-size:0.72rem; color:var(--muted); font-weight:600; text-transform:uppercase; letter-spacing:0.04em; margin-bottom:10px; display:block; }
     .ia-etape { display:flex; gap:14px; padding:14px 0; border-top:1px solid var(--border); }
-    .ia-etape .num { flex:0 0 26px; height:26px; border-radius:50%; background:var(--primary); color:#fff; font-size:0.78rem; font-weight:800; display:flex; align-items:center; justify-content:center; }
+    .ia-etape .num { flex:0 0 24px; height:24px; border-radius:50%; background:var(--primary); color:#fff; font-size:0.78rem; font-weight:800; display:flex; align-items:center; justify-content:center; }
     .ia-etape b a { color:var(--text); text-decoration:none; border-bottom:2px solid rgba(26,60,255,0.25); }
     .ia-etape b a:hover { color:var(--primary); }
     .ia-etape .role { font-size:0.78rem; color:var(--primary); font-weight:700; }
@@ -852,12 +865,12 @@ def build_hub():
       <h2>L'annuaire complet</h2>
       <p class="intro">{len(TOOLS)} outils classés par usage, niveau requis, budget réel et pays d'hébergement des données. Filtrez, ou cherchez par mot-clé.</p>
 
-      <label class="ia-search" for="ia-q">
-        <svg width="17" height="17" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
-        <input id="ia-q" type="text" inputmode="search" placeholder="Chercher un outil ou un usage (ex. : compte rendu, facture, image)" autocomplete="off" />
-        <button class="ia-reset" type="button" id="ia-clear" aria-label="Effacer la recherche">✕</button>
-      </label>
       <div class="ia-filters">
+        <label class="ia-filtre-texte" for="ia-q">
+          <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+          <input id="ia-q" type="text" inputmode="search" placeholder="Filtrer par mot-clé" autocomplete="off" />
+          <button class="ia-reset" type="button" id="ia-clear" aria-label="Effacer le filtre">✕</button>
+        </label>
         <select id="f-cat" aria-label="Filtrer par usage"><option value="">Tous les usages</option>
 {opts_cat}
         </select>
@@ -1358,6 +1371,15 @@ def build_hub():
       return el;
     }}
 
+    function rendreQuestions(el, r) {{
+      el.innerHTML =
+        '<span class="ia-conseil-source">Quelques précisions</span>' +
+        '<h3>' + echapper(r.situation) + '</h3>' +
+        '<ul class="ia-questions">' +
+        r.questions.map(function (q) {{ return '<li>' + echapper(q) + '</li>'; }}).join('') +
+        '</ul><p class="ia-questions-note">Répondez en une phrase, même approximative — je m’adapte.</p>';
+    }}
+
     function rendre(el, r) {{
       var etapes = r.etapes.map(function (e, i) {{
         return '<div class="ia-etape"><div class="num">' + (i + 1) + '</div><div>' +
@@ -1427,8 +1449,16 @@ def build_hub():
         .then(function (data) {{
           if (moi !== enCours) return;
           var r = data || local;
-          if (!r) {{ rendreEchec(bulle); }}
-          else {{
+          if (!r) {{
+            rendreEchec(bulle);
+          }} else if (r.mode === 'questions') {{
+            rendreQuestions(bulle, r);
+            historique.push({{
+              role: 'assistant',
+              content: r.situation + ' Questions posées : ' + r.questions.join(' ')
+            }});
+            saisie.focus();
+          }} else {{
             rendre(bulle, r);
             historique.push({{
               role: 'assistant',
