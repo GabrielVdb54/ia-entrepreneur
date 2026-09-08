@@ -100,7 +100,21 @@ const TACHES = new RegExp('\\b(?:' + [
   'sous-?titrer', 'synthetiser', 'classer', 'archiver', 'extraire', 'trier',
 ].join('|') + ')\\b', 'i');
 
+/**
+ * Une question qui porte sur une PROPRIETE d'outil — francais, gratuit,
+ * europeen, open source — appelle une reponse, pas un interrogatoire.
+ * « Meilleure ia francaise » repartait en questions alors que la reponse
+ * tient en un mot. Ce n'est pas une tache, mais ce n'est pas non plus un
+ * contexte flou : le visiteur a dit ce qu'il cherchait.
+ */
+const ATTRIBUTS = /\b(?:francais\w*|hexagonal\w*|europeen\w*|souverain\w*|open ?source|auto-?heberg\w*|en local|gratuit\w*|libre|rgpd|alternative\w*)\b/i;
+
 function tacheNommee(texte) {
+  const t = String(texte)
+    .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+    .replace(/['\u2019]/g, ' ')
+    .toLowerCase();
+  if (ATTRIBUTS.test(t)) return true;
   return TACHES.test(
     String(texte)
       .normalize('NFD').replace(/[\u0300-\u036f]/g, '')   // « rédiger » et « rediger » se valent
@@ -500,10 +514,14 @@ export default async function handler(req, res) {
     }
 
     // Mêmes garde-fous que pour la chaîne principale : tout slug inconnu saute.
-    function variante(v) {
+    function variante(v, gratuitSeulement) {
       if (!v || !Array.isArray(v.outils)) return null;
       const outils = v.outils
         .filter((sl) => SLUGS.has(sl))
+        // La colonne « Sans payer » a propose Naaia, qui est payant. Le titre
+        // de la colonne est une promesse : elle ne peut contenir que des outils
+        // dont l'offre gratuite existe reellement.
+        .filter((sl) => !gratuitSeulement || CATALOGUE.find((o) => o.slug === sl).prix !== 'Payant')
         .slice(0, 3)
         .map((sl) => {
           const f = CATALOGUE.find((o) => o.slug === sl);
@@ -551,8 +569,8 @@ export default async function handler(req, res) {
     }
     const offre = { cle: cleOffre, ...OFFRES[cleOffre], phrase: phraseOffre };
 
-    let colGratuit = variante(brut.gratuit);
-    let colPerformance = variante(brut.performance);
+    let colGratuit = variante(brut.gratuit, true);
+    let colPerformance = variante(brut.performance, false);
     const affiches = new Set([
       ...etapes.map((e) => e.slug),
       ...(colGratuit?.outils || []).map((o) => o.slug),
