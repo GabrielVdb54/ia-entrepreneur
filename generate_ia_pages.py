@@ -732,6 +732,21 @@ def tool_url(t):
 def cat_url(c):
     return f"/ia/meilleures-ia-{c['slug']}.html"
 
+# Nom d'action -> verbe correspondant. Sert uniquement a enrichir l'index de
+# recherche : « automatisation » rend aussi « automatiser » trouvable.
+VERBE_DE = {
+    'automatisation': 'automatiser', 'transcription': 'transcrire',
+    'correction': 'corriger', 'redaction': 'rediger', 'traduction': 'traduire',
+    'facturation': 'facturer', 'prospection': 'prospecter', 'analyse': 'analyser',
+    'generation': 'generer', 'montage': 'monter', 'signature': 'signer',
+    'recrutement': 'recruter', 'planification': 'planifier', 'resume': 'resumer',
+    'publication': 'publier', 'reservation': 'reserver', 'creation': 'creer',
+    'conception': 'concevoir', 'gestion': 'gerer', 'suivi': 'suivre',
+    'integration': 'integrer', 'organisation': 'organiser', 'formation': 'former',
+    'presentation': 'presenter', 'comptabilite': 'comptabiliser',
+}
+
+
 def all_cats(t):
     return [t['cat']] + [c for c in t.get('cats', []) if c != t['cat']]
 
@@ -747,9 +762,23 @@ def card_html(t, lien_interne=True):
                 ' '.join(CAT_BY[x]['nom'] for x in all_cats(t)), ' '.join(t.get('profils', []))]:
         mots.update(w for w in norm(src).split() if len(w) > 2 and w not in visible)
     data = ' '.join(sorted(mots))
+    # Les mots-cles editoriaux, a part. Un outil dont les tags disent « rgpd »
+    # EST un outil RGPD ; un outil dont la description mentionne le RGPD au
+    # detour d'une phrase ne l'est pas. Sans cette distinction, « rgpd »
+    # classait n8n et Brevo devant Dastra, uniquement parce qu'ils sont mieux
+    # notes. La recherche pondere donc ces mots-la plus fort que le corps.
+    mots_cles = set(norm(t['name'] + ' ' + t['tags'] + ' ' + t.get('editeur', '') + ' ' +
+                        ' '.join(CAT_BY[x]['nom'] for x in all_cats(t))).split())
+    # Le catalogue est ecrit en noms, les visiteurs tapent des verbes :
+    # « automatiser » ne trouvait pas n8n, dont les mots-cles disent
+    # « automatisation ». On ajoute la forme verbale a l'index de recherche,
+    # sans toucher aux donnees editoriales.
+    mots_cles.update(VERBE_DE[m] for m in list(mots_cles) if m in VERBE_DE)
+    cles = ' '.join(sorted(mots_cles))
     return f"""        <div class="ia-item" style="--tool:{c['couleur']}" data-slug="{t['slug']}"
            data-cat="{' '.join(all_cats(t))}" data-prof="{e(' '.join(t.get('profils', [])))}"
            data-niv="{e(t['niveau'])}" data-prix="{e(t['prix'])}" data-note="{t['note']}" data-fr="{'1' if badge else '0'}"
+           data-cles="{e(cles)}"
            data-txt="{e(data)}">
           <a class="ia-card" href="{tool_url(t)}">
             <div class="ia-card-top">
@@ -1025,11 +1054,32 @@ def build_hub():
         .replace(/[^a-z0-9]+/g, ' ').trim();
     }}
     cards.forEach(function (c) {{
-      c._hay = norm(c.textContent) + ' ' + (c.dataset.txt || '');
+      // L'index de mots-cles fait partie du champ cherche, pas seulement de la
+      // ponderation : sans cela un mot qui n'existe QUE la — « automatiser »,
+      // ajoute comme forme verbale — restait introuvable.
+      c._cles = ' ' + (c.dataset.cles || '') + ' ';
+      c._hay = norm(c.textContent) + ' ' + (c.dataset.txt || '') + c._cles;
       c._nom = norm(c.querySelector('strong').textContent);
       c._cat = norm(c.querySelector('small').textContent);
     }});
     var ordreInitial = cards.slice();
+    // Certaines demandes ne survivent pas au decoupage en mots. « ai act »
+    // devenait « act », qui se retrouve dans contact, exact, action : 46
+    // resultats, dont aucun outil de conformite. Ces expressions sont donc
+    // reconnues entieres, avant le decoupage.
+    var EXPRESSIONS = {{
+      'ai act': 'ai-act conformite gouvernance registre risque europe',
+      'ia act': 'ai-act conformite gouvernance registre risque europe',
+      'prise de note': 'notes reunion transcription compte-rendu',
+      'compte rendu': 'compte-rendu reunion transcription notes visio',
+      'tableau de bord': 'tableau-de-bord dashboard visualisation reporting indicateurs',
+      'sous titre': 'sous-titres video montage transcription',
+      'note de frais': 'notes-de-frais depenses justificatif comptabilite',
+      'signature electronique': 'signature electronique contrat document',
+      'reseaux sociaux': 'reseaux-sociaux post publication contenu linkedin',
+      'business plan': 'business-plan previsionnel financier creation'
+    }};
+
     var ALIAS = {{
       'reunion': 'reunion compte rendu transcription note visio entretien',
       'client': 'client relation support chatbot prospection crm service',
@@ -1049,7 +1099,24 @@ def build_hub():
       'seo': 'seo referencement google visibilite mots-cles trafic',
       'presentation': 'presentation slides powerpoint support diaporama',
       'traduction': 'traduction traduire langue multilingue',
-      'juridique': 'juridique contrat droit conformite avocat'
+      'juridique': 'juridique contrat droit conformite avocat',
+      // Le visiteur tape un verbe, l'annuaire est ecrit en noms. « faute » ne
+      // renvoyait rien du tout, « corriger » ne trouvait pas Antidote.
+      'faute': 'faute orthographe correction grammaire relecture redaction',
+      'ecrir': 'redaction ecriture texte contenu article rediger',
+      'article': 'article blog redaction contenu publication texte',
+      'corrig': 'correction orthographe grammaire relecture style',
+      'transcri': 'transcription sous-titre verbatim',
+      'redig': 'redaction contenu texte article ecriture',
+      'resum': 'resume synthese document lecture analyse',
+      'traduir': 'traduction langue multilingue anglais',
+      'sign': 'signature electronique contrat document',
+      'analys': 'analyse donnees tableau statistique visualisation',
+      'compta': 'comptabilite facture finance administratif tresorerie',
+      'devis': 'devis proposition commerciale contrat facture',
+      'chatbot': 'chatbot agent conversationnel support client messagerie',
+      'sondage': 'sondage questionnaire quiz formulaire',
+      'planning': 'planning agenda organisation tache projet'
     }};
 
     // Mots vides : articles, verbes de requete et vocabulaire de l'annuaire
@@ -1062,6 +1129,12 @@ def build_hub():
       'cherche cherches cherchez chercher recherche rechercher trouve trouver veux voudrais aimerais ' +
       'besoin aide utiliser servir prendre choisir conseil conseille recommande ' +
       'meilleur meilleure meilleurs meilleures bon bonne top ' +
+      // « gagner du temps » est la formule que tout le monde emploie ici. Sans
+      // ces mots, « gagner du temps sur mes factures » remontait Otter.ai,
+      // dont les mots-cles disent « temps reel ».
+      'gagner gagne gagnez perdre perds perd passe passer temps heure heures ' +
+      'jour jours journee journees semaine semaines mois annee rapidement vite ' +
+      'facilement simplement beaucoup trop peu moins mieux vraiment ' +
       'ia intelligence artificielle outil outils logiciel logiciels solution solutions ' +
       'application applications appli app plateforme service services truc machin ').replace(/\s+/g, ' ');
 
@@ -1069,7 +1142,14 @@ def build_hub():
     // ses synonymes metier. Un outil est classe selon le NOMBRE de groupes
     // qu'il satisfait, ce qui permet de taper une phrase entiere.
     function groups(s) {{
-      return norm(s).split(' ').filter(function (w) {{
+      var t = norm(s), prefixes = [];
+      Object.keys(EXPRESSIONS).forEach(function (k) {{
+        if (t.indexOf(k) >= 0) {{
+          prefixes.push([k.replace(/ /g, '-')].concat(EXPRESSIONS[k].split(' ')));
+          t = t.split(k).join(' ');       // les mots de l'expression ne sont plus cherches isolement
+        }}
+      }});
+      return prefixes.concat(t.split(' ').filter(function (w) {{
         return w.length > 2 && STOP.indexOf(' ' + w + ' ') < 0;
       }}).map(function (w) {{
         var alt = [w];
@@ -1077,11 +1157,30 @@ def build_hub():
           if (k.indexOf(w) === 0 || w.indexOf(k) === 0) alt = alt.concat(ALIAS[k].split(' '));
         }});
         return alt;
-      }});
+      }}));
+    }}
+
+    // Vers quel usage la requete pointe-t-elle ? On reutilise le lexique du
+    // moteur local : « rgpd » designe la conformite, « tableau de bord » la
+    // data. Un outil de cet usage passe alors devant un outil qui se contente
+    // d'en parler — sans quoi « rgpd » remontait n8n avant Dastra, les deux
+    // ayant le mot dans leurs mots-cles, departages par la seule note.
+    function usagesVises(texte) {{
+      var tq = ' ' + norm(texte) + ' ';
+      if (tq.length < 4) return [];
+      return Object.keys(USAGES).map(function (u) {{
+        var sc = 0;
+        USAGES[u].fort.split(' ').forEach(function (m) {{ if (m && tq.indexOf(' ' + m + ' ') >= 0) sc += 3; }});
+        USAGES[u].faible.split(' ').forEach(function (m) {{ if (m && tq.indexOf(' ' + m + ' ') >= 0) sc += 1; }});
+        return {{ u: u, sc: sc }};
+      }}).filter(function (x) {{ return x.sc >= 3; }})
+        .sort(function (a, b) {{ return b.sc - a.sc; }})
+        .slice(0, 2).map(function (x) {{ return x.u; }});
     }}
 
     function apply() {{
-      var terms = groups(q.value), cat = fcat.value, prof = fprof.value,
+      var terms = groups(q.value), vises = usagesVises(q.value),
+          cat = fcat.value, prof = fprof.value,
           niv = fniv.value, prix = fprix.value, fr = ffr.getAttribute('aria-pressed') === 'true',
           fav = ffav.getAttribute('aria-pressed') === 'true',
           favoris = (window.IAFavoris ? window.IAFavoris.lire() : []), n = 0;
@@ -1101,27 +1200,67 @@ def build_hub():
       //    desserrant d'un cran tant qu'il y a moins de trois resultats :
       //    une phrase entiere donne ainsi les outils qui cochent le plus de
       //    cases, sans jamais renvoyer une page vide.
+      // Quatre signaux, du plus decisif au moins. Un mot-cle editorial dit ce
+      // que l'outil EST ; une mention dans la description dit seulement qu'il
+      // en parle. Avant cette hierarchie, « automatiser » remontait Youtrust,
+      // dont la description contient le verbe, devant n8n, dont c'est le metier.
       function noter(c) {{
-        var hay = c._hay, score = 0, directs = 0, touches = 0;
+        var hay = c._hay, cles = c._cles, score = 0;
+        var clesExact = 0, clesSyn = 0, corpsExact = 0, corpsSyn = 0, touches = 0;
         terms.forEach(function (g) {{
+          var exactCles = cles.indexOf(' ' + g[0]) >= 0;
           if (hay.indexOf(g[0]) >= 0) {{
             score += c._nom.indexOf(g[0]) === 0 ? 12 : 6;
             if (c._cat.indexOf(g[0]) >= 0) score += 5;
-            directs++; touches++;
-          }} else if (g.some(function (w) {{ return w.length > 2 && hay.indexOf(w) >= 0; }})) {{
-            score += 2;
+            if (exactCles) {{ score += 8; clesExact++; }} else corpsExact++;
+            touches++;
+            return;
+          }}
+          var nb = 0, nbCles = 0;
+          g.forEach(function (w) {{
+            if (w.length > 2 && hay.indexOf(w) >= 0) {{
+              nb++;
+              if (cles.indexOf(' ' + w) >= 0) nbCles++;
+            }}
+          }});
+          if (nb) {{
+            score += 2 + nb + nbCles * 4;
+            if (nbCles) clesSyn++; else corpsSyn++;
             touches++;
           }}
         }});
+        // L'usage vise ne sert QU'A DEPARTAGER, jamais a selectionner. Place
+        // dans le rang, il faisait remonter toute une categorie et ramenait du
+        // bruit : « contrat » passait de deux resultats precis a dix-huit, dont
+        // n8n et DeepL. En departage, il replace Dastra devant n8n sur « rgpd »
+        // sans jamais elargir ce qui s'affiche.
+        var cats = c.dataset.cat.split(' ');
+        var bonUsage = vises.length && vises.some(function (u) {{ return cats.indexOf(u) >= 0; }}) ? 1 : 0;
+        if (bonUsage) score += 18;
         c._score = score + parseFloat(c.dataset.note) / 10;
-        // Le mot exact prime toujours sur le synonyme : sans cela, « prospection »
-        // remonterait tout ce qui parle de vente, de client ou de CRM.
-        c._rang = directs * 100 + touches;
-        return c._rang;
+        // Quatre niveaux. Le mot exact prime toujours sur le synonyme — la
+        // description de TurboScribe dit « Transcrire », ce qui vaut mieux
+        // qu'un « transcription » trouve dans les mots-cles d'un autre. Et a
+        // egalite de nature, le mot-cle metier passe devant la description :
+        // « automatiser » doit donner n8n, pas l'outil de signature dont la
+        // description emploie le verbe.
+        // Le NOMBRE de mots satisfaits domine : c'est ce qui fait fonctionner la
+        // recherche par phrase. « ecrire mes articles de blog » doit donner un
+        // outil qui repond a « ecrire » ET « articles », pas WordPress, qui ne
+        // coche que « blog » mais le coche parfaitement. La qualite des
+        // correspondances ne sert qu'a departager, a nombre egal.
+        // L'usage vise ne compte QUE dans le score, donc uniquement pour
+        // departager. Essaye dans le rang, il ramenait tout une categorie :
+        // « contrat » passait de deux resultats precis a dix-neuf, dont n8n et
+        // Claude. Un signal de pertinence ne doit pas servir de filtre.
+        c._rang = touches * 10000 + clesExact * 1000 + corpsExact * 300 + clesSyn * 100 + corpsSyn;
+        return touches;
       }}
 
       var res = pool;
       if (terms.length) {{
+        // noter() renvoie le nombre de groupes touches : c'est lui qui sert de
+        // seuil de pertinence, tandis que _rang classe ce qui passe le seuil.
         pool.forEach(noter);
         // Rangs presents, du meilleur au moins bon : on descend d'un cran tant
         // qu'il y a moins de trois resultats, sans jamais afficher une page vide.
