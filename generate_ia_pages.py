@@ -137,6 +137,38 @@ IA_CSS = """
     .ia-count { font-size:0.8rem; color:var(--muted); font-weight:600; margin-left:auto; }
 
     #annuaire { scroll-margin-top: 190px; }
+    /* ── La conversation ─────────────────────────────────────────────── */
+    .ia-chat { padding:110px 0 44px; background:linear-gradient(180deg, var(--bg2), var(--bg)); }
+    .ia-chat h1 { font-size:clamp(1.8rem,4vw,2.7rem); line-height:1.15; letter-spacing:-0.02em; margin-bottom:14px; }
+    .ia-chat p.lead { font-size:1.02rem; color:var(--muted); max-width:640px; margin-bottom:26px; }
+
+    .ia-fil { display:flex; flex-direction:column; gap:18px; margin-bottom:18px; }
+    .ia-msg-moi { align-self:flex-end; max-width:min(560px,88%); padding:12px 18px; border-radius:18px 18px 4px 18px; background:var(--primary); color:#fff; font-size:0.94rem; line-height:1.5; }
+    .ia-msg-ia { align-self:stretch; padding:22px 24px; border-radius:4px 18px 18px 18px; background:var(--bg); border:1px solid var(--border); box-shadow:0 8px 30px rgba(10,15,44,0.06); }
+    .ia-msg-ia > h3 { font-size:1.02rem; line-height:1.45; margin-bottom:2px; }
+    .ia-msg-ia .ia-conseil-source { font-size:0.7rem; color:var(--muted); font-weight:700; text-transform:uppercase; letter-spacing:0.05em; display:block; margin-bottom:8px; }
+    .ia-reflexion { display:flex; align-items:center; gap:10px; font-size:0.86rem; color:var(--muted); padding:14px 20px; }
+    .ia-reflexion i { width:8px; height:8px; border-radius:50%; background:var(--primary); animation:ia-pulse 1.1s ease-in-out infinite; }
+    @keyframes ia-pulse { 0%,100% { opacity:0.25; transform:scale(0.8); } 50% { opacity:1; transform:scale(1.15); } }
+
+    .ia-saisie { display:flex; align-items:flex-end; gap:10px; padding:10px 10px 10px 20px; border:1.5px solid var(--border); border-radius:26px; background:var(--bg); box-shadow:0 4px 22px rgba(10,15,44,0.07); }
+    .ia-saisie:focus-within { border-color:var(--primary); box-shadow:0 6px 26px rgba(26,60,255,0.14); }
+    .ia-saisie textarea { flex:1; border:0; outline:0; resize:none; background:transparent; font-family:inherit; font-size:0.98rem; line-height:1.5; color:var(--text); padding:9px 0; max-height:160px; }
+    .ia-saisie button { flex:0 0 auto; width:40px; height:40px; border-radius:50%; border:0; background:var(--primary); color:#fff; cursor:pointer; display:flex; align-items:center; justify-content:center; transition:background .15s, opacity .15s; }
+    .ia-saisie button:hover { background:var(--primary-h); }
+    .ia-saisie button[disabled] { opacity:0.45; cursor:progress; }
+
+    .ia-suggestions { display:flex; flex-wrap:wrap; gap:8px; margin-top:14px; }
+    .ia-suggestions button { padding:9px 16px; border-radius:50px; border:1.5px solid var(--border); background:var(--bg); color:var(--muted); font-family:inherit; font-size:0.83rem; font-weight:600; cursor:pointer; transition:all .15s; }
+    .ia-suggestions button:hover { border-color:var(--primary); color:var(--primary); background:rgba(26,60,255,0.04); }
+    .ia-chat-note { font-size:0.78rem; color:var(--muted); margin-top:16px; }
+    .ia-chat-note a { color:var(--primary); font-weight:700; text-decoration:none; }
+
+    .ia-suivis { display:flex; flex-wrap:wrap; gap:8px; margin-top:16px; padding-top:14px; border-top:1px solid var(--border); }
+    .ia-suivis span { font-size:0.78rem; color:var(--muted); font-weight:700; width:100%; margin-bottom:2px; }
+    .ia-suivis button { padding:7px 14px; border-radius:50px; border:1px solid var(--border); background:var(--bg2); color:var(--primary); font-family:inherit; font-size:0.8rem; font-weight:600; cursor:pointer; }
+    .ia-suivis button:hover { border-color:var(--primary); }
+
     .ia-demander { flex:0 0 auto; padding:8px 18px; border-radius:50px; border:0; background:var(--primary); color:#fff; font-family:inherit; font-size:0.82rem; font-weight:700; cursor:pointer; transition:background .15s; }
     .ia-demander:hover { background:var(--primary-h); }
     .ia-demander[disabled] { opacity:0.6; cursor:progress; }
@@ -307,6 +339,12 @@ IA_CSS = """
       .ia-cats { grid-template-columns:1fr; }
       .ia-count { margin-left:0; width:100%; }
       .ia-search-wrap { position:static; }
+      .ia-chat { padding:88px 0 30px; }
+      .ia-chat h1 { font-size:1.55rem; }
+      .ia-chat p.lead { font-size:0.92rem; margin-bottom:18px; }
+      .ia-msg-ia { padding:18px; }
+      .ia-suggestions { flex-wrap:nowrap; overflow-x:auto; scrollbar-width:none; padding-bottom:4px; }
+      .ia-suggestions button { flex:0 0 auto; }
       .ia-demander { padding:8px 14px; font-size:0.78rem; }
       .ia-conseil { padding:18px; }
       /* Seize catégories empilées mangeaient un écran entier : on les fait
@@ -780,36 +818,45 @@ def build_hub():
     ]
 
     body = f"""
-  <section class="ia-hero">
+  <section class="ia-chat">
     <div class="container">
-      <div class="ia-badge">Annuaire indépendant · mis à jour le {datetime.date.today().strftime('%d/%m/%Y')}</div>
-      <h1>Les meilleures IA du moment :<br />trouvez celle qui règle <span class="gradient">votre</span> problème</h1>
-      <p class="lead">Il n'existe pas une « meilleure IA », mais une meilleure IA par usage.
-      <span class="ia-lead-suite">{len(TOOLS)} outils sélectionnés et classés par besoin métier, niveau requis,
-      budget réel et — c'est rare — pays d'hébergement des données.
-      Cherchez, filtrez, ou laissez le sélecteur vous orienter en quatre questions.</span></p>
-      <p class="ia-hero-liens">
-        <a href="#selecteur">Je ne sais pas par où commencer →</a>
-      </p>
+      <div class="ia-badge">Annuaire indépendant · {len(TOOLS)} outils · mis à jour le {datetime.date.today().strftime('%d/%m/%Y')}</div>
+      <h1>Quelle IA pour <span class="gradient">votre</span> situation ?</h1>
+      <p class="lead">Décrivez ce que vous cherchez à régler, en une phrase.
+      <span class="ia-lead-suite">Vous recevez la chaîne d'outils qui y répond : lequel pour quelle étape,
+      comment s'en servir, ce que ça coûte et où partent vos données.</span></p>
+
+      <div class="ia-fil" id="ia-fil" hidden aria-live="polite"></div>
+
+      <form class="ia-saisie" id="ia-form">
+        <textarea id="ia-chat-q" rows="1" maxlength="500" autocomplete="off"
+                  placeholder="Ex. : je suis commercial et je veux plus de rendez-vous qualifiés sans y passer mes matinées"></textarea>
+        <button type="submit" id="ia-envoyer" aria-label="Envoyer">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
+        </button>
+      </form>
+
+      <div class="ia-suggestions" id="ia-suggestions">
+        <button type="button" data-exemple="Je suis commercial et je veux plus de rendez-vous qualifiés">Trouver plus de clients</button>
+        <button type="button" data-exemple="Je perds un temps fou sur mes factures et mes relances">Gagner du temps sur l'administratif</button>
+        <button type="button" data-exemple="Je veux créer une image et un post pour LinkedIn">Créer du contenu</button>
+        <button type="button" data-exemple="Je manipule des données clients, je veux rester conforme au RGPD">Rester conforme au RGPD</button>
+      </div>
+      <p class="ia-chat-note">Réponses composées à partir des {len(TOOLS)} outils de l'annuaire, jamais inventées.
+      Aucun lien rémunéré. <a href="#annuaire">Parcourir l'annuaire complet</a></p>
     </div>
   </section>
 
-  <div class="ia-search-wrap">
+  <section class="ia-section" id="annuaire">
     <div class="container">
+      <h2>L'annuaire complet</h2>
+      <p class="intro">{len(TOOLS)} outils classés par usage, niveau requis, budget réel et pays d'hébergement des données. Filtrez, ou cherchez par mot-clé.</p>
+
       <label class="ia-search" for="ia-q">
         <svg width="17" height="17" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
-        <input id="ia-q" type="text" inputmode="search" placeholder="Que voulez-vous faire ? (ex. : compte rendu de réunion, prospection, facture)" autocomplete="off" />
+        <input id="ia-q" type="text" inputmode="search" placeholder="Chercher un outil ou un usage (ex. : compte rendu, facture, image)" autocomplete="off" />
         <button class="ia-reset" type="button" id="ia-clear" aria-label="Effacer la recherche">✕</button>
-        <button class="ia-demander" type="button" id="ia-demander">Me conseiller</button>
       </label>
-      <div class="ia-exemples">
-        <span>Décrivez votre situation, ou essayez :</span>
-        <button type="button" data-exemple="compte rendu de réunion">compte rendu de réunion</button>
-        <button type="button" data-exemple="prospection et posts linkedin">prospection et posts LinkedIn</button>
-        <button type="button" data-exemple="automatiser mes factures">automatiser mes factures</button>
-        <button type="button" data-exemple="créer des images gratuitement">créer des images gratuitement</button>
-        <button type="button" data-exemple="données hébergées en France">données hébergées en France</button>
-      </div>
       <div class="ia-filters">
         <select id="f-cat" aria-label="Filtrer par usage"><option value="">Tous les usages</option>
 {opts_cat}
@@ -827,29 +874,24 @@ def build_hub():
         <button class="ia-chip" type="button" id="f-fav" aria-pressed="false">★ Mes favoris</button>
         <span class="ia-count" id="ia-count" role="status" aria-live="polite">{len(TOOLS)} outils affichés</span>
       </div>
-      <div class="ia-conseil" id="ia-conseil" hidden></div>
       <div class="ia-actifs" id="ia-actifs" hidden>
         <span>Filtres actifs :</span>
         <span id="ia-actifs-liste"></span>
         <button type="button" id="ia-tout-effacer">Tout effacer</button>
       </div>
-    </div>
-  </div>
 
-  <section class="ia-section" id="annuaire" style="padding-top:26px;">
-    <div class="container">
-      <div class="ia-stats">
-        <div><b>{len(TOOLS)}</b><span>outils référencés</span></div>
-        <div><b>{len(CATS)}</b><span>usages en entreprise</span></div>
-        <div><b>{nb_fr}</b><span>éditeurs européens ou open source</span></div>
-        <div><b>{sum(1 for t in TOOLS if t['prix'] in ('Gratuit', 'Freemium'))}</b><span>utilisables gratuitement</span></div>
-      </div>
       <div class="ia-chips">
 {chips}
       </div>
       <div class="ia-grid" id="ia-grid">
 {cards}
         <div class="ia-empty" id="ia-empty" hidden>Aucun outil ne correspond. Essayez un autre mot ou réinitialisez les filtres.</div>
+      </div>
+      <div class="ia-stats">
+        <div><b>{len(TOOLS)}</b><span>outils référencés</span></div>
+        <div><b>{len(CATS)}</b><span>usages en entreprise</span></div>
+        <div><b>{nb_fr}</b><span>éditeurs européens ou open source</span></div>
+        <div><b>{sum(1 for t in TOOLS if t['prix'] in ('Gratuit', 'Freemium'))}</b><span>utilisables gratuitement</span></div>
       </div>
       <p class="ia-maj"><b>Niveau requis</b> — <em>Débutant</em> : on s'en sert le jour même, sans paramétrage ni vocabulaire technique. <em>Intermédiaire</em> : il faut comprendre une logique (scénarios, champs, filtres) ou compter quelques jours de prise en main. <em>Expert</em> : compétence technique requise (code, auto-hébergement, administration).<br />
       Notes attribuées par l'équipe IA-Entrepreneur selon quatre critères : facilité de prise en main, utilité réelle pour une TPE-PME, rapport qualité/prix et maturité de l'outil. Les tarifs sont indicatifs et constatés en {datetime.date.today().strftime('%m/%Y')} — vérifiez-les sur le site de l'éditeur. Aucun lien de cet annuaire n'est rémunéré.</p>
@@ -1099,15 +1141,6 @@ def build_hub():
       apply();
     }});
 
-    // ── Exemples de requetes : ils enseignent la recherche en phrase ─────
-    document.querySelectorAll('[data-exemple]').forEach(function (b) {{
-      b.addEventListener('click', function () {{
-        q.value = b.dataset.exemple;
-        apply();
-        document.getElementById('annuaire').scrollIntoView({{ behavior: 'smooth', block: 'start' }});
-      }});
-    }});
-
     // ══ Le conseiller ══════════════════════════════════════════════════
     // Deux étages. Le moteur local compose une réponse instantanément à partir
     // des cartes déjà présentes dans la page ; l’appel à /api/conseil la
@@ -1115,8 +1148,11 @@ def build_hub():
     // absente, en panne ou saturée, le visiteur garde la réponse locale et ne
     // voit aucune erreur.
 
-    var panneau = document.getElementById('ia-conseil'),
-        boutonConseil = document.getElementById('ia-demander');
+    var fil = document.getElementById('ia-fil'),
+        saisie = document.getElementById('ia-chat-q'),
+        formulaire = document.getElementById('ia-form'),
+        boutonEnvoyer = document.getElementById('ia-envoyer'),
+        suggestions = document.getElementById('ia-suggestions');
 
     // Chaque usage a ses mots forts (sans ambiguïté) et ses mots faibles
     // (indices). « image » désigne à coup sûr le design ; « linkedin » peut
@@ -1300,49 +1336,127 @@ def build_hub():
       }};
     }}
 
-    function afficherConseil(r) {{
-      if (!r) {{ panneau.hidden = true; return; }}
-      var etapes = r.etapes.map(function (e, i) {{
-        return '<div class="ia-etape"><div class="num">' + (i + 1) + '</div><div>' +
-          '<b><a href="' + e.url + '">' + e.nom + '</a></b> ' +
-          '<span class="role">· ' + e.role + '</span>' +
-          '<p>' + e.comment + '</p>' +
-          '<span class="ia-pills"><span class="ia-pill">' + e.usage + '</span>' +
-          '<span class="ia-pill">' + e.niveau + '</span><span class="ia-pill">' + e.prix + '</span></span>' +
-          '</div></div>';
-      }}).join('');
-      var offre = r.offre ? '<div class="ia-conseil-offre"><b>' + r.offre.titre + '</b><p>' + r.offre.phrase + '</p>' +
-        '<div class="ia-conseil-actions"><a class="principal" href="' + CAL_URL + '" target="_blank" rel="noopener">Appel gratuit de 15 min</a>' +
-        '<a class="secondaire" href="' + r.offre.url + '">Voir le programme</a></div></div>' : '';
-      panneau.innerHTML =
-        '<span class="ia-conseil-source">' +
-        (r.source === 'claude' ? 'Réponse composée pour votre situation' : 'Réponse instantanée') + '</span>' +
-        '<h3>' + r.situation + '</h3>' + etapes +
-        (r.vigilance ? '<p class="ia-conseil-vigilance">' + r.vigilance + '</p>' : '') + offre;
-      panneau.hidden = false;
+    function echapper(t) {{
+      return String(t).replace(/[&<>"]/g, function (c) {{
+        return {{ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }}[c];
+      }});
     }}
 
-    var enCours = 0;
-    function demanderConseil() {{
-      var question = q.value.trim();
-      if (question.length < 3) return;
-      var local = conseilLocal(question);
-      afficherConseil(local);
+    function bulleVisiteur(texte) {{
+      var el = document.createElement('div');
+      el.className = 'ia-msg ia-msg-moi';
+      el.textContent = texte;
+      fil.appendChild(el);
+      return el;
+    }}
+
+    function bulleReponse() {{
+      var el = document.createElement('div');
+      el.className = 'ia-msg ia-msg-ia';
+      el.innerHTML = '<div class="ia-reflexion"><i></i>Je cherche dans les ' + cards.length + ' outils…</div>';
+      fil.appendChild(el);
+      return el;
+    }}
+
+    function rendre(el, r) {{
+      var etapes = r.etapes.map(function (e, i) {{
+        return '<div class="ia-etape"><div class="num">' + (i + 1) + '</div><div>' +
+          '<b><a href="' + e.url + '">' + echapper(e.nom) + '</a></b> ' +
+          '<span class="role">· ' + echapper(e.role) + '</span>' +
+          '<p>' + echapper(e.comment) + '</p>' +
+          '<span class="ia-pills"><span class="ia-pill">' + echapper(e.usage) + '</span>' +
+          '<span class="ia-pill">' + echapper(e.niveau) + '</span>' +
+          '<span class="ia-pill">' + echapper(e.prix) + '</span></span>' +
+          '</div></div>';
+      }}).join('');
+
+      var offre = r.offre ? '<div class="ia-conseil-offre"><b>' + echapper(r.offre.titre) + '</b>' +
+        '<p>' + echapper(r.offre.phrase) + '</p><div class="ia-conseil-actions">' +
+        '<a class="principal" href="' + CAL_URL + '" target="_blank" rel="noopener">Appel gratuit de 15 min</a>' +
+        '<a class="secondaire" href="' + r.offre.url + '">Voir le programme</a></div></div>' : '';
+
+      var suivis = (r.suivis && r.suivis.length)
+        ? '<div class="ia-suivis"><span>Pour aller plus loin</span>' +
+          r.suivis.map(function (s) {{
+            return '<button type="button" data-suivi="' + echapper(s) + '">' + echapper(s) + '</button>';
+          }}).join('') + '</div>'
+        : '';
+
+      el.innerHTML =
+        '<span class="ia-conseil-source">' +
+        (r.source === 'claude' ? 'Réponse composée pour votre situation' : 'Réponse instantanée') +
+        '</span><h3>' + echapper(r.situation) + '</h3>' + etapes +
+        (r.vigilance ? '<p class="ia-conseil-vigilance">' + echapper(r.vigilance) + '</p>' : '') +
+        offre + suivis;
+    }}
+
+    function rendreEchec(el) {{
+      el.innerHTML = '<span class="ia-conseil-source">Aucune correspondance</span>' +
+        '<h3>Je n’ai pas trouvé d’outil pour cette demande.</h3>' +
+        '<p style="font-size:0.88rem;color:var(--muted);line-height:1.55;">Reformulez en décrivant la tâche ' +
+        'qui vous prend du temps — « je passe mes vendredis sur mes factures », par exemple — ou ' +
+        '<a href="#annuaire" style="color:var(--primary);font-weight:700;">parcourez l’annuaire complet</a>.</p>';
+    }}
+
+    // Le fil envoyé au modèle : on garde les six derniers tours, assez pour
+    // qu’une relance ait du sens sans payer un contexte inutile.
+    var historique = [], enCours = 0;
+
+    function envoyer(texte) {{
+      texte = (texte || saisie.value).trim();
+      if (texte.length < 3) return;
+      fil.hidden = false;
+      saisie.value = '';
+      saisie.style.height = 'auto';
+      bulleVisiteur(texte);
+      var bulle = bulleReponse();
+      bulle.scrollIntoView({{ behavior: 'smooth', block: 'nearest' }});
+
+      historique.push({{ role: 'user', content: texte }});
       var moi = ++enCours;
-      boutonConseil.disabled = true;
+      boutonEnvoyer.disabled = true;
+
+      var local = conseilLocal(texte);
+
       fetch('/api/conseil', {{
         method: 'POST',
         headers: {{ 'Content-Type': 'application/json' }},
-        body: JSON.stringify({{ question: question.slice(0, 500) }})
+        body: JSON.stringify({{ messages: historique.slice(-6) }})
       }}).then(function (r) {{ return r.ok ? r.json() : null; }})
-        .then(function (data) {{ if (data && moi === enCours) afficherConseil(data); }})
-        .catch(function () {{ /* le visiteur garde la réponse locale */ }})
-        .then(function () {{ if (moi === enCours) boutonConseil.disabled = false; }});
+        .catch(function () {{ return null; }})
+        .then(function (data) {{
+          if (moi !== enCours) return;
+          var r = data || local;
+          if (!r) {{ rendreEchec(bulle); }}
+          else {{
+            rendre(bulle, r);
+            historique.push({{
+              role: 'assistant',
+              content: r.situation + ' Outils proposés : ' +
+                       r.etapes.map(function (e) {{ return e.nom; }}).join(', ') + '.'
+            }});
+          }}
+          boutonEnvoyer.disabled = false;
+          bulle.scrollIntoView({{ behavior: 'smooth', block: 'nearest' }});
+        }});
     }}
 
-    boutonConseil.addEventListener('click', demanderConseil);
-    q.addEventListener('keydown', function (ev) {{
-      if (ev.key === 'Enter') {{ ev.preventDefault(); demanderConseil(); }}
+    formulaire.addEventListener('submit', function (ev) {{ ev.preventDefault(); envoyer(); }});
+    saisie.addEventListener('input', function () {{
+      saisie.style.height = 'auto';
+      saisie.style.height = Math.min(saisie.scrollHeight, 160) + 'px';
+    }});
+    saisie.addEventListener('keydown', function (ev) {{
+      // Entrée envoie, Maj+Entrée passe à la ligne : la convention des messageries.
+      if (ev.key === 'Enter' && !ev.shiftKey) {{ ev.preventDefault(); envoyer(); }}
+    }});
+    suggestions.addEventListener('click', function (ev) {{
+      var b = ev.target.closest('[data-exemple]');
+      if (b) envoyer(b.dataset.exemple);
+    }});
+    fil.addEventListener('click', function (ev) {{
+      var b = ev.target.closest('[data-suivi]');
+      if (b) envoyer(b.dataset.suivi);
     }});
 
     // Recherche pré-remplie depuis une autre page du site : /meilleures-ia.html?q=…

@@ -60,6 +60,9 @@ STYLE
 - Aucune promesse chiffrée de retour sur investissement. On parle de temps gagné et de fiabilité.
 - Pas de superlatif creux.
 
+LA CONVERSATION
+Le visiteur peut rebondir sur ta réponse précédente. Tiens compte de tout le fil : s'il précise son budget, son niveau ou son métier après coup, révise ta recommandation au lieu de la répéter. Termine toujours par deux ou trois questions courtes qu'il pourrait poser ensuite, formulées à la première personne.
+
 L'OFFRE
 Tu termines toujours par l'offre IA-Entrepreneur la plus pertinente pour la situation décrite, choisie dans la liste fournie. Une phrase, honnête, qui relie le besoin exprimé à ce que la formation ou l'accompagnement change concrètement. L'idée à faire passer : disposer de l'outil ne suffit pas, c'est de savoir s'en servir sur ses propres cas qui fait la différence. Jamais de pression commerciale, jamais d'urgence artificielle.`;
 
@@ -94,8 +97,13 @@ const OUTIL = {
       },
       offre: { type: 'string', enum: CLES_OFFRES, description: "Clé de l'offre IA-Entrepreneur la plus pertinente." },
       phrase_offre: { type: 'string', description: "Une phrase reliant la situation décrite à cette offre." },
+      suivis: {
+        type: 'array',
+        description: "Deux ou trois questions courtes que le visiteur pourrait poser ensuite, à la première personne, pour approfondir sa situation. Exemple : « Et pour la facturation ? »",
+        items: { type: 'string' },
+      },
     },
-    required: ['situation', 'etapes', 'vigilance', 'offre', 'phrase_offre'],
+    required: ['situation', 'etapes', 'vigilance', 'offre', 'phrase_offre', 'suivis'],
     additionalProperties: false,
   },
 };
@@ -129,7 +137,19 @@ export default async function handler(req, res) {
     return res.status(503).json({ erreur: 'conseiller_indisponible' });
   }
 
-  const question = String(req.body?.question ?? '').trim().slice(0, QUESTION_MAX);
+  // Le fil de discussion, pour que « et pour la facturation ? » ait du sens.
+  // On ne garde que les six derniers tours : au-delà, on paie du contexte qui
+  // n'apporte plus rien à la recommandation.
+  const brutMessages = Array.isArray(req.body?.messages) ? req.body.messages : null;
+  const fil = (brutMessages || [{ role: 'user', content: req.body?.question ?? '' }])
+    .filter((m) => m && (m.role === 'user' || m.role === 'assistant') && String(m.content || '').trim())
+    .slice(-6)
+    .map((m) => ({ role: m.role, content: String(m.content).trim().slice(0, QUESTION_MAX) }));
+
+  if (!fil.length || fil[fil.length - 1].role !== 'user') {
+    return res.status(400).json({ erreur: 'fil_invalide' });
+  }
+  const question = fil[fil.length - 1].content;
   if (question.length < QUESTION_MIN) {
     return res.status(400).json({ erreur: 'question_trop_courte' });
   }
@@ -157,7 +177,7 @@ export default async function handler(req, res) {
       ],
       tools: [OUTIL],
       tool_choice: { type: 'tool', name: 'recommander' },
-      messages: [{ role: 'user', content: question }],
+      messages: fil,
     });
 
     const bloc = reponse.content.find((b) => b.type === 'tool_use');
@@ -198,6 +218,10 @@ export default async function handler(req, res) {
       situation: String(brut.situation || '').slice(0, 300),
       etapes,
       vigilance: String(brut.vigilance || '').slice(0, 400),
+      suivis: (Array.isArray(brut.suivis) ? brut.suivis : [])
+        .filter((x) => typeof x === 'string' && x.trim())
+        .slice(0, 3)
+        .map((x) => x.trim().slice(0, 120)),
       offre,
     });
   } catch (erreur) {

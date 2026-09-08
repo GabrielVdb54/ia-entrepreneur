@@ -286,6 +286,38 @@ footer{
     .ia-count { font-size:0.8rem; color:var(--muted); font-weight:600; margin-left:auto; }
 
     #annuaire { scroll-margin-top: 190px; }
+    /* ── La conversation ─────────────────────────────────────────────── */
+    .ia-chat { padding:110px 0 44px; background:linear-gradient(180deg, var(--bg2), var(--bg)); }
+    .ia-chat h1 { font-size:clamp(1.8rem,4vw,2.7rem); line-height:1.15; letter-spacing:-0.02em; margin-bottom:14px; }
+    .ia-chat p.lead { font-size:1.02rem; color:var(--muted); max-width:640px; margin-bottom:26px; }
+
+    .ia-fil { display:flex; flex-direction:column; gap:18px; margin-bottom:18px; }
+    .ia-msg-moi { align-self:flex-end; max-width:min(560px,88%); padding:12px 18px; border-radius:18px 18px 4px 18px; background:var(--primary); color:#fff; font-size:0.94rem; line-height:1.5; }
+    .ia-msg-ia { align-self:stretch; padding:22px 24px; border-radius:4px 18px 18px 18px; background:var(--bg); border:1px solid var(--border); box-shadow:0 8px 30px rgba(10,15,44,0.06); }
+    .ia-msg-ia > h3 { font-size:1.02rem; line-height:1.45; margin-bottom:2px; }
+    .ia-msg-ia .ia-conseil-source { font-size:0.7rem; color:var(--muted); font-weight:700; text-transform:uppercase; letter-spacing:0.05em; display:block; margin-bottom:8px; }
+    .ia-reflexion { display:flex; align-items:center; gap:10px; font-size:0.86rem; color:var(--muted); padding:14px 20px; }
+    .ia-reflexion i { width:8px; height:8px; border-radius:50%; background:var(--primary); animation:ia-pulse 1.1s ease-in-out infinite; }
+    @keyframes ia-pulse { 0%,100% { opacity:0.25; transform:scale(0.8); } 50% { opacity:1; transform:scale(1.15); } }
+
+    .ia-saisie { display:flex; align-items:flex-end; gap:10px; padding:10px 10px 10px 20px; border:1.5px solid var(--border); border-radius:26px; background:var(--bg); box-shadow:0 4px 22px rgba(10,15,44,0.07); }
+    .ia-saisie:focus-within { border-color:var(--primary); box-shadow:0 6px 26px rgba(26,60,255,0.14); }
+    .ia-saisie textarea { flex:1; border:0; outline:0; resize:none; background:transparent; font-family:inherit; font-size:0.98rem; line-height:1.5; color:var(--text); padding:9px 0; max-height:160px; }
+    .ia-saisie button { flex:0 0 auto; width:40px; height:40px; border-radius:50%; border:0; background:var(--primary); color:#fff; cursor:pointer; display:flex; align-items:center; justify-content:center; transition:background .15s, opacity .15s; }
+    .ia-saisie button:hover { background:var(--primary-h); }
+    .ia-saisie button[disabled] { opacity:0.45; cursor:progress; }
+
+    .ia-suggestions { display:flex; flex-wrap:wrap; gap:8px; margin-top:14px; }
+    .ia-suggestions button { padding:9px 16px; border-radius:50px; border:1.5px solid var(--border); background:var(--bg); color:var(--muted); font-family:inherit; font-size:0.83rem; font-weight:600; cursor:pointer; transition:all .15s; }
+    .ia-suggestions button:hover { border-color:var(--primary); color:var(--primary); background:rgba(26,60,255,0.04); }
+    .ia-chat-note { font-size:0.78rem; color:var(--muted); margin-top:16px; }
+    .ia-chat-note a { color:var(--primary); font-weight:700; text-decoration:none; }
+
+    .ia-suivis { display:flex; flex-wrap:wrap; gap:8px; margin-top:16px; padding-top:14px; border-top:1px solid var(--border); }
+    .ia-suivis span { font-size:0.78rem; color:var(--muted); font-weight:700; width:100%; margin-bottom:2px; }
+    .ia-suivis button { padding:7px 14px; border-radius:50px; border:1px solid var(--border); background:var(--bg2); color:var(--primary); font-family:inherit; font-size:0.8rem; font-weight:600; cursor:pointer; }
+    .ia-suivis button:hover { border-color:var(--primary); }
+
     .ia-demander { flex:0 0 auto; padding:8px 18px; border-radius:50px; border:0; background:var(--primary); color:#fff; font-family:inherit; font-size:0.82rem; font-weight:700; cursor:pointer; transition:background .15s; }
     .ia-demander:hover { background:var(--primary-h); }
     .ia-demander[disabled] { opacity:0.6; cursor:progress; }
@@ -456,6 +488,12 @@ footer{
       .ia-cats { grid-template-columns:1fr; }
       .ia-count { margin-left:0; width:100%; }
       .ia-search-wrap { position:static; }
+      .ia-chat { padding:88px 0 30px; }
+      .ia-chat h1 { font-size:1.55rem; }
+      .ia-chat p.lead { font-size:0.92rem; margin-bottom:18px; }
+      .ia-msg-ia { padding:18px; }
+      .ia-suggestions { flex-wrap:nowrap; overflow-x:auto; scrollbar-width:none; padding-bottom:4px; }
+      .ia-suggestions button { flex:0 0 auto; }
       .ia-demander { padding:8px 14px; font-size:0.78rem; }
       .ia-conseil { padding:18px; }
       /* Seize catégories empilées mangeaient un écran entier : on les fait
