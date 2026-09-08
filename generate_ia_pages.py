@@ -355,7 +355,16 @@ IA_CSS = """
       .ia-chat { padding:88px 0 30px; }
       .ia-chat h1 { font-size:1.55rem; }
       .ia-chat p.lead { font-size:0.92rem; margin-bottom:18px; }
-      .ia-msg-ia { padding:18px; }
+      /* Sur 390px, la pastille « IA » en marge volait 34px de largeur au
+         texte : elle passe au-dessus. Et le rôle de chaque outil prend sa
+         propre ligne, au lieu de se couper en plein milieu. */
+      .ia-msg-ia { padding-left:0; }
+      .ia-msg-ia::before { position:static; margin-bottom:10px; }
+      .ia-msg-ia .ia-etape { padding-left:12px; }
+      .ia-etape { gap:10px; }
+      .ia-etape .role { display:block; margin-top:3px; }
+      .ia-msg-moi { max-width:92%; }
+      .ia-questions li { font-size:0.9rem; }
       .ia-suggestions { flex-wrap:nowrap; overflow-x:auto; scrollbar-width:none; padding-bottom:4px; }
       .ia-suggestions button { flex:0 0 auto; }
       .ia-demander { padding:8px 14px; font-size:0.78rem; }
@@ -843,7 +852,7 @@ def build_hub():
 
       <form class="ia-saisie" id="ia-form">
         <textarea id="ia-chat-q" rows="1" maxlength="500" autocomplete="off"
-                  placeholder="Ex. : je suis commercial et je veux plus de rendez-vous qualifiés sans y passer mes matinées"></textarea>
+                  placeholder="Décrivez votre situation en une phrase…"></textarea>
         <button type="submit" id="ia-envoyer" aria-label="Envoyer">
           <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
         </button>

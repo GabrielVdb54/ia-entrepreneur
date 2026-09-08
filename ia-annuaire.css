@@ -504,7 +504,16 @@ footer{
       .ia-chat { padding:88px 0 30px; }
       .ia-chat h1 { font-size:1.55rem; }
       .ia-chat p.lead { font-size:0.92rem; margin-bottom:18px; }
-      .ia-msg-ia { padding:18px; }
+      /* Sur 390px, la pastille « IA » en marge volait 34px de largeur au
+         texte : elle passe au-dessus. Et le rôle de chaque outil prend sa
+         propre ligne, au lieu de se couper en plein milieu. */
+      .ia-msg-ia { padding-left:0; }
+      .ia-msg-ia::before { position:static; margin-bottom:10px; }
+      .ia-msg-ia .ia-etape { padding-left:12px; }
+      .ia-etape { gap:10px; }
+      .ia-etape .role { display:block; margin-top:3px; }
+      .ia-msg-moi { max-width:92%; }
+      .ia-questions li { font-size:0.9rem; }
       .ia-suggestions { flex-wrap:nowrap; overflow-x:auto; scrollbar-width:none; padding-bottom:4px; }
       .ia-suggestions button { flex:0 0 auto; }
       .ia-demander { padding:8px 14px; font-size:0.78rem; }
