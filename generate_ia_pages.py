@@ -162,7 +162,7 @@ IA_CSS = """
     .ia-saisie button[disabled] { opacity:0.45; cursor:progress; }
 
     .ia-suggestions { display:flex; flex-wrap:wrap; gap:8px; margin-top:14px; }
-    .ia-suggestions button { padding:9px 16px; border-radius:50px; border:1.5px solid var(--border); background:var(--bg); color:var(--muted); font-family:inherit; font-size:0.83rem; font-weight:600; cursor:pointer; transition:all .15s; }
+    .ia-suggestions button { min-height:44px; padding:11px 16px; border-radius:50px; border:1.5px solid var(--border); background:var(--bg); color:var(--muted); font-family:inherit; font-size:0.83rem; font-weight:600; cursor:pointer; transition:all .15s; }
     .ia-suggestions button:hover { border-color:var(--primary); color:var(--primary); background:rgba(26,60,255,0.04); }
     .ia-chat-note { font-size:0.78rem; color:var(--muted); margin-top:16px; }
     .ia-chat-note a { color:var(--primary); font-weight:700; text-decoration:none; }
@@ -179,7 +179,9 @@ IA_CSS = """
 
     .ia-suivis { display:flex; flex-wrap:wrap; gap:8px; margin-top:16px; padding-top:14px; border-top:1px solid var(--border); }
     .ia-suivis span { font-size:0.78rem; color:var(--muted); font-weight:700; width:100%; margin-bottom:2px; }
-    .ia-suivis button { padding:7px 14px; border-radius:50px; border:1px solid var(--border); background:var(--bg2); color:var(--primary); font-family:inherit; font-size:0.8rem; font-weight:600; cursor:pointer; }
+    /* 44px de haut : en dessous, la cible est trop petite pour un pouce.
+       Recommandation d'accessibilité WCAG 2.5.8, et bon sens sur mobile. */
+    .ia-suivis button { min-height:44px; padding:11px 16px; border-radius:50px; border:1px solid var(--border); background:var(--bg2); color:var(--primary); font-family:inherit; font-size:0.82rem; font-weight:600; cursor:pointer; text-align:left; line-height:1.35; }
     .ia-suivis button:hover { border-color:var(--primary); }
 
     .ia-demander { flex:0 0 auto; padding:8px 18px; border-radius:50px; border:0; background:var(--primary); color:#fff; font-family:inherit; font-size:0.82rem; font-weight:700; cursor:pointer; transition:background .15s; }
