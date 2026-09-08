@@ -838,6 +838,74 @@ OBJECTIFS = [
     ("Sécuriser mes données et me mettre en conformité", ['juridique-conformite', 'assistants-ia']),
 ]
 
+# ── Neutralité des liens : un seul interrupteur ────────────────────────────
+# Le jour où un éditeur paiera pour être mis en avant, cette valeur passe à
+# True et TOUTES les mentions du site changent d'un coup : les 129 fiches, les
+# 16 pages d'usage, le hub, la question de FAQ et son balisage JSON-LD. Les
+# laisser éparpillées était la garantie d'en oublier une — et une réponse
+# balisée qui contredit la page visible est traitée par Google comme du
+# balisage trompeur.
+#
+# Ce n'est pas qu'une affaire de mots. Un site qui classe des outils et se fait
+# payer pour la mise en avant devient un comparateur au sens de l'article
+# L111-7 du Code de la consommation : il doit alors déclarer l'existence de la
+# relation contractuelle et son influence sur le classement. Les formulations
+# ci-dessous supposent le seul montage tenable avec une certification Qualiopi :
+# la rémunération n'achète jamais un rang ni une note, elle achète un encart
+# identifié comme tel. Si un jour elle achetait le classement, ces phrases
+# deviendraient fausses et il faudrait les réécrire, pas seulement basculer ce
+# booléen.
+#
+# À changer aussi, hors de ce fichier : le paragraphe « annuaire » de llms.txt
+# et le pied de l'email de récap dans api/recap.js.
+LIENS_REMUNERES = False
+
+MENTIONS = {
+    'fiche': (
+        "Lien direct vers l'éditeur, sans affiliation ni parrainage.",
+        "Lien direct vers l'éditeur. Certains éditeurs rémunèrent leur mise en avant : "
+        "c'est signalé sur leur fiche, et cela ne change ni la note ni le classement.",
+    ),
+    'hub_bas': (
+        "Aucun lien de cet annuaire n'est rémunéré.",
+        "Les mises en avant rémunérées sont signalées sur la fiche concernée ; elles ne changent "
+        "ni la note ni le rang.",
+    ),
+    'liste': (
+        "Aucun lien rémunéré.",
+        "Les mises en avant rémunérées sont signalées comme telles ; le classement reste "
+        "établi sur la seule note IA-Entrepreneur.",
+    ),
+    'findia': (
+        "aucun lien rémunéré",
+        "les mises en avant rémunérées y sont signalées",
+    ),
+    'faq_q': (
+        "Cet annuaire contient-il des liens sponsorisés ou affiliés ?",
+        "Certains éditeurs vous rémunèrent-ils ? Comment le savoir ?",
+    ),
+    'faq_r': (
+        "Non, aucun. Chaque « Site officiel » pointe directement vers le domaine de l'éditeur, "
+        "sans identifiant de parrainage, sans redirection et sans paramètre de suivi. Aucun éditeur "
+        "ne paie pour figurer dans cet annuaire, pour y être mieux classé ou pour en être retiré. "
+        "Les notes et les limites sont celles que nous constatons en formation et en mission chez "
+        "nos clients — y compris quand elles ne servent pas l'outil.",
+        "Oui, pour certains, et c'est écrit sur leur fiche : la mention « mise en avant rémunérée » "
+        "y figure explicitement. Ce que cette rémunération n'achète pas : la présence dans "
+        "l'annuaire, la note, le rang dans les listes, ni le retrait d'une limite gênante. Le "
+        "classement reste établi sur la seule note IA-Entrepreneur, selon les quatre critères "
+        "publiés. Les notes et les limites sont celles que nous constatons en formation et en "
+        "mission chez nos clients — y compris quand elles ne servent pas l'outil, et y compris "
+        "quand l'éditeur nous rémunère.",
+    ),
+}
+
+
+def mention(cle):
+    """Renvoie la formulation qui correspond à l'état réel du modèle économique."""
+    return MENTIONS[cle][1 if LIENS_REMUNERES else 0]
+
+
 HUB_FAQ = [
     ("Quelle est la meilleure IA en " + str(ANNEE) + " ?",
      "Il n'y a pas de meilleure IA dans l'absolu, seulement une meilleure IA <em>pour un usage donné</em>. Pour un usage généraliste en entreprise (rédiger, analyser, résumer), <a href='/ia/chatgpt.html'>ChatGPT</a> et <a href='/ia/claude.html'>Claude</a> sont les deux références, et <a href='/ia/mistral-le-chat.html'>Mistral Le Chat</a> s'impose dès que les données doivent rester en Europe. Pour automatiser des tâches, c'est <a href='/ia/n8n.html'>n8n</a> ou <a href='/ia/make.html'>Make</a>. Pour les comptes rendus de réunion, <a href='/ia/fathom.html'>Fathom</a> ou <a href='/ia/noota.html'>Noota</a>. Le bon réflexe est de partir du problème à résoudre, pas de l'outil."),
@@ -849,8 +917,7 @@ HUB_FAQ = [
      "Oui, et elles couvrent une bonne partie des besoins. <a href='/ia/chatgpt.html'>ChatGPT</a>, <a href='/ia/claude.html'>Claude</a>, <a href='/ia/gemini.html'>Gemini</a> et <a href='/ia/mistral-le-chat.html'>Mistral</a> ont des versions gratuites utilisables au quotidien. <a href='/ia/notebooklm.html'>NotebookLM</a>, <a href='/ia/google-search-console.html'>Google Search Console</a> et <a href='/ia/looker-studio.html'>Looker Studio</a> sont entièrement gratuits. <a href='/ia/fathom.html'>Fathom</a> et <a href='/ia/canva.html'>Canva</a> ont des offres gratuites généreuses. Utilisez le filtre « Gratuit » ou « Freemium » de l'annuaire pour ne voir que celles-là."),
     ("Faut-il former ses salariés avant de déployer une IA ?",
      "Ce n'est pas seulement recommandé, c'est une obligation. L'article 4 de l'AI Act, en vigueur depuis le 2 février 2025, impose aux entreprises qui déploient des systèmes d'IA de garantir un niveau suffisant de maîtrise de l'IA chez les personnes qui les utilisent. Au-delà du texte, c'est surtout ce qui distingue un abonnement payé et inutilisé d'un gain de temps réel. <a href='/formations-entreprises.html'>Nos formations</a> délivrent une attestation individuelle mentionnant les volets AI Act, RGPD et gouvernance des données."),
-    ("Cet annuaire contient-il des liens sponsorisés ou affiliés ?",
-     "Non, aucun. Chaque « Site officiel » pointe directement vers le domaine de l'éditeur, sans identifiant de parrainage, sans redirection et sans paramètre de suivi. Aucun éditeur ne paie pour figurer dans cet annuaire, pour y être mieux classé ou pour en être retiré. Les notes et les limites sont celles que nous constatons en formation et en mission chez nos clients — y compris quand elles ne servent pas l'outil."),
+    (mention('faq_q'), mention('faq_r')),
     ("À quelle fréquence cet annuaire est-il mis à jour ?",
      "Il est revu régulièrement : les outils qui disparaissent sont retirés, les nouveaux entrants sérieux sont ajoutés, et les tarifs indiqués sont réévalués. Les prix mentionnés restent indicatifs — sur ce marché, ils évoluent vite : vérifiez toujours sur le site de l'éditeur avant de vous engager."),
 ]
@@ -938,7 +1005,7 @@ def build_hub():
         <button type="button" data-exemple="Je manipule des données clients, je veux rester conforme au RGPD">Rester conforme au RGPD</button>
       </div>
       <p class="ia-avertissement"><b>FindIA est une intelligence artificielle.</b> Elle lit les {len(TOOLS)} fiches
-      de cet annuaire et n'en recommande jamais d'autres. Trois échanges suffisent en général, aucun lien rémunéré.
+      de cet annuaire et n'en recommande jamais d'autres. Trois échanges suffisent en général, {mention('findia')}.
       <a href="#annuaire">Ou parcourez l'annuaire complet</a></p>
     </div>
   </section>
@@ -990,7 +1057,7 @@ def build_hub():
         <div><b>{sum(1 for t in TOOLS if t['prix'] in ('Gratuit', 'Freemium'))}</b><span>utilisables gratuitement</span></div>
       </div>
       <p class="ia-maj"><b>Niveau requis</b> — <em>Débutant</em> : on s'en sert le jour même, sans paramétrage ni vocabulaire technique. <em>Intermédiaire</em> : il faut comprendre une logique (scénarios, champs, filtres) ou compter quelques jours de prise en main. <em>Expert</em> : compétence technique requise (code, auto-hébergement, administration).<br />
-      Notes attribuées par l'équipe IA-Entrepreneur selon quatre critères : facilité de prise en main, utilité réelle pour une TPE-PME, rapport qualité/prix et maturité de l'outil. Les tarifs sont indicatifs et constatés en {datetime.date.today().strftime('%m/%Y')} — vérifiez-les sur le site de l'éditeur. Aucun lien de cet annuaire n'est rémunéré.</p>
+      Notes attribuées par l'équipe IA-Entrepreneur selon quatre critères : facilité de prise en main, utilité réelle pour une TPE-PME, rapport qualité/prix et maturité de l'outil. Les tarifs sont indicatifs et constatés en {datetime.date.today().strftime('%m/%Y')} — vérifiez-les sur le site de l'éditeur. {mention('hub_bas')}</p>
     </div>
   </section>
 
@@ -2142,7 +2209,7 @@ def build_category(c):
       <div class="ia-grid">
 {cards}
       </div>
-      <p class="ia-maj">Classement par note IA-Entrepreneur (prise en main, utilité pour une TPE-PME, rapport qualité/prix, maturité). Tarifs indicatifs constatés en {datetime.date.today().strftime('%m/%Y')}. Aucun lien rémunéré.</p>
+      <p class="ia-maj">Classement par note IA-Entrepreneur (prise en main, utilité pour une TPE-PME, rapport qualité/prix, maturité). Tarifs indicatifs constatés en {datetime.date.today().strftime('%m/%Y')}. {mention('liste')}</p>
     </div>
   </section>
 
@@ -2299,7 +2366,7 @@ def build_tool(t):
           <div class="ia-kv"><span>Tarifs</span><b style="font-weight:600;font-size:0.8rem;">{e(t['prixDetail'])}</b></div>
           <div class="ia-kv"><span>Profils concernés</span><b style="font-weight:600;font-size:0.8rem;">{e(', '.join(t['profils']))}</b></div>
           <a class="btn btn-outline" style="margin-top:14px;" href="{e(t['url'])}" target="_blank" rel="noopener">Site officiel ↗</a>
-          <p style="font-size:0.72rem;color:var(--muted);margin-top:8px;text-align:center;">Lien direct vers l'éditeur, sans affiliation ni parrainage.</p>
+          <p style="font-size:0.72rem;color:var(--muted);margin-top:8px;text-align:center;">{mention('fiche')}</p>
           <button class="ia-fav ia-fav-long" type="button" data-fav="{t['slug']}" aria-pressed="false" style="margin-top:8px;">☆ Ajouter à mes favoris</button>
           <button class="btn btn-outline" type="button" data-partager style="margin-top:8px;width:100%;justify-content:center;">Partager cette fiche</button>
         </div>
