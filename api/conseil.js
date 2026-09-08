@@ -40,10 +40,17 @@ const passages = new Map();
 function tropDeRequetes(empreinte) {
   const maintenant = Date.now();
   const recentes = (passages.get(empreinte) || []).filter((t) => maintenant - t < FENETRE_MS);
+  if (passages.size > 5000) passages.clear();       // garde-fou mémoire
+  // On ne compte QUE les requêtes servies. Compter aussi les refus enfermait
+  // le visiteur : chaque tentative repoussait la sortie, et quelqu'un qui
+  // réessaie deux ou trois fois restait bloqué bien au-delà des dix minutes.
+  if (recentes.length >= MAX_PAR_FENETRE) {
+    passages.set(empreinte, recentes);
+    return true;
+  }
   recentes.push(maintenant);
   passages.set(empreinte, recentes);
-  if (passages.size > 5000) passages.clear();       // garde-fou mémoire
-  return recentes.length > MAX_PAR_FENETRE;
+  return false;
 }
 
 const INSTRUCTIONS = `Tu es FindIA, l'assistant de l'annuaire d'outils IA de IA-Entrepreneur, organisme de formation certifié Qualiopi qui accompagne des dirigeants et des équipes de TPE-PME françaises. Si on te demande qui tu es, dis-le simplement : une IA qui connaît cet annuaire et rien d'autre.
