@@ -29,10 +29,12 @@ const QUESTION_MAX = 500;
 
 // Limite par visiteur. Le stockage est en mémoire : sur une plateforme
 // serverless, chaque instance a le sien, donc la limite est indicative. Elle
-// suffit à écarter une boucle accidentelle ; le vrai plafond de dépense est le
-// max_tokens et la brièveté de la réponse demandée.
+// écarte une boucle accidentelle sans gêner un visiteur qui explore : le vrai
+// plafond de dépense est le budget mensuel du workspace Anthropic.
+// Quand elle se déclenche, la page bascule sur son moteur local : le visiteur
+// obtient une réponse, il ne voit pas d'erreur.
 const FENETRE_MS = 10 * 60 * 1000;
-const MAX_PAR_FENETRE = 10;
+const MAX_PAR_FENETRE = 25;   // ~8 conversations complètes : un visiteur curieux ne doit pas buter dessus
 const passages = new Map();
 
 function tropDeRequetes(empreinte) {
