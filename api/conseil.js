@@ -384,7 +384,7 @@ export default async function handler(req, res) {
         // modèle quoi faire du détail qui lui manque, plutôt que de le laisser
         // buter contre un champ absent.
         ...(!dernierTour && recommandeDirectement
-          ? [{ type: 'text', text: "Le visiteur a nommé une tâche précise : tu recommandes, tu ne demandes rien. S'il te manque un détail, pose ton hypothèse en une demi-phrase dans la reformulation et cite l'alternative si ce détail changeait la réponse — « si vos documents contiennent des données clients, prenez plutôt X »." }]
+          ? [{ type: 'text', text: "Le visiteur a nommé une tâche précise : tu recommandes, tu ne demandes rien. Le champ « etapes » ne peut PAS rester vide — c'est une impasse pour le visiteur, qui repartirait sans rien. S'il te manque un détail, prends l'interprétation la plus probable, dis-la en une demi-phrase dans la reformulation (« je pars du principe que vous voulez monter des vidéos existantes »), et couvre l'autre lecture en citant un outil de plus avec son rôle. Une hypothèse assumée vaut mieux qu'une question, et infiniment mieux que rien." }]
           : []),
       ],
       tools: [recommandeDirectement ? OUTIL_SANS_QUESTIONS : OUTIL],
@@ -430,6 +430,16 @@ export default async function handler(req, res) {
         situation: couper(brut.situation, 320),
         questions,
       });
+    }
+
+    // Une tâche etait nommee, et il n'en sort aucun outil : le modele, prive du
+    // champ « questions », a repondu « vous cherchez une IA pour la video, mais
+    // sans preciser le type » et s'est arrete la. C'est une impasse : ni outil,
+    // ni question, rien a faire pour le visiteur. On renvoie donc une erreur,
+    // ce qui fait basculer la page sur son moteur local — lequel, lui, trouvera
+    // toujours des outils video. Le visiteur obtient une reponse, pas un mur.
+    if (recommandeDirectement && !etapes.length) {
+      return res.status(502).json({ erreur: 'aucune_recommandation' });
     }
 
     // Ni outil ni question : le visiteur a demandé autre chose (« qui es-tu ? »,
