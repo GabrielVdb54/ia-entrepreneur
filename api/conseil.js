@@ -109,18 +109,19 @@ const TACHES = new RegExp('\\b(?:' + [
  */
 const ATTRIBUTS = /\b(?:francais\w*|hexagonal\w*|europeen\w*|souverain\w*|open ?source|auto-?heberg\w*|en local|gratuit\w*|libre|rgpd|alternative\w*)\b/i;
 
-function tacheNommee(texte) {
-  const t = String(texte)
-    .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
-    .replace(/['\u2019]/g, ' ')
+function normaliser(texte) {
+  return String(texte)
+    .normalize('NFD').replace(/[\u0300-\u036f]/g, '')   // « rédiger » et « rediger » se valent
+    .replace(/['\u2019]/g, ' ')                          // « l'AI Act » doit se lire « l ai act »
     .toLowerCase();
-  if (ATTRIBUTS.test(t)) return true;
-  return TACHES.test(
-    String(texte)
-      .normalize('NFD').replace(/[\u0300-\u036f]/g, '')   // « rédiger » et « rediger » se valent
-      .replace(/['\u2019]/g, ' ')                          // « l'AI Act » doit se lire « l ai act »
-      .toLowerCase(),
-  );
+}
+
+function questionCatalogue(texte) {
+  return ATTRIBUTS.test(normaliser(texte));
+}
+
+function tacheNommee(texte) {
+  return TACHES.test(normaliser(texte));
 }
 
 const INSTRUCTIONS = `Tu es FindIA, l'assistant de l'annuaire d'outils IA de IA-Entrepreneur, organisme de formation certifié Qualiopi qui accompagne des dirigeants et des équipes de TPE-PME françaises. Si on te demande qui tu es, dis-le simplement : une IA qui connaît cet annuaire et rien d'autre.
@@ -388,6 +389,11 @@ export default async function handler(req, res) {
   // Une tache nommee se traite directement ; au dernier tour, on tranche de
   // toute facon. Dans les deux cas, le champ « questions » disparait du schema.
   const recommandeDirectement = dernierTour || tacheNommee(question);
+  // Une question portant sur une propriete d'outil garde, elle, son champ
+  // « questions ». Lui retirer le rendait muet : « meilleure ia francaise »
+  // renvoyait une reponse vide, ce qui est pire qu'une question. On l'oriente
+  // par la consigne, sans lui fermer la porte.
+  const surAttribut = !recommandeDirectement && questionCatalogue(question);
 
   const client = new Anthropic({ timeout: 50000, maxRetries: 1 });
 
@@ -417,6 +423,9 @@ export default async function handler(req, res) {
         // buter contre un champ absent.
         ...(!dernierTour && recommandeDirectement
           ? [{ type: 'text', text: "Le visiteur a nommé une tâche précise : tu recommandes, tu ne demandes rien. Le champ « etapes » ne peut PAS rester vide — ce serait une impasse. S'il te manque un détail, prends l'interprétation la plus probable et annonce-la en une demi-phrase dans « situation » : « je pars du principe que vous voulez monter des vidéos existantes ». Reste bref : deux outils, une phrase chacun." }]
+          : []),
+        ...(surAttribut
+          ? [{ type: 'text', text: "Le visiteur cherche un outil ayant une propriété précise — français, européen, gratuit, open source, auto-hébergeable. Le catalogue permet d'y répondre directement : nomme les outils qui ont cette propriété et dis en une demi-phrase ce qui les distingue. Ne pose une question que si tu ne peux vraiment pas trancher." }]
           : []),
         ...(consigneSupplementaire ? [{ type: 'text', text: consigneSupplementaire }] : []),
       ],
