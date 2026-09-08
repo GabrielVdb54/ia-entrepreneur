@@ -174,6 +174,33 @@ IA_CSS = """
     .ia-questions li::before { content:"?"; position:absolute; left:0; top:1px; width:14px; height:14px; border-radius:50%; background:rgba(26,60,255,0.12); color:var(--primary); font-size:0.62rem; font-weight:800; display:flex; align-items:center; justify-content:center; }
     .ia-questions-note { font-size:0.83rem; color:var(--muted); margin-top:10px; }
 
+    /* Restaurees : un nettoyage de CSS trop large les avait emportees alors
+       qu'elles habillent toujours l'offre et l'avertissement. */
+    .ia-msg-ia .ia-conseil-source { font-size:0.7rem; color:var(--muted); font-weight:700; text-transform:uppercase; letter-spacing:0.05em; display:block; margin-bottom:8px; }
+    .ia-conseil-offre { margin-top:16px; padding:16px 18px; border-radius:12px; background:rgba(16,185,129,0.07); border-left:4px solid var(--accent); }
+    .ia-conseil-offre b { display:block; font-size:0.92rem; margin-bottom:4px; }
+    .ia-conseil-offre p { font-size:0.86rem; color:var(--muted); line-height:1.55; margin-bottom:10px; }
+    .ia-conseil-offre .ia-conseil-actions { display:flex; flex-wrap:wrap; gap:8px; }
+    .ia-conseil-offre a { display:inline-flex; align-items:center; padding:9px 18px; border-radius:50px; font-size:0.82rem; font-weight:700; text-decoration:none; }
+    .ia-conseil-offre a.principal { background:var(--accent); color:#fff; }
+    .ia-conseil-offre a.secondaire { border:1.5px solid var(--border); color:var(--muted); }
+    .ia-conseil-vigilance { margin-top:14px; font-size:0.85rem; color:var(--muted); padding-left:22px; position:relative; line-height:1.55; }
+    .ia-conseil-vigilance::before { content:"!"; position:absolute; left:0; top:0; width:16px; height:16px; border-radius:50%; background:#EF4444; color:#fff; font-size:0.68rem; font-weight:800; display:flex; align-items:center; justify-content:center; }
+
+    /* Trois façons de faire, côte à côte : le visiteur se situe sans qu'on
+       lui ait demandé son budget. */
+    .ia-voies { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin:14px 0 6px; }
+    .ia-voie { padding:14px 15px; border:1px solid var(--border); border-radius:14px; background:var(--bg); }
+    .ia-voie.est-recommandee { border-color:var(--primary); background:rgba(26,60,255,0.04); box-shadow:0 4px 18px rgba(26,60,255,0.08); }
+    .ia-voie b { display:block; font-size:0.88rem; }
+    .ia-voie.est-recommandee b { color:var(--primary); }
+    .ia-voie em { display:block; font-style:normal; font-size:0.7rem; color:var(--muted); margin-bottom:9px; }
+    .ia-voie-outils { display:flex; flex-wrap:wrap; gap:5px; margin-bottom:8px; }
+    .ia-voie-outils a { padding:3px 9px; border-radius:50px; background:var(--card); font-size:0.73rem; font-weight:700; color:var(--text); text-decoration:none; }
+    .ia-voie-outils a:hover { background:rgba(26,60,255,0.10); color:var(--primary); }
+    .ia-voie p { font-size:0.78rem; color:var(--muted); line-height:1.5; }
+    .ia-voies-detail { font-size:0.78rem; font-weight:700; color:var(--muted); margin:14px 0 2px; }
+
     .ia-suivis { display:flex; flex-wrap:wrap; gap:8px; margin-top:16px; padding-top:14px; border-top:1px solid var(--border); }
     .ia-suivis span { font-size:0.78rem; color:var(--muted); font-weight:700; width:100%; margin-bottom:2px; }
     /* 44px de haut : en dessous, la cible est trop petite pour un pouce.
@@ -332,6 +359,10 @@ IA_CSS = """
       .ia-msg-ia { padding-left:0; }
       .ia-msg-ia::before { position:static; margin-bottom:10px; }
       .ia-msg-ia .ia-etape { padding-left:12px; }
+      /* Trois colonnes sur 390px seraient illisibles : elles s'empilent, la
+         recommandée en premier pour qu'on la voie sans faire défiler. */
+      .ia-voies { grid-template-columns:1fr; gap:8px; }
+      .ia-voie.est-recommandee { order:-1; }
       .ia-etape { gap:10px; }
       .ia-etape .role { display:block; margin-top:3px; }
       .ia-msg-moi { max-width:92%; }
