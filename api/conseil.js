@@ -198,7 +198,7 @@ const OUTIL = {
           properties: {
             outil: { type: 'string', description: 'Slug exact d\'un outil du catalogue.' },
             role: { type: 'string', description: "Le rôle de cet outil dans la chaîne, en quelques mots." },
-            comment: { type: 'string', description: "Comment s'en servir dans cette situation précise. UNE phrase, deux au maximum si la première ne suffit pas." },
+            comment: { type: 'string', description: "Comment s'en servir dans cette situation précise. UNE phrase, jamais deux." },
           },
           required: ['outil', 'role', 'comment'],
           additionalProperties: false,
@@ -275,7 +275,7 @@ const OUTIL_SANS_QUESTIONS = (() => {
         },
         etapes: {
           ...proprietes.etapes,
-          description: "La chaîne recommandée, JAMAIS VIDE : deux ou trois outils, quatre au maximum, dans l'ordre où on les utilise. Si la demande admet plusieurs lectures, prends la plus probable et couvre la seconde avec un outil de plus.",
+          description: "La chaîne recommandée, JAMAIS VIDE : deux outils, trois seulement si la tâche l'exige vraiment. Si la demande admet plusieurs lectures, prends la plus probable et dis-le dans « situation » — n'ajoute pas d'outil pour couvrir l'autre.",
         },
       },
       required: OUTIL.input_schema.required.filter((c) => c !== 'questions'),
@@ -400,7 +400,7 @@ export default async function handler(req, res) {
         // modèle quoi faire du détail qui lui manque, plutôt que de le laisser
         // buter contre un champ absent.
         ...(!dernierTour && recommandeDirectement
-          ? [{ type: 'text', text: "Le visiteur a nommé une tâche précise : tu recommandes, tu ne demandes rien. Le champ « etapes » ne peut PAS rester vide — c'est une impasse pour le visiteur, qui repartirait sans rien. S'il te manque un détail, prends l'interprétation la plus probable, dis-la en une demi-phrase dans la reformulation (« je pars du principe que vous voulez monter des vidéos existantes »), et couvre l'autre lecture en citant un outil de plus avec son rôle. Une hypothèse assumée vaut mieux qu'une question, et infiniment mieux que rien." }]
+          ? [{ type: 'text', text: "Le visiteur a nommé une tâche précise : tu recommandes, tu ne demandes rien. Le champ « etapes » ne peut PAS rester vide — ce serait une impasse. S'il te manque un détail, prends l'interprétation la plus probable et annonce-la en une demi-phrase dans « situation » : « je pars du principe que vous voulez monter des vidéos existantes ». Reste bref : deux outils, une phrase chacun." }]
           : []),
       ],
       tools: [recommandeDirectement ? OUTIL_SANS_QUESTIONS : OUTIL],
@@ -455,15 +455,7 @@ export default async function handler(req, res) {
     // ce qui fait basculer la page sur son moteur local — lequel, lui, trouvera
     // toujours des outils video. Le visiteur obtient une reponse, pas un mur.
     if (recommandeDirectement && !etapes.length) {
-      return res.status(502).json({
-        erreur: 'aucune_recommandation',
-        // DIAGNOSTIC TEMPORAIRE : distinguer « le modele n'a rien propose » de
-        // « il a propose des outils dont les identifiants ont ete rejetes ».
-        diag: {
-          proposes: Array.isArray(brut.etapes) ? brut.etapes.map((e) => e && e.outil) : null,
-          situation: String(brut.situation || '').slice(0, 120),
-        },
-      });
+      return res.status(502).json({ erreur: 'aucune_recommandation' });
     }
 
     // Ni outil ni question : le visiteur a demandé autre chose (« qui es-tu ? »,
