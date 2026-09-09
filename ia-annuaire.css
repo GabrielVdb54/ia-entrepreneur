@@ -565,7 +565,13 @@ footer{
          défiler sur une ligne, comme les filtres d'une application mobile. */
       .ia-chips { flex-wrap:nowrap; overflow-x:auto; scrollbar-width:none; padding-bottom:4px; }
       .ia-chips::-webkit-scrollbar { display:none; }
-      .ia-chip { flex:0 0 auto; }
+      .ia-chip { flex:0 0 auto; min-height:40px; }
+      /* Mesure sur 390 et 360 px : le texte des trois colonnes budgetaires et
+         la mention de consentement tombaient a 12,5 px. Ce sont deux contenus
+         qu'on lit vraiment — l'un pour choisir sa voie, l'autre parce qu'il
+         engage. Le reste de la reponse etait deja a 14 px et ne bouge pas. */
+      .ia-voie p { font-size:0.84rem; }
+      .ia-recap-consent { font-size:0.84rem; }
       .ia-toast { bottom:86px; }
       #annuaire { scroll-margin-top: 80px; }
       .ia-filters select { flex:1 1 calc(50% - 4px); min-width:0; }
