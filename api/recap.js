@@ -206,6 +206,53 @@ function composerTexte(outils, offre) {
   ].join('\n');
 }
 
+const NOM_LISTE = 'FindIA — plans envoyés par email';
+
+// Le visiteur a coché la case : il faut une liste où le poser. Plutôt que de
+// réclamer un identifiant numérique de plus dans les variables d'environnement
+// — une valeur à recopier à la main, donc une occasion de se tromper — la
+// fonction retrouve la liste par son nom et la crée si elle n'existe pas.
+// Résolu une seule fois, puis gardé en mémoire de l'instance.
+//
+// BREVO_LISTE_ID reste prioritaire, pour pouvoir viser une liste précise sans
+// toucher au code.
+let listeConnue = null;
+
+async function listeNurturing(cle) {
+  if (process.env.BREVO_LISTE_ID) return Number(process.env.BREVO_LISTE_ID);
+  if (listeConnue) return listeConnue;
+  const entetes = { 'api-key': cle, 'Content-Type': 'application/json', accept: 'application/json' };
+  const lire = async (url, options) => {
+    try {
+      const r = await fetch(url, options);
+      return r.ok ? await r.json() : null;
+    } catch {
+      return null;
+    }
+  };
+
+  const existantes = await lire('https://api.brevo.com/v3/contacts/lists?limit=50', { headers: entetes });
+  const deja = (existantes?.lists || []).find((l) => l.name === NOM_LISTE);
+  if (deja) return (listeConnue = deja.id);
+
+  // Une liste appartient forcément à un dossier. On réutilise le premier
+  // existant plutôt que d'en empiler un nouveau dans le compte.
+  const dossiers = await lire('https://api.brevo.com/v3/contacts/folders?limit=10&offset=0', { headers: entetes });
+  let dossier = dossiers?.folders?.[0]?.id;
+  if (!dossier) {
+    const cree = await lire('https://api.brevo.com/v3/contacts/folders', {
+      method: 'POST', headers: entetes, body: JSON.stringify({ name: 'IA-Entrepreneur' }),
+    });
+    dossier = cree?.id;
+  }
+  if (!dossier) return null;
+
+  const creee = await lire('https://api.brevo.com/v3/contacts/lists', {
+    method: 'POST', headers: entetes, body: JSON.stringify({ name: NOM_LISTE, folderId: dossier }),
+  });
+  return (listeConnue = creee?.id || null);
+}
+
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
     res.setHeader('Allow', 'POST');
@@ -312,15 +359,17 @@ export default async function handler(req, res) {
 
   // Le contact n'entre dans la liste QUE si la case a été cochée. L'échec de
   // cette étape ne doit pas priver le visiteur de son récap, qui est déjà parti.
-  if (consentement && process.env.BREVO_LISTE_ID) {
+  if (consentement) {
     try {
+      const liste = await listeNurturing(cleBrevo);
+      if (!liste) throw new Error('liste introuvable');
       await fetch('https://api.brevo.com/v3/contacts', {
         method: 'POST',
         headers: { 'api-key': cleBrevo, 'Content-Type': 'application/json', accept: 'application/json' },
         body: JSON.stringify({
           email,
           updateEnabled: true,          // un visiteur qui revient met à jour sa fiche, il ne crée pas de doublon
-          listIds: [Number(process.env.BREVO_LISTE_ID)],
+          listIds: [liste],
           attributes: {
             // De quoi segmenter la séquence : ce que la personne cherchait, et
             // ce qu'on lui a répondu. Ecrire à quelqu'un sans savoir pourquoi
