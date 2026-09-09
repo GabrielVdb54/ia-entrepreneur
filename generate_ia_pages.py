@@ -142,7 +142,7 @@ IA_CSS = """
     .ia-avertissement { font-size:0.78rem; color:var(--muted); line-height:1.55; margin-top:14px; max-width:700px; }
     .ia-avertissement b { color:var(--text); font-weight:700; }
     .ia-avertissement a { color:var(--primary); font-weight:700; text-decoration:none; }
-    .ia-puce { flex:0 0 auto; width:22px; height:22px; border-radius:50%; background:var(--primary); color:#fff; font-size:0.58rem; font-weight:800; display:flex; align-items:center; justify-content:center; margin-top:1px; }
+    .ia-puce { flex:0 0 auto; width:22px; height:22px; border-radius:50%; background:var(--primary); color:#fff; font-size:0.7rem; font-weight:800; display:flex; align-items:center; justify-content:center; margin-top:1px; }
 
     .ia-fil { display:flex; flex-direction:column; gap:18px; margin-bottom:18px; }
     .ia-msg-moi { align-self:flex-end; max-width:min(560px,88%); padding:12px 18px; border-radius:18px 18px 4px 18px; background:var(--primary); color:#fff; font-size:0.94rem; line-height:1.5; }
@@ -551,7 +551,7 @@ def header_html():
       <div class="header-inner">
         <a href="/" class="logo" style="line-height:1.2;">
           IA<span>-</span>Entrepreneur
-          <span style="display:block;font-size:0.58rem;font-weight:500;color:var(--muted);letter-spacing:0.03em;margin-top:2px;">Organisme de formation certifié Qualiopi</span>
+          <span style="display:block;font-size:0.7rem;font-weight:500;color:var(--muted);letter-spacing:0.03em;margin-top:2px;">Organisme de formation certifié Qualiopi</span>
         </a>
         <nav>
 {nav}

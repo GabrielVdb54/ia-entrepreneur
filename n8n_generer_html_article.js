@@ -132,7 +132,7 @@ html += '<body>';
 html += '<header>';
 html += '<div class="container">';
 html += '<div class="header-inner">';
-html += '<a href="/" class="logo" style="line-height:1.2;">IA<span>-</span>Entrepreneur<span style="display:block;font-size:0.58rem;font-weight:500;color:var(--muted);letter-spacing:0.03em;margin-top:2px;">Organisme de formation certifié Qualiopi</span></a>';
+html += '<a href="/" class="logo" style="line-height:1.2;">IA<span>-</span>Entrepreneur<span style="display:block;font-size:0.7rem;font-weight:500;color:var(--muted);letter-spacing:0.03em;margin-top:2px;">Organisme de formation certifié Qualiopi</span></a>';
 // Navigation identique a celle que simplifier_nav.py pose sur les 153 autres
 // pages. Quatre liens, le telephone, l'appel gratuit. Toute divergence ici se
 // voit immediatement : l'article publie n'a plus la meme barre que le reste du

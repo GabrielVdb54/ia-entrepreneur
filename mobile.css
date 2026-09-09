@@ -18,7 +18,11 @@
    ════════════════════════════════════════════ */
 @media (max-width: 900px) {
   nav { display: none !important; }
-  .hamburger { display: flex !important; margin-left: auto !important; }
+  .hamburger { display: flex !important; margin-left: auto !important; position: relative; }
+  /* Le bouton du menu mesurait 32x24 : c'est le controle principal de
+     navigation sur mobile, et il etait plus petit que la pulpe d'un pouce.
+     On elargit la zone tactile a 52x44 sans toucher au dessin. */
+  .hamburger::after { content: ''; position: absolute; top: -10px; bottom: -10px; left: -10px; right: -10px; }
 
   /* Hero homepage 2-col → 1-col quand nav hamburger */
   .hero-layout {
