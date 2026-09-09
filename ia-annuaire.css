@@ -566,6 +566,10 @@ footer{
       .ia-chips { flex-wrap:nowrap; overflow-x:auto; scrollbar-width:none; padding-bottom:4px; }
       .ia-chips::-webkit-scrollbar { display:none; }
       .ia-chip { flex:0 0 auto; min-height:40px; }
+      /* Les vingt boutons de reponse du selecteur mesuraient 32 px de haut.
+         C'est le parcours en quatre questions : on les tape, il faut pouvoir
+         les viser. */
+      .ia-choice { min-height:40px; }
       /* Mesure sur 390 et 360 px : le texte des trois colonnes budgetaires et
          la mention de consentement tombaient a 12,5 px. Ce sont deux contenus
          qu'on lit vraiment — l'un pour choisir sa voie, l'autre parce qu'il
