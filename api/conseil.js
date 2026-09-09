@@ -303,8 +303,26 @@ const OUTIL_SANS_QUESTIONS = (() => {
  * ruine la credibilite de la reponse : mieux vaut une phrase entiere plus
  * courte qu'une phrase coupee au milieu d'un mot.
  */
+/**
+ * Le modele laisse parfois fuir sa propre syntaxe d'appel d'outil DANS le
+ * texte d'un champ. Vu en production le 09/09/2026, sur une vraie visite :
+ *
+ *   « ...Lovable et Bolt sont basés aux États-Unis."}antml:parameter>
+ *     <parameter name="offre">integration-cle-en-main »
+ *
+ * Le balisage s'affichait tel quel au visiteur. On coupe donc a la premiere
+ * marque de structure interne, avant meme de tronquer. Meme discipline que
+ * pour les slugs : ce qui sort du modele n'est jamais repris tel quel.
+ */
+const FUITE = /\}?\s*(?:<\/?antml:|antml:parameter|<\/?parameter\b|<\/?function_calls\b|<\/?invoke\b)/i;
+
 function couper(texte, maxi) {
-  const t = String(texte || '').trim();
+  let t = String(texte || '').trim();
+  const fuite = t.search(FUITE);
+  if (fuite >= 0) t = t.slice(0, fuite);
+  // Une coupe laisse souvent derriere elle la ponctuation de la structure.
+  t = t.replace(/[\s"'`»)\]}]+$/, '').trim();
+  if (!t) return '';
   if (t.length <= maxi) return t;
   const coupe = t.slice(0, maxi).replace(/\s+\S*$/, '');
   return (coupe || t.slice(0, maxi)) + '…';
