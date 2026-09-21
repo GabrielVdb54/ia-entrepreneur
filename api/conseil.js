@@ -397,7 +397,7 @@ export default async function handler(req, res) {
       mode: 'termine',
       situation: "Nous avons fait le tour de ce qu'un échange écrit permet. Pour aller plus loin sur votre cas précis — vos outils, vos process, ce qui bloque vraiment — quinze minutes au téléphone valent mieux que dix messages.",
       offre: {
-        url: '/formations-entreprises.html',
+        url: '/formation-ia-entreprise.html',
         titre: 'Parlons de votre situation',
         phrase: "Un appel gratuit de quinze minutes, sans engagement. Et si vous préférez continuer seul, l'annuaire complet est juste en dessous.",
       },

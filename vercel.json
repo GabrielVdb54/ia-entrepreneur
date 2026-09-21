@@ -2,8 +2,23 @@
   "cleanUrls": false,
   "redirects": [
     {
+      "source": "/formations-entreprises",
+      "destination": "/formation-ia-entreprise.html",
+      "permanent": true
+    },
+    {
+      "source": "/formations-entreprises.html",
+      "destination": "/formation-ia-entreprise.html",
+      "permanent": true
+    },
+    {
       "source": "/(.*)",
-      "has": [{ "type": "host", "value": "www.ia-entrepreneur.fr" }],
+      "has": [
+        {
+          "type": "host",
+          "value": "www.ia-entrepreneur.fr"
+        }
+      ],
       "destination": "https://ia-entrepreneur.fr/$1",
       "permanent": true
     }

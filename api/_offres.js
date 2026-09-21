@@ -6,9 +6,14 @@
  */
 export const OFFRES = {
   'formation-sur-mesure': {
-    url: '/formations-entreprises.html',
+    url: '/formation-ia-entreprise.html',
     titre: 'Formation IA sur mesure pour vos équipes',
-    pour: "former une équipe sur SES outils et SES cas métier, quels qu'ils soient. C'est le choix par défaut dès que les outils recommandés ne correspondent pas exactement à une formation nommée.",
+    pour: "former une ÉQUIPE sur SES outils et SES cas métier, quels qu'ils soient. Trois niveaux, d'une demi-journée à deux jours. C'est le choix par défaut dès que plusieurs personnes sont concernées et que les outils recommandés ne correspondent pas exactement à une formation nommée.",
+  },
+  'formation-independant': {
+    url: '/formation-ia-independant.html',
+    titre: 'Formation IA pour indépendants et freelances',
+    pour: "une personne SEULE (freelance, solopreneur, profession libérale, artisan) qui veut se former en session ouverte, en petit groupe et en visio, plutôt que faire venir un formateur pour elle. Si la personne veut un accompagnement individuel sur son cas précis, préférez le coaching dirigeant.",
   },
   'coaching-dirigeant': {
     url: '/coaching-ia-dirigeant.html',

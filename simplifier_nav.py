@@ -23,6 +23,9 @@ Ce qui en sort et pourquoi :
 Le menu mobile, lui, garde tout : sur mobile un menu déroulant n'a pas la
 contrainte de largeur de la barre du haut.
 
+Depuis le 21/09/2026 le numéro n'est plus écrit en clair : il est encodé dans
+data-tel et révélé au clic par tel-reveal.js (voir masquer_telephone.py).
+
 Usage : python3 simplifier_nav.py
 """
 
@@ -37,16 +40,17 @@ TEL_SVG = ('<svg width="13" height="13" fill="none" stroke="currentColor" stroke
            '1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>')
 
 NAV = f"""<nav>
-        <a href="/formations-entreprises.html">Formations IA</a>
+        <a href="/formation-ia-entreprise.html">Formations IA</a>
         <a href="/integrations-ia.html">Intégrations IA</a>
         <a href="/meilleures-ia.html">Meilleures IA</a>
         <a href="/nos-formateurs.html">Nos formateurs</a>
-        <a href="tel:+33614980713" class="nav-tel">{TEL_SVG}06 14 98 07 13</a>
+        <a class="nav-tel tel-reveal" role="button" tabindex="0" data-tel="MzEgNzAgODkgNDEgNjA=" aria-label="Afficher le numéro de téléphone">{TEL_SVG}<span class="tel-value">Afficher le numéro</span></a>
         <a href="{CAL}" target="_blank" rel="noopener noreferrer" class="nav-cta">Appel gratuit</a>
       </nav>"""
 
 MENU = f"""<div class="mobile-menu" id="mobile-menu">
-    <a href="/formations-entreprises.html">Formations IA</a>
+    <a href="/formation-ia-entreprise.html">Formations IA</a>
+    <a href="/formation-ia-independant.html">Formation indépendants</a>
     <a href="/integrations-ia.html">Intégrations IA</a>
     <a href="/meilleures-ia.html">Meilleures IA</a>
     <a href="/nos-formateurs.html">Nos formateurs</a>
@@ -54,7 +58,7 @@ MENU = f"""<div class="mobile-menu" id="mobile-menu">
     <a href="/blog.html">Blog</a>
     <a href="/apropos.html">À propos</a>
     <a href="mailto:contact@ia-entrepreneur.fr">✉ Écrire un email</a>
-    <a href="tel:+33614980713">📞 06 14 98 07 13</a>
+    <a class="tel-reveal" role="button" tabindex="0" data-tel="MzEgNzAgODkgNDEgNjA=" aria-label="Afficher le numéro de téléphone">📞 <span class="tel-value">Afficher le numéro</span></a>
     <a href="{CAL}" target="_blank" rel="noopener noreferrer" style="background:var(--accent);color:#fff;text-align:center;border-radius:var(--radius);margin-top:8px;padding:14px;display:block;font-weight:700;">Réserver un appel gratuit</a>
   </div>"""
 
@@ -75,7 +79,7 @@ def main():
     print(f'{nav_ok} barres de navigation et {menu_ok} menus mobiles remplacés '
           f'sur {len(fichiers)} pages')
     manquants = [os.path.basename(f) for f in fichiers
-                 if 'tel:+33614980713' not in open(f, encoding='utf-8').read()]
+                 if 'tel-reveal' not in open(f, encoding='utf-8').read()]
     print('pages sans numéro de téléphone :', manquants or 'aucune')
 
 

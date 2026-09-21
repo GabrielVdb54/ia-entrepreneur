@@ -532,18 +532,22 @@ ANNUAIRE_JS = r"""/* ia-annuaire.js — genere par generate_ia_pages.py, ne pas 
 # Blog, À propos, financement et e-mail vivent dans le menu mobile et le pied de
 # page — voir simplifier_nav.py pour le détail des arbitrages.
 NAV_ITEMS = [
-    ('/formations-entreprises.html', 'Formations IA'),
+    ('/formation-ia-entreprise.html', 'Formations IA'),
     ('/integrations-ia.html', 'Intégrations IA'),
     ('/meilleures-ia.html', 'Meilleures IA'),
     ('/nos-formateurs.html', 'Nos formateurs'),
 ]
 
-MENU_MOBILE = NAV_ITEMS + [
+MENU_MOBILE = [
+    ('/formation-ia-entreprise.html', 'Formations IA'),
+    ('/formation-ia-independant.html', 'Formation indépendants'),
+    ('/integrations-ia.html', 'Intégrations IA'),
+    ('/meilleures-ia.html', 'Meilleures IA'),
+    ('/nos-formateurs.html', 'Nos formateurs'),
     ('/simulateur-financement-formation-ia.html', '💶 Financer ma formation'),
     ('/blog.html', 'Blog'),
     ('/apropos.html', 'À propos'),
     ('mailto:contact@ia-entrepreneur.fr', '✉ Écrire un email'),
-    ('tel:+33614980713', '📞 06 14 98 07 13'),
 ]
 
 TEL_SVG = ('<svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" '
@@ -552,10 +556,24 @@ TEL_SVG = ('<svg width="13" height="13" fill="none" stroke="currentColor" stroke
            '1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.338 '
            '1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>')
 
+# Le numéro n'apparaît jamais en clair dans le HTML généré : il est encodé
+# (base64 de la chaîne inversée) et révélé au clic par /tel-reveal.js — voir
+# masquer_telephone.py, qui applique la même règle aux pages écrites à la main.
+TEL_ATTRS = ('role="button" tabindex="0" data-tel="%s" '
+             'aria-label="Afficher le numéro de téléphone"' % "MzEgNzAgODkgNDEgNjA=")
+TEL_REVEAL_NAV = (f'<a class="nav-tel tel-reveal" {TEL_ATTRS}>{TEL_SVG}'
+                  '<span class="tel-value">Afficher le numéro</span></a>')
+TEL_REVEAL_MENU = (f'<a class="tel-reveal" {TEL_ATTRS}>'
+                   '📞 <span class="tel-value">Afficher le numéro</span></a>')
+TEL_REVEAL_FOOTER = (f'<a class="tel-reveal" style="display:inline-flex;align-items:center;gap:6px;'
+                     f'font-size:0.82rem;color:var(--muted);margin-top:8px;" {TEL_ATTRS}>'
+                     '📞 <span class="tel-value">Afficher le numéro</span></a>')
+
 
 def header_html():
     nav = '\n'.join(f'        <a href="{u}">{t}</a>' for u, t in NAV_ITEMS)
     mob = '\n'.join(f'    <a href="{u}">{t}</a>' for u, t in MENU_MOBILE)
+    mob += f'\n    {TEL_REVEAL_MENU}'
     return f"""  <header id="header">
     <div class="container">
       <div class="header-inner">
@@ -565,7 +583,7 @@ def header_html():
         </a>
         <nav>
 {nav}
-        <a href="tel:+33614980713" class="nav-tel">{TEL_SVG}06 14 98 07 13</a>
+        {TEL_REVEAL_NAV}
         <a href="{CAL}" target="_blank" rel="noopener noreferrer" class="nav-cta">Appel gratuit</a>
       </nav>
         <button class="hamburger" id="hamburger" aria-label="Menu"><span></span><span></span><span></span></button>
@@ -587,7 +605,7 @@ FOOTER_HTML = f"""  <footer>
             <a href="/">Accueil</a>
             <a href="/apropos.html">À propos</a>
             <a href="/nos-formateurs.html">Nos formateurs</a>
-            <a href="/formations-entreprises.html">Formations IA</a>
+            <a href="/formation-ia-entreprise.html">Formations IA</a>
             <a href="/integrations-ia.html">Intégrations IA</a>
             <a href="/meilleures-ia.html">Les meilleures IA</a>
             <a href="/blog.html">Blog</a>
@@ -596,7 +614,7 @@ FOOTER_HTML = f"""  <footer>
             <a href="/cgv.html">CGV</a>
             <a href="/politique-confidentialite.html">Politique de confidentialité</a>
           </div>
-          <a href="tel:+33614980713" style="display:inline-flex;align-items:center;gap:6px;font-size:0.82rem;color:var(--muted);margin-top:8px;">📞 06 14 98 07 13</a>
+          {TEL_REVEAL_FOOTER}
         </div>
         <div class="footer-right">
           <p class="footer-copy">© {ANNEE} IA-Entrepreneur · Clindit SASU. Tous droits réservés. · NDA : 44 54 04871 54</p>
@@ -695,6 +713,7 @@ def head_html(title, desc, canonical, jsonld, keywords='', og_type='website',
   <link rel="stylesheet" href="/ia-annuaire.css" />
   <link rel="stylesheet" href="/mobile.css" />
   <script src="/ia-annuaire.js" defer></script>
+  <script defer src="/tel-reveal.js"></script>
 </head>
 <body>
 {header_html()}
@@ -828,7 +847,7 @@ CTA = f"""  <section class="ia-section">
         <p>Connaître les outils ne suffit pas. Nous formons vos équipes aux IA qui correspondent à vos processus, et nous délivrons une attestation mentionnant les volets AI Act (article 4), RGPD et gouvernance des données. Organisme certifié Qualiopi, formations finançables par votre OPCO.</p>
         <div class="ia-cta-actions">
           <a class="btn" href="{CAL}" target="_blank" rel="noopener noreferrer">Appel gratuit de 15 min</a>
-          <a class="btn ghost" href="/formations-entreprises.html">Voir les formations IA</a>
+          <a class="btn ghost" href="/formation-ia-entreprise.html">Voir les formations IA</a>
         </div>
       </div>
     </div>
@@ -926,7 +945,7 @@ HUB_FAQ = [
     ("Existe-t-il des IA gratuites suffisantes pour une TPE ?",
      "Oui, et elles couvrent une bonne partie des besoins. <a href='/ia/chatgpt.html'>ChatGPT</a>, <a href='/ia/claude.html'>Claude</a>, <a href='/ia/gemini.html'>Gemini</a> et <a href='/ia/mistral-le-chat.html'>Mistral</a> ont des versions gratuites utilisables au quotidien. <a href='/ia/notebooklm.html'>NotebookLM</a>, <a href='/ia/google-search-console.html'>Google Search Console</a> et <a href='/ia/looker-studio.html'>Looker Studio</a> sont entièrement gratuits. <a href='/ia/fathom.html'>Fathom</a> et <a href='/ia/canva.html'>Canva</a> ont des offres gratuites généreuses. Utilisez le filtre « Gratuit » ou « Freemium » de l'annuaire pour ne voir que celles-là."),
     ("Faut-il former ses salariés avant de déployer une IA ?",
-     "Ce n'est pas seulement recommandé, c'est une obligation. L'article 4 de l'AI Act, en vigueur depuis le 2 février 2025, impose aux entreprises qui déploient des systèmes d'IA de garantir un niveau suffisant de maîtrise de l'IA chez les personnes qui les utilisent. Au-delà du texte, c'est surtout ce qui distingue un abonnement payé et inutilisé d'un gain de temps réel. <a href='/formations-entreprises.html'>Nos formations</a> délivrent une attestation individuelle mentionnant les volets AI Act, RGPD et gouvernance des données."),
+     "Ce n'est pas seulement recommandé, c'est une obligation. L'article 4 de l'AI Act, en vigueur depuis le 2 février 2025, impose aux entreprises qui déploient des systèmes d'IA de garantir un niveau suffisant de maîtrise de l'IA chez les personnes qui les utilisent. Au-delà du texte, c'est surtout ce qui distingue un abonnement payé et inutilisé d'un gain de temps réel. <a href='/formation-ia-entreprise.html'>Nos formations</a> délivrent une attestation individuelle mentionnant les volets AI Act, RGPD et gouvernance des données."),
     (mention('faq_q'), mention('faq_r')),
     ("À quelle fréquence cet annuaire est-il mis à jour ?",
      "Il est revu régulièrement : les outils qui disparaissent sont retirés, les nouveaux entrants sérieux sont ajoutés, et les tarifs indiqués sont réévalués. Les prix mentionnés restent indicatifs — sur ce marché, ils évoluent vite : vérifiez toujours sur le site de l'éditeur avant de vous engager."),
@@ -1510,10 +1529,10 @@ def build_hub():
       'prospection-vente': ['/formation-prospection-commerciale.html', 'Formation prospection commerciale et IA'],
       'relation-client': ['/integrations-ia.html', 'Intégration IA clé en main'],
       'juridique-conformite': ['/formation-ia-obligatoire-ai-act.html', 'Formation IA obligatoire — article 4 de l’AI Act'],
-      'rh-formation': ['/formations-entreprises.html', 'Formation IA sur mesure pour vos équipes'],
+      'rh-formation': ['/formation-ia-entreprise.html', 'Formation IA sur mesure pour vos équipes'],
       'assistants-ia': ['/formation-chatgpt-entreprise.html', 'Formation ChatGPT en entreprise'],
-      'video-audio': ['/formations-entreprises.html', 'Formation IA sur mesure pour vos équipes'],
-      'defaut': ['/formations-entreprises.html', 'Formation IA sur mesure pour vos équipes']
+      'video-audio': ['/formation-ia-entreprise.html', 'Formation IA sur mesure pour vos équipes'],
+      'defaut': ['/formation-ia-entreprise.html', 'Formation IA sur mesure pour vos équipes']
     }};
 
     function contient(texte, mots) {{
@@ -2181,7 +2200,7 @@ def build_category(c):
           " s'appuient sur un éditeur européen ou sur une solution auto-hébergeable, ce qui simplifie considérablement la justification auprès d'un DPO. Chaque fiche indique le pays de l'éditeur et le point de vigilance à documenter."
           if fr else "Aucun éditeur européen ne s'impose ici : si vous traitez des données personnelles avec ces outils, vérifiez l'offre entreprise (non-entraînement sur vos données) et documentez le transfert hors UE dans votre registre.")),
         ("Faut-il former les équipes à ces outils ?",
-         "Un abonnement ne produit aucun gain de temps tant que personne ne sait s'en servir — c'est la cause la plus fréquente d'un déploiement IA qui ne donne rien. L'article 4 de l'AI Act impose d'ailleurs, depuis le 2 février 2025, un niveau suffisant de maîtrise de l'IA chez les personnes qui l'utilisent. <a href='/formations-entreprises.html'>Nos formations</a> sont construites sur les outils que vous utilisez réellement et donnent lieu à une attestation mentionnant les volets AI Act, RGPD et gouvernance des données."),
+         "Un abonnement ne produit aucun gain de temps tant que personne ne sait s'en servir — c'est la cause la plus fréquente d'un déploiement IA qui ne donne rien. L'article 4 de l'AI Act impose d'ailleurs, depuis le 2 février 2025, un niveau suffisant de maîtrise de l'IA chez les personnes qui l'utilisent. <a href='/formation-ia-entreprise.html'>Nos formations</a> sont construites sur les outils que vous utilisez réellement et donnent lieu à une attestation mentionnant les volets AI Act, RGPD et gouvernance des données."),
     ]
 
     title = titre_seo([
@@ -2283,7 +2302,7 @@ def build_tool(t):
          {"Débutant": "Quelques heures suffisent pour un usage courant : l'outil est conçu pour être pris en main sans compétence technique. Le vrai sujet n'est pas l'outil mais la méthode — savoir quoi lui demander, et sur quels processus l'utiliser.",
           "Intermédiaire": "Comptez une à deux journées pour être autonome, et davantage pour concevoir des usages solides. C'est le type d'outil où une formation courte fait gagner plusieurs semaines de tâtonnement.",
           "Expert": "C'est un outil technique : prévoyez un accompagnement ou une compétence interne. Une mauvaise mise en place coûte plus cher que le temps qu'elle devait faire gagner."}[t['niveau']] +
-         " <a href='/formations-entreprises.html'>Nos formations IA</a> sont construites sur les outils que vous utilisez déjà."),
+         " <a href='/formation-ia-entreprise.html'>Nos formations IA</a> sont construites sur les outils que vous utilisez déjà."),
     ]
 
     title = titre_seo([

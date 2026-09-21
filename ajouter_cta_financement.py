@@ -30,7 +30,7 @@ BLOC = MARQUEUR + """
 """
 
 
-# formations-entreprises.html ouvre sur l'onglet « Entreprise », qui parle 31
+# formation-ia-entreprise.html s'adresse aux équipes, qui parle 31
 # fois de financement et d'OPCO sans jamais offrir le simulateur : la section
 # « Financement » ne vit que dans l'onglet « Inter-entreprises », masqué par
 # defaut. On y place donc le meme appel, juste avant la FAQ.
