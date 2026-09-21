@@ -7,50 +7,84 @@
  "donnee_maj": "2026-08-11",
  "etablissements_source": 3648012,
  "idcc_couverts": 953,
+ "regle_commune": "Les fonds mutualisés du plan de développement des compétences sont réservés aux entreprises de moins de 50 salariés. Au-delà, la formation se finance sur le budget de l'entreprise ou par versement volontaire à l'OPCO. Dans tous les cas, l'organisme de formation doit être certifié Qualiopi et le dossier déposé avant le début de la formation.",
  "opco": {
   "AFDAS": {
    "nom": "Afdas",
-   "site": "https://www.afdas.com"
+   "site": "https://www.afdas.com",
+   "criteres": "https://www.afdas.com/entreprise/financer-vos-actions-de-formation.html",
+   "espace": "https://www.afdas.com/",
+   "regle": "Conditions générales votées par le conseil d'administration, puis barèmes par branche. L'entreprise doit être à jour de ses contributions."
   },
   "AKTO": {
    "nom": "AKTO",
-   "site": "https://www.akto.fr"
+   "site": "https://www.akto.fr",
+   "criteres": "https://www.akto.fr/entreprise/financer-une-formation/regles-de-prise-en-charge/",
+   "espace": "https://www.akto.fr/espace-entreprise/",
+   "regle": "Une fiche « Règles de prise en charge » par branche, revue chaque année."
   },
   "ATLAS": {
    "nom": "Atlas",
-   "site": "https://www.opco-atlas.fr"
+   "site": "https://www.opco-atlas.fr",
+   "criteres": "https://www.opco-atlas.fr/criteres-financement/criteres-legaux",
+   "espace": "https://www.opco-atlas.fr/entreprise/espace-entreprise.html",
+   "regle": "Une page de critères par branche, avec un plafond annuel par entreprise qui varie selon l'effectif."
   },
   "CONSTRUCTYS": {
    "nom": "Constructys",
-   "site": "https://www.constructys.fr"
+   "site": "https://www.constructys.fr",
+   "criteres": "https://www.constructys.fr/financer-vos-projets-de-formation/modalites-demandes-de-prise-charge/conditions-de-prise-en-charge-2/",
+   "espace": "https://www.constructys.fr/entreprise/",
+   "regle": "Modalités de participation financière révisées chaque année. Dossier à déposer 15 jours avant le début, via eGestion."
   },
   "L'OPCOMMERCE": {
    "nom": "L'Opcommerce",
-   "site": "https://www.lopcommerce.com"
+   "site": "https://www.lopcommerce.com",
+   "criteres": "https://www.lopcommerce.com/entreprise/criteres-de-prise-en-charge-par-branche-professionnelle/",
+   "espace": "https://www.lopcommerce.com/",
+   "regle": "Critères fixés branche par branche ; un document de critères par section paritaire."
   },
   "OCAPIAT": {
    "nom": "OCAPIAT",
-   "site": "https://www.ocapiat.fr"
+   "site": "https://www.ocapiat.fr",
+   "criteres": "https://www.ocapiat.fr/informations-legales-et-reglementaires/",
+   "espace": "https://www.ocapiat.fr/",
+   "regle": "Règles de prise en charge publiées en PDF chaque année, avec conditions générales de gestion."
   },
   "OPCO2I": {
    "nom": "OPCO 2i",
-   "site": "https://www.opco2i.fr"
+   "site": "https://www.opco2i.fr",
+   "criteres": "https://www.opco2i.fr/formation-et-financement/les-regles-de-prise-en-charge/",
+   "espace": "https://www.opco2i.fr/espace-entreprise/",
+   "regle": "Règles communes à l'industrie : plafond annuel par entreprise et plafond horaire, complétés par les priorités de branche."
   },
   "OPCO EP": {
    "nom": "OPCO EP",
-   "site": "https://www.opcoep.fr"
+   "site": "https://www.opcoep.fr",
+   "criteres": "https://www.opcoep.fr/criteres-de-financement",
+   "espace": "https://acces-formation.opcoep.fr/",
+   "regle": "Critères par branche ; à défaut de montant fixé par accord de branche, un forfait horaire s'applique."
   },
   "OPCO MOBILITES": {
    "nom": "OPCO Mobilités",
-   "site": "https://www.opcomobilites.fr"
+   "site": "https://www.opcomobilites.fr",
+   "criteres": "https://www.opcomobilites.fr/dispositifs-formation/le-plan-de-developpement-des-competences/",
+   "espace": "https://www.opcomobilites.fr/entreprise/",
+   "regle": "Conditions financières par branche, avec une enveloppe distincte pour les frais annexes. Demande un mois avant le démarrage."
   },
   "OPCO SANTE": {
    "nom": "OPCO Santé",
-   "site": "https://www.opco-sante.fr"
+   "site": "https://www.opco-sante.fr",
+   "criteres": "https://www.opco-sante.fr/employeur/financer-vos-formations/",
+   "espace": "https://www.opco-sante.fr/",
+   "regle": "Fonds conventionnels et compte d'investissement formation adhérent (CIFA), selon la branche et le niveau de contribution."
   },
   "UNIFORMATION COHESION SOCIALE": {
    "nom": "Uniformation",
-   "site": "https://www.uniformation.fr"
+   "site": "https://www.uniformation.fr",
+   "criteres": "https://www.uniformation.fr/entreprise/financements/frais-annexes-et-couts-pedagogiques",
+   "espace": "https://www.uniformation.fr/",
+   "regle": "Barème de coûts pédagogiques et de frais annexes, avec un plafond annuel par adhérent qui dépend de l'effectif."
   }
  },
  "idcc": {

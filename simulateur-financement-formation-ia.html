@@ -693,7 +693,7 @@ const OPCO_INFO={'ATLAS':{icon:'🏦',desc:'Banque · Finance · Assurance · Co
 const CODE_OPCO={'ATLAS':'ATLAS','OPCO EP':'OPCO EP','AKTO':'AKTO','AFDAS':'AFDAS','OCAPIAT':'OCAPIAT','OPCO2I':'OPCO 2i','CONSTRUCTYS':'Construction','OPCO MOBILITES':'Mobilités','OPCO SANTE':'Santé','UNIFORMATION COHESION SOCIALE':'UNIFORMATION',"L'OPCOMMERCE":'Opcommerce'};
 
 // ══ STATE ══════════════════════════════════════════════
-const S={profil:null,partType:null,struct:null,microAct:null,sal:null,nb:1,secteur:null,opco:null,siren:'',company:null,idcc:'',opcoSrc:null,opcoMaj:null,opcoAmbigu:null,opcoEchec:null};
+const S={profil:null,partType:null,struct:null,microAct:null,sal:null,nb:1,secteur:null,opco:null,siren:'',company:null,idcc:'',opcoSrc:null,opcoMaj:null,opcoAmbigu:null,opcoEchec:null,opcoOff:null,opcoRegle:null};
 
 // ══ PARTICULIER CONTENT ════════════════════════════════
 const PART_CONTENT = {
@@ -773,7 +773,7 @@ function pick(key,val,el){
 }
 function isSalariedStruct(){return ['sasu','sarl_min'].includes(S.struct);}
 function pickSect(val,el){
-  S.secteur=val;S.opco=val;S.opcoSrc='secteur';S.opcoMaj=null;S.opcoAmbigu=null;
+  S.secteur=val;S.opco=val;S.opcoSrc='secteur';S.opcoMaj=null;S.opcoAmbigu=null;S.opcoOff=null;S.opcoRegle=null;
   document.querySelectorAll('#sectOpts .choice').forEach(c=>c.classList.remove('sel'));
   el.classList.add('sel');
   if(S.sal==='oui'||isSalariedStruct())document.getElementById('btn3').disabled=false;
@@ -897,7 +897,16 @@ function computeAndRenderResults(){
     const amb=S.opcoAmbigu&&S.opcoAmbigu.length>1
       ? `<div class="ob-src" style="border-top:1px solid rgba(10,15,44,.08);margin-top:8px;padding-top:8px"><strong>⚠️ Deux OPCO possibles pour cette convention :</strong> ${S.opcoAmbigu.join(' ou ')}. Vérifiez avant de déposer votre dossier.</div>`
       : '';
-    ob.innerHTML=`<div class="opco-box"><div class="ob-head"><div class="ob-ic">${o.icon}</div><div class="ob-info"><strong>Votre OPCO : ${S.opco}</strong><span>${o.desc}</span></div></div><div class="ob-links"><a href="${o.url}" target="_blank" class="olink ol-p">Accéder à mon espace ${o.label} →</a><a href="https://quel-est-mon-opco.francecompetences.fr/" target="_blank" rel="noopener" class="olink ol-s">Vérifier sur France compétences</a></div><div class="ob-src"><strong>${src.t}</strong> ${src.d}</div>${amb}</div>`;
+    // Les montants ne sont pas affiches : ils dependent de la branche et de
+    // l'effectif et changent chaque annee. On renvoie vers la page ou CET OPCO
+    // publie ses criteres — la seule source qui fasse foi.
+    const off=S.opcoOff;
+    const lienCriteres=off&&off.criteres
+      ? `<a href="${off.criteres}" target="_blank" rel="noopener" class="olink ol-s">Critères de prise en charge ${off.nom} →</a>` : '';
+    const regle=off&&off.regle
+      ? `<div class="ob-src"><strong>Ce que finance ${off.nom} :</strong> ${off.regle} Les montants dépendent de votre branche et de votre effectif, et sont revus chaque année — ils se lisent sur la page ci-dessus.</div>` : '';
+    const commune=S.opcoRegle?`<div class="ob-src">${S.opcoRegle}</div>`:'';
+    ob.innerHTML=`<div class="opco-box"><div class="ob-head"><div class="ob-ic">${o.icon}</div><div class="ob-info"><strong>Votre OPCO : ${S.opco}</strong><span>${o.desc}</span></div></div><div class="ob-links"><a href="${(off&&off.espace)||o.url}" target="_blank" rel="noopener" class="olink ol-p">Accéder à mon espace ${o.label} →</a>${lienCriteres}<a href="https://quel-est-mon-opco.francecompetences.fr/" target="_blank" rel="noopener" class="olink ol-s">Vérifier sur France compétences</a></div><div class="ob-src"><strong>${src.t}</strong> ${src.d}</div>${regle}${commune}${amb}</div>`;
   }else if(S.sal==='oui'){
     ob.innerHTML=`<div class="opco-box"><div class="ob-head"><div class="ob-ic">🔍</div><div class="ob-info"><strong>OPCO à identifier</strong><span>Renseignez votre SIREN ci-dessous pour un résultat précis</span></div></div><div class="ob-links"><a href="https://www.trouver-mon-opco.fr" target="_blank" class="olink ol-p">Trouver mon OPCO →</a></div></div>`;
   }else ob.innerHTML='';
@@ -1000,12 +1009,12 @@ async function opcoOfficiel(params){
     if(!d.trouve)return null;
     const cle=CODE_OPCO[d.opco.code];
     if(!cle||!OPCO_INFO[cle])return null;
-    return {cle,src:d.methode,maj:d.donnee_maj,ambigu:d.opco.ambigu?d.opco.candidats.map(c=>c.nom):null};
+    return {cle,src:d.methode,maj:d.donnee_maj,ambigu:d.opco.ambigu?d.opco.candidats.map(c=>c.nom):null,off:d.opco,regleCommune:d.regle_commune};
   }catch(e){return null;}
 }
 function appliquerOpco(res){
   if(!res)return false;
-  S.opco=res.cle;S.opcoSrc=res.src;S.opcoMaj=res.maj;S.opcoAmbigu=res.ambigu;
+  S.opco=res.cle;S.opcoSrc=res.src;S.opcoMaj=res.maj;S.opcoAmbigu=res.ambigu;S.opcoOff=res.off||null;S.opcoRegle=res.regleCommune||null;
   return true;
 }
 async function fetchSiren(siren){
@@ -1050,7 +1059,7 @@ function detectOPCO(idcc,naf){
 }
 // ══ RESTART ════════════════════════════════════════════
 function restart(){
-  Object.assign(S,{profil:null,partType:null,struct:null,microAct:null,sal:null,nb:1,secteur:null,opco:null,siren:'',company:null,idcc:'',opcoSrc:null,opcoMaj:null,opcoAmbigu:null,opcoEchec:null});
+  Object.assign(S,{profil:null,partType:null,struct:null,microAct:null,sal:null,nb:1,secteur:null,opco:null,siren:'',company:null,idcc:'',opcoSrc:null,opcoMaj:null,opcoAmbigu:null,opcoEchec:null,opcoOff:null,opcoRegle:null});
   document.querySelectorAll('.choice').forEach(c=>c.classList.remove('sel'));
   document.querySelectorAll('.inp').forEach(i=>{i.value='';i.classList.remove('ok','err');});
   ['microQ','nbWrap','sectWrap','coCard','idccWrap','emailFormWrap','emailFormWrapP','sectSoloHint'].forEach(id=>document.getElementById(id).classList.add('hidden'));

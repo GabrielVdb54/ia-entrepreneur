@@ -45,20 +45,91 @@ SORTIE_JS = os.path.join(RACINE, 'api', '_opco.js')   # consomme par api/opco.js
 PSEUDO_IDCC = {'9998', '9999'}
 SEUIL_CONFIANCE = 0.90          # en dessous, l'IDCC est marque comme ambigu
 
-# Nom d'affichage + site officiel, pour pouvoir citer la source à l'utilisateur.
+# Nom d'affichage, site, et surtout la page ou CET OPCO publie ses criteres de
+# prise en charge : c'est la seule source qui fasse foi, et elle differe pour
+# chacun des onze. Les montants, eux, ne sont volontairement pas stockes ici :
+# ils dependent de la branche et de l'effectif, changent au moins chaque annee,
+# et une valeur perimee affichee comme certaine ferait perdre un dossier.
+# `regle` decrit la FORME de la prise en charge, qui est stable ; le montant se
+# lit sur la page officielle. URLs verifiees le 21/09/2026.
 OPCO_OFFICIELS = {
-    'AFDAS':                        ('Afdas',            'https://www.afdas.com'),
-    'AKTO':                         ('AKTO',             'https://www.akto.fr'),
-    'ATLAS':                        ('Atlas',            'https://www.opco-atlas.fr'),
-    'CONSTRUCTYS':                  ('Constructys',      'https://www.constructys.fr'),
-    "L'OPCOMMERCE":                 ("L'Opcommerce",     'https://www.lopcommerce.com'),
-    'OCAPIAT':                      ('OCAPIAT',          'https://www.ocapiat.fr'),
-    'OPCO2I':                       ('OPCO 2i',          'https://www.opco2i.fr'),
-    'OPCO EP':                      ('OPCO EP',          'https://www.opcoep.fr'),
-    'OPCO MOBILITES':               ('OPCO Mobilités',   'https://www.opcomobilites.fr'),
-    'OPCO SANTE':                   ('OPCO Santé',       'https://www.opco-sante.fr'),
-    'UNIFORMATION COHESION SOCIALE':('Uniformation',     'https://www.uniformation.fr'),
+    'AFDAS': {
+        'nom': 'Afdas', 'site': 'https://www.afdas.com',
+        'criteres': 'https://www.afdas.com/entreprise/financer-vos-actions-de-formation.html',
+        'espace': 'https://www.afdas.com/',
+        'regle': "Conditions générales votées par le conseil d'administration, puis barèmes par branche. L'entreprise doit être à jour de ses contributions.",
+    },
+    'AKTO': {
+        'nom': 'AKTO', 'site': 'https://www.akto.fr',
+        'criteres': 'https://www.akto.fr/entreprise/financer-une-formation/regles-de-prise-en-charge/',
+        'espace': 'https://www.akto.fr/espace-entreprise/',
+        'regle': "Une fiche « Règles de prise en charge » par branche, revue chaque année.",
+    },
+    'ATLAS': {
+        'nom': 'Atlas', 'site': 'https://www.opco-atlas.fr',
+        'criteres': 'https://www.opco-atlas.fr/criteres-financement/criteres-legaux',
+        'espace': 'https://www.opco-atlas.fr/entreprise/espace-entreprise.html',
+        'regle': "Une page de critères par branche, avec un plafond annuel par entreprise qui varie selon l'effectif.",
+    },
+    'CONSTRUCTYS': {
+        'nom': 'Constructys', 'site': 'https://www.constructys.fr',
+        'criteres': 'https://www.constructys.fr/financer-vos-projets-de-formation/modalites-demandes-de-prise-charge/conditions-de-prise-en-charge-2/',
+        'espace': 'https://www.constructys.fr/entreprise/',
+        'regle': "Modalités de participation financière révisées chaque année. Dossier à déposer 15 jours avant le début, via eGestion.",
+    },
+    "L'OPCOMMERCE": {
+        'nom': "L'Opcommerce", 'site': 'https://www.lopcommerce.com',
+        'criteres': 'https://www.lopcommerce.com/entreprise/criteres-de-prise-en-charge-par-branche-professionnelle/',
+        'espace': 'https://www.lopcommerce.com/',
+        'regle': "Critères fixés branche par branche ; un document de critères par section paritaire.",
+    },
+    'OCAPIAT': {
+        'nom': 'OCAPIAT', 'site': 'https://www.ocapiat.fr',
+        'criteres': 'https://www.ocapiat.fr/informations-legales-et-reglementaires/',
+        'espace': 'https://www.ocapiat.fr/',
+        'regle': "Règles de prise en charge publiées en PDF chaque année, avec conditions générales de gestion.",
+    },
+    'OPCO2I': {
+        'nom': 'OPCO 2i', 'site': 'https://www.opco2i.fr',
+        'criteres': 'https://www.opco2i.fr/formation-et-financement/les-regles-de-prise-en-charge/',
+        'espace': 'https://www.opco2i.fr/espace-entreprise/',
+        'regle': "Règles communes à l'industrie : plafond annuel par entreprise et plafond horaire, complétés par les priorités de branche.",
+    },
+    'OPCO EP': {
+        'nom': 'OPCO EP', 'site': 'https://www.opcoep.fr',
+        'criteres': 'https://www.opcoep.fr/criteres-de-financement',
+        'espace': 'https://acces-formation.opcoep.fr/',
+        'regle': "Critères par branche ; à défaut de montant fixé par accord de branche, un forfait horaire s'applique.",
+    },
+    'OPCO MOBILITES': {
+        'nom': 'OPCO Mobilités', 'site': 'https://www.opcomobilites.fr',
+        'criteres': 'https://www.opcomobilites.fr/dispositifs-formation/le-plan-de-developpement-des-competences/',
+        'espace': 'https://www.opcomobilites.fr/entreprise/',
+        'regle': "Conditions financières par branche, avec une enveloppe distincte pour les frais annexes. Demande un mois avant le démarrage.",
+    },
+    'OPCO SANTE': {
+        'nom': 'OPCO Santé', 'site': 'https://www.opco-sante.fr',
+        'criteres': 'https://www.opco-sante.fr/employeur/financer-vos-formations/',
+        'espace': 'https://www.opco-sante.fr/',
+        'regle': "Fonds conventionnels et compte d'investissement formation adhérent (CIFA), selon la branche et le niveau de contribution.",
+    },
+    'UNIFORMATION COHESION SOCIALE': {
+        'nom': 'Uniformation', 'site': 'https://www.uniformation.fr',
+        'criteres': 'https://www.uniformation.fr/entreprise/financements/frais-annexes-et-couts-pedagogiques',
+        'espace': 'https://www.uniformation.fr/',
+        'regle': "Barème de coûts pédagogiques et de frais annexes, avec un plafond annuel par adhérent qui dépend de l'effectif.",
+    },
 }
+
+# Vrai pour les onze, et c'est la regle qui decide de tout le reste : les fonds
+# mutualises du plan de developpement des competences sont reserves aux
+# entreprises de moins de 50 salaries. Au-dela, la formation reste finançable,
+# mais sur le budget propre de l'entreprise ou par versement volontaire.
+REGLE_COMMUNE = ("Les fonds mutualisés du plan de développement des compétences sont réservés aux "
+                 "entreprises de moins de 50 salariés. Au-delà, la formation se finance sur le budget "
+                 "de l'entreprise ou par versement volontaire à l'OPCO. Dans tous les cas, l'organisme "
+                 "de formation doit être certifié Qualiopi et le dossier déposé avant le début de la "
+                 "formation.")
 
 
 def ressource():
@@ -142,7 +213,8 @@ def main():
         'donnee_maj': res['maj'],
         'etablissements_source': etablissements,
         'idcc_couverts': len(table),
-        'opco': {cle: {'nom': nom, 'site': site} for cle, (nom, site) in OPCO_OFFICIELS.items()},
+        'regle_commune': REGLE_COMMUNE,
+        'opco': OPCO_OFFICIELS,
         'idcc': dict(sorted(table.items())),
     }
     os.makedirs(os.path.dirname(SORTIE), exist_ok=True)
@@ -167,9 +239,8 @@ def main():
             'licence': 'Licence Ouverte / Open Licence 2.0',
             'idcc_couverts': len(table),
         }, ensure_ascii=False) + ';\n\n')
-        f.write('export const OPCO = ' + json.dumps(
-            {cle: {'nom': nom, 'site': site} for cle, (nom, site) in OPCO_OFFICIELS.items()},
-            ensure_ascii=False, indent=1) + ';\n\n')
+        f.write('export const REGLE_COMMUNE = ' + json.dumps(REGLE_COMMUNE, ensure_ascii=False) + ';\n\n')
+        f.write('export const OPCO = ' + json.dumps(OPCO_OFFICIELS, ensure_ascii=False, indent=1) + ';\n\n')
         f.write('export const IDCC = ' + json.dumps(dict(sorted(table.items())),
                                                     ensure_ascii=False) + ';\n')
 

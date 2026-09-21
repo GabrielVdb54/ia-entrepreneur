@@ -27,7 +27,7 @@
  * qui casserait le simulateur.
  */
 
-import { META, OPCO, IDCC } from './_opco.js';
+import { META, OPCO, IDCC, REGLE_COMMUNE } from './_opco.js';
 
 export const maxDuration = 15;
 
@@ -91,7 +91,10 @@ async function recuperer(url) {
 /** Clé d'OPCO telle qu'écrite dans la table → fiche d'affichage. */
 function fiche(cle) {
   const o = OPCO[cle];
-  return o ? { code: cle, nom: o.nom, site: o.site } : { code: cle, nom: cle, site: null };
+  if (!o) return { code: cle, nom: cle, site: null };
+  // `criteres` est la page où CET OPCO publie ses règles : c'est la seule
+  // source qui fasse foi, et le simulateur doit pouvoir y renvoyer.
+  return { code: cle, nom: o.nom, site: o.site, criteres: o.criteres, espace: o.espace, regle: o.regle };
 }
 
 /** IDCC (2 à 4 chiffres) → OPCO, via la table embarquée. */
@@ -131,7 +134,7 @@ export default async function handler(req, res) {
     return res.status(429).json({ erreur: 'trop_de_demandes' });
   }
 
-  const socle = { source: META.source, donnee_maj: META.donnee_maj, licence: META.licence };
+  const socle = { source: META.source, donnee_maj: META.donnee_maj, licence: META.licence, regle_commune: REGLE_COMMUNE };
 
   // Chemin direct : on nous donne déjà la convention collective.
   if (!siret) {
