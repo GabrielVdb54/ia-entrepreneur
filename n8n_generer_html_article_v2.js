@@ -128,6 +128,7 @@ html += 'footer{padding:40px 0 24px;border-top:1px solid var(--border)}';
 html += '@media(max-width:900px){.article-layout{grid-template-columns:1fr}.article-sidebar{position:static}}';
 html += '@media(max-width:768px){nav{display:none}.hamburger{display:flex}.article-hero{height:300px}.article-hero-content{padding:24px}.article-title{font-size:1.6rem}}';
 html += '</style>';
+html += '<link rel="stylesheet" href="/mobile.css">';
 html += '</head>';
 html += '<body>';
 html += '<header>';

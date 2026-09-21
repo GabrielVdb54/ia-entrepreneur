@@ -128,6 +128,7 @@ html += '@media(max-width:900px){.article-layout{grid-template-columns:1fr}.arti
 html += '@media(max-width:768px){nav{display:none}.hamburger{display:flex}.article-hero{height:300px}.article-hero-content{padding:24px}.article-title{font-size:1.6rem}}';
 html += '</style>';
 html += '<style>@media(max-width:900px){nav{display:none!important}.hamburger{display:flex!important}}@media(min-width:901px) and (max-width:1000px){header nav a{padding:6px 6px!important}header nav .nav-cta{padding:8px 13px!important}}</style>';
+html += '<link rel="stylesheet" href="/mobile.css">';
 html += '</head>';
 html += '<body>';
 html += '<header>';
