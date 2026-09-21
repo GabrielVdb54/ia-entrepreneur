@@ -1,0 +1,69 @@
+# Rafraîchissement mensuel de la correspondance IDCC → OPCO.
+#
+# France compétences republie chaque mois l'extrait SIRO_AAAAMM.csv de la
+# table SIRET-OPCO. Le simulateur de financement s'appuie dessus pour dire à
+# un visiteur de quel OPCO il relève : une table figée vieillirait en silence,
+# et une mauvaise affectation d'OPCO fait perdre un dossier de financement.
+#
+# Le 5 du mois (France compétences publie en cours de première semaine),
+# generer_table_opco.py retélécharge la source, reconstruit data/idcc-opco.json
+# et api/_opco.js, et ne commite que s'il y a une différence réelle.
+#
+# Aucune dépendance : bibliothèque standard uniquement. Lançable à la main
+# depuis l'onglet Actions.
+
+name: Table IDCC → OPCO
+
+on:
+  schedule:
+    - cron: '0 6 5 * *'   # le 5 du mois, 6h UTC
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  issues: write
+
+jobs:
+  regenerer:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+
+      - name: Régénérer la table
+        id: gen
+        run: |
+          python3 generer_table_opco.py | tee sortie.txt
+          # Le script signale les OPCO inconnus : c'est le seul cas qui demande
+          # une intervention humaine, parce qu'un OPCO absent de la table de
+          # correspondance ne s'affichera pas dans le simulateur.
+          if grep -q "OPCO absents de OPCO_OFFICIELS" sortie.txt; then
+            echo "alerte=oui" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Signaler un OPCO inconnu
+        if: steps.gen.outputs.alerte == 'oui'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh issue create \
+            --title "Table OPCO — un opérateur inconnu est apparu ($(date +'%Y-%m'))" \
+            --body-file sortie.txt
+
+      - name: Commiter si la donnée a changé
+        run: |
+          rm -f sortie.txt
+          if [ -n "$(git status --porcelain data/idcc-opco.json api/_opco.js)" ]; then
+            maj=$(python3 -c "import json;print(json.load(open('data/idcc-opco.json'))['donnee_maj'])")
+            git config user.name  "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add data/idcc-opco.json api/_opco.js
+            git commit -m "table OPCO : donnée France compétences du $maj"
+            git push
+          else
+            echo "aucun changement : la source n'a pas bougé depuis le dernier passage"
+          fi

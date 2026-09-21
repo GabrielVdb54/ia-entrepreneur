@@ -240,6 +240,8 @@
   /* Detail rows */
   .sim-page .res-detail{margin-top:18px}
   .sim-page .opco-box{padding:13px;border-radius:11px;background:var(--bg-soft);border:1px solid var(--border-sim);margin-bottom:13px}
+.ob-src{font-size:11px;line-height:1.5;color:var(--muted-sim);margin-top:10px;padding-top:9px;border-top:1px solid rgba(10,15,44,.08)}
+.ob-src strong{color:#0A0F2C}
   .sim-page .ob-head{display:flex;align-items:center;gap:9px;margin-bottom:9px}
   .sim-page .ob-ic{width:34px;height:34px;border-radius:8px;background:rgba(37,99,235,.12);display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0}
   .sim-page .ob-info strong{display:block;font-size:13px;font-weight:700;color:var(--navy);margin-bottom:1px}
@@ -590,8 +592,8 @@
       <div class="siren-refine">
         <div class="sr-title">🔍 Optionnel : affiner avec votre SIREN</div>
         <div class="field" style="margin-bottom:8px">
-          <input class="inp" id="sirenInp" type="text" maxlength="9" placeholder="Votre SIREN (9 chiffres)" oninput="onSiren(this)">
-          <div class="hint">Identifie automatiquement votre OPCO et votre entreprise</div>
+          <input class="inp" id="sirenInp" type="text" maxlength="14" placeholder="Votre SIREN (9 chiffres) ou SIRET (14)" oninput="onSiren(this)">
+          <div class="hint">Identifie votre OPCO dans la table officielle de France compétences</div>
         </div>
         <div id="sirenLoad" class="hidden" style="display:flex;align-items:center;gap:7px;font-size:11px;color:var(--muted-sim);padding:3px 0">
           Recherche <div class="ldot"><span></span><span></span><span></span></div>
@@ -685,10 +687,13 @@ const IDCC_MAP={
 // NAF 71 mélange architectes/OPCO EP et bureaux d'études/ATLAS). Le choix ci-dessous privilégie
 // le cas le plus fréquent chez une audience TPE/PME, mais reste une estimation, pas une certitude.
 const NAF_MAP={'64':'ATLAS','65':'ATLAS','66':'ATLAS','69':'ATLAS','70':'ATLAS','71':'ATLAS','73':'AFDAS','47':'OPCO EP','56':'AKTO','96':'OPCO EP','93':'AFDAS','41':'Construction','42':'Construction','43':'Construction','45':'Mobilités','49':'Mobilités','81':'AKTO','78':'AKTO','86':'OPCO EP','87':'Santé','88':'UNIFORMATION','01':'OCAPIAT','02':'OCAPIAT','10':'OCAPIAT'};
-const OPCO_INFO={'ATLAS':{icon:'🏦',desc:'Banque · Finance · Assurance · Conseil',url:'https://www.opco-atlas.fr/entreprise/espace-entreprise.html',label:'myAtlas'},'OPCO EP':{icon:'🏪',desc:'Commerce · Artisanat · Professions libérales',url:'https://acces-formation.opcoep.fr/',label:'OPCO EP'},'AKTO':{icon:'🤝',desc:'Services · Nettoyage · Sécurité',url:'https://www.akto.fr/espace-entreprise/',label:'AKTO'},'AFDAS':{icon:'🎭',desc:'Culture · Médias · Sport',url:'https://www.afdas.com/',label:'AFDAS'},'UNIFORMATION':{icon:'🌿',desc:'Économie sociale',url:'https://www.uniformation.fr/',label:'Uniformation'},'OCAPIAT':{icon:'🌾',desc:'Agriculture · Coopératives',url:'https://www.ocapiat.fr/',label:'OCAPIAT'},'OPCO 2i':{icon:'⚙️',desc:'Industries',url:'https://www.opco2i.fr/espace-entreprise/',label:'OPCO 2i'},'Construction':{icon:'🏗️',desc:'BTP · Travaux publics',url:'https://www.constructys.fr/entreprise/',label:'Constructys'},'Mobilités':{icon:'🚗',desc:'Transport · Automobile',url:'https://www.opcomobilites.fr/entreprise/',label:'Mobilités'},'Santé':{icon:'🏥',desc:'Sanitaire · Social privé',url:'https://www.opco-sante.fr/',label:'Santé'}};
+const OPCO_INFO={'ATLAS':{icon:'🏦',desc:'Banque · Finance · Assurance · Conseil',url:'https://www.opco-atlas.fr/entreprise/espace-entreprise.html',label:'myAtlas'},'OPCO EP':{icon:'🏪',desc:'Commerce · Artisanat · Professions libérales',url:'https://acces-formation.opcoep.fr/',label:'OPCO EP'},'AKTO':{icon:'🤝',desc:'Services · Nettoyage · Sécurité',url:'https://www.akto.fr/espace-entreprise/',label:'AKTO'},'AFDAS':{icon:'🎭',desc:'Culture · Médias · Sport',url:'https://www.afdas.com/',label:'AFDAS'},'UNIFORMATION':{icon:'🌿',desc:'Économie sociale',url:'https://www.uniformation.fr/',label:'Uniformation'},'OCAPIAT':{icon:'🌾',desc:'Agriculture · Coopératives',url:'https://www.ocapiat.fr/',label:'OCAPIAT'},'OPCO 2i':{icon:'⚙️',desc:'Industries',url:'https://www.opco2i.fr/espace-entreprise/',label:'OPCO 2i'},'Construction':{icon:'🏗️',desc:'BTP · Travaux publics',url:'https://www.constructys.fr/entreprise/',label:'Constructys'},'Mobilités':{icon:'🚗',desc:'Transport · Automobile',url:'https://www.opcomobilites.fr/entreprise/',label:'Mobilités'},'Santé':{icon:'🏥',desc:'Sanitaire · Social privé',url:'https://www.opco-sante.fr/',label:'Santé'},'Opcommerce':{icon:'🛒',desc:'Commerce de gros et international',url:'https://www.lopcommerce.com/',label:"L'Opcommerce"}};
+
+// Codes tels qu'ecrits dans la table de France competences -> cles internes ci-dessus.
+const CODE_OPCO={'ATLAS':'ATLAS','OPCO EP':'OPCO EP','AKTO':'AKTO','AFDAS':'AFDAS','OCAPIAT':'OCAPIAT','OPCO2I':'OPCO 2i','CONSTRUCTYS':'Construction','OPCO MOBILITES':'Mobilités','OPCO SANTE':'Santé','UNIFORMATION COHESION SOCIALE':'UNIFORMATION',"L'OPCOMMERCE":'Opcommerce'};
 
 // ══ STATE ══════════════════════════════════════════════
-const S={profil:null,partType:null,struct:null,microAct:null,sal:null,nb:1,secteur:null,opco:null,siren:'',company:null,idcc:''};
+const S={profil:null,partType:null,struct:null,microAct:null,sal:null,nb:1,secteur:null,opco:null,siren:'',company:null,idcc:'',opcoSrc:null,opcoMaj:null,opcoAmbigu:null,opcoEchec:null};
 
 // ══ PARTICULIER CONTENT ════════════════════════════════
 const PART_CONTENT = {
@@ -768,7 +773,7 @@ function pick(key,val,el){
 }
 function isSalariedStruct(){return ['sasu','sarl_min'].includes(S.struct);}
 function pickSect(val,el){
-  S.secteur=val;S.opco=val;
+  S.secteur=val;S.opco=val;S.opcoSrc='secteur';S.opcoMaj=null;S.opcoAmbigu=null;
   document.querySelectorAll('#sectOpts .choice').forEach(c=>c.classList.remove('sel'));
   el.classList.add('sel');
   if(S.sal==='oui'||isSalariedStruct())document.getElementById('btn3').disabled=false;
@@ -868,7 +873,9 @@ function computeAndRenderResults(){
   // ── Render ──
   if(isSalaried&&!S.opco){
     document.getElementById('rMax').textContent='···';
-    document.getElementById('rNote').innerHTML=`<strong>Indiquez votre secteur ou votre SIREN ci-dessous</strong> pour découvrir votre budget OPCO`;
+    document.getElementById('rNote').innerHTML = S.opcoEchec
+      ? `<strong>Votre établissement n'apparaît pas dans la table de France compétences.</strong> Elle ne recense que les employeurs déclarant en DSN : c'est le cas courant d'une entreprise sans salarié ou créée récemment. Saisissez votre code IDCC ci-dessous, ou choisissez votre secteur.`
+      : `<strong>Indiquez votre secteur ou votre SIREN ci-dessous</strong> pour découvrir votre budget OPCO`;
   }else{
     document.getElementById('rMax').textContent=fmt(base);
     document.getElementById('rNote').innerHTML=`<strong>Budget estimé</strong> · Gabriel vous aide à mobiliser chaque dispositif`;
@@ -878,7 +885,19 @@ function computeAndRenderResults(){
   const ob=document.getElementById('opcoBox');
   if(S.opco&&OPCO_INFO[S.opco]){
     const o=OPCO_INFO[S.opco];
-    ob.innerHTML=`<div class="opco-box"><div class="ob-head"><div class="ob-ic">${o.icon}</div><div class="ob-info"><strong>Votre OPCO : ${S.opco}</strong><span>${o.desc}</span></div></div><div class="ob-links"><a href="${o.url}" target="_blank" class="olink ol-p">Accéder à mon espace ${o.label} →</a><a href="https://www.trouver-mon-opco.fr" target="_blank" class="olink ol-s">Vérifier mon rattachement</a></div></div>`;
+    // D'ou vient cette reponse ? Un visiteur qui monte un dossier de financement
+    // a besoin de savoir s'il lit la donnee officielle ou une estimation.
+    const SRC={
+      siret:{t:'✅ Source officielle',d:`Table SIRET-OPCO de France compétences, donnée du ${S.opcoMaj||'?'} — c'est l'affectation retenue par l'administration pour votre établissement.`},
+      idcc:{t:'✅ Source officielle',d:`Déduit de votre convention collective via la table de France compétences, donnée du ${S.opcoMaj||'?'}. L'affectation à un OPCO est une règle de branche.`},
+      local:{t:'⚠️ Estimation',d:"Déduit de votre code d'activité, pas de la table officielle. À confirmer auprès de l'OPCO avant de monter votre dossier."},
+      secteur:{t:'⚠️ Estimation',d:"Déduit du secteur que vous avez choisi. Renseignez votre SIREN ou SIRET ci-dessus pour obtenir l'affectation officielle."}
+    };
+    const src=SRC[S.opcoSrc]||SRC.secteur;
+    const amb=S.opcoAmbigu&&S.opcoAmbigu.length>1
+      ? `<div class="ob-src" style="border-top:1px solid rgba(10,15,44,.08);margin-top:8px;padding-top:8px"><strong>⚠️ Deux OPCO possibles pour cette convention :</strong> ${S.opcoAmbigu.join(' ou ')}. Vérifiez avant de déposer votre dossier.</div>`
+      : '';
+    ob.innerHTML=`<div class="opco-box"><div class="ob-head"><div class="ob-ic">${o.icon}</div><div class="ob-info"><strong>Votre OPCO : ${S.opco}</strong><span>${o.desc}</span></div></div><div class="ob-links"><a href="${o.url}" target="_blank" class="olink ol-p">Accéder à mon espace ${o.label} →</a><a href="https://quel-est-mon-opco.francecompetences.fr/" target="_blank" rel="noopener" class="olink ol-s">Vérifier sur France compétences</a></div><div class="ob-src"><strong>${src.t}</strong> ${src.d}</div>${amb}</div>`;
   }else if(S.sal==='oui'){
     ob.innerHTML=`<div class="opco-box"><div class="ob-head"><div class="ob-ic">🔍</div><div class="ob-info"><strong>OPCO à identifier</strong><span>Renseignez votre SIREN ci-dessous pour un résultat précis</span></div></div><div class="ob-links"><a href="https://www.trouver-mon-opco.fr" target="_blank" class="olink ol-p">Trouver mon OPCO →</a></div></div>`;
   }else ob.innerHTML='';
@@ -967,12 +986,33 @@ function onSiren(el){
   const raw=el.value.replace(/\D/g,'');el.value=raw;S.siren=raw;
   document.getElementById('coCard').classList.add('hidden');el.classList.remove('ok','err');
   clearTimeout(sirenTimer);
-  if(raw.length===9)sirenTimer=setTimeout(()=>fetchSiren(raw),700);
+  if(raw.length===9||raw.length===14)sirenTimer=setTimeout(()=>fetchSiren(raw),700);
+}
+
+// Interroge /api/opco : d'abord la table SIRET-OPCO de France competences, puis
+// la convention collective. Si la fonction est indisponible, on ne casse rien :
+// on renvoie null et l'appelant retombe sur la detection locale (IDCC/NAF).
+async function opcoOfficiel(params){
+  try{
+    const r=await fetch('/api/opco?'+new URLSearchParams(params));
+    if(!r.ok)return null;
+    const d=await r.json();
+    if(!d.trouve)return null;
+    const cle=CODE_OPCO[d.opco.code];
+    if(!cle||!OPCO_INFO[cle])return null;
+    return {cle,src:d.methode,maj:d.donnee_maj,ambigu:d.opco.ambigu?d.opco.candidats.map(c=>c.nom):null};
+  }catch(e){return null;}
+}
+function appliquerOpco(res){
+  if(!res)return false;
+  S.opco=res.cle;S.opcoSrc=res.src;S.opcoMaj=res.maj;S.opcoAmbigu=res.ambigu;
+  return true;
 }
 async function fetchSiren(siren){
   const ld=document.getElementById('sirenLoad');ld.style.display='flex';
   try{
-    const r=await fetch(`https://recherche-entreprises.api.gouv.fr/search?q=${siren}&page=1&per_page=1`);
+    const q=siren.length===14?siren.slice(0,9):siren;
+    const r=await fetch(`https://recherche-entreprises.api.gouv.fr/search?q=${q}&page=1&per_page=1`);
     const d=await r.json();ld.style.display='none';
     if(d.results&&d.results.length>0){
       const c=d.results[0];S.company={name:c.nom_complet||'Entreprise',naf:c.activite_principale||'',nafLabel:c.libelle_activite_principale||''};
@@ -981,13 +1021,27 @@ async function fetchSiren(siren){
       document.getElementById('coCard').classList.remove('hidden');
       document.getElementById('sirenInp').classList.add('ok');
       document.getElementById('idccWrap').classList.toggle('hidden',!(S.sal==='oui'||isSalariedStruct()));
-      const o=detectOPCO(S.idcc,S.company.naf);if(o){S.opco=o;computeAndRenderResults();}
+      // L'OPCO se lit par etablissement : on prend le SIRET saisi, sinon celui du siege.
+      const siret=siren.length===14?siren:(c.siege&&c.siege.siret)||'';
+      S.opcoEchec=null;
+      if(!appliquerOpco(siret?await opcoOfficiel({siret}):null)){
+        const o=detectOPCO(S.idcc,S.company.naf);
+        if(o){S.opco=o;S.opcoSrc='local';S.opcoMaj=null;S.opcoAmbigu=null;}
+        else S.opcoEchec=true;
+      }
+      computeAndRenderResults();
     }else document.getElementById('sirenInp').classList.add('err');
   }catch(e){ld.style.display='none';}
 }
-function onIDCC(el){
+async function onIDCC(el){
   S.idcc=el.value.trim();
-  if(S.company){const o=detectOPCO(S.idcc,S.company.naf);if(o){S.opco=o;el.classList.add('ok');computeAndRenderResults();}else el.classList.remove('ok');}
+  if(!S.idcc){el.classList.remove('ok');return;}
+  if(appliquerOpco(await opcoOfficiel({idcc:S.idcc}))){el.classList.add('ok');computeAndRenderResults();return;}
+  if(S.company){
+    const o=detectOPCO(S.idcc,S.company.naf);
+    if(o){S.opco=o;S.opcoSrc='local';S.opcoMaj=null;S.opcoAmbigu=null;el.classList.add('ok');computeAndRenderResults();}
+    else el.classList.remove('ok');
+  }else el.classList.remove('ok');
 }
 function detectOPCO(idcc,naf){
   if(idcc&&IDCC_MAP[idcc])return IDCC_MAP[idcc];
@@ -996,7 +1050,7 @@ function detectOPCO(idcc,naf){
 }
 // ══ RESTART ════════════════════════════════════════════
 function restart(){
-  Object.assign(S,{profil:null,partType:null,struct:null,microAct:null,sal:null,nb:1,secteur:null,opco:null,siren:'',company:null,idcc:''});
+  Object.assign(S,{profil:null,partType:null,struct:null,microAct:null,sal:null,nb:1,secteur:null,opco:null,siren:'',company:null,idcc:'',opcoSrc:null,opcoMaj:null,opcoAmbigu:null,opcoEchec:null});
   document.querySelectorAll('.choice').forEach(c=>c.classList.remove('sel'));
   document.querySelectorAll('.inp').forEach(i=>{i.value='';i.classList.remove('ok','err');});
   ['microQ','nbWrap','sectWrap','coCard','idccWrap','emailFormWrap','emailFormWrapP','sectSoloHint'].forEach(id=>document.getElementById(id).classList.add('hidden'));
