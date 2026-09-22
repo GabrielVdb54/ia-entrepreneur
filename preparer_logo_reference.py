@@ -5,7 +5,7 @@ preparer_logo_reference.py — Normalise un logo client pour la bande
 « Ils nous font confiance » (images/references/).
 
 Les logos arrivent dans des formats incomparables : 3508x2480 pour GRDF,
-202x164 pour Generali, avec des marges blanches, des cadres gris, de la
+816x368 pour ACF, avec des marges blanches, des cadres gris, de la
 transparence, et parfois un logotype pensé pour fond sombre. Ce script les
 ramène tous à la même hauteur, sans marge, aplatis sur blanc.
 
