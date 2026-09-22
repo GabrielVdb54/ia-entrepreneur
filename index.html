@@ -2062,6 +2062,10 @@
                   <img src="/images/formation-ia-equipes.jpg" alt="Formation IA pour équipes" width="840" height="630" loading="lazy" />
                   <div class="hero-carousel-caption">Formation IA pour équipes</div>
                 </div>
+                <div class="hero-carousel-slide">
+                  <img src="/images/salon-demain-avec-ia.jpg" alt="Atelier prompting animé par IA-Entrepreneur au salon Demain avec l'IA" width="840" height="630" loading="lazy" />
+                  <div class="hero-carousel-caption">Atelier prompting au salon Demain avec l'IA</div>
+                </div>
               </div>
               <button class="hero-carousel-arrow prev" id="carouselPrev" aria-label="Image précédente">
                 <svg width="14" height="14" fill="none" stroke="#0A0F2C" stroke-width="2.5" viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg>
@@ -2074,6 +2078,7 @@
                 <div class="hero-carousel-dot" data-index="1"></div>
                 <div class="hero-carousel-dot" data-index="2"></div>
                 <div class="hero-carousel-dot" data-index="3"></div>
+                <div class="hero-carousel-dot" data-index="4"></div>
               </div>
             </div>
           </div>
@@ -2128,6 +2133,10 @@
           <img src="/images/formation-ia-equipes.jpg" alt="Formation IA pour équipes" width="840" height="630" loading="lazy" />
           <div class="hero-carousel-caption">Formation IA pour équipes</div>
         </div>
+        <div class="hero-carousel-slide">
+          <img src="/images/salon-demain-avec-ia.jpg" alt="Atelier prompting animé par IA-Entrepreneur au salon Demain avec l'IA" width="840" height="630" loading="lazy" />
+          <div class="hero-carousel-caption">Atelier prompting au salon Demain avec l'IA</div>
+        </div>
       </div>
       <button class="hero-carousel-arrow prev" id="carouselMobilePrev" aria-label="Précédent">
         <svg width="14" height="14" fill="none" stroke="#0A0F2C" stroke-width="2.5" viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg>
@@ -2140,6 +2149,7 @@
         <div class="hero-carousel-dot" data-index="1"></div>
         <div class="hero-carousel-dot" data-index="2"></div>
         <div class="hero-carousel-dot" data-index="3"></div>
+        <div class="hero-carousel-dot" data-index="4"></div>
       </div>
     </div>
   </div>
@@ -3008,7 +3018,7 @@
     const carouselTrack = document.getElementById('heroCarouselTrack');
     const carouselDots = document.querySelectorAll('.hero-carousel-dot');
     let currentSlide = 0;
-    const totalSlides = 4;
+    const totalSlides = carouselTrack.children.length;
 
     const carouselEl = document.getElementById('heroCarousel');
 
@@ -3033,7 +3043,8 @@
     let mTimer;
 
     function mGoTo(n) {
-      mSlide = ((n % 4) + 4) % 4;
+      const mTotal = mTrack.children.length;
+      mSlide = ((n % mTotal) + mTotal) % mTotal;
       const w = mEl.offsetWidth;
       mTrack.style.transform = 'translateX(-' + (mSlide * w) + 'px)';
       mDots.forEach((d, i) => d.classList.toggle('active', i === mSlide));
