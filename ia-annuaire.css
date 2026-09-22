@@ -283,7 +283,7 @@ footer{
 
     #annuaire { scroll-margin-top: 190px; }
     /* ── La conversation ─────────────────────────────────────────────── */
-    .ia-chat { padding:110px 0 44px; background:linear-gradient(180deg, var(--bg2), var(--bg)); }
+    .ia-chat { padding:110px 0 44px; background:var(--bg2); }
     .ia-chat h1 { font-size:clamp(1.8rem,4vw,2.7rem); line-height:1.15; letter-spacing:-0.02em; margin-bottom:14px; }
     .ia-chat p.lead { font-size:1.02rem; color:var(--muted); max-width:640px; margin-bottom:26px; }
 
@@ -506,7 +506,7 @@ footer{
     .ia-faq details[open] summary::after { content:"–"; }
     .ia-faq .answer { padding:0 20px 18px; color:var(--muted); font-size:0.9rem; line-height:1.65; }
 
-    .ia-cta { background:linear-gradient(135deg, var(--primary), #4B6BFF); color:#fff; border-radius:20px; padding:38px; text-align:center; }
+    .ia-cta { background:var(--primary); color:#fff; border-radius:20px; padding:38px; text-align:center; }
     .ia-cta h2 { color:#fff; margin-bottom:10px; }
     .ia-cta p { color:rgba(255,255,255,0.9); max-width:620px; margin:0 auto 22px; }
     .ia-cta .btn { background:#fff; color:var(--primary); }

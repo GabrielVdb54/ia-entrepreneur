@@ -84,7 +84,6 @@
     overflow-x:hidden;
     color:var(--navy);
   }
-  .sim-page::before{content:'';position:fixed;inset:0;pointer-events:none;background:radial-gradient(ellipse 60% 45% at 8% 6%,rgba(37,99,235,.06) 0%,transparent 65%),radial-gradient(ellipse 45% 40% at 92% 90%,rgba(16,185,129,.06) 0%,transparent 65%);z-index:0}
   .sim-page .wrap{width:100%;max-width:600px;position:relative;z-index:1}
 
   /* HEADER interne du simulateur */
@@ -161,12 +160,12 @@
 
   /* BUTTONS */
   .sim-page .btn{width:100%;padding:13px 18px;border-radius:11px;border:none;font-family:inherit;font-size:14px;font-weight:700;cursor:pointer;transition:all .18s;margin-top:14px}
-  .sim-page .btn-p{background:linear-gradient(135deg,var(--blue),var(--blue2));color:#fff;box-shadow:0 4px 14px rgba(37,99,235,.22)}
+  .sim-page .btn-p{background:var(--blue);color:#fff;box-shadow:0 4px 14px rgba(37,99,235,.22)}
   .sim-page .btn-p:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 6px 20px rgba(37,99,235,.3)}
   .sim-page .btn-p:disabled{opacity:.35;cursor:not-allowed;transform:none!important;box-shadow:none}
   .sim-page .btn-g{background:transparent;color:var(--muted-sim);border:1px solid var(--border-sim);margin-top:8px;font-size:13px;font-weight:500}
   .sim-page .btn-g:hover{color:var(--navy);border-color:var(--muted2);background:var(--bg-soft)}
-  .sim-page .btn-green{background:linear-gradient(135deg,var(--green),var(--green2));color:#fff;box-shadow:0 4px 14px rgba(16,185,129,.22)}
+  .sim-page .btn-green{background:var(--green);color:#fff;box-shadow:0 4px 14px rgba(16,185,129,.22)}
   .sim-page .btn-green:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 6px 20px rgba(16,185,129,.3)}
   .sim-page .btn-green:disabled{opacity:.35;cursor:not-allowed;transform:none!important}
   .sim-page .btn-blue-outline{background:transparent;color:var(--blue);border:1.5px solid rgba(37,99,235,.35);margin-top:8px;font-size:14px;font-weight:600}
@@ -198,7 +197,7 @@
   .sim-page .cta-pair{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:16px}
   .sim-page .cta-btn{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;padding:14px 12px;border-radius:12px;font-family:inherit;font-size:13px;font-weight:700;text-decoration:none;cursor:pointer;border:none;transition:all .18s;text-align:center;line-height:1.3}
   .sim-page .cta-btn .cb-icon{font-size:20px}
-  .sim-page .cta-primary{background:linear-gradient(135deg,var(--green),var(--green2));color:#fff;box-shadow:0 4px 14px rgba(16,185,129,.25)}
+  .sim-page .cta-primary{background:var(--green);color:#fff;box-shadow:0 4px 14px rgba(16,185,129,.25)}
   .sim-page .cta-primary:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(16,185,129,.35)}
   .sim-page .cta-secondary{background:rgba(37,99,235,.08);color:var(--blue);border:1.5px solid rgba(37,99,235,.3)}
   .sim-page .cta-secondary:hover{background:rgba(37,99,235,.14);border-color:var(--blue);transform:translateY(-1px)}
@@ -217,11 +216,11 @@
   .sim-page .ra-note strong{color:var(--green2)}
 
   /* Accroche + CTA in results */
-  .sim-page .hook{background:linear-gradient(135deg,rgba(37,99,235,.06),rgba(16,185,129,.06));border:1px solid rgba(37,99,235,.15);border-radius:12px;padding:12px 14px;text-align:center;font-size:13px;font-weight:700;color:var(--navy);margin-bottom:14px}
+  .sim-page .hook{background:rgba(37,99,235,.06);border:1px solid rgba(37,99,235,.15);border-radius:12px;padding:12px 14px;text-align:center;font-size:13px;font-weight:700;color:var(--navy);margin-bottom:14px}
 
   .sim-page .res-cta-block{margin-bottom:20px}
   .sim-page .res-cta-block .cta-label{font-size:11px;font-weight:600;color:var(--muted-sim);text-align:center;margin-bottom:10px;text-transform:uppercase;letter-spacing:.06em}
-  .sim-page .res-cta-main{width:100%;padding:15px;border-radius:12px;border:none;font-family:inherit;font-size:15px;font-weight:700;cursor:pointer;background:linear-gradient(135deg,var(--green),var(--green2));color:#fff;box-shadow:0 5px 18px rgba(16,185,129,.28);transition:all .2s;text-decoration:none;display:block;text-align:center}
+  .sim-page .res-cta-main{width:100%;padding:15px;border-radius:12px;border:none;font-family:inherit;font-size:15px;font-weight:700;cursor:pointer;background:var(--green);color:#fff;box-shadow:0 5px 18px rgba(16,185,129,.28);transition:all .2s;text-decoration:none;display:block;text-align:center}
   .sim-page .res-cta-main:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(16,185,129,.38)}
   .sim-page .email-toggle-btn{width:100%;padding:12px;border-radius:11px;border:1.5px solid var(--border-sim);background:transparent;font-family:inherit;font-size:13px;font-weight:600;color:var(--muted-sim);cursor:pointer;transition:all .18s;margin-top:8px;display:flex;align-items:center;justify-content:center;gap:6px}
   .sim-page .email-toggle-btn:hover{border-color:var(--muted2);color:var(--navy);background:var(--bg-soft)}
@@ -229,7 +228,7 @@
   /* Email form inline */
   .sim-page .email-form-wrap{background:var(--bg-soft);border:1px solid var(--border-sim);border-radius:14px;padding:16px;margin-top:10px;animation:fu .3s ease}
   .sim-page .ef-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px}
-  .sim-page .ef-submit{width:100%;padding:11px;border-radius:9px;border:none;font-family:inherit;font-size:13px;font-weight:700;cursor:pointer;background:linear-gradient(135deg,var(--green),var(--green2));color:#fff;transition:all .18s}
+  .sim-page .ef-submit{width:100%;padding:11px;border-radius:9px;border:none;font-family:inherit;font-size:13px;font-weight:700;cursor:pointer;background:var(--green);color:#fff;transition:all .18s}
   .sim-page .ef-submit:hover:not(:disabled){transform:translateY(-1px)}
   .sim-page .ef-submit:disabled{opacity:.4;cursor:not-allowed}
   .sim-page .ec-success{text-align:center;padding:12px;background:rgba(16,185,129,.07);border:1px solid rgba(16,185,129,.2);border-radius:10px;margin-top:10px}

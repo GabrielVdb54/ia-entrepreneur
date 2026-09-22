@@ -58,7 +58,7 @@
     .pricing-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;align-items:stretch}
     .pricing-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:40px 32px 36px;position:relative;display:flex;flex-direction:column;transition:border-color 0.3s,transform 0.3s,box-shadow 0.3s}
     .pricing-card:hover{transform:translateY(-6px);box-shadow:0 20px 50px rgba(10,15,44,0.10)}
-    .pricing-card.featured{border:2px solid var(--primary);background:linear-gradient(165deg,rgba(26,60,255,0.08) 0%,var(--card) 40%);transform:scale(1.04);z-index:2}
+    .pricing-card.featured{border:2px solid var(--primary);background:rgba(26,60,255,0.08);transform:scale(1.04);z-index:2}
     .pricing-card.featured:hover{transform:scale(1.04) translateY(-6px);box-shadow:0 24px 60px rgba(26,60,255,0.2)}
     .pricing-badge{position:absolute;top:-14px;left:50%;transform:translateX(-50%);padding:6px 20px;border-radius:50px;font-size:0.75rem;font-weight:800;letter-spacing:0.1em;text-transform:uppercase;background:var(--primary);color:#fff;box-shadow:0 4px 16px rgba(26,60,255,0.4);white-space:nowrap}
     .pricing-icon{font-size:2rem;margin-bottom:16px}
@@ -84,14 +84,13 @@
     .valeur-card p{font-size:0.86rem;color:var(--muted);line-height:1.65}
 
     .methode-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:32px;position:relative}
-    .methode-grid::before{content:'';position:absolute;top:36px;left:12%;right:12%;height:2px;background:linear-gradient(90deg,var(--accent),var(--primary));opacity:0.12;z-index:0}
+    .methode-grid::before{content:'';position:absolute;top:36px;left:12%;right:12%;height:2px;background:var(--accent);opacity:0.12;z-index:0}
     .methode-step{text-align:center;position:relative;z-index:1}
     .methode-num{width:72px;height:72px;border-radius:50%;background:var(--bg2);border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:1.6rem;margin:0 auto 16px}
     .methode-step h4{font-size:1rem;font-weight:700;margin-bottom:8px}
     .methode-step p{font-size:0.86rem;color:var(--muted);line-height:1.65}
 
-    .page-hero{margin-top:68px;padding:80px 0 64px;background:linear-gradient(180deg,var(--bg2) 0%,var(--bg) 100%);position:relative;overflow:hidden}
-    .page-hero::after{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 60% 60% at 50% 0%,rgba(16,185,129,0.08),transparent 70%);pointer-events:none}
+    .page-hero{margin-top:68px;padding:80px 0 64px;background:var(--bg2);position:relative;overflow:hidden}
     .page-hero-inner{position:relative}
     .page-hero-badge{display:inline-flex;align-items:center;gap:8px;padding:6px 16px;background:rgba(16,185,129,0.08);border:1px solid rgba(16,185,129,0.25);border-radius:50px;font-size:0.82rem;font-weight:600;color:var(--accent);margin-bottom:20px}
     .page-hero h1{font-size:clamp(2rem,4.5vw,3.2rem);font-weight:800;line-height:1.12;margin-bottom:20px}
@@ -99,7 +98,7 @@
     .page-hero p{font-size:1.05rem;color:var(--muted);max-width:620px;line-height:1.8;margin-bottom:36px}
     .page-hero-actions{display:flex;gap:14px;flex-wrap:wrap}
 
-    .cta-section{padding:80px 0;text-align:center;background:linear-gradient(135deg,rgba(26,60,255,0.04),rgba(16,185,129,0.04));border-top:1px solid var(--border);border-bottom:1px solid var(--border)}
+    .cta-section{padding:80px 0;text-align:center;background:rgba(26,60,255,0.04);border-top:1px solid var(--border);border-bottom:1px solid var(--border)}
     .cta-section h2{font-size:clamp(1.5rem,3vw,2.2rem);font-weight:800;margin-bottom:14px}
     .cta-section p{color:var(--muted);font-size:0.97rem;max-width:520px;margin:0 auto 32px;line-height:1.8}
 
