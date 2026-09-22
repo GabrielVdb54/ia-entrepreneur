@@ -219,7 +219,19 @@
       .matrix th[scope=row] span{font-size:0.85rem!important}
       .matrix-yes span{font-size:0.86rem!important}
     }
-  </style>
+  
+    /* ── BANDE DE RÉFÉRENCES ──
+       Les logos sont aplatis sur blanc a la generation, donc la bande doit
+       rester sur fond blanc. height + max-width + object-fit:contain : sans
+       object-fit, un logotype large comme TurboHero serait ecrase. */
+    .refs-band{padding:46px 0;background:#fff;border-top:1px solid var(--border);border-bottom:1px solid var(--border)}
+    .refs-titre{text-align:center;font-size:0.76rem;font-weight:800;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted);margin-bottom:28px}
+    .refs-logos{display:flex;align-items:center;justify-content:center;gap:30px 40px;flex-wrap:wrap}
+    .refs-logos img{height:46px;width:auto;max-width:180px;object-fit:contain;opacity:.82;transition:opacity .2s}
+    .refs-logos img:hover{opacity:1}
+    .refs-note{text-align:center;font-size:0.8rem;color:var(--muted);margin-top:24px;line-height:1.6;max-width:720px;margin-left:auto;margin-right:auto}
+    @media(max-width:768px){.refs-band{padding:34px 0}.refs-logos{gap:24px 30px}.refs-logos img{height:34px;max-width:124px}}
+</style>
   <link rel="stylesheet" href="/mobile.css" />
 
   <script type="application/ld+json">{"@context":"https://schema.org","@type":"VideoObject","name":"Formation IA en entreprise : comment on construit un programme sur mesure","description":"En 18 secondes : pourquoi vos equipes perdent des heures que l'IA fait en minutes, comment IA-Entrepreneur construit un programme calibre sur vos process, vos outils et vos metiers, et comment le financer via votre OPCO. Organisme certifie Qualiopi.","thumbnailUrl":["https://ia-entrepreneur.fr/videos/ia-societes-4x5.jpg"],"uploadDate":"2026-09-08T15:20:06+02:00","duration":"PT18S","contentUrl":"https://ia-entrepreneur.fr/videos/ia-societes-4x5.mp4","publisher":{"@type":"Organization","name":"IA-Entrepreneur","url":"https://ia-entrepreneur.fr"},"inLanguage":"fr-FR","url":"https://ia-entrepreneur.fr/formation-ia-entreprise.html"}</script>
@@ -318,6 +330,23 @@
           <span class="outil-chip">Mistral<small>modèle français, données en Europe</small></span>
         </div>
       </div>
+    </div>
+  </section>
+
+  <!-- ── Références ─────────────────────────────────────────────── -->
+  <section class="refs-band">
+    <div class="container">
+      <p class="refs-titre">Ils nous font confiance</p>
+      <div class="refs-logos">
+        <img src="/images/references/grdf.png" alt="GRDF" width="292" height="120" loading="lazy" decoding="async" />
+        <img src="/images/references/bpifrance.png" alt="Bpifrance" width="416" height="120" loading="lazy" decoding="async" />
+        <img src="/images/references/generali.png" alt="Generali" width="148" height="120" loading="lazy" decoding="async" />
+        <img src="/images/references/apec.png" alt="Apec" width="379" height="120" loading="lazy" decoding="async" />
+        <img src="/images/references/grand-nancy-innovation.png" alt="Grand Nancy Innovation" width="181" height="120" loading="lazy" decoding="async" />
+        <img src="/images/references/turbohero.png" alt="TurboHero" width="772" height="120" loading="lazy" decoding="async" />
+        <img src="/images/references/ux-key.png" alt="UX Key" width="137" height="120" loading="lazy" decoding="async" />
+      </div>
+      <p class="refs-note">De l'ETI au grand compte, en passant par les institutions publiques : le programme s'adapte à la taille de l'équipe comme au niveau de départ.</p>
     </div>
   </section>
 
