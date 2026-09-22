@@ -14,7 +14,6 @@
   <link rel="icon" type="image/png" href="/favicon.png" />
   <link rel="apple-touch-icon" href="/favicon.png" />
 
-
   <!-- ── SEO ─────────────────────────────────────────────────── -->
   <title>Formation IA en entreprise & coaching IA | IA-Entrepreneur</title>
   <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1" />
@@ -130,7 +129,6 @@
     .hero-desc {
       text-align: left;
     }
-
 
     a { color: inherit; text-decoration: none; }
     img { display: block; max-width: 100%; }
@@ -434,33 +432,6 @@
     }
 
     /* Animated background grid */
-    .hero-grid {
-      position: absolute;
-      inset: 0;
-      background-image:
-        linear-gradient(rgba(26,60,255,0.05) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(26,60,255,0.05) 1px, transparent 1px);
-      background-size: 60px 60px;
-      mask-image: radial-gradient(ellipse 80% 70% at 50% 40%, black 30%, transparent 100%);
-    }
-
-    /* Glow blobs */
-    .blob {
-      position: absolute;
-      border-radius: 50%;
-      filter: blur(100px);
-      pointer-events: none;
-    }
-    .blob-1 {
-      width: 600px; height: 600px;
-      background: rgba(26,60,255,0.08);
-      top: -200px; right: -150px;
-    }
-    .blob-2 {
-      width: 400px; height: 400px;
-      background: rgba(16,185,129,0.07);
-      bottom: -100px; left: -100px;
-    }
 
     /* Hero 2-col layout */
     .hero-layout {
@@ -485,18 +456,7 @@
       position: relative;
       display: inline-block;
     }
-    .hero-photo-glow {
-      position: absolute;
-      top: 20%;
-      left: 10%;
-      right: 10%;
-      bottom: 0;
-      border-radius: 50%;
-      background: rgba(26,60,255,0.10);
-      filter: blur(60px);
-      z-index: 0;
-      animation: float 3s ease-in-out infinite;
-    }
+    
     .hero-photo {
       position: relative;
       z-index: 1;
@@ -508,7 +468,6 @@
       animation: float 3s ease-in-out infinite;
       filter: drop-shadow(0 20px 40px rgba(26,60,255,0.3));
     }
-
 
     /* ── Carousel mobile uniquement ─────────────────────────── */
     #carouselMobileWrap { display: none; }
@@ -658,12 +617,7 @@
       letter-spacing: -0.03em;
       margin-bottom: 24px;
     }
-    .hero-title .gradient {
-      background: linear-gradient(135deg, #1A3CFF 0%, #2d4fff 50%, #10B981 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-    }
+    .hero-title .gradient {color:var(--primary)}
 
     .hero-desc {
       font-size: 1.1rem;
@@ -1053,22 +1007,8 @@
       padding: 48px 32px;
       text-align: center;
     }
-    .chiffre-num {
-      font-size: clamp(2.5rem, 5vw, 3.5rem);
-      font-weight: 800;
-      letter-spacing: -0.04em;
-      line-height: 1;
-      margin-bottom: 8px;
-      background: linear-gradient(135deg, var(--text), var(--muted));
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-    }
-    .chiffre-num.accent {
-      background: linear-gradient(135deg, var(--accent), #34d399);
-      -webkit-background-clip: text;
-      background-clip: text;
-    }
+    .chiffre-num {font-size: clamp(2.5rem, 5vw, 3.5rem);font-weight: 800;letter-spacing: -0.04em;line-height: 1;margin-bottom: 8px;color: var(--text)}
+    .chiffre-num.accent {color: var(--accent)}
     .chiffre-label {
       font-size: 0.88rem;
       font-weight: 600;
@@ -1540,7 +1480,6 @@
         width: 160px;
         height: 160px;
       }
-      .hero-photo-glow { display: none; }
       .hero-title { font-size: clamp(1.6rem, 7vw, 2rem) !important; white-space: normal !important; }
       .hero-stats { grid-template-columns: 1fr 1fr; gap: 12px; }
       .hero-stat span { white-space: normal; }
@@ -1593,8 +1532,6 @@
         display: none !important;
       }
     }
-
-
 
     /* ── Pricing compact mobile ────────────────────────────── */
     @media (max-width: 768px) {
@@ -1968,6 +1905,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="/mobile.css" />
+  <link rel="stylesheet" href="/nav-dropdown.css">
   <!-- Preload image hero (LCP) -->
   <link rel="preload" as="image" href="/images/formation-2.jpg" />
   <script type="application/ld+json">{"@context":"https://schema.org","@type":"VideoObject","name":"Formation IA en entreprise : comment on construit un programme sur mesure","description":"En 18 secondes : pourquoi vos equipes perdent des heures que l'IA fait en minutes, comment IA-Entrepreneur construit un programme calibre sur vos process, vos outils et vos metiers, et comment le financer via votre OPCO. Organisme certifie Qualiopi.","thumbnailUrl":["https://ia-entrepreneur.fr/videos/ia-societes-4x5.jpg"],"uploadDate":"2026-09-08T15:20:06+02:00","duration":"PT18S","contentUrl":"https://ia-entrepreneur.fr/videos/ia-societes-4x5.mp4","publisher":{"@type":"Organization","name":"IA-Entrepreneur","url":"https://ia-entrepreneur.fr"},"inLanguage":"fr-FR","url":"https://ia-entrepreneur.fr/"}</script>
@@ -1994,9 +1932,43 @@
           <span style="display:block;font-size:0.7rem;font-weight:500;color:var(--muted);letter-spacing:0.03em;margin-top:2px;">Organisme de formation certifié Qualiopi</span>
         </a>
         <nav>
-        <a href="/formation-ia-entreprise.html">Formations IA</a>
-        <a href="/integrations-ia.html">Intégrations IA</a>
-        <a href="/meilleures-ia.html">Meilleures IA</a>
+        <div class="nav-item">
+          <a href="/formation-ia-entreprise.html">Formations IA<svg class="nav-chevron" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></a>
+          <div class="nav-menu"><div class="nav-menu-inner">
+            <a href="/formation-ia-entreprise.html">Former mes équipes à l'IA</a>
+            <a href="/formation-ia-independant.html">Me former, je suis indépendant</a>
+            <a href="/formation-chatgpt-entreprise.html">Maîtriser ChatGPT au quotidien</a>
+            <a href="/formation-microsoft-copilot-entreprise.html">Exploiter Microsoft Copilot</a>
+            <a href="/formation-ia-automatisation.html">Créer mes propres automatisations</a>
+            <a href="/formation-ia-obligatoire-ai-act.html">Me mettre en conformité AI Act</a>
+            <a href="/coaching-ia-dirigeant.html">Être accompagné en individuel</a>
+          </div></div>
+        </div>
+        <div class="nav-item">
+          <a href="/integrations-ia.html">Intégrations IA<svg class="nav-chevron" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></a>
+          <div class="nav-menu"><div class="nav-menu-inner">
+            <a href="/integration-chatbot-client.html">Créer mon chatbot client</a>
+            <a href="/integration-prospection-linkedin.html">Automatiser ma prospection LinkedIn</a>
+            <a href="/integration-reponse-email.html">Répondre à mes emails automatiquement</a>
+            <a href="/integration-compte-rendu-reunion.html">Générer mes comptes rendus de réunion</a>
+            <a href="/integration-contenu-seo.html">Produire mon contenu SEO</a>
+            <a href="/integration-veille-concurrentielle.html">Surveiller mes concurrents</a>
+            <a href="/integration-rapport-performance.html">Automatiser mes rapports d'activité</a>
+            <a href="/integrations-ia.html" class="nav-menu-tout">Voir toutes les intégrations →</a>
+          </div></div>
+        </div>
+        <div class="nav-item">
+          <a href="/meilleures-ia.html">Meilleures IA<svg class="nav-chevron" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></a>
+          <div class="nav-menu"><div class="nav-menu-inner">
+            <a href="/ia/meilleures-ia-assistants-ia.html">Quel assistant IA choisir</a>
+            <a href="/ia/meilleures-ia-automatisation.html">Automatisation et agents IA</a>
+            <a href="/ia/meilleures-ia-prospection-vente.html">Prospection, vente et CRM</a>
+            <a href="/ia/meilleures-ia-redaction-contenu.html">Rédaction et contenu marketing</a>
+            <a href="/ia/meilleures-ia-reunions-notes.html">Réunions, notes et transcription</a>
+            <a href="/ia/meilleures-ia-images-design.html">Images, design et vidéo</a>
+            <a href="/meilleures-ia.html" class="nav-menu-tout">Voir l'annuaire complet →</a>
+          </div></div>
+        </div>
         <a href="/nos-formateurs.html">Nos formateurs</a>
         <a class="nav-tel tel-reveal" role="button" tabindex="0" data-tel="MzEgNzAgODkgNDEgNjA=" aria-label="Afficher le numéro de téléphone"><svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.362 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.338 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg><span class="tel-value">Afficher le numéro</span></a>
         <a href="https://calendly.com/gabriel-ia-entrepreneur/decouverte" target="_blank" rel="noopener noreferrer" class="nav-cta">Appel gratuit</a>
@@ -2021,9 +1993,6 @@
 
   <!-- ── Hero ─────────────────────────────────────────────────── -->
   <section id="accueil">
-    <div class="hero-grid"></div>
-    <div class="blob blob-1"></div>
-    <div class="blob blob-2"></div>
     <div class="container">
       <div class="hero-layout">
 
@@ -2075,7 +2044,6 @@
         <!-- Colonne droite : carousel photos -->
         <div class="hero-photo-col">
           <div class="hero-photo-wrapper" style="width:100%;">
-            <div class="hero-photo-glow"></div>
             <div class="hero-carousel" id="heroCarousel">
               <div class="hero-carousel-track" id="heroCarouselTrack">
                 <div class="hero-carousel-slide">
@@ -2115,7 +2083,6 @@
     </div>
   </section>
 
-
   <!-- ── Stats Impact ──────────────────────────────────────────── -->
   <div style="background:var(--primary);border-top:1px solid var(--border);border-bottom:1px solid var(--border);padding:20px 0;">
     <div class="container">
@@ -2140,7 +2107,6 @@
       </div>
     </div>
   </div>
-
 
   <!-- ── Carousel mobile uniquement ──────────────────────────── -->
   <div id="carouselMobileWrap" style="padding:24px 0 8px;">
@@ -2373,7 +2339,6 @@
       </div>
     </div>
   </section>
-
 
   <!-- ── Pourquoi ça marche ───────────────────────────────── -->
   <section style="padding:50px 0;position:relative;overflow:hidden;">
@@ -2846,7 +2811,6 @@
       </div>
     </div>
   </section>
-
 
   <footer>
     <div class="container">

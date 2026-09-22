@@ -1,0 +1,109 @@
+/*
+ * nav-dropdown.css — Menus déroulants de la barre du haut.
+ *
+ * Le style de la barre est dupliqué en ligne dans chaque page ; celui des
+ * menus déroulants ne pouvait pas l'être sur 316 pages sans devenir
+ * impossible à corriger. D'où cette deuxième feuille partagée, posée par
+ * simplifier_nav.py et generate_ia_pages.py en même temps que le <nav>.
+ *
+ * Deux contraintes qui expliquent le code :
+ *   - Les pages déclarent déjà `nav a { ... }`. Les liens du menu sont des
+ *     descendants de <nav>, donc ils héritent de ce style. Il faut une
+ *     spécificité supérieure (`nav .nav-menu a`) pour le neutraliser.
+ *   - Sans JavaScript : ouverture au survol et au clavier (`:focus-within`),
+ *     ce qui évite d'ajouter un script sur un site qui n'en a pas besoin.
+ *     Le lien parent reste un vrai lien vers la page pilier.
+ *
+ * Sous 768 px la barre est masquée au profit du menu déroulant mobile :
+ * ces règles n'y jouent aucun rôle.
+ */
+
+.nav-item {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+/* Le chevron tourne quand le menu s'ouvre : seul indice visuel que
+   l'entrée en cache d'autres. */
+.nav-item > a > .nav-chevron {
+  margin-left: 4px;
+  transition: transform .18s ease;
+  flex-shrink: 0;
+}
+.nav-item:hover > a > .nav-chevron,
+.nav-item:focus-within > a > .nav-chevron {
+  transform: rotate(180deg);
+}
+
+.nav-menu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  z-index: 200;
+  min-width: 272px;
+  /* Le padding haut sert de pont : sans lui, le curseur qui descend du lien
+     vers le menu traverse un vide et le menu se referme. */
+  padding: 10px 0 0;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-6px);
+  transition: opacity .18s ease, transform .18s ease, visibility .18s;
+}
+.nav-item:hover > .nav-menu,
+.nav-item:focus-within > .nav-menu {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+.nav-menu-inner {
+  background: #fff;
+  border: 1px solid rgba(10, 15, 44, 0.10);
+  border-radius: 14px;
+  box-shadow: 0 12px 40px rgba(10, 15, 44, 0.13);
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+nav .nav-menu a {
+  display: block;
+  padding: 9px 12px;
+  border-radius: 9px;
+  font-size: 0.86rem;
+  font-weight: 600;
+  line-height: 1.4;
+  color: #0A0F2C;
+  white-space: normal;
+  transition: background .15s ease, color .15s ease;
+}
+nav .nav-menu a:hover,
+nav .nav-menu a:focus-visible {
+  background: rgba(26, 60, 255, 0.06);
+  color: #1A3CFF;
+}
+
+/* Dernière entrée : le lien vers la page pilier, détaché du reste. */
+nav .nav-menu a.nav-menu-tout {
+  margin-top: 5px;
+  padding-top: 12px;
+  border-top: 1px solid rgba(10, 15, 44, 0.08);
+  border-radius: 0 0 9px 9px;
+  font-size: 0.82rem;
+  color: #1A3CFF;
+}
+
+/* Le dernier menu de la barre déborderait à droite sur un écran étroit. */
+.nav-item:last-of-type .nav-menu {
+  left: auto;
+  right: 0;
+}
+
+/* La barre du haut laisse place au menu hamburger dès 900 px (et non 768 :
+   le bouton « Afficher le numéro » est plus large que le numéro qu'il
+   remplace). Les menus déroulants n'ont donc plus lieu d'être en dessous. */
+@media (max-width: 900px) {
+  .nav-menu { display: none; }
+}

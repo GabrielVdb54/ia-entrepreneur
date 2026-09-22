@@ -570,8 +570,59 @@ TEL_REVEAL_FOOTER = (f'<a class="tel-reveal" style="display:inline-flex;align-it
                      '📞 <span class="tel-value">Afficher le numéro</span></a>')
 
 
+CHEVRON = ('<svg class="nav-chevron" width="11" height="11" viewBox="0 0 24 24" fill="none" '
+           'stroke="currentColor" stroke-width="3" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>')
+
+# Menus déroulants : doivent rester identiques à ceux de simplifier_nav.py,
+# qui fait le même travail pour les pages racine et le blog. Toute
+# modification se fait dans les deux fichiers, puis on relance les deux.
+MENUS_NAV = [
+    ('/formation-ia-entreprise.html', 'Formations IA', [
+        ("Former mes équipes à l'IA",             '/formation-ia-entreprise.html'),
+        ("Me former, je suis indépendant",        '/formation-ia-independant.html'),
+        ("Maîtriser ChatGPT au quotidien",        '/formation-chatgpt-entreprise.html'),
+        ("Exploiter Microsoft Copilot",           '/formation-microsoft-copilot-entreprise.html'),
+        ("Créer mes propres automatisations",     '/formation-ia-automatisation.html'),
+        ("Me mettre en conformité AI Act",        '/formation-ia-obligatoire-ai-act.html'),
+        ("Être accompagné en individuel",         '/coaching-ia-dirigeant.html'),
+    ], None),
+    ('/integrations-ia.html', 'Intégrations IA', [
+        ("Créer mon chatbot client",              '/integration-chatbot-client.html'),
+        ("Automatiser ma prospection LinkedIn",   '/integration-prospection-linkedin.html'),
+        ("Répondre à mes emails automatiquement", '/integration-reponse-email.html'),
+        ("Générer mes comptes rendus de réunion", '/integration-compte-rendu-reunion.html'),
+        ("Produire mon contenu SEO",              '/integration-contenu-seo.html'),
+        ("Surveiller mes concurrents",            '/integration-veille-concurrentielle.html'),
+        ("Automatiser mes rapports d'activité",   '/integration-rapport-performance.html'),
+    ], ('Voir toutes les intégrations', '/integrations-ia.html')),
+    ('/meilleures-ia.html', 'Meilleures IA', [
+        ("Quel assistant IA choisir",             '/ia/meilleures-ia-assistants-ia.html'),
+        ("Automatisation et agents IA",           '/ia/meilleures-ia-automatisation.html'),
+        ("Prospection, vente et CRM",             '/ia/meilleures-ia-prospection-vente.html'),
+        ("Rédaction et contenu marketing",        '/ia/meilleures-ia-redaction-contenu.html'),
+        ("Réunions, notes et transcription",      '/ia/meilleures-ia-reunions-notes.html'),
+        ("Images, design et vidéo",               '/ia/meilleures-ia-images-design.html'),
+    ], ("Voir l'annuaire complet", '/meilleures-ia.html')),
+]
+
+
+def bloc_nav():
+    blocs = []
+    for url, libelle, entrees, tout in MENUS_NAV:
+        liens = '\n'.join(f'            <a href="{u}">{t}</a>' for t, u in entrees)
+        if tout:
+            liens += f'\n            <a href="{tout[1]}" class="nav-menu-tout">{tout[0]} →</a>'
+        blocs.append(f'        <div class="nav-item">\n'
+                     f'          <a href="{url}">{libelle}{CHEVRON}</a>\n'
+                     f'          <div class="nav-menu"><div class="nav-menu-inner">\n{liens}\n'
+                     f'          </div></div>\n'
+                     f'        </div>')
+    blocs.append('        <a href="/nos-formateurs.html">Nos formateurs</a>')
+    return '\n'.join(blocs)
+
+
 def header_html():
-    nav = '\n'.join(f'        <a href="{u}">{t}</a>' for u, t in NAV_ITEMS)
+    nav = bloc_nav()
     mob = '\n'.join(f'    <a href="{u}">{t}</a>' for u, t in MENU_MOBILE)
     mob += f'\n    {TEL_REVEAL_MENU}'
     return f"""  <header id="header">
@@ -712,6 +763,7 @@ def head_html(title, desc, canonical, jsonld, keywords='', og_type='website',
 {ld}
   <link rel="stylesheet" href="/ia-annuaire.css" />
   <link rel="stylesheet" href="/mobile.css" />
+  <link rel="stylesheet" href="/nav-dropdown.css" />
   <script src="/ia-annuaire.js" defer></script>
   <script defer src="/tel-reveal.js"></script>
 </head>

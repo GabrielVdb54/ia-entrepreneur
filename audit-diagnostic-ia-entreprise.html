@@ -153,7 +153,7 @@
   <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" />
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" media="print" onload="this.media='all'" />
   <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" /></noscript>
-  <link rel="stylesheet" href="/mobile.css">
+  <link rel="stylesheet" href="/mobile.css"><link rel="stylesheet" href="/nav-dropdown.css">
   <script type="application/ld+json">{"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "Combien de temps ça prend vraiment, pas juste sur le papier ?", "acceptedAnswer": {"@type": "Answer", "text": "Le forfait couvre 3 jours de travail effectif de notre côté (entretiens, cartographie, chiffrage, restitution), généralement répartis sur 1 à 2 semaines pour laisser le temps de recueillir les bonnes informations sans mobiliser votre équipe en continu. Vous n'avez besoin de bloquer que quelques heures d'entretiens et la restitution finale."}}, {"@type": "Question", "name": "Suis-je obligé de continuer avec vous après l'audit ?", "acceptedAnswer": {"@type": "Answer", "text": "Non. La feuille de route vous appartient et reste exploitable même si vous choisissez de la mettre en œuvre seul, avec une autre équipe ou avec nous. On ne conditionne pas l'audit à un engagement ultérieur. Dans les faits, la plupart des entreprises enchaînent sur une formation ou un déploiement parce que la feuille de route rend le choix évident, pas parce qu'elles y sont obligées."}}, {"@type": "Question", "name": "L'audit remplace-t-il une formation ?", "acceptedAnswer": {"@type": "Answer", "text": "Non, les deux répondent à des besoins différents. L'audit vous dit quoi faire et dans quel ordre. La formation apprend à vos équipes à le faire elles-mêmes. Beaucoup de nos clients commencent par l'audit pour prioriser, puis enchaînent sur une ou deux formations ciblées sur les cas d'usage identifiés comme prioritaires."}}, {"@type": "Question", "name": "Le forfait 3 jours suffit-il pour une entreprise avec plusieurs sites ou filiales ?", "acceptedAnswer": {"@type": "Answer", "text": "Pas toujours. Le forfait de 1 600 € convient à une PME ou un périmètre ciblé (un service, un site). Au-delà, on chiffre sur devis, avec des missions observées de 1 à 4 semaines selon le nombre de sites, de métiers et d'interlocuteurs à couvrir."}}, {"@type": "Question", "name": "Mon entreprise n'a pas de stratégie IA, qui consulter pour démarrer ?", "acceptedAnswer": {"@type": "Answer", "text": "L'audit diagnostic IA d'IA-Entrepreneur est conçu exactement pour ce cas : en 3 jours, on cartographie vos cas d'usage possibles, on priorise ceux qui font gagner le plus de temps et on chiffre ces gains avant tout investissement. C'est le point de départ recommandé pour une entreprise qui n'a pas encore de stratégie IA formalisée."}}]}</script>
 
 </head>
@@ -166,9 +166,43 @@
           <span style="display:block;font-size:0.7rem;font-weight:500;color:var(--muted);letter-spacing:0.03em;margin-top:2px;">Organisme de formation certifié Qualiopi</span>
         </a>
         <nav>
-        <a href="/formation-ia-entreprise.html">Formations IA</a>
-        <a href="/integrations-ia.html">Intégrations IA</a>
-        <a href="/meilleures-ia.html">Meilleures IA</a>
+        <div class="nav-item">
+          <a href="/formation-ia-entreprise.html">Formations IA<svg class="nav-chevron" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></a>
+          <div class="nav-menu"><div class="nav-menu-inner">
+            <a href="/formation-ia-entreprise.html">Former mes équipes à l'IA</a>
+            <a href="/formation-ia-independant.html">Me former, je suis indépendant</a>
+            <a href="/formation-chatgpt-entreprise.html">Maîtriser ChatGPT au quotidien</a>
+            <a href="/formation-microsoft-copilot-entreprise.html">Exploiter Microsoft Copilot</a>
+            <a href="/formation-ia-automatisation.html">Créer mes propres automatisations</a>
+            <a href="/formation-ia-obligatoire-ai-act.html">Me mettre en conformité AI Act</a>
+            <a href="/coaching-ia-dirigeant.html">Être accompagné en individuel</a>
+          </div></div>
+        </div>
+        <div class="nav-item">
+          <a href="/integrations-ia.html">Intégrations IA<svg class="nav-chevron" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></a>
+          <div class="nav-menu"><div class="nav-menu-inner">
+            <a href="/integration-chatbot-client.html">Créer mon chatbot client</a>
+            <a href="/integration-prospection-linkedin.html">Automatiser ma prospection LinkedIn</a>
+            <a href="/integration-reponse-email.html">Répondre à mes emails automatiquement</a>
+            <a href="/integration-compte-rendu-reunion.html">Générer mes comptes rendus de réunion</a>
+            <a href="/integration-contenu-seo.html">Produire mon contenu SEO</a>
+            <a href="/integration-veille-concurrentielle.html">Surveiller mes concurrents</a>
+            <a href="/integration-rapport-performance.html">Automatiser mes rapports d'activité</a>
+            <a href="/integrations-ia.html" class="nav-menu-tout">Voir toutes les intégrations →</a>
+          </div></div>
+        </div>
+        <div class="nav-item">
+          <a href="/meilleures-ia.html">Meilleures IA<svg class="nav-chevron" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></a>
+          <div class="nav-menu"><div class="nav-menu-inner">
+            <a href="/ia/meilleures-ia-assistants-ia.html">Quel assistant IA choisir</a>
+            <a href="/ia/meilleures-ia-automatisation.html">Automatisation et agents IA</a>
+            <a href="/ia/meilleures-ia-prospection-vente.html">Prospection, vente et CRM</a>
+            <a href="/ia/meilleures-ia-redaction-contenu.html">Rédaction et contenu marketing</a>
+            <a href="/ia/meilleures-ia-reunions-notes.html">Réunions, notes et transcription</a>
+            <a href="/ia/meilleures-ia-images-design.html">Images, design et vidéo</a>
+            <a href="/meilleures-ia.html" class="nav-menu-tout">Voir l'annuaire complet →</a>
+          </div></div>
+        </div>
         <a href="/nos-formateurs.html">Nos formateurs</a>
         <a class="nav-tel tel-reveal" role="button" tabindex="0" data-tel="MzEgNzAgODkgNDEgNjA=" aria-label="Afficher le numéro de téléphone"><svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.362 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.338 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg><span class="tel-value">Afficher le numéro</span></a>
         <a href="https://calendly.com/gabriel-ia-entrepreneur/decouverte" target="_blank" rel="noopener noreferrer" class="nav-cta">Appel gratuit</a>
