@@ -646,6 +646,18 @@
     font-size: 13px;
     cursor: pointer;
   }
+
+    /* ── BANDE DE RÉFÉRENCES ──
+       Les logos sont aplatis sur blanc a la generation, donc la bande doit
+       rester sur fond blanc. height + max-width + object-fit:contain : sans
+       object-fit, un logotype large comme TurboHero serait ecrase. */
+    .refs-band{padding:46px 0;background:#fff;border-top:1px solid var(--border);border-bottom:1px solid var(--border)}
+    .refs-titre{text-align:center;font-size:0.76rem;font-weight:800;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted);margin-bottom:28px}
+    .refs-logos{display:flex;align-items:center;justify-content:center;gap:26px 30px;flex-wrap:wrap}
+    .refs-logos img{height:40px;width:auto;max-width:158px;object-fit:contain;opacity:.82;transition:opacity .2s}
+    .refs-logos img:hover{opacity:1}
+    .refs-note{text-align:center;font-size:0.8rem;color:var(--muted);margin-top:24px;line-height:1.6;max-width:720px;margin-left:auto;margin-right:auto}
+    @media(max-width:768px){.refs-band{padding:34px 0}.refs-logos{gap:24px 30px}.refs-logos img{height:34px;max-width:124px}}
 </style>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -2131,6 +2143,24 @@ if (location.hash) {
     </div>
   </div>
 </section>
+
+  <!-- ── Références ─────────────────────────────────────────────── -->
+  <section class="refs-band">
+    <div class="container">
+      <p class="refs-titre">Ils nous font confiance</p>
+      <div class="refs-logos">
+        <img src="/images/references/grdf.png" alt="GRDF" width="292" height="120" loading="lazy" decoding="async" />
+        <img src="/images/references/bpifrance.png" alt="Bpifrance" width="416" height="120" loading="lazy" decoding="async" />
+        <img src="/images/references/acf.png" alt="ACF - Assurances Conseils Financiers" width="541" height="120" loading="lazy" decoding="async" />
+        <img src="/images/references/apec.png" alt="Apec" width="379" height="120" loading="lazy" decoding="async" />
+        <img src="/images/references/grand-nancy-innovation.png" alt="Grand Nancy Innovation" width="181" height="120" loading="lazy" decoding="async" />
+        <img src="/images/references/pano.png" alt="PANO sign'service" width="120" height="120" loading="lazy" decoding="async" />
+        <img src="/images/references/turbohero.png" alt="TurboHero" width="772" height="120" loading="lazy" decoding="async" />
+        <img src="/images/references/ux-key.png" alt="UX Key" width="137" height="120" loading="lazy" decoding="async" />
+      </div>
+      <p class="refs-note">Nos formateurs interviennent auprès de ces organisations : grands comptes, institutions publiques, PME et start-up.</p>
+    </div>
+  </section>
 
 <footer>
     <div class="container">
