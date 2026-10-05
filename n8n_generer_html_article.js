@@ -1,5 +1,13 @@
-// Génère le fichier HTML complet de l'article
-const parsed = $('📝 Parser réponse').first().json;
+// Génère le fichier HTML complet de l'article.
+// Copie de référence du nœud n8n « 📄 Générer HTML Article » : c'est ce fichier
+// qu'on recolle dans n8n, il n'y en a plus qu'un (l'ancien _v2 y est fusionné).
+// Lit le contenu enrichi par « 🔗 Maillage inter-articles » ; si ce nœud est
+// absent ou n'a pas tourné, retombe sur « 📝 Parser réponse » plutôt que planter.
+const parsed = (() => {
+  try { return $('🔗 Maillage inter-articles').first().json; } catch(e) {
+    return $('📝 Parser réponse').first().json;
+  }
+})();
 const imageUrl = (() => {
   try {
     const uploadResult = $input.first().json;
@@ -91,7 +99,7 @@ html += '.article-category{display:inline-block;padding:4px 14px;border-radius:5
 html += '.article-meta{display:flex;align-items:center;gap:16px;font-size:0.82rem;opacity:0.85;margin-top:8px}';
 html += '.article-layout{display:grid;grid-template-columns:1fr 320px;gap:48px;padding:56px 0 80px;align-items:start}';
 html += '.article-title{font-size:clamp(1.8rem,3.5vw,2.8rem);font-weight:800;line-height:1.15;margin-bottom:20px}';
-html += '.article-title .gradient{background:linear-gradient(135deg,#1A3CFF 0%,#10B981 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}';
+html += '.article-title .gradient{color:var(--primary)}';
 html += '.article-excerpt{font-size:1.05rem;color:var(--muted);line-height:1.8;padding:20px 24px;border-left:3px solid var(--accent);background:rgba(16,185,129,0.04);border-radius:0 var(--radius) var(--radius) 0;margin-bottom:32px}';
 html += '.article-body h2{font-size:1.5rem;font-weight:800;margin:40px 0 16px;color:var(--text);padding-bottom:8px;border-bottom:2px solid var(--border)}';
 html += '.article-body h3{font-size:1.15rem;font-weight:700;margin:28px 0 12px;color:var(--text)}';
@@ -116,7 +124,7 @@ html += '.sidebar-cta a:hover{transform:translateY(-2px)}';
 html += '.sidebar-cta a.accent{background:var(--accent);color:#fff}';
 html += '.tags-list{display:flex;flex-wrap:wrap;gap:6px}';
 html += '.tag-item{padding:4px 12px;border-radius:50px;font-size:0.72rem;font-weight:700;background:rgba(26,60,255,0.07);color:var(--primary);border:1px solid rgba(26,60,255,0.15)}';
-html += '.article-footer-cta{background:linear-gradient(135deg,rgba(26,60,255,0.05),rgba(16,185,129,0.05));border:1px solid var(--border);border-radius:20px;padding:40px;text-align:center;margin:48px 0}';
+html += '.article-footer-cta{background:rgba(26,60,255,0.05);border:1px solid var(--border);border-radius:20px;padding:40px;text-align:center;margin:48px 0}';
 html += '.article-footer-cta h3{font-size:1.4rem;font-weight:800;margin-bottom:12px}';
 html += '.article-footer-cta p{color:var(--muted);font-size:0.95rem;margin-bottom:24px;max-width:480px;margin-left:auto;margin-right:auto;line-height:1.7}';
 html += '.btn-cta{display:inline-flex;align-items:center;gap:8px;padding:13px 28px;border-radius:50px;font-weight:700;font-size:0.95rem;text-decoration:none;transition:transform 0.2s,box-shadow 0.2s}';
@@ -128,21 +136,54 @@ html += '@media(max-width:900px){.article-layout{grid-template-columns:1fr}.arti
 html += '@media(max-width:768px){nav{display:none}.hamburger{display:flex}.article-hero{height:300px}.article-hero-content{padding:24px}.article-title{font-size:1.6rem}}';
 html += '</style>';
 html += '<style>@media(max-width:900px){nav{display:none!important}.hamburger{display:flex!important}}@media(min-width:901px) and (max-width:1000px){header nav a{padding:6px 6px!important}header nav .nav-cta{padding:8px 13px!important}}</style>';
-html += '<link rel="stylesheet" href="/mobile.css">';
+html += '<link rel="stylesheet" href="/mobile.css"><link rel="stylesheet" href="/nav-dropdown.css">';
 html += '</head>';
 html += '<body>';
 html += '<header>';
 html += '<div class="container">';
 html += '<div class="header-inner">';
 html += '<a href="/" class="logo" style="line-height:1.2;">IA<span>-</span>Entrepreneur<span style="display:block;font-size:0.7rem;font-weight:500;color:var(--muted);letter-spacing:0.03em;margin-top:2px;">Organisme de formation certifié Qualiopi</span></a>';
-// Navigation identique a celle que simplifier_nav.py pose sur les 153 autres
-// pages. Quatre liens, le telephone, l'appel gratuit. Toute divergence ici se
-// voit immediatement : l'article publie n'a plus la meme barre que le reste du
-// site, et il perd le lien vers l'annuaire.
+// Navigation identique a celle que simplifier_nav.py pose sur toutes les autres
+// pages : trois menus deroulants, Nos formateurs, le telephone, l'appel gratuit.
+// MENUS est une copie conforme de MENUS dans simplifier_nav.py et de MENUS_NAV
+// dans generate_ia_pages.py ; les trois listes doivent rester identiques, sinon
+// l'article publie n'a plus la meme barre que le reste du site.
+const CHEVRON = '<svg class="nav-chevron" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>';
+const MENUS = [
+  ['/formation-ia-entreprise.html', 'Formations IA', [
+    ["Former mes équipes à l'IA", '/formation-ia-entreprise.html'],
+    ["Me former, je suis indépendant", '/formation-ia-independant.html'],
+    ["Maîtriser ChatGPT au quotidien", '/formation-chatgpt-entreprise.html'],
+    ["Exploiter Microsoft Copilot", '/formation-microsoft-copilot-entreprise.html'],
+    ["Créer mes propres automatisations", '/formation-ia-automatisation.html'],
+    ["Me mettre en conformité AI Act", '/formation-ia-obligatoire-ai-act.html'],
+    ["Être accompagné en individuel", '/coaching-ia-dirigeant.html'],
+  ], null],
+  ['/integrations-ia.html', 'Intégrations IA', [
+    ["Créer mon chatbot client", '/integration-chatbot-client.html'],
+    ["Automatiser ma prospection LinkedIn", '/integration-prospection-linkedin.html'],
+    ["Répondre à mes emails automatiquement", '/integration-reponse-email.html'],
+    ["Générer mes comptes rendus de réunion", '/integration-compte-rendu-reunion.html'],
+    ["Produire mon contenu SEO", '/integration-contenu-seo.html'],
+    ["Surveiller mes concurrents", '/integration-veille-concurrentielle.html'],
+    ["Automatiser mes rapports d'activité", '/integration-rapport-performance.html'],
+  ], ['Voir toutes les intégrations', '/integrations-ia.html']],
+  ['/meilleures-ia.html', 'Meilleures IA', [
+    ["Quel assistant IA choisir", '/ia/meilleures-ia-assistants-ia.html'],
+    ["Automatisation et agents IA", '/ia/meilleures-ia-automatisation.html'],
+    ["Prospection, vente et CRM", '/ia/meilleures-ia-prospection-vente.html'],
+    ["Rédaction et contenu marketing", '/ia/meilleures-ia-redaction-contenu.html'],
+    ["Réunions, notes et transcription", '/ia/meilleures-ia-reunions-notes.html'],
+    ["Images, design et vidéo", '/ia/meilleures-ia-images-design.html'],
+  ], ["Voir l'annuaire complet", '/meilleures-ia.html']],
+];
+const blocMenu = (m) => {
+  let liens = m[2].map(function(e){ return '<a href="' + e[1] + '">' + e[0] + '</a>'; }).join('');
+  if (m[3]) liens += '<a href="' + m[3][1] + '" class="nav-menu-tout">' + m[3][0] + ' →</a>';
+  return '<div class="nav-item"><a href="' + m[0] + '">' + m[1] + CHEVRON + '</a><div class="nav-menu"><div class="nav-menu-inner">' + liens + '</div></div></div>';
+};
 html += '<nav>';
-html += '<a href="/formation-ia-entreprise.html">Formations IA</a>';
-html += '<a href="/integrations-ia.html">Intégrations IA</a>';
-html += '<a href="/meilleures-ia.html">Meilleures IA</a>';
+html += MENUS.map(blocMenu).join('');
 html += '<a href="/nos-formateurs.html">Nos formateurs</a>';
 html += '<a class="nav-tel tel-reveal" role="button" tabindex="0" data-tel="MzEgNzAgODkgNDEgNjA=" aria-label="Afficher le numéro de téléphone"><svg width=\"13\" height=\"13\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" viewBox=\"0 0 24 24\"><path d=\"M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.362 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.338 1.85.573 2.81.7A2 2 0 0 1 22 16.92z\"/></svg><span class="tel-value">Afficher le numéro</span></a>';
 html += '<a href="https://calendly.com/gabriel-ia-entrepreneur/decouverte" target="_blank" rel="noopener noreferrer" class="nav-cta">Appel gratuit</a>';
@@ -151,7 +192,7 @@ html += '<button class="hamburger" id="hamburger" aria-label="Menu"><span></span
 html += '</div>';
 html += '</div>';
 html += '<div class="mobile-menu" id="mobile-menu">';
-html += '<a href="/formation-ia-entreprise.html">Formations IA</a><a href="/integrations-ia.html">Intégrations IA</a><a href="/meilleures-ia.html">Meilleures IA</a><a href="/nos-formateurs.html">Nos formateurs</a>';
+html += '<a href="/formation-ia-entreprise.html">Formations IA</a><a href="/formation-ia-independant.html">Formation indépendants</a><a href="/integrations-ia.html">Intégrations IA</a><a href="/meilleures-ia.html">Meilleures IA</a><a href="/nos-formateurs.html">Nos formateurs</a>';
 html += '<a href="/simulateur-financement-formation-ia.html">💶 Financer ma formation</a>';
 html += '<a href="/blog.html">Blog</a><a href="/apropos.html">À propos</a>';
 html += '<a href="mailto:contact@ia-entrepreneur.fr">✉ Écrire un email</a>';
