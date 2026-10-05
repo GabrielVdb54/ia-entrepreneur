@@ -669,7 +669,7 @@ FOOTER_HTML = f"""  <footer>
         </div>
         <div class="footer-right">
           <p class="footer-copy">© {ANNEE} IA-Entrepreneur · Clindit SASU. Tous droits réservés. · NDA : 44 54 04871 54</p>
-          <p class="footer-tagline">Organisme de formation certifié Qualiopi · Certificat n° 883211-1</p>
+          <p class="footer-tagline">Organisme de formation certifié Qualiopi · Certificat n° 883211-2</p>
         </div>
       </div>
     </div>
