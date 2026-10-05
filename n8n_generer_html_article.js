@@ -33,14 +33,30 @@ const heroImage = imageUrl || 'https://images.unsplash.com/photo-1556761175-b413
 
 const titleEsc = (parsed.title || '').replace(/"/g, '\\"');
 const excerptRaw = parsed.excerpt || '';
-const excerptShort = excerptRaw.substring(0, 160).replace(/"/g, '\\"');
-const excerptMed = excerptRaw.substring(0, 200).replace(/"/g, '\\"');
+function smartTruncate(str, maxLen) {
+  if (str.length <= maxLen) return str;
+  const cut = str.substring(0, maxLen);
+  const lastStop = Math.max(cut.lastIndexOf('. '), cut.lastIndexOf('! '), cut.lastIndexOf('? '));
+  if (lastStop > maxLen * 0.5) return cut.substring(0, lastStop + 1);
+  const lastSpace = cut.lastIndexOf(' ');
+  return (lastSpace > 0 ? cut.substring(0, lastSpace) : cut) + '\u2026';
+}
+
+const excerptShort = smartTruncate(excerptRaw, 158).replace(/"/g, '\\"');
+const excerptMed = smartTruncate(excerptRaw, 200).replace(/"/g, '\\"');
 
 const tagsHtml = (parsed.tags && parsed.tags.length > 0)
   ? '<div class="sidebar-card"><h4>Tags</h4><div class="tags-list">' + parsed.tags.map(function(t){ return '<span class="tag-item">' + t + '</span>'; }).join('') + '</div></div>'
   : '';
 
 const excerptBlock = excerptRaw ? '<p class="article-excerpt">' + excerptRaw + '</p>' : '';
+
+const sourceDomain = (() => {
+  try { return new URL(sourceUrl).hostname.replace(/^www\./, ''); } catch(e) { return null; }
+})();
+const sourceCitationBlock = (sourceUrl && sourceDomain)
+  ? '<p class="source-citation">Article inspiré d\'une source externe : <a href="' + sourceUrl + '" target="_blank" rel="nofollow noopener">' + sourceDomain + ' \u2197</a></p>'
+  : '';
 
 const ldJson = '{"@context":"https://schema.org","@type":"Article","headline":"' + titleEsc + '","description":"' + excerptShort + '","author":{"@type":"Organization","name":"IA-Entrepreneur","url":"https://ia-entrepreneur.fr"},"datePublished":"' + dateISO + '","dateModified":"' + dateISO + '","publisher":{"@type":"Organization","name":"IA-Entrepreneur"},"image":"' + heroImage + '"}';
 
@@ -98,6 +114,7 @@ html += '.breadcrumb a{color:#fff}';
 html += '.article-category{display:inline-block;padding:4px 14px;border-radius:50px;font-size:0.72rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;background:rgba(255,255,255,0.2);color:#fff;border:1px solid rgba(255,255,255,0.3);margin-bottom:12px}';
 html += '.article-meta{display:flex;align-items:center;gap:16px;font-size:0.82rem;opacity:0.85;margin-top:8px}';
 html += '.article-layout{display:grid;grid-template-columns:1fr 320px;gap:48px;padding:56px 0 80px;align-items:start}';
+html += '.article-layout>article{min-width:0}';
 html += '.article-title{font-size:clamp(1.8rem,3.5vw,2.8rem);font-weight:800;line-height:1.15;margin-bottom:20px}';
 html += '.article-title .gradient{color:var(--primary)}';
 html += '.article-excerpt{font-size:1.05rem;color:var(--muted);line-height:1.8;padding:20px 24px;border-left:3px solid var(--accent);background:rgba(16,185,129,0.04);border-radius:0 var(--radius) var(--radius) 0;margin-bottom:32px}';
@@ -108,6 +125,8 @@ html += '.article-body ul,.article-body ol{margin:16px 0 20px 24px}';
 html += '.article-body li{font-size:1rem;color:#1a1f3a;line-height:1.8;margin-bottom:8px}';
 html += '.article-body strong{color:var(--text);font-weight:700}';
 html += '.article-body a{color:var(--primary);text-decoration:underline;text-decoration-color:rgba(26,60,255,0.3)}';
+html += '.source-citation{font-size:0.85rem;color:var(--muted);margin-bottom:28px;padding-bottom:16px;border-bottom:1px solid var(--border)}';
+html += '.source-citation a{color:var(--muted);text-decoration:underline}';
 html += '.article-body>strong{font-weight:400;font-size:1rem;display:block;margin-bottom:20px;color:#1a1f3a;line-height:1.9}';
 html += '.article-body table{width:100%;border-collapse:collapse;margin:24px 0}';
 html += '.article-body th{background:var(--primary);color:#fff;padding:12px 16px;text-align:left;font-size:0.88rem}';
@@ -213,6 +232,7 @@ html += '<div class="article-layout">';
 html += '<article>';
 html += '<h1 class="article-title">' + parsed.title + '</h1>';
 html += excerptBlock;
+html += sourceCitationBlock;
 html += '<div class="article-body">' + parsed.content + '</div>';
 html += '<div class="article-footer-cta">';
 html += '<h3>Prêt à intégrer l\'IA dans votre activité ?</h3>';
