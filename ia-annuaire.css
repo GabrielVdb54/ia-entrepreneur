@@ -439,6 +439,7 @@ footer{
     .ia-pill { font-size:0.68rem; font-weight:700; padding:4px 10px; border-radius:50px; background:var(--card); color:var(--muted); }
     .ia-pill.fr { background:rgba(16,185,129,0.12); color:#047857; }
     .ia-pill.note { background:rgba(26,60,255,0.09); color:var(--primary); }
+    .ia-pill.partenaire { background:rgba(245,158,11,0.14); color:#92400E; }
     .ia-empty { grid-column:1/-1; padding:48px 20px; text-align:center; color:var(--muted); border:1.5px dashed var(--border); border-radius:var(--radius); }
 
     .ia-section { padding:56px 0; }
@@ -484,6 +485,8 @@ footer{
     .ia-body ul.cas li::before { content:"→"; position:absolute; left:0; color:var(--primary); font-weight:800; }
     .ia-note { padding:16px 18px; border-radius:12px; background:rgba(16,185,129,0.07); border-left:4px solid var(--accent); font-size:0.9rem; line-height:1.6; }
     .ia-note.warn { background:rgba(239,68,68,0.06); border-left-color:#EF4444; }
+    .ia-note.part { background:rgba(245,158,11,0.08); border-left-color:#F59E0B; margin:14px 0 6px; }
+    .ia-note.part a { color:var(--primary); font-weight:700; }
     .ia-note b { display:block; margin-bottom:4px; }
     .ia-aside { position:sticky; top:92px; display:grid; gap:14px; }
     .ia-box { border:1px solid var(--border); border-radius:var(--radius); padding:18px; background:var(--bg); }

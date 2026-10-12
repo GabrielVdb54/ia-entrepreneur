@@ -623,6 +623,22 @@ export const CATALOGUE = [
 ]
 },
 {
+"slug": "goodweek",
+"nom": "Goodweek",
+"usage": "Assistants IA & LLM",
+"niveau": "Débutant",
+"prix": "Payant",
+"pays": "France",
+"resume": "Une plateforme française qui réunit Claude, ChatGPT, Gemini, Mistral et Nova dans un seul espace d'entreprise, avec des versions des modèles hébergées en France et branchées sur vos outils.",
+"profils": [
+"Dirigeant",
+"Ops",
+"Commercial",
+"Marketing",
+"RH"
+]
+},
+{
 "slug": "google-search-console",
 "nom": "Google Search Console",
 "usage": "SEO & visibilité",

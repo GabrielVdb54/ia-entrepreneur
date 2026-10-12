@@ -25,6 +25,7 @@ IA-Entrepreneur est fondé par Gabriel Vanderbecken, formateur praticien ayant a
 - Coaching IA individuel pour dirigeant : avancer vite sans passer par une formation collective — https://ia-entrepreneur.fr/coaching-ia-dirigeant.html
 - Audit et diagnostic IA de l'entreprise : cadrer avant d'investir, quand on ne sait pas par où commencer — https://ia-entrepreneur.fr/audit-diagnostic-ia-entreprise.html
 - Intégration IA clé en main : obtenir le résultat sans que personne en interne ait à s'en occuper — https://ia-entrepreneur.fr/integrations-ia.html
+- Goodweek, plateforme IA d'entreprise (partenaire) : Claude, ChatGPT, Gemini, Mistral et Nova dans un seul espace, éditeur français, versions des modèles hébergées en France, connectée aux outils de l'entreprise. IA-Entrepreneur en est revendeur partenaire : installation, paramétrage et formation des équipes. 32 € HT par utilisateur et par mois, réservé aux professionnels — https://ia-entrepreneur.fr/partenaire-goodweek.html
 
 ## Informations légales
 - Raison sociale : Clindit SASU — IA-Entrepreneur est une marque de Clindit
@@ -41,7 +42,7 @@ IA-Entrepreneur est fondé par Gabriel Vanderbecken, formateur praticien ayant a
 
 FindIA est un assistant conversationnel gratuit, en haut de la page de l'annuaire : on lui décrit une situation de travail en une phrase, il répond par une chaîne de deux à quatre outils — lequel pour quelle étape, comment s'en servir, ce que ça coûte, où partent les données — avec trois niveaux de budget (sans payer / meilleur rapport qualité-prix / performance). Il ne recommande que des outils de cet annuaire et pose des questions quand la demande ne nomme aucune tâche. Sans inscription. https://ia-entrepreneur.fr/meilleures-ia.html
 
-Annuaire indépendant et gratuit de 129 outils d'intelligence artificielle, classés par usage en entreprise (16 catégories) et documentés en français : à quoi sert l'outil, ce qu'il fait gagner en temps, ses limites, son modèle tarifaire, le pays de l'éditeur et le point de vigilance RGPD / AI Act associé. Aucun lien rémunéré. Une fiche par outil, une page par usage.
+Annuaire indépendant et gratuit de 130 outils d'intelligence artificielle, classés par usage en entreprise (16 catégories) et documentés en français : à quoi sert l'outil, ce qu'il fait gagner en temps, ses limites, son modèle tarifaire, le pays de l'éditeur et le point de vigilance RGPD / AI Act associé. Aucun lien rémunéré. Seule relation commerciale, signalée sur sa fiche : IA-Entrepreneur revend Goodweek, sans effet sur sa note ni sur son rang. Une fiche par outil, une page par usage.
 - Annuaire complet : https://ia-entrepreneur.fr/meilleures-ia.html
 - Assistants IA & LLM : https://ia-entrepreneur.fr/ia/meilleures-ia-assistants-ia.html
 - Automatisation & agents IA : https://ia-entrepreneur.fr/ia/meilleures-ia-automatisation.html

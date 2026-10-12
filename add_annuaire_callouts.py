@@ -43,7 +43,7 @@ ARTICLES = {
         "/ia/microsoft-copilot.html"),
     'prompting-chatgpt-avance-aller-plus-loin.html': (
         "ChatGPT n'est pas toujours l'outil le plus adapté à la tâche.",
-        "Voir la fiche ChatGPT et les 129 outils de l'annuaire",
+        "Voir la fiche ChatGPT et les 130 outils de l'annuaire",
         "/ia/chatgpt.html"),
     'conformite-ai-act-ce-que-ca-implique.html': (
         "Quelles IA pouvez-vous utiliser sans exposer vos données ?",
@@ -51,11 +51,11 @@ ARTICLES = {
         "/ia/meilleures-ia-juridique-conformite.html"),
     'cahier-des-charges-ia-structurer-projet.html': (
         "Avant d'écrire le cahier des charges, cadrez les outils envisageables.",
-        "Explorer l'annuaire des 129 outils IA, classés par usage",
+        "Explorer l'annuaire des 130 outils IA, classés par usage",
         "/meilleures-ia.html"),
     'consultant-ia-audit-accompagnement-sur-mesure.html': (
         "Vous préférez commencer par regarder ce qui existe ?",
-        "Explorer l'annuaire des 129 outils IA, classés par usage",
+        "Explorer l'annuaire des 130 outils IA, classés par usage",
         "/meilleures-ia.html"),
     'roi-formation-ia-mesurer-gains-reels.html': (
         "Le temps gagné dépend d'abord du bon outil.",

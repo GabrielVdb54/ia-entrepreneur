@@ -5249,5 +5249,57 @@
    "Tenir la comptabilité d'une micro-entreprise sans expert-comptable",
    "Préparer les déclarations URSSAF et TVA automatiquement"
   ]
+ },
+ {
+  "slug": "goodweek",
+  "name": "Goodweek",
+  "url": "https://www.goodweek.com/fr",
+  "cat": "assistants-ia",
+  "cats": [
+   "juridique-conformite",
+   "automatisation"
+  ],
+  "editeur": "Goodweek",
+  "pays": "France",
+  "prix": "Payant",
+  "prixDetail": "Licence entreprise 32 € HT/utilisateur/mois (offre Pro) · réservé aux professionnels",
+  "niveau": "Débutant",
+  "profils": [
+   "Dirigeant",
+   "Ops",
+   "Commercial",
+   "Marketing",
+   "RH"
+  ],
+  "tags": "goodweek plateforme ia entreprise multi modeles claude chatgpt gemini mistral nova france rgpd souverainete connecteurs outlook teams sharepoint shadow ia espace securise",
+  "note": 4.4,
+  "resume": "Une plateforme française qui réunit Claude, ChatGPT, Gemini, Mistral et Nova dans un seul espace d'entreprise, avec des versions des modèles hébergées en France et branchées sur vos outils.",
+  "forces": [
+   "Les grands modèles (Claude, ChatGPT, Gemini, Mistral, Nova) dans un seul abonnement, avec le choix du modèle par espace de travail",
+   "Chaque modèle existe en version hébergée en France : l'administrateur active celle-là et coupe le reste",
+   "Branché sur Outlook, Teams, SharePoint, Google Drive et plus de 1 500 outils, avec une bibliothèque d'actions prêtes à l'emploi",
+   "Administration pensée pour l'entreprise : import des comptes Microsoft, droits par utilisateur, double authentification, vue des usages sans lecture des conversations"
+  ],
+  "limites": [
+   "Les deux modèles de génération d'images (Nano Banana, ChatGPT Images) restent hébergés aux États-Unis : à couper si vos visuels contiennent des données sensibles",
+   "Réservé aux professionnels (entreprises, indépendants, micro-entrepreneurs) : pas d'offre pour les particuliers",
+   "Éditeur créé en 2025 : moins de recul que sur les assistants historiques"
+  ],
+  "gain": "Les comptes ChatGPT et Claude personnels laissent place à un espace d'entreprise : chacun garde ses usages, et les tâches répétitives (briefing du matin, compte rendu, reporting) se règlent en quelques minutes.",
+  "conformite": "Éditeur français. Chaque modèle existe en version hébergée en France, à activer par l'administrateur, et les conversations ne servent pas à entraîner les modèles. Exception à connaître : les deux modèles d'images sont hébergés aux États-Unis.",
+  "alternatives": [
+   "mistral-le-chat",
+   "dust",
+   "microsoft-copilot"
+  ],
+  "cas": [
+   "Remplacer les comptes ChatGPT et Claude personnels par un espace d'entreprise encadré",
+   "Préparer le briefing du matin à partir d'Outlook et de Teams",
+   "Donner à chaque équipe un espace avec ses documents, ses consignes et ses actions prêtes à l'emploi"
+  ],
+  "partenaire": {
+   "page": "/partenaire-goodweek.html",
+   "texte": "IA-Entrepreneur est revendeur partenaire de Goodweek : nous touchons une marge sur les licences que nous déployons chez nos clients. Cette fiche suit les mêmes règles que les autres : la note, le rang et les limites ne dépendent pas de ce partenariat."
+  }
  }
 ]

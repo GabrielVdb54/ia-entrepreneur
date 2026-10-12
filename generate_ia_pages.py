@@ -134,7 +134,7 @@ IA_CSS = """
 
     #annuaire { scroll-margin-top: 190px; }
     /* ── La conversation ─────────────────────────────────────────────── */
-    .ia-chat { padding:110px 0 44px; background:linear-gradient(180deg, var(--bg2), var(--bg)); }
+    .ia-chat { padding:110px 0 44px; background:var(--bg2); }
     .ia-chat h1 { font-size:clamp(1.8rem,4vw,2.7rem); line-height:1.15; letter-spacing:-0.02em; margin-bottom:14px; }
     .ia-chat p.lead { font-size:1.02rem; color:var(--muted); max-width:640px; margin-bottom:26px; }
 
@@ -290,6 +290,7 @@ IA_CSS = """
     .ia-pill { font-size:0.68rem; font-weight:700; padding:4px 10px; border-radius:50px; background:var(--card); color:var(--muted); }
     .ia-pill.fr { background:rgba(16,185,129,0.12); color:#047857; }
     .ia-pill.note { background:rgba(26,60,255,0.09); color:var(--primary); }
+    .ia-pill.partenaire { background:rgba(245,158,11,0.14); color:#92400E; }
     .ia-empty { grid-column:1/-1; padding:48px 20px; text-align:center; color:var(--muted); border:1.5px dashed var(--border); border-radius:var(--radius); }
 
     .ia-section { padding:56px 0; }
@@ -335,6 +336,8 @@ IA_CSS = """
     .ia-body ul.cas li::before { content:"→"; position:absolute; left:0; color:var(--primary); font-weight:800; }
     .ia-note { padding:16px 18px; border-radius:12px; background:rgba(16,185,129,0.07); border-left:4px solid var(--accent); font-size:0.9rem; line-height:1.6; }
     .ia-note.warn { background:rgba(239,68,68,0.06); border-left-color:#EF4444; }
+    .ia-note.part { background:rgba(245,158,11,0.08); border-left-color:#F59E0B; margin:14px 0 6px; }
+    .ia-note.part a { color:var(--primary); font-weight:700; }
     .ia-note b { display:block; margin-bottom:4px; }
     .ia-aside { position:sticky; top:92px; display:grid; gap:14px; }
     .ia-box { border:1px solid var(--border); border-radius:var(--radius); padding:18px; background:var(--bg); }
@@ -357,7 +360,7 @@ IA_CSS = """
     .ia-faq details[open] summary::after { content:"–"; }
     .ia-faq .answer { padding:0 20px 18px; color:var(--muted); font-size:0.9rem; line-height:1.65; }
 
-    .ia-cta { background:linear-gradient(135deg, var(--primary), #4B6BFF); color:#fff; border-radius:20px; padding:38px; text-align:center; }
+    .ia-cta { background:var(--primary); color:#fff; border-radius:20px; padding:38px; text-align:center; }
     .ia-cta h2 { color:#fff; margin-bottom:10px; }
     .ia-cta p { color:rgba(255,255,255,0.9); max-width:620px; margin:0 auto 22px; }
     .ia-cta .btn { background:#fff; color:var(--primary); }
@@ -596,6 +599,7 @@ MENUS_NAV = [
         ("Automatiser mes rapports d'activité",   '/integration-rapport-performance.html'),
     ], ('Voir toutes les intégrations', '/integrations-ia.html')),
     ('/meilleures-ia.html', 'Meilleures IA', [
+        ("Goodweek : toutes les IA réunies",      '/partenaire-goodweek.html'),
         ("Quel assistant IA choisir",             '/ia/meilleures-ia-assistants-ia.html'),
         ("Automatisation et agents IA",           '/ia/meilleures-ia-automatisation.html'),
         ("Prospection, vente et CRM",             '/ia/meilleures-ia-prospection-vente.html'),
@@ -835,6 +839,9 @@ def card_html(t, lien_interne=True):
     c = CAT_BY[t['cat']]
     badge, cls = souverainete(t)
     badge_html = f'<span class="ia-pill {cls}">{badge}</span>' if badge else ''
+    if t.get('partenaire'):
+        badge_html += ('<span class="ia-pill partenaire" title="IA-Entrepreneur revend cet outil : '
+                       'voir la fiche">🤝 Partenaire</span>')
     # data-txt ne porte que les mots-cles absents du texte visible de la carte :
     # le reste du champ de recherche est reconstruit en JS depuis textContent.
     visible = norm(t['name'] + ' ' + t['resume'] + ' ' + CAT_BY[t['cat']]['nom'])
@@ -987,6 +994,29 @@ def mention(cle):
     return MENTIONS[cle][1 if LIENS_REMUNERES else 0]
 
 
+# Relations commerciales déclarées (12/10/2026). Ce ne sont pas des liens
+# payés : LIENS_REMUNERES reste False, aucun éditeur ne paie pour figurer ni
+# pour son rang, et le « Site officiel » reste un lien nu. Mais IA-Entrepreneur
+# revend certains outils et touche une marge sur les licences : l'article
+# L111-7 du Code de la consommation impose de le dire là où l'outil est
+# classé. Le champ « partenaire » d'une fiche (page + texte) allume tout à la
+# fois : pastille sur la carte, encadré sur la fiche, phrase dans la FAQ du
+# hub et en pied des listes qui le contiennent. La note se fixe comme pour
+# n'importe quel outil, jamais au-dessus de ce que les critères justifient.
+def mention_partenaires(court=False, outils=None):
+    ps = [t for t in (TOOLS if outils is None else outils) if t.get('partenaire')]
+    if not ps:
+        return ''
+    noms = ', '.join(f"<a href='{tool_url(t)}'>{e(t['name'])}</a>" for t in ps)
+    fiche = 'sa fiche' if len(ps) == 1 else 'leur fiche'
+    if court:
+        return (f" Seule relation commerciale, signalée sur {fiche} : IA-Entrepreneur revend {noms}, "
+                f"sans effet sur la note ni sur le rang.")
+    return (f" Une relation commerciale existe en revanche, et elle est déclarée : IA-Entrepreneur est "
+            f"revendeur partenaire de {noms} et touche une marge sur ces licences. C'est écrit sur {fiche}, "
+            f"et cela ne change ni la note, ni le rang, ni les limites publiées.")
+
+
 HUB_FAQ = [
     ("Quelle est la meilleure IA en " + str(ANNEE) + " ?",
      "Il n'y a pas de meilleure IA dans l'absolu, seulement une meilleure IA <em>pour un usage donné</em>. Pour un usage généraliste en entreprise (rédiger, analyser, résumer), <a href='/ia/chatgpt.html'>ChatGPT</a> et <a href='/ia/claude.html'>Claude</a> sont les deux références, et <a href='/ia/mistral-le-chat.html'>Mistral Le Chat</a> s'impose dès que les données doivent rester en Europe. Pour automatiser des tâches, c'est <a href='/ia/n8n.html'>n8n</a> ou <a href='/ia/make.html'>Make</a>. Pour les comptes rendus de réunion, <a href='/ia/fathom.html'>Fathom</a> ou <a href='/ia/noota.html'>Noota</a>. Le bon réflexe est de partir du problème à résoudre, pas de l'outil."),
@@ -998,7 +1028,7 @@ HUB_FAQ = [
      "Oui, et elles couvrent une bonne partie des besoins. <a href='/ia/chatgpt.html'>ChatGPT</a>, <a href='/ia/claude.html'>Claude</a>, <a href='/ia/gemini.html'>Gemini</a> et <a href='/ia/mistral-le-chat.html'>Mistral</a> ont des versions gratuites utilisables au quotidien. <a href='/ia/notebooklm.html'>NotebookLM</a>, <a href='/ia/google-search-console.html'>Google Search Console</a> et <a href='/ia/looker-studio.html'>Looker Studio</a> sont entièrement gratuits. <a href='/ia/fathom.html'>Fathom</a> et <a href='/ia/canva.html'>Canva</a> ont des offres gratuites généreuses. Utilisez le filtre « Gratuit » ou « Freemium » de l'annuaire pour ne voir que celles-là."),
     ("Faut-il former ses salariés avant de déployer une IA ?",
      "Ce n'est pas seulement recommandé, c'est une obligation. L'article 4 de l'AI Act, en vigueur depuis le 2 février 2025, impose aux entreprises qui déploient des systèmes d'IA de garantir un niveau suffisant de maîtrise de l'IA chez les personnes qui les utilisent. Au-delà du texte, c'est surtout ce qui distingue un abonnement payé et inutilisé d'un gain de temps réel. <a href='/formation-ia-entreprise.html'>Nos formations</a> délivrent une attestation individuelle mentionnant les volets AI Act, RGPD et gouvernance des données."),
-    (mention('faq_q'), mention('faq_r')),
+    (mention('faq_q'), mention('faq_r') + mention_partenaires()),
     ("À quelle fréquence cet annuaire est-il mis à jour ?",
      "Il est revu régulièrement : les outils qui disparaissent sont retirés, les nouveaux entrants sérieux sont ajoutés, et les tarifs indiqués sont réévalués. Les prix mentionnés restent indicatifs — sur ce marché, ils évoluent vite : vérifiez toujours sur le site de l'éditeur avant de vous engager."),
 ]
@@ -1138,7 +1168,7 @@ def build_hub():
         <div><b>{sum(1 for t in TOOLS if t['prix'] in ('Gratuit', 'Freemium'))}</b><span>utilisables gratuitement</span></div>
       </div>
       <p class="ia-maj"><b>Niveau requis</b> — <em>Débutant</em> : on s'en sert le jour même, sans paramétrage ni vocabulaire technique. <em>Intermédiaire</em> : il faut comprendre une logique (scénarios, champs, filtres) ou compter quelques jours de prise en main. <em>Expert</em> : compétence technique requise (code, auto-hébergement, administration).<br />
-      Notes attribuées par l'équipe IA-Entrepreneur selon quatre critères : facilité de prise en main, utilité réelle pour une TPE-PME, rapport qualité/prix et maturité de l'outil. Les tarifs sont indicatifs et constatés en {datetime.date.today().strftime('%m/%Y')} — vérifiez-les sur le site de l'éditeur. {mention('hub_bas')}</p>
+      Notes attribuées par l'équipe IA-Entrepreneur selon quatre critères : facilité de prise en main, utilité réelle pour une TPE-PME, rapport qualité/prix et maturité de l'outil. Les tarifs sont indicatifs et constatés en {datetime.date.today().strftime('%m/%Y')} — vérifiez-les sur le site de l'éditeur. {mention('hub_bas')}{mention_partenaires(court=True)}</p>
     </div>
   </section>
 
@@ -2290,7 +2320,7 @@ def build_category(c):
       <div class="ia-grid">
 {cards}
       </div>
-      <p class="ia-maj">Classement par note IA-Entrepreneur (prise en main, utilité pour une TPE-PME, rapport qualité/prix, maturité). Tarifs indicatifs constatés en {datetime.date.today().strftime('%m/%Y')}. {mention('liste')}</p>
+      <p class="ia-maj">Classement par note IA-Entrepreneur (prise en main, utilité pour une TPE-PME, rapport qualité/prix, maturité). Tarifs indicatifs constatés en {datetime.date.today().strftime('%m/%Y')}. {mention('liste')}{mention_partenaires(court=True, outils=tools)}</p>
     </div>
   </section>
 
@@ -2388,6 +2418,16 @@ def build_tool(t):
                                 "width": 1200, "height": 630}},
     ]
 
+    p = t.get('partenaire')
+    partenaire_html = (f"""        <div class="ia-note part"><b>Partenariat déclaré</b>{e(p['texte'])} <a href="{p['page']}">Déployer {e(t['name'])} avec IA-Entrepreneur →</a></div>
+""" if p else '')
+    partenaire_box = (f"""        <div class="ia-box" style="border-color:#F59E0B;">
+          <h3>Avec IA-Entrepreneur</h3>
+          <p style="font-size:0.86rem;color:var(--muted);line-height:1.6;margin-bottom:14px;">Nous installons {e(t['name'])} chez vous : modèles hébergés en France activés, outils connectés, équipes formées.</p>
+          <a class="btn btn-accent" href="{p['page']}">Voir l'offre {e(t['name'])}</a>
+        </div>
+""" if p else '')
+
     conformite_html = f"""      <h2>Où vont vos données</h2>
       <div class="ia-note{' warn' if t['pays'] in ('Chine', 'Chine / Singapour', 'Singapour') else ''}"><b>Éditeur basé en {e(t['pays'])}</b>{e(t['conformite'])}</div>
 """ if t.get('conformite') else ''
@@ -2408,7 +2448,7 @@ def build_tool(t):
       <div class="ia-body">
         <h2>À quoi sert {e(t['name'])} ?</h2>
         <p>{e(t['resume'])}</p>
-
+{partenaire_html}
         <h2>Points forts</h2>
         <ul class="plus">
 {forces}
@@ -2451,7 +2491,7 @@ def build_tool(t):
           <button class="ia-fav ia-fav-long" type="button" data-fav="{t['slug']}" aria-pressed="false" style="margin-top:8px;">☆ Ajouter à mes favoris</button>
           <button class="btn btn-outline" type="button" data-partager style="margin-top:8px;width:100%;justify-content:center;">Partager cette fiche</button>
         </div>
-        <div class="ia-box" style="background:var(--bg2);">
+{partenaire_box}        <div class="ia-box" style="background:var(--bg2);">
           <h3>Vous hésitez ?</h3>
           <p style="font-size:0.86rem;color:var(--muted);line-height:1.6;margin-bottom:14px;">Un outil mal choisi coûte plus cher que pas d'outil du tout. 15 minutes au téléphone pour cadrer le besoin avant de vous engager.</p>
           <a class="btn btn-accent" href="{CAL}" target="_blank" rel="noopener noreferrer">Appel gratuit de 15 min</a>

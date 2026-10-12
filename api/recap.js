@@ -115,7 +115,7 @@ const SITE = 'https://ia-entrepreneur.fr';
 // email qui affirme la neutralite alors que le site declare des mises en avant
 // payantes serait la contradiction la plus visible qui soit : le destinataire a
 // les deux sous les yeux.
-const MENTION_LIENS = 'aucun éditeur ne paie pour figurer dans cet annuaire';
+const MENTION_LIENS = 'aucun éditeur ne paie pour figurer dans cet annuaire ; seule relation commerciale, signalée sur sa fiche : IA-Entrepreneur revend Goodweek';
 // Le jour venu : 'les mises en avant rémunérées y sont signalées'
 const CALENDLY = 'https://calendly.com/gabriel-ia-entrepreneur/decouverte';
 

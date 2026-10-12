@@ -188,6 +188,7 @@ const MENUS = [
     ["Automatiser mes rapports d'activité", '/integration-rapport-performance.html'],
   ], ['Voir toutes les intégrations', '/integrations-ia.html']],
   ['/meilleures-ia.html', 'Meilleures IA', [
+    ["Goodweek : toutes les IA réunies", '/partenaire-goodweek.html'],
     ["Quel assistant IA choisir", '/ia/meilleures-ia-assistants-ia.html'],
     ["Automatisation et agents IA", '/ia/meilleures-ia-automatisation.html'],
     ["Prospection, vente et CRM", '/ia/meilleures-ia-prospection-vente.html'],
