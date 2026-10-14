@@ -55,7 +55,6 @@ MENUS = [
         ("Exploiter Microsoft Copilot",          '/formation-microsoft-copilot-entreprise.html'),
         ("Créer mes propres automatisations",    '/formation-ia-automatisation.html'),
         ("Me mettre en conformité AI Act",       '/formation-ia-obligatoire-ai-act.html'),
-        ("Être accompagné en individuel",        '/coaching-ia-dirigeant.html'),
     ], None),
     ('/integrations-ia.html', 'Intégrations IA', [
         ("Créer mon chatbot client",             '/integration-chatbot-client.html'),

@@ -8,22 +8,12 @@ export const OFFRES = {
   'formation-sur-mesure': {
     url: '/formation-ia-entreprise.html',
     titre: 'Formation IA sur mesure pour vos équipes',
-    pour: "former une ÉQUIPE sur SES outils et SES cas métier, quels qu'ils soient. Trois niveaux, d'une demi-journée à deux jours. C'est le choix par défaut dès que plusieurs personnes sont concernées et que les outils recommandés ne correspondent pas exactement à une formation nommée.",
+    pour: "former une ÉQUIPE sur SES outils et SES cas métier, quels qu'ils soient. Trois niveaux, de 1 à 4 jours selon le niveau : acculturation IA (1 à 2 jours), IA métier (2 à 3 jours), automatisation et intégration (3 à 4 jours). C'est le choix par défaut dès que plusieurs personnes sont concernées et que les outils recommandés ne correspondent pas exactement à une formation nommée.",
   },
   'formation-independant': {
     url: '/formation-ia-independant.html',
     titre: 'Formation IA pour indépendants et freelances',
-    pour: "une personne SEULE (freelance, solopreneur, profession libérale, artisan) qui veut se former en session ouverte, en petit groupe et en visio, plutôt que faire venir un formateur pour elle. Si la personne veut un accompagnement individuel sur son cas précis, préférez le coaching dirigeant.",
-  },
-  'coaching-dirigeant': {
-    url: '/coaching-ia-dirigeant.html',
-    titre: 'Coaching IA individuel pour dirigeant',
-    pour: "un dirigeant seul qui veut avancer vite sans passer par une formation collective",
-  },
-  'audit-diagnostic': {
-    url: '/audit-diagnostic-ia-entreprise.html',
-    titre: "Audit et diagnostic IA de l'entreprise",
-    pour: "ne pas savoir par où commencer, ou vouloir cadrer avant d'investir",
+    pour: "une personne SEULE (freelance, solopreneur, profession libérale, artisan) qui veut se former en session ouverte, en petit groupe et en visio, plutôt que faire venir un formateur pour elle.",
   },
   'integration-cle-en-main': {
     url: '/integrations-ia.html',
@@ -57,8 +47,8 @@ export const OFFRES = {
   },
   'formation-ai-act': {
     url: '/formation-ia-obligatoire-ai-act.html',
-    titre: "Formation IA obligatoire — article 4 de l'AI Act",
-    pour: "se mettre en conformité et obtenir une attestation opposable",
+    titre: "Formation IA et AI Act : ce que demande l'article 4",
+    pour: "développer la maîtrise de l'IA de ses équipes, comme le demande l'article 4 de l'AI Act (obligation de moyens), avec une attestation individuelle et un registre de conformité comme preuve",
   },
 };
 

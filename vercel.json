@@ -12,6 +12,46 @@
       "permanent": true
     },
     {
+      "source": "/coaching-ia-dirigeant",
+      "destination": "/formation-ia-entreprise.html",
+      "permanent": true
+    },
+    {
+      "source": "/coaching-ia-dirigeant.html",
+      "destination": "/formation-ia-entreprise.html",
+      "permanent": true
+    },
+    {
+      "source": "/audit-diagnostic-ia-entreprise",
+      "destination": "/formation-ia-entreprise.html",
+      "permanent": true
+    },
+    {
+      "source": "/audit-diagnostic-ia-entreprise.html",
+      "destination": "/formation-ia-entreprise.html",
+      "permanent": true
+    },
+    {
+      "source": "/formations-creation",
+      "destination": "/",
+      "permanent": true
+    },
+    {
+      "source": "/formations-creation.html",
+      "destination": "/",
+      "permanent": true
+    },
+    {
+      "source": "/formateur-charly-michel",
+      "destination": "/nos-formateurs.html",
+      "permanent": true
+    },
+    {
+      "source": "/formateur-charly-michel.html",
+      "destination": "/nos-formateurs.html",
+      "permanent": true
+    },
+    {
       "source": "/(.*)",
       "has": [
         {

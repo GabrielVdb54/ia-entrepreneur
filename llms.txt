@@ -1,30 +1,31 @@
 # IA-Entrepreneur
-> Organisme de formation et d'accompagnement certifié Qualiopi, spécialisé en création d'entreprise et intelligence artificielle appliquée.
+> Organisme de formation certifié Qualiopi, spécialisé dans l'intelligence artificielle appliquée au travail : formations IA sur mesure pour les équipes d'entreprise, et intégrations IA clé en main.
 
-IA-Entrepreneur est fondé par Gabriel Vanderbecken, formateur praticien ayant accompagné plus de 1 500 porteurs de projet. L'organisme propose des formations et un accompagnement personnalisé pour les créateurs d'entreprise et les équipes d'entreprise.
+IA-Entrepreneur est fondé par Gabriel Vanderbecken, formateur praticien qui a accompagné plus de 1 500 professionnels depuis 2020. Références : une formation déployée pour GRDF Est, des interventions régulières à l'ECM Nancy (enseignement supérieur).
 
-## Formations proposées
+## Formations IA en entreprise
+Intra-entreprise et sur mesure (métier, cas réels et logiciels du client), groupes de 12 personnes maximum, en présentiel ou à distance. Sur devis : IA-Entrepreneur monte le dossier de financement OPCO pour viser zéro reste à charge. Chaque participant reçoit une attestation individuelle de formation (AI Act, RGPD, gouvernance, données sensibles) ; l'entreprise reçoit un registre de conformité AI Act.
+- Niveau 1 — Montée en compétences / acculturation IA (1 à 2 jours) : comprendre les IA, savoir laquelle est bonne pour quoi, bonnes pratiques et erreurs à éviter
+- Niveau 2 — IA métier (2 à 3 jours) : l'IA dans les process et les logiciels internes de l'entreprise
+- Niveau 3 — Automatisation & intégration (3 à 4 jours) : automatiser et intégrer soi-même des solutions IA liées au métier
+- Page : https://ia-entrepreneur.fr/formation-ia-entreprise.html
 
-### Création d'entreprise
-- Accompagnement de A à Z : statut juridique, business plan, financement, premiers clients
-- Moins de 5% d'échec parmi les accompagnés
-- Certifié Qualiopi, finançable OPCO
-
-### Formations entreprises (sur mesure, finançables OPCO)
-- Formation IA obligatoire — article 4 de l'AI Act : obligation d'alphabétisation à l'IA en vigueur depuis le 2 février 2025, inventaire des systèmes utilisés, classement par niveau de risque, documentation de la conformité — https://ia-entrepreneur.fr/formation-ia-obligatoire-ai-act.html
+### Formations thématiques (sur mesure, sur devis)
+- Formation IA et AI Act : l'article 4, applicable depuis le 2 février 2025, demande aux entreprises qui utilisent l'IA de prendre des mesures pour développer la maîtrise de l'IA de leur personnel ; depuis le règlement Digital Omnibus, c'est une obligation de moyens — https://ia-entrepreneur.fr/formation-ia-obligatoire-ai-act.html
 - Formation ChatGPT en entreprise : rédiger, analyser un document, préparer une réunion, créer des assistants sur mesure — https://ia-entrepreneur.fr/formation-chatgpt-entreprise.html
 - Formation Microsoft Copilot : pour une entreprise déjà équipée de Microsoft 365 — https://ia-entrepreneur.fr/formation-microsoft-copilot-entreprise.html
-- Formation IA & Automatisation : ChatGPT, n8n, Make, automatisation des process — https://ia-entrepreneur.fr/formation-ia-automatisation.html
-- Formation Prospection Commerciale & IA : LinkedIn, emailing, phoning, closing — https://ia-entrepreneur.fr/formation-prospection-commerciale.html
-- Formation Techniques de Vente & Closing : taux de transformation, défense des marges — https://ia-entrepreneur.fr/formation-techniques-vente-closing.html
+- Formation IA & Automatisation : n8n, Make, automatisation des process — https://ia-entrepreneur.fr/formation-ia-automatisation.html
+- Formation Prospection Commerciale & IA : LinkedIn, emailing, phoning — https://ia-entrepreneur.fr/formation-prospection-commerciale.html
+- Formation Techniques de Vente & Closing — https://ia-entrepreneur.fr/formation-techniques-vente-closing.html
 - Formation Management & Leadership : délégation, feedback, gestion des conflits
 - Formation Négociation Commerciale : concessions, grands comptes, posture
 - Formation Prise de Parole en Public : pitcher, convaincre, gérer le stress
 
-### Autres accompagnements
-- Coaching IA individuel pour dirigeant : avancer vite sans passer par une formation collective — https://ia-entrepreneur.fr/coaching-ia-dirigeant.html
-- Audit et diagnostic IA de l'entreprise : cadrer avant d'investir, quand on ne sait pas par où commencer — https://ia-entrepreneur.fr/audit-diagnostic-ia-entreprise.html
-- Intégration IA clé en main : obtenir le résultat sans que personne en interne ait à s'en occuper — https://ia-entrepreneur.fr/integrations-ia.html
+### Indépendants et freelances
+- Sessions ouvertes, en liste d'attente : le tarif est communiqué avec les dates — https://ia-entrepreneur.fr/formation-ia-independant.html
+
+### Autres services
+- Intégration IA clé en main, sur devis : obtenir le résultat sans que personne en interne ait à s'en occuper (chatbot client, réponse email, comptes rendus de réunion, contenu SEO, veille concurrentielle, rapports) — https://ia-entrepreneur.fr/integrations-ia.html
 - Goodweek, plateforme IA d'entreprise (partenaire) : les versions les plus puissantes de Claude (dont Opus et Fable), ChatGPT (dont GPT-6 Astra et Sol), Gemini, Mistral et Nova dans un seul espace, éditeur français, versions des modèles hébergées en France, connectée aux outils de l'entreprise. IA-Entrepreneur en est revendeur partenaire : installation, paramétrage et formation des équipes. 32 € HT par utilisateur et par mois, contre environ 139 € HT pour accéder séparément au modèle phare de chaque éditeur ; réservé aux professionnels — https://ia-entrepreneur.fr/partenaire-goodweek.html
 
 ## Informations légales
@@ -53,7 +54,6 @@ Annuaire indépendant et gratuit de 130 outils d'intelligence artificielle, clas
 
 ## Pages principales
 - Accueil : https://ia-entrepreneur.fr/
-- Formation création d'entreprise : https://ia-entrepreneur.fr/formations-creation.html
 - Formation IA en entreprise (équipes, sur mesure, 3 niveaux) : https://ia-entrepreneur.fr/formation-ia-entreprise.html
 - Formation IA pour indépendants et freelances (sessions ouvertes, 3 niveaux) : https://ia-entrepreneur.fr/formation-ia-independant.html
 - À propos : https://ia-entrepreneur.fr/apropos.html
