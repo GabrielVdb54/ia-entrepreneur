@@ -25,7 +25,7 @@ IA-Entrepreneur est fondé par Gabriel Vanderbecken, formateur praticien ayant a
 - Coaching IA individuel pour dirigeant : avancer vite sans passer par une formation collective — https://ia-entrepreneur.fr/coaching-ia-dirigeant.html
 - Audit et diagnostic IA de l'entreprise : cadrer avant d'investir, quand on ne sait pas par où commencer — https://ia-entrepreneur.fr/audit-diagnostic-ia-entreprise.html
 - Intégration IA clé en main : obtenir le résultat sans que personne en interne ait à s'en occuper — https://ia-entrepreneur.fr/integrations-ia.html
-- Goodweek, plateforme IA d'entreprise (partenaire) : Claude, ChatGPT, Gemini, Mistral et Nova dans un seul espace, éditeur français, versions des modèles hébergées en France, connectée aux outils de l'entreprise. IA-Entrepreneur en est revendeur partenaire : installation, paramétrage et formation des équipes. 32 € HT par utilisateur et par mois, réservé aux professionnels — https://ia-entrepreneur.fr/partenaire-goodweek.html
+- Goodweek, plateforme IA d'entreprise (partenaire) : les versions les plus puissantes de Claude (dont Opus et Fable), ChatGPT (dont GPT-6 Astra et Sol), Gemini, Mistral et Nova dans un seul espace, éditeur français, versions des modèles hébergées en France, connectée aux outils de l'entreprise. IA-Entrepreneur en est revendeur partenaire : installation, paramétrage et formation des équipes. 32 € HT par utilisateur et par mois, contre environ 139 € HT pour accéder séparément au modèle phare de chaque éditeur ; réservé aux professionnels — https://ia-entrepreneur.fr/partenaire-goodweek.html
 
 ## Informations légales
 - Raison sociale : Clindit SASU — IA-Entrepreneur est une marque de Clindit
