@@ -278,6 +278,34 @@
         "@type": "Organization",
         "name": "IA-Entrepreneur"
       }
+    },
+    {
+      "@type": "Person",
+      "position": 12,
+      "name": "Cyril Cieslak",
+      "jobTitle": "Formateur en IA générative et concepteur d'agents IA",
+      "description": "Formateur en IA générative et concepteur d'agents IA, fondateur de FikolasAI. Mentor et évaluateur OpenClassrooms depuis 2020 (plus de 3 000 sessions de mentorat, plus de 1 400 soutenances évaluées). Forme dirigeants, entrepreneurs et équipes à partir de leurs besoins professionnels : rédiger, synthétiser, rechercher, organiser une veille ou créer un assistant métier.",
+      "image": "https://ia-entrepreneur.fr/images/cyril-cieslak.jpg",
+      "url": "https://ia-entrepreneur.fr/nos-formateurs.html#cyril-cieslak",
+      "knowsAbout": [
+        "IA générative",
+        "ChatGPT",
+        "Prompting",
+        "IA appliquée aux métiers",
+        "Veille stratégique assistée par IA",
+        "Assistants IA",
+        "Agents IA",
+        "Automatisation",
+        "Pédagogie pour adultes"
+      ],
+      "knowsLanguage": [
+        "fr",
+        "en"
+      ],
+      "worksFor": {
+        "@type": "Organization",
+        "name": "IA-Entrepreneur"
+      }
     }
   ]
 }
@@ -416,6 +444,14 @@
     flex-wrap: wrap;
     gap: 6px;
     margin-bottom: 18px;
+  }
+
+  /* Dans les profils, les pastilles sont collées sans espace : sans flex,
+     elles ne passent à la ligne qu'au milieu d'un intitulé, ou débordent. */
+  .detail-block .pills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
   }
 
   .pill {
@@ -862,6 +898,7 @@
     <a href="/formateur-ryad-mimeche.html">Ryad Mimeche</a>
     <a href="/formateur-myriam-djebbara.html">Myriam Djebbara</a>
     <a href="/formateur-fathi-sehla.html">Fathi Sehla</a>
+    <a href="/formateur-cyril-cieslak.html">Cyril Cieslak</a>
   </div>
 
   <div class="search-wrap">
@@ -1455,6 +1492,53 @@
           <button class="cta-rappel" data-action="rappel" data-formateur-id="fathi-sehla">Demander à être rappelé par Fathi</button>
         </div>
       </section>
+      <section class="profil-complet" id="cyril-cieslak">
+        <div class="modal-header">
+          <div class="identite-row">
+            <img class="photo" src="images/cyril-cieslak.jpg" alt="Cyril Cieslak, Formateur en IA générative · Concepteur d'agents IA">
+            <div>
+              <h2>Cyril Cieslak</h2>
+              <p class="role">Formateur en IA générative · Concepteur d'agents IA</p>
+              <p class="loc">Distanciel partout en France · Présentiel sur planification · Français et anglais</p>
+            </div>
+          </div>
+          <button class="cta-rappel" data-action="rappel" data-formateur-id="cyril-cieslak">Être rappelé</button>
+        </div>
+        <p class="bio">Formateur en intelligence artificielle générative et concepteur d'agents IA, Cyril est le fondateur de FikolasAI. Il accompagne les entrepreneurs, les dirigeants et les équipes dans l'adoption de l'IA à partir de leurs besoins professionnels : rédiger, synthétiser, rechercher, organiser une veille ou créer un assistant métier, avec une approche accessible aux publics non techniques. Mentor et évaluateur OpenClassrooms depuis juillet 2020, il a réalisé plus de 3 000 sessions de mentorat et évalué plus de 1 400 soutenances. Son parcours associe pédagogie pour adultes, développement Android, gestion de produit et direction de projets industriels internationaux. Il part d'un besoin métier et d'un diagnostic des acquis : ses séances alternent explications courtes, démonstrations, exercices guidés et mises en situation sur les cas des participants, qui repartent avec des livrables réutilisables (prompts, synthèses, procédures ou assistants adaptés à leur activité). Il accorde une attention particulière à la confidentialité des données, à la vérification des réponses et à la validation humaine, et intervient en français et en anglais, à distance et en présentiel.</p>
+        <div class="stats-row">
+          <div class="stat"><div class="num">3 000+</div><div class="label">Sessions de mentorat OpenClassrooms depuis 2020</div></div><div class="stat"><div class="num">1 400+</div><div class="label">Soutenances évaluées par compétences</div></div><div class="stat"><div class="num">FR · EN</div><div class="label">Interventions en français et en anglais</div></div><div class="stat"><div class="num">France Num</div><div class="label">Activateur référencé en 2026</div></div>
+        </div>
+        <div class="detail-grid">
+          <div class="detail-block">
+            <h3>Compétences clés</h3>
+            <ul class="simple"><li>Acculturation à l'IA générative : possibilités, limites, confidentialité et vérification des réponses</li><li>IA appliquée aux métiers : rédaction, synthèse, recherche et veille</li><li>Cas d'usage commerciaux, RH, marketing et management</li><li>Veille stratégique : recherche sourcée, comparaison et synthèse avec ChatGPT, NotebookLM et Perplexity</li><li>Assistants et agents IA : cadrage du besoin, consignes, ressources documentaires, tests et validation humaine</li><li>Automatisation : décomposer un processus, repérer les tâches pertinentes et construire un premier workflow</li></ul>
+          </div>
+          <div class="detail-block">
+            <h3>Public visé</h3>
+            <div class="pills"><span class="pill">Dirigeants</span><span class="pill">Entrepreneurs</span><span class="pill">Équipes commerciales</span><span class="pill">RH &amp; management</span><span class="pill">Marketing</span><span class="pill">Publics non techniques</span></div>
+          </div>
+        </div>
+        <div class="detail-grid">
+          <div class="detail-block">
+            <h3>Outils maîtrisés</h3>
+            <div class="pills"><span class="pill outil">ChatGPT</span><span class="pill outil">Claude</span><span class="pill outil">Gemini</span><span class="pill outil">NotebookLM</span><span class="pill outil">Perplexity</span><span class="pill outil">Dust</span><span class="pill outil">Codex</span><span class="pill outil">Hermes</span><span class="pill outil">Google Workspace</span><span class="pill outil">Airtable</span><span class="pill outil">Notion</span></div>
+          </div>
+          <div class="detail-block">
+            <h3>Références</h3>
+            <div class="refs"><span class="ref-tag">Mentor et évaluateur OpenClassrooms depuis 2020 : parcours IA et no-code, Product Management, UX, pédagogie</span><span class="ref-tag">Formation à l'IA appliquée à la veille stratégique (2026)</span><span class="ref-tag">Auteur du cours Udemy « IA pour les pros : 15 mini-projets concrets »</span><span class="ref-tag">Google Certified Educator (2026)</span><span class="ref-tag">Activateur France Num (2026)</span><span class="ref-tag">Ateliers métier, accompagnement individuel, formation de formateurs</span></div>
+          </div>
+        </div>
+        <div class="detail-block">
+          <h3>Sa méthode, en ses mots</h3>
+          <div class="temoignage">
+            <p>« Je pars d'un besoin métier et d'un diagnostic des acquis. Les participants produisent des livrables réutilisables : prompts, synthèses, procédures ou assistants adaptés à leur activité. »</p>
+            <div class="auteur">Cyril Cieslak</div>
+          </div>
+        </div>
+        <div class="cta-rappel-bas">
+          <button class="cta-rappel" data-action="rappel" data-formateur-id="cyril-cieslak">Demander à être rappelé par Cyril</button>
+        </div>
+      </section>
     </div>
 
 <script>
@@ -1815,6 +1899,37 @@ const formateurs = [
     temoignage: {
       texte: "Pas de théorie hors sol, pas de slides à emporter. Chacun travaille sur ses propres dossiers et repart avec des livrables utilisables dès le lendemain.",
       auteur: "Fathi Sehla"
+    }
+  },
+  {
+    id: "cyril-cieslak",
+    nom: "Cyril Cieslak",
+    role: "Formateur en IA générative · Concepteur d'agents IA",
+    loc: "Distanciel partout en France · Présentiel sur planification · Français et anglais",
+    photo: "images/cyril-cieslak.jpg",
+    pitch: "Forme dirigeants et équipes à l'IA à partir de leurs propres tâches et documents : rédiger, synthétiser, faire sa veille, créer un assistant métier. Mentor et évaluateur OpenClassrooms depuis 2020.",
+    specialites: ["IA générative & ChatGPT", "Assistants & agents IA", "Pédagogie pour adultes"],
+    bio: "Formateur en intelligence artificielle générative et concepteur d'agents IA, Cyril est le fondateur de FikolasAI. Il accompagne les entrepreneurs, les dirigeants et les équipes dans l'adoption de l'IA à partir de leurs besoins professionnels : rédiger, synthétiser, rechercher, organiser une veille ou créer un assistant métier, avec une approche accessible aux publics non techniques. Mentor et évaluateur OpenClassrooms depuis juillet 2020, il a réalisé plus de 3 000 sessions de mentorat et évalué plus de 1 400 soutenances. Son parcours associe pédagogie pour adultes, développement Android, gestion de produit et direction de projets industriels internationaux. Il part d'un besoin métier et d'un diagnostic des acquis : ses séances alternent explications courtes, démonstrations, exercices guidés et mises en situation sur les cas des participants, qui repartent avec des livrables réutilisables (prompts, synthèses, procédures ou assistants adaptés à leur activité). Il accorde une attention particulière à la confidentialité des données, à la vérification des réponses et à la validation humaine, et intervient en français et en anglais, à distance et en présentiel.",
+    stats: [
+      { num: "3 000+", label: "Sessions de mentorat OpenClassrooms depuis 2020" },
+      { num: "1 400+", label: "Soutenances évaluées par compétences" },
+      { num: "FR · EN", label: "Interventions en français et en anglais" },
+      { num: "France Num", label: "Activateur référencé en 2026" }
+    ],
+    competences: [
+      "Acculturation à l'IA générative : possibilités, limites, confidentialité et vérification des réponses",
+      "IA appliquée aux métiers : rédaction, synthèse, recherche et veille",
+      "Cas d'usage commerciaux, RH, marketing et management",
+      "Veille stratégique : recherche sourcée, comparaison et synthèse avec ChatGPT, NotebookLM et Perplexity",
+      "Assistants et agents IA : cadrage du besoin, consignes, ressources documentaires, tests et validation humaine",
+      "Automatisation : décomposer un processus, repérer les tâches pertinentes et construire un premier workflow"
+    ],
+    public: ["Dirigeants", "Entrepreneurs", "Équipes commerciales", "RH & management", "Marketing", "Publics non techniques"],
+    outils: ["ChatGPT", "Claude", "Gemini", "NotebookLM", "Perplexity", "Dust", "Codex", "Hermes", "Google Workspace", "Airtable", "Notion"],
+    references: ["Mentor et évaluateur OpenClassrooms depuis 2020 : parcours IA et no-code, Product Management, UX, pédagogie", "Formation à l'IA appliquée à la veille stratégique (2026)", "Auteur du cours Udemy « IA pour les pros : 15 mini-projets concrets »", "Google Certified Educator (2026)", "Activateur France Num (2026)", "Ateliers métier, accompagnement individuel, formation de formateurs"],
+    temoignage: {
+      texte: "Je pars d'un besoin métier et d'un diagnostic des acquis. Les participants produisent des livrables réutilisables : prompts, synthèses, procédures ou assistants adaptés à leur activité.",
+      auteur: "Cyril Cieslak"
     }
   }
 ];
