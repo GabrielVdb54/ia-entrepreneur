@@ -230,7 +230,7 @@
  },
  {
   "slug": "notebooklm",
-  "name": "NotebookLM",
+  "name": "Gemini Notebook",
   "url": "https://notebooklm.google.com/",
   "cat": "assistants-ia",
   "cats": [
@@ -248,9 +248,9 @@
    "RH",
    "Ops"
   ],
-  "tags": "notebooklm google documents sources synthese podcast audio recherche",
+  "tags": "gemini notebook notebooklm google documents sources synthese podcast audio recherche",
   "note": 4.6,
-  "resume": "Un assistant qui ne répond qu'à partir des documents que vous lui donnez : idéal pour interroger vos procédures, vos rapports ou votre documentation.",
+  "resume": "L'ex-NotebookLM de Google : un assistant qui ne répond qu'à partir de vos documents, idéal pour interroger vos procédures, rapports ou documentation.",
   "forces": [
    "Chaque réponse est sourcée et renvoie au passage exact du document : très peu d'inventions",
    "Transforme un corpus documentaire en synthèse, en FAQ ou en résumé audio de type podcast",

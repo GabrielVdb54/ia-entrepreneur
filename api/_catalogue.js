@@ -582,6 +582,21 @@ export const CATALOGUE = [
 ]
 },
 {
+"slug": "notebooklm",
+"nom": "Gemini Notebook",
+"usage": "Assistants IA & LLM",
+"niveau": "Débutant",
+"prix": "Freemium",
+"pays": "États-Unis",
+"resume": "L'ex-NotebookLM de Google : un assistant qui ne répond qu'à partir de vos documents, idéal pour interroger vos procédures, rapports ou documentation.",
+"profils": [
+"Dirigeant",
+"Formateur",
+"RH",
+"Ops"
+]
+},
+{
 "slug": "gemini-image",
 "nom": "Gemini — Nano Banana",
 "usage": "Images & design",
@@ -1138,21 +1153,6 @@ export const CATALOGUE = [
 "RH",
 "Dirigeant",
 "Commercial"
-]
-},
-{
-"slug": "notebooklm",
-"nom": "NotebookLM",
-"usage": "Assistants IA & LLM",
-"niveau": "Débutant",
-"prix": "Freemium",
-"pays": "États-Unis",
-"resume": "Un assistant qui ne répond qu'à partir des documents que vous lui donnez : idéal pour interroger vos procédures, vos rapports ou votre documentation.",
-"profils": [
-"Dirigeant",
-"Formateur",
-"RH",
-"Ops"
 ]
 },
 {
