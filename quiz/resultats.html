@@ -24,6 +24,8 @@
   .barre-outils img { height: 36px; margin-right: auto; }
   select, input, button { font: inherit; font-size: 16px; }
   select, input[type=password] { padding: 10px 12px; border: 1.5px solid var(--line); border-radius: 12px; background: #fff; color: var(--text); }
+  /* Un select prend la largeur de son option la plus longue : sur téléphone, « 4.1 · Le sondage… » faisait déborder la page. */
+  select { max-width: 100%; }
   .onglets { display: inline-flex; background: #fff; border: 1.5px solid var(--line); border-radius: 50px; padding: 3px; }
   .onglets button { border: none; background: none; padding: 8px 16px; border-radius: 50px; font-weight: 700; color: var(--muted); cursor: pointer; }
   .onglets button[aria-pressed=true] { background: var(--primary); color: #fff; }
