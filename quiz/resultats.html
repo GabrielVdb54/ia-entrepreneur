@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Résultats du quiz · IA-Entrepreneur</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="icon" type="image/png" href="/favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  /* Page du formateur, faite pour être partagée dans le Meet : grands
+     caractères, rien d'autre à l'écran que ce que les participantes doivent voir. */
+  :root {
+    --bg: #F7F8FD; --card: #FFFFFF; --text: #0A0F2C; --muted: #525880; --line: #E3E7F5;
+    --primary: #1A3CFF; --primary-soft: #EEF1FF; --accent: #10B981; --accent-dark: #0E7A57; --accent-soft: #E7F8F1;
+    --gold: #F59E0B; --gold-soft: #FFF8E6; --danger: #B42318;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text); font-family: 'Plus Jakarta Sans', Arial, sans-serif; font-size: 18px; line-height: 1.45; }
+  .wrap { max-width: 1280px; margin: 0 auto; padding: 24px 16px 64px; }
+  .barre-outils { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin-bottom: 24px; }
+  .barre-outils img { height: 36px; margin-right: auto; }
+  select, input, button { font: inherit; font-size: 16px; }
+  select, input[type=password] { padding: 10px 12px; border: 1.5px solid var(--line); border-radius: 12px; background: #fff; color: var(--text); }
+  .onglets { display: inline-flex; background: #fff; border: 1.5px solid var(--line); border-radius: 50px; padding: 3px; }
+  .onglets button { border: none; background: none; padding: 8px 16px; border-radius: 50px; font-weight: 700; color: var(--muted); cursor: pointer; }
+  .onglets button[aria-pressed=true] { background: var(--primary); color: #fff; }
+  .bascule { border: 1.5px solid var(--line); background: #fff; padding: 9px 14px; border-radius: 50px; font-weight: 700; color: var(--text); cursor: pointer; }
+  .bascule[aria-pressed=true] { border-color: var(--accent); background: var(--accent-soft); color: var(--accent-dark); }
+  .entete { display: flex; justify-content: space-between; align-items: flex-end; gap: 24px; flex-wrap: wrap; margin-bottom: 24px; }
+  .eyebrow { font-size: 15px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--accent-dark); }
+  h1 { font-size: 44px; line-height: 1.15; font-weight: 800; }
+  .compteur { text-align: right; }
+  .compteur .n { font-size: 64px; font-weight: 800; line-height: 1; color: var(--primary); }
+  .compteur .l { font-size: 16px; color: var(--muted); font-weight: 600; }
+  .grille { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 560px), 1fr)); gap: 20px; }
+  .question { background: var(--card); border: 1px solid var(--line); border-radius: 20px; padding: 24px; }
+  .question h2 { font-size: 22px; line-height: 1.35; margin-bottom: 16px; }
+  .option { margin-bottom: 12px; }
+  .option .ligne { display: flex; justify-content: space-between; gap: 12px; font-size: 17px; font-weight: 600; margin-bottom: 5px; }
+  .option .ligne .val { color: var(--muted); white-space: nowrap; }
+  .jauge { height: 14px; background: var(--bg); border-radius: 8px; overflow: hidden; }
+  .jauge span { display: block; height: 100%; background: #B9C3F5; border-radius: 8px; transition: width .4s; }
+  .jauge.avant span { background: #D7DCEE; }
+  .option.bonne .ligne { color: var(--accent-dark); }
+  .option.bonne .jauge span { background: var(--accent); }
+  .comparaison { font-size: 14px; color: var(--muted); margin: 2px 0 4px; }
+  .expl { margin-top: 14px; padding: 12px 14px; background: var(--accent-soft); border-radius: 12px; font-size: 16px; color: var(--accent-dark); }
+  .podium { background: var(--card); border: 1px solid var(--line); border-radius: 20px; padding: 8px 24px; }
+  .rang { display: flex; align-items: center; gap: 18px; padding: 16px 0; border-bottom: 1px solid var(--line); font-size: 22px; }
+  .rang:last-child { border-bottom: none; }
+  .rang .pos { width: 52px; height: 52px; border-radius: 50%; background: var(--bg); display: flex; align-items: center; justify-content: center; font-weight: 800; flex: none; }
+  .rang.premier .pos { background: var(--gold-soft); color: #92400E; }
+  .rang .nom { font-weight: 700; flex: 1; }
+  .rang .pts { font-weight: 800; color: var(--primary); }
+  .rang .det { font-size: 15px; color: var(--muted); }
+  .vide, .alerte { background: var(--card); border: 1px dashed var(--line); border-radius: 20px; padding: 40px 24px; text-align: center; color: var(--muted); font-size: 20px; }
+  .alerte { border-style: solid; color: var(--danger); font-size: 17px; }
+  .connexion { max-width: 420px; margin: 80px auto; background: var(--card); border: 1px solid var(--line); border-radius: 20px; padding: 28px; }
+  .connexion h1 { font-size: 26px; margin-bottom: 8px; }
+  .connexion p { color: var(--muted); font-size: 15px; margin-bottom: 16px; }
+  .connexion input { width: 100%; margin-bottom: 12px; }
+  .btn { width: 100%; padding: 13px; border: none; border-radius: 50px; background: var(--primary); color: #fff; font-weight: 700; cursor: pointer; }
+  .petit { font-size: 14px; color: var(--muted); margin-top: 18px; }
+  .lien-part { font-size: 16px; color: var(--muted); margin-top: 6px; }
+  .lien-part b { color: var(--text); }
+</style>
+</head>
+<body>
+<div class="wrap" id="app"></div>
+<script>
+(function () {
+  'use strict';
+  var params = new URLSearchParams(location.search);
+  var FORMATION = params.get('f') || 'prudence-creole';
+  var app = document.getElementById('app');
+
+  function lire(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
+  function ecrire(k, v) { try { localStorage.setItem(k, v); } catch (e) {} }
+
+  // Tout l'état vit en mémoire ; l'URL garde l'activité et le groupe pour
+  // qu'un rechargement retombe au même endroit.
+  var etat = {
+    cle: lire('quiz-cle-formateur') || '',
+    vue: params.get('vue') || 'resultats',
+    activite: params.get('a') || '1.1',
+    groupe: params.get('groupe') || lire('quiz-groupe') || '',
+    // Masqués par défaut : on laisse le groupe débattre avant de révéler.
+    reponses: false,
+    noms: false,
+    catalogue: null
+  };
+  var minuteur = null;
+
+  function el(tag, attrs, enfants) {
+    var n = document.createElement(tag);
+    if (attrs) Object.keys(attrs).forEach(function (k) {
+      if (k === 'texte') n.textContent = attrs[k];
+      else if (k === 'onclick') n.addEventListener('click', attrs[k]);
+      else if (k === 'onchange') n.addEventListener('change', attrs[k]);
+      else if (attrs[k] !== null && attrs[k] !== false) n.setAttribute(k, attrs[k]);
+    });
+    (enfants || []).forEach(function (c) { if (c) n.appendChild(typeof c === 'string' ? document.createTextNode(c) : c); });
+    return n;
+  }
+
+  function api(q) {
+    return fetch('/api/quiz?f=' + encodeURIComponent(FORMATION) + '&' + q, { headers: { 'X-Cle-Formateur': etat.cle } })
+      .then(function (r) { return r.json().then(function (j) { if (!r.ok) { var e = new Error(j.erreur || r.status); e.status = r.status; throw e; } return j; }); });
+  }
+
+  function majUrl() {
+    var p = new URLSearchParams();
+    if (FORMATION !== 'prudence-creole') p.set('f', FORMATION);
+    p.set('vue', etat.vue);
+    if (etat.vue === 'resultats') p.set('a', etat.activite);
+    if (etat.groupe) p.set('groupe', etat.groupe);
+    history.replaceState(null, '', '?' + p.toString());
+  }
+
+  /* ---- Connexion ---- */
+  function ecranConnexion(message) {
+    clearInterval(minuteur);
+    var champ = el('input', { type: 'password', placeholder: 'Clé formateur', autocomplete: 'current-password' });
+    var form = el('form', { class: 'connexion' }, [
+      el('h1', { texte: 'Résultats du quiz' }),
+      el('p', { texte: 'Entrez la clé formateur (variable QUIZ_CLE_FORMATEUR sur Vercel).' }),
+      champ,
+      message ? el('p', { style: 'color:#B42318', texte: message }) : null,
+      el('button', { class: 'btn', type: 'submit', texte: 'Ouvrir' })
+    ]);
+    form.addEventListener('submit', function (ev) {
+      ev.preventDefault();
+      etat.cle = champ.value.trim();
+      ecrire('quiz-cle-formateur', etat.cle);
+      demarrer();
+    });
+    app.innerHTML = '';
+    app.appendChild(form);
+    champ.focus();
+  }
+
+  /* ---- Barre d'outils ---- */
+  function barre() {
+    var choixAct = el('select', { 'aria-label': 'Activité', onchange: function (e) { etat.activite = e.target.value; etat.reponses = false; rafraichir(true); } },
+      etat.catalogue.activites.map(function (a) {
+        return el('option', { value: a.id, selected: a.id === etat.activite ? 'selected' : null, texte: a.id + ' · ' + a.titre });
+      }));
+    var choixGroupe = el('select', { 'aria-label': 'Groupe', onchange: function (e) { etat.groupe = e.target.value; ecrire('quiz-groupe', etat.groupe); rafraichir(true); } },
+      [el('option', { value: '', texte: 'Les deux groupes' })].concat(Object.keys(etat.catalogue.groupes).map(function (g) {
+        return el('option', { value: g, selected: g === etat.groupe ? 'selected' : null, texte: etat.catalogue.groupes[g] });
+      })));
+    // Un sondage n'a ni bonne réponse ni score : pas de boutons qui ne feraient rien.
+    var sondage = etat.catalogue.activites.some(function (a) { return a.id === etat.activite && a.sondage; });
+    function onglet(vue, libelle) {
+      return el('button', { 'aria-pressed': String(etat.vue === vue), texte: libelle, onclick: function () { etat.vue = vue; rafraichir(true); } });
+    }
+    return el('div', { class: 'barre-outils' }, [
+      el('img', { src: '/images/logo-ia-entrepreneur-compact.png', alt: 'IA-Entrepreneur' }),
+      el('div', { class: 'onglets' }, [onglet('resultats', 'Activité'), onglet('classement', 'Championnat')]),
+      etat.vue === 'resultats' ? choixAct : null,
+      choixGroupe,
+      etat.vue === 'resultats' && !sondage ? el('button', { class: 'bascule', 'aria-pressed': String(etat.reponses), texte: etat.reponses ? 'Bonnes réponses affichées' : 'Révéler les réponses', onclick: function () { etat.reponses = !etat.reponses; rafraichir(true); } }) : null,
+      etat.vue === 'resultats' && !sondage ? el('button', { class: 'bascule', 'aria-pressed': String(etat.noms), texte: etat.noms ? 'Scores affichés' : 'Afficher les scores', onclick: function () { etat.noms = !etat.noms; rafraichir(true); } }) : null
+    ]);
+  }
+
+  /* ---- Vue activité ---- */
+  function vueActivite(r, avant) {
+    var nb = r.participantes.length;
+    var lien = location.origin + '/quiz/?a=' + r.id + (FORMATION !== 'prudence-creole' ? '&f=' + FORMATION : '');
+    var blocs = [
+      el('div', { class: 'entete' }, [
+        el('div', null, [
+          el('p', { class: 'eyebrow', texte: 'Activité ' + r.id + (r.sondage ? ' · sondage' : '') }),
+          el('h1', { texte: r.titre }),
+          el('p', { class: 'lien-part' }, ['Pour répondre : ', el('b', { texte: lien.replace(/^https?:\/\//, '') })])
+        ]),
+        el('div', { class: 'compteur' }, [el('div', { class: 'n', texte: String(nb) }), el('div', { class: 'l', texte: nb > 1 ? 'réponses' : 'réponse' })])
+      ])
+    ];
+    if (!nb) {
+      blocs.push(el('div', { class: 'vide', texte: 'En attente des premières réponses…' }));
+      return blocs;
+    }
+    var grille = el('div', { class: 'grille' });
+    r.questions.forEach(function (q, i) {
+      var total = q.comptes.reduce(function (s, c) { return s + c; }, 0) || 1;
+      var totalAvant = avant ? (avant.questions[i].comptes.reduce(function (s, c) { return s + c; }, 0) || 1) : 0;
+      var opts = q.o.map(function (texte, j) {
+        var pct = Math.round((q.comptes[j] / total) * 100);
+        var bonne = etat.reponses && q.a === j;
+        var enfants = [
+          el('div', { class: 'ligne' }, [el('span', { texte: (bonne ? '✓ ' : '') + texte }), el('span', { class: 'val', texte: q.comptes[j] + ' · ' + pct + ' %' })]),
+          el('div', { class: 'jauge' }, [el('span', { style: 'width:' + pct + '%' })])
+        ];
+        if (avant) {
+          var pa = Math.round((avant.questions[i].comptes[j] / totalAvant) * 100);
+          enfants.push(el('div', { class: 'comparaison', texte: 'Séance 1 : ' + pa + ' %' }));
+          enfants.push(el('div', { class: 'jauge avant' }, [el('span', { style: 'width:' + pa + '%' })]));
+        }
+        return el('div', { class: 'option' + (bonne ? ' bonne' : '') }, enfants);
+      });
+      grille.appendChild(el('div', { class: 'question' }, [
+        el('h2', { texte: (r.questions.length > 1 ? (i + 1) + '. ' : '') + q.q }),
+        el('div', null, opts),
+        etat.reponses && q.a !== null ? el('div', { class: 'expl', texte: q.e }) : null
+      ]));
+    });
+    blocs.push(grille);
+    if (etat.noms && !r.sondage) {
+      blocs.push(el('h2', { style: 'margin:32px 0 12px;font-size:26px', texte: 'Les scores' }));
+      blocs.push(classementListe(r.participantes.map(function (p) { return { prenom: p.prenom, points: p.score, det: 'sur ' + p.total }; })));
+    }
+    return blocs;
+  }
+
+  function classementListe(lignes) {
+    var pos = 0, precedent = null;
+    return el('div', { class: 'podium' }, lignes.map(function (l, i) {
+      if (l.points !== precedent) { pos = i + 1; precedent = l.points; }
+      return el('div', { class: 'rang' + (pos === 1 ? ' premier' : '') }, [
+        el('div', { class: 'pos', texte: String(pos) }),
+        el('div', { class: 'nom', texte: l.prenom }),
+        l.det ? el('div', { class: 'det', texte: l.det }) : null,
+        el('div', { class: 'pts', texte: l.points + ' pt' + (l.points > 1 ? 's' : '') })
+      ]);
+    }));
+  }
+
+  /* ---- Vue championnat ---- */
+  function vueClassement(r) {
+    var blocs = [el('div', { class: 'entete' }, [el('div', null, [
+      el('p', { class: 'eyebrow', texte: 'Championnat · points des quiz' }),
+      el('h1', { texte: etat.groupe ? etat.catalogue.groupes[etat.groupe] : 'Les deux groupes' })
+    ])])];
+    if (!r.classement.length) blocs.push(el('div', { class: 'vide', texte: 'Aucune réponse pour l’instant.' }));
+    else blocs.push(classementListe(r.classement.map(function (p) {
+      return { prenom: p.prenom, points: p.points, det: p.activites + (p.activites > 1 ? ' activités' : ' activité') };
+    })));
+    blocs.push(el('p', { class: 'petit', texte: '1 point par bonne réponse, sondages exclus. À ajouter au tableau des points : missions, jeux de rôle, phrases d’or et bingo.' }));
+    return blocs;
+  }
+
+  /* ---- Rafraîchissement ---- */
+  function rendre(blocs) {
+    app.innerHTML = '';
+    app.appendChild(barre());
+    blocs.forEach(function (b) { app.appendChild(b); });
+  }
+
+  // Le sondage de la séance 4 reprend celui de la séance 1 : on affiche les
+  // deux côte à côte, c'est tout l'intérêt de l'avoir reposé.
+  var COMPARER = { '4.1': '1.1' };
+
+  function rafraichir(immediat) {
+    majUrl();
+    var g = etat.groupe ? '&groupe=' + encodeURIComponent(etat.groupe) : '';
+    var p;
+    if (etat.vue === 'classement') {
+      p = api('vue=classement' + g).then(function (r) { rendre(vueClassement(r)); });
+    } else {
+      var ref = COMPARER[etat.activite];
+      p = Promise.all([
+        api('vue=resultats&a=' + encodeURIComponent(etat.activite) + g),
+        ref ? api('vue=resultats&a=' + ref + g) : Promise.resolve(null)
+      ]).then(function (rs) { rendre(vueActivite(rs[0], rs[1] && rs[1].participantes.length ? rs[1] : null)); });
+    }
+    return p.catch(function (e) {
+      if (e.status === 401) return ecranConnexion('Clé incorrecte.');
+      var msg = {
+        stockage_non_configure: 'Le stockage n’est pas configuré : ajoutez SUPABASE_URL et SUPABASE_SERVICE_ROLE_KEY sur Vercel.',
+        resultats_non_configures: 'La clé formateur n’est pas configurée : ajoutez QUIZ_CLE_FORMATEUR sur Vercel.'
+      }[e.message];
+      if (immediat || msg) rendre([el('div', { class: 'alerte', texte: msg || 'Les résultats ne répondent pas. Nouvel essai dans quelques secondes.' })]);
+    });
+  }
+
+  function demarrer() {
+    if (!etat.cle) return ecranConnexion();
+    api('vue=activites').then(function (c) {
+      etat.catalogue = c;
+      if (!c.activites.some(function (a) { return a.id === etat.activite; })) etat.activite = c.activites[0].id;
+      rafraichir(true);
+      clearInterval(minuteur);
+      // Toutes les 3 secondes, et seulement quand l'onglet est visible.
+      minuteur = setInterval(function () {
+        // Pas de rafraîchissement pendant qu'un menu est ouvert : il se refermerait sous le curseur.
+        var actif = document.activeElement;
+        if (document.hidden || (actif && actif.tagName === 'SELECT')) return;
+        rafraichir(false);
+      }, 3000);
+    }).catch(function (e) {
+      if (e.status === 401) return ecranConnexion('Clé incorrecte.');
+      app.innerHTML = '';
+      app.appendChild(el('div', { class: 'alerte', texte: e.message === 'resultats_non_configures' ? 'Ajoutez QUIZ_CLE_FORMATEUR sur Vercel.' : e.message === 'stockage_non_configure' ? 'Ajoutez SUPABASE_URL et SUPABASE_SERVICE_ROLE_KEY sur Vercel.' : 'Le serveur du quiz ne répond pas.' }));
+    });
+  }
+
+  demarrer();
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quiz de la formation · IA-Entrepreneur</title>
+<meta name="description" content="Le quiz de votre formation IA-Entrepreneur : répondez depuis votre téléphone et recevez votre correction.">
+<!-- Page réservée aux stagiaires : jamais dans Google, jamais dans le sitemap. -->
+<meta name="robots" content="noindex, nofollow">
+<link rel="icon" type="image/png" href="/favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #F7F8FD;
+    --card: #FFFFFF;
+    --text: #0A0F2C;
+    --muted: #525880;
+    --line: #E3E7F5;
+    --primary: #1A3CFF;
+    --primary-soft: #EEF1FF;
+    --accent: #10B981;
+    --accent-dark: #0E7A57;
+    --accent-soft: #E7F8F1;
+    --danger: #B42318;
+    --danger-soft: #FDECEA;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Plus Jakarta Sans', Arial, sans-serif;
+    font-size: 17px;
+    line-height: 1.5;
+    min-height: 100vh;
+  }
+  .wrap { max-width: 560px; margin: 0 auto; padding: 20px 16px 48px; }
+  header { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 20px; }
+  header img { height: 26px; width: auto; display: block; }
+  .tag { font-size: 13px; font-weight: 700; color: var(--accent-dark); background: var(--accent-soft); padding: 4px 10px; border-radius: 50px; white-space: nowrap; }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 18px; padding: 24px 20px; }
+  .eyebrow { font-size: 13px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: var(--accent-dark); margin-bottom: 6px; }
+  h1 { font-size: 25px; line-height: 1.25; font-weight: 800; margin-bottom: 8px; }
+  h2 { font-size: 21px; line-height: 1.35; font-weight: 700; margin-bottom: 18px; }
+  p.muted, .muted { color: var(--muted); font-size: 15px; }
+  label { display: block; font-weight: 700; font-size: 15px; margin: 18px 0 6px; }
+  input[type=text], input[type=email] {
+    width: 100%; font: inherit; font-size: 17px; padding: 13px 14px;
+    border: 1.5px solid var(--line); border-radius: 12px; background: #fff; color: var(--text);
+  }
+  input:focus { outline: none; border-color: var(--primary); }
+  .hint { font-size: 13px; color: var(--muted); margin-top: 6px; }
+  .groupes { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .choix {
+    display: block; width: 100%; text-align: left; font: inherit; font-size: 16px; font-weight: 600;
+    padding: 15px 16px; border-radius: 14px; border: 1.5px solid var(--line); background: #fff; color: var(--text);
+    cursor: pointer; margin-bottom: 10px; transition: border-color .15s, background .15s;
+  }
+  .groupes .choix { margin-bottom: 0; text-align: center; }
+  .choix:hover { border-color: #B9C3F5; }
+  .choix[aria-pressed=true] { border-color: var(--primary); background: var(--primary-soft); }
+  .btn {
+    display: block; width: 100%; font: inherit; font-size: 17px; font-weight: 700; text-align: center;
+    padding: 15px 18px; border-radius: 50px; border: none; background: var(--primary); color: #fff; cursor: pointer; margin-top: 22px;
+  }
+  .btn:disabled { opacity: .45; cursor: default; }
+  .btn.secondaire { background: transparent; color: var(--muted); border: 1.5px solid var(--line); margin-top: 10px; }
+  .lien { background: none; border: none; font: inherit; font-size: 14px; color: var(--primary); font-weight: 700; cursor: pointer; padding: 0; }
+  .barre { height: 6px; background: var(--line); border-radius: 6px; overflow: hidden; margin: 4px 0 18px; }
+  .barre span { display: block; height: 100%; background: var(--primary); border-radius: 6px; transition: width .25s; }
+  .progression { display: flex; justify-content: space-between; font-size: 14px; color: var(--muted); font-weight: 600; }
+  .intro { background: var(--primary-soft); border-radius: 12px; padding: 12px 14px; font-size: 15px; margin-bottom: 16px; }
+  .nav { display: flex; gap: 10px; margin-top: 12px; }
+  .nav .btn { margin-top: 0; }
+  .nav .btn.secondaire { flex: 0 0 auto; width: auto; padding-left: 22px; padding-right: 22px; }
+  .score { text-align: center; padding: 8px 0 18px; }
+  .score .chiffre { font-size: 64px; font-weight: 800; line-height: 1; color: var(--accent-dark); }
+  .score .sur { font-size: 22px; color: var(--muted); font-weight: 700; }
+  .corr { border-top: 1px solid var(--line); padding: 16px 0; }
+  .corr h3 { font-size: 16px; line-height: 1.45; margin-bottom: 8px; }
+  .rep { font-size: 15px; padding: 8px 12px; border-radius: 10px; margin-bottom: 6px; }
+  .rep.juste { background: var(--accent-soft); color: var(--accent-dark); font-weight: 700; }
+  .rep.faux { background: var(--danger-soft); color: var(--danger); }
+  .rep.neutre { background: var(--primary-soft); }
+  .rep b { font-weight: 700; }
+  .expl { font-size: 14px; color: var(--muted); margin-top: 6px; }
+  .statut { font-size: 14px; color: var(--muted); text-align: center; margin-top: 14px; }
+  .erreur { background: var(--danger-soft); color: var(--danger); border-radius: 12px; padding: 12px 14px; font-size: 15px; margin-top: 14px; }
+  .piege { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
+  .moi { display: flex; justify-content: space-between; align-items: center; gap: 10px; background: var(--bg); border-radius: 12px; padding: 10px 14px; font-size: 14px; margin-bottom: 18px; }
+  .chargement { text-align: center; color: var(--muted); padding: 40px 0; }
+  footer { text-align: center; font-size: 12px; color: var(--muted); margin-top: 24px; }
+  footer a { color: var(--muted); }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <img src="/images/logo-ia-entrepreneur-compact.png" alt="IA-Entrepreneur">
+    <span class="tag" id="tag" hidden></span>
+  </header>
+  <main id="app"><div class="card chargement">Chargement du quiz…</div></main>
+  <footer>
+    Vos réponses ne sont visibles que par votre formateur et servent au suivi de la formation.<br>
+    <a href="/politique-confidentialite.html">Politique de confidentialité</a>
+  </footer>
+</div>
+
+<script>
+(function () {
+  'use strict';
+  var params = new URLSearchParams(location.search);
+  var FORMATION = params.get('f') || 'prudence-creole';
+  var ACTIVITE = params.get('a') || '';
+  var app = document.getElementById('app');
+  var act = null;
+  var reponses = [];
+  var etape = 0;
+
+  // Le stockage local n'est qu'un confort (ne pas retaper son prénom à chaque
+  // activité). Navigation privée, stockage bloqué : la page marche sans.
+  function lire(cle) { try { return JSON.parse(localStorage.getItem(cle)); } catch (e) { return null; } }
+  function ecrire(cle, v) { try { localStorage.setItem(cle, JSON.stringify(v)); } catch (e) {} }
+  var CLE_MOI = 'quiz-moi-' + FORMATION;
+  var cleFaite = function () { return 'quiz-fait-' + FORMATION + '-' + ACTIVITE; };
+
+  function el(tag, attrs, enfants) {
+    var n = document.createElement(tag);
+    if (attrs) Object.keys(attrs).forEach(function (k) {
+      if (k === 'texte') n.textContent = attrs[k];
+      else if (k === 'onclick') n.addEventListener('click', attrs[k]);
+      else if (attrs[k] !== null && attrs[k] !== false) n.setAttribute(k, attrs[k]);
+    });
+    (enfants || []).forEach(function (c) { if (c) n.appendChild(typeof c === 'string' ? document.createTextNode(c) : c); });
+    return n;
+  }
+  function afficher(noeud) { app.innerHTML = ''; app.appendChild(noeud); window.scrollTo(0, 0); }
+
+  /* ---- Écran 0 : pas de code d'activité dans le lien ---- */
+  function ecranCode(message) {
+    var champ = el('input', { type: 'text', id: 'code', inputmode: 'decimal', placeholder: 'Par exemple 1.2', autocomplete: 'off' });
+    var carte = el('div', { class: 'card' }, [
+      el('p', { class: 'eyebrow', texte: 'Quiz de la formation' }),
+      el('h1', { texte: 'Quelle activité ?' }),
+      el('p', { class: 'muted', texte: 'Scannez le QR code affiché à l’écran, ou tapez le numéro de l’activité.' }),
+      el('label', { for: 'code', texte: 'Numéro de l’activité' }),
+      champ,
+      message ? el('div', { class: 'erreur', texte: message }) : null,
+      el('button', { class: 'btn', texte: 'Commencer', onclick: function () {
+        var v = champ.value.trim().replace(',', '.');
+        if (!v) return;
+        params.set('a', v);
+        location.search = params.toString();
+      } })
+    ]);
+    afficher(carte);
+  }
+
+  /* ---- Écran 1 : qui répond ---- */
+  function ecranIdentite() {
+    var moi = lire(CLE_MOI) || {};
+    var groupe = moi.groupe || null;
+    var prenom = el('input', { type: 'text', id: 'prenom', autocomplete: 'given-name', maxlength: '30', value: moi.prenom || '' });
+    var email = act.email ? el('input', { type: 'email', id: 'email', autocomplete: 'email', inputmode: 'email', value: moi.email || '' }) : null;
+    var piege = el('input', { type: 'text', name: 'site', tabindex: '-1', autocomplete: 'off', 'aria-hidden': 'true' });
+    var erreur = el('div', { class: 'erreur', hidden: true });
+
+    var boutonsGroupe = Object.keys(act.groupes).map(function (g) {
+      var b = el('button', { type: 'button', class: 'choix', 'aria-pressed': String(groupe === g), texte: act.groupes[g], onclick: function () {
+        groupe = g;
+        boutonsGroupe.forEach(function (x) { x.setAttribute('aria-pressed', String(x === b)); });
+      } });
+      return b;
+    });
+
+    var carte = el('div', { class: 'card' }, [
+      el('p', { class: 'eyebrow', texte: 'Activité ' + act.id }),
+      el('h1', { texte: act.titre }),
+      el('p', { class: 'muted', texte: act.questions.length + (act.questions.length > 1 ? ' questions' : ' question') + (act.sondage ? ' · sondage anonyme dans les résultats affichés' : ' · 1 point par bonne réponse au championnat') }),
+      el('label', { for: 'prenom', texte: 'Votre prénom' }),
+      prenom,
+      el('label', { texte: 'Votre groupe' }),
+      el('div', { class: 'groupes' }, boutonsGroupe),
+      email ? el('label', { for: 'email', texte: 'Votre email, pour recevoir la correction' }) : null,
+      email,
+      email ? el('p', { class: 'hint', texte: 'Facultatif. Il ne sert qu’à vous envoyer votre correction.' }) : null,
+      el('div', { class: 'piege' }, [piege]),
+      erreur,
+      el('button', { class: 'btn', texte: 'C’est parti', onclick: function () {
+        var p = prenom.value.trim().replace(/\s+/g, ' ');
+        var m = email ? email.value.trim() : '';
+        var msg = '';
+        if (!/^[A-Za-zÀ-ÖØ-öø-ÿ][A-Za-zÀ-ÖØ-öø-ÿ '’-]{0,29}$/.test(p)) msg = 'Indiquez votre prénom, en lettres seulement.';
+        else if (!groupe) msg = 'Choisissez votre groupe.';
+        else if (m && !/^[^@\s]+@[^@\s.]+\.[^@\s]+$/.test(m)) msg = 'Cette adresse email ne semble pas complète.';
+        if (msg) { erreur.textContent = msg; erreur.hidden = false; return; }
+        ecrire(CLE_MOI, { prenom: p, groupe: groupe, email: m });
+        piegeValeur = piege.value;
+        etape = 0;
+        ecranQuestion();
+      } })
+    ]);
+    afficher(carte);
+  }
+  var piegeValeur = '';
+
+  function bandeauMoi() {
+    var moi = lire(CLE_MOI);
+    if (!moi) return null;
+    return el('div', { class: 'moi' }, [
+      el('span', { texte: moi.prenom + ' · ' + (act.groupes[moi.groupe] || '') }),
+      el('button', { class: 'lien', texte: 'Modifier', onclick: ecranIdentite })
+    ]);
+  }
+
+  /* ---- Écran 2 : une question à la fois ---- */
+  function ecranQuestion() {
+    var q = act.questions[etape];
+    var n = act.questions.length;
+    var derniere = etape === n - 1;
+    var suivant = el('button', { class: 'btn', texte: derniere ? 'Envoyer mes réponses' : 'Question suivante', disabled: reponses[etape] === undefined || reponses[etape] === null, onclick: function () {
+      if (derniere) envoyer(); else { etape += 1; ecranQuestion(); }
+    } });
+    var options = q.o.map(function (texte, i) {
+      var b = el('button', { type: 'button', class: 'choix', 'aria-pressed': String(reponses[etape] === i), texte: texte, onclick: function () {
+        reponses[etape] = i;
+        options.forEach(function (x, j) { x.setAttribute('aria-pressed', String(j === i)); });
+        suivant.disabled = false;
+      } });
+      return b;
+    });
+    var carte = el('div', { class: 'card' }, [
+      etape === 0 ? bandeauMoi() : null,
+      el('div', { class: 'progression' }, [el('span', { texte: 'Question ' + (etape + 1) + ' sur ' + n }), el('span', { texte: 'Activité ' + act.id })]),
+      el('div', { class: 'barre' }, [el('span', { style: 'width:' + Math.round(((etape + 1) / n) * 100) + '%' })]),
+      etape === 0 && act.intro ? el('div', { class: 'intro', texte: act.intro }) : null,
+      el('h2', { texte: q.q }),
+      el('div', null, options),
+      etape > 0
+        ? el('div', { class: 'nav' }, [el('button', { class: 'btn secondaire', texte: 'Retour', onclick: function () { etape -= 1; ecranQuestion(); } }), suivant])
+        : suivant
+    ]);
+    afficher(carte);
+  }
+
+  /* ---- Envoi ---- */
+  function envoyer() {
+    var moi = lire(CLE_MOI) || {};
+    afficher(el('div', { class: 'card chargement', texte: 'Correction en cours…' }));
+    fetch('/api/quiz', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        f: FORMATION, a: act.id, groupe: moi.groupe, prenom: moi.prenom, email: moi.email || '',
+        reponses: act.questions.map(function (_, i) { return reponses[i] === undefined ? null : reponses[i]; }),
+        piege: piegeValeur
+      })
+    }).then(function (r) {
+      return r.json().then(function (j) { return { ok: r.ok, j: j }; });
+    }).then(function (res) {
+      if (!res.ok) throw new Error(res.j && res.j.erreur);
+      ecrire(cleFaite(), { resultat: res.j, reponses: reponses, email: moi.email || '' });
+      ecranCorrection(res.j, moi.email);
+    }).catch(function (e) {
+      var messages = {
+        trop_de_demandes: 'Trop d’envois d’un coup. Patientez une minute et réessayez.',
+        prenom_invalide: 'Votre prénom n’a pas été accepté. Corrigez-le et réessayez.',
+        email_invalide: 'Votre adresse email n’a pas été acceptée. Corrigez-la ou laissez-la vide.',
+        groupe_invalide: 'Choisissez votre groupe.'
+      };
+      var carte = el('div', { class: 'card' }, [
+        el('h2', { texte: 'L’envoi n’a pas abouti' }),
+        el('div', { class: 'erreur', texte: messages[e.message] || 'Vérifiez votre connexion, puis réessayez. Vos réponses sont gardées.' }),
+        el('button', { class: 'btn', texte: 'Réessayer', onclick: envoyer }),
+        (e.message === 'prenom_invalide' || e.message === 'email_invalide' || e.message === 'groupe_invalide')
+          ? el('button', { class: 'btn secondaire', texte: 'Corriger mes informations', onclick: ecranIdentite }) : null
+      ]);
+      afficher(carte);
+    });
+  }
+
+  /* ---- Écran 3 : la correction ---- */
+  function ecranCorrection(r, email) {
+    var enfants = [el('p', { class: 'eyebrow', texte: 'Activité ' + act.id + ' · ' + act.titre })];
+    if (r.sondage) {
+      enfants.push(el('h1', { texte: 'Merci, c’est noté !' }));
+      enfants.push(el('p', { class: 'muted', texte: 'On regarde les résultats ensemble, à l’écran.' }));
+    } else {
+      enfants.push(el('div', { class: 'score' }, [
+        el('div', { class: 'chiffre', texte: String(r.score) }),
+        el('div', { class: 'sur', texte: 'sur ' + r.total })
+      ]));
+      enfants.push(el('p', { class: 'muted', style: 'text-align:center', texte: r.score === r.total ? 'Sans faute, bravo !' : r.score >= r.total / 2 ? 'Bien joué. Voici la correction.' : 'Pas de souci, c’est fait pour ça. Voici la correction.' }));
+    }
+    act.questions.forEach(function (q, i) {
+      var d = r.details[i];
+      var bloc = [el('h3', { texte: (i + 1) + '. ' + q.q })];
+      var donnee = d.choisie === null ? 'Pas de réponse' : q.o[d.choisie];
+      if (r.sondage) bloc.push(el('div', { class: 'rep neutre', texte: 'Votre réponse : ' + donnee }));
+      else if (d.juste) bloc.push(el('div', { class: 'rep juste', texte: 'Juste : ' + donnee }));
+      else {
+        bloc.push(el('div', { class: 'rep faux', texte: 'Votre réponse : ' + donnee }));
+        bloc.push(el('div', { class: 'rep juste', texte: 'Bonne réponse : ' + q.o[d.bonne] }));
+      }
+      if (!r.sondage) bloc.push(el('p', { class: 'expl', texte: d.e }));
+      enfants.push(el('div', { class: 'corr' }, bloc));
+    });
+    if (email) enfants.push(el('p', { class: 'statut', texte: r.emailEnvoye ? 'La correction a aussi été envoyée à ' + email + '.' : 'La correction n’a pas pu partir par email : gardez cet écran ou faites une capture.' }));
+    enfants.push(el('button', { class: 'btn secondaire', texte: 'Répondre à une autre activité', onclick: function () { params.delete('a'); location.search = params.toString(); } }));
+    afficher(el('div', { class: 'card' }, enfants));
+  }
+
+  /* ---- Démarrage ---- */
+  if (!ACTIVITE) return ecranCode();
+  fetch('/api/quiz?f=' + encodeURIComponent(FORMATION) + '&a=' + encodeURIComponent(ACTIVITE))
+    .then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); })
+    .then(function (j) {
+      act = j;
+      var tag = document.getElementById('tag');
+      tag.textContent = 'Séance ' + act.seance;
+      tag.hidden = false;
+      document.title = 'Activité ' + act.id + ' · ' + act.titre;
+      var fait = lire(cleFaite());
+      if (fait && fait.resultat) {
+        reponses = fait.reponses || [];
+        return ecranCorrection(fait.resultat, fait.email);
+      }
+      if (lire(CLE_MOI)) { etape = 0; return ecranQuestion(); }
+      ecranIdentite();
+    })
+    .catch(function (e) {
+      ecranCode(String(e.message) === '404' ? 'L’activité « ' + ACTIVITE + ' » n’existe pas. Vérifiez le numéro affiché à l’écran.' : 'Le quiz ne répond pas. Vérifiez votre connexion et rechargez la page.');
+    });
+})();
+</script>
+</body>
+</html>

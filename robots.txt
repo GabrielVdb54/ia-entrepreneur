@@ -8,6 +8,8 @@ Disallow: /*.pyc$
 Disallow: /node_modules/
 Disallow: /.git/
 Disallow: /.DS_Store
+Disallow: /quiz/
+Disallow: /supabase/
 
 # Sitemap
 Sitemap: https://ia-entrepreneur.fr/sitemap.xml
