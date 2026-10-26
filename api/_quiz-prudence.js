@@ -169,7 +169,7 @@ export const FORMATIONS = {
       },
       "2.1": {
         "seance": 2,
-        "seanceTitre": "Séance 2 · Questionner pour découvrir les besoins",
+        "seanceTitre": "Séance 2 · Écouter et questionner",
         "titre": "Rappel de la séance 1",
         "sondage": false,
         "intro": null,
@@ -208,7 +208,7 @@ export const FORMATIONS = {
       },
       "2.2": {
         "seance": 2,
-        "seanceTitre": "Séance 2 · Questionner pour découvrir les besoins",
+        "seanceTitre": "Séance 2 · Écouter et questionner",
         "titre": "Ouverte, fermée ou alternative ?",
         "sondage": false,
         "intro": null,
@@ -277,7 +277,7 @@ export const FORMATIONS = {
       },
       "2.3": {
         "seance": 2,
-        "seanceTitre": "Séance 2 · Questionner pour découvrir les besoins",
+        "seanceTitre": "Séance 2 · Écouter et questionner",
         "titre": "Quelle étape SPID ?",
         "sondage": false,
         "intro": null,
@@ -352,7 +352,7 @@ export const FORMATIONS = {
       },
       "2.4": {
         "seance": 2,
-        "seanceTitre": "Séance 2 · Questionner pour découvrir les besoins",
+        "seanceTitre": "Séance 2 · Écouter et questionner",
         "titre": "Quiz de fin de séance",
         "sondage": false,
         "intro": null,
@@ -406,6 +406,26 @@ export const FORMATIONS = {
             ],
             "a": 1,
             "e": "« Si je résume, ce qui compte pour vous, c’est… C’est bien ça ? »"
+          },
+          {
+            "q": "Une cliente arrive très énervée : son remboursement traîne depuis 6 semaines. Que faites-vous en premier ?",
+            "o": [
+              "Je lui explique que ce n’est pas la faute de l’agence",
+              "Je l’écoute jusqu’au bout, sans la couper",
+              "Je lui propose tout de suite un geste commercial"
+            ],
+            "a": 1,
+            "e": "Étape 1 : écouter. Se justifier trop tôt relance la colère."
+          },
+          {
+            "q": "Pour l’étape « Agir » face à un client en litige, quelle phrase choisir ?",
+            "o": [
+              "« Je vais voir ce que je peux faire. »",
+              "« J’appelle le gestionnaire aujourd’hui et je vous rappelle demain avant midi. »",
+              "« Il faut que vous appeliez le siège. »"
+            ],
+            "a": 1,
+            "e": "Une action concrète et un délai précis. Puis on tient le rappel promis."
           }
         ]
       },
