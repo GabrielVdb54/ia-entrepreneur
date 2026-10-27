@@ -242,7 +242,7 @@
     else blocs.push(classementListe(r.classement.map(function (p) {
       return { prenom: p.prenom, points: p.points, det: p.activites + (p.activites > 1 ? ' activités' : ' activité') };
     })));
-    blocs.push(el('p', { class: 'petit', texte: '1 point par bonne réponse, sondages exclus. À ajouter au tableau des points : missions, jeux de rôle, phrases d’or et bingo.' }));
+    blocs.push(el('p', { class: 'petit', texte: '1 point par bonne réponse, sondages exclus.' + (FORMATION === 'prudence-creole' ? ' À ajouter au tableau des points : missions, jeux de rôle, phrases d’or et bingo.' : '') }));
     return blocs;
   }
 

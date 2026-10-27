@@ -17,7 +17,7 @@
  * Même discipline que /api/recap : rien de ce qui vient du navigateur ne
  * part tel quel dans un email. La participante envoie des index de réponses ;
  * les questions, les corrections et les explications sont reconstruites ici
- * depuis api/_quiz-prudence.js. Le seul texte libre, le prénom, est réduit à
+ * depuis les banques api/_quiz-*.js. Le seul texte libre, le prénom, est réduit à
  * des lettres. Sans cela, n'importe qui pourrait se servir du domaine pour
  * écrire ce qu'il veut à l'adresse de son choix.
  *
@@ -38,7 +38,12 @@
  */
 
 import { timingSafeEqual } from 'node:crypto';
-import { FORMATIONS } from './_quiz-prudence.js';
+import { FORMATIONS as FORMATIONS_PRUDENCE } from './_quiz-prudence.js';
+import { FORMATIONS as FORMATIONS_INTEGRATION } from './_quiz-integration.js';
+
+// Une banque par fichier : _quiz-prudence.js est remplacé en bloc quand la
+// formation évolue, il ne doit pas emporter les autres quiz avec lui.
+const FORMATIONS = { ...FORMATIONS_PRUDENCE, ...FORMATIONS_INTEGRATION };
 
 export const maxDuration = 15;
 
