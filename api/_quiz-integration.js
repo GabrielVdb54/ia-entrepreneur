@@ -42,21 +42,21 @@ export const FORMATIONS = {
           {
             "q": "Qui monte les propositions commerciales et les programmes ?",
             "o": [
+              "Gabriel, et lui seul",
               "Le closer qui a fait la découverte",
-              "Cathy, avec le dossier de financement",
-              "Gabriel, et lui seul"
+              "Cathy, avec le dossier de financement"
             ],
-            "a": 2,
+            "a": 0,
             "e": "Gabriel monte toutes les propositions et les programmes, valide les prix et choisit le formateur de chaque mission."
           },
           {
             "q": "Qui sont les closers ?",
             "o": [
               "Dorian, Axel et Karine",
-              "Axel et Cathy",
-              "Dorian, Axel et Gabriel"
+              "Dorian, Axel et Gabriel",
+              "Axel et Cathy"
             ],
-            "a": 2,
+            "a": 1,
             "e": "Karine pose des rendez-vous, avec les mêmes règles que toi. Cathy monte les dossiers de financement."
           },
           {
@@ -92,31 +92,31 @@ export const FORMATIONS = {
           {
             "q": "Quel délai annonce-t-on pour recevoir la proposition ?",
             "o": [
-              "48 heures ouvrées après la découverte",
               "24 heures après la découverte",
-              "Une semaine après la découverte"
+              "Une semaine après la découverte",
+              "48 heures ouvrées après la découverte"
             ],
-            "a": 0,
+            "a": 2,
             "e": "Les 24 heures, c’est le délai du compte rendu du closer à Gabriel. On n’annonce jamais d’autre délai que 48 heures ouvrées."
           },
           {
             "q": "Quand le dossier de financement est-il monté ?",
             "o": [
               "Avant le rendez-vous de découverte, pour savoir si le prospect est finançable",
-              "Après la formation, avec les feuilles d’émargement",
-              "Une fois la proposition validée par le client, et avant le début de la formation"
+              "Une fois la proposition validée par le client, et avant le début de la formation",
+              "Après la formation, avec les feuilles d’émargement"
             ],
-            "a": 2,
+            "a": 1,
             "e": "Cathy le dépose avant le début de la formation : au moins 15 jours avant pour un FAF."
           },
           {
             "q": "Le Figaro, pour nous, c’est :",
             "o": [
               "Une référence client que l’on peut citer",
-              "Une campagne de publicités Meta",
-              "Un article et un partenariat exclusif d’un an, à partir de janvier 2027"
+              "Un article et un partenariat exclusif d’un an, à partir de janvier 2027",
+              "Une campagne de publicités Meta"
             ],
-            "a": 2,
+            "a": 1,
             "e": "Nos autres sources de prospects : les publicités Meta, le site, tes appels et la séquence d’emails à froid."
           }
         ]
@@ -124,10 +124,40 @@ export const FORMATIONS = {
       "1.2": {
         "seance": 1,
         "seanceTitre": "Séance 1 · L’équipe et les offres",
-        "titre": "Ce qu’on vend",
+        "titre": "Ce qu’on vend, et à qui",
         "sondage": false,
-        "intro": "À relire : « 20-commercial.md » (section 2) dans le dossier Goodweek du Drive, et le catalogue (dossier 01).",
+        "intro": "À relire : « 20-commercial.md » (section 2) dans le dossier Goodweek du Drive, le catalogue (dossier 01) et le livret (section 3).",
         "questions": [
+          {
+            "q": "Notre cible principale :",
+            "o": [
+              "Les particuliers qui veulent se former à l’IA",
+              "Les PME : on forme leurs équipes, dans l’entreprise et sur mesure",
+              "Les indépendants, en sessions ouvertes à dates fixes"
+            ],
+            "a": 1,
+            "e": "Toutes les formations sont intra-entreprise et sur mesure : métier, cas réels et logiciels du client."
+          },
+          {
+            "q": "Qui peut suivre le niveau 1 ?",
+            "o": [
+              "Les salariés comme les dirigeants, sans prérequis",
+              "Seulement les dirigeants",
+              "Seulement les profils à l’aise avec le numérique"
+            ],
+            "a": 0,
+            "e": "Le niveau 3, lui, s’adresse plutôt à un référent IA ou à un profil à l’aise avec le numérique."
+          },
+          {
+            "q": "Un dirigeant te dit : « On n’est pas concernés, on n’utilise pas vraiment l’IA. »",
+            "o": [
+              "Tu le remercies : il n’est pas dans notre cible",
+              "Tu lui expliques que l’AI Act l’oblige à former ses équipes sous peine d’amende",
+              "C’est un bon point de départ : l’IA est souvent déjà dans ses logiciels, et des salariés utilisent ChatGPT sans cadre"
+            ],
+            "a": 2,
+            "e": "Microsoft 365 Copilot, CRM, outils de compta ou de recrutement : beaucoup de dirigeants ne savent pas qu’ils utilisent déjà l’IA."
+          },
           {
             "q": "Combien de niveaux de formation propose-t-on aux entreprises ?",
             "o": [
@@ -141,11 +171,11 @@ export const FORMATIONS = {
           {
             "q": "Le niveau 1, « Montée en compétences / acculturation IA », c’est :",
             "o": [
-              "2 à 3 jours sur les logiciels et les process internes de l’entreprise",
               "1 à 2 jours pour comprendre les IA, savoir laquelle sert à quoi et éviter les erreurs",
+              "2 à 3 jours sur les logiciels et les process internes de l’entreprise",
               "3 à 4 jours pour automatiser des tâches entières"
             ],
-            "a": 1,
+            "a": 0,
             "e": "Pour salariés et dirigeants, sans prérequis."
           },
           {
@@ -162,10 +192,10 @@ export const FORMATIONS = {
             "q": "Le niveau 3, « Automatisation & intégration », s’adresse surtout à :",
             "o": [
               "Tous les salariés, sans prérequis",
-              "Un référent IA ou un profil à l’aise avec le numérique",
-              "Les dirigeants qui découvrent l’IA"
+              "Les dirigeants qui découvrent l’IA",
+              "Un référent IA ou un profil à l’aise avec le numérique"
             ],
-            "a": 1,
+            "a": 2,
             "e": "3 à 4 jours pour automatiser et intégrer soi-même : ils repartent avec au moins une automatisation qui marche sur leur cas."
           },
           {
@@ -212,20 +242,20 @@ export const FORMATIONS = {
             "q": "Que reçoivent les participants à la fin d’une formation ?",
             "o": [
               "Une certification RS6776 reconnue par l’État",
-              "Un diplôme inscrit au Répertoire Spécifique",
-              "Une attestation individuelle de formation (AI Act, RGPD, gouvernance, données sensibles)"
+              "Une attestation individuelle de formation (AI Act, RGPD, gouvernance, données sensibles)",
+              "Un diplôme inscrit au Répertoire Spécifique"
             ],
-            "a": 2,
+            "a": 1,
             "e": "Et l’entreprise reçoit un registre de conformité AI Act. Ce n’est pas une formation certifiante : Qualiopi certifie l’organisme, pas la formation."
           },
           {
             "q": "Laquelle de ces offres existe toujours ?",
             "o": [
-              "L’intégration IA clé en main, sur devis",
               "L’audit IA",
-              "Le coaching individuel"
+              "Le coaching individuel",
+              "L’intégration IA clé en main, sur devis"
             ],
-            "a": 0,
+            "a": 2,
             "e": "L’intégration clé en main (chatbot, automatisations) se remonte à Gabriel. L’audit IA, le coaching individuel et la formation création d’entreprise ne sont plus proposés."
           }
         ]
@@ -241,30 +271,30 @@ export const FORMATIONS = {
             "q": "Comment présentes-tu IA-Entrepreneur dans ton accroche ?",
             "o": [
               "Organisme de formation certifiante, éligible au CPF",
-              "Organisme de formation certifié Qualiopi, qui forme les équipes de PME à l’IA sur leurs propres outils",
-              "Éditeur de logiciels d’intelligence artificielle"
+              "Éditeur de logiciels d’intelligence artificielle",
+              "Organisme de formation certifié Qualiopi, qui forme les équipes de PME à l’IA sur leurs propres outils"
             ],
-            "a": 1,
+            "a": 2,
             "e": "Et tu ajoutes : « On monte le dossier de financement pour viser zéro reste à charge. »"
           },
           {
             "q": "Ton accroche se termine par une question simple. Laquelle ?",
             "o": [
+              "« Est-ce que vos équipes utilisent déjà l’IA aujourd’hui ? »",
               "« Vous avez un budget formation cette année ? »",
-              "« Vous connaissez l’AI Act ? »",
-              "« Est-ce que vos équipes utilisent déjà l’IA aujourd’hui ? »"
+              "« Vous connaissez l’AI Act ? »"
             ],
-            "a": 2,
+            "a": 0,
             "e": "Puis tu écoutes : la suite dépend de sa réponse."
           },
           {
             "q": "Le prospect répond : « Non, pas vraiment. »",
             "o": [
               "« Alors ce n’est sans doute pas le bon moment, je vous rappelle dans six mois. »",
-              "« C’est le cas de la plupart des PME. Souvent, certains salariés l’utilisent déjà sans cadre. Un conseiller peut faire le point avec vous en 30 minutes. »",
-              "« Attention, avec l’AI Act, vous êtes obligés de former vos équipes. »"
+              "« Attention, avec l’AI Act, vous êtes obligés de former vos équipes. »",
+              "« C’est le cas de la plupart des PME. Souvent, certains salariés l’utilisent déjà sans cadre. Un conseiller peut faire le point avec vous en 30 minutes. »"
             ],
-            "a": 1,
+            "a": 2,
             "e": "Beaucoup de dirigeants pensent ne pas être concernés, alors que l’IA est déjà dans leurs logiciels."
           },
           {
@@ -280,21 +310,21 @@ export const FORMATIONS = {
           {
             "q": "« Pas le temps, pas intéressé. »",
             "o": [
+              "« Je comprends. Je vous envoie un email avec le lien pour réserver quand ce sera le bon moment ? », et tu le notes dans le CRM",
               "Tu insistes jusqu’à obtenir un rendez-vous",
-              "Tu raccroches et tu passes au suivant sans rien noter",
-              "« Je comprends. Je vous envoie un email avec le lien pour réserver quand ce sera le bon moment ? », et tu le notes dans le CRM"
+              "Tu raccroches et tu passes au suivant sans rien noter"
             ],
-            "a": 2,
+            "a": 0,
             "e": "Chaque réponse se note dans le CRM, même un refus."
           },
           {
             "q": "Un prospect t’appelle sur ton numéro affiché sur le site. Que fais-tu ?",
             "o": [
-              "Tu l’accueilles, tu qualifies et tu réserves le rendez-vous pendant l’appel",
               "Tu lui demandes de remplir le formulaire du site",
+              "Tu l’accueilles, tu qualifies et tu réserves le rendez-vous pendant l’appel",
               "Tu prends son numéro pour que Gabriel le rappelle"
             ],
-            "a": 0,
+            "a": 1,
             "e": "Un appel entrant, c’est un prospect déjà intéressé."
           },
           {
@@ -311,20 +341,20 @@ export const FORMATIONS = {
             "q": "Pour obtenir la raison du rendez-vous en une phrase, tu demandes :",
             "o": [
               "« Combien êtes-vous prêt à investir dans la formation ? »",
-              "« Qu’est-ce qui vous ferait dire que ce rendez-vous a été utile ? »",
-              "« Pourquoi vous n’utilisez pas encore l’IA ? »"
+              "« Pourquoi vous n’utilisez pas encore l’IA ? »",
+              "« Qu’est-ce qui vous ferait dire que ce rendez-vous a été utile ? »"
             ],
-            "a": 1,
+            "a": 2,
             "e": "Le closer lit cette phrase avant l’appel : c’est son point de départ."
           },
           {
             "q": "Pour savoir qui décide, tu demandes :",
             "o": [
-              "« Sur ce type de sujet, c’est vous qui décidez, ou quelqu’un d’autre doit être associé ? »",
               "« C’est vous le patron ? »",
-              "Rien : le décideur, c’est au closer de le trouver"
+              "Rien : le décideur, c’est au closer de le trouver",
+              "« Sur ce type de sujet, c’est vous qui décidez, ou quelqu’un d’autre doit être associé ? »"
             ],
-            "a": 0,
+            "a": 2,
             "e": "Le décideur fait partie de ta qualification minimale."
           },
           {
@@ -341,10 +371,10 @@ export const FORMATIONS = {
             "q": "La source du lead (« Comment avez-vous entendu parler de nous ? ») :",
             "o": [
               "Ne se note que pour les leads venus des publicités Meta",
-              "Se note dans chaque fiche : Figaro, Meta, site, appel Anna, email, recommandation ou autre",
-              "Est facultative si le prospect a réservé en ligne"
+              "Est facultative si le prospect a réservé en ligne",
+              "Se note dans chaque fiche : Figaro, Meta, site, appel Anna, email, recommandation ou autre"
             ],
-            "a": 1,
+            "a": 2,
             "e": "Le closer la complète si elle manque."
           }
         ]
@@ -359,11 +389,11 @@ export const FORMATIONS = {
           {
             "q": "« Combien ça coûte ? » Ta réponse :",
             "o": [
-              "« À partir de 1 500 € HT par jour, pour un groupe jusqu’à 12 personnes. »",
               "« Ça dépend du programme, le conseiller vous expliquera. Nous montons le dossier de financement pour viser zéro reste à charge. »",
+              "« À partir de 1 500 € HT par jour, pour un groupe jusqu’à 12 personnes. »",
               "« C’est gratuit, c’est entièrement financé. »"
             ],
-            "a": 1,
+            "a": 0,
             "e": "Setter et commerciale : jamais de prix. L’ordre d’idée de 1 500 € HT par jour, seul un closer le donne, à l’oral, si le prospect insiste."
           },
           {
@@ -379,31 +409,31 @@ export const FORMATIONS = {
           {
             "q": "« C’est financé à 100 % ? »",
             "o": [
-              "« Nous montons le dossier pour viser zéro reste à charge ; c’est le financeur qui décide. »",
               "« Oui, c’est garanti. »",
+              "« Nous montons le dossier pour viser zéro reste à charge ; c’est le financeur qui décide. »",
               "« Oui, grâce au CPF de vos salariés. »"
             ],
-            "a": 0,
+            "a": 1,
             "e": "On ne promet jamais une prise en charge avant l’accord écrit du financeur."
           },
           {
             "q": "Une entreprise de 80 salariés demande si la formation sera financée.",
             "o": [
+              "Tu ne promets pas le zéro reste à charge : à cette taille, ça passe en général par son budget formation, et on vérifie avec l’OPCO",
               "Tu promets le zéro reste à charge, comme pour toutes les entreprises",
-              "Tu lui dis qu’on ne forme pas les entreprises de plus de 50 salariés",
-              "Tu ne promets pas le zéro reste à charge : à cette taille, ça passe en général par son budget formation, et on vérifie avec l’OPCO"
+              "Tu lui dis qu’on ne forme pas les entreprises de plus de 50 salariés"
             ],
-            "a": 2,
+            "a": 0,
             "e": "À partir de 50 salariés, l’OPCO ne finance en général pas la formation des salariés. Effectif inconnu ? Demande-le avant de parler de financement."
           },
           {
             "q": "Un OPCO, c’est :",
             "o": [
               "La certification qualité de l’organisme de formation",
-              "L’organisme qui finance la formation des salariés, selon la branche de l’entreprise",
-              "Le financement des dirigeants non salariés"
+              "Le financement des dirigeants non salariés",
+              "L’organisme qui finance la formation des salariés, selon la branche de l’entreprise"
             ],
-            "a": 1,
+            "a": 2,
             "e": "C’est notre levier de financement principal. Les dirigeants non salariés et les indépendants dépendent d’un FAF."
           },
           {
@@ -420,40 +450,40 @@ export const FORMATIONS = {
             "q": "Un prospect demande s’il peut utiliser son CPF.",
             "o": [
               "Oui, pour le niveau 1",
-              "Oui, s’il complète avec un financement OPCO",
-              "Non : nous ne sommes pas habilités aujourd’hui, on ne parle pas de CPF"
+              "Non : nous ne sommes pas habilités aujourd’hui, on ne parle pas de CPF",
+              "Oui, s’il complète avec un financement OPCO"
             ],
-            "a": 2,
+            "a": 1,
             "e": "Pas d’« éligible CPF », de « formation certifiante » ni de « RS6776 »."
           },
           {
             "q": "Comment parler de l’AI Act ?",
             "o": [
               "Les entreprises risquent jusqu’à 15 millions d’euros d’amende si leurs salariés ne sont pas formés",
-              "L’article 4 demande aux entreprises qui utilisent l’IA de prendre des mesures pour développer la maîtrise de l’IA de leur personnel ; notre attestation et notre registre en sont la preuve",
-              "L’AI Act interdit d’utiliser ChatGPT au travail sans formation"
+              "L’AI Act interdit d’utiliser ChatGPT au travail sans formation",
+              "L’article 4 demande aux entreprises qui utilisent l’IA de prendre des mesures pour développer la maîtrise de l’IA de leur personnel ; notre attestation et notre registre en sont la preuve"
             ],
-            "a": 1,
+            "a": 2,
             "e": "Depuis le Digital Omnibus, c’est une obligation de moyens. Jamais de menace d’amende : on reste factuel."
           },
           {
             "q": "Quel argument mets-tu en avant ?",
             "o": [
               "Un retour sur investissement de 300 % en un an",
-              "Une formation rentabilisée en trois mois",
-              "Le temps gagné et les erreurs évitées sur des tâches concrètes : emails, comptes rendus, devis, reporting"
+              "Le temps gagné et les erreurs évitées sur des tâches concrètes : emails, comptes rendus, devis, reporting",
+              "Une formation rentabilisée en trois mois"
             ],
-            "a": 2,
+            "a": 1,
             "e": "Aucun chiffre de ROI, aucun gain en euros, aucun pourcentage de temps gagné."
           },
           {
             "q": "Comment présenter l’expérience de Gabriel ?",
             "o": [
               "« Nous avons accompagné plus de 1 500 entreprises. »",
-              "« Gabriel, notre fondateur, a accompagné plus de 1 500 professionnels depuis 2020. »",
-              "« Nous avons formé plus de 1 500 professionnels cette année. »"
+              "« Nous avons formé plus de 1 500 professionnels cette année. »",
+              "« Gabriel, notre fondateur, a accompagné plus de 1 500 professionnels depuis 2020. »"
             ],
-            "a": 1,
+            "a": 2,
             "e": "C’est l’activité de Gabriel depuis 2020 : jamais « nous avons accompagné »."
           },
           {
@@ -488,11 +518,11 @@ export const FORMATIONS = {
           {
             "q": "« On utilise déjà ChatGPT. »",
             "o": [
+              "« Très bien : est-ce que c’est cadré (données, vérification) et utilisé dans vos vrais outils ? »",
               "« Alors vous n’avez sans doute pas besoin de nous. »",
-              "« ChatGPT n’est pas sûr, il faut arrêter de l’utiliser. »",
-              "« Très bien : est-ce que c’est cadré (données, vérification) et utilisé dans vos vrais outils ? »"
+              "« ChatGPT n’est pas sûr, il faut arrêter de l’utiliser. »"
             ],
-            "a": 2,
+            "a": 0,
             "e": "Utiliser l’IA dans ses vrais outils, c’est l’objet du niveau 2."
           },
           {
@@ -508,11 +538,11 @@ export const FORMATIONS = {
           {
             "q": "« Mes salariés ont peur d’être remplacés. »",
             "o": [
+              "« La formation montre l’IA comme un outil à leur service : on part de leurs tâches, ils gardent la main et la validation. »",
               "« Certains postes vont disparaître, autant qu’ils s’y préparent. »",
-              "« Ce n’est pas le sujet de la formation. »",
-              "« La formation montre l’IA comme un outil à leur service : on part de leurs tâches, ils gardent la main et la validation. »"
+              "« Ce n’est pas le sujet de la formation. »"
             ],
-            "a": 2,
+            "a": 0,
             "e": "On rassure en partant de leurs tâches."
           },
           {
@@ -528,11 +558,11 @@ export const FORMATIONS = {
           {
             "q": "La séquence d’emails à froid, c’est :",
             "o": [
-              "4 emails : J0, J+3 ou 4, J+10 et J+17",
               "6 emails, un par semaine",
+              "4 emails : J0, J+3 ou 4, J+10 et J+17",
               "3 emails sur trois jours de suite"
             ],
-            "a": 0,
+            "a": 1,
             "e": "Un email par palier : accroche temps gagné, données et usage non encadré, financement, puis clôture sans pression."
           },
           {
