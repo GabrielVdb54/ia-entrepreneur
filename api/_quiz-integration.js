@@ -1,6 +1,6 @@
 /**
  * Banque de questions du quiz d'intégration de l'équipe commerciale
- * d'IA-Entrepreneur (setter, commerciale), écrit pour l'arrivée d'Anna en
+ * d'IA-Entrepreneur (setter, commerciale, closers), écrit pour l'arrivée d'Anna en
  * novembre 2026.
  *
  * Généré depuis les documents du Drive « IA-Entrepreneur — Intégration
@@ -19,7 +19,8 @@ export const FORMATIONS = {
     "titre": "Intégration de l’équipe commerciale · IA-Entrepreneur",
     "groupes": {
       "S": "Setter",
-      "C": "Commerciale"
+      "C": "Commerciale",
+      "L": "Closer"
     },
     "activites": {
       "1.1": {
@@ -30,14 +31,14 @@ export const FORMATIONS = {
         "intro": "À relire : « 00 — Process commercial » et le livret d’intégration, dans le Drive « Intégration Commercial ».",
         "questions": [
           {
-            "q": "Ton rôle de setter, c’est :",
+            "q": "Le rôle de la setter, c’est :",
             "o": [
               "Poser des rendez-vous qualifiés pour les closers",
               "Vendre la formation dès le premier appel",
               "Préparer la proposition commerciale du prospect"
             ],
             "a": 0,
-            "e": "Tu ne vends pas : tu donnes envie d’en parler avec un conseiller, et tu remplis la fiche pour qu’il arrive préparé."
+            "e": "Elle ne vend pas : elle donne envie d’en parler avec un conseiller, et remplit la fiche pour qu’il arrive préparé."
           },
           {
             "q": "Qui monte les propositions commerciales et les programmes ?",
@@ -57,16 +58,16 @@ export const FORMATIONS = {
               "Axel et Cathy"
             ],
             "a": 1,
-            "e": "Karine pose des rendez-vous, avec les mêmes règles que toi. Cathy monte les dossiers de financement."
+            "e": "Karine pose des rendez-vous, avec les mêmes règles que la setter. Cathy monte les dossiers de financement."
           },
           {
             "q": "Que fait Cathy (Adminella) ?",
             "o": [
+              "Elle monte les dossiers de financement (OPCO, FAF) pour viser zéro reste à charge",
               "Elle mène les rendez-vous de découverte avec les prospects",
-              "Elle choisit le formateur de chaque mission",
-              "Elle monte les dossiers de financement (OPCO, FAF) pour viser zéro reste à charge"
+              "Elle choisit le formateur de chaque mission"
             ],
-            "a": 2,
+            "a": 0,
             "e": "Elle intervient une fois la proposition validée par le client."
           },
           {
@@ -77,7 +78,7 @@ export const FORMATIONS = {
               "Tu choisis le closer qui te semble le plus adapté"
             ],
             "a": 1,
-            "e": "La répartition suit les disponibilités, pas des parts égales. Tu notes ensuite le closer attribué dans le CRM."
+            "e": "La répartition suit les disponibilités, pas des parts égales. La setter note ensuite le closer attribué dans le CRM."
           },
           {
             "q": "Après le rendez-vous de découverte, qu’est-ce qui se passe ?",
@@ -92,11 +93,11 @@ export const FORMATIONS = {
           {
             "q": "Quel délai annonce-t-on pour recevoir la proposition ?",
             "o": [
+              "48 heures ouvrées après la découverte",
               "24 heures après la découverte",
-              "Une semaine après la découverte",
-              "48 heures ouvrées après la découverte"
+              "Une semaine après la découverte"
             ],
-            "a": 2,
+            "a": 0,
             "e": "Les 24 heures, c’est le délai du compte rendu du closer à Gabriel. On n’annonce jamais d’autre délai que 48 heures ouvrées."
           },
           {
@@ -117,7 +118,7 @@ export const FORMATIONS = {
               "Une campagne de publicités Meta"
             ],
             "a": 1,
-            "e": "Nos autres sources de prospects : les publicités Meta, le site, tes appels et la séquence d’emails à froid."
+            "e": "Nos autres sources de prospects : les publicités Meta, le site, les appels d’Anna et la séquence d’emails à froid."
           }
         ]
       },
@@ -151,11 +152,11 @@ export const FORMATIONS = {
           {
             "q": "Un dirigeant te dit : « On n’est pas concernés, on n’utilise pas vraiment l’IA. »",
             "o": [
+              "C’est un bon point de départ : l’IA est souvent déjà dans ses logiciels, et des salariés utilisent ChatGPT sans cadre",
               "Tu le remercies : il n’est pas dans notre cible",
-              "Tu lui expliques que l’AI Act l’oblige à former ses équipes sous peine d’amende",
-              "C’est un bon point de départ : l’IA est souvent déjà dans ses logiciels, et des salariés utilisent ChatGPT sans cadre"
+              "Tu lui expliques que l’AI Act l’oblige à former ses équipes sous peine d’amende"
             ],
-            "a": 2,
+            "a": 0,
             "e": "Microsoft 365 Copilot, CRM, outils de compta ou de recrutement : beaucoup de dirigeants ne savent pas qu’ils utilisent déjà l’IA."
           },
           {
@@ -181,21 +182,21 @@ export const FORMATIONS = {
           {
             "q": "Le niveau 2, « IA métier », c’est :",
             "o": [
-              "2 à 3 jours, totalement adaptés aux process et aux logiciels internes du client",
               "1 jour de découverte générale de ChatGPT",
+              "2 à 3 jours, totalement adaptés aux process et aux logiciels internes du client",
               "3 à 4 jours pour construire des agents IA"
             ],
-            "a": 0,
+            "a": 1,
             "e": "Ateliers sur les cas réels du client : emails, devis, comptes rendus, reporting, CRM…"
           },
           {
             "q": "Le niveau 3, « Automatisation & intégration », s’adresse surtout à :",
             "o": [
+              "Un référent IA ou un profil à l’aise avec le numérique",
               "Tous les salariés, sans prérequis",
-              "Les dirigeants qui découvrent l’IA",
-              "Un référent IA ou un profil à l’aise avec le numérique"
+              "Les dirigeants qui découvrent l’IA"
             ],
-            "a": 2,
+            "a": 0,
             "e": "3 à 4 jours pour automatiser et intégrer soi-même : ils repartent avec au moins une automatisation qui marche sur leur cas."
           },
           {
@@ -265,7 +266,7 @@ export const FORMATIONS = {
         "seanceTitre": "Séance 2 · Le setting",
         "titre": "L’appel et la prise de rendez-vous",
         "sondage": false,
-        "intro": "À relire : la fiche setter (dossier 04 du Drive).",
+        "intro": "Mets-toi à la place de la setter. Closers : c’est ce qui a été dit au prospect avant votre rendez-vous. À relire : la fiche setter (dossier 04 du Drive).",
         "questions": [
           {
             "q": "Comment présentes-tu IA-Entrepreneur dans ton accroche ?",
@@ -310,11 +311,11 @@ export const FORMATIONS = {
           {
             "q": "« Pas le temps, pas intéressé. »",
             "o": [
-              "« Je comprends. Je vous envoie un email avec le lien pour réserver quand ce sera le bon moment ? », et tu le notes dans le CRM",
               "Tu insistes jusqu’à obtenir un rendez-vous",
-              "Tu raccroches et tu passes au suivant sans rien noter"
+              "Tu raccroches et tu passes au suivant sans rien noter",
+              "« Je comprends. Je vous envoie un email avec le lien pour réserver quand ce sera le bon moment ? », et tu le notes dans le CRM"
             ],
-            "a": 0,
+            "a": 2,
             "e": "Chaque réponse se note dans le CRM, même un refus."
           },
           {
@@ -330,11 +331,11 @@ export const FORMATIONS = {
           {
             "q": "Laquelle de ces informations ne fait PAS partie de la qualification minimale ?",
             "o": [
-              "Le chiffre d’affaires de l’entreprise",
               "L’effectif",
+              "Le chiffre d’affaires de l’entreprise",
               "Le décideur"
             ],
-            "a": 0,
+            "a": 1,
             "e": "Qualification minimale : contact (nom, prénom, poste, téléphone, email), entreprise et secteur, effectif, raison du rendez-vous, usage actuel de l’IA, décideur, source du lead."
           },
           {
@@ -355,7 +356,7 @@ export const FORMATIONS = {
               "« Sur ce type de sujet, c’est vous qui décidez, ou quelqu’un d’autre doit être associé ? »"
             ],
             "a": 2,
-            "e": "Le décideur fait partie de ta qualification minimale."
+            "e": "Le décideur fait partie de la qualification minimale."
           },
           {
             "q": "Comment réserves-tu le rendez-vous pendant l’appel ?",
@@ -387,7 +388,7 @@ export const FORMATIONS = {
         "intro": "À relire : le process commercial (sections 4 et 6), le dossier 03 et « 20-commercial.md » (sections 6 et 7).",
         "questions": [
           {
-            "q": "« Combien ça coûte ? » Ta réponse :",
+            "q": "Au téléphone, la setter entend : « Combien ça coûte ? » Sa réponse :",
             "o": [
               "« Ça dépend du programme, le conseiller vous expliquera. Nous montons le dossier de financement pour viser zéro reste à charge. »",
               "« À partir de 1 500 € HT par jour, pour un groupe jusqu’à 12 personnes. »",
@@ -397,43 +398,53 @@ export const FORMATIONS = {
             "e": "Setter et commerciale : jamais de prix. L’ordre d’idée de 1 500 € HT par jour, seul un closer le donne, à l’oral, si le prospect insiste."
           },
           {
-            "q": "Le prospect insiste : « Donnez-moi au moins une fourchette. »",
+            "q": "Le prospect insiste auprès de la setter : « Donnez-moi au moins une fourchette. »",
             "o": [
-              "Tu donnes la fourchette du niveau qui l’intéresse, d’après le catalogue",
-              "Tu donnes une fourchette large pour ne pas l’engager",
-              "Tu ne donnes aucun chiffre : le conseiller en parlera, et le prix exact sera dans la proposition"
+              "Elle donne la fourchette du niveau qui l’intéresse, d’après le catalogue",
+              "Elle donne une fourchette large pour ne pas l’engager",
+              "Elle ne donne aucun chiffre : le conseiller en parlera, et le prix exact sera dans la proposition"
             ],
             "a": 2,
             "e": "Les fourchettes du catalogue sont des repères internes : elles ne sortent jamais."
           },
           {
-            "q": "« C’est financé à 100 % ? »",
+            "q": "En rendez-vous de découverte, le prospect insiste pour avoir un prix. Le closer dit :",
             "o": [
-              "« Oui, c’est garanti. »",
-              "« Nous montons le dossier pour viser zéro reste à charge ; c’est le financeur qui décide. »",
-              "« Oui, grâce au CPF de vos salariés. »"
+              "« Pour votre niveau 2, comptez entre telle et telle somme, d’après notre catalogue. »",
+              "« Pour vous donner un ordre d’idée, nos formations démarrent à 1 500 € HT par jour pour un groupe jusqu’à 12 personnes. Le prix exact sera dans la proposition. »",
+              "« Pour 8 personnes sur 2 jours, ça vous fera environ tel total, remise comprise. »"
             ],
             "a": 1,
+            "e": "À l’oral, seulement si le prospect insiste, et rien d’autre : aucune fourchette par niveau, aucun total, aucune remise."
+          },
+          {
+            "q": "« C’est financé à 100 % ? »",
+            "o": [
+              "« Nous montons le dossier pour viser zéro reste à charge ; c’est le financeur qui décide. »",
+              "« Oui, c’est garanti. »",
+              "« Oui, grâce au CPF de vos salariés. »"
+            ],
+            "a": 0,
             "e": "On ne promet jamais une prise en charge avant l’accord écrit du financeur."
           },
           {
             "q": "Une entreprise de 80 salariés demande si la formation sera financée.",
             "o": [
-              "Tu ne promets pas le zéro reste à charge : à cette taille, ça passe en général par son budget formation, et on vérifie avec l’OPCO",
               "Tu promets le zéro reste à charge, comme pour toutes les entreprises",
-              "Tu lui dis qu’on ne forme pas les entreprises de plus de 50 salariés"
+              "Tu lui dis qu’on ne forme pas les entreprises de plus de 50 salariés",
+              "Tu ne promets pas le zéro reste à charge : à cette taille, ça passe en général par son budget formation, et on vérifie avec l’OPCO"
             ],
-            "a": 0,
+            "a": 2,
             "e": "À partir de 50 salariés, l’OPCO ne finance en général pas la formation des salariés. Effectif inconnu ? Demande-le avant de parler de financement."
           },
           {
             "q": "Un OPCO, c’est :",
             "o": [
               "La certification qualité de l’organisme de formation",
-              "Le financement des dirigeants non salariés",
-              "L’organisme qui finance la formation des salariés, selon la branche de l’entreprise"
+              "L’organisme qui finance la formation des salariés, selon la branche de l’entreprise",
+              "Le financement des dirigeants non salariés"
             ],
-            "a": 2,
+            "a": 1,
             "e": "C’est notre levier de financement principal. Les dirigeants non salariés et les indépendants dépendent d’un FAF."
           },
           {
@@ -449,11 +460,11 @@ export const FORMATIONS = {
           {
             "q": "Un prospect demande s’il peut utiliser son CPF.",
             "o": [
-              "Oui, pour le niveau 1",
               "Non : nous ne sommes pas habilités aujourd’hui, on ne parle pas de CPF",
+              "Oui, pour le niveau 1",
               "Oui, s’il complète avec un financement OPCO"
             ],
-            "a": 1,
+            "a": 0,
             "e": "Pas d’« éligible CPF », de « formation certifiante » ni de « RS6776 »."
           },
           {
@@ -470,10 +481,10 @@ export const FORMATIONS = {
             "q": "Quel argument mets-tu en avant ?",
             "o": [
               "Un retour sur investissement de 300 % en un an",
-              "Le temps gagné et les erreurs évitées sur des tâches concrètes : emails, comptes rendus, devis, reporting",
-              "Une formation rentabilisée en trois mois"
+              "Une formation rentabilisée en trois mois",
+              "Le temps gagné et les erreurs évitées sur des tâches concrètes : emails, comptes rendus, devis, reporting"
             ],
-            "a": 1,
+            "a": 2,
             "e": "Aucun chiffre de ROI, aucun gain en euros, aucun pourcentage de temps gagné."
           },
           {
@@ -508,31 +519,31 @@ export const FORMATIONS = {
           {
             "q": "« On n’a pas le temps. »",
             "o": [
+              "« C’est justement le sujet : 1 à 2 jours sur vos propres tâches, pour en gagner ensuite chaque semaine. On cale les dates selon votre activité. »",
               "« Pas de souci, je vous rappelle l’année prochaine. »",
-              "« Ça ne prend qu’une heure, en ligne. »",
-              "« C’est justement le sujet : 1 à 2 jours sur vos propres tâches, pour en gagner ensuite chaque semaine. On cale les dates selon votre activité. »"
+              "« Ça ne prend qu’une heure, en ligne. »"
             ],
-            "a": 2,
+            "a": 0,
             "e": "On ramène l’objection au temps gagné ensuite, sur les tâches réelles."
           },
           {
             "q": "« On utilise déjà ChatGPT. »",
             "o": [
-              "« Très bien : est-ce que c’est cadré (données, vérification) et utilisé dans vos vrais outils ? »",
               "« Alors vous n’avez sans doute pas besoin de nous. »",
-              "« ChatGPT n’est pas sûr, il faut arrêter de l’utiliser. »"
+              "« ChatGPT n’est pas sûr, il faut arrêter de l’utiliser. »",
+              "« Très bien : est-ce que c’est cadré (données, vérification) et utilisé dans vos vrais outils ? »"
             ],
-            "a": 0,
+            "a": 2,
             "e": "Utiliser l’IA dans ses vrais outils, c’est l’objet du niveau 2."
           },
           {
             "q": "« Nos données sont sensibles. »",
             "o": [
+              "« Chaque formation intègre les règles RGPD et de confidentialité. Et pour équiper vos équipes, il existe des solutions hébergées en France. »",
               "« Pas d’inquiétude, l’IA ne garde aucune donnée. »",
-              "« Dans ce cas, l’IA n’est pas faite pour votre entreprise. »",
-              "« Chaque formation intègre les règles RGPD et de confidentialité. Et pour équiper vos équipes, il existe des solutions hébergées en France. »"
+              "« Dans ce cas, l’IA n’est pas faite pour votre entreprise. »"
             ],
-            "a": 2,
+            "a": 0,
             "e": "La règle d’or RGPD : jamais de données clients, de devis ou de contrats dans une IA grand public gratuite."
           },
           {
@@ -548,12 +559,12 @@ export const FORMATIONS = {
           {
             "q": "« Je dois en parler à ma direction. »",
             "o": [
-              "« Qui d’autre doit être convaincu ? », puis tu proposes un échange avec le décideur",
               "« D’accord, rappelez-moi quand vous aurez sa réponse. »",
+              "« Qui d’autre doit être convaincu ? », puis tu proposes un échange avec le décideur",
               "Tu demandes le numéro du directeur pour l’appeler directement"
             ],
-            "a": 0,
-            "e": "Le décideur fait partie de ta qualification : autant l’associer au rendez-vous."
+            "a": 1,
+            "e": "Le décideur fait partie de la qualification : autant l’associer au rendez-vous."
           },
           {
             "q": "La séquence d’emails à froid, c’est :",
@@ -568,31 +579,31 @@ export const FORMATIONS = {
           {
             "q": "Le prospect répond après le deuxième email.",
             "o": [
-              "Tu laisses partir les emails 3 et 4, au cas où",
               "Tu arrêtes la séquence : on s’arrête dès qu’il y a une réponse",
+              "Tu laisses partir les emails 3 et 4, au cas où",
               "Tu reprends la séquence au premier email"
             ],
-            "a": 1,
+            "a": 0,
             "e": "Et jamais de relance après l’email 4."
           },
           {
             "q": "Avant de lancer une séquence, il faut :",
             "o": [
-              "Indiquer dans le premier email la source des coordonnées du prospect",
               "Envoyer au moins 300 emails par jour depuis une seule boîte",
-              "Mettre une fourchette de prix dans l’email sur le financement"
+              "Mettre une fourchette de prix dans l’email sur le financement",
+              "Indiquer dans le premier email la source des coordonnées du prospect"
             ],
-            "a": 0,
+            "a": 2,
             "e": "C’est une obligation CNIL. Et on limite le volume : idéalement 50 à 100 emails par jour et par boîte."
           },
           {
             "q": "Sur quelle plateforme partent les emails à froid ?",
             "o": [
               "Brevo",
-              "Time",
-              "Calendly"
+              "Calendly",
+              "Time"
             ],
-            "a": 1,
+            "a": 2,
             "e": "Calendly sert à réserver les rendez-vous ; les relances se suivent dans le CRM."
           },
           {
@@ -695,13 +706,13 @@ export const FORMATIONS = {
             "e": "Salariés : OPCO de la branche. Dirigeants non salariés du commerce, de l’industrie ou des services : AGEFICE. Professions libérales : FIF-PL. Artisans : FAFCEA. Cathy vérifie, on n’annonce aucun montant."
           },
           {
-            "q": "Le prospect vient de réserver et raccroche. Il te reste à :",
+            "q": "Le prospect vient de réserver avec la setter et raccroche. Il reste à :",
             "o": [
-              "Compléter la fiche CRM, avec le closer attribué, pour qu’il arrive préparé",
               "Rien, Calendly s’occupe de tout",
-              "Lui envoyer par email une estimation du prix"
+              "Lui envoyer par email une estimation du prix",
+              "Compléter la fiche CRM, avec le closer attribué, pour qu’il arrive préparé"
             ],
-            "a": 0,
+            "a": 2,
             "e": "Le closer lit la fiche avant l’appel."
           }
         ]

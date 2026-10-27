@@ -151,7 +151,7 @@
         return el('option', { value: a.id, selected: a.id === etat.activite ? 'selected' : null, texte: a.id + ' · ' + a.titre });
       }));
     var choixGroupe = el('select', { 'aria-label': 'Groupe', onchange: function (e) { etat.groupe = e.target.value; ecrire('quiz-groupe', etat.groupe); rafraichir(true); } },
-      [el('option', { value: '', texte: 'Les deux groupes' })].concat(Object.keys(etat.catalogue.groupes).map(function (g) {
+      [el('option', { value: '', texte: tousLesGroupes() })].concat(Object.keys(etat.catalogue.groupes).map(function (g) {
         return el('option', { value: g, selected: g === etat.groupe ? 'selected' : null, texte: etat.catalogue.groupes[g] });
       })));
     // Un sondage n'a ni bonne réponse ni score : pas de boutons qui ne feraient rien.
@@ -233,10 +233,15 @@
   }
 
   /* ---- Vue championnat ---- */
+  // Prudence Créole a deux groupes ; le quiz d'intégration en a trois.
+  function tousLesGroupes() {
+    return Object.keys(etat.catalogue.groupes).length === 2 ? 'Les deux groupes' : 'Tous les groupes';
+  }
+
   function vueClassement(r) {
     var blocs = [el('div', { class: 'entete' }, [el('div', null, [
       el('p', { class: 'eyebrow', texte: 'Championnat · points des quiz' }),
-      el('h1', { texte: etat.groupe ? etat.catalogue.groupes[etat.groupe] : 'Les deux groupes' })
+      el('h1', { texte: etat.groupe ? etat.catalogue.groupes[etat.groupe] : tousLesGroupes() })
     ])])];
     if (!r.classement.length) blocs.push(el('div', { class: 'vide', texte: 'Aucune réponse pour l’instant.' }));
     else blocs.push(classementListe(r.classement.map(function (p) {
