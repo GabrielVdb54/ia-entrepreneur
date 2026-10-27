@@ -178,7 +178,7 @@
     var carte = el('div', { class: 'card' }, [
       el('p', { class: 'eyebrow', texte: 'Activité ' + act.id }),
       el('h1', { texte: act.titre }),
-      el('p', { class: 'muted', texte: act.questions.length + (act.questions.length > 1 ? ' questions' : ' question') + (act.sondage ? ' · sondage anonyme dans les résultats affichés' : ' · 1 point par bonne réponse au championnat') }),
+      el('p', { class: 'muted', texte: act.questions.length + (act.questions.length > 1 ? ' questions' : ' question') + (act.sondage ? ' · sondage anonyme dans les résultats affichés' : ' · 1 point par bonne réponse' + (FORMATION === 'prudence-creole' ? ' au championnat' : '')) }),
       el('label', { for: 'prenom', texte: 'Votre prénom' }),
       prenom,
       el('label', { texte: 'Votre groupe' }),
