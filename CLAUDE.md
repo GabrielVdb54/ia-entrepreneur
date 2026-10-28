@@ -104,17 +104,29 @@ Emails about IA-Entrepreneur should come from `gabriel@ia-entrepreneur.fr`, not
 from `gabriel@clindit.com` (the parent company's address, wrong on anything
 IA-Entrepreneur-branded: trainers, prospects, clients, partners).
 
-**This is currently not possible, so ask Gabriel before sending.** The Gmail
-connector sends from the connected account's default send-as address and exposes
-no `from` parameter, and `gabriel@ia-entrepreneur.fr` is a separate Google mailbox
-(not an alias of the Clindit one). SendGrid can set the sender explicitly, but as
-of 2026-09-04 only `clindit.com` is domain-authenticated there — `ia-entrepreneur.fr`
-is not, and no single sender is verified, so it rejects that address with a 403.
-Fixing it would mean authenticating the domain in SendGrid (3 CNAME records);
-Gabriel has chosen not to, for now.
+**Never use the claude.ai Gmail connector for IA-Entrepreneur mail**: it is tied to
+`gabriel@clindit.com` (a separate Google mailbox, not an alias), exposes no `from`
+parameter, and on 2026-10-27 two onboarding emails to Anna and Axel left from
+Clindit because of it. Keep that connector for Clindit only.
 
-So: never send an IA-Entrepreneur email on the assumption it will look right.
-Say which address it would actually leave from, and let Gabriel decide.
+**IA-Entrepreneur drafts go through `~/.config/gmail-iae/gmail_iae.py`** (since
+2026-10-28): a stdlib-only script calling the Gmail API with its own OAuth client
+(Google Cloud project `claude-gmail-513008` in the ia-entrepreneur.fr Workspace,
+audience *Interne*, scope `gmail.compose`). Token in `~/.config/gmail-iae/`, chmod 600.
+- `python3 ~/.config/gmail-iae/gmail_iae.py compte` — must print `gabriel@ia-entrepreneur.fr`.
+- `… brouillon --a <to> [--cc <cc>] --objet "<subject>" --texte <file.txt>` — creates a
+  draft (From: Gabriel Vanderbecken <gabriel@ia-entrepreneur.fr>); refuses if the
+  linked mailbox is anything else.
+- `… brouillons` — lists the drafts with their From/To/Subject.
+- It has **no send command on purpose**: Claude creates drafts, Gabriel sends.
+  Always tell him which address the message will leave from.
+- Never open a Gmail compose link for him (`open`, `authuser=…`): when the account
+  isn't signed in, Gmail silently falls back to the default one — that is exactly
+  how the Clindit emails left.
+
+Transactional mail from the site (quiz corrections, `/api/recap`) goes through
+Brevo, where `gabriel@ia-entrepreneur.fr` is the verified sender. SendGrid only has
+`clindit.com` authenticated: never use it for IA-Entrepreneur.
 
 To check what an already-sent message used: `get_message` with
 `messageFormat: "METADATA_ONLY"` returns the `sender` field.
