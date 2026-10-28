@@ -120,8 +120,12 @@ audience *Interne*, scope `gmail.compose`). Token in `~/.config/gmail-iae/`, chm
 - `… brouillons` — lists the drafts with their From/To/Subject.
 - `… envoyer <draft id>` — sends an existing draft, only if its From is
   `gabriel@ia-entrepreneur.fr` (added 2026-10-28 at Gabriel's request). **Send only
-  when Gabriel asks for that specific message**; otherwise stop at the draft.
-  Always tell him which address the message leaves from.
+  when Gabriel asks for that specific message, and only if certain** (his rule:
+  « tu n'envoies que si t'es sûr »): recipient address given or confirmed by him,
+  sender checked, every link opened and shared with the recipient's account, every
+  fact taken from the reference docs or from Gabriel, no placeholder left. Any doubt
+  → stop at the draft and tell him what is uncertain. Always say which address the
+  message leaves from.
 - Never open a Gmail compose link for him (`open`, `authuser=…`): when the account
   isn't signed in, Gmail silently falls back to the default one — that is exactly
   how the Clindit emails left.
