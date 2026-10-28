@@ -118,8 +118,10 @@ audience *Interne*, scope `gmail.compose`). Token in `~/.config/gmail-iae/`, chm
   draft (From: Gabriel Vanderbecken <gabriel@ia-entrepreneur.fr>); refuses if the
   linked mailbox is anything else.
 - `… brouillons` — lists the drafts with their From/To/Subject.
-- It has **no send command on purpose**: Claude creates drafts, Gabriel sends.
-  Always tell him which address the message will leave from.
+- `… envoyer <draft id>` — sends an existing draft, only if its From is
+  `gabriel@ia-entrepreneur.fr` (added 2026-10-28 at Gabriel's request). **Send only
+  when Gabriel asks for that specific message**; otherwise stop at the draft.
+  Always tell him which address the message leaves from.
 - Never open a Gmail compose link for him (`open`, `authuser=…`): when the account
   isn't signed in, Gmail silently falls back to the default one — that is exactly
   how the Clindit emails left.
