@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Votre rendez-vous est confirmé | IA-Entrepreneur</title>
+  <meta name="description" content="Votre rendez-vous découverte est confirmé. Découvrez nos formations et nos formateurs avant notre échange." />
+  <meta name="robots" content="noindex, nofollow" />
+  <link rel="icon" type="image/png" href="/favicon.png" />
+  <script>window.addEventListener('load',function(){var s=document.createElement('script');s.async=true;s.src='https://www.googletagmanager.com/gtag/js?id=G-SZG9XPNNNC';document.head.appendChild(s);window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-SZG9XPNNNC',{'send_page_view':true});});</script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <style>
+    :root{--bg:#fff;--bg2:#F5F7FF;--primary:#1A3CFF;--accent:#10B981;--accent-text:#0B7A57;--text:#0A0F2C;--muted:#4B5171;--border:rgba(10,15,44,0.10);--radius:14px}
+    *{margin:0;padding:0;box-sizing:border-box}html{scroll-behavior:smooth}
+    body{overflow-x:hidden;font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);line-height:1.6}
+    a{color:inherit;text-decoration:none}img{display:block}
+    .container{max-width:1120px;margin:0 auto;padding:0 24px}
+    header{border-bottom:1px solid var(--border);background:var(--bg)}
+    .header-inner{display:flex;align-items:center;min-height:68px;padding:12px 0}
+    .logo{font-size:1rem;font-weight:800;color:var(--text);letter-spacing:-0.02em;line-height:1.2}.logo span{color:var(--primary)}
+    .logo small{display:block;font-size:0.7rem;font-weight:500;color:var(--muted);letter-spacing:0.03em;margin-top:2px}
+    footer{border-top:1px solid var(--border);padding:24px 0;font-size:0.8rem;color:var(--muted);line-height:1.7}
+    .footer-liens{display:flex;flex-wrap:wrap;gap:6px 16px;margin-top:6px}
+    .footer-liens a:hover{color:var(--primary)}
+    .confirm{padding:48px 0 52px;background:#F0F3FF;border-bottom:1px solid var(--border)}
+    .confirm-badge{display:inline-flex;align-items:center;gap:8px;padding:6px 14px;border-radius:50px;background:#fff;border:1px solid rgba(16,185,129,0.35);font-size:0.78rem;font-weight:700;color:var(--accent-text);margin-bottom:18px}
+    .confirm-badge svg{flex-shrink:0}
+    .confirm h1{font-size:clamp(2rem,4.4vw,2.9rem);font-weight:900;line-height:1.12;letter-spacing:-0.02em}
+    .date{font-size:1.1rem;font-weight:700;color:var(--primary);margin-top:10px}
+    .date:empty{display:none}
+    .conseiller{display:flex;align-items:center;gap:24px;margin-top:24px;max-width:820px;background:#fff;border:1px solid var(--border);border-radius:20px;padding:24px 26px;box-shadow:0 10px 32px rgba(10,15,44,0.07)}
+    .photos{display:flex;flex-shrink:0}
+    .photos img{width:104px;height:104px;border-radius:50%;object-fit:cover;border:3px solid #fff;box-shadow:0 0 0 2px var(--accent)}
+    .photos.trois img{width:84px;height:84px}.photos.trois img+img{margin-left:-16px}
+    .conseiller h2{font-size:1.2rem;font-weight:800;line-height:1.3}
+    .conseiller .role{font-size:0.86rem;font-weight:600;color:var(--accent-text);margin-bottom:8px}
+    .conseiller p{font-size:0.97rem;color:var(--muted);line-height:1.65}
+    .infos{max-width:820px;margin-top:18px;font-size:0.93rem;color:var(--muted);line-height:1.7}
+    .section{padding:60px 0}
+    .section.alt{background:var(--bg2);border-top:1px solid var(--border);border-bottom:1px solid var(--border)}
+    .section-head{max-width:680px;margin-bottom:28px}
+    .section h2.titre{font-size:clamp(1.5rem,3vw,2rem);font-weight:800;line-height:1.2;letter-spacing:-0.02em;margin-bottom:8px}
+    .section-head p{font-size:1.02rem;color:var(--muted);line-height:1.7}
+    .niveaux{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:20px}
+    .niveau-card{border-radius:20px;padding:28px;border:1.5px solid var(--border);display:flex;flex-direction:column;gap:14px;background:var(--bg)}
+    .niveau-head{display:flex;align-items:center;gap:12px}
+    .niveau-num{flex-shrink:0;width:34px;height:34px;border-radius:50%;background:var(--primary);color:#fff;font-weight:800;font-size:0.95rem;display:flex;align-items:center;justify-content:center}
+    .niveau-card h3{font-size:1.18rem;font-weight:800;line-height:1.25}
+    .niveau-sub{font-size:0.92rem;color:var(--muted);line-height:1.6}
+    .niveau-details{display:flex;flex-wrap:wrap;gap:6px}
+    .niveau-detail{font-size:0.78rem;font-weight:600;background:var(--bg2);padding:5px 11px;border-radius:6px;color:var(--muted)}
+    .programme-titre{font-size:0.72rem;font-weight:800;letter-spacing:0.08em;text-transform:uppercase;color:var(--muted)}
+    .modules{list-style:none;display:grid;gap:7px}
+    .modules li{font-size:0.9rem;color:var(--muted);position:relative;padding-left:18px;line-height:1.6}
+    .modules li::before{content:"";position:absolute;left:2px;top:0.62em;width:6px;height:6px;border-radius:50%;background:var(--accent)}
+    .modules li strong{color:var(--text)}
+    .livrable{margin-top:auto;padding:13px 15px;background:rgba(16,185,129,0.07);border-left:3px solid var(--accent);border-radius:8px;font-size:0.88rem;line-height:1.6}
+    .livrable strong{display:block;font-size:0.72rem;font-weight:800;letter-spacing:0.08em;text-transform:uppercase;color:var(--accent-text);margin-bottom:2px}
+    .precision{margin-top:18px;font-size:0.92rem;color:var(--muted);line-height:1.7}
+    .etapes{list-style:none;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;counter-reset:etape}
+    .etapes li{counter-increment:etape;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius);padding:20px}
+    .etapes li::before{content:counter(etape);display:flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:50%;background:rgba(26,60,255,0.1);font-size:0.82rem;font-weight:800;color:var(--primary);margin-bottom:10px}
+    .etapes strong{display:block;font-size:1rem;font-weight:800;margin-bottom:4px}
+    .etapes span{display:block;font-size:0.92rem;color:var(--muted);line-height:1.6}
+    .formateurs{list-style:none;display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:22px 14px}
+    .formateur{text-align:center}
+    .formateur img{width:88px;height:88px;border-radius:50%;object-fit:cover;margin:0 auto 8px;background:var(--bg2)}
+    .formateur strong{display:block;font-size:0.84rem;font-weight:700;line-height:1.3}
+    .formateur span{display:block;font-size:0.76rem;color:var(--muted);line-height:1.35;margin-top:2px}
+    .lien{display:inline-block;margin-top:24px;font-size:0.94rem;font-weight:700;color:var(--primary)}
+    .lien:hover{text-decoration:underline}
+    .contact-ligne{margin-top:14px;font-size:0.94rem;color:var(--muted);line-height:1.7}
+    .contact-ligne a{color:var(--primary);font-weight:600}
+    @media(max-width:900px){
+      .niveaux,.etapes{grid-template-columns:minmax(0,1fr)}
+      .formateurs{grid-template-columns:repeat(4,minmax(0,1fr))}
+    }
+    @media(max-width:560px){
+      .container{padding:0 18px}
+      .confirm{padding:34px 0 38px}
+      .section{padding:42px 0}
+      .conseiller{flex-direction:column;align-items:flex-start;gap:16px;padding:20px}
+      .niveau-card{padding:22px}
+      .formateurs{grid-template-columns:repeat(3,minmax(0,1fr))}
+      .formateur img{width:72px;height:72px}
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="container">
+      <div class="header-inner">
+        <a href="/" class="logo">IA<span>-</span>Entrepreneur<small>Organisme de formation certifié Qualiopi</small></a>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <section class="confirm">
+      <div class="container">
+        <div class="confirm-badge"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 13l4 4L19 7"/></svg>Rendez-vous confirmé</div>
+        <h1 id="titre">Merci, c'est noté&nbsp;!</h1>
+        <p class="date" id="date"></p>
+        <div class="conseiller">
+          <div class="photos trois" id="photos">
+            <img src="/images/signature/axel-ouhadda.png" alt="Axel Ouhadda" width="84" height="84" />
+            <img src="/images/dorian-didiot.jpg" alt="Dorian Didiot" width="84" height="84" />
+            <img src="/images/signature/gabriel-vanderbecken.png" alt="Gabriel Vanderbecken" width="84" height="84" />
+          </div>
+          <div>
+            <h2 id="nom">Axel, Dorian et Gabriel</h2>
+            <p class="role" id="role">Vos conseillers IA-Entrepreneur</p>
+            <p id="mot">L'un de nos conseillers vous retrouve en visio pendant 30 minutes. Votre invitation vous indique avec qui. D'ici là, voici de quoi vous faire une idée de nos formations.</p>
+          </div>
+        </div>
+        <p class="infos">Vous allez recevoir une invitation par email, avec le lien de la visio. Besoin de changer de créneau ? Le lien pour replanifier se trouve dans cette invitation.</p>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="container">
+        <div class="section-head">
+          <h2 class="titre">Nos formations, en 3 niveaux</h2>
+          <p>Voici un exemple de programme pour chaque niveau. Vous n'avez rien à choisir : nous regarderons ensemble ce qui convient à vos équipes.</p>
+        </div>
+        <div class="niveaux">
+          <article class="niveau-card">
+            <div class="niveau-head">
+              <span class="niveau-num">1</span>
+              <h3>Acculturation IA</h3>
+            </div>
+            <p class="niveau-sub">Comprendre les IA et les utiliser sans risque. Pour les salariés comme pour les dirigeants, sans prérequis.</p>
+            <div class="niveau-details">
+              <span class="niveau-detail">1 à 2 jours</span>
+              <span class="niveau-detail">Visio ou présentiel</span>
+            </div>
+            <p class="programme-titre">Exemple de programme</p>
+            <ul class="modules">
+              <li><strong>IA générative</strong> : ce qu'elle sait faire et ne sait pas faire, démonstrations en direct</li>
+              <li><strong>Quelle IA pour quoi</strong> : ChatGPT, Claude, Gemini, Copilot, Perplexity</li>
+              <li><strong>Prompter sur ses propres documents</strong> : une consigne qui donne un résultat exploitable</li>
+              <li><strong>Vérifier</strong> : contrôler une réponse et repérer une hallucination</li>
+              <li><strong>Règle d'or RGPD et shadow AI</strong> : ce qui ne doit jamais entrer dans une IA</li>
+              <li><strong>Cadre AI Act et règles internes</strong></li>
+            </ul>
+            <div class="livrable"><strong>Ce que vous repartez avec</strong>Une charte d'usage de l'IA diffusable à vos équipes, et des prompts testés sur vos propres documents.</div>
+          </article>
+          <article class="niveau-card">
+            <div class="niveau-head">
+              <span class="niveau-num">2</span>
+              <h3>IA métier</h3>
+            </div>
+            <p class="niveau-sub">La formation s'adapte à vos process et à vos logiciels internes. Prérequis : niveau 1 ou équivalent.</p>
+            <div class="niveau-details">
+              <span class="niveau-detail">2 à 3 jours</span>
+              <span class="niveau-detail">Visio ou présentiel</span>
+            </div>
+            <p class="programme-titre">Exemple de programme</p>
+            <ul class="modules">
+              <li><strong>Cartographie des tâches</strong> : repérer, service par service, où l'IA a sa place</li>
+              <li><strong>L'IA intégrée à vos outils</strong> : ChatGPT, Claude, Microsoft 365 Copilot, Google Workspace / Gemini, votre CRM et vos logiciels métier</li>
+              <li><strong>Ateliers sur cas réels</strong> : chacun travaille sur ses propres dossiers</li>
+              <li><strong>Bibliothèque de prompts partagée</strong> : les consignes qui marchent, mises en commun</li>
+              <li><strong>Règles d'usage propres à l'entreprise</strong></li>
+            </ul>
+            <div class="livrable"><strong>Ce que vous repartez avec</strong>Une bibliothèque de prompts partagée sur vos cas réels, et des règles d'usage écrites pour votre entreprise.</div>
+          </article>
+          <article class="niveau-card">
+            <div class="niveau-head">
+              <span class="niveau-num">3</span>
+              <h3>Automatisation &amp; intégration</h3>
+            </div>
+            <p class="niveau-sub">Automatiser et intégrer vous-mêmes des solutions IA. Prérequis : niveau 2 ou équivalent.</p>
+            <div class="niveau-details">
+              <span class="niveau-detail">3 à 4 jours</span>
+              <span class="niveau-detail">Visio ou présentiel</span>
+            </div>
+            <p class="programme-titre">Exemple de programme</p>
+            <ul class="modules">
+              <li><strong>Automatisation ou agent IA ?</strong> : choisir la bonne approche selon la tâche</li>
+              <li><strong>Automatisations sans code</strong> : un workflow n8n ou Make qui tourne sans intervention humaine</li>
+              <li><strong>Agents IA métier</strong> : branchés sur vos outils</li>
+              <li><strong>Chatbots sur vos documents (RAG)</strong></li>
+              <li><strong>Sécurité, coûts, maintenance</strong> : qui accède à quoi et qui maintient</li>
+            </ul>
+            <div class="livrable"><strong>Ce que vous repartez avec</strong>Au moins une automatisation en production dans l'entreprise, documentée et maintenable par vos équipes.</div>
+          </article>
+        </div>
+        <p class="precision">Chaque programme est construit sur mesure, à partir de vos outils et de vos cas réels. Formation intra-entreprise, 12 personnes maximum par groupe. Chaque participant repart avec une attestation individuelle de formation.</p>
+      </div>
+    </section>
+
+    <section class="section alt">
+      <div class="container">
+        <div class="section-head">
+          <h2 class="titre">Comment se passe notre échange</h2>
+          <p>Trente minutes pour faire le point, sans engagement.</p>
+        </div>
+        <ol class="etapes">
+          <li><strong>Votre situation</strong><span>Vos équipes, vos outils et ce que vous faites déjà avec l'IA.</span></li>
+          <li><strong>Vos besoins</strong><span>Les tâches où l'IA peut vous faire gagner du temps, et le niveau adapté.</span></li>
+          <li><strong>La suite</strong><span>Vous recevez une proposition et un programme sous 48 heures ouvrées. Nous regardons aussi avec vous ce que votre OPCO peut prendre en charge.</span></li>
+        </ol>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="container">
+        <div class="section-head">
+          <h2 class="titre">Quelques-uns de nos formateurs</h2>
+          <p>Voici un aperçu de notre équipe. Selon votre métier et vos outils, nous choisissons le formateur le plus adapté à votre projet.</p>
+        </div>
+        <ul class="formateurs">
+          <li class="formateur"><img src="/images/celine-herment.jpg" alt="Céline Herment" width="88" height="88" loading="lazy" /><strong>Céline Herment</strong><span>SEO et marketing digital</span></li>
+          <li class="formateur"><img src="/images/gilles-idoux.jpg" alt="Gilles Idoux" width="88" height="88" loading="lazy" /><strong>Gilles Idoux</strong><span>Commerce, vente et management</span></li>
+          <li class="formateur"><img src="/images/sina-movaghar.jpg" alt="Sina Movaghar" width="88" height="88" loading="lazy" /><strong>Sina Movaghar</strong><span>IA souveraine et automatisation</span></li>
+          <li class="formateur"><img src="/images/myriam-djebbara.jpg" alt="Myriam Djebbara" width="88" height="88" loading="lazy" /><strong>Myriam Djebbara</strong><span>IA et transformation digitale</span></li>
+          <li class="formateur"><img src="/images/fathi-sehla.jpg" alt="Fathi Sehla" width="88" height="88" loading="lazy" /><strong>Fathi Sehla</strong><span>Claude et Claude Code</span></li>
+          <li class="formateur"><img src="/images/cyril-cieslak.jpg" alt="Cyril Cieslak" width="88" height="88" loading="lazy" /><strong>Cyril Cieslak</strong><span>Agents IA</span></li>
+        </ul>
+        <a class="lien" href="/nos-formateurs.html">Découvrir tous nos formateurs</a>
+        <p class="contact-ligne">Une question avant le rendez-vous ? Écrivez-nous à <a href="mailto:contact@ia-entrepreneur.fr">contact@ia-entrepreneur.fr</a>.</p>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="container">
+      <div>IA-Entrepreneur, marque de Clindit SASU · Organisme de formation certifié Qualiopi · Certificat n° 883211-2</div>
+      <div class="footer-liens">
+        <a href="/mentions-legales.html">Mentions légales</a>
+        <a href="/politique-confidentialite.html">Politique de confidentialité</a>
+        <a href="/cgv.html">CGV</a>
+      </div>
+    </div>
+  </footer>
+  <script>
+    (function () {
+      var CLOSERS = {
+        axel: { nom: 'Axel Ouhadda', prenom: 'Axel', role: 'Conseiller formation IA', photo: '/images/signature/axel-ouhadda.png' },
+        gabriel: { nom: 'Gabriel Vanderbecken', prenom: 'Gabriel', role: 'Fondateur d\'IA-Entrepreneur', photo: '/images/signature/gabriel-vanderbecken.png' }
+      };
+      var rdv = {};
+      try { rdv = JSON.parse(sessionStorage.getItem('rdv-ia-entrepreneur')) || {}; } catch (e) {}
+
+      var prenom = String(rdv.prenom || '').trim();
+      if (/^[\p{L}][\p{L} '’-]{0,39}$/u.test(prenom)) {
+        document.getElementById('titre').textContent = 'Merci ' + prenom + ', c\'est noté\u00a0!';
+      }
+
+      var quand = new Date(rdv.date);
+      if (rdv.date && !isNaN(quand.getTime())) {
+        var jour = new Intl.DateTimeFormat('fr-FR', { weekday: 'long', day: 'numeric', month: 'long', timeZone: 'Europe/Paris' }).format(quand);
+        var heure = new Intl.DateTimeFormat('fr-FR', { hour: '2-digit', minute: '2-digit', timeZone: 'Europe/Paris' }).format(quand).replace(':', ' h ');
+        document.getElementById('date').textContent = jour.charAt(0).toUpperCase() + jour.slice(1) + ' à ' + heure + ' · 30 minutes en visio';
+      }
+
+      var c = Object.prototype.hasOwnProperty.call(CLOSERS, rdv.closer) ? CLOSERS[rdv.closer] : null;
+      if (c) {
+        var photos = document.getElementById('photos');
+        photos.className = 'photos';
+        photos.innerHTML = '';
+        var img = document.createElement('img');
+        img.src = c.photo; img.alt = c.nom; img.width = 104; img.height = 104;
+        photos.appendChild(img);
+        document.getElementById('nom').textContent = 'Vous avez rendez-vous avec ' + c.prenom;
+        document.getElementById('role').textContent = c.nom + ' · ' + c.role;
+        document.getElementById('mot').textContent = 'Merci pour votre réservation. Je vous retrouve en visio pendant 30 minutes. D\'ici là, voici de quoi vous faire une idée de nos formations.';
+      }
+    })();
+  </script>
+</body>
+</html>

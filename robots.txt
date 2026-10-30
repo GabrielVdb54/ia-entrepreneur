@@ -9,6 +9,8 @@ Disallow: /node_modules/
 Disallow: /.git/
 Disallow: /.DS_Store
 Disallow: /quiz/
+Disallow: /rdv-confirme.html
+Disallow: /rendez-vous.html
 Disallow: /supabase/
 
 # Sitemap
