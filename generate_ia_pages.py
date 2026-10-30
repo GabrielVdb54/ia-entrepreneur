@@ -23,7 +23,7 @@ SITE = "https://ia-entrepreneur.fr"
 TODAY = datetime.date.today().isoformat()
 ANNEE = datetime.date.today().year
 
-CAL = "https://calendly.com/gabriel-ia-entrepreneur/decouverte"
+CAL = "https://ia-entrepreneur.fr/rendez-vous.html"
 
 def e(s):
     return html.escape(str(s), quote=True)
@@ -904,7 +904,7 @@ CTA = f"""  <section class="ia-section">
         <h2>Vos équipes savent-elles vraiment s'en servir ?</h2>
         <p>Connaître les outils ne suffit pas. Nous formons vos équipes aux IA qui correspondent à vos processus, et nous délivrons une attestation mentionnant les volets AI Act (article 4), RGPD et gouvernance des données. Organisme certifié Qualiopi, formations finançables par votre OPCO.</p>
         <div class="ia-cta-actions">
-          <a class="btn" href="{CAL}" target="_blank" rel="noopener noreferrer">Appel gratuit de 15 min</a>
+          <a class="btn" href="{CAL}" target="_blank" rel="noopener noreferrer">Appel gratuit de 30 min</a>
           <a class="btn ghost" href="/formation-ia-entreprise.html">Voir les formations IA</a>
         </div>
       </div>
@@ -1796,7 +1796,7 @@ def build_hub():
 
       var offre = r.offre ? '<div class="ia-conseil-offre"><b>' + echapper(r.offre.titre) + '</b>' +
         '<p>' + echapper(r.offre.phrase) + '</p><div class="ia-conseil-actions">' +
-        '<a class="principal" href="' + CAL_URL + '" target="_blank" rel="noopener">Appel gratuit de 15 min</a>' +
+        '<a class="principal" href="' + CAL_URL + '" target="_blank" rel="noopener">Appel gratuit de 30 min</a>' +
         '<a class="secondaire" href="' + r.offre.url + '">Voir le programme</a></div></div>' : '';
 
       var suivis = (r.suivis && r.suivis.length)
@@ -2069,7 +2069,7 @@ def build_hub():
               echapper(r.situation) + '</h3>' +
               '<div class="ia-conseil-offre"><b>' + echapper(r.offre.titre) + '</b>' +
               '<p>' + echapper(r.offre.phrase) + '</p><div class="ia-conseil-actions">' +
-              '<a class="principal" href="' + CAL_URL + '" target="_blank" rel="noopener">Appel gratuit de 15 min</a>' +
+              '<a class="principal" href="' + CAL_URL + '" target="_blank" rel="noopener">Appel gratuit de 30 min</a>' +
               '<a class="secondaire" href="#annuaire">Parcourir l’annuaire</a></div></div>' +
               '<p class="ia-reprise" style="margin-top:12px;">Une autre question ? ' +
               '<button type="button" data-nouvelle>Nouvelle conversation</button></p>';
@@ -2493,7 +2493,7 @@ def build_tool(t):
 {partenaire_box}        <div class="ia-box" style="background:var(--bg2);">
           <h3>Vous hésitez ?</h3>
           <p style="font-size:0.86rem;color:var(--muted);line-height:1.6;margin-bottom:14px;">Un outil mal choisi coûte plus cher que pas d'outil du tout. 15 minutes au téléphone pour cadrer le besoin avant de vous engager.</p>
-          <a class="btn btn-accent" href="{CAL}" target="_blank" rel="noopener noreferrer">Appel gratuit de 15 min</a>
+          <a class="btn btn-accent" href="{CAL}" target="_blank" rel="noopener noreferrer">Appel gratuit de 30 min</a>
         </div>
       </aside>
     </div>

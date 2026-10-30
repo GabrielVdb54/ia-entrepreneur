@@ -6,7 +6,7 @@ Mise à jour finale :
 """
 import re
 
-CALENDLY = "https://calendly.com/gabriel-ia-entrepreneur/decouverte"
+CALENDLY = "https://ia-entrepreneur.fr/rendez-vous.html"
 
 # ══════════════════════════════════════════════════════════════
 # INDEX.HTML

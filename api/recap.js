@@ -117,7 +117,7 @@ const SITE = 'https://ia-entrepreneur.fr';
 // les deux sous les yeux.
 const MENTION_LIENS = 'aucun éditeur ne paie pour figurer dans cet annuaire ; seule relation commerciale, signalée sur sa fiche : IA-Entrepreneur revend Goodweek';
 // Le jour venu : 'les mises en avant rémunérées y sont signalées'
-const CALENDLY = 'https://calendly.com/gabriel-ia-entrepreneur/decouverte';
+const CALENDLY = 'https://ia-entrepreneur.fr/rendez-vous.html';
 
 function echapper(t) {
   return String(t).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
@@ -150,7 +150,7 @@ function composerEmail(outils, offre) {
               Disposer de l’outil ne suffit pas : ce qui change tout, c’est de savoir s’en servir sur vos propres dossiers.
               Organisme certifié Qualiopi, formation finançable par votre OPCO.
             </div>
-            <a href="${CALENDLY}" style="display:inline-block;background:#10B981;color:#fff;font:700 13px Helvetica,Arial,sans-serif;text-decoration:none;padding:12px 22px;border-radius:50px;">Appel gratuit de 15 minutes</a>
+            <a href="${CALENDLY}" style="display:inline-block;background:#10B981;color:#fff;font:700 13px Helvetica,Arial,sans-serif;text-decoration:none;padding:12px 22px;border-radius:50px;">Appel gratuit de 30 minutes</a>
             <a href="${offre.url}" style="display:inline-block;color:#525880;font:700 13px Helvetica,Arial,sans-serif;text-decoration:none;padding:12px 16px;">Voir le programme</a>
           </td></tr>
         </table>
@@ -197,7 +197,7 @@ function composerTexte(outils, offre) {
       offre.titre,
       'Disposer de l’outil ne suffit pas : ce qui change tout, c’est de savoir s’en servir sur vos propres dossiers.',
       'Organisme certifié Qualiopi, formation finançable par votre OPCO.',
-      `Appel gratuit de 15 minutes : ${CALENDLY}`,
+      `Appel gratuit de 30 minutes : ${CALENDLY}`,
       `Programme : ${offre.url}`,
       '',
     ] : []),

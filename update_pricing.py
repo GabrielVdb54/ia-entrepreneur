@@ -180,7 +180,7 @@ import re
 # Find the services-grid div and replace it
 old_grid_pattern = r'<div class="services-grid">.*?</div>\s*</div>\s*</div>\s*</div>'
 
-CALENDLY = "https://calendly.com/gabriel-ia-entrepreneur/decouverte"
+CALENDLY = "https://ia-entrepreneur.fr/rendez-vous.html"
 
 new_pricing = f'''<div class="pricing-grid">
 

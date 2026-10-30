@@ -13,7 +13,7 @@ with open("index.html", "r", encoding="utf-8") as f:
     html = f.read()
 
 changes = 0
-CALENDLY = "https://calendly.com/gabriel-ia-entrepreneur/decouverte"
+CALENDLY = "https://ia-entrepreneur.fr/rendez-vous.html"
 
 # ══════════════════════════════════════════════════════════════
 # 1. HERO STATS — Mettre à jour les 3 stats du hero

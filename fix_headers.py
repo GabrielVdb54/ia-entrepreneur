@@ -36,7 +36,7 @@ def make_header(active=None, header_id=''):
           {a('apropos', 'À propos', '/apropos.html')}
           {a('blog', 'Blog', '/blog.html')}
           <a href="mailto:contact@ia-entrepreneur.fr" style="display:flex;align-items:center;gap:4px;">{EMAIL_SVG}contact@ia-entrepreneur.fr</a>
-          <a href="https://calendly.com/gabriel-ia-entrepreneur/decouverte" target="_blank" rel="noopener noreferrer" class="nav-cta">Appel gratuit</a>
+          <a href="/rendez-vous.html" class="nav-cta">Appel gratuit</a>
         </nav>
         <button class="hamburger" id="hamburger" aria-label="Menu"><span></span><span></span><span></span></button>
       </div>
@@ -48,7 +48,7 @@ def make_header(active=None, header_id=''):
       <a href="/apropos.html">À propos</a>
       <a href="/blog.html">Blog</a>
       <a href="mailto:contact@ia-entrepreneur.fr">contact@ia-entrepreneur.fr</a>
-      <a href="https://calendly.com/gabriel-ia-entrepreneur/decouverte" target="_blank" rel="noopener noreferrer" style="background:var(--accent);color:#fff;text-align:center;border-radius:var(--radius);margin-top:8px;padding:14px;display:block;font-weight:700;">Réserver un appel gratuit</a>
+      <a href="/rendez-vous.html" style="background:var(--accent);color:#fff;text-align:center;border-radius:var(--radius);margin-top:8px;padding:14px;display:block;font-weight:700;">Réserver un appel gratuit</a>
     </div>
   </header>'''
 

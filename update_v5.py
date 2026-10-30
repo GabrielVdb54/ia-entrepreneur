@@ -10,7 +10,7 @@ with open("index.html", "r", encoding="utf-8") as f:
     html = f.read()
 
 changes = 0
-CALENDLY = "https://calendly.com/gabriel-ia-entrepreneur/decouverte"
+CALENDLY = "https://ia-entrepreneur.fr/rendez-vous.html"
 
 # ══════════════════════════════════════════════════════════════
 # 1. À PROPOS — Condenser en 2 paragraphes
