@@ -28,6 +28,7 @@
     .reservation p{font-size:1.02rem;color:var(--muted);line-height:1.7;margin-bottom:22px;max-width:640px}
     .calendrier{background:#fff;border:1px solid var(--border);border-radius:20px;overflow:hidden;min-height:640px}
     .calendrier iframe{display:block}
+    #diagnostic{margin-top:20px;padding:14px;background:#fff;border:1px solid var(--border);border-radius:12px;font-size:0.76rem;line-height:1.5;white-space:pre-wrap;word-break:break-all}
     @media(max-width:560px){.container{padding:0 14px}.reservation{padding:28px 0 34px}}
   </style>
 </head>
@@ -48,6 +49,7 @@
         <div class="calendrier">
           <div class="meetings-iframe-container" data-src="https://meetings-eu1.hubspot.com/gvanderbecken/rdv-decouverte?embed=true"></div>
         </div>
+        <pre id="diagnostic" hidden></pre>
       </div>
     </section>
   </main>
@@ -67,6 +69,14 @@
     // HubSpot prévient la page une fois le créneau réservé : on garde le closer attribué dans l'onglet, pas dans l'URL.
     function traiterReservation(d) {
       if (!d || !d.meetingBookSucceeded) return;
+      if (/[?&]diagnostic=1/.test(location.search)) {
+        var brut = JSON.stringify(d.meetingsPayload || {}, null, 2);
+        try { sessionStorage.setItem('rdv-diagnostic', brut); } catch (e) {}
+        var bloc = document.getElementById('diagnostic');
+        bloc.textContent = brut;
+        bloc.hidden = false;
+        return;
+      }
       var reservation = (d.meetingsPayload || {}).bookingResponse || {};
       var reponse = reservation.postResponse || {};
       var organisateur = JSON.stringify(reponse.organizer || {}).toLowerCase();

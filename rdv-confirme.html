@@ -244,6 +244,14 @@
       var rdv = {};
       try { rdv = JSON.parse(sessionStorage.getItem('rdv-ia-entrepreneur')) || {}; } catch (e) {}
 
+      var diagnostic = sessionStorage.getItem('rdv-diagnostic');
+      if (diagnostic) {
+        var bloc = document.createElement('pre');
+        bloc.style.cssText = 'margin-top:18px;padding:14px;background:#fff;border-radius:12px;font-size:0.76rem;white-space:pre-wrap;word-break:break-all';
+        bloc.textContent = diagnostic;
+        document.querySelector('.infos').after(bloc);
+      }
+
       var prenom = String(rdv.prenom || '').trim();
       if (/^[\p{L}][\p{L} '’-]{0,39}$/u.test(prenom)) {
         document.getElementById('titre').textContent = 'Merci ' + prenom + ', c\'est noté\u00a0!';
@@ -252,7 +260,7 @@
       var quand = new Date(rdv.date);
       if (rdv.date && !isNaN(quand.getTime())) {
         var jour = new Intl.DateTimeFormat('fr-FR', { weekday: 'long', day: 'numeric', month: 'long', timeZone: 'Europe/Paris' }).format(quand);
-        var heure = new Intl.DateTimeFormat('fr-FR', { hour: '2-digit', minute: '2-digit', timeZone: 'Europe/Paris' }).format(quand).replace(':', ' h ');
+        var heure = new Intl.DateTimeFormat('fr-FR', { hour: '2-digit', minute: '2-digit', timeZone: 'Europe/Paris' }).format(quand).replace(':', ' h ').replace(/^0/, '');
         document.getElementById('date').textContent = jour.charAt(0).toUpperCase() + jour.slice(1) + ' à ' + heure + ' · 30 minutes en visio';
       }
 
