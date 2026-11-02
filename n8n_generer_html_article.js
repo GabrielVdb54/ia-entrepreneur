@@ -204,7 +204,7 @@ const blocMenu = (m) => {
 html += '<nav>';
 html += MENUS.map(blocMenu).join('');
 html += '<a href="/nos-formateurs.html">Nos formateurs</a>';
-html += '<a class="nav-tel tel-reveal" role="button" tabindex="0" data-tel="MzEgNzAgODkgNDEgNjA=" aria-label="Afficher le numéro de téléphone"><svg width=\"13\" height=\"13\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" viewBox=\"0 0 24 24\"><path d=\"M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.362 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.338 1.85.573 2.81.7A2 2 0 0 1 22 16.92z\"/></svg><span class="tel-value">Afficher le numéro</span></a>';
+html += '<a class="nav-tel tel-reveal" role="button" tabindex="0" data-tel="MzUgODIgMzEgNzUgNzA=" aria-label="Afficher le numéro de téléphone"><svg width=\"13\" height=\"13\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" viewBox=\"0 0 24 24\"><path d=\"M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.362 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.338 1.85.573 2.81.7A2 2 0 0 1 22 16.92z\"/></svg><span class="tel-value">Afficher le numéro</span></a>';
 html += '<a href="/rendez-vous.html" class="nav-cta">Appel gratuit</a>';
 html += '</nav>';
 html += '<button class="hamburger" id="hamburger" aria-label="Menu"><span></span><span></span><span></span></button>';
@@ -215,7 +215,7 @@ html += '<a href="/formation-ia-entreprise.html">Formations IA</a><a href="/form
 html += '<a href="/simulateur-financement-formation-ia.html">💶 Financer ma formation</a>';
 html += '<a href="/blog.html">Blog</a><a href="/apropos.html">À propos</a>';
 html += '<a href="mailto:contact@ia-entrepreneur.fr">✉ Écrire un email</a>';
-html += '<a class="tel-reveal" role="button" tabindex="0" data-tel="MzEgNzAgODkgNDEgNjA=" aria-label="Afficher le numéro de téléphone">📞 <span class="tel-value">Afficher le numéro</span></a>';
+html += '<a class="tel-reveal" role="button" tabindex="0" data-tel="MzUgODIgMzEgNzUgNzA=" aria-label="Afficher le numéro de téléphone">📞 <span class="tel-value">Afficher le numéro</span></a>';
 html += '<a href="/rendez-vous.html" style="background:var(--accent);color:#fff;text-align:center;border-radius:var(--radius);margin-top:8px;padding:14px;display:block;font-weight:700;">Réserver un appel gratuit</a>';
 html += '</div>';
 html += '</header>';

@@ -26,6 +26,9 @@
     .reservation{padding:40px 0 48px;background:#F0F3FF;min-height:70vh}
     .reservation h1{font-size:clamp(1.7rem,3.6vw,2.4rem);font-weight:900;line-height:1.15;letter-spacing:-0.02em;margin-bottom:8px}
     .reservation p{font-size:1.02rem;color:var(--muted);line-height:1.7;margin-bottom:22px;max-width:640px}
+    .reservation p.appel{margin-top:-12px;font-size:0.95rem}
+    .appel a{color:var(--primary);font-weight:700;white-space:nowrap}
+    .appel a:hover{text-decoration:underline}
     .calendrier{background:#fff;border:1px solid var(--border);border-radius:20px;overflow:hidden;min-height:640px}
     .calendrier iframe{display:block}
     @media(max-width:560px){.container{padding:0 14px}.reservation{padding:28px 0 34px}}
@@ -45,6 +48,7 @@
       <div class="container">
         <h1>Choisissez votre créneau</h1>
         <p>30 minutes en visio avec un conseiller IA-Entrepreneur, pour faire le point sur l'usage de l'IA dans vos équipes et voir ce qui vous serait utile.</p>
+        <p class="appel">Vous préférez en parler de vive voix ? <a class="tel-reveal" role="button" tabindex="0" data-tel="MzUgODIgMzEgNzUgNzA=" aria-label="Afficher le numéro de téléphone">📞 <span class="tel-value">Afficher le numéro</span></a></p>
         <div class="calendrier">
           <div class="meetings-iframe-container" data-src="https://meetings-eu1.hubspot.com/gvanderbecken/rdv-decouverte?embed=true"></div>
         </div>
@@ -62,6 +66,7 @@
       </div>
     </div>
   </footer>
+  <script defer src="/tel-reveal.js"></script>
   <script src="https://static.hsappstatic.net/MeetingsEmbed/ex/MeetingsEmbedCode.js"></script>
   <script>
     // HubSpot prévient la page une fois le créneau réservé : on garde le closer attribué dans l'onglet, pas dans l'URL.

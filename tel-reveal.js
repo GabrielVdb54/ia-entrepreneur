@@ -18,7 +18,13 @@
 (function () {
   'use strict';
 
+  // Depuis le 02/11/2026 le numéro du site est celui d'Anna (setter). Un article
+  // publié par n8n avant le recollage de son gabarit porterait encore l'ancien
+  // numéro encodé : on le redirige ici vers le bon.
+  var ANCIENS = { 'MzEgNzAgODkgNDEgNjA=': 'MzUgODIgMzEgNzUgNzA=' };
+
   function decode(encoded) {
+    if (ANCIENS[encoded]) encoded = ANCIENS[encoded];
     try {
       return atob(encoded).split('').reverse().join('');
     } catch (e) {

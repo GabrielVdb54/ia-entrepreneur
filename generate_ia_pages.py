@@ -563,7 +563,7 @@ TEL_SVG = ('<svg width="13" height="13" fill="none" stroke="currentColor" stroke
 # (base64 de la chaîne inversée) et révélé au clic par /tel-reveal.js — voir
 # masquer_telephone.py, qui applique la même règle aux pages écrites à la main.
 TEL_ATTRS = ('role="button" tabindex="0" data-tel="%s" '
-             'aria-label="Afficher le numéro de téléphone"' % "MzEgNzAgODkgNDEgNjA=")
+             'aria-label="Afficher le numéro de téléphone"' % "MzUgODIgMzEgNzUgNzA=")
 TEL_REVEAL_NAV = (f'<a class="nav-tel tel-reveal" {TEL_ATTRS}>{TEL_SVG}'
                   '<span class="tel-value">Afficher le numéro</span></a>')
 TEL_REVEAL_MENU = (f'<a class="tel-reveal" {TEL_ATTRS}>'

@@ -20,8 +20,13 @@ Usage : python3 masquer_telephone.py [--dry-run]
 import base64, glob, os, re, sys
 
 ROOT = os.path.dirname(os.path.abspath(__file__))
-NUMERO = '06 14 98 07 13'
-DATA_TEL = base64.b64encode(NUMERO[::-1].encode()).decode()
+# Ligne d'Anna Nilsen (setter) depuis le 02/11/2026. Ce fichier est servi
+# publiquement par Vercel comme le reste du dépôt : on n'y garde que la forme
+# encodée, jamais le numéro lisible. Pour changer de numéro :
+#   python3 -c "import base64;print(base64.b64encode('0X XX XX XX XX'[::-1].encode()).decode())"
+# puis remplacer cette valeur ici, dans simplifier_nav.py, generate_ia_pages.py,
+# n8n_generer_html_article.js (et le nœud n8n), et dans les data-tel des pages.
+DATA_TEL = 'MzUgODIgMzEgNzUgNzA='
 LIBELLE = 'Afficher le numéro'
 SCRIPT = '<script defer src="/tel-reveal.js"></script>'
 

@@ -91,7 +91,7 @@ def bloc_menu(url, libelle, entrees, tout):
 NAV = ('<nav>\n'
        + '\n'.join(bloc_menu(*m) for m in MENUS) + '\n'
        + '        <a href="/nos-formateurs.html">Nos formateurs</a>\n'
-       + f'        <a class="nav-tel tel-reveal" role="button" tabindex="0" data-tel="MzEgNzAgODkgNDEgNjA=" aria-label="Afficher le numéro de téléphone">{TEL_SVG}<span class="tel-value">Afficher le numéro</span></a>\n'
+       + f'        <a class="nav-tel tel-reveal" role="button" tabindex="0" data-tel="MzUgODIgMzEgNzUgNzA=" aria-label="Afficher le numéro de téléphone">{TEL_SVG}<span class="tel-value">Afficher le numéro</span></a>\n'
        + f'        <a href="{CAL}" target="_blank" rel="noopener noreferrer" class="nav-cta">Appel gratuit</a>\n'
        + '      </nav>')
 
@@ -105,7 +105,7 @@ MENU = f"""<div class="mobile-menu" id="mobile-menu">
     <a href="/blog.html">Blog</a>
     <a href="/apropos.html">À propos</a>
     <a href="mailto:contact@ia-entrepreneur.fr">✉ Écrire un email</a>
-    <a class="tel-reveal" role="button" tabindex="0" data-tel="MzEgNzAgODkgNDEgNjA=" aria-label="Afficher le numéro de téléphone">📞 <span class="tel-value">Afficher le numéro</span></a>
+    <a class="tel-reveal" role="button" tabindex="0" data-tel="MzUgODIgMzEgNzUgNzA=" aria-label="Afficher le numéro de téléphone">📞 <span class="tel-value">Afficher le numéro</span></a>
     <a href="{CAL}" target="_blank" rel="noopener noreferrer" style="background:var(--accent);color:#fff;text-align:center;border-radius:var(--radius);margin-top:8px;padding:14px;display:block;font-weight:700;">Réserver un appel gratuit</a>
   </div>"""
 
