@@ -171,11 +171,12 @@ const CHEVRON = '<svg class="nav-chevron" width="11" height="11" viewBox="0 0 24
 const MENUS = [
   ['/formation-ia-entreprise.html', 'Formations IA', [
     ["Former mes équipes à l'IA", '/formation-ia-entreprise.html'],
-    ["Me former, je suis indépendant", '/formation-ia-independant.html'],
-    ["Maîtriser ChatGPT au quotidien", '/formation-chatgpt-entreprise.html'],
-    ["Exploiter Microsoft Copilot", '/formation-microsoft-copilot-entreprise.html'],
-    ["Créer mes propres automatisations", '/formation-ia-automatisation.html'],
+    ["Former mes équipes à Claude", '/formation-claude-entreprise.html'],
+    ["Former mes équipes à ChatGPT", '/formation-chatgpt-entreprise.html'],
+    ["Former mes équipes à Microsoft Copilot", '/formation-microsoft-copilot-entreprise.html'],
+    ["Créer mes automatisations et agents IA", '/formation-ia-automatisation.html'],
     ["Me mettre en conformité AI Act", '/formation-ia-obligatoire-ai-act.html'],
+    ["Me former, je suis indépendant", '/formation-ia-independant.html'],
   ], null],
   ['/integrations-ia.html', 'Intégrations IA', [
     ["Créer mon chatbot client", '/integration-chatbot-client.html'],
@@ -211,11 +212,11 @@ html += '<button class="hamburger" id="hamburger" aria-label="Menu"><span></span
 html += '</div>';
 html += '</div>';
 html += '<div class="mobile-menu" id="mobile-menu">';
-html += '<a href="/formation-ia-entreprise.html">Formations IA</a><a href="/formation-ia-independant.html">Formation indépendants</a><a href="/integrations-ia.html">Intégrations IA</a><a href="/meilleures-ia.html">Meilleures IA</a><a href="/nos-formateurs.html">Nos formateurs</a>';
-html += '<a href="/simulateur-financement-formation-ia.html">💶 Financer ma formation</a>';
+html += '<a href="/formation-ia-entreprise.html">Formations IA</a><a href="/formation-claude-entreprise.html">Formation Claude</a><a href="/formation-chatgpt-entreprise.html">Formation ChatGPT</a><a href="/formation-ia-independant.html">Formation indépendants</a><a href="/integrations-ia.html">Intégrations IA</a><a href="/meilleures-ia.html">Meilleures IA</a><a href="/nos-formateurs.html">Nos formateurs</a>';
+html += '<a href="/simulateur-financement-formation-ia.html">Financer ma formation</a>';
 html += '<a href="/blog.html">Blog</a><a href="/apropos.html">À propos</a>';
-html += '<a href="mailto:contact@ia-entrepreneur.fr">✉ Écrire un email</a>';
-html += '<a class="tel-reveal" role="button" tabindex="0" data-tel="MzUgODIgMzEgNzUgNzA=" aria-label="Afficher le numéro de téléphone">📞 <span class="tel-value">Afficher le numéro</span></a>';
+html += '<a href="mailto:contact@ia-entrepreneur.fr">Écrire un email</a>';
+html += '<a class="tel-reveal" role="button" tabindex="0" data-tel="MzUgODIgMzEgNzUgNzA=" aria-label="Afficher le numéro de téléphone"><span class="tel-value">Afficher le numéro</span></a>';
 html += '<a href="/rendez-vous.html" style="background:var(--accent);color:#fff;text-align:center;border-radius:var(--radius);margin-top:8px;padding:14px;display:block;font-weight:700;">Réserver un appel gratuit</a>';
 html += '</div>';
 html += '</header>';

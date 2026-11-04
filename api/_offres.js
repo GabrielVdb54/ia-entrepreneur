@@ -8,7 +8,7 @@ export const OFFRES = {
   'formation-sur-mesure': {
     url: '/formation-ia-entreprise.html',
     titre: 'Formation IA sur mesure pour vos équipes',
-    pour: "former une ÉQUIPE sur SES outils et SES cas métier, quels qu'ils soient. Trois niveaux, de 1 à 4 jours selon le niveau : acculturation IA (1 à 2 jours), IA métier (2 à 3 jours), automatisation et intégration (3 à 4 jours). C'est le choix par défaut dès que plusieurs personnes sont concernées et que les outils recommandés ne correspondent pas exactement à une formation nommée.",
+    pour: "former une ÉQUIPE sur SES outils et SES cas métier, quels qu'ils soient. Trois niveaux, de 1 à 4 jours selon le niveau, à des prix indicatifs de 1 200, 1 500 et 2 000 € HT par jour pour un groupe jusqu'à 12 personnes : acculturation IA (1 à 2 jours), IA métier (2 à 3 jours), automatisation et intégration (3 à 4 jours). C'est le choix par défaut dès que plusieurs personnes sont concernées et que les outils recommandés ne correspondent pas exactement à une formation nommée.",
   },
   'formation-independant': {
     url: '/formation-ia-independant.html',
@@ -23,7 +23,12 @@ export const OFFRES = {
   'formation-chatgpt': {
     url: '/formation-chatgpt-entreprise.html',
     titre: 'Formation ChatGPT en entreprise',
-    pour: "quand l'outil retenu est ChatGPT lui-même. Si vous avez recommandé Mistral, Claude, Gemini ou Copilot, prenez plutôt la formation sur mesure : proposer une formation ChatGPT après avoir conseillé un autre assistant sonne faux.",
+    pour: "quand l'outil retenu est ChatGPT lui-même. Si vous avez recommandé Claude, prenez la formation Claude ; pour Mistral, Gemini ou Copilot, la formation sur mesure : proposer une formation ChatGPT après avoir conseillé un autre assistant sonne faux.",
+  },
+  'formation-claude': {
+    url: '/formation-claude-entreprise.html',
+    titre: 'Formation Claude en entreprise',
+    pour: "quand l'outil retenu est Claude lui-même (Anthropic). Pour ChatGPT, prenez la formation ChatGPT ; pour un autre assistant, la formation sur mesure.",
   },
   'formation-automatisation': {
     url: '/formation-ia-automatisation.html',
@@ -62,6 +67,7 @@ export const CLES_OFFRES = Object.keys(OFFRES);
  */
 export const OFFRES_CONDITIONNEES = {
   'formation-chatgpt': ['chatgpt', 'chatgpt-images'],
+  'formation-claude': ['claude'],
   'formation-copilot': ['microsoft-copilot', 'power-automate', 'power-bi'],
   'formation-automatisation': ['n8n', 'make', 'zapier', 'power-automate', 'lindy',
                                'relevance-ai', 'crewai', 'dust', 'manus'],

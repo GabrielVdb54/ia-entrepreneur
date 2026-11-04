@@ -1805,6 +1805,8 @@
       .stats-row, [style*="display:flex"][style*="gap"] {
         flex-wrap: wrap;
       }
+      /* sauf les puces : la coche doit rester à gauche du texte, pas au-dessus */
+      li[style*="display:flex"] { flex-wrap: nowrap !important; }
 
       /* ── Blog grid ── */
       .blog-grid { grid-template-columns: 1fr !important; }
@@ -1909,6 +1911,9 @@
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="/mobile.css" />
   <link rel="stylesheet" href="/nav-dropdown.css">
+  <link rel="stylesheet" href="/immersion.css">
+  <link rel="expect" href="#accueil" blocking="render">
+  <script>if(!matchMedia('(prefers-reduced-motion: reduce)').matches){document.documentElement.classList.add('imm-anim');setTimeout(function(){document.documentElement.classList.remove('imm-anim')},3000)}</script>
   <!-- Preload image hero (LCP) -->
   <link rel="preload" as="image" href="/images/formation-2.jpg" />
   <script type="application/ld+json">{"@context":"https://schema.org","@type":"VideoObject","name":"Formation IA en entreprise : comment on construit un programme sur mesure","description":"En 18 secondes : pourquoi vos equipes perdent des heures que l'IA fait en minutes, comment IA-Entrepreneur construit un programme calibre sur vos process, vos outils et vos metiers, et comment le financer via votre OPCO. Organisme certifie Qualiopi.","thumbnailUrl":["https://ia-entrepreneur.fr/videos/ia-societes-4x5.jpg"],"uploadDate":"2026-09-08T15:20:06+02:00","duration":"PT18S","contentUrl":"https://ia-entrepreneur.fr/videos/ia-societes-4x5.mp4","publisher":{"@type":"Organization","name":"IA-Entrepreneur","url":"https://ia-entrepreneur.fr"},"inLanguage":"fr-FR","url":"https://ia-entrepreneur.fr/"}</script>
@@ -1940,11 +1945,12 @@
           <a href="/formation-ia-entreprise.html">Formations IA<svg class="nav-chevron" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></a>
           <div class="nav-menu"><div class="nav-menu-inner">
             <a href="/formation-ia-entreprise.html">Former mes équipes à l'IA</a>
-            <a href="/formation-ia-independant.html">Me former, je suis indépendant</a>
-            <a href="/formation-chatgpt-entreprise.html">Maîtriser ChatGPT au quotidien</a>
-            <a href="/formation-microsoft-copilot-entreprise.html">Exploiter Microsoft Copilot</a>
-            <a href="/formation-ia-automatisation.html">Créer mes propres automatisations</a>
+            <a href="/formation-claude-entreprise.html">Former mes équipes à Claude</a>
+            <a href="/formation-chatgpt-entreprise.html">Former mes équipes à ChatGPT</a>
+            <a href="/formation-microsoft-copilot-entreprise.html">Former mes équipes à Microsoft Copilot</a>
+            <a href="/formation-ia-automatisation.html">Créer mes automatisations et agents IA</a>
             <a href="/formation-ia-obligatoire-ai-act.html">Me mettre en conformité AI Act</a>
+            <a href="/formation-ia-independant.html">Me former, je suis indépendant</a>
           </div></div>
         </div>
         <div class="nav-item">
@@ -1975,23 +1981,25 @@
         </div>
         <a href="/nos-formateurs.html">Nos formateurs</a>
         <a class="nav-tel tel-reveal" role="button" tabindex="0" data-tel="MzUgODIgMzEgNzUgNzA=" aria-label="Afficher le numéro de téléphone"><svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.362 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.338 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg><span class="tel-value">Afficher le numéro</span></a>
-        <a href="/rendez-vous.html" class="nav-cta">Appel gratuit</a>
+        <a href="https://ia-entrepreneur.fr/rendez-vous.html" target="_blank" rel="noopener noreferrer" class="nav-cta">Appel gratuit</a>
       </nav>
         <button class="hamburger" id="hamburger" aria-label="Menu"><span></span><span></span><span></span></button>
       </div>
     </div>
     <div class="mobile-menu" id="mobile-menu">
     <a href="/formation-ia-entreprise.html">Formations IA</a>
+    <a href="/formation-claude-entreprise.html">Formation Claude</a>
+    <a href="/formation-chatgpt-entreprise.html">Formation ChatGPT</a>
     <a href="/formation-ia-independant.html">Formation indépendants</a>
     <a href="/integrations-ia.html">Intégrations IA</a>
     <a href="/meilleures-ia.html">Meilleures IA</a>
     <a href="/nos-formateurs.html">Nos formateurs</a>
-    <a href="/simulateur-financement-formation-ia.html">💶 Financer ma formation</a>
+    <a href="/simulateur-financement-formation-ia.html">Financer ma formation</a>
     <a href="/blog.html">Blog</a>
     <a href="/apropos.html">À propos</a>
-    <a href="mailto:contact@ia-entrepreneur.fr">✉ Écrire un email</a>
-    <a class="tel-reveal" role="button" tabindex="0" data-tel="MzUgODIgMzEgNzUgNzA=" aria-label="Afficher le numéro de téléphone">📞 <span class="tel-value">Afficher le numéro</span></a>
-    <a href="/rendez-vous.html" style="background:var(--accent);color:#fff;text-align:center;border-radius:var(--radius);margin-top:8px;padding:14px;display:block;font-weight:700;">Réserver un appel gratuit</a>
+    <a href="mailto:contact@ia-entrepreneur.fr">Écrire un email</a>
+    <a class="tel-reveal" role="button" tabindex="0" data-tel="MzUgODIgMzEgNzUgNzA=" aria-label="Afficher le numéro de téléphone"><span class="tel-value">Afficher le numéro</span></a>
+    <a href="https://ia-entrepreneur.fr/rendez-vous.html" target="_blank" rel="noopener noreferrer" style="background:var(--accent);color:#fff;text-align:center;border-radius:var(--radius);margin-top:8px;padding:14px;display:block;font-weight:700;">Réserver un appel gratuit</a>
   </div>
 </header>
 
@@ -2012,11 +2020,11 @@
 
           <h1 class="hero-title">
             Formez vos équipes à <span class="gradient">l'IA</span>.<br />
-            <span class="gradient">Des heures gagnées</span>, chaque semaine.
+            <span class="gradient imm-souligne">Des heures gagnées<svg viewBox="0 0 300 14" preserveAspectRatio="none" aria-hidden="true"><path d="M3 9 C 60 3, 140 2, 297 7"/></svg></span>, chaque semaine.
           </h1>
 
           <p class="hero-desc">
-            Organisme de formation certifié Qualiopi : on forme vos équipes sur vos propres outils &mdash; ChatGPT, Copilot, automatisation &mdash; en trois niveaux, de 1 à 4 jours. Attestation et registre de formation à la clé. Sur devis : nous montons le dossier de financement (OPCO) pour viser zéro reste à charge. Vous préférez déléguer&nbsp;? On installe aussi l'IA pour vous.
+            Organisme de formation certifié Qualiopi : on forme vos équipes sur vos propres outils &mdash; ChatGPT, Copilot, automatisation &mdash; en trois niveaux, de 1 à 4 jours. Attestation et registre de formation à la clé. Dès 1 200 € HT la journée, prix indicatif : nous montons le dossier de financement (OPCO) pour viser zéro reste à charge. Vous préférez déléguer&nbsp;? On installe aussi l'IA pour vous.
           </p>
 
           <div class="hero-actions">
@@ -2026,9 +2034,15 @@
                 <path d="M5 12h14M12 5l7 7-7 7"/>
               </svg>
             </a>
-            <a href="/simulateur-financement-formation-ia.html" class="btn btn-outline">💶 Calculer mon financement</a>
+            <a href="/simulateur-financement-formation-ia.html" class="btn btn-outline">Calculer mon financement</a>
           </div>
 
+<!-- imm:preuve -->
+          <div class="imm-preuve">
+            <div class="imm-preuve-visages" aria-hidden="true"><img src="/images/gabriel-vanderbecken.jpg" alt="" width="80" height="80" loading="eager"><img src="/images/fathi-sehla.jpg" alt="" width="80" height="80" loading="eager"><img src="/images/ghozlane-yahiaoui.jpg" alt="" width="80" height="80" loading="eager"><img src="/images/gilles-idoux.jpg" alt="" width="80" height="80" loading="eager"><img src="/images/myriam-djebbara.jpg" alt="" width="80" height="80" loading="eager"><img src="/images/cyril-cieslak.jpg" alt="" width="80" height="80" loading="eager"></div>
+            <p><b>13 formateurs-praticiens</b> et <span class="imm-etoiles" aria-hidden="true">★★★★★</span> 5/5 sur 14 avis Google</p>
+          </div>
+<!-- /imm:preuve -->
           <div class="hero-stats">
             <div class="hero-stat">
               <strong>1 500+</strong>
@@ -2045,44 +2059,74 @@
           </div>
         </div>
 
-        <!-- Colonne droite : carousel photos -->
-        <div class="hero-photo-col">
-          <div class="hero-photo-wrapper" style="width:100%;">
-            <div class="hero-carousel" id="heroCarousel">
-              <div class="hero-carousel-track" id="heroCarouselTrack">
-                <div class="hero-carousel-slide">
-                  <img src="/images/formation-2.jpg" alt="Formation IA en entreprise" width="840" height="630" loading="eager" />
-                  <div class="hero-carousel-caption">Formation IA en entreprise</div>
-                </div>
-                <div class="hero-carousel-slide">
-                  <img src="/images/conference-ia-entreprise.jpg" alt="Conférence IA en entreprise" width="840" height="630" loading="lazy" />
-                  <div class="hero-carousel-caption">Conférence IA &amp; prise de parole</div>
-                </div>
-                <div class="hero-carousel-slide">
-                  <img src="/images/accompagnement-ia-individuel.jpg" alt="Accompagnement IA sur mesure" width="840" height="630" loading="lazy" />
-                  <div class="hero-carousel-caption">Accompagnement IA sur mesure</div>
-                </div>
-                <div class="hero-carousel-slide">
-                  <img src="/images/formation-ia-equipes.jpg" alt="Formation IA pour équipes" width="840" height="630" loading="lazy" />
-                  <div class="hero-carousel-caption">Formation IA pour équipes</div>
-                </div>
-                <div class="hero-carousel-slide">
-                  <img src="/images/salon-demain-avec-ia.jpg" alt="Atelier prompting animé par IA-Entrepreneur au salon Demain avec l'IA" width="840" height="630" loading="lazy" />
-                  <div class="hero-carousel-caption">Atelier prompting au salon Demain avec l'IA</div>
-                </div>
+        <!-- Colonne droite : démonstration « la semaine de votre équipe » (prototype immersion) -->
+        <div class="hero-photo-col imm-col">
+          <div class="imm-scene" id="immScene">
+            <figure class="imm-photo" data-prof="-1">
+              <img src="/images/formation-2.jpg" alt="Formation IA en entreprise animée par IA-Entrepreneur" width="840" height="630" loading="eager" />
+              <figcaption>En formation, sur vos documents</figcaption>
+            </figure>
+            <div class="imm-demo" id="immDemo" data-prof="1">
+              <div class="imm-demo-barre">
+                <span class="imm-demo-pts" aria-hidden="true"><i></i><i></i><i></i></span>
+                <span class="imm-demo-titre">Ce que vos équipes apprennent à faire</span>
               </div>
-              <button class="hero-carousel-arrow prev" id="carouselPrev" aria-label="Image précédente">
-                <svg width="14" height="14" fill="none" stroke="#0A0F2C" stroke-width="2.5" viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg>
-              </button>
-              <button class="hero-carousel-arrow next" id="carouselNext" aria-label="Image suivante">
-                <svg width="14" height="14" fill="none" stroke="#0A0F2C" stroke-width="2.5" viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg>
-              </button>
-              <div class="hero-carousel-dots" id="heroCarouselDots">
-                <div class="hero-carousel-dot active" data-index="0"></div>
-                <div class="hero-carousel-dot" data-index="1"></div>
-                <div class="hero-carousel-dot" data-index="2"></div>
-                <div class="hero-carousel-dot" data-index="3"></div>
-                <div class="hero-carousel-dot" data-index="4"></div>
+              <div class="imm-jours" role="tablist" aria-label="Exemples de la semaine">
+                <button type="button" role="tab" id="immTab0" aria-controls="immCas0" aria-selected="true"><b>Lundi</b> le compte-rendu</button>
+                <button type="button" role="tab" id="immTab1" aria-controls="immCas1" aria-selected="false" tabindex="-1"><b>Mardi</b> la réponse client</button>
+                <button type="button" role="tab" id="immTab2" aria-controls="immCas2" aria-selected="false" tabindex="-1"><b>Vendredi</b> le post LinkedIn</button>
+                <span class="imm-jours-pastille" aria-hidden="true"></span>
+              </div>
+              <div class="imm-cas-zone">
+
+                <div class="imm-cas on" id="immCas0" role="tabpanel" aria-labelledby="immTab0">
+                  <div class="imm-source">
+                    <span class="imm-source-nom">Notes de réunion</span>
+                    <p>réu lundi 9h, Marc, Sophie, Karim<br>devis Hoffmann ok sur le principe, attendre budget ??<br>Sophie relance Brasserie du Port (rien depuis 2 sem.)<br>salon de Metz : qui y va ?</p>
+                  </div>
+                  <div class="imm-prompt"><span class="imm-prompt-txt" data-texte="Fais-en un compte-rendu clair : décisions, actions, qui fait quoi.">Fais-en un compte-rendu clair : décisions, actions, qui fait quoi.</span></div>
+                  <div class="imm-sortie">
+                    <p class="imm-l imm-l-titre">Compte-rendu, réunion commerciale du lundi</p>
+                    <p class="imm-l"><b>Décision</b> Devis Hoffmann validé sur le principe, en attente du budget.</p>
+                    <div class="imm-l imm-actions">
+                      <span>Marc</span><span>Envoie le devis Hoffmann</span><span>vendredi</span>
+                      <span>Sophie</span><span>Relance la Brasserie du Port</span><span>mardi</span>
+                    </div>
+                    <p class="imm-l"><b>À trancher</b> Qui représente l'équipe au salon de Metz ?</p>
+                    <span class="imm-l imm-ok">Relu avant envoi</span>
+                  </div>
+                </div>
+
+                <div class="imm-cas" id="immCas1" role="tabpanel" aria-labelledby="immTab1" hidden>
+                  <div class="imm-source">
+                    <span class="imm-source-nom">Email reçu</span>
+                    <p>Trois semaines que j'attends ma commande, personne ne me répond. C'est inadmissible.<br>M. Lefèvre</p>
+                  </div>
+                  <div class="imm-prompt"><span class="imm-prompt-txt" data-texte="Réponds calmement, propose une date ferme et un geste à valider.">Réponds calmement, propose une date ferme et un geste à valider.</span></div>
+                  <div class="imm-sortie">
+                    <p class="imm-l imm-l-titre">Brouillon de réponse</p>
+                    <p class="imm-l">Bonjour Monsieur Lefèvre,</p>
+                    <p class="imm-l">Vous avez raison : ce délai n'est pas acceptable, et nous vous prions de nous en excuser.</p>
+                    <p class="imm-l">Votre commande part jeudi, livraison confirmée vendredi matin. Pour le désagrément, nous vous proposons <mark>[geste commercial à valider]</mark>.</p>
+                    <span class="imm-l imm-ok">À valider par vous avant envoi</span>
+                  </div>
+                </div>
+
+                <div class="imm-cas" id="immCas2" role="tabpanel" aria-labelledby="immTab2" hidden>
+                  <div class="imm-source">
+                    <span class="imm-source-nom">Notes de chantier</span>
+                    <p>école de Laxou terminée, 3 semaines, équipe de 5<br>client très content, photos dans le dossier partagé</p>
+                  </div>
+                  <div class="imm-prompt"><span class="imm-prompt-txt" data-texte="Rédige un post LinkedIn sobre pour annoncer la fin du chantier.">Rédige un post LinkedIn sobre pour annoncer la fin du chantier.</span></div>
+                  <div class="imm-sortie">
+                    <p class="imm-l imm-l-titre">Post LinkedIn, prêt à publier</p>
+                    <p class="imm-l">Chantier terminé à Laxou.</p>
+                    <p class="imm-l">Trois semaines de travaux, une équipe de cinq, et une école qui rouvre ses portes à l'heure. Merci à toute l'équipe pour le travail soigné.</p>
+                    <p class="imm-l imm-tags">#GrandEst #Chantier #Équipe</p>
+                    <span class="imm-l imm-ok">Ton de l'entreprise respecté</span>
+                  </div>
+                </div>
+
               </div>
             </div>
           </div>
@@ -2097,19 +2141,19 @@
     <div class="container">
       <div style="display:flex;align-items:center;justify-content:center;gap:48px;flex-wrap:wrap;text-align:center;">
         <div style="display:flex;flex-direction:column;gap:2px;">
-          <span style="font-size:1.5rem;font-weight:900;color:#fff;line-height:1;">67%</span>
+          <span style="font-size:1.5rem;font-weight:900;color:#fff;line-height:1;" data-imm-compte="67" data-pre="" data-suf="%">67%</span>
           <span style="font-size:0.72rem;color:rgba(255,255,255,0.75);max-width:130px;">des formations entreprises demandées portent sur l'IA en 2026</span>
           <span style="font-size:0.6rem;color:rgba(255,255,255,0.45);">Conferencier.ai, 2026</span>
         </div>
         <div style="width:1px;height:40px;background:rgba(255,255,255,0.15);"></div>
         <div style="display:flex;flex-direction:column;gap:2px;">
-          <span style="font-size:1.5rem;font-weight:900;color:#fff;line-height:1;">~83%</span>
+          <span style="font-size:1.5rem;font-weight:900;color:#fff;line-height:1;" data-imm-compte="83" data-pre="~" data-suf="%">~83%</span>
           <span style="font-size:0.72rem;color:rgba(255,255,255,0.75);max-width:130px;">des PME françaises sans programme IA structuré à ce jour</span>
           <span style="font-size:0.6rem;color:rgba(255,255,255,0.45);">Baromètre PME 2026</span>
         </div>
         <div style="width:1px;height:40px;background:rgba(255,255,255,0.15);"></div>
         <div style="display:flex;flex-direction:column;gap:2px;">
-          <span style="font-size:1.5rem;font-weight:900;color:#fff;line-height:1;">48h</span>
+          <span style="font-size:1.5rem;font-weight:900;color:#fff;line-height:1;" data-imm-compte="48" data-pre="" data-suf="h">48h</span>
           <span style="font-size:0.72rem;color:rgba(255,255,255,0.75);max-width:130px;">pour avoir un outil IA opérationnel dans votre entreprise</span>
           <span style="font-size:0.6rem;color:rgba(255,255,255,0.45);">Garanti IA-Entrepreneur</span>
         </div>
@@ -2162,7 +2206,7 @@
   <section class="refs-band">
     <div class="container">
       <p class="refs-titre">Ils nous font confiance</p>
-      <div class="refs-logos">
+      <div class="refs-logos imm-defile"><div class="imm-defile-piste">
         <img src="/images/references/grdf.png" alt="GRDF" width="292" height="120" loading="lazy" decoding="async" />
         <img src="/images/references/bpifrance.png" alt="Bpifrance" width="416" height="120" loading="lazy" decoding="async" />
         <img src="/images/references/acf.png" alt="ACF - Assurances Conseils Financiers" width="541" height="120" loading="lazy" decoding="async" />
@@ -2171,71 +2215,82 @@
         <img src="/images/references/pano.png" alt="PANO sign'service" width="120" height="120" loading="lazy" decoding="async" />
         <img src="/images/references/turbohero.png" alt="TurboHero" width="772" height="120" loading="lazy" decoding="async" />
         <a href="/partenaire-ux-key.html" title="UX-KEY, partenaire UX"><img src="/images/references/ux-key.png" alt="UX Key" width="137" height="120" loading="lazy" decoding="async" /></a>
-      </div>
+      </div><div class="imm-defile-piste" aria-hidden="true">
+        <img src="/images/references/grdf.png" alt="" data-alt="GRDF" width="292" height="120" loading="lazy" aria-hidden="true" decoding="async" />
+        <img src="/images/references/bpifrance.png" alt="" data-alt="Bpifrance" width="416" height="120" loading="lazy" aria-hidden="true" decoding="async" />
+        <img src="/images/references/acf.png" alt="" data-alt="ACF - Assurances Conseils Financiers" width="541" height="120" loading="lazy" aria-hidden="true" decoding="async" />
+        <img src="/images/references/apec.png" alt="" data-alt="Apec" width="379" height="120" loading="lazy" aria-hidden="true" decoding="async" />
+        <img src="/images/references/grand-nancy-innovation.png" alt="" data-alt="Grand Nancy Innovation" width="181" height="120" loading="lazy" aria-hidden="true" decoding="async" />
+        <img src="/images/references/pano.png" alt="" data-alt="PANO sign'service" width="120" height="120" loading="lazy" aria-hidden="true" decoding="async" />
+        <img src="/images/references/turbohero.png" alt="" data-alt="TurboHero" width="772" height="120" loading="lazy" aria-hidden="true" decoding="async" />
+        <img src="/images/references/ux-key.png" alt="" data-alt="UX Key" width="137" height="120" loading="lazy" aria-hidden="true" decoding="async" />
+      </div></div>
       <p class="refs-note">Grands comptes, institutions et start-up : nos formateurs interviennent aussi bien auprès d'équipes de plusieurs milliers de salariés qu'auprès de structures de quelques personnes.</p>
     </div>
   </section>
 
-  <!-- ── Offres IA ──────────────────────────────────────────────── -->
-  <section style="padding:72px 0 48px;">
+  <!-- ── Offres IA (prototype : deux chemins) ─────────────────────── -->
+  <section class="imm-offres" id="offres">
     <div class="container">
-      <div class="section-label reveal" style="margin-bottom:16px;"><span>Comment on peut vous aider</span></div>
-      <h2 class="section-title reveal" style="margin-bottom:12px;">On forme vos équipes à l'IA. <span style="color:var(--primary)">Et si vous préférez, on l'installe pour vous.</span></h2>
-      <p class="section-sub reveal" style="margin-bottom:40px;">La formation est notre métier : organisme certifié Qualiopi, finançable par votre OPCO. L'AI Act demande aux entreprises de développer la maîtrise de l'IA de leurs équipes : notre attestation et notre registre en sont la preuve. Si vous voulez le résultat sans que personne n'ait à monter en compétence, on déploie l'IA chez vous, clé en main.</p>
+      <div class="imm-offres-tete">
+        <h2 class="section-title">Deux façons de faire entrer l'IA dans votre entreprise</h2>
+        <p class="section-sub">Former vos équipes, c'est notre métier : nous sommes un organisme de formation certifié Qualiopi. Et si personne n'a le temps d'apprendre, on installe l'outil et on le maintient.</p>
+      </div>
+      <div class="imm-offres-grille">
 
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-bottom:32px;" class="reveal">
-
-        <!-- Formations IA — offre principale -->
-        <div style="background:rgba(16,185,129,0.06);border:2px solid rgba(16,185,129,0.3);border-radius:24px;padding:36px 32px;display:flex;flex-direction:column;gap:20px;position:relative;overflow:hidden;">
-          <div style="position:absolute;top:16px;right:16px;background:var(--accent);color:#fff;font-size:0.65rem;font-weight:700;padding:4px 10px;border-radius:50px;letter-spacing:0.06em;text-transform:uppercase;">Finançable OPCO</div>
-          <div style="width:52px;height:52px;background:rgba(16,185,129,0.12);border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:1.5rem;">🎓</div>
-          <div>
-            <div style="font-size:0.72rem;font-weight:800;letter-spacing:0.1em;text-transform:uppercase;color:var(--accent-text,#0B7A57);margin-bottom:8px;">Formations IA · Certifié Qualiopi</div>
-            <h3 style="font-size:1.4rem;font-weight:800;margin-bottom:12px;line-height:1.2;">Maîtrisez l'IA. Formez vos équipes.</h3>
-            <p style="font-size:0.92rem;color:var(--muted);line-height:1.7;margin-bottom:20px;">Trois niveaux, sur mesure et en intra-entreprise : l'acculturation IA, l'IA métier sur vos process et vos logiciels, puis l'automatisation et l'intégration. Groupes de 12 personnes maximum, en présentiel ou en distanciel. Vous êtes indépendant ? Il existe aussi des sessions ouvertes.</p>
-            <ul style="list-style:none;padding:0;margin:0 0 20px;display:flex;flex-direction:column;gap:9px;">
-              <li style="font-size:0.88rem;color:var(--muted);display:flex;align-items:flex-start;gap:8px;line-height:1.5;"><span style="color:var(--accent);font-weight:700;flex-shrink:0;">✓</span> De 1 à 4 jours selon le niveau, calé sur vos outils et vos cas métier</li>
-              <li style="font-size:0.88rem;color:var(--muted);display:flex;align-items:flex-start;gap:8px;line-height:1.5;"><span style="color:var(--accent);font-weight:700;flex-shrink:0;">✓</span> Certifié Qualiopi · sur devis · finançable OPCO</li>
-              <li style="font-size:0.88rem;color:var(--muted);display:flex;align-items:flex-start;gap:8px;line-height:1.5;"><span style="color:var(--accent);font-weight:700;flex-shrink:0;">✓</span> Nous montons le dossier de financement (OPCO) pour viser zéro reste à charge</li>
-              <li style="font-size:0.88rem;color:var(--muted);display:flex;align-items:flex-start;gap:8px;line-height:1.5;"><span style="color:var(--accent);font-weight:700;flex-shrink:0;">✓</span> Attestation individuelle et registre de formation : la preuve que vous développez la maîtrise de l'IA de vos équipes</li>
-              <li style="font-size:0.88rem;color:var(--muted);display:flex;align-items:flex-start;gap:8px;line-height:1.5;"><span style="color:var(--primary);font-weight:700;flex-shrink:0;">⚖</span> <a href="/formation-ia-obligatoire-ai-act.html" style="color:var(--primary);font-weight:600;text-decoration:underline;">L'AI Act demande de développer la maîtrise de l'IA de vos équipes →</a></li>
-            </ul>
-            <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
-              <a href="/formation-ia-entreprise.html" class="btn btn-accent" style="font-size:0.88rem;padding:11px 22px;">Voir les formations IA</a>
-              <a href="/formation-ia-independant.html" class="btn btn-outline" style="font-size:0.88rem;padding:11px 22px;">Je suis indépendant</a>
-            </div>
-            <p style="font-size:0.82rem;color:var(--muted);margin-top:14px;line-height:1.6;">Programmes dédiés : <a href="/formation-chatgpt-entreprise.html" style="color:var(--primary);font-weight:600;">ChatGPT</a> · <a href="/formation-microsoft-copilot-entreprise.html" style="color:var(--primary);font-weight:600;">Microsoft Copilot</a> · <a href="/formation-ia-automatisation.html" style="color:var(--primary);font-weight:600;">automatisation n8n</a></p>
+        <article class="imm-voie imm-voie-former">
+          <h3>Vos équipes apprennent</h3>
+          <p class="imm-voie-texte">En intra-entreprise, sur vos outils et vos propres documents. Groupes de 12 personnes au plus, en présentiel ou à distance.</p>
+          <ol class="imm-marches">
+            <li><a href="/formation-ia-entreprise.html#niveau-1"><span class="n">1</span><span class="t"><b>Acculturation IA</b>Utiliser l'IA sans risque, sur ses vrais fichiers</span><span class="d">1 à 2 jours<em>1 200 € HT / jour</em></span></a></li>
+            <li><a href="/formation-ia-entreprise.html#niveau-2"><span class="n">2</span><span class="t"><b>IA métier</b>L'IA dans vos process et vos logiciels</span><span class="d">2 à 3 jours<em>1 500 € HT / jour</em></span></a></li>
+            <li><a href="/formation-ia-entreprise.html#niveau-3"><span class="n">3</span><span class="t"><b>Automatisation et intégration</b>Construire vous-mêmes vos automatisations</span><span class="d">3 à 4 jours<em>2 000 € HT / jour</em></span></a></li>
+          </ol>
+          <p class="imm-voie-preuve">Prix indicatifs par jour, pour un groupe de 12 personnes au plus. Nous montons le dossier de financement OPCO pour viser zéro reste à charge. Chaque participant reçoit une attestation individuelle, l'entreprise un registre de formation : la preuve des mesures que demande <a href="/formation-ia-obligatoire-ai-act.html">l'article 4 de l'AI Act</a>.</p>
+          <div class="imm-voie-actions">
+            <a href="/formation-ia-entreprise.html" class="btn btn-accent">Voir les formations</a>
+            <a href="/formation-ia-independant.html" class="imm-lien">Vous êtes indépendant ?</a>
           </div>
-        </div>
+          <p class="imm-voie-outils">Par outil : <a href="/formation-chatgpt-entreprise.html">ChatGPT</a>, <a href="/formation-claude-entreprise.html">Claude</a>, <a href="/formation-microsoft-copilot-entreprise.html">Microsoft Copilot</a>, <a href="/formation-ia-automatisation.html">automatisation n8n</a></p>
+        </article>
 
-        <!-- Intégrations IA — pour qui ne veut pas se former -->
-        <div style="background:rgba(26,60,255,0.04);border:1.5px solid rgba(26,60,255,0.18);border-radius:24px;padding:36px 32px;display:flex;flex-direction:column;gap:20px;">
-          <div style="width:52px;height:52px;background:rgba(26,60,255,0.1);border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:1.5rem;">⚡</div>
-          <div>
-            <div style="font-size:0.72rem;font-weight:800;letter-spacing:0.1em;text-transform:uppercase;color:var(--primary);margin-bottom:8px;">Intégrations IA clé en main</div>
-            <h3 style="font-size:1.4rem;font-weight:800;margin-bottom:12px;line-height:1.2;">On installe. Vous récoltez les bénéfices.</h3>
-            <p style="font-size:0.92rem;color:var(--muted);line-height:1.7;margin-bottom:20px;">Chatbot client 24h/24, réponse email automatique, génération de contenu SEO, veille concurrentielle. On configure, on installe, on maintient. Personne n'a rien à apprendre.</p>
-            <ul style="list-style:none;padding:0;margin:0 0 24px;display:flex;flex-direction:column;gap:9px;">
-              <li style="font-size:0.88rem;color:var(--muted);display:flex;align-items:flex-start;gap:8px;line-height:1.5;"><span style="color:var(--accent);font-weight:700;flex-shrink:0;">✓</span> Opérationnel en 48h</li>
-              <li style="font-size:0.88rem;color:var(--muted);display:flex;align-items:flex-start;gap:8px;line-height:1.5;"><span style="color:var(--accent);font-weight:700;flex-shrink:0;">✓</span> Bugs corrigés inclus</li>
-              <li style="font-size:0.88rem;color:var(--muted);display:flex;align-items:flex-start;gap:8px;line-height:1.5;"><span style="color:var(--accent);font-weight:700;flex-shrink:0;">✓</span> Payable en 3 fois sans frais</li>
-            </ul>
-            <div style="display:flex;gap:8px;flex-wrap:wrap;">
-              <a href="/integrations-ia.html" class="btn btn-outline" style="font-size:0.88rem;padding:11px 22px;">Voir les intégrations</a>
-            </div>
-          </div>
-        </div>
+        <article class="imm-voie imm-voie-installer">
+          <h3>On l'installe pour vous</h3>
+          <p class="imm-voie-texte">Personne n'a rien à apprendre. On configure l'outil, on l'installe dans votre environnement et on le maintient.</p>
+          <ul class="imm-installs">
+            <li><a href="/integration-chatbot-client.html">Un chatbot qui répond à vos clients, jour et nuit</a></li>
+            <li><a href="/integration-reponse-email.html">Des réponses aux emails préparées automatiquement</a></li>
+            <li><a href="/integration-contenu-seo.html">Des contenus pour votre site, publiés au fil de l'eau</a></li>
+            <li><a href="/integration-veille-concurrentielle.html">Une veille sur vos concurrents, chaque semaine</a></li>
+          </ul>
+          <p class="imm-voie-preuve">Opérationnel en 48 h, bugs corrigés inclus, payable en 3 fois sans frais.</p>
+          <div class="imm-voie-actions"><a href="/integrations-ia.html" class="btn btn-outline">Voir les intégrations</a></div>
+        </article>
 
       </div>
     </div>
   </section>
 
+<!-- imm:equipe -->
+  <section class="imm-equipe " aria-label="Nos formateurs">
+    <div class="container imm-equipe-tete">
+      <div>
+        <h2 class="section-title">Ceux qui viendront former vos équipes</h2>
+        <p class="section-sub">Treize praticiens. Ils se servent de ces outils dans leur métier avant de les enseigner : commerce, marketing, développement, SEO, management.</p>
+      </div>
+      <a class="imm-lien" href="/nos-formateurs.html">Voir tous les profils</a>
+    </div>
+    <div class="imm-equipe-fenetre">
+      <div class="imm-equipe-piste"><a class="imm-portrait" href="/apropos.html"><img src="/images/gabriel-vanderbecken.jpg" alt="Gabriel Vanderbecken" loading="lazy" decoding="async" width="440" height="586"><span class="imm-portrait-info"><span class="imm-portrait-nom">Gabriel Vanderbecken</span><span class="imm-portrait-role">Fondateur d&#x27;IA-Entrepreneur</span><span class="imm-portrait-outils"><span>IA</span><span>Commerce</span><span>Entrepreneuriat</span></span></span></a><a class="imm-portrait" href="/formateur-achille-brial.html"><img src="/images/achille-brial.jpg" alt="Achille Brial" loading="lazy" decoding="async" width="440" height="586"><span class="imm-portrait-info"><span class="imm-portrait-nom">Achille Brial</span><span class="imm-portrait-role">CTO Full-Stack &amp; Expert IA</span><span class="imm-portrait-outils"><span>Agents IA &amp; automatisation</span><span>Développement SaaS</span><span>Claude Code</span></span></span></a><a class="imm-portrait" href="/formateur-celine-herment.html"><img src="/images/celine-herment.jpg" alt="Céline Herment" loading="lazy" decoding="async" width="440" height="586"><span class="imm-portrait-info"><span class="imm-portrait-nom">Céline Herment</span><span class="imm-portrait-role">Experte SEO &amp; IA</span><span class="imm-portrait-outils"><span>SEO sémantique</span><span>Réseaux sociaux</span><span>Formation IA</span></span></span></a><a class="imm-portrait" href="/formateur-ghozlane-yahiaoui.html"><img src="/images/ghozlane-yahiaoui.jpg" alt="Ghozlane Yahiaoui" loading="lazy" decoding="async" width="440" height="586" style="object-position:top center"><span class="imm-portrait-info"><span class="imm-portrait-nom">Ghozlane Yahiaoui</span><span class="imm-portrait-role">Formatrice &amp; consultante en intelligence artificielle</span><span class="imm-portrait-outils"><span>Copilot Microsoft 365</span><span>ChatGPT, Claude, Gemini</span><span>Agents &amp; automatisation</span></span></span></a><a class="imm-portrait" href="/formateur-sina-movaghar.html"><img src="/images/sina-movaghar.jpg" alt="Sina Movaghar" loading="lazy" decoding="async" width="440" height="586"><span class="imm-portrait-info"><span class="imm-portrait-nom">Sina Movaghar</span><span class="imm-portrait-role">Formateur IA d&#x27;entreprise</span><span class="imm-portrait-outils"><span>IA souveraine &amp; sécurisée</span><span>Automatisation LLMOps</span><span>Formation aux prompts</span></span></span></a><a class="imm-portrait" href="/formateur-gilles-idoux.html"><img src="/images/gilles-idoux.jpg" alt="Gilles Idoux" loading="lazy" decoding="async" width="440" height="586"><span class="imm-portrait-info"><span class="imm-portrait-nom">Gilles Idoux</span><span class="imm-portrait-role">Formateur IA générative</span><span class="imm-portrait-outils"><span>IA générative</span><span>Vente &amp; négociation</span><span>Management commercial</span></span></span></a><a class="imm-portrait" href="/formateur-dorian-didiot.html"><img src="/images/dorian-didiot.jpg" alt="Dorian Didiot" loading="lazy" decoding="async" width="440" height="586"><span class="imm-portrait-info"><span class="imm-portrait-nom">Dorian Didiot</span><span class="imm-portrait-role">Expert IA</span><span class="imm-portrait-outils"><span>IA appliquée au marketing</span><span>Développement commercial</span><span>Automatisation des processus</span></span></span></a><a class="imm-portrait" href="/formateur-mathieu-lemoine.html"><img src="/images/mathieu-lemoine.jpg" alt="Mathieu Lemoine" loading="lazy" decoding="async" width="440" height="586"><span class="imm-portrait-info"><span class="imm-portrait-nom">Mathieu Lemoine</span><span class="imm-portrait-role">Formateur IA générative</span><span class="imm-portrait-outils"><span>IA générative appliquée au commerce</span><span>Techniques de vente &amp; prospection</span><span>Automatisation &amp; CRM</span></span></span></a><a class="imm-portrait" href="/formateur-benjamin-niel.html"><img src="/images/benjamin-niel.jpg" alt="Benjamin Niel" loading="lazy" decoding="async" width="440" height="586"><span class="imm-portrait-info"><span class="imm-portrait-nom">Benjamin Niel</span><span class="imm-portrait-role">Formateur IA</span><span class="imm-portrait-outils"><span>Automatisation IA &amp; agents</span><span>Développement de logiciels sur-mesure</span><span>Vulgarisation IA terrain</span></span></span></a><a class="imm-portrait" href="/formateur-ryad-mimeche.html"><img src="/images/ryad-mimeche.jpg" alt="Ryad Mimeche" loading="lazy" decoding="async" width="440" height="586"><span class="imm-portrait-info"><span class="imm-portrait-nom">Ryad Mimeche</span><span class="imm-portrait-role">Expert en Développement Commercial, Négociation &amp; Stratégies IA</span><span class="imm-portrait-outils"><span>Négociation commerciale</span><span>IA appliquée à la vente</span><span>Bootcamp Négociation</span></span></span></a><a class="imm-portrait" href="/formateur-myriam-djebbara.html"><img src="/images/myriam-djebbara.jpg" alt="Myriam Djebbara" loading="lazy" decoding="async" width="440" height="586"><span class="imm-portrait-info"><span class="imm-portrait-nom">Myriam Djebbara</span><span class="imm-portrait-role">Consultante, formatrice &amp; conférencière</span><span class="imm-portrait-outils"><span>Éthique &amp; IA responsable</span><span>Transformation digitale</span><span>Conférences &amp; sensibilisation</span></span></span></a><a class="imm-portrait" href="/formateur-fathi-sehla.html"><img src="/images/fathi-sehla.jpg" alt="Fathi Sehla" loading="lazy" decoding="async" width="440" height="586"><span class="imm-portrait-info"><span class="imm-portrait-nom">Fathi Sehla</span><span class="imm-portrait-role">Formateur indépendant en IA générative</span><span class="imm-portrait-outils"><span>Claude &amp; Claude Code</span><span>Agents &amp; automatisation n8n</span><span>Assistants IA sur mesure</span></span></span></a><a class="imm-portrait" href="/formateur-cyril-cieslak.html"><img src="/images/cyril-cieslak.jpg" alt="Cyril Cieslak" loading="lazy" decoding="async" width="440" height="586"><span class="imm-portrait-info"><span class="imm-portrait-nom">Cyril Cieslak</span><span class="imm-portrait-role">Formateur en IA générative</span><span class="imm-portrait-outils"><span>IA générative &amp; ChatGPT</span><span>Assistants &amp; agents IA</span><span>Pédagogie pour adultes</span></span></span></a><a class="imm-portrait" href="/apropos.html" aria-hidden="true" tabindex="-1"><img src="/images/gabriel-vanderbecken.jpg" alt="" loading="lazy" decoding="async" width="440" height="586"><span class="imm-portrait-info"><span class="imm-portrait-nom">Gabriel Vanderbecken</span><span class="imm-portrait-role">Fondateur d&#x27;IA-Entrepreneur</span><span class="imm-portrait-outils"><span>IA</span><span>Commerce</span><span>Entrepreneuriat</span></span></span></a><a class="imm-portrait" href="/formateur-achille-brial.html" aria-hidden="true" tabindex="-1"><img src="/images/achille-brial.jpg" alt="" loading="lazy" decoding="async" width="440" height="586"><span class="imm-portrait-info"><span class="imm-portrait-nom">Achille Brial</span><span class="imm-portrait-role">CTO Full-Stack &amp; Expert IA</span><span class="imm-portrait-outils"><span>Agents IA &amp; automatisation</span><span>Développement SaaS</span><span>Claude Code</span></span></span></a><a class="imm-portrait" href="/formateur-celine-herment.html" aria-hidden="true" tabindex="-1"><img src="/images/celine-herment.jpg" alt="" loading="lazy" decoding="async" width="440" height="586"><span class="imm-portrait-info"><span class="imm-portrait-nom">Céline Herment</span><span class="imm-portrait-role">Experte SEO &amp; IA</span><span class="imm-portrait-outils"><span>SEO sémantique</span><span>Réseaux sociaux</span><span>Formation IA</span></span></span></a><a class="imm-portrait" href="/formateur-ghozlane-yahiaoui.html" aria-hidden="true" tabindex="-1"><img src="/images/ghozlane-yahiaoui.jpg" alt="" loading="lazy" decoding="async" width="440" height="586" style="object-position:top center"><span class="imm-portrait-info"><span class="imm-portrait-nom">Ghozlane Yahiaoui</span><span class="imm-portrait-role">Formatrice &amp; consultante en intelligence artificielle</span><span class="imm-portrait-outils"><span>Copilot Microsoft 365</span><span>ChatGPT, Claude, Gemini</span><span>Agents &amp; automatisation</span></span></span></a><a class="imm-portrait" href="/formateur-sina-movaghar.html" aria-hidden="true" tabindex="-1"><img src="/images/sina-movaghar.jpg" alt="" loading="lazy" decoding="async" width="440" height="586"><span class="imm-portrait-info"><span class="imm-portrait-nom">Sina Movaghar</span><span class="imm-portrait-role">Formateur IA d&#x27;entreprise</span><span class="imm-portrait-outils"><span>IA souveraine &amp; sécurisée</span><span>Automatisation LLMOps</span><span>Formation aux prompts</span></span></span></a><a class="imm-portrait" href="/formateur-gilles-idoux.html" aria-hidden="true" tabindex="-1"><img src="/images/gilles-idoux.jpg" alt="" loading="lazy" decoding="async" width="440" height="586"><span class="imm-portrait-info"><span class="imm-portrait-nom">Gilles Idoux</span><span class="imm-portrait-role">Formateur IA générative</span><span class="imm-portrait-outils"><span>IA générative</span><span>Vente &amp; négociation</span><span>Management commercial</span></span></span></a><a class="imm-portrait" href="/formateur-dorian-didiot.html" aria-hidden="true" tabindex="-1"><img src="/images/dorian-didiot.jpg" alt="" loading="lazy" decoding="async" width="440" height="586"><span class="imm-portrait-info"><span class="imm-portrait-nom">Dorian Didiot</span><span class="imm-portrait-role">Expert IA</span><span class="imm-portrait-outils"><span>IA appliquée au marketing</span><span>Développement commercial</span><span>Automatisation des processus</span></span></span></a><a class="imm-portrait" href="/formateur-mathieu-lemoine.html" aria-hidden="true" tabindex="-1"><img src="/images/mathieu-lemoine.jpg" alt="" loading="lazy" decoding="async" width="440" height="586"><span class="imm-portrait-info"><span class="imm-portrait-nom">Mathieu Lemoine</span><span class="imm-portrait-role">Formateur IA générative</span><span class="imm-portrait-outils"><span>IA générative appliquée au commerce</span><span>Techniques de vente &amp; prospection</span><span>Automatisation &amp; CRM</span></span></span></a><a class="imm-portrait" href="/formateur-benjamin-niel.html" aria-hidden="true" tabindex="-1"><img src="/images/benjamin-niel.jpg" alt="" loading="lazy" decoding="async" width="440" height="586"><span class="imm-portrait-info"><span class="imm-portrait-nom">Benjamin Niel</span><span class="imm-portrait-role">Formateur IA</span><span class="imm-portrait-outils"><span>Automatisation IA &amp; agents</span><span>Développement de logiciels sur-mesure</span><span>Vulgarisation IA terrain</span></span></span></a><a class="imm-portrait" href="/formateur-ryad-mimeche.html" aria-hidden="true" tabindex="-1"><img src="/images/ryad-mimeche.jpg" alt="" loading="lazy" decoding="async" width="440" height="586"><span class="imm-portrait-info"><span class="imm-portrait-nom">Ryad Mimeche</span><span class="imm-portrait-role">Expert en Développement Commercial, Négociation &amp; Stratégies IA</span><span class="imm-portrait-outils"><span>Négociation commerciale</span><span>IA appliquée à la vente</span><span>Bootcamp Négociation</span></span></span></a><a class="imm-portrait" href="/formateur-myriam-djebbara.html" aria-hidden="true" tabindex="-1"><img src="/images/myriam-djebbara.jpg" alt="" loading="lazy" decoding="async" width="440" height="586"><span class="imm-portrait-info"><span class="imm-portrait-nom">Myriam Djebbara</span><span class="imm-portrait-role">Consultante, formatrice &amp; conférencière</span><span class="imm-portrait-outils"><span>Éthique &amp; IA responsable</span><span>Transformation digitale</span><span>Conférences &amp; sensibilisation</span></span></span></a><a class="imm-portrait" href="/formateur-fathi-sehla.html" aria-hidden="true" tabindex="-1"><img src="/images/fathi-sehla.jpg" alt="" loading="lazy" decoding="async" width="440" height="586"><span class="imm-portrait-info"><span class="imm-portrait-nom">Fathi Sehla</span><span class="imm-portrait-role">Formateur indépendant en IA générative</span><span class="imm-portrait-outils"><span>Claude &amp; Claude Code</span><span>Agents &amp; automatisation n8n</span><span>Assistants IA sur mesure</span></span></span></a><a class="imm-portrait" href="/formateur-cyril-cieslak.html" aria-hidden="true" tabindex="-1"><img src="/images/cyril-cieslak.jpg" alt="" loading="lazy" decoding="async" width="440" height="586"><span class="imm-portrait-info"><span class="imm-portrait-nom">Cyril Cieslak</span><span class="imm-portrait-role">Formateur en IA générative</span><span class="imm-portrait-outils"><span>IA générative &amp; ChatGPT</span><span>Assistants &amp; agents IA</span><span>Pédagogie pour adultes</span></span></span></a></div>
+    </div>
+  </section>
+<!-- /imm:equipe -->
   <!-- ── Partenaire Goodweek ───────────────────────────────────── -->
   <section id="goodweek" style="padding:8px 0 64px;">
     <div class="container">
       <div class="gw-box reveal" style="display:grid;grid-template-columns:1fr 1fr;gap:40px;align-items:center;background:var(--bg2);border:1px solid var(--border);border-radius:24px;padding:44px 40px;">
         <div>
-          <div style="font-size:0.72rem;font-weight:800;letter-spacing:0.1em;text-transform:uppercase;color:var(--primary);margin-bottom:14px;">🤝 Partenaire officiel</div>
+          <div style="font-size:0.72rem;font-weight:800;letter-spacing:0.1em;text-transform:uppercase;color:var(--primary);margin-bottom:14px;">Partenaire officiel</div>
           <img src="/images/partenaires/goodweek.png" alt="Goodweek" width="167" height="40" loading="lazy" decoding="async" style="height:40px;width:auto;display:block;margin-bottom:18px;" />
           <h2 class="section-title" style="margin-bottom:12px;">Toutes les IA de vos équipes, <span style="color:var(--primary)">dans un seul espace sécurisé.</span></h2>
           <p style="font-size:0.95rem;color:var(--muted);line-height:1.7;margin-bottom:22px;">On forme vos équipes, puis on les équipe. Goodweek réunit les versions les plus puissantes de Claude, ChatGPT, Gemini, Mistral et Nova dans une plateforme française, avec des modèles hébergés en France et branchés sur vos outils. IA-Entrepreneur l'installe chez vous et reste votre interlocuteur au quotidien.</p>
@@ -2343,35 +2398,31 @@
       <h2 class="section-title reveal">De zéro à opérationnel en 4 étapes</h2>
       <p class="section-sub reveal">Que vous choisissiez une formation ou une intégration clé en main, voici comment ça se passe concrètement.</p>
 
-      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:24px;position:relative;" class="reveal">
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:24px;position:relative;" class="reveal" data-imm="etapes">
         <!-- Ligne de connexion -->
-        <div style="position:absolute;top:48px;left:calc(12.5% + 24px);right:calc(12.5% + 24px);height:2px;background:#1A3CFF;opacity:0.3;z-index:0;"></div>
+        <div class="imm-etapes-trait" aria-hidden="true"></div>
 
         <div style="text-align:center;position:relative;z-index:1;">
-          <div style="width:96px;height:96px;border-radius:50%;background:rgba(26,60,255,0.15);border:2px solid rgba(26,60,255,0.3);display:flex;align-items:center;justify-content:center;margin:0 auto 20px;font-size:2rem;">📞</div>
-          <div style="font-size:0.75rem;font-weight:800;color:#1A3CFF;letter-spacing:0.1em;text-transform:uppercase;margin-bottom:8px;">Étape 1</div>
-          <h3 style="font-size:1.05rem;font-weight:700;margin-bottom:8px;color:var(--text);">Appel découverte gratuit</h3>
+          <div class="imm-etape-rond" data-n="1" aria-hidden="true">1</div>
+          <h3 style="font-size:1.05rem;font-weight:700;margin-bottom:8px;color:var(--text);"><span class="imm-sr">Étape 1 : </span>Appel découverte gratuit</h3>
           <p style="font-size:0.88rem;color:var(--muted);line-height:1.6;">15 minutes pour identifier vos besoins IA, vos cas d'usage prioritaires et votre budget. Sans engagement.</p>
         </div>
 
         <div style="text-align:center;position:relative;z-index:1;">
-          <div style="width:96px;height:96px;border-radius:50%;background:rgba(26,60,255,0.15);border:2px solid rgba(26,60,255,0.3);display:flex;align-items:center;justify-content:center;margin:0 auto 20px;font-size:2rem;">🎯</div>
-          <div style="font-size:0.75rem;font-weight:800;color:#1A3CFF;letter-spacing:0.1em;text-transform:uppercase;margin-bottom:8px;">Étape 2</div>
-          <h3 style="font-size:1.05rem;font-weight:700;margin-bottom:8px;color:var(--text);">Choix du dispositif</h3>
+          <div class="imm-etape-rond" data-n="2" aria-hidden="true">2</div>
+          <h3 style="font-size:1.05rem;font-weight:700;margin-bottom:8px;color:var(--text);"><span class="imm-sr">Étape 2 : </span>Choix du dispositif</h3>
           <p style="font-size:0.88rem;color:var(--muted);line-height:1.6;">Formation pour maîtriser les outils vous-même, ou intégration clé en main pour déléguer. On vous conseille le bon choix selon votre temps.</p>
         </div>
 
         <div style="text-align:center;position:relative;z-index:1;">
-          <div style="width:96px;height:96px;border-radius:50%;background:rgba(16,185,129,0.15);border:2px solid rgba(16,185,129,0.3);display:flex;align-items:center;justify-content:center;margin:0 auto 20px;font-size:2rem;">⚡</div>
-          <div style="font-size:0.75rem;font-weight:800;color:#10B981;letter-spacing:0.1em;text-transform:uppercase;margin-bottom:8px;">Étape 3</div>
-          <h3 style="font-size:1.05rem;font-weight:700;margin-bottom:8px;color:var(--text);">Déploiement en 48h</h3>
+          <div class="imm-etape-rond" data-n="3" aria-hidden="true">3</div>
+          <h3 style="font-size:1.05rem;font-weight:700;margin-bottom:8px;color:var(--text);"><span class="imm-sr">Étape 3 : </span>Déploiement en 48h</h3>
           <p style="font-size:0.88rem;color:var(--muted);line-height:1.6;">Formation en présentiel ou distanciel, ou installation de l'outil directement dans votre environnement. Opérationnel rapidement.</p>
         </div>
 
         <div style="text-align:center;position:relative;z-index:1;">
-          <div style="width:96px;height:96px;border-radius:50%;background:rgba(16,185,129,0.15);border:2px solid rgba(16,185,129,0.3);display:flex;align-items:center;justify-content:center;margin:0 auto 20px;font-size:2rem;">📈</div>
-          <div style="font-size:0.75rem;font-weight:800;color:#10B981;letter-spacing:0.1em;text-transform:uppercase;margin-bottom:8px;">Étape 4</div>
-          <h3 style="font-size:1.05rem;font-weight:700;margin-bottom:8px;color:var(--text);">Résultats mesurables</h3>
+          <div class="imm-etape-rond" data-n="4" aria-hidden="true">4</div>
+          <h3 style="font-size:1.05rem;font-weight:700;margin-bottom:8px;color:var(--text);"><span class="imm-sr">Étape 4 : </span>Résultats mesurables</h3>
           <p style="font-size:0.88rem;color:var(--muted);line-height:1.6;">Temps gagné, erreurs en moins, leads générés automatiquement. On mesure ce qui change concrètement dans votre activité.</p>
         </div>
       </div>
@@ -2432,30 +2483,41 @@
       </div>
     </div>
   </section>
+<!-- imm:terrain -->
+  <section class="imm-terrain" aria-label="Photos de nos formations">
+    <div class="container">
+      <h2 class="section-title">En formation, pour de vrai</h2>
+      <p class="section-sub">Quelques moments de nos sessions, en entreprise, en accompagnement et en salon. Ce sont nos photos, pas celles d'une banque d'images.</p>
+      <div class="imm-terrain-grille imm-terrain-4">
+        <figure class="t1"><img src="/images/formation-2.jpg" alt="Formation IA en entreprise animée par IA-Entrepreneur" loading="lazy" decoding="async"><figcaption>Formation IA en entreprise</figcaption></figure>
+        <figure class="t2"><img src="/images/formation-1.jpg" alt="Gabriel Vanderbecken en session de formation" loading="lazy" decoding="async" style="object-position:center 20%"><figcaption>Gabriel Vanderbecken en session</figcaption></figure>
+        <figure class="t3"><img src="/images/accompagnement-gabriel.jpg" alt="Accompagnement individuel sur l'IA" loading="lazy" decoding="async" style="object-position:center 35%"><figcaption>Accompagnement individuel</figcaption></figure>
+        <figure class="t4"><img src="/images/salon-demain-avec-ia.jpg" alt="Atelier prompting animé par IA-Entrepreneur au salon Demain avec l'IA" loading="lazy" decoding="async"><figcaption>Atelier prompting au salon Demain avec l'IA</figcaption></figure>
+      </div>
+    </div>
+  </section>
+<!-- /imm:terrain -->
 
   <!-- ── Risques sans formation ────────────────────────────── -->
   <section style="padding:50px 0;">
     <div class="container">
       <div class="reveal" style="text-align:center;max-width:720px;margin:0 auto 36px;">
         <div class="section-label" style="justify-content:center;"><span>Le vrai risque</span></div>
-        <h2 style="font-size:clamp(1.5rem,3vw,2.2rem);font-weight:800;line-height:1.2;margin-bottom:16px;">Vos équipes utilisent déjà l'IA.<br><span style="color:var(--primary);">Formées ou non.</span></h2>
+        <h2 data-imm="enonce" style="font-size:clamp(1.5rem,3vw,2.2rem);font-weight:800;line-height:1.2;margin-bottom:16px;">Vos équipes utilisent déjà l'IA.<br><span style="color:var(--primary);">Formées ou non.</span></h2>
         <p style="font-size:1rem;color:var(--muted);line-height:1.8;">La question n'est plus de savoir si vos salariés vont s'en servir. La seule variable, c'est s'ils savent le faire correctement.</p>
       </div>
       <div class="reveal" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:20px;">
         <div style="background:#fff;border:1px solid var(--border);border-radius:20px;padding:26px;box-shadow:0 12px 40px rgba(10,15,44,0.06);">
-          <div style="font-size:1.6rem;margin-bottom:12px;">🔓</div>
           <h3 style="font-size:1.05rem;font-weight:800;margin-bottom:10px;line-height:1.3;">Fuite de données</h3>
           <p style="font-size:0.88rem;color:var(--muted);line-height:1.7;margin-bottom:14px;">Un contrat, un fichier RH ou un code source collé dans une IA grand public sort de l'entreprise et peut servir à entraîner le modèle. Personne ne l'a fait exprès : le réglage par défaut suffit. Et c'est vous qui restez responsable au titre du RGPD.</p>
           <p style="font-size:0.83rem;color:var(--accent);font-weight:700;line-height:1.55;margin:0;padding-top:14px;border-top:1px solid var(--border);">Formés, vos équipes savent ce qui ne doit jamais y entrer, et les comptes sont paramétrés pour que vos données n'entraînent rien.</p>
         </div>
         <div style="background:#fff;border:1px solid var(--border);border-radius:20px;padding:26px;box-shadow:0 12px 40px rgba(10,15,44,0.06);">
-          <div style="font-size:1.6rem;margin-bottom:12px;">⚠️</div>
           <h3 style="font-size:1.05rem;font-weight:800;margin-bottom:10px;line-height:1.3;">Gros risque d'erreur</h3>
           <p style="font-size:0.88rem;color:var(--muted);line-height:1.7;margin-bottom:14px;">L'IA se trompe avec aplomb : chiffres inventés, sources fabriquées, clauses approximatives. Une réponse fausse est aussi bien écrite qu'une réponse juste. Sans méthode de vérification, l'erreur part au client.</p>
           <p style="font-size:0.83rem;color:var(--accent);font-weight:700;line-height:1.55;margin:0;padding-top:14px;border-top:1px solid var(--border);">Formés, ils repèrent une réponse douteuse, la recoupent et la corrigent avant qu'elle ne sorte.</p>
         </div>
         <div style="background:#fff;border:1px solid var(--border);border-radius:20px;padding:26px;box-shadow:0 12px 40px rgba(10,15,44,0.06);">
-          <div style="font-size:1.6rem;margin-bottom:12px;">⏳</div>
           <h3 style="font-size:1.05rem;font-weight:800;margin-bottom:10px;line-height:1.3;">Perte de temps</h3>
           <p style="font-size:0.88rem;color:var(--muted);line-height:1.7;margin-bottom:14px;">Sans méthode, on relance l'IA dix fois pour un résultat moyen, puis on abandonne. La licence est payée tous les mois et personne ne l'ouvre. Le temps censé être gagné est perdu deux fois.</p>
           <p style="font-size:0.83rem;color:var(--accent);font-weight:700;line-height:1.55;margin:0;padding-top:14px;border-top:1px solid var(--border);">Formés, ils écrivent des prompts qui fonctionnent du premier coup sur vos propres cas, dès la semaine suivante.</p>
@@ -2629,12 +2691,12 @@
       </form>
 
       <div class="reveal" style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:26px;">
-        <a href="/ia/meilleures-ia-assistants-ia.html" class="btn btn-outline" style="padding:8px 16px;font-size:0.8rem;">🤖 Assistants IA</a>
-        <a href="/ia/meilleures-ia-automatisation.html" class="btn btn-outline" style="padding:8px 16px;font-size:0.8rem;">⚙️ Automatisation</a>
-        <a href="/ia/meilleures-ia-reunions-notes.html" class="btn btn-outline" style="padding:8px 16px;font-size:0.8rem;">🎙️ Comptes rendus</a>
-        <a href="/ia/meilleures-ia-prospection-vente.html" class="btn btn-outline" style="padding:8px 16px;font-size:0.8rem;">💼 Prospection</a>
-        <a href="/ia/meilleures-ia-juridique-conformite.html" class="btn btn-outline" style="padding:8px 16px;font-size:0.8rem;">🔐 Données &amp; conformité</a>
-        <a href="/ia/meilleures-ia-finance-admin.html" class="btn btn-outline" style="padding:8px 16px;font-size:0.8rem;">🧾 Finance &amp; admin</a>
+        <a href="/ia/meilleures-ia-assistants-ia.html" class="btn btn-outline" style="padding:8px 16px;font-size:0.8rem;">Assistants IA</a>
+        <a href="/ia/meilleures-ia-automatisation.html" class="btn btn-outline" style="padding:8px 16px;font-size:0.8rem;">Automatisation</a>
+        <a href="/ia/meilleures-ia-reunions-notes.html" class="btn btn-outline" style="padding:8px 16px;font-size:0.8rem;">Comptes rendus</a>
+        <a href="/ia/meilleures-ia-prospection-vente.html" class="btn btn-outline" style="padding:8px 16px;font-size:0.8rem;">Prospection</a>
+        <a href="/ia/meilleures-ia-juridique-conformite.html" class="btn btn-outline" style="padding:8px 16px;font-size:0.8rem;">Données &amp; conformité</a>
+        <a href="/ia/meilleures-ia-finance-admin.html" class="btn btn-outline" style="padding:8px 16px;font-size:0.8rem;">Finance &amp; admin</a>
       </div>
 
       <div class="reveal">
@@ -2754,35 +2816,30 @@
 
           <div class="contact-items">
             <div class="contact-item reveal reveal-delay-1">
-              <div class="contact-item-icon">📞</div>
               <div class="contact-item-text">
                 <strong>Téléphone</strong>
                 <a class="tel-reveal" role="button" tabindex="0" data-tel="MzUgODIgMzEgNzUgNzA=" aria-label="Afficher le numéro de téléphone"><span class="tel-value">Afficher le numéro</span></a>
               </div>
             </div>
             <div class="contact-item reveal reveal-delay-1">
-              <div class="contact-item-icon">✉️</div>
               <div class="contact-item-text">
                 <strong>E-mail</strong>
                 <a href="mailto:contact@ia-entrepreneur.fr">✉ Écrire un email</a>
               </div>
             </div>
             <div class="contact-item reveal reveal-delay-2">
-              <div class="contact-item-icon">📅</div>
               <div class="contact-item-text">
                 <strong>Réserver un appel</strong>
                 <a href="/rendez-vous.html">Appel gratuit de 30 min</a>
               </div>
             </div>
             <div class="contact-item reveal reveal-delay-2">
-              <div class="contact-item-icon">📍</div>
               <div class="contact-item-text">
                 <strong>Zone d'intervention</strong>
                 <span>France entière : présentiel, distanciel, e-learning</span>
               </div>
             </div>
             <div class="contact-item reveal reveal-delay-3">
-              <div class="contact-item-icon">⚡</div>
               <div class="contact-item-text">
                 <strong>Réponse rapide</strong>
                 <span>Sous 24h en jours ouvrés</span>
@@ -2838,7 +2895,7 @@
             <p class="form-note">Aucun spam. Vos données restent confidentielles.</p>
           </form>
           <div class="form-success" id="form-success">
-            ✅ Message envoyé ! Nous vous répondons sous 24h.
+            Message envoyé. Nous vous répondons sous 24h.
           </div>
         </div>
 
@@ -3065,6 +3122,7 @@
 
     // ── Hero Carousel ─────────────────────────────────────────
     const carouselTrack = document.getElementById('heroCarouselTrack');
+    if (carouselTrack) {
     const carouselDots = document.querySelectorAll('.hero-carousel-dot');
     let currentSlide = 0;
     const totalSlides = carouselTrack.children.length;
@@ -3083,6 +3141,10 @@
     });
     document.getElementById('carouselPrev').addEventListener('click', () => goToSlide(currentSlide - 1));
     document.getElementById('carouselNext').addEventListener('click', () => goToSlide(currentSlide + 1));
+    setInterval(() => {
+      goToSlide(currentSlide + 1);
+    }, 4000);
+    }
 
     // ── Carousel mobile ──────────────────────────────────────
     const mTrack = document.getElementById('heroCarouselTrackMobile');
@@ -3108,10 +3170,6 @@
     document.getElementById('carouselMobilePrev').addEventListener('click', () => { mGoTo(mSlide - 1); mStartAuto(); });
     document.getElementById('carouselMobileNext').addEventListener('click', () => { mGoTo(mSlide + 1); mStartAuto(); });
     mStartAuto();
-
-    setInterval(() => {
-      goToSlide(currentSlide + 1);
-    }, 4000);
   </script>
 
 <script></script>
@@ -3125,5 +3183,9 @@
     <button class="mobile-sticky-cta-close" onclick="this.closest('.mobile-sticky-cta').style.display='none';document.body.style.paddingBottom='0';" aria-label="Fermer">✕</button>
   </div>
   <script defer src="/tel-reveal.js"></script>
+  <script defer src="/vendor/gsap/gsap.min.js"></script>
+  <script defer src="/vendor/gsap/ScrollTrigger.min.js"></script>
+  <script defer src="/vendor/gsap/SplitText.min.js"></script>
+  <script defer src="/immersion.js"></script>
 </body>
 </html>

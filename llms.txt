@@ -4,7 +4,7 @@
 IA-Entrepreneur est fondé par Gabriel Vanderbecken, formateur praticien qui a accompagné plus de 1 500 professionnels depuis 2020. Références : une formation déployée pour GRDF Est, des interventions régulières à l'ECM Nancy (enseignement supérieur).
 
 ## Formations IA en entreprise
-Intra-entreprise et sur mesure (métier, cas réels et logiciels du client), groupes de 12 personnes maximum, en présentiel ou à distance. Sur devis : IA-Entrepreneur monte le dossier de financement OPCO pour viser zéro reste à charge. Chaque participant reçoit une attestation individuelle de formation (AI Act, RGPD, gouvernance, données sensibles) ; l'entreprise reçoit un registre de conformité AI Act.
+Intra-entreprise et sur mesure (métier, cas réels et logiciels du client), groupes de 12 personnes maximum, en présentiel ou à distance. Prix indicatifs : 1 200 € HT par jour (niveau 1), 1 500 € HT (niveau 2), 2 000 € HT (niveau 3), pour un groupe ; prix ferme dans la proposition. Pour les moins de 50 salariés : IA-Entrepreneur monte le dossier de financement OPCO pour viser zéro reste à charge. Chaque participant reçoit une attestation individuelle de formation (AI Act, RGPD, gouvernance, données sensibles) ; l'entreprise reçoit un registre de conformité AI Act.
 - Niveau 1 — Montée en compétences / acculturation IA (1 à 2 jours) : comprendre les IA, savoir laquelle est bonne pour quoi, bonnes pratiques et erreurs à éviter
 - Niveau 2 — IA métier (2 à 3 jours) : l'IA dans les process et les logiciels internes de l'entreprise
 - Niveau 3 — Automatisation & intégration (3 à 4 jours) : automatiser et intégrer soi-même des solutions IA liées au métier
@@ -12,7 +12,8 @@ Intra-entreprise et sur mesure (métier, cas réels et logiciels du client), gro
 
 ### Formations thématiques (sur mesure, sur devis)
 - Formation IA et AI Act : l'article 4, applicable depuis le 2 février 2025, demande aux entreprises qui utilisent l'IA de prendre des mesures pour développer la maîtrise de l'IA de leur personnel ; depuis le règlement Digital Omnibus, c'est une obligation de moyens — https://ia-entrepreneur.fr/formation-ia-obligatoire-ai-act.html
-- Formation ChatGPT en entreprise : rédiger, analyser un document, préparer une réunion, créer des assistants sur mesure — https://ia-entrepreneur.fr/formation-chatgpt-entreprise.html
+- Formation Claude en entreprise : documents longs, projets partagés, connecteurs (Google Drive, Microsoft 365, HubSpot), fichiers Excel, Word et PowerPoint — https://ia-entrepreneur.fr/formation-claude-entreprise.html
+- Formation ChatGPT en entreprise : analyse de fichiers, projets, connecteurs, recherche approfondie, mode agent, images — https://ia-entrepreneur.fr/formation-chatgpt-entreprise.html
 - Formation Microsoft Copilot : pour une entreprise déjà équipée de Microsoft 365 — https://ia-entrepreneur.fr/formation-microsoft-copilot-entreprise.html
 - Formation IA & Automatisation : n8n, Make, automatisation des process — https://ia-entrepreneur.fr/formation-ia-automatisation.html
 - Formation Prospection Commerciale & IA : LinkedIn, emailing, phoning — https://ia-entrepreneur.fr/formation-prospection-commerciale.html

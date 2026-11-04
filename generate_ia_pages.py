@@ -543,14 +543,16 @@ NAV_ITEMS = [
 
 MENU_MOBILE = [
     ('/formation-ia-entreprise.html', 'Formations IA'),
+    ('/formation-claude-entreprise.html', 'Formation Claude'),
+    ('/formation-chatgpt-entreprise.html', 'Formation ChatGPT'),
     ('/formation-ia-independant.html', 'Formation indépendants'),
     ('/integrations-ia.html', 'Intégrations IA'),
     ('/meilleures-ia.html', 'Meilleures IA'),
     ('/nos-formateurs.html', 'Nos formateurs'),
-    ('/simulateur-financement-formation-ia.html', '💶 Financer ma formation'),
+    ('/simulateur-financement-formation-ia.html', 'Financer ma formation'),
     ('/blog.html', 'Blog'),
     ('/apropos.html', 'À propos'),
-    ('mailto:contact@ia-entrepreneur.fr', '✉ Écrire un email'),
+    ('mailto:contact@ia-entrepreneur.fr', 'Écrire un email'),
 ]
 
 TEL_SVG = ('<svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" '
@@ -567,7 +569,7 @@ TEL_ATTRS = ('role="button" tabindex="0" data-tel="%s" '
 TEL_REVEAL_NAV = (f'<a class="nav-tel tel-reveal" {TEL_ATTRS}>{TEL_SVG}'
                   '<span class="tel-value">Afficher le numéro</span></a>')
 TEL_REVEAL_MENU = (f'<a class="tel-reveal" {TEL_ATTRS}>'
-                   '📞 <span class="tel-value">Afficher le numéro</span></a>')
+                   '<span class="tel-value">Afficher le numéro</span></a>')
 TEL_REVEAL_FOOTER = (f'<a class="tel-reveal" style="display:inline-flex;align-items:center;gap:6px;'
                      f'font-size:0.82rem;color:var(--muted);margin-top:8px;" {TEL_ATTRS}>'
                      '📞 <span class="tel-value">Afficher le numéro</span></a>')
@@ -582,11 +584,12 @@ CHEVRON = ('<svg class="nav-chevron" width="11" height="11" viewBox="0 0 24 24" 
 MENUS_NAV = [
     ('/formation-ia-entreprise.html', 'Formations IA', [
         ("Former mes équipes à l'IA",             '/formation-ia-entreprise.html'),
-        ("Me former, je suis indépendant",        '/formation-ia-independant.html'),
-        ("Maîtriser ChatGPT au quotidien",        '/formation-chatgpt-entreprise.html'),
-        ("Exploiter Microsoft Copilot",           '/formation-microsoft-copilot-entreprise.html'),
-        ("Créer mes propres automatisations",     '/formation-ia-automatisation.html'),
+        ("Former mes équipes à Claude",           '/formation-claude-entreprise.html'),
+        ("Former mes équipes à ChatGPT",          '/formation-chatgpt-entreprise.html'),
+        ("Former mes équipes à Microsoft Copilot", '/formation-microsoft-copilot-entreprise.html'),
+        ("Créer mes automatisations et agents IA", '/formation-ia-automatisation.html'),
         ("Me mettre en conformité AI Act",        '/formation-ia-obligatoire-ai-act.html'),
+        ("Me former, je suis indépendant",        '/formation-ia-independant.html'),
     ], None),
     ('/integrations-ia.html', 'Intégrations IA', [
         ("Créer mon chatbot client",              '/integration-chatbot-client.html'),

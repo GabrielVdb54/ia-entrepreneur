@@ -31,9 +31,11 @@
     .appel a:hover{text-decoration:underline}
     .calendrier{background:#fff;border:1px solid var(--border);border-radius:20px;overflow:hidden;min-height:640px}
     .calendrier iframe{display:block}
+    .programme-choisi{margin:0 0 18px;padding:14px 16px;border-radius:14px;background:rgba(16,185,129,.08);border:1px solid rgba(16,185,129,.3);font-size:.95rem;line-height:1.55}
+    .programme-choisi b{display:block;font-size:1rem}
     @media(max-width:560px){.container{padding:0 14px}.reservation{padding:28px 0 34px}}
   </style>
-</head>
+<link rel="stylesheet" href="/nav-dropdown.css"></head>
 <body>
   <header>
     <div class="container">
@@ -49,6 +51,7 @@
         <h1>Choisissez votre créneau</h1>
         <p>30 minutes en visio avec un conseiller IA-Entrepreneur, pour faire le point sur l'usage de l'IA dans vos équipes et voir ce qui vous serait utile.</p>
         <p class="appel">Vous préférez en parler de vive voix ? <a class="tel-reveal" role="button" tabindex="0" data-tel="MzUgODIgMzEgNzUgNzA=" aria-label="Afficher le numéro de téléphone">📞 <span class="tel-value">Afficher le numéro</span></a></p>
+        <p class="programme-choisi" id="programmeChoisi" hidden></p>
         <div class="calendrier">
           <div class="meetings-iframe-container" data-src="https://meetings-eu1.hubspot.com/gvanderbecken/rdv-decouverte?embed=true"></div>
         </div>
@@ -67,6 +70,17 @@
     </div>
   </footer>
   <script defer src="/tel-reveal.js"></script>
+  <script>
+    // Programme type choisi sur la page formation : rappelé au visiteur, et transmis aux statistiques à la réservation.
+    var PROGRAMMES = {"niveau-1": ["Niveau 1 · Acculturation IA", "sur 1 jour", "1 200 € HT par jour"], "niveau-2": ["Niveau 2 · IA métier", "sur 2 jours", "1 500 € HT par jour"], "niveau-3": ["Niveau 3 · Automatisation & intégration", "sur 3 jours", "2 000 € HT par jour"]};
+    var programmeChoisi = (new URLSearchParams(location.search).get('programme') || '').toLowerCase();
+    (function () {
+      var p = PROGRAMMES[programmeChoisi], el = document.getElementById('programmeChoisi');
+      if (!p || !el) { programmeChoisi = ''; return; }
+      el.innerHTML = '<b>Programme type : ' + p[0] + '</b>' + p[1].replace('sur', 'Sur') + ', ' + p[2] + ' (prix indicatif). Le conseiller l\'adaptera avec vous pendant l\'appel.';
+      el.hidden = false;
+    })();
+  </script>
   <script src="https://static.hsappstatic.net/MeetingsEmbed/ex/MeetingsEmbedCode.js"></script>
   <script>
     // HubSpot prévient la page une fois le créneau réservé : on garde le closer attribué dans l'onglet, pas dans l'URL.
@@ -83,6 +97,7 @@
           date: (reservation.event || {}).dateTime || (reservation.event || {}).dateString || ''
         }));
       } catch (e) {}
+      if (programmeChoisi && window.gtag) { try { gtag('event', 'rdv_programme_type', { programme: programmeChoisi }); } catch (e) {} }
       location.href = '/rdv-confirme.html';
     }
     window.addEventListener('message', function (e) {
