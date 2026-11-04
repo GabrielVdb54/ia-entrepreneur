@@ -17,6 +17,7 @@ Usage : python3 generate_ia_pages.py
 """
 
 import json, os, re, html, datetime
+from nettoyage_typo import nettoie_html, reformule_financement  # pas de tirets, points médians, flèches ni emojis (04/11/2026)
 
 ROOT = os.path.dirname(os.path.abspath(__file__))
 SITE = "https://ia-entrepreneur.fr"
@@ -332,8 +333,8 @@ IA_CSS = """
     .ia-body ul { margin:0 0 12px 0; padding-left:0; list-style:none; }
     .ia-body ul li { position:relative; padding-left:26px; margin-bottom:9px; color:var(--text); line-height:1.6; }
     .ia-body ul.plus li::before { content:"✓"; position:absolute; left:0; color:var(--accent); font-weight:800; }
-    .ia-body ul.moins li::before { content:"—"; position:absolute; left:0; color:#EF4444; font-weight:800; }
-    .ia-body ul.cas li::before { content:"→"; position:absolute; left:0; color:var(--primary); font-weight:800; }
+    .ia-body ul.moins li::before { content:"•"; position:absolute; left:0; color:#EF4444; font-weight:800; }
+    .ia-body ul.cas li::before { content:"•"; position:absolute; left:0; color:var(--primary); font-weight:800; }
     .ia-note { padding:16px 18px; border-radius:12px; background:rgba(16,185,129,0.07); border-left:4px solid var(--accent); font-size:0.9rem; line-height:1.6; }
     .ia-note.warn { background:rgba(239,68,68,0.06); border-left-color:#EF4444; }
     .ia-note.part { background:rgba(245,158,11,0.08); border-left-color:#F59E0B; margin:14px 0 6px; }
@@ -572,7 +573,7 @@ TEL_REVEAL_MENU = (f'<a class="tel-reveal" {TEL_ATTRS}>'
                    '<span class="tel-value">Afficher le numéro</span></a>')
 TEL_REVEAL_FOOTER = (f'<a class="tel-reveal" style="display:inline-flex;align-items:center;gap:6px;'
                      f'font-size:0.82rem;color:var(--muted);margin-top:8px;" {TEL_ATTRS}>'
-                     '📞 <span class="tel-value">Afficher le numéro</span></a>')
+                     '<span class="tel-value">Afficher le numéro</span></a>')
 
 
 CHEVRON = ('<svg class="nav-chevron" width="11" height="11" viewBox="0 0 24 24" fill="none" '
@@ -617,7 +618,7 @@ def bloc_nav():
     for url, libelle, entrees, tout in MENUS_NAV:
         liens = '\n'.join(f'            <a href="{u}">{t}</a>' for t, u in entrees)
         if tout:
-            liens += f'\n            <a href="{tout[1]}" class="nav-menu-tout">{tout[0]} →</a>'
+            liens += f'\n            <a href="{tout[1]}" class="nav-menu-tout">{tout[0]}</a>'
         blocs.append(f'        <div class="nav-item">\n'
                      f'          <a href="{url}">{libelle}{CHEVRON}</a>\n'
                      f'          <div class="nav-menu"><div class="nav-menu-inner">\n{liens}\n'
@@ -1612,7 +1613,7 @@ def build_hub():
       'automatisation': ['/formation-ia-automatisation.html', 'Formation IA et automatisation'],
       'prospection-vente': ['/formation-prospection-commerciale.html', 'Formation prospection commerciale et IA'],
       'relation-client': ['/integrations-ia.html', 'Intégration IA clé en main'],
-      'juridique-conformite': ['/formation-ia-obligatoire-ai-act.html', 'Formation IA obligatoire — article 4 de l’AI Act'],
+      'juridique-conformite': ['/formation-ia-obligatoire-ai-act.html', 'Ce que demande l’article 4 de l’AI Act'],
       'rh-formation': ['/formation-ia-entreprise.html', 'Formation IA sur mesure pour vos équipes'],
       'assistants-ia': ['/formation-chatgpt-entreprise.html', 'Formation ChatGPT en entreprise'],
       'video-audio': ['/formation-ia-entreprise.html', 'Formation IA sur mesure pour vos équipes'],
@@ -1773,11 +1774,11 @@ def build_hub():
     function rendreQuestions(el, r) {{
       stopAttente(el);
       el.innerHTML =
-        '<span class="ia-conseil-source">FindIA · quelques précisions</span>' +
+        '<span class="ia-conseil-source">FindIA, quelques précisions</span>' +
         '<h3>' + echapper(r.situation) + '</h3>' +
         '<ul class="ia-questions">' +
         r.questions.map(function (q) {{ return '<li>' + echapper(q) + '</li>'; }}).join('') +
-        '</ul><p class="ia-questions-note">Répondez en une phrase, même approximative — je m’adapte.</p>';
+        '</ul><p class="ia-questions-note">Répondez en une phrase, même approximative : je m’adapte.</p>';
     }}
 
     function stopAttente(el) {{
@@ -1789,7 +1790,7 @@ def build_hub():
       var etapes = r.etapes.map(function (e, i) {{
         return '<div class="ia-etape"><div class="num">' + (i + 1) + '</div><div>' +
           '<b><a href="' + e.url + '">' + echapper(e.nom) + '</a></b> ' +
-          '<span class="role">· ' + echapper(e.role) + '</span>' +
+          '<span class="role">' + echapper(e.role) + '</span>' +
           '<p>' + echapper(e.comment) + '</p>' +
           '<span class="ia-pills"><span class="ia-pill">' + echapper(e.usage) + '</span>' +
           '<span class="ia-pill">' + echapper(e.niveau) + '</span>' +
@@ -1833,7 +1834,7 @@ def build_hub():
       }}
 
       el.innerHTML =
-        '<span class="ia-conseil-source">FindIA · ' +
+        '<span class="ia-conseil-source">FindIA, ' +
         (r.source === 'claude' ? 'réponse composée pour votre situation' : 'réponse instantanée') +
         '</span><h3>' + echapper(r.situation) + '</h3>' + colonnes +
         (colonnes ? '<p class="ia-voies-detail">En détail, la voie recommandée :</p>' : '') + etapes +
@@ -1860,7 +1861,7 @@ def build_hub():
       return '<div class="ia-recap" data-outils="' + slugs + '"' +
         (r.offre && r.offre.cle ? ' data-offre="' + echapper(r.offre.cle) + '"' : '') + '>' +
         '<b>Recevoir ce plan par email</b>' +
-        '<p>' + combien + ', dans votre boîte mail — pour y revenir au calme ou le transmettre à votre équipe.</p>' +
+        '<p>' + combien + ', dans votre boîte mail, pour y revenir au calme ou le transmettre à votre équipe.</p>' +
         '<div class="ia-recap-champs">' +
         '<input type="email" placeholder="votre@email.com" autocomplete="email" aria-label="Votre adresse email">' +
         '<button type="button" class="ia-recap-envoi">Recevoir le plan</button>' +
@@ -1959,10 +1960,10 @@ def build_hub():
 
     function rendreEchec(el) {{
       stopAttente(el);
-      el.innerHTML = '<span class="ia-conseil-source">FindIA · aucune correspondance</span>' +
+      el.innerHTML = '<span class="ia-conseil-source">FindIA, aucune correspondance</span>' +
         '<h3>Je n’ai pas trouvé d’outil pour cette demande.</h3>' +
         '<p style="font-size:0.88rem;color:var(--muted);line-height:1.55;">Reformulez en décrivant la tâche ' +
-        'qui vous prend du temps — « je passe mes vendredis sur mes factures », par exemple — ou ' +
+        'qui vous prend du temps (« je passe mes vendredis sur mes factures », par exemple) ou ' +
         '<a href="#annuaire" style="color:var(--primary);font-weight:700;">parcourez l’annuaire complet</a>.</p>';
     }}
 
@@ -2078,7 +2079,7 @@ def build_hub():
               '<button type="button" data-nouvelle>Nouvelle conversation</button></p>';
             saisie.value = '';
             saisie.disabled = true;
-            saisie.placeholder = 'Conversation terminée — « Nouvelle conversation » pour repartir';
+            saisie.placeholder = 'Conversation terminée. « Nouvelle conversation » pour repartir';
             boutonEnvoyer.disabled = true;
             return;
           }} else if (r.mode === 'message') {{
@@ -2243,7 +2244,7 @@ def build_hub():
             col = c.style.getPropertyValue('--tool');
         return '<a href="' + c.querySelector('a').getAttribute('href') + '" style="--tool:' + col + '">' +
           '<div class="ia-logo">' + (i + 1) + '</div><div><b>' + t + '</b>' +
-          '<small>' + cat + ' · ' + use + '</small>' +
+          '<small>' + cat + ', ' + use + '</small>' +
           '<span class="ia-pills" style="margin-top:6px;"><span class="ia-pill">' + c.dataset.niv +
           '</span><span class="ia-pill">' + c.dataset.prix + '</span></span></div></a>';
       }}).join('');
@@ -2366,7 +2367,7 @@ def build_tool(t):
     forces = '\n'.join(f'        <li>{e(f)}</li>' for f in t['forces'])
     limites = '\n'.join(f'        <li>{e(l)}</li>' for l in t['limites'])
     cas = '\n'.join(f'        <li>{e(x)}</li>' for x in t['cas'])
-    alts_html = ' '.join(f'<a href="{tool_url(a)}">{e(a["name"])}</a>' for a in alts) or '—'
+    alts_html = ' '.join(f'<a href="{tool_url(a)}">{e(a["name"])}</a>' for a in alts) or 'Aucune'
     cats_html = ' '.join(
         f'<a class="ia-chip" href="{cat_url(CAT_BY[x])}">{CAT_BY[x]["emoji"]} {e(CAT_BY[x]["court"])}</a>'
         for x in all_cats(t))
@@ -2571,16 +2572,16 @@ def main():
     print(f'✓ api/_catalogue.js ({len(compact)} outils)')
     urls = [(f"{SITE}/meilleures-ia.html", 'weekly', '0.9')]
 
-    open(os.path.join(ROOT, 'meilleures-ia.html'), 'w', encoding='utf-8').write(build_hub())
+    open(os.path.join(ROOT, 'meilleures-ia.html'), 'w', encoding='utf-8').write(nettoie_html(reformule_financement(build_hub())))
     print('✓ meilleures-ia.html')
 
     for c in CATS:
-        open(os.path.join(ROOT, 'ia', f"meilleures-ia-{c['slug']}.html"), 'w', encoding='utf-8').write(build_category(c))
+        open(os.path.join(ROOT, 'ia', f"meilleures-ia-{c['slug']}.html"), 'w', encoding='utf-8').write(nettoie_html(reformule_financement(build_category(c))))
         urls.append((SITE + cat_url(c), 'monthly', '0.8'))
     print(f'✓ {len(CATS)} pages par usage')
 
     for t in TOOLS:
-        open(os.path.join(ROOT, 'ia', f"{t['slug']}.html"), 'w', encoding='utf-8').write(build_tool(t))
+        open(os.path.join(ROOT, 'ia', f"{t['slug']}.html"), 'w', encoding='utf-8').write(nettoie_html(reformule_financement(build_tool(t))))
         urls.append((SITE + tool_url(t), 'monthly', '0.6'))
     print(f'✓ {len(TOOLS)} fiches outils')
 

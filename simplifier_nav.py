@@ -81,7 +81,7 @@ MENUS = [
 def bloc_menu(url, libelle, entrees, tout):
     liens = '\n'.join(f'            <a href="{u}">{t}</a>' for t, u in entrees)
     if tout:
-        liens += f'\n            <a href="{tout[1]}" class="nav-menu-tout">{tout[0]} →</a>'
+        liens += f'\n            <a href="{tout[1]}" class="nav-menu-tout">{tout[0]}</a>'
     return (f'        <div class="nav-item">\n'
             f'          <a href="{url}">{libelle}{CHEVRON}</a>\n'
             f'          <div class="nav-menu"><div class="nav-menu-inner">\n{liens}\n'

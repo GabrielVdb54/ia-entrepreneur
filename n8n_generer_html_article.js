@@ -199,7 +199,7 @@ const MENUS = [
 ];
 const blocMenu = (m) => {
   let liens = m[2].map(function(e){ return '<a href="' + e[1] + '">' + e[0] + '</a>'; }).join('');
-  if (m[3]) liens += '<a href="' + m[3][1] + '" class="nav-menu-tout">' + m[3][0] + ' →</a>';
+  if (m[3]) liens += '<a href="' + m[3][1] + '" class="nav-menu-tout">' + m[3][0] + '</a>';
   return '<div class="nav-item"><a href="' + m[0] + '">' + m[1] + CHEVRON + '</a><div class="nav-menu"><div class="nav-menu-inner">' + liens + '</div></div></div>';
 };
 html += '<nav>';
@@ -225,7 +225,7 @@ html += '<img src="' + heroImage + '" alt="' + titleEsc + '" loading="eager" />'
 html += '<div class="article-hero-content">';
 html += '<div class="breadcrumb"><a href="/">Accueil</a><span>›</span><a href="/blog.html">Blog</a><span>›</span><span>' + categoryLabel + '</span></div>';
 html += '<div class="article-category">' + categoryLabel + '</div>';
-html += '<div class="article-meta"><span>📅 ' + dateDisplay + '</span><span>⏱ ' + readTime + ' min de lecture</span></div>';
+html += '<div class="article-meta"><span>' + dateDisplay + '</span><span>' + readTime + ' min de lecture</span></div>';
 html += '</div>';
 html += '</div>';
 html += '<div class="container">';
@@ -263,7 +263,7 @@ html += '<div class="container">';
 html += '<div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:20px;padding:20px 0;border-bottom:1px solid var(--border);margin-bottom:24px;">';
 html += '<div style="display:flex;align-items:center;gap:12px;">';
 html += '<img src="/qualiopi-logo.png" alt="Qualiopi" style="height:40px;width:auto;" onerror="this.style.display=\'none\'" />';
-html += '<div><div style="font-size:0.82rem;font-weight:800;">Certifié Qualiopi — Certificat n° 883211-2</div><div style="font-size:0.72rem;color:var(--muted);">NDA : 44 54 04871 54</div></div>';
+html += '<div><div style="font-size:0.82rem;font-weight:800;">Organisme certifié Qualiopi, certificat n° 883211-2</div><div style="font-size:0.72rem;color:var(--muted);">NDA : 44 54 04871 54</div></div>';
 html += '</div>';
 html += '<a href="/qualiopi-certificat.pdf" target="_blank" style="font-size:0.78rem;font-weight:700;color:var(--primary);border:1px solid rgba(26,60,255,0.2);padding:7px 14px;border-radius:50px;background:rgba(26,60,255,0.04);">Voir le certificat</a>';
 html += '</div>';
@@ -279,7 +279,7 @@ html += '<a href="/cgv.html" style="font-size:0.8rem;color:var(--muted);">CGV</a
 html += '<a href="mailto:contact@ia-entrepreneur.fr" style="font-size:0.8rem;color:var(--muted);">Contact</a>';
 html += '</div>';
 html += '</div>';
-html += '<p style="font-size:0.72rem;color:var(--muted);opacity:0.6;">© ' + today.getFullYear() + ' IA-Entrepreneur — Clindit. Tous droits réservés. | NDA : 44 54 04871 54</p>';
+html += '<p style="font-size:0.72rem;color:var(--muted);opacity:0.6;">© ' + today.getFullYear() + ' IA-Entrepreneur, marque de Clindit SASU. Tous droits réservés. NDA : 44 54 04871 54</p>';
 html += '</div>';
 html += '</footer>';
 html += '<script>';
@@ -290,6 +290,37 @@ html += '</script>';
 html += '<script defer src="/tel-reveal.js"><\/script>';
 html += '</body>';
 html += '</html>';
+
+// Typographie (décision du 04/11/2026, même règle que nettoyage_typo.py pour le site) :
+// ni tiret cadratin ou demi-cadratin comme ponctuation, ni point médian, ni flèche, ni emoji
+// dans le texte visible ; pas de promesse de « zéro reste à charge ». Les étoiles (★ ☆),
+// la coche (✓) et la croix (✕) restent. Les scripts, styles et balises ne sont pas touchés.
+function nettoieTexte(t) {
+  if (!/[—–·→←↗]|&(mdash|ndash|middot|rarr|larr);|[\u{1F000}-\u{1FAFF}\u{2600}-\u{27BF}\u{2B00}-\u{2BFF}]/u.test(t)) return t;
+  t = t.replace(/&mdash;/g, '—').replace(/&ndash;/g, '–').replace(/&middot;/g, '·').replace(/&rarr;/g, '→').replace(/&larr;/g, '←');
+  t = t.replace(/(\d)\s?[–—]\s?(\d)/g, '$1 à $2');
+  t = t.replace(/^[—–]\s*/, '');
+  t = t.replace(/\s+[—–]\s+(?=[a-zàâçéèêëîïôûùüÿœ«(])/g, ', ');
+  t = t.replace(/\s+[—–]\s+/g, ' : ').replace(/(\w)—(\w)/g, '$1, $2').replace(/(\w)–(\w)/g, '$1-$2').replace(/[—]/g, ',').replace(/[–]/g, '-');
+  t = t.replace(/\s*·\s*/g, ', ');
+  t = t.replace(/\s*[→↗]+\s*$/, '').replace(/^\s*←+\s*/, '').replace(/(\w)\s*→\s*(\w)/g, '$1 puis $2').replace(/\s*[→←↗]\s*/g, ' ');
+  t = t.replace(/[\u{1F000}-\u{1FAFF}\u{2600}-\u{27BF}\u{2B00}-\u{2BFF}][\u{FE0F}\u{200D}]*/gu, c => '★☆✓✕'.includes(c[0]) ? c : '');
+  t = t.replace(/,\s*,/g, ',').replace(/\s+,/g, ',').replace(/,\s*([.;:!?)])/g, '$1').replace(/(\S)[ \t]{2,}(\S)/g, '$1 $2');
+  return t;
+}
+function nettoieHtml(h) {
+  h = h.replace(/,?\s*pour viser z[ée]ro reste à charge(?: pour l'entreprise)?/g, '')
+       .replace(/[Oo]bjectif z[ée]ro reste à charge/g, 'Dossier de financement monté par nos soins')
+       .replace(/(?:z[ée]ro|sans) reste à charge/g, 'prise en charge par votre OPCO');
+  return h.split(/(<script\b[^>]*>[\s\S]*?<\/script>|<style\b[^>]*>[\s\S]*?<\/style>|<pre\b[\s\S]*?<\/pre>|<code\b[\s\S]*?<\/code>|<[^>]+>)/i)
+    .map(m => {
+      if (!m) return m;
+      if (/^<(script|style|pre|code)/i.test(m)) return m;
+      if (m.startsWith('<')) return m.replace(/(\s(?:alt|title|aria-label|content)=")([^"]*)(")/g, (x, a, v, b) => a + nettoieTexte(v) + b);
+      return nettoieTexte(m);
+    }).join('');
+}
+html = nettoieHtml(html);
 
 const base64Html = Buffer.from(html).toString('base64');
 

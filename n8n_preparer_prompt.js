@@ -21,7 +21,7 @@ SOCIÉTÉS :
 
 Si tu mentionnes un chiffre absent de cette liste, ajoute : "(à vérifier sur urssaf.fr ou impots.gouv.fr)"
 
-MISSION : Réécris et enrichis cet article pour le blog de IA-Entrepreneur. Ce n'est pas une simple paraphrase — tu produis un article original, plus complet et plus utile que la source.
+MISSION : Réécris et enrichis cet article pour le blog de IA-Entrepreneur. Ce n'est pas une simple paraphrase : tu produis un article original, plus complet et plus utile que la source.
 STRUCTURE OBLIGATOIRE (dans cet ordre) :
 1. Accroche (1 paragraphe) : une situation concrète ou un chiffre qui interpelle. Pas de question rhétorique.
 2. Introduction (1 paragraphe) : contexte et promesse de l'article.
@@ -38,6 +38,8 @@ RÈGLES CONTENU :
   · Organisme de formation certifié Qualiopi, formations finançables par l'OPCO de l'entreprise. Chaque participant reçoit une attestation individuelle de formation qui mentionne les volets réglementaires traités (AI Act article 4, RGPD).
   · L'argument, c'est le temps gagné et la réduction des erreurs. JAMAIS de promesse de ROI, de rentabilité, de « formation qui se rembourse » ou de gain en euros pour une formation IA-Entrepreneur.
   · JAMAIS écrire qu'une formation IA-Entrepreneur est éligible au CPF ou enregistrée au Répertoire spécifique. Tu peux expliquer le CPF de façon générale, mais sans jamais le rattacher à une offre IA-Entrepreneur.
+  · Financement : JAMAIS « zéro reste à charge », « sans reste à charge », « financé à 100 % » ni « gratuit ». Écris : « IA-Entrepreneur monte le dossier de financement auprès de l'OPCO de l'entreprise » ; la prise en charge dépend de la branche et de l'effectif (fonds mutualisés réservés aux moins de 50 salariés).
+  · Typographie : JAMAIS de tiret cadratin (—) ni demi-cadratin (–) comme ponctuation, JAMAIS de point médian (·), de flèche (→) ni d'emoji. Utilise une virgule, un deux-points, des parenthèses ou une nouvelle phrase.
   · Prix des formations IA-Entrepreneur : uniquement les prix indicatifs publiés (1 200 € HT par jour au niveau 1, 1 500 € HT au niveau 2, 2 000 € HT au niveau 3, pour un groupe jusqu'à 12 personnes en intra), toujours « indicatifs », jamais de total ni de remise ; les intégrations sont sur devis ; les formations pour indépendants n'ont pas encore de tarif (liste d'attente).
 - MAILLAGE INTERNE OBLIGATOIRE : intègre 2 à 3 liens internes vers des pages pertinentes du site IA-Entrepreneur. Pages disponibles : /formation-ia-entreprise.html (formations IA en entreprise), /formation-chatgpt-entreprise.html (formation ChatGPT), /formation-microsoft-copilot-entreprise.html (formation Copilot), /formation-ia-automatisation.html (automatisation IA), /formation-prospection-commerciale.html (prospection), /formation-management-leadership.html (management), /formation-ia-independant.html (formation IA pour indépendants et freelances), /formation-ia-obligatoire-ai-act.html (obligation de formation AI Act), /integrations-ia.html (intégrations IA sur mesure), /meilleures-ia.html (annuaire des meilleures IA par usage), /simulateur-financement-formation-ia.html (simulateur de financement OPCO), /blog.html (blog). Choisis uniquement les pages en rapport avec le sujet de l'article. Format : <a href="/formation-ia-entreprise.html">formations IA</a>.
 - SEO : le mot-clé principal doit apparaître dans le titre (h1), dans le premier paragraphe et dans au moins un h2. Ne pas le répéter mécaniquement, mais l'intégrer naturellement.
@@ -51,7 +53,7 @@ RÈGLES CONTENU :
 - category : l'une de ces valeurs selon le sujet principal : "Intelligence Artificielle" | "Création d'entreprise" | "Développement commercial" | "Management" | "Financement".
 - imagePrompt : description EN ANGLAIS d'une photo professionnelle illustrant l'article.
 - L'article est rédigé en 2026. Toutes les années mentionnées dans le titre, l'excerpt et le contenu doivent être 2026. Ne jamais écrire "2024" ou "2025".
-FORMAT DE RÉPONSE — JSON brut uniquement :
+FORMAT DE RÉPONSE : JSON brut uniquement :
 {
   "title": "Titre accrocheur et SEO de l'article",
   "slug": "titre-de-larticle",

@@ -227,7 +227,7 @@
 
   <footer>
     <div class="container">
-      <div>IA-Entrepreneur, marque de Clindit SASU · Organisme de formation certifié Qualiopi · Certificat n° 883211-2</div>
+      <div>IA-Entrepreneur, marque de Clindit SASU, Organisme de formation certifié Qualiopi, Certificat n° 883211-2</div>
       <div class="footer-liens">
         <a href="/mentions-legales.html">Mentions légales</a>
         <a href="/politique-confidentialite.html">Politique de confidentialité</a>
@@ -253,7 +253,7 @@
       if (rdv.date && !isNaN(quand.getTime())) {
         var jour = new Intl.DateTimeFormat('fr-FR', { weekday: 'long', day: 'numeric', month: 'long', timeZone: 'Europe/Paris' }).format(quand);
         var heure = new Intl.DateTimeFormat('fr-FR', { hour: '2-digit', minute: '2-digit', timeZone: 'Europe/Paris' }).format(quand).replace(':', ' h ').replace(/^0/, '');
-        document.getElementById('date').textContent = jour.charAt(0).toUpperCase() + jour.slice(1) + ' à ' + heure + ' · 30 minutes en visio';
+        document.getElementById('date').textContent = jour.charAt(0).toUpperCase() + jour.slice(1) + ' à ' + heure + '30 minutes en visio';
       }
 
       var c = Object.prototype.hasOwnProperty.call(CLOSERS, rdv.closer) ? CLOSERS[rdv.closer] : null;
@@ -265,7 +265,7 @@
         img.src = c.photo; img.alt = c.nom; img.width = 104; img.height = 104;
         photos.appendChild(img);
         document.getElementById('nom').textContent = 'Vous avez rendez-vous avec ' + c.prenom;
-        document.getElementById('role').textContent = c.nom + ' · ' + c.role;
+        document.getElementById('role').textContent = c.nom + '' + c.role;
         document.getElementById('mot').textContent = 'Merci pour votre réservation. Je vous retrouve en visio pendant 30 minutes. D\'ici là, voici de quoi vous faire une idée de nos formations.';
       }
     })();

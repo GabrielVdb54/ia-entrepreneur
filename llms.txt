@@ -4,35 +4,35 @@
 IA-Entrepreneur est fondé par Gabriel Vanderbecken, formateur praticien qui a accompagné plus de 1 500 professionnels depuis 2020. Références : une formation déployée pour GRDF Est, des interventions régulières à l'ECM Nancy (enseignement supérieur).
 
 ## Formations IA en entreprise
-Intra-entreprise et sur mesure (métier, cas réels et logiciels du client), groupes de 12 personnes maximum, en présentiel ou à distance. Prix indicatifs : 1 200 € HT par jour (niveau 1), 1 500 € HT (niveau 2), 2 000 € HT (niveau 3), pour un groupe ; prix ferme dans la proposition. Pour les moins de 50 salariés : IA-Entrepreneur monte le dossier de financement OPCO pour viser zéro reste à charge. Chaque participant reçoit une attestation individuelle de formation (AI Act, RGPD, gouvernance, données sensibles) ; l'entreprise reçoit un registre de conformité AI Act.
-- Niveau 1 — Montée en compétences / acculturation IA (1 à 2 jours) : comprendre les IA, savoir laquelle est bonne pour quoi, bonnes pratiques et erreurs à éviter
-- Niveau 2 — IA métier (2 à 3 jours) : l'IA dans les process et les logiciels internes de l'entreprise
-- Niveau 3 — Automatisation & intégration (3 à 4 jours) : automatiser et intégrer soi-même des solutions IA liées au métier
+Intra-entreprise et sur mesure (métier, cas réels et logiciels du client), groupes de 12 personnes maximum, en présentiel ou à distance. Prix indicatifs : 1 200 € HT par jour (niveau 1), 1 500 € HT (niveau 2), 2 000 € HT (niveau 3), pour un groupe ; prix ferme dans la proposition. Pour les moins de 50 salariés : IA-Entrepreneur monte le dossier de financement OPCO. Chaque participant reçoit une attestation individuelle de formation (AI Act, RGPD, gouvernance, données sensibles) ; l'entreprise reçoit un registre de conformité AI Act.
+- Niveau 1 : Montée en compétences / acculturation IA (1 à 2 jours) : comprendre les IA, savoir laquelle est bonne pour quoi, bonnes pratiques et erreurs à éviter
+- Niveau 2 : IA métier (2 à 3 jours) : l'IA dans les process et les logiciels internes de l'entreprise
+- Niveau 3 : Automatisation & intégration (3 à 4 jours) : automatiser et intégrer soi-même des solutions IA liées au métier
 - Page : https://ia-entrepreneur.fr/formation-ia-entreprise.html
 
 ### Formations thématiques (sur mesure, sur devis)
-- Formation IA et AI Act : l'article 4, applicable depuis le 2 février 2025, demande aux entreprises qui utilisent l'IA de prendre des mesures pour développer la maîtrise de l'IA de leur personnel ; depuis le règlement Digital Omnibus, c'est une obligation de moyens — https://ia-entrepreneur.fr/formation-ia-obligatoire-ai-act.html
-- Formation Claude en entreprise : documents longs, projets partagés, connecteurs (Google Drive, Microsoft 365, HubSpot), fichiers Excel, Word et PowerPoint — https://ia-entrepreneur.fr/formation-claude-entreprise.html
-- Formation ChatGPT en entreprise : analyse de fichiers, projets, connecteurs, recherche approfondie, mode agent, images — https://ia-entrepreneur.fr/formation-chatgpt-entreprise.html
-- Formation Microsoft Copilot : pour une entreprise déjà équipée de Microsoft 365 — https://ia-entrepreneur.fr/formation-microsoft-copilot-entreprise.html
-- Formation IA & Automatisation : n8n, Make, automatisation des process — https://ia-entrepreneur.fr/formation-ia-automatisation.html
-- Formation Prospection Commerciale & IA : LinkedIn, emailing, phoning — https://ia-entrepreneur.fr/formation-prospection-commerciale.html
-- Formation Techniques de Vente & Closing — https://ia-entrepreneur.fr/formation-techniques-vente-closing.html
+- Formation IA et AI Act : l'article 4, applicable depuis le 2 février 2025, demande aux entreprises qui utilisent l'IA de prendre des mesures pour développer la maîtrise de l'IA de leur personnel ; depuis le règlement Digital Omnibus, c'est une obligation de moyens : https://ia-entrepreneur.fr/formation-ia-obligatoire-ai-act.html
+- Formation Claude en entreprise : documents longs, projets partagés, connecteurs (Google Drive, Microsoft 365, HubSpot), fichiers Excel, Word et PowerPoint : https://ia-entrepreneur.fr/formation-claude-entreprise.html
+- Formation ChatGPT en entreprise : analyse de fichiers, projets, connecteurs, recherche approfondie, mode agent, images : https://ia-entrepreneur.fr/formation-chatgpt-entreprise.html
+- Formation Microsoft Copilot : pour une entreprise déjà équipée de Microsoft 365 : https://ia-entrepreneur.fr/formation-microsoft-copilot-entreprise.html
+- Formation IA & Automatisation : n8n, Make, automatisation des process : https://ia-entrepreneur.fr/formation-ia-automatisation.html
+- Formation Prospection Commerciale & IA : LinkedIn, emailing, phoning : https://ia-entrepreneur.fr/formation-prospection-commerciale.html
+- Formation Techniques de Vente & Closing : https://ia-entrepreneur.fr/formation-techniques-vente-closing.html
 - Formation Management & Leadership : délégation, feedback, gestion des conflits
 - Formation Négociation Commerciale : concessions, grands comptes, posture
 - Formation Prise de Parole en Public : pitcher, convaincre, gérer le stress
 
 ### Indépendants et freelances
-- Sessions ouvertes, en liste d'attente : le tarif est communiqué avec les dates — https://ia-entrepreneur.fr/formation-ia-independant.html
+- Sessions ouvertes, en liste d'attente : le tarif est communiqué avec les dates : https://ia-entrepreneur.fr/formation-ia-independant.html
 
 ### Autres services
-- Intégration IA clé en main, sur devis : obtenir le résultat sans que personne en interne ait à s'en occuper (chatbot client, réponse email, comptes rendus de réunion, contenu SEO, veille concurrentielle, rapports) — https://ia-entrepreneur.fr/integrations-ia.html
-- Goodweek, plateforme IA d'entreprise (partenaire) : les versions les plus puissantes de Claude (dont Opus et Fable), ChatGPT (dont GPT-6 Astra et Sol), Gemini, Mistral et Nova dans un seul espace, éditeur français, versions des modèles hébergées en France, connectée aux outils de l'entreprise. IA-Entrepreneur en est revendeur partenaire : installation, paramétrage et formation des équipes. 32 € HT par utilisateur et par mois, contre environ 139 € HT pour accéder séparément au modèle phare de chaque éditeur ; réservé aux professionnels — https://ia-entrepreneur.fr/partenaire-goodweek.html
+- Intégration IA clé en main, sur devis : obtenir le résultat sans que personne en interne ait à s'en occuper (chatbot client, réponse email, comptes rendus de réunion, contenu SEO, veille concurrentielle, rapports) : https://ia-entrepreneur.fr/integrations-ia.html
+- Goodweek, plateforme IA d'entreprise (partenaire) : les versions les plus puissantes de Claude (dont Opus et Fable), ChatGPT (dont GPT-6 Astra et Sol), Gemini, Mistral et Nova dans un seul espace, éditeur français, versions des modèles hébergées en France, connectée aux outils de l'entreprise. IA-Entrepreneur en est revendeur partenaire : installation, paramétrage et formation des équipes. 32 € HT par utilisateur et par mois, contre environ 139 € HT pour accéder séparément au modèle phare de chaque éditeur ; réservé aux professionnels : https://ia-entrepreneur.fr/partenaire-goodweek.html
 
 ## Informations légales
-- Raison sociale : Clindit SASU — IA-Entrepreneur est une marque de Clindit
+- Raison sociale : Clindit SASU : IA-Entrepreneur est une marque de Clindit
 - SIRET : 944 539 410 00018
-- Certification Qualiopi n° 883211-2 (valable 24/04/2026 – 23/04/2029)
+- Certification Qualiopi n° 883211-2 (valable du 24/04/2026 au 23/04/2029)
 - NDA : 44 54 04871 54
 
 ## Contact
@@ -42,7 +42,7 @@ Intra-entreprise et sur mesure (métier, cas réels et logiciels du client), gro
 
 ## Ressource : FindIA et l'annuaire « Les meilleures IA du moment »
 
-FindIA est un assistant conversationnel gratuit, en haut de la page de l'annuaire : on lui décrit une situation de travail en une phrase, il répond par une chaîne de deux à quatre outils — lequel pour quelle étape, comment s'en servir, ce que ça coûte, où partent les données — avec trois niveaux de budget (sans payer / meilleur rapport qualité-prix / performance). Il ne recommande que des outils de cet annuaire et pose des questions quand la demande ne nomme aucune tâche. Sans inscription. https://ia-entrepreneur.fr/meilleures-ia.html
+FindIA est un assistant conversationnel gratuit, en haut de la page de l'annuaire : on lui décrit une situation de travail en une phrase, il répond par une chaîne de deux à quatre outils, lequel pour quelle étape, comment s'en servir, ce que ça coûte, où partent les données, avec trois niveaux de budget (sans payer / meilleur rapport qualité-prix / performance). Il ne recommande que des outils de cet annuaire et pose des questions quand la demande ne nomme aucune tâche. Sans inscription. https://ia-entrepreneur.fr/meilleures-ia.html
 
 Annuaire indépendant et gratuit de 130 outils d'intelligence artificielle, classés par usage en entreprise (16 catégories) et documentés en français : à quoi sert l'outil, ce qu'il fait gagner en temps, ses limites, son modèle tarifaire, le pays de l'éditeur et le point de vigilance RGPD / AI Act associé. Aucun lien rémunéré. Seule relation commerciale, signalée sur sa fiche : IA-Entrepreneur revend Goodweek, sans effet sur sa note ni sur son rang. Une fiche par outil, une page par usage.
 - Annuaire complet : https://ia-entrepreneur.fr/meilleures-ia.html

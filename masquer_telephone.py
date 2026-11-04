@@ -47,7 +47,7 @@ def bouton(attrs, inner):
     if svg:
         icone = svg.group(0)
     elif '📞' in inner:
-        icone = '📞 '
+        icone = ''  # plus d'emoji dans le texte visible (04/11/2026)
 
     if CLASSE.search(attrs):
         attrs = CLASSE.sub(lambda m: 'class="%s tel-reveal"' % m.group(1), attrs, count=1)

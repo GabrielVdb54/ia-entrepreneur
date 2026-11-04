@@ -50,7 +50,7 @@
       <div class="container">
         <h1>Choisissez votre créneau</h1>
         <p>30 minutes en visio avec un conseiller IA-Entrepreneur, pour faire le point sur l'usage de l'IA dans vos équipes et voir ce qui vous serait utile.</p>
-        <p class="appel">Vous préférez en parler de vive voix ? <a class="tel-reveal" role="button" tabindex="0" data-tel="MzUgODIgMzEgNzUgNzA=" aria-label="Afficher le numéro de téléphone">📞 <span class="tel-value">Afficher le numéro</span></a></p>
+        <p class="appel">Vous préférez en parler de vive voix ? <a class="tel-reveal" role="button" tabindex="0" data-tel="MzUgODIgMzEgNzUgNzA=" aria-label="Afficher le numéro de téléphone"> <span class="tel-value">Afficher le numéro</span></a></p>
         <p class="programme-choisi" id="programmeChoisi" hidden></p>
         <div class="calendrier">
           <div class="meetings-iframe-container" data-src="https://meetings-eu1.hubspot.com/gvanderbecken/rdv-decouverte?embed=true"></div>
@@ -61,7 +61,7 @@
 
   <footer>
     <div class="container">
-      <div>IA-Entrepreneur, marque de Clindit SASU · Organisme de formation certifié Qualiopi · Certificat n° 883211-2</div>
+      <div>IA-Entrepreneur, marque de Clindit SASU, Organisme de formation certifié Qualiopi, Certificat n° 883211-2</div>
       <div class="footer-liens">
         <a href="/mentions-legales.html">Mentions légales</a>
         <a href="/politique-confidentialite.html">Politique de confidentialité</a>
@@ -72,7 +72,7 @@
   <script defer src="/tel-reveal.js"></script>
   <script>
     // Programme type choisi sur la page formation : rappelé au visiteur, et transmis aux statistiques à la réservation.
-    var PROGRAMMES = {"niveau-1": ["Niveau 1 · Acculturation IA", "sur 1 jour", "1 200 € HT par jour"], "niveau-2": ["Niveau 2 · IA métier", "sur 2 jours", "1 500 € HT par jour"], "niveau-3": ["Niveau 3 · Automatisation & intégration", "sur 3 jours", "2 000 € HT par jour"]};
+    var PROGRAMMES = {"niveau-1": ["Niveau 1, Acculturation IA", "sur 1 jour", "1 200 € HT par jour"], "niveau-2": ["Niveau 2, IA métier", "sur 2 jours", "1 500 € HT par jour"], "niveau-3": ["Niveau 3, Automatisation & intégration", "sur 3 jours", "2 000 € HT par jour"]};
     var programmeChoisi = (new URLSearchParams(location.search).get('programme') || '').toLowerCase();
     (function () {
       var p = PROGRAMMES[programmeChoisi], el = document.getElementById('programmeChoisi');
