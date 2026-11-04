@@ -55,7 +55,7 @@ const sourceDomain = (() => {
   try { return new URL(sourceUrl).hostname.replace(/^www\./, ''); } catch(e) { return null; }
 })();
 const sourceCitationBlock = (sourceUrl && sourceDomain)
-  ? '<p class="source-citation">Article inspiré d\'une source externe : <a href="' + sourceUrl + '" target="_blank" rel="nofollow noopener">' + sourceDomain + ' \u2197</a></p>'
+  ? '<p class="source-citation">Article inspiré d\'une source externe : <a href="' + sourceUrl + '" target="_blank" rel="nofollow noopener">' + sourceDomain + '</a></p>'
   : '';
 
 const ldJson = '{"@context":"https://schema.org","@type":"Article","headline":"' + titleEsc + '","description":"' + excerptShort + '","author":{"@type":"Organization","name":"IA-Entrepreneur","url":"https://ia-entrepreneur.fr"},"datePublished":"' + dateISO + '","dateModified":"' + dateISO + '","publisher":{"@type":"Organization","name":"IA-Entrepreneur"},"image":"' + heroImage + '"}';
