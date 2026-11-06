@@ -1439,7 +1439,10 @@ async function traiterEntrant(corps) {
 const SCHEMA_VOCAL = {
   type: 'object',
   properties: {
-    action: { type: 'string', enum: ['appel', 'reponse', 'note', 'decaler', 'rdv', 'perdu', 'passer', 'incompris'] },
+    action: { type: 'string', enum: ['appel', 'reponse', 'note', 'decaler', 'rdv', 'etape', 'perdu', 'passer', 'incompris'] },
+    suivi: { type: 'string', enum: [...SUIVIS, ''] },
+    formation_debut: { type: 'string', description: 'AAAA-MM-JJ, ou vide' },
+    formation_fin: { type: 'string', description: 'AAAA-MM-JJ, ou vide' },
     resultat_appel: { type: 'string', enum: ['joint', 'sans_reponse', 'message', ''] },
     note: { type: 'string' },
     relance_date: { type: 'string', description: 'AAAA-MM-JJ, ou vide' },
@@ -1450,7 +1453,7 @@ const SCHEMA_VOCAL = {
     raison_perte: { type: 'string' },
     confirmation: { type: 'string', description: 'Une phrase courte, au tutoiement, lue à voix haute' },
   },
-  required: ['action', 'resultat_appel', 'note', 'relance_date', 'relance_action', 'rdv_date', 'rdv_heure', 'rdv_lieu', 'raison_perte', 'confirmation'],
+  required: ['action', 'suivi', 'formation_debut', 'formation_fin', 'resultat_appel', 'note', 'relance_date', 'relance_action', 'rdv_date', 'rdv_heure', 'rdv_lieu', 'raison_perte', 'confirmation'],
   additionalProperties: false,
 };
 
@@ -1462,6 +1465,7 @@ Actions possibles :
 - note : une simple information à garder.
 - decaler : il veut seulement déplacer la prochaine relance.
 - rdv : un rendez-vous est fixé. rdv_date, rdv_heure (HH:MM), rdv_lieu si dits.
+- etape : pour un client en formation, une étape du suivi est franchie. suivi = la clé de l'étape atteinte : financement_demande (dossier de financement envoyé), financement_accepte (accord du financeur), programme_valide, dates_placees, convention_signee, convocations (convocations envoyées), formation_terminee, facturee (facture envoyée), payee (paiement reçu). Si des dates de formation sont dites, formation_debut et formation_fin en AAAA-MM-JJ. Le CRM prévoit tout seul la tâche suivante.
 - perdu : le lead est perdu. raison_perte si dite.
 - passer : « suivant », « passe », « plus tard » sans date.
 - incompris : la phrase n'est pas claire ; confirmation = la question courte à lui poser.
@@ -1476,14 +1480,14 @@ async function interpreterVocal(corps, ip) {
   const texte = String(corps.texte || '').trim().slice(0, 1500);
   if (!texte) throw new Refus('message_invalide');
   if (tropDeRedactions(ip)) throw new Refus('ia_trop_de_demandes', 429);
-  const { lignes } = await sb(`iae_crm_leads?select=entreprise,statut,prochaine_relance,prochaine_action,prochaine_note,relances_sans_reponse&id=eq.${corps.lead_id}`);
+  const { lignes } = await sb(`iae_crm_leads?select=entreprise,statut,suivi,prochaine_relance,prochaine_action,prochaine_note,relances_sans_reponse&id=eq.${corps.lead_id}`);
   const lead = lignes[0];
   if (!lead) throw new Refus('introuvable', 404);
   const maintenant = new Date();
   const jourSemaine = new Intl.DateTimeFormat('fr-FR', { timeZone: 'Europe/Paris', weekday: 'long' }).format(maintenant);
   const contexte = [
     `Date du jour : ${aujourdHuiParis()} (${jourSemaine})`,
-    `Lead : ${lead.entreprise}, étape ${lead.statut}`,
+    `Lead : ${lead.entreprise}, étape ${lead.statut}${lead.suivi ? `, suivi client : ${lead.suivi}` : ''}`,
     `Prévu : ${lead.prochaine_action || ''} le ${lead.prochaine_relance || 'rien'}${lead.prochaine_note ? `, ${lead.prochaine_note}` : ''}`,
     `Relances sans réponse : ${lead.relances_sans_reponse}`,
     `Ce que Gabriel a dit : « ${texte} »`,
@@ -1513,7 +1517,10 @@ async function interpreterVocal(corps, ip) {
   // On ne garde que des valeurs sûres : la page les applique avec ses propres fonctions.
   const date = (x) => (DATE_RE.test(x || '') ? x : '');
   return {
-    action: SCHEMA_VOCAL.properties.action.enum.includes(r.action) ? r.action : 'incompris',
+    action: SCHEMA_VOCAL.properties.action.enum.includes(r.action) && (r.action !== 'etape' || SUIVIS.includes(r.suivi)) ? r.action : 'incompris',
+    suivi: SUIVIS.includes(r.suivi) ? r.suivi : '',
+    formation_debut: date(r.formation_debut),
+    formation_fin: date(r.formation_fin),
     resultat_appel: ['joint', 'sans_reponse', 'message'].includes(r.resultat_appel) ? r.resultat_appel : '',
     note: String(r.note || '').slice(0, 2000),
     relance_date: date(r.relance_date),

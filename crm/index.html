@@ -254,6 +254,16 @@
   .statut.s-proposition { background: #FEF1DC; color: #874A08; border-color: transparent; }
   .statut.s-negociation { background: #FCE8DA; color: #93390B; border-color: transparent; }
   .statut.s-perdu { background: #F2F3F6; color: #6B7085; border-color: transparent; }
+  .statut.s-suivi { background: var(--accent-soft); color: var(--accent-dark); border-color: transparent; }
+  .segments { display: inline-flex; gap: 4px; padding: 4px; border-radius: 12px; background: #EEF0F8; margin: 10px 0 4px; }
+  .segments button { border: 0; background: none; padding: 7px 14px; border-radius: 9px; font: inherit; font-weight: 600; color: var(--muted); cursor: pointer; min-height: 36px; }
+  .segments button[aria-selected="true"] { background: #fff; color: var(--ink, #14172B); box-shadow: 0 1px 2px rgb(20 23 43 / 10%); }
+  .puces-type { display: flex; flex-wrap: wrap; gap: 6px; margin: 8px 0 2px; }
+  .puce-type { border: 1px solid var(--line); background: #fff; border-radius: 999px; padding: 5px 12px; font: inherit; font-size: 14px; cursor: pointer; min-height: 34px; }
+  .puce-type[aria-pressed="true"] { background: var(--primary); border-color: var(--primary); color: #fff; }
+  .puce-type small, .segments small { opacity: .75; font-weight: 600; }
+  .aide-colonne { font-size: 12.5px; color: var(--muted); margin: -2px 4px 2px; }
+  .ligne-statut { flex-wrap: wrap; }
   .toast-annuler { pointer-events: auto; margin-left: 10px; border: 0; background: none; color: #fff; font-weight: 700; text-decoration: underline; cursor: pointer; font-size: 14px; }
   .pied .erreur { flex-basis: 100%; margin: 0; order: -1; }
   .form { position: relative; }
@@ -489,6 +499,25 @@ const STATUTS = [['nouveau', 'Nouveau'], ['contacte', 'Contacté'], ['qualifie',
 const LIB_STATUT = Object.fromEntries(STATUTS);
 const TYPES = [['prospect', 'Prospect'], ['client', 'Client'], ['partenaire', 'Partenaire'], ['fournisseur', 'Fournisseur'], ['formateur', 'Formateur']];
 const LIB_TYPE = Object.fromEntries(TYPES);
+// Suivi client, après « Gagné ». L'ordre est celui de Gabriel ; il peut sauter une étape.
+const SUIVIS = [['a_lancer', 'À lancer'], ['financement_demande', 'Financement demandé'], ['financement_accepte', 'Financement accepté'],
+  ['programme_valide', 'Programme validé'], ['dates_placees', 'Dates placées'], ['convention_signee', 'Convention signée'],
+  ['convocations', 'Convocations envoyées'], ['formation_terminee', 'Formation terminée'], ['facturee', 'Facturée'], ['payee', 'Payée']];
+const LIB_SUIVI = Object.fromEntries(SUIVIS);
+const AIDE_SUIVI = {
+  a_lancer: 'Gagné : monter le dossier de financement',
+  financement_demande: "En attente de l'accord du financeur",
+  financement_accepte: 'Accord reçu : valider le programme',
+  programme_valide: 'Placer les dates avec le client et le formateur',
+  dates_placees: 'Envoyer la convention à signer',
+  convention_signee: "Convocations, livret d'accueil et positionnement à J-7",
+  convocations: 'La formation approche ou a lieu',
+  formation_terminee: 'Émargements et évaluations, puis facture',
+  facturee: 'En attente du paiement',
+  payee: 'Évaluation à froid à 3 mois, et la suite à proposer. Nouvelle formation signée ? Remets la carte dans « À lancer ».',
+};
+const suivantDe = (k) => { const i = SUIVIS.findIndex(([x]) => x === k); return i >= 0 && i < SUIVIS.length - 1 ? SUIVIS[i + 1][0] : null; };
+const enSuivi = (l) => Boolean(!l.archive && l.suivi);
 const ACTIONS = [['email', 'Email'], ['appel', 'Appel'], ['rdv', 'Rendez-vous'], ['autre', 'Autre']];
 const LIB_ACTION = Object.fromEntries(ACTIONS);
 // Dans une phrase, « Autre aujourd'hui » ne veut rien dire : « À faire aujourd'hui ».
@@ -597,6 +626,7 @@ function feries(an) {
 }
 function estOuvre(s) { const j = versDate(s).getUTCDay(); return j !== 0 && j !== 6 && !feries(Number(s.slice(0, 4))).has(s); }
 function prochainOuvre(s) { let d = s; while (!estOuvre(d)) d = ajouterJours(d, 1); return d; }
+function precedentOuvre(s) { let d = s; while (!estOuvre(d)) d = ajouterJours(d, -1); return d; }
 function dansJours(n, depuis = aujourdhui()) { return prochainOuvre(ajouterJours(depuis, n)); }
 function lundiProchain() { const t = aujourdhui(); const j = versDate(t).getUTCDay(); return prochainOuvre(ajouterJours(t, ((8 - j) % 7) || 7)); }
 function dansMois(n) { const d = versDate(aujourdhui()); d.setUTCMonth(d.getUTCMonth() + n); return prochainOuvre(versIso(d)); }
@@ -781,14 +811,16 @@ function carte(l, { compacte = false } = {}) {
   const qui = [nomContact(c), c && c.poste].filter(Boolean).join(', ');
   const relance = l.prochaine_relance
     ? `<p class="relance ${classeQuand(l.prochaine_relance)}">${esc(actionLue(l.prochaine_action))} ${esc(quand(l.prochaine_relance))}${l.relances_sans_reponse ? ` <span class="meta">(${l.relances_sans_reponse} sans réponse)</span>` : ''}</p>`
-    : (actif(l) ? '<p class="relance meta">Aucune relance prévue</p>' : '');
+    : (actif(l) || enSuivi(l) ? '<p class="relance meta">Aucune relance prévue</p>' : '');
+  const suivant = enSuivi(l) ? suivantDe(l.suivi) : null;
   const texte = l.prochaine_note || l.besoin || '';
   const sms = mobileDe(l);
   const prim = (a) => (l.prochaine_action === a ? ' primaire' : '');
   // Dans le Pipeline, la carte entière se glisse (un bouton ne démarre pas de glisser) :
   // le clic sur la carte ouvre la fiche, le titre reste un bouton pour le clavier.
   return `<article class="carte" data-id="${l.id}"${compacte ? ' data-act="ouvrir"' : ''}${compacte && matchMedia('(pointer: fine)').matches ? ' draggable="true"' : ''}>
-    <div class="carte-haut">${avatar(l, compacte ? 's' : 'm')}<div class="carte-titre"><h3><button type="button" class="lien-carte" data-act="ouvrir">${esc(l.entreprise)}</button></h3>${qui ? `<p class="meta">${esc(qui)}</p>` : ''}</div><span class="statut s-${l.statut}">${esc(LIB_STATUT[l.statut])}</span></div>
+    <div class="carte-haut">${avatar(l, compacte ? 's' : 'm')}<div class="carte-titre"><h3><button type="button" class="lien-carte" data-act="ouvrir">${esc(l.entreprise)}</button></h3>${qui ? `<p class="meta">${esc(qui)}</p>` : ''}</div>${l.suivi ? `<span class="statut s-suivi">${esc(LIB_SUIVI[l.suivi])}</span>` : `<span class="statut s-${l.statut}">${esc(LIB_STATUT[l.statut])}</span>`}</div>
+    ${l.formation_debut ? `<p class="meta">Formation : ${esc(periodeFormation(l))}</p>` : ''}
     ${relance}
     ${texte ? `<p class="extrait">${esc(texte)}</p>` : ''}
     ${compacte ? '' : `<div class="carte-actions">
@@ -797,7 +829,7 @@ function carte(l, { compacte = false } = {}) {
       ${sms ? '<button type="button" class="btn petit" data-act="sms">SMS</button>' : ''}
       <button type="button" class="btn petit" data-act="appel">Noter un appel</button>
       <button type="button" class="btn petit" data-act="decaler">Décaler</button>
-      <button type="button" class="btn petit lien" data-act="perdu">Perdu</button>
+      ${suivant ? `<button type="button" class="btn petit" data-act="suivi-suivant">Étape suivante : ${esc(LIB_SUIVI[suivant])}</button>` : enSuivi(l) ? '' : '<button type="button" class="btn petit lien" data-act="perdu">Perdu</button>'}
     </div>`}
   </article>`;
 }
@@ -810,7 +842,7 @@ function vueJour() {
   const jour = avecDate.filter((l) => l.prochaine_relance === t).sort(tri);
   const fin = ajouterJours(t, 7);
   const semaine = avecDate.filter((l) => l.prochaine_relance > t && l.prochaine_relance <= fin).sort(tri);
-  const sansDate = D.leads.filter((l) => actif(l) && !l.prochaine_relance).sort((a, b) => a.entreprise.localeCompare(b.entreprise, 'fr'));
+  const sansDate = D.leads.filter((l) => (actif(l) || enSuivi(l)) && !l.prochaine_relance).sort((a, b) => a.entreprise.localeCompare(b.entreprise, 'fr'));
   const parJour = new Map();
   for (const l of semaine) { if (!parJour.has(l.prochaine_relance)) parJour.set(l.prochaine_relance, []); parJour.get(l.prochaine_relance).push(l); }
   const enCours = D.leads.filter(actif).length;
@@ -849,11 +881,37 @@ function vueJour() {
   return h + (S.ecartesEnBas || '');
 }
 
+S.pipeline = localStorage.getItem('crm_pipeline') === 'suivi' ? 'suivi' : 'ventes';
+S.typePipeline = 'tous';
+function ongletsPipeline() {
+  const n = D.leads.filter(enSuivi).length;
+  return `<div class="segments" role="tablist" aria-label="Pipeline">
+    <button type="button" role="tab" data-pipeline="ventes" aria-selected="${S.pipeline === 'ventes'}">Ventes</button>
+    <button type="button" role="tab" data-pipeline="suivi" aria-selected="${S.pipeline === 'suivi'}">Suivi client <small>${n}</small></button></div>`;
+}
+function vueSuivi() {
+  const ls = D.leads.filter(enSuivi);
+  const tri = (a, b) => (a.prochaine_relance || '9999') < (b.prochaine_relance || '9999') ? -1 : (a.prochaine_relance || '9999') > (b.prochaine_relance || '9999') ? 1 : a.entreprise.localeCompare(b.entreprise, 'fr');
+  const enCours = ls.filter((l) => l.suivi !== 'payee');
+  const aEncaisser = enCours.reduce((x, l) => x + (Number(l.valeur) || 0), 0);
+  let h = `<h1 class="titre-vue">Suivi client</h1>${ongletsPipeline()}<p class="sous-titre">${enCours.length ? `${enCours.length} formation${enCours.length > 1 ? 's' : ''} en cours` : 'Aucune formation en cours'}${aEncaisser ? `, ${esc(euros(aEncaisser))} à encaisser` : ''}. Un lead « Gagné » arrive dans « À lancer ». Glisse la carte ou touche « Étape suivante » sur sa fiche : la tâche d'après se prévoit seule.</p><div class="kanban">`;
+  for (const [cle, lib] of SUIVIS) {
+    const cs = ls.filter((l) => l.suivi === cle).sort(tri);
+    const valeur = cs.reduce((x, l) => x + (Number(l.valeur) || 0), 0);
+    h += `<section class="colonne" data-suivi="${cle}" aria-label="${esc(lib)}"><header><span>${esc(lib)} <small>${cs.length}</small></span>${valeur ? `<small>${esc(euros(valeur))}</small>` : ''}</header>
+      <p class="aide-colonne">${esc(AIDE_SUIVI[cle])}</p>
+      ${cs.map((l) => carte(l, { compacte: true })).join('') || '<p class="vide">Aucun client</p>'}</section>`;
+  }
+  return h + '</div>';
+}
 function vuePipeline() {
-  const leads = D.leads.filter((l) => !l.archive);
+  if (S.pipeline === 'suivi') return vueSuivi();
+  const tous = D.leads.filter((l) => !l.archive);
+  const leads = tous.filter((l) => S.typePipeline === 'tous' || l.type === S.typePipeline);
   const tri = (a, b) => (a.prochaine_relance || '9999') < (b.prochaine_relance || '9999') ? -1 : (a.prochaine_relance || '9999') > (b.prochaine_relance || '9999') ? 1 : a.entreprise.localeCompare(b.entreprise, 'fr');
   const total = leads.filter(actif).reduce((s, l) => s + (Number(l.valeur) || 0), 0);
-  let h = `<h1 class="titre-vue">Pipeline</h1><p class="sous-titre">${leads.filter(actif).length} leads en cours${total ? `, ${esc(euros(total))} en jeu` : ''}. Pour changer d'étape, ouvre la fiche.</p><div class="kanban">`;
+  const puces = [['tous', 'Tous'], ...TYPES].map(([k, v]) => { const n = k === 'tous' ? tous.length : tous.filter((l) => l.type === k).length; return n || k === 'tous' ? `<button type="button" class="puce-type" data-type-pipeline="${k}" aria-pressed="${S.typePipeline === k}">${esc(v)} <small>${n}</small></button>` : ''; }).join('');
+  let h = `<h1 class="titre-vue">Pipeline</h1>${ongletsPipeline()}<div class="puces-type" role="group" aria-label="Type">${puces}</div><p class="sous-titre">${leads.filter(actif).length} en cours${total ? `, ${esc(euros(total))} en jeu` : ''}. Glisse une carte pour changer d'étape. Passer en « Gagné » envoie le lead dans le suivi client.</p><div class="kanban">`;
   for (const [cle, lib] of STATUTS) {
     const ls = leads.filter((l) => l.statut === cle).sort(tri);
     const valeur = ls.reduce((s, l) => s + (Number(l.valeur) || 0), 0);
@@ -942,6 +1000,7 @@ function rendreFiche() {
   const sous = [l.secteur, l.localisation].filter(Boolean).join(', ');
   const infos = [['Besoin', l.besoin], ['Source', l.source], ['Valeur', l.valeur != null ? euros(l.valeur) : ''], ['Service demandé', l.service], ['Budget', l.budget],
     ['Téléphone', l.telephone], ['Site web', l.site_web], ['Adresse', l.adresse], ['SIRET', l.siret], ['Tags', (l.tags || []).join(', ')],
+    ['Formation', periodeFormation(l)], ['Financeur', [l.financeur, l.financement_ref && `dossier ${l.financement_ref}`].filter(Boolean).join(', ')],
     ['Dernier contact', l.dernier_contact ? dateCourte(l.dernier_contact) : ''], ['Fiche HubSpot', l.hubspot_id], ['Raison de la perte', l.raison_perte],
     ['Créé le', l.created_at ? instantLisible(l.created_at) : '']].filter(([, v]) => v);
   const lienInfo = (nom, v) => {
@@ -959,6 +1018,8 @@ function rendreFiche() {
       <div class="ligne-statut">
         <label class="meta" for="statut-fiche">Étape</label>
         <select id="statut-fiche" data-lead="${l.id}">${STATUTS.map(([k, v]) => `<option value="${k}" ${k === l.statut ? 'selected' : ''}>${esc(v)}</option>`).join('')}</select>
+        ${l.suivi || l.statut === 'gagne' ? `<label class="meta" for="suivi-fiche">Suivi client</label>
+        <select id="suivi-fiche" data-lead="${l.id}"><option value="">Hors suivi</option>${SUIVIS.map(([k, v]) => `<option value="${k}" ${k === l.suivi ? 'selected' : ''}>${esc(v)}</option>`).join('')}</select>` : ''}
       </div>
       <div class="prochaine">
         <p class="meta">Prochaine relance</p>
@@ -971,6 +1032,7 @@ function rendreFiche() {
         ${boutonEchanges(l)}
       </div>
       <div class="actions">
+        ${enSuivi(l) && suivantDe(l.suivi) ? `<button type="button" class="btn primaire" data-act="suivi-suivant">Étape suivante : ${esc(LIB_SUIVI[suivantDe(l.suivi)])}</button>` : ''}
         ${telephoneDe(l) ? `<a class="btn${l.prochaine_action === 'appel' ? ' primaire' : ''}" href="${esc(telLien(telephoneDe(l)))}" data-act="tel">Appeler</a>` : ''}
         <button type="button" class="btn${l.prochaine_action !== 'appel' ? ' primaire' : ''}" data-act="email">Écrire un email</button>
         ${mobileDe(l) ? '<button type="button" class="btn" data-act="sms">SMS</button>' : ''}
@@ -1111,6 +1173,10 @@ function brancherAnnuler(form) { $$('[data-fermer]', form).forEach((b) => b.addE
 function montrerErreur(form, message, champFautif = null) { const e = $('[data-erreur]', form); e.textContent = message; e.hidden = false; if (champFautif) champFautif.focus(); }
 
 async function journal(leadId, activite, majLead, extra = {}) {
+  if (majLead) {
+    const ajout = effetsStatut(IDX.lead.get(leadId), majLead);
+    if (ajout && activite && activite.resume) activite = { ...activite, resume: `${activite.resume}${ajout}` };
+  }
   const r = await api('POST', { op: 'journal', lead_id: leadId, activite, lead: majLead || undefined, ...extra });
   ajouterActivite(r.activite);
   remplacerLead(r.lead);
@@ -1224,11 +1290,11 @@ function texteFiche(l) {
   const c = contactPrincipal(l.id);
   const prevu = l.prochaine_relance ? `${actionLue(l.prochaine_action)} ${quand(l.prochaine_relance)}` : 'rien de prévu';
   const d = derniereNote(l.id);
-  return [`${l.entreprise}.`, c && nomContact(c) ? `${nomContact(c)}${c.poste ? `, ${c.poste}` : ''}.` : '', `Prévu : ${prevu}.`,
+  return [`${l.entreprise}.`, c && nomContact(c) ? `${nomContact(c)}${c.poste ? `, ${c.poste}` : ''}.` : '', l.suivi ? `Suivi client : ${LIB_SUIVI[l.suivi]}.` : '', `Prévu : ${prevu}.`,
     l.prochaine_note ? `${l.prochaine_note}.` : '', l.relances_sans_reponse ? `${l.relances_sans_reponse} relance${l.relances_sans_reponse > 1 ? 's' : ''} sans réponse.` : '',
     l.recap && l.recap.situation ? `Où vous en êtes : ${l.recap.situation}` : d ? `Dernier échange : ${d}` : ''].filter(Boolean).join(' ');
 }
-const LIB_VOCAL = { appel: 'Appel', reponse: 'Réponse reçue', note: 'Note', decaler: 'Relance déplacée', rdv: 'Rendez-vous', perdu: 'Perdu', passer: 'Suivant', incompris: 'Pas compris' };
+const LIB_VOCAL = { etape: 'Étape de suivi', appel: 'Appel', reponse: 'Réponse reçue', note: 'Note', decaler: 'Relance déplacée', rdv: 'Rendez-vous', perdu: 'Perdu', passer: 'Suivant', incompris: 'Pas compris' };
 const ETATS_VOCAL = { lecture: 'Je te lis la relance…', ecoute: "Je t'écoute…", reflexion: 'Je note…', pause: 'En pause.' };
 function panneauVocal() {
   const s = S.session;
@@ -1352,7 +1418,7 @@ async function executerVocal(l, r) {
   const suite = (jours, action) => ({ prochaine_relance: r.relance_date || dansJours(jours), prochaine_action: r.relance_action || action, prochaine_note: r.note ? r.note.slice(0, 300) : null });
   const contacte = l.statut === 'nouveau' ? { statut: 'contacte' } : {};
   // Ce qu'il faut pour revenir en arrière si tu dis « annule ».
-  const avant = Object.fromEntries(['statut', 'prochaine_relance', 'prochaine_action', 'prochaine_note', 'relances_sans_reponse', 'dernier_contact', 'raison_perte'].map((k) => [k, l[k] ?? null]));
+  const avant = Object.fromEntries(['statut', 'type', 'suivi', 'prochaine_relance', 'prochaine_action', 'prochaine_note', 'relances_sans_reponse', 'dernier_contact', 'raison_perte', 'formation_debut', 'formation_fin'].map((k) => [k, l[k] ?? null]));
   const i = s.i;
   let res = null;
   try {
@@ -1384,10 +1450,16 @@ async function executerVocal(l, r) {
       res = await journal(l.id, { type: 'rdv', resume: `RDV prévu le ${dateLongue(r.rdv_date)}${heure}${r.rdv_lieu ? `, ${r.rdv_lieu}` : ''}${r.note ? ` : ${r.note}` : ''}`, source: 'crm', meta: { date_rdv: r.rdv_date, heure: r.rdv_heure || null, lieu: r.rdv_lieu || null, vocal: r.texte } },
         { prochaine_relance: r.rdv_date, prochaine_action: 'rdv', prochaine_note: `RDV${heure}${r.rdv_lieu ? `, ${r.rdv_lieu}` : ''}`, relances_sans_reponse: 0, dernier_contact: t, ...(['nouveau', 'contacte'].includes(l.statut) ? { statut: 'qualifie' } : {}) },
         D.agenda ? { agenda: { date: r.rdv_date, heure: r.rdv_heure || null, duree: 30, lieu: r.rdv_lieu || null, titre: `RDV ${l.entreprise}${ct && nomContact(ct) ? ` avec ${nomContact(ct)}` : ''}`, description: r.note || '' } } : {});
+    } else if (r.action === 'etape') {
+      if (!r.suivi || !LIB_SUIVI[r.suivi]) throw new ErreurApi("Je n'ai pas compris l'étape du suivi.");
+      const donnees = Object.fromEntries([['formation_debut', r.formation_debut], ['formation_fin', r.formation_fin || r.formation_debut]].filter(([, v]) => v));
+      res = await changerSuivi(l.id, r.suivi, { donnees, vocal: r.texte });
+      if (!res) throw new ErreurApi("L'étape n'a pas été enregistrée.");
+      if (r.relance_date) await journal(l.id, { type: 'relance_decalee', resume: `Relance prévue le ${dateLongue(r.relance_date)}`, source: 'crm', meta: { vocal: r.texte } }, { prochaine_relance: r.relance_date });
     } else if (r.action === 'perdu') {
       res = await journal(l.id, { type: 'statut', resume: `Étape : ${LIB_STATUT[l.statut]}, puis Perdu${r.raison_perte ? ` : ${r.raison_perte}` : ''}`, source: 'crm', meta: { vocal: r.texte } }, { statut: 'perdu', raison_perte: r.raison_perte || null, prochaine_relance: null, prochaine_note: null });
     } else return;
-    const nature = { appel: 'appel', reponse: 'note', note: 'note', decaler: 'decale', rdv: 'rdv', perdu: 'perdu' }[r.action];
+    const nature = { appel: 'appel', reponse: 'note', note: 'note', decaler: 'decale', rdv: 'rdv', perdu: 'perdu', etape: 'suivi' }[r.action];
     s.derniere = { leadId: l.id, i, nature, activite: res && res.activite, avant, rdvAgenda: r.action === 'rdv' && Boolean(D.agenda) };
     s.annonce = r.confirmation || 'Noté.';
     s.annonceSuivant = true;
@@ -2310,7 +2382,10 @@ function champsLead(l = {}) {
     <div class="deux">${champ('SIRET', `<input type="text" name="siret" value="${esc(l.siret)}">`)}${champ('Fiche HubSpot', `<input type="text" name="hubspot_id" value="${esc(l.hubspot_id)}">`)}</div>
     <div class="deux">${champ('Service demandé', `<input type="text" name="service" value="${esc(l.service)}">`)}${champ('Budget', `<input type="text" name="budget" value="${esc(l.budget)}">`)}</div>
     ${champ('Tags (séparés par des virgules)', `<input type="text" name="tags" value="${esc((l.tags || []).join(', '))}">`)}
-    ${champ('Raison de la perte', `<input type="text" name="raison_perte" value="${esc(l.raison_perte)}">`)}`;
+    ${champ('Raison de la perte', `<input type="text" name="raison_perte" value="${esc(l.raison_perte)}">`)}
+    ${l.suivi || l.type === 'client' || l.statut === 'gagne' ? `<h3 class="sous-groupe">La formation</h3>
+    <div class="deux">${champ('Premier jour', `<input type="date" name="formation_debut" value="${esc(l.formation_debut || '')}">`)}${champ('Dernier jour', `<input type="date" name="formation_fin" value="${esc(l.formation_fin || '')}">`)}</div>
+    <div class="deux">${champ('Financeur', `<input type="text" name="financeur" value="${esc(l.financeur)}" placeholder="OPCO EP, AKTO, AGEFICE, le client…">`)}${champ('N° de dossier ou bon de commande', `<input type="text" name="financement_ref" value="${esc(l.financement_ref)}">`)}</div>` : ''}`;
 }
 function lireLead(form) {
   const el = form.elements;
@@ -2318,6 +2393,7 @@ function lireLead(form) {
   for (const k of ['entreprise', 'type', 'statut', 'besoin', 'source', 'secteur', 'localisation', 'telephone', 'site_web', 'adresse', 'siret', 'hubspot_id', 'service', 'budget', 'raison_perte']) v[k] = el[k].value;
   v.valeur = el.valeur.value.trim() === '' ? null : el.valeur.value;
   v.tags = el.tags.value.split(',').map((t) => t.trim()).filter(Boolean);
+  for (const k of ['formation_debut', 'formation_fin', 'financeur', 'financement_ref']) if (el[k]) v[k] = el[k].value.trim() || null;
   return v;
 }
 
@@ -2330,9 +2406,10 @@ function ouvrirInfos(leadId) {
       soumettre(form, async () => {
         const v = lireLead(form);
         if (!v.entreprise.trim()) throw new ErreurApi("Il manque le nom de l'entreprise.");
+        const ajout = effetsStatut(l, v);
         const r = await api('POST', { op: 'maj', table: 'leads', id: l.id, valeurs: v });
         remplacerLead(r.ligne);
-        if (v.statut !== l.statut) await journal(l.id, { type: 'statut', resume: `Étape : ${LIB_STATUT[l.statut]}, puis ${LIB_STATUT[v.statut]}`, source: 'crm' });
+        if (v.statut !== l.statut) await journal(l.id, { type: 'statut', resume: `Étape : ${LIB_STATUT[l.statut]}, puis ${LIB_STATUT[v.statut]}${ajout}`, source: 'crm' });
         indexer(); rendre(); rendreFiche(); fermerModale();
         toast('Infos enregistrées.');
       });
@@ -2545,6 +2622,100 @@ async function annulerAction(leadId, activite, valeurs) {
   } catch (e) { toast(e.message); }
 }
 
+// La tâche qui suit chaque étape du suivi client.
+function tacheSuivi(l, k, d = {}) {
+  const debut = d.formation_debut || (l && l.formation_debut) || null;
+  const fin = d.formation_fin || (l && l.formation_fin) || debut;
+  const financeur = d.financeur || (l && l.financeur) || '';
+  const ref = d.financement_ref || (l && l.financement_ref) || '';
+  const t = aujourdhui();
+  const tache = (jours, action, note, date = null) => ({ prochaine_relance: date || dansJours(jours), prochaine_action: action, prochaine_note: note });
+  switch (k) {
+    case 'a_lancer': return tache(1, 'autre', 'Monter le dossier de financement (OPCO, AGEFICE…) avec le client. Sans financement, passe directement à « Programme validé ».');
+    case 'financement_demande': return tache(7, 'email', `Relancer ${financeur || 'le financeur'} pour l'accord de prise en charge${ref ? ` (dossier ${ref})` : ''}.`);
+    case 'financement_accepte': return tache(1, 'email', 'Valider le programme avec le client.');
+    case 'programme_valide': return tache(1, 'email', 'Placer les dates de formation avec le client et le formateur.');
+    case 'dates_placees': return tache(1, 'email', 'Envoyer la convention de formation à signer.');
+    case 'convention_signee': {
+      const j7 = debut ? precedentOuvre(ajouterJours(debut, -7)) : null;
+      return tache(7, 'email', "Envoyer les convocations, le livret d'accueil et le questionnaire de positionnement.", j7 ? (j7 > t ? j7 : t) : null);
+    }
+    case 'convocations': return tache(7, 'autre', 'Formation finie ? Récupérer les émargements et les évaluations, puis passer à « Formation terminée ».', fin && fin >= t ? dansJours(1, fin) : null);
+    case 'formation_terminee': return tache(1, 'autre', 'Envoyer la facture avec les attestations et les émargements (au financeur ou au client).');
+    case 'facturee': return tache(30, 'autre', "Vérifier le paiement ; relancer s'il n'est pas arrivé.");
+    case 'payee': return tache(90, 'email', 'Évaluation à froid de la formation, et proposer la suite (niveau suivant).');
+    default: return {};
+  }
+}
+// « Gagné » fait entrer un prospect dans le suivi client ; quitter « Gagné » l'en sort.
+function effetsStatut(l, maj) {
+  if (!l || !maj || maj.statut === undefined || maj.statut === l.statut) return '';
+  if (maj.statut === 'gagne' && !l.suivi && maj.suivi === undefined && ['prospect', 'client'].includes(maj.type || l.type)) {
+    Object.assign(maj, { type: 'client', suivi: 'a_lancer', relances_sans_reponse: 0 });
+    if (maj.prochaine_relance === undefined) Object.assign(maj, tacheSuivi(l, 'a_lancer'));
+    return `${l.type === 'prospect' ? ', devient client' : ''} et passe dans le suivi client (À lancer)`;
+  }
+  if (maj.statut !== 'gagne' && l.suivi && maj.suivi === undefined) { maj.suivi = null; return ', sort du suivi client'; }
+  return '';
+}
+const periodeFormation = (l) => (l.formation_debut ? `${dateCourte(l.formation_debut)}${l.formation_fin && l.formation_fin !== l.formation_debut ? ` au ${dateCourte(l.formation_fin)}` : ''}` : '');
+// Certaines étapes demandent une info : le financeur, ou les dates. « Plus tard » passe sans.
+function demanderDonneesSuivi(l, k) {
+  const besoinFinanceur = ['financement_demande', 'financement_accepte'].includes(k) && !l.financeur;
+  const besoinDates = ['dates_placees', 'convention_signee', 'convocations'].includes(k) && !l.formation_debut;
+  if (!besoinFinanceur && !besoinDates) return Promise.resolve({});
+  return new Promise((resoudre) => {
+    let fini = false;
+    ouvrirModale(`<h2>${esc(l.entreprise)} : ${esc(LIB_SUIVI[k])}</h2>
+      ${besoinFinanceur ? `<div class="deux">${champ('Financeur', '<input type="text" name="financeur" autofocus placeholder="OPCO EP, AKTO, AGEFICE, le client…">')}${champ('N° de dossier', '<input type="text" name="financement_ref">')}</div>` : ''}
+      ${besoinDates ? `<div class="deux">${champ('Premier jour', `<input type="date" name="formation_debut"${besoinFinanceur ? '' : ' autofocus'}>`)}${champ('Dernier jour', '<input type="date" name="formation_fin">')}</div><p class="aide">Les dates servent à prévoir les convocations (J-7) et la fin de formation.</p>` : ''}
+      <div class="pied"><p class="erreur" data-erreur role="alert" hidden></p><button type="submit" class="btn primaire">Enregistrer</button><button type="button" class="btn" data-plus-tard>Plus tard</button><button type="button" class="btn" data-fermer>Annuler</button></div>`, (form) => {
+      brancherAnnuler(form);
+      $('[data-plus-tard]', form).addEventListener('click', () => { fini = true; fermerModale(); resoudre({}); });
+      form.addEventListener('submit', (ev) => {
+        ev.preventDefault();
+        const el = form.elements;
+        const d = {};
+        for (const c of ['financeur', 'financement_ref', 'formation_debut', 'formation_fin']) if (el[c] && el[c].value.trim()) d[c] = el[c].value.trim();
+        if (d.formation_debut && !d.formation_fin) d.formation_fin = d.formation_debut;
+        if (d.formation_fin && d.formation_debut && d.formation_fin < d.formation_debut) return montrerErreur(form, 'Le dernier jour est avant le premier.', el.formation_fin);
+        fini = true;
+        fermerModale();
+        resoudre(d);
+      });
+      modale().addEventListener('close', () => { if (!fini) resoudre(null); }, { once: true });
+    });
+  });
+}
+async function changerSuivi(leadId, k, { donnees = null, vocal = null } = {}) {
+  const l = IDX.lead.get(leadId);
+  if (!l || (k || null) === (l.suivi || null) || (k && !LIB_SUIVI[k])) return null;
+  let d = donnees;
+  if (k && !d) {
+    d = await demanderDonneesSuivi(l, k);
+    if (d === null) { rendre(); if (S.fiche) rendreFiche(); return null; }
+  }
+  d = d || {};
+  const maj = { suivi: k || null, ...d };
+  if (k) {
+    Object.assign(maj, tacheSuivi(l, k, d), { relances_sans_reponse: 0 });
+    if (l.statut !== 'gagne') maj.statut = 'gagne';
+    if (l.type === 'prospect') maj.type = 'client';
+  }
+  const avant = Object.fromEntries(['suivi', 'statut', 'type', 'prochaine_relance', 'prochaine_action', 'prochaine_note', 'relances_sans_reponse', 'formation_debut', 'formation_fin', 'financeur', 'financement_ref'].map((x) => [x, l[x] ?? null]));
+  const precisions = [d.formation_debut && `formation ${periodeFormation({ ...l, ...d })}`, d.financeur && `${d.financeur}${d.financement_ref ? `, dossier ${d.financement_ref}` : ''}`].filter(Boolean).join(' ; ');
+  const resume = `Suivi client : ${l.suivi ? LIB_SUIVI[l.suivi] : 'hors suivi'}, puis ${k ? LIB_SUIVI[k] : 'hors suivi'}${precisions ? ` (${precisions})` : ''}`;
+  try {
+    const r = await journal(leadId, { type: 'statut', resume, source: 'crm', ...(vocal ? { meta: { vocal } } : {}) }, maj);
+    toast(k ? `${LIB_SUIVI[k]}. Prochaine tâche : ${quand(maj.prochaine_relance)}.` : 'Sorti du suivi client.', 3500, () => annulerAction(leadId, r.activite, avant));
+    return r;
+  } catch (e) {
+    toast(e.message);
+    if (S.fiche) rendreFiche();
+    return null;
+  }
+}
+
 async function changerStatut(leadId, statut) {
   const l = IDX.lead.get(leadId);
   if (!l || statut === l.statut) return;
@@ -2558,10 +2729,10 @@ async function changerStatut(leadId, statut) {
     maj.prochaine_relance = null;
     maj.prochaine_note = null;
   }
-  if (statut === 'gagne' && l.type === 'prospect') { maj.type = 'client'; resume += ', devient client'; }
+  const remise = Object.fromEntries(['statut', 'type', 'suivi', 'prochaine_relance', 'prochaine_action', 'prochaine_note', 'relances_sans_reponse'].map((x) => [x, l[x] ?? null]));
   try {
     const r = await journal(leadId, { type: 'statut', resume, source: 'crm' }, maj);
-    toast(`Étape : ${LIB_STATUT[statut]}.`, 3200, statut === 'perdu' || avant === 'perdu' ? null : () => annulerAction(leadId, r.activite, { statut: avant, type: l.type }));
+    toast(statut === 'gagne' && IDX.lead.get(leadId)?.suivi === 'a_lancer' ? 'Gagné : il passe dans le suivi client, étape « À lancer ».' : `Étape : ${LIB_STATUT[statut]}.`, 3600, statut === 'perdu' || avant === 'perdu' ? null : () => annulerAction(leadId, r.activite, remise));
   } catch (e) {
     toast(e.message);
     rendreFiche();
@@ -2615,8 +2786,10 @@ const COLS = [
   { cle: 'dernier_contact', titre: 'Dernier contact', src: 'lead', type: 'date' },
   { cle: 'source', titre: 'Source', src: 'lead', type: 'texte' },
   { cle: 'type', titre: 'Type', src: 'lead', type: 'choix', options: TYPES },
+  { cle: 'suivi', titre: 'Suivi client', src: 'lead', type: 'choix', options: SUIVIS },
   { cle: 'besoin', titre: 'Besoin', src: 'lead', type: 'texte', large: true },
   { cle: 'valeur', titre: 'Valeur (€ HT)', src: 'lead', type: 'nombre' },
+  { cle: 'formation_debut', titre: 'Début formation', src: 'lead', type: 'date' },
   { cle: 'localisation', titre: 'Ville', src: 'lead', type: 'texte' },
   { cle: 'poste', titre: 'Poste', src: 'contact', type: 'texte' },
 ];
@@ -2650,6 +2823,7 @@ function affichageCellule(l, c, v) {
   if (v === '' || v == null) return '';
   if (c.cle === 'statut') return `<span class="statut s-${esc(v)}">${esc(LIB_STATUT[v])}</span>`;
   if (c.cle === 'type') return esc(LIB_TYPE[v]);
+  if (c.cle === 'suivi') return `<span class="statut s-suivi">${esc(LIB_SUIVI[v])}</span>`;
   if (c.cle === 'prochaine_action') return esc(LIB_ACTION[v]);
   if (c.cle === 'prochaine_relance') return `<span class="relance ${classeQuand(v)}" title="${esc(dateCourte(v))}">${esc(quandCourt(v))}</span>`;
   if (c.type === 'date') return esc(dateCourte(v));
@@ -2842,6 +3016,7 @@ async function enregistrerCellule(l, c, v) {
   }
   if (c.cle === 'entreprise' && !v) throw new ErreurApi("Le nom de l'entreprise ne peut pas être vide.");
   if (c.cle === 'statut') { await changerStatut(l.id, v); restaurerCellule(); return; }
+  if (c.cle === 'suivi') { await changerSuivi(l.id, v || null); restaurerCellule(); return; }
   if (c.cle === 'prochaine_relance' || c.cle === 'prochaine_action') {
     const p = { prochaine_relance: l.prochaine_relance, prochaine_action: l.prochaine_action, [c.cle]: v || null };
     if (!p.prochaine_action) p.prochaine_action = 'email';
@@ -2918,7 +3093,11 @@ function ouvrirLot(sorte) {
           if (sorte === 'etape') {
             const maj = { statut: v };
             if (v === 'perdu') { maj.prochaine_relance = null; maj.prochaine_note = null; }
-            await lot(ids, maj, { type: 'statut', resume: `Étape : ${LIB_STATUT[v]} (modification groupée)`, source: 'crm' }, `${n} lead${n > 1 ? 's' : ''} en ${LIB_STATUT[v]}.`);
+            if (v !== 'gagne') maj.suivi = null;
+            const entrent = v === 'gagne' ? ids.filter((id) => { const x = IDX.lead.get(id); return x && x.statut !== 'gagne' && !x.suivi && ['prospect', 'client'].includes(x.type); }) : [];
+            const autres = ids.filter((id) => !entrent.includes(id));
+            if (entrent.length) await lot(entrent, { ...maj, type: 'client', suivi: 'a_lancer', relances_sans_reponse: 0, ...tacheSuivi(null, 'a_lancer') }, { type: 'statut', resume: 'Étape : Gagné, passe dans le suivi client (modification groupée)', source: 'crm' }, `${entrent.length} lead${entrent.length > 1 ? 's' : ''} gagné${entrent.length > 1 ? 's' : ''}, dans le suivi client.`);
+            if (autres.length) await lot(autres, maj, { type: 'statut', resume: `Étape : ${LIB_STATUT[v]} (modification groupée)`, source: 'crm' }, `${autres.length} lead${autres.length > 1 ? 's' : ''} en ${LIB_STATUT[v]}.`);
           } else {
             await lot(ids, { prochaine_action: v }, null, `Action : ${LIB_ACTION[v]} pour ${n} lead${n > 1 ? 's' : ''}.`);
           }
@@ -3153,7 +3332,7 @@ document.addEventListener('keydown', (ev) => {
 
 /* ================= Enchaîner : une file de leads, l'un après l'autre ================= */
 
-const LIB_BILAN = { email: 'Emails envoyés', brouillon: 'Brouillons créés', appel: 'Appels notés', sms: 'SMS envoyés', decale: 'Relances décalées', rdv: 'RDV prévus', note: 'Notes ou réponses', passe: 'Passés', perdu: 'Passés en perdu', linkedin: 'Actions LinkedIn' };
+const LIB_BILAN = { suivi: 'Étapes de suivi client', email: 'Emails envoyés', brouillon: 'Brouillons créés', appel: 'Appels notés', sms: 'SMS envoyés', decale: 'Relances décalées', rdv: 'RDV prévus', note: 'Notes ou réponses', passe: 'Passés', perdu: 'Passés en perdu', linkedin: 'Actions LinkedIn' };
 
 function demarrerSession(ids, titre, { vocal = false } = {}) {
   const liste = ids.filter((id) => IDX.lead.has(id));
@@ -3209,7 +3388,7 @@ function rendreSession() {
       <div class="progression" role="progressbar" aria-label="Avancement" aria-valuemin="0" aria-valuemax="${n}" aria-valuenow="${s.i}"><span style="width:${Math.round((s.i / n) * 100)}%"></span></div>
     </header>
     <div class="session-corps">
-      <p class="surtitre">${esc(LIB_TYPE[l.type])}, ${esc(LIB_STATUT[l.statut])}</p>
+      <p class="surtitre">${esc(LIB_TYPE[l.type])}, ${esc(l.suivi ? `suivi : ${LIB_SUIVI[l.suivi]}` : LIB_STATUT[l.statut])}${l.formation_debut ? `, formation ${esc(periodeFormation(l))}` : ''}</p>
       <div class="tete-ent">${avatar(l, 'l')}<h2>${esc(l.entreprise)}</h2></div>
       ${c ? `<p class="meta">${esc([nomContact(c), c.poste].filter(Boolean).join(', '))}</p>` : '<p class="meta">Aucun contact</p>'}
       <div class="coord">
@@ -3233,7 +3412,7 @@ function rendreSession() {
       <button type="button" class="btn" data-act="appel" aria-keyshortcuts="A">Noter un appel <kbd>A</kbd></button>
       ${mobile ? '<button type="button" class="btn" data-act="sms" aria-keyshortcuts="S">SMS <kbd>S</kbd></button>' : ''}
       <button type="button" class="btn" data-act="decaler">Décaler <kbd>D</kbd></button>
-      <button type="button" class="btn" data-act="perdu">Perdu</button>
+      ${enSuivi(l) && suivantDe(l.suivi) ? `<button type="button" class="btn" data-act="suivi-suivant">Étape suivante : ${esc(LIB_SUIVI[suivantDe(l.suivi)])}</button>` : '<button type="button" class="btn" data-act="perdu">Perdu</button>'}
       <button type="button" class="btn" data-act="ouvrir">Fiche</button>
       <span class="pousse"></span>
       <button type="button" class="btn" data-sess="precedent" ${s.i === 0 ? 'disabled' : ''}>Précédent</button>
@@ -3422,7 +3601,7 @@ document.addEventListener('drop', (ev) => {
   ev.preventDefault();
   col.classList.remove('survol');
   const id = ev.dataTransfer.getData('text/plain');
-  if (id && IDX.lead.has(id)) changerStatut(id, col.dataset.statut);
+  if (id && IDX.lead.has(id)) { if (col.dataset.suivi) changerSuivi(id, col.dataset.suivi); else changerStatut(id, col.dataset.statut); }
 });
 
 /* ================= Événements ================= */
@@ -3448,6 +3627,7 @@ document.addEventListener('click', (ev) => {
     case 'email': return ouvrirEmail(leadId, cible.dataset.contact);
     case 'appel': return ouvrirAppel(leadId);
     case 'perdu': return changerStatut(leadId, 'perdu').then(() => { if (IDX.lead.get(leadId)?.statut === 'perdu') actionFaite(leadId, 'perdu'); });
+    case 'suivi-suivant': { const l = IDX.lead.get(leadId); const k = l && suivantDe(l.suivi); if (!k) return; return changerSuivi(leadId, k).then((r) => { if (r) actionFaite(leadId, 'suivi'); }); }
     case 'linkedin': return ouvrirLinkedin(leadId);
     case 'sms': return ouvrirSms(leadId);
     case 'journal-edition': S.journalEdition = !S.journalEdition; return rendreFiche();
@@ -3486,6 +3666,14 @@ document.addEventListener('keydown', (ev) => {
 });
 
 document.addEventListener('click', (ev) => {
+  const b = ev.target.closest('[data-pipeline], [data-type-pipeline]');
+  if (!b) return;
+  if (b.dataset.pipeline) { S.pipeline = b.dataset.pipeline; localStorage.setItem('crm_pipeline', S.pipeline); }
+  else S.typePipeline = b.dataset.typePipeline;
+  rendre();
+});
+
+document.addEventListener('click', (ev) => {
   const b = ev.target.closest('[data-enchainer]');
   if (!b || !S.dusDuJour) return;
   const titres = { tout: 'Relances du jour', email: 'Emails du jour', appel: 'Appels du jour', autre: 'Le reste du jour' };
@@ -3496,6 +3684,7 @@ document.addEventListener('click', (ev) => {
 document.addEventListener('change', (ev) => {
   const t = ev.target;
   if (t.id === 'statut-fiche') return changerStatut(t.dataset.lead, t.value);
+  if (t.id === 'suivi-fiche') return changerSuivi(t.dataset.lead, t.value || null);
   if (t.dataset.filtre) {
     S.filtres[t.dataset.filtre] = t.type === 'checkbox' ? t.checked : t.value;
     rendre();
