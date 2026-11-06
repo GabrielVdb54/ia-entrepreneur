@@ -1,9 +1,9 @@
 /**
  * /api/demande : les demandes des formulaires du site (devis, contact, liste
- * d'attente, AI Act) vont dans le CRM de Gabriel ET dans HubSpot (son choix du
- * 06/11/2026 : « les 2 »). Formspree continue d'envoyer l'email de notification :
- * la page poste aux deux, sans attendre cette route, donc une panne ici ne
- * bloque jamais le visiteur.
+ * d'attente, AI Act) vont dans le CRM de Gabriel. Pas dans HubSpot (son choix du
+ * 06/11/2026 : « hubspot pas besoin »). Formspree continue d'envoyer l'email de
+ * notification : la page poste aux deux, sans attendre cette route, donc une
+ * panne ici ne bloque jamais le visiteur.
  *
  *   POST /api/demande { prenom, nom?, email, entreprise?, telephone?, message?,
  *                       type?, niveau?, participants?, duree?, page?, _gotcha? }
@@ -14,20 +14,14 @@
  *
  * CRM : un lead « Nouveau » à rappeler le jour même (ou une ligne d'historique
  * sur le lead existant si l'email est connu), source « Site : <page> ».
- * HubSpot : contact créé ou mis à jour par email, propriétaire = la setter
- * (les appels entrants du site vont déjà à Anna), plus une note avec la demande.
  *
- * Variables : SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY (déjà là) ;
- *   HUBSPOT_TOKEN  jeton d'application privée HubSpot (contacts et notes en
- *       écriture). Sans lui, seul le CRM reçoit la demande.
- *   HUBSPOT_PROPRIETAIRE  facultatif, id du propriétaire (défaut : Anna).
+ * Variables : SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY (déjà là).
  */
 
 export const maxDuration = 15;
 
 const HOTES = ['ia-entrepreneur.fr', 'www.ia-entrepreneur.fr'];
 const EMAIL_RE = /^[^@\s<>,;"]+@[^@\s<>,;".]+(\.[^@\s<>,;".]+)+$/;
-const PROPRIETAIRE_DEFAUT = '39531283'; // Anna Nilsen, setter
 const FENETRE_MS = 10 * 60 * 1000;
 const passages = new Map();
 
@@ -115,38 +109,6 @@ async function versCrm(d) {
   await sb('iae_crm_activites', { methode: 'POST', corps: { lead_id: lead.id, contact_id: contact.id, type: 'email_recu', resume, contenu: detail, source: 'site' }, prefer: 'return=minimal' });
 }
 
-async function versHubspot(d) {
-  const jeton = process.env.HUBSPOT_TOKEN;
-  if (!jeton) return;
-  const entetes = { Authorization: `Bearer ${jeton}`, 'Content-Type': 'application/json' };
-  const proprietes = {
-    email: d.email, firstname: d.prenom, lastname: d.nom, company: d.entreprise, phone: d.telephone,
-    hubspot_owner_id: process.env.HUBSPOT_PROPRIETAIRE || PROPRIETAIRE_DEFAUT,
-  };
-  const r = await fetch('https://api.hubapi.com/crm/v3/objects/contacts/batch/upsert', {
-    method: 'POST',
-    headers: entetes,
-    body: JSON.stringify({ inputs: [{ idProperty: 'email', id: d.email, properties: Object.fromEntries(Object.entries(proprietes).filter(([, v]) => v)) }] }),
-  });
-  if (!r.ok) throw new Error(`hubspot contact ${r.status} ${(await r.text()).slice(0, 200)}`);
-  const contactId = (await r.json()).results?.[0]?.id;
-  if (!contactId) return;
-  const note = [`Demande depuis le site (${d.libelle}), page ${d.page}`, d.entreprise && `Entreprise : ${d.entreprise}`,
-    d.participants && `Participants : ${d.participants}`, d.niveau && `Niveau : ${d.niveau}`, d.duree && `Durée : ${d.duree}`,
-    d.message && `Message : ${d.message}`].filter(Boolean)
-    .map((ligne) => ligne.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\n/g, '<br>'))
-    .join('<br>');
-  const n = await fetch('https://api.hubapi.com/crm/v3/objects/notes', {
-    method: 'POST',
-    headers: entetes,
-    body: JSON.stringify({
-      properties: { hs_timestamp: new Date().toISOString(), hs_note_body: note },
-      associations: [{ to: { id: contactId }, types: [{ associationCategory: 'HUBSPOT_DEFINED', associationTypeId: 202 }] }],
-    }),
-  });
-  if (!n.ok) throw new Error(`hubspot note ${n.status} ${(await n.text()).slice(0, 200)}`);
-}
-
 export default async function handler(req, res) {
   res.setHeader('Cache-Control', 'no-store');
   if (req.method !== 'POST') {
@@ -169,10 +131,8 @@ export default async function handler(req, res) {
     niveau: texte(corps.niveau, 120), participants: texte(corps.participants, 60), duree: texte(corps.duree, 60),
     page: texte(corps.page, 120) || '/', libelle: LIBELLES[type] || (type ? type.replace(/-/g, ' ') : 'Contact'),
   };
-  const resultats = await Promise.allSettled([
-    process.env.SUPABASE_URL && process.env.SUPABASE_SERVICE_ROLE_KEY ? versCrm(d) : Promise.resolve(),
-    versHubspot(d),
-  ]);
-  resultats.forEach((r, i) => { if (r.status === 'rejected') console.error(i ? 'demande hubspot' : 'demande crm', r.reason?.message || r.reason); });
+  if (process.env.SUPABASE_URL && process.env.SUPABASE_SERVICE_ROLE_KEY) {
+    try { await versCrm(d); } catch (e) { console.error('demande crm', e?.message || e); }
+  }
   return res.status(200).json({ ok: true });
 }
