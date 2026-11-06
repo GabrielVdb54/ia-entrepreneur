@@ -277,6 +277,28 @@
   @keyframes pouls { 50% { box-shadow: 0 0 0 8px color-mix(in srgb, var(--danger) 22%, transparent); } }
   @media (prefers-reduced-motion: reduce) { .vocal .micro.ecoute { animation: none; } }
   .vocal .etat-vocal { font-weight: 700; font-size: 17px; margin: 0; }
+  .fil-email { border: 1px solid var(--line); border-radius: 12px; padding: 10px 12px; margin-top: 10px; background: #fff; }
+  .fil-email > summary { cursor: pointer; display: flex; flex-wrap: wrap; gap: 4px 10px; align-items: baseline; }
+  .fil { list-style: none; margin: 12px 0 0; padding: 0; display: flex; flex-direction: column; gap: 12px; }
+  .fil li { max-width: 92%; display: flex; flex-direction: column; gap: 4px; }
+  .fil li.moi { align-self: flex-end; align-items: flex-end; }
+  .fil .bulle { white-space: pre-wrap; overflow-wrap: anywhere; font-size: 14px; line-height: 1.5; padding: 10px 12px; border-radius: 12px; background: #F4F5FA; }
+  .fil li.moi .bulle { background: var(--primary-soft); }
+  .fil pre { white-space: pre-wrap; overflow-wrap: anywhere; font-size: 13px; max-height: 50vh; overflow: auto; }
+  .sous-groupe { font-size: 15px; margin: 18px 0 6px; }
+  .recap p { margin: 6px 0; }
+  .recap .pastilles { list-style: none; padding: 0; margin: 8px 0; display: flex; flex-wrap: wrap; gap: 6px; }
+  .recap .pastilles li { font-size: 13px; padding: 3px 10px; border-radius: 999px; background: #F2F3F6; color: #3D4258; }
+  .recap .chaleur.c-chaude { background: var(--accent-soft); color: var(--accent-dark); }
+  .recap .chaleur.c-bonne { background: #E3F4F6; color: #0C6470; }
+  .recap .chaleur.c-froide { background: #FCE8DA; color: #93390B; }
+  .recap .points { margin: 6px 0; padding-left: 18px; font-size: 14px; }
+  .analyse { font-size: 14px; margin: 4px 0; }
+  .analyse .meta { display: block; margin-top: 2px; }
+  .ecartes { margin-top: 28px; border-top: 1px solid var(--line); padding-top: 12px; }
+  .ecartes > summary { cursor: pointer; color: var(--muted); font-weight: 600; }
+  .ecartes ul { list-style: none; padding: 0; margin: 10px 0 0; display: flex; flex-direction: column; gap: 8px; }
+  .ecartes li { display: flex; justify-content: space-between; gap: 10px; align-items: center; flex-wrap: wrap; font-size: 14px; background: #fff; border: 1px solid var(--line); border-radius: 10px; padding: 8px 10px; }
   .vocal .alerte-vocal { background: #FEF1DC; color: #874A08; border-radius: 10px; padding: 10px 12px; font-size: 14px; margin: 0; }
   .vocal .transcription { font-size: 16px; min-height: 1.5em; }
   .vocal .saisie { display: flex; gap: 8px; }
@@ -465,7 +487,7 @@ const SIGNATURE_DEFAUT = 'Gabriel Vanderbecken\nIA-Entrepreneur\nhttps://ia-entr
 const STATUTS = [['nouveau', 'Nouveau'], ['contacte', 'Contacté'], ['qualifie', 'Qualifié'], ['proposition', 'Proposition'],
   ['negociation', 'Négociation'], ['gagne', 'Gagné'], ['perdu', 'Perdu']];
 const LIB_STATUT = Object.fromEntries(STATUTS);
-const TYPES = [['prospect', 'Prospect'], ['client', 'Client'], ['partenaire', 'Partenaire'], ['fournisseur', 'Fournisseur']];
+const TYPES = [['prospect', 'Prospect'], ['client', 'Client'], ['partenaire', 'Partenaire'], ['fournisseur', 'Fournisseur'], ['formateur', 'Formateur']];
 const LIB_TYPE = Object.fromEntries(TYPES);
 const ACTIONS = [['email', 'Email'], ['appel', 'Appel'], ['rdv', 'Rendez-vous'], ['autre', 'Autre']];
 const LIB_ACTION = Object.fromEntries(ACTIONS);
@@ -497,6 +519,9 @@ const ERREURS = {
   introuvable: "Cette fiche n'existe plus. Actualise la page.",
   reseau: 'Pas de connexion. Ta saisie est gardée, réessaie quand le réseau revient.',
   ia_non_configuree: "La rédaction automatique n'est pas branchée sur le serveur.",
+  google_acces: "Gmail refuse l'accès : il faut reconnecter la boîte dans les réglages Google.",
+  google_erreur: "Gmail n'a pas répondu. Réessaie dans un instant.",
+  introuvable: "Introuvable : il a peut-être été supprimé.",
   ia_trop_de_demandes: 'Beaucoup de rédactions en peu de temps : réessaie dans une minute.',
   ia_injoignable: 'Claude ne répond pas pour le moment. Écris le message toi-même ou réessaie.',
   ia_erreur: "La rédaction n'a pas abouti. Réessaie, ou écris le message toi-même.",
@@ -682,10 +707,10 @@ function indexer() {
 
 class ErreurApi extends Error {}
 
-async function api(methode, corps) {
+async function api(methode, corps, requete = '') {
   let r;
   try {
-    r = await fetch(API, {
+    r = await fetch(API + requete, {
       method: methode,
       headers: { 'X-Cle-Crm': S.cle, ...(corps ? { 'Content-Type': 'application/json' } : {}) },
       body: corps ? JSON.stringify(corps) : undefined,
@@ -812,6 +837,7 @@ function vueJour() {
     S.dusDuJour = { tout: dus.map((l) => l.id), email: emails.map((l) => l.id), appel: appels.map((l) => l.id), autre: autres.map((l) => l.id) };
   }
   h += blocATrier();
+  S.ecartesEnBas = blocEcartes();
   if (retard.length) h += `<h2 class="groupe retard" id="g-retard">En retard <span>${retard.length}</span></h2><div class="grille">${retard.map((l) => carte(l)).join('')}</div>`;
   h += `<h2 class="groupe" id="g-jour">Aujourd'hui <span>${jour.length}</span></h2>`;
   const prochain = semaine[0] || D.leads.filter((l) => !l.archive && l.prochaine_relance > fin).sort((a, b) => a.prochaine_relance.localeCompare(b.prochaine_relance))[0];
@@ -820,7 +846,7 @@ function vueJour() {
   let premierJour = true;
   for (const [d, ls] of parJour) h += `<h2 class="groupe"${premierJour ? ((premierJour = false), ' id="g-semaine"') : ''}>${esc(dateLongue(d))} <span>${ls.length}</span></h2><div class="grille">${ls.map((l) => carte(l)).join('')}</div>`;
   if (sansDate.length) h += `<h2 class="groupe">Sans relance prévue <span>${sansDate.length}</span></h2><div class="grille">${sansDate.map((l) => carte(l)).join('')}</div>`;
-  return h;
+  return h + (S.ecartesEnBas || '');
 }
 
 function vuePipeline() {
@@ -900,6 +926,7 @@ function vueMemo() {
 
 function ouvrirFiche(id) {
   S.fiche = id;
+  recapAuto(id);
   rendreFiche();
   const f = $('#fiche');
   if (!f.open) { f.showModal(); f.scrollTop = 0; }
@@ -941,6 +968,7 @@ function rendreFiche() {
           : '<p class="valeur">Rien de prévu</p>'}
         ${l.prochaine_note ? `<p style="margin-top:6px">${esc(l.prochaine_note)}</p>` : ''}
         ${l.relances_sans_reponse ? `<p class="meta" style="margin-top:6px">${l.relances_sans_reponse} relance${l.relances_sans_reponse > 1 ? 's' : ''} sans réponse depuis le dernier échange.</p>` : ''}
+        ${boutonEchanges(l)}
       </div>
       <div class="actions">
         ${telephoneDe(l) ? `<a class="btn${l.prochaine_action === 'appel' ? ' primaire' : ''}" href="${esc(telLien(telephoneDe(l)))}" data-act="tel">Appeler</a>` : ''}
@@ -954,6 +982,7 @@ function rendreFiche() {
         <button type="button" class="btn" data-act="linkedin">LinkedIn</button>
       </div>
     </section>
+    ${blocRecap(l)}
     <section class="bloc">
       <h3>Contacts <button type="button" class="btn petit" data-act="contact-nouveau">Ajouter</button></h3>
       ${cs.map((c) => `<div class="contact">
@@ -983,6 +1012,7 @@ function rendreFiche() {
             <button type="button" class="suppr-journal" data-act="suppr-activite" data-activite="${a.id}">Supprimer</button></div>
           <p class="resume">${esc(a.resume)}</p>
           ${a.contenu ? `<details><summary>Voir le texte</summary><pre>${esc(a.contenu)}</pre></details>` : ''}
+          ${a.meta && FIL_RE.test(a.meta.fil || '') ? `<button type="button" class="btn petit lien" data-act="echanges" data-fil="${esc(a.meta.fil)}">Lire tout le fil</button>` : ''}
         </li>`;
       }).join('')}</ol>` : '<p class="vide">Rien encore. Chaque email, appel ou note s\'ajoute ici.</p>'}
     </section>
@@ -1196,7 +1226,7 @@ function texteFiche(l) {
   const d = derniereNote(l.id);
   return [`${l.entreprise}.`, c && nomContact(c) ? `${nomContact(c)}${c.poste ? `, ${c.poste}` : ''}.` : '', `Prévu : ${prevu}.`,
     l.prochaine_note ? `${l.prochaine_note}.` : '', l.relances_sans_reponse ? `${l.relances_sans_reponse} relance${l.relances_sans_reponse > 1 ? 's' : ''} sans réponse.` : '',
-    d ? `Dernier échange : ${d}` : ''].filter(Boolean).join(' ');
+    l.recap && l.recap.situation ? `Où vous en êtes : ${l.recap.situation}` : d ? `Dernier échange : ${d}` : ''].filter(Boolean).join(' ');
 }
 const LIB_VOCAL = { appel: 'Appel', reponse: 'Réponse reçue', note: 'Note', decaler: 'Relance déplacée', rdv: 'Rendez-vous', perdu: 'Perdu', passer: 'Suivant', incompris: 'Pas compris' };
 const ETATS_VOCAL = { lecture: 'Je te lis la relance…', ecoute: "Je t'écoute…", reflexion: 'Je note…', pause: 'En pause.' };
@@ -1439,42 +1469,200 @@ function brancherDictee(form) {
   }
 }
 
+/* ----- Les échanges d'un lead : ses fils Gmail, lus en entier ----- */
+
+const FIL_RE = /^[0-9a-f]{6,32}$/i;
+function filsDuLead(leadId) {
+  const fils = new Map();
+  for (const a of activitesDe(leadId)) {
+    const f = a.meta && a.meta.fil;
+    if (!f || !FIL_RE.test(f)) continue;
+    const x = fils.get(f) || { fil: f, objet: '', dernier: a.date, n: 0 };
+    x.n++;
+    if (!x.objet) x.objet = String(a.meta.objet || (String(a.resume).match(/« (.+) »/) || [])[1] || a.resume).replace(/^((re|tr|fwd?)\s*:\s*)+/i, '');
+    if (a.date > x.dernier) x.dernier = a.date;
+    fils.set(f, x);
+  }
+  return [...fils.values()].sort((a, b) => (a.dernier < b.dernier ? 1 : -1));
+}
+function boutonEchanges(l) {
+  const n = filsDuLead(l.id).length;
+  if (!n || !D.gmail) return '';
+  const tache = l.tache_fil && FIL_RE.test(l.tache_fil);
+  return `<div class="actions" style="margin-top:8px"><button type="button" class="btn petit${tache ? ' primaire' : ''}" data-act="echanges"${tache ? ` data-fil="${esc(l.tache_fil)}"` : ''}>${tache ? "Lire l'email à traiter" : `Voir les échanges (${n})`}</button>${tache && n > 1 ? `<button type="button" class="btn petit" data-act="echanges">Tous les échanges (${n})</button>` : ''}</div>`;
+}
+const FILS_LUS = new Map();
+async function lireFilCrm(fil) {
+  if (FILS_LUS.has(fil)) return FILS_LUS.get(fil);
+  const r = await api('GET', null, `?fil=${encodeURIComponent(fil)}`);
+  FILS_LUS.set(fil, r.messages || []);
+  return r.messages || [];
+}
+function messagesHtml(ms) {
+  if (!ms.length) return '<p class="vide">Ce fil est vide dans Gmail.</p>';
+  return `<ol class="fil">${ms.map((m) => `<li class="${m.moi ? 'moi' : 'eux'}">
+      <p class="meta">${esc(m.moi ? 'Toi' : m.de)}, ${esc(instantLisible(m.date))}</p>
+      <div class="bulle">${esc(m.texte || '(message vide)')}</div>
+      ${m.pieces && m.pieces.length ? `<p class="meta">Pièces jointes : ${esc(m.pieces.join(', '))}</p>` : ''}
+      ${m.complet && m.complet.length > (m.texte || '').length + 80 ? `<details><summary>Afficher le message entier</summary><pre>${esc(m.complet)}</pre></details>` : ''}
+    </li>`).join('')}</ol>`;
+}
+function brancherFils(racine) {
+  $$('details.fil-email', racine).forEach((d) => {
+    const lire = async () => {
+      if (d.dataset.lu) return;
+      d.dataset.lu = '1';
+      const zone = $('[data-fil-corps]', d);
+      try { zone.innerHTML = messagesHtml(await lireFilCrm(d.dataset.fil)); } catch (e) { zone.innerHTML = `<p class="erreur" role="alert">${esc(e.message)}</p>`; delete d.dataset.lu; }
+    };
+    d.addEventListener('toggle', () => { if (d.open) lire(); });
+    if (d.open) lire();
+  });
+}
+const AUTRES_ECHANGES = ['appel', 'appel_sans_reponse', 'rdv', 'sms', 'note', 'linkedin', 'relance_decalee', 'statut'];
+function ouvrirEchanges(leadId, filOuvert = null) {
+  const l = IDX.lead.get(leadId);
+  if (!l) return;
+  const fils = filsDuLead(leadId);
+  const ouvert = filOuvert || (FIL_RE.test(l.tache_fil || '') ? l.tache_fil : '') || (fils[0] && fils[0].fil);
+  const autres = activitesDe(leadId).filter((a) => AUTRES_ECHANGES.includes(a.type)).slice(0, 15);
+  ouvrirModale(`<h2>Échanges avec ${esc(l.entreprise)}</h2>
+    ${l.prochaine_note ? `<div class="prochaine"><p class="meta">À faire ${esc(l.prochaine_relance ? quand(l.prochaine_relance) : '')}</p><p>${esc(l.prochaine_note)}</p></div>` : ''}
+    ${fils.length ? `<p class="meta">${fils.length} fil${fils.length > 1 ? 's' : ''} d'emails, lus dans ta boîte</p>${fils.map((f) => `<details class="fil-email" data-fil="${esc(f.fil)}"${f.fil === ouvert ? ' open' : ''}>
+        <summary><b>${esc(f.objet || 'Sans objet')}</b> <span class="meta">${esc(instantLisible(f.dernier))}${f.fil === l.tache_fil ? ', lié à la tâche' : ''}</span></summary>
+        <div data-fil-corps><p class="aide">Je lis le fil dans Gmail…</p></div></details>`).join('')}` : '<p class="vide">Aucun email de ce lead dans le CRM pour l\'instant.</p>'}
+    ${autres.length ? `<h3 class="sous-groupe">Appels, RDV et notes</h3><ol class="journal">${autres.map((a) => `<li class="t-${a.type}"><div class="quand"><span class="quoi">${esc(LIB_ACTIVITE[a.type] || a.type)}</span><span>${esc(instantLisible(a.date))}</span></div><p class="resume">${esc(a.resume)}</p>${a.contenu ? `<details><summary>Voir le texte</summary><pre>${esc(a.contenu)}</pre></details>` : ''}</li>`).join('')}</ol>` : ''}
+    <div class="pied"><button type="button" class="btn" data-fermer>Fermer</button></div>`, (form) => {
+    brancherAnnuler(form);
+    brancherFils(form);
+  });
+}
+function ouvrirFilSeul(fil, titre) {
+  ouvrirModale(`<h2>${esc(titre || 'Email')}</h2>
+    <details class="fil-email" data-fil="${esc(fil)}" open><summary class="meta">Le fil dans ta boîte</summary><div data-fil-corps><p class="aide">Je lis le fil dans Gmail…</p></div></details>
+    <div class="pied"><button type="button" class="btn" data-fermer>Fermer</button></div>`, (form) => { brancherAnnuler(form); brancherFils(form); });
+}
+
+/* ----- Le récap de la relation, fait par Claude d'après l'historique et les emails ----- */
+
+S.recapEnCours = new Set();
+S.recapTente = new Set();
+const CHALEUR = { chaude: 'Relation chaude', bonne: 'Bonne relation', neutre: 'Relation neutre', froide: 'Relation froide', inconnue: 'Relation à construire' };
+const derniereActivite = (id) => activitesDe(id).reduce((m, a) => (a.date > m ? a.date : m), '');
+const recapPerime = (l) => !l.recap || derniereActivite(l.id) > (l.recap_le || '');
+function blocRecap(l, { compact = false } = {}) {
+  if (!D.ia) return '';
+  const r = l.recap;
+  const enCours = S.recapEnCours.has(l.id);
+  const bouton = `<button type="button" class="btn petit" data-act="recap"${enCours ? ' disabled' : ''}>${enCours ? 'Je relis les échanges…' : r ? 'Mettre à jour' : 'Faire le récap'}</button>`;
+  if (!r) {
+    if (!activitesDe(l.id).length) return '';
+    return `<section class="bloc recap" data-recap="${l.id}"><h3>Récap ${bouton}</h3><p class="aide">${enCours ? 'Je relis tout ce que vous vous êtes dit…' : "Pas encore de récap pour ce lead."}</p></section>`;
+  }
+  return `<section class="bloc recap" data-recap="${l.id}">
+    <h3>Récap <span class="meta">du ${esc(instantLisible(l.recap_le))}${recapPerime(l) && !enCours ? ', il y a du nouveau depuis' : ''}</span> ${bouton}</h3>
+    <p>${esc(r.situation)}</p>
+    ${r.attentes ? `<p><b>Attendu :</b> ${esc(r.attentes)}</p>` : ''}
+    <ul class="pastilles"><li class="chaleur c-${esc(r.chaleur)}">${esc(CHALEUR[r.chaleur] || r.chaleur)}</li>${r.reactivite ? `<li>${esc(r.reactivite)}</li>` : ''}${r.ton ? `<li>${esc(r.ton)}</li>` : ''}</ul>
+    ${!compact && r.points && r.points.length ? `<ul class="points">${r.points.map((x) => `<li>${esc(x)}</li>`).join('')}</ul>` : ''}
+    ${r.prochaine_etape ? `<p><b>Ensuite :</b> ${esc(r.prochaine_etape)}</p>` : ''}
+  </section>`;
+}
+function majRecaps(leadId) {
+  if (S.fiche === leadId) rendreFiche();
+  const z = $(`#session [data-recap="${leadId}"]`);
+  const l = IDX.lead.get(leadId);
+  if (z && l) z.outerHTML = blocRecap(l, { compact: true });
+}
+async function faireRecap(leadId, { auto = false } = {}) {
+  if (!D.ia || S.recapEnCours.has(leadId)) return;
+  S.recapEnCours.add(leadId);
+  S.recapTente.add(leadId);
+  majRecaps(leadId);
+  try {
+    const r = await api('POST', { op: 'recap', lead_id: leadId });
+    remplacerLead(r.lead);
+    indexer();
+  } catch (e) {
+    if (!auto) toast(e.message);
+  } finally {
+    S.recapEnCours.delete(leadId);
+    majRecaps(leadId);
+  }
+}
+// À l'ouverture d'une fiche : le récap se fait (ou se refait) tout seul s'il y a du nouveau, une fois par visite.
+function recapAuto(leadId) {
+  const l = IDX.lead.get(leadId);
+  if (!l || !D.ia || S.recapTente.has(leadId) || !activitesDe(leadId).length || !recapPerime(l)) return;
+  setTimeout(() => faireRecap(leadId, { auto: true }), 0);
+}
+
 /* ----- À trier : emails et RDV de personnes inconnues du CRM ----- */
 
 function blocATrier() {
   const es = D.entrants || [];
   if (!es.length) return '';
   return `<h2 class="groupe" id="g-trier">À trier <span>${es.length}</span></h2>
-    <p class="sous-titre">Emails et rendez-vous de personnes qui ne sont pas encore dans ton CRM. Les newsletters et l'équipe sont déjà écartées.</p>
+    <p class="sous-titre">Des personnes qui ne sont pas encore dans ton CRM et qui valent le coup d'œil, d'après Claude. Les élèves, notifications et démarchages sont écartés, en bas de la page.</p>
     <div class="grille">${es.map((e) => {
       const qui = e.de_nom || e.de_email || 'Inconnu';
+      const an = (e.meta && e.meta.analyse) || null;
+      const piste = (an && an.lead_id && IDX.lead.get(an.lead_id)) || ((e.meta && e.meta.candidats) || []).map((c) => IDX.lead.get(c.lead_id)).find(Boolean);
       return `<article class="carte" data-entrant="${e.id}">
         <div class="carte-haut"><span class="avatar a-m a-rond" style="--h:${teinte(qui)}" aria-hidden="true">${esc(initiales(qui))}</span>
           <div class="carte-titre"><h3>${esc(qui)}</h3><p class="meta">${esc(e.de_email || '')}</p></div>
-          <span class="statut">${e.canal === 'agenda' ? 'RDV' : 'Email'}</span></div>
+          <span class="statut">${e.canal === 'agenda' ? 'RDV' : an && an.type ? esc(LIB_TYPE[an.type] || 'Email') : 'Email'}</span></div>
         <p class="relance">${esc(e.objet || '')}</p>
-        ${e.extrait ? `<p class="extrait">${esc(e.extrait)}</p>` : ''}
+        ${an && an.resume ? `<p class="analyse">${esc(an.resume)}${an.raison ? ` <span class="meta">${esc(an.raison)}</span>` : ''}</p>` : e.extrait ? `<p class="extrait">${esc(e.extrait)}</p>` : ''}
         <p class="meta">Reçu le ${esc(instantLisible(e.recu_le))}</p>
         <div class="carte-actions">
-          <button type="button" class="btn petit primaire" data-entrant-act="creer">Créer le lead</button>
-          <button type="button" class="btn petit" data-entrant-act="rattacher">Rattacher à un lead</button>
+          ${piste ? `<button type="button" class="btn petit primaire" data-entrant-act="rattacher-direct" data-lead="${piste.id}">Rattacher à ${esc(piste.entreprise)}</button>` : ''}
+          <button type="button" class="btn petit${piste ? '' : ' primaire'}" data-entrant-act="creer">Créer ${an && an.type === 'formateur' ? 'la fiche formateur' : 'le lead'}</button>
+          <button type="button" class="btn petit" data-entrant-act="rattacher">${piste ? 'Rattacher ailleurs' : 'Rattacher à un lead'}</button>
+          ${e.fil && D.gmail ? '<button type="button" class="btn petit" data-entrant-act="lire">Lire l\'email</button>' : ''}
           <button type="button" class="btn petit" data-entrant-act="ignorer">Ignorer</button>
           <button type="button" class="btn petit lien" data-entrant-act="ignorer_toujours">Toujours ignorer</button>
         </div></article>`;
     }).join('')}</div>`;
 }
+function blocEcartes() {
+  const es = D.ecartes || [];
+  if (!es.length) return '';
+  return `<details class="ecartes" id="g-ecartes"><summary>Écartés : ${es.length} message${es.length > 1 ? 's' : ''} (élèves, notifications, démarchage…), toujours dans ta boîte Gmail</summary>
+    <ul>${es.map((e) => {
+      const an = (e.meta && e.meta.analyse) || {};
+      return `<li data-ecarte="${e.id}"><div><b>${esc(e.de_nom || e.de_email || 'Inconnu')}</b> : ${esc(e.objet || '')}<br><span class="meta">${esc(an.raison || an.resume || 'Ignoré par toi')}, ${esc(instantLisible(e.recu_le))}</span></div>
+        <div class="carte-actions">${e.fil && D.gmail ? '<button type="button" class="btn petit" data-ecarte-act="lire">Lire</button>' : ''}<button type="button" class="btn petit" data-ecarte-act="remettre">Remettre à trier</button></div></li>`;
+    }).join('')}</ul></details>`;
+}
+document.addEventListener('click', async (ev) => {
+  const b = ev.target.closest('[data-ecarte-act]');
+  if (!b) return;
+  const id = b.closest('[data-ecarte]').dataset.ecarte;
+  const e = (D.ecartes || []).find((x) => x.id === id);
+  if (!e) return;
+  if (b.dataset.ecarteAct === 'lire') return ouvrirFilSeul(e.fil, e.objet || e.de_nom || 'Email');
+  try {
+    await api('POST', { op: 'entrant', id, action: 'remettre' });
+    D.ecartes = D.ecartes.filter((x) => x.id !== id);
+    D.entrants = [{ ...e, statut: 'a_trier' }, ...(D.entrants || [])];
+    rendre();
+    toast('Remis dans « À trier ».');
+  } catch (err) { toast(err.message); }
+});
 function nomDepuisDomaine(email) {
   const d = String(email || '').split('@')[1] || '';
   if (!d || WEBMAILS.test(d)) return '';
   return d.split('.').slice(0, -1).join(' ').replace(/[-_]+/g, ' ').replace(/\b\p{L}/gu, (c) => c.toUpperCase());
 }
 function ouvrirEntrantCreer(e) {
+  const an = (e.meta && e.meta.analyse) || {};
   const [prenom, ...reste] = String(e.de_nom || '').split(/\s+/).filter(Boolean);
-  ouvrirModale(`<h2>Créer le lead</h2>
+  ouvrirModale(`<h2>Créer ${an.type === 'formateur' ? 'la fiche formateur' : 'le lead'}</h2>
     <p class="aide">${esc(e.de_nom || '')} ${esc(e.de_email || '')} : « ${esc(e.objet || '')} »</p>
-    ${champ('Entreprise', `<input type="text" name="entreprise" required autofocus value="${esc(nomDepuisDomaine(e.de_email) || e.de_nom || '')}">`)}
-    <div class="deux">${champ('Prénom', `<input type="text" name="prenom" value="${esc(prenom || '')}">`)}${champ('Nom', `<input type="text" name="nom" value="${esc(reste.join(' '))}">`)}</div>
-    ${champ('Besoin', `<textarea name="besoin">${esc(e.objet || '')}</textarea>`)}
+    <div class="deux">${champ('Entreprise ou nom', `<input type="text" name="entreprise" required autofocus value="${esc(an.entreprise || nomDepuisDomaine(e.de_email) || e.de_nom || '')}">`)}${champ('Type', `<select name="type">${options(TYPES, an.type || 'prospect')}</select>`)}</div>
+    <div class="deux">${champ('Prénom', `<input type="text" name="prenom" value="${esc(an.prenom || prenom || '')}">`)}${champ('Nom', `<input type="text" name="nom" value="${esc(an.nom || reste.join(' '))}">`)}</div>
+    ${champ('Besoin ou objet', `<textarea name="besoin">${esc(an.resume || e.objet || '')}</textarea>`)}
     ${champ('Source', `<input type="text" name="source" list="liste-sources" value="${e.canal === 'agenda' ? 'RDV pris dans ton agenda' : 'Email reçu'}">`)}
     <datalist id="liste-sources">${sources().map((x) => `<option value="${esc(x)}">`).join('')}</datalist>
     <p class="aide">${e.canal === 'agenda' ? 'Le rendez-vous devient la prochaine relance.' : "Le message va dans l'historique et le lead est à traiter aujourd'hui."}</p>
@@ -1485,7 +1673,7 @@ function ouvrirEntrantCreer(e) {
       soumettre(form, async () => {
         const el = form.elements;
         if (!el.entreprise.value.trim()) throw new ErreurApi("Il manque le nom de l'entreprise.");
-        const r = await api('POST', { op: 'entrant', id: e.id, action: 'creer', lead: { entreprise: el.entreprise.value, besoin: el.besoin.value, source: el.source.value }, contact: { prenom: el.prenom.value, nom: el.nom.value } });
+        const r = await api('POST', { op: 'entrant', id: e.id, action: 'creer', lead: { entreprise: el.entreprise.value, type: el.type.value, besoin: el.besoin.value, source: el.source.value }, contact: { prenom: el.prenom.value, nom: el.nom.value } });
         fermerModale();
         await actualiser();
         ouvrirFiche(r.lead_id);
@@ -1523,12 +1711,24 @@ document.addEventListener('click', async (ev) => {
   const act = b.dataset.entrantAct;
   if (act === 'creer') return ouvrirEntrantCreer(e);
   if (act === 'rattacher') return ouvrirEntrantRattacher(e);
+  if (act === 'lire') return ouvrirFilSeul(e.fil, e.objet || e.de_nom || 'Email');
+  if (act === 'rattacher-direct') {
+    const leadId = b.dataset.lead;
+    try {
+      await api('POST', { op: 'entrant', id, action: 'rattacher', lead_id: leadId });
+      await actualiser();
+      toast(`Rattaché à ${IDX.lead.get(leadId)?.entreprise || 'ce lead'}.`);
+    } catch (err) { toast(err.message); }
+    return;
+  }
   if (act === 'ignorer_toujours' && !confirm(`Ne plus jamais trier les messages de ${e.de_email} ?`)) return;
   try {
     await api('POST', { op: 'entrant', id, action: act });
-    D.entrants = D.entrants.filter((x) => x.id !== id && (act !== 'ignorer_toujours' || x.de_email !== e.de_email));
+    const partis = D.entrants.filter((x) => x.id === id || (act === 'ignorer_toujours' && x.de_email === e.de_email));
+    D.entrants = D.entrants.filter((x) => !partis.includes(x));
+    D.ecartes = [...partis.map((x) => ({ ...x, statut: 'ignore' })), ...(D.ecartes || [])];
     rendre();
-    toast(act === 'ignorer' ? 'Ignoré.' : `Les messages de ${e.de_email} ne seront plus triés.`);
+    toast(act === 'ignorer' ? 'Ignoré : il reste dans Gmail et dans « Écartés », en bas de la page.' : `Les messages de ${e.de_email} ne seront plus triés.`);
   } catch (err) { toast(err.message); }
 });
 
@@ -1537,7 +1737,7 @@ document.addEventListener('click', async (ev) => {
 function resumeSynchro(r) {
   const g = r.gmail || {}, a = r.agenda || {};
   const n = (g.reponses || 0) + (g.nouveaux || 0) + (a.rdv || 0) + (a.nouveaux || 0);
-  const morceaux = [g.reponses && `${g.reponses} réponse${g.reponses > 1 ? 's' : ''}`, (g.nouveaux || a.nouveaux) && `${(g.nouveaux || 0) + (a.nouveaux || 0)} à trier`, a.rdv && `${a.rdv} RDV`].filter(Boolean);
+  const morceaux = [g.reponses && `${g.reponses} email${g.reponses > 1 ? 's' : ''} rangé${g.reponses > 1 ? 's' : ''} sur leurs fiches`, (g.nouveaux || a.nouveaux) && `${(g.nouveaux || 0) + (a.nouveaux || 0)} à trier`, a.rdv && `${a.rdv} RDV`, g.ecartes && `${g.ecartes} écarté${g.ecartes > 1 ? 's' : ''}`, g.envoyes && `${g.envoyes} de tes réponses notée${g.envoyes > 1 ? 's' : ''}`].filter(Boolean);
   return { n, texte: morceaux.join(', ') };
 }
 // À l'ouverture, une synchro discrète si la dernière date de plus de 10 minutes.
@@ -3001,6 +3201,7 @@ function rendreSession() {
   const mobile = mobileDe(l);
   const prim = (a) => (l.prochaine_action === a ? ' primaire' : '');
   const acts = activitesDe(l.id).filter((a) => a.type !== 'import').slice(0, 3);
+  recapAuto(l.id);
   d.innerHTML = `<div class="session-cadre${s.vocal ? ' mode-vocal' : ''}" data-id="${l.id}">
     <header class="session-tete">
       <div><p class="surtitre">${esc(s.titre)}</p><p class="pos">${s.i + 1} sur ${n}</p></div>
@@ -3020,7 +3221,9 @@ function rendreSession() {
         <p class="valeur ${classeQuand(l.prochaine_relance)}">${l.prochaine_relance ? `${esc(actionLue(l.prochaine_action))} ${esc(quand(l.prochaine_relance))}` : 'Rien de prévu'}</p>
         ${l.prochaine_note ? `<p style="margin-top:4px">${esc(l.prochaine_note)}</p>` : ''}
         ${l.relances_sans_reponse ? `<p class="meta" style="margin-top:4px">${l.relances_sans_reponse} relance${l.relances_sans_reponse > 1 ? 's' : ''} sans réponse.</p>` : ''}
+        ${boutonEchanges(l)}
       </div>
+      ${blocRecap(l, { compact: true })}
       ${s.vocal ? panneauVocal() : ''}
       ${l.besoin ? `<p><span class="meta">Besoin :</span> ${esc(l.besoin)}</p>` : ''}
       ${acts.length ? `<p class="meta">Derniers échanges</p><ul class="derniers">${acts.map((a) => `<li><span class="quand">${esc(LIB_ACTIVITE[a.type] || a.type)}, ${esc(instantLisible(a.date))}</span><br>${esc(a.resume.length > 220 ? a.resume.slice(0, 220) + '…' : a.resume)}</li>`).join('')}</ul>` : ''}
@@ -3239,6 +3442,8 @@ document.addEventListener('click', (ev) => {
   if (cible.tagName === 'BUTTON' || act !== 'ouvrir') ev.stopPropagation();
   switch (act) {
     case 'ouvrir': S.journalEdition = false; return ouvrirFiche(leadId);
+    case 'echanges': return ouvrirEchanges(leadId, cible.dataset.fil || null);
+    case 'recap': return faireRecap(leadId);
     case 'fermer-fiche': return $('#fiche').close();
     case 'email': return ouvrirEmail(leadId, cible.dataset.contact);
     case 'appel': return ouvrirAppel(leadId);

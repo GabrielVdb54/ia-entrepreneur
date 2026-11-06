@@ -31,14 +31,22 @@
  *        devient une action proposée ; rien n'est enregistré ici, la page
  *        relit la proposition et Gabriel valide
  *   POST /api/crm { op: 'entrant',   id, action, lead_id?, lead?, contact? }
- *        traite une ligne « À trier » : créer le lead, rattacher, ignorer
+ *        traite une ligne « À trier » : créer le lead, rattacher, ignorer, remettre
+ *   POST /api/crm { op: 'recap',     lead_id }
+ *        Claude fait le récap de la relation (où on en est, ce qu'elle attend,
+ *        chaleur, réactivité, ton, points à retenir, prochaine étape)
+ *   GET  /api/crm?fil=<id Gmail>     les messages d'un fil lié au CRM, en entier
  *   GET  /api/crm?tache=synchro      la même synchro, lancée par Vercel Cron
  *        toutes les 15 minutes (en-tête Authorization: Bearer CRON_SECRET)
  *
- * Synchro (06/11/2026, choix de Gabriel) : une réponse d'un contact connu va
- * dans l'historique de son lead et le remet dans « Aujourd'hui » ; un email ou
- * un RDV d'une personne inconnue va dans « À trier » (iae_crm_entrants), pour
- * ne jamais créer de lead à partir d'une newsletter ou d'un fournisseur. Un RDV
+ * Synchro (06/11/2026, choix de Gabriel) : chaque email reçu est lu en entier
+ * et analysé par Claude. S'il concerne un lead (adresse connue, même domaine,
+ * même nom, ou contenu clair), il va dans son historique avec un résumé, et la
+ * tâche dit exactement quoi faire ; « Répondre » seulement si Gabriel n'a pas
+ * déjà répondu dans le fil. Une vraie piste inconnue va dans « À trier » ; le
+ * reste (élèves, notifications, démarchage…) est écarté avec la raison, visible
+ * dans la page. Jamais de lead créé tout seul. Les emails que Gabriel envoie
+ * depuis Gmail vont aussi dans l'historique, et règlent la tâche de leur fil. Un RDV
  * noté dans le CRM crée l'événement dans l'agenda de gabriel@ia-entrepreneur.fr,
  * sans inviter personne. Portées Google : gmail.compose, gmail.readonly,
  * calendar.events (même jeton que l'envoi).
@@ -82,7 +90,10 @@ const MAX_EMAILS_JOUR = 60;
 const T = 'texte';      // 2 000 caractères
 const L = 'long';       // 50 000 caractères
 const STATUTS = ['nouveau', 'contacte', 'qualifie', 'proposition', 'negociation', 'gagne', 'perdu'];
-const TYPES_LEAD = ['prospect', 'client', 'partenaire', 'fournisseur'];
+const TYPES_LEAD = ['prospect', 'client', 'partenaire', 'fournisseur', 'formateur'];
+// Suivi client, après « Gagné » (Gabriel, 06/11/2026).
+const SUIVIS = ['a_lancer', 'financement_demande', 'financement_accepte', 'programme_valide', 'dates_placees',
+  'convention_signee', 'convocations', 'formation_terminee', 'facturee', 'payee'];
 const ACTIONS = ['email', 'appel', 'rdv', 'autre'];
 const TYPES_ACTIVITE = ['note', 'appel', 'appel_sans_reponse', 'email_envoye', 'email_recu',
   'brouillon', 'rdv', 'sms', 'relance_decalee', 'statut', 'import', 'linkedin'];
@@ -96,7 +107,8 @@ const TABLES = {
       site_web: T, localisation: T, adresse: T, siret: T, valeur: 'nombre', besoin: L, service: T,
       budget: T, source: T, tags: 'tags', prochaine_relance: 'date', prochaine_action: ['enum', ACTIONS],
       prochaine_note: T, relances_sans_reponse: 'entier', dernier_contact: 'date', raison_perte: T,
-      hubspot_id: T, archive: 'bool',
+      hubspot_id: T, archive: 'bool', tache_fil: T,
+      suivi: ['enum', SUIVIS], formation_debut: 'date', formation_fin: 'date', financeur: T, financement_ref: T,
     },
   },
   contacts: {
@@ -421,7 +433,7 @@ async function emailsEnvoyesAujourdhui() {
 /* ---------- Opérations ---------- */
 
 async function lireTout() {
-  const [leads, contacts, activites, memos, modeles, reglages, { lignes: entrants }] = await Promise.all([
+  const [leads, contacts, activites, memos, modeles, reglages, { lignes: entrants }, { lignes: ecartes }] = await Promise.all([
     toutLire('iae_crm_leads', 'entreprise.asc'),
     toutLire('iae_crm_contacts', 'principal.desc,created_at.asc'),
     toutLire('iae_crm_activites', 'date.desc'),
@@ -429,9 +441,10 @@ async function lireTout() {
     toutLire('iae_crm_modeles', 'ordre.asc,nom.asc'),
     toutLire('iae_crm_reglages', 'cle.asc'),
     sb('iae_crm_entrants?select=*&statut=eq.a_trier&order=recu_le.desc&limit=100'),
+    sb('iae_crm_entrants?select=id,recu_le,canal,de_email,de_nom,objet,fil,meta&statut=eq.ignore&order=recu_le.desc&limit=60'),
   ]);
   return {
-    leads, contacts, activites, memos, modeles, entrants,
+    leads, contacts, activites, memos, modeles, entrants, ecartes,
     reglages: Object.fromEntries(reglages.map((r) => [r.cle, r.valeur])),
     gmail: gmailConfigure(),
     agenda: gmailConfigure(),
@@ -481,6 +494,7 @@ async function operation(corps) {
   if (op === 'lot') return operationLot(corps);
   if (op === 'synchro') return synchroniser();
   if (op === 'entrant') return traiterEntrant(corps);
+  if (op === 'recap') return recapLead(corps);
   if (op === 'importer') return importer(corps);
   if (op === 'email') return envoyerEmail(corps);
   if (op === 'reglage') {
@@ -769,57 +783,508 @@ async function contactParEmail(email) {
   return lignes[0] || null;
 }
 
+/* ---------- Lire un email en entier ---------- */
+
+const decoder64 = (d) => Buffer.from(String(d).replace(/-/g, '+').replace(/_/g, '/'), 'base64').toString('utf8');
+function decoderEntites(t) {
+  return String(t || '').replace(/&nbsp;/g, ' ').replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>')
+    .replace(/&quot;/g, '"').replace(/&#39;/g, "'").replace(/&#(\d+);/g, (x, n) => String.fromCodePoint(Number(n)));
+}
+function partieTexte(p) {
+  if (!p) return '';
+  if (p.mimeType === 'text/plain' && p.body?.data) return decoder64(p.body.data);
+  for (const q of p.parts || []) { const t = partieTexte(q); if (t) return t; }
+  if (p.mimeType === 'text/html' && p.body?.data) {
+    return decoder64(p.body.data).replace(/<(style|script)[\s\S]*?<\/\1>/gi, '').replace(/<(br|\/p|\/div|\/li|\/tr|\/h\d)[^>]*>/gi, '\n').replace(/<[^>]+>/g, ' ');
+  }
+  return '';
+}
+function piecesJointes(p, out = []) {
+  if (p?.filename && !/^(image\d*|\d+_\d+|outlook-\w+)\.(png|jpe?g|gif)$/i.test(p.filename)) out.push(p.filename);
+  for (const q of p?.parts || []) piecesJointes(q, out);
+  return out.slice(0, 20);
+}
+const propre = (t) => decoderEntites(t).replace(/\r/g, '').replace(/[ \t ]+/g, ' ').replace(/ *\n */g, '\n').replace(/\n{3,}/g, '\n\n').trim();
+// Le message lui-même, sans la citation du précédent.
+function sansCitation(t) {
+  const lignes = [];
+  for (const l of String(t || '').replace(/\r/g, '').split('\n')) {
+    if (/^\s*>/.test(l) || /^\s*(Le (lun|mar|mer|jeu|ven|sam|dim)\.? .{0,90}\d{1,2}:\d{2}|Le .{4,120}a écrit|On .{4,120}wrote|De ?: .*@|From: .*@|-{3,} ?(Message|Original|Forwarded|Mail)|_{8,})/i.test(l)) break;
+    lignes.push(l);
+  }
+  return propre(lignes.join('\n'));
+}
+const enTetes = (m) => Object.fromEntries((m.payload?.headers || []).map((x) => [x.name.toLowerCase(), x.value]));
+const listeAdresses = (v) => String(v || '').split(/,(?=(?:[^"]*"[^"]*")*[^"]*$)/).map((x) => adresse(x).email).filter((x) => x && x.includes('@'));
+
+async function lireFil(fil) {
+  const t = await google(`${GMAIL}/threads/${encodeURIComponent(fil)}?format=full`);
+  return (t.messages || []).filter((m) => !(m.labelIds || []).includes('DRAFT')).map((m) => {
+    const h = enTetes(m);
+    const de = adresse(h.from);
+    const brut = partieTexte(m.payload);
+    return {
+      id: m.id, date: new Date(Number(m.internalDate) || Date.now()).toISOString(), de: de.nom || de.email, email: de.email,
+      moi: de.email === COMPTE, a: String(h.to || '').slice(0, 300), objet: String(h.subject || '').slice(0, 300),
+      texte: (sansCitation(brut) || texteBrut(m.snippet)).slice(0, 5000), complet: propre(brut).slice(0, 15000), pieces: piecesJointes(m.payload),
+    };
+  });
+}
+// Un fil n'est lisible que s'il est lié au CRM (historique ou « À trier »).
+async function filDuCrm(fil) {
+  if (!/^[0-9a-f]{6,32}$/i.test(fil || '')) throw new Refus('id_invalide');
+  const [{ lignes: a }, { lignes: e }] = await Promise.all([
+    sb(`iae_crm_activites?select=id&meta->>fil=eq.${fil}&limit=1`),
+    sb(`iae_crm_entrants?select=id&fil=eq.${fil}&limit=1`),
+  ]);
+  if (!a.length && !e.length) throw new Refus('introuvable', 404);
+  if (!gmailConfigure()) throw new Refus('gmail_non_configure', 503);
+  return { fil, messages: await lireFil(fil) };
+}
+
+/* ---------- Dates ouvrées (mêmes règles que la page) ---------- */
+
+function ajouterJoursIso(s, n) { const [y, m, d] = s.split('-').map(Number); const x = new Date(Date.UTC(y, m - 1, d + n)); return x.toISOString().slice(0, 10); }
+function paquesIso(an) {
+  const a = an % 19, b = Math.floor(an / 100), c = an % 100, d = Math.floor(b / 4), e = b % 4;
+  const f = Math.floor((b + 8) / 25), g = Math.floor((b - f + 1) / 3), h = (19 * a + b - d - g + 15) % 30;
+  const i = Math.floor(c / 4), k = c % 4, l = (32 + 2 * e + 2 * i - h - k) % 7, m = Math.floor((a + 11 * h + 22 * l) / 451);
+  const mois = Math.floor((h + l - 7 * m + 114) / 31), jour = ((h + l - 7 * m + 114) % 31) + 1;
+  return `${an}-${String(mois).padStart(2, '0')}-${String(jour).padStart(2, '0')}`;
+}
+function estOuvreIso(s) {
+  const an = Number(s.slice(0, 4));
+  const p = paquesIso(an);
+  const feries = [`${an}-01-01`, ajouterJoursIso(p, 1), `${an}-05-01`, `${an}-05-08`, ajouterJoursIso(p, 39), ajouterJoursIso(p, 50), `${an}-07-14`, `${an}-08-15`, `${an}-11-01`, `${an}-11-11`, `${an}-12-25`];
+  const j = new Date(`${s}T12:00:00Z`).getUTCDay();
+  return j !== 0 && j !== 6 && !feries.includes(s);
+}
+function dansJoursOuvres(n, depuis = aujourdHuiParis()) { let d = ajouterJoursIso(depuis, n); while (!estOuvreIso(d)) d = ajouterJoursIso(d, 1); return d; }
+const dateCourte = (iso) => iso.split('-').reverse().join('/');
+
+/* ---------- Qui est qui : leads et contacts, pour relier un email au bon lead ---------- */
+
+const DOMAINES_PERSO = new Set(['gmail.com', 'googlemail.com', 'outlook.fr', 'outlook.com', 'hotmail.com', 'hotmail.fr', 'live.fr', 'live.com', 'msn.com',
+  'yahoo.fr', 'yahoo.com', 'icloud.com', 'me.com', 'mac.com', 'orange.fr', 'wanadoo.fr', 'free.fr', 'sfr.fr', 'neuf.fr', 'laposte.net', 'gmx.fr', 'gmx.com',
+  'protonmail.com', 'proton.me', 'aol.com', 'bbox.fr', 'numericable.fr']);
+const normaliser = (t) => String(t || '').normalize('NFD').replace(/\p{M}/gu, '').toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
+const nomDe = (c) => [c.prenom, c.nom].filter(Boolean).join(' ');
+
+async function annuaire() {
+  const [leads, contacts] = await Promise.all([toutLire('iae_crm_leads', 'entreprise.asc'), toutLire('iae_crm_contacts', 'principal.desc,created_at.asc')]);
+  const parLead = new Map();
+  for (const c of contacts) { if (!parLead.has(c.lead_id)) parLead.set(c.lead_id, []); parLead.get(c.lead_id).push(c); }
+  return { leads, contacts, parLead, ids: new Set(leads.map((l) => l.id)), lead: (id) => leads.find((l) => l.id === id) };
+}
+// Des pistes, pas des certitudes : Claude tranche avec le contenu de l'email.
+function candidatsPour(ann, { email, nom }) {
+  const trouves = new Map();
+  const dom = String(email || '').split('@')[1] || '';
+  if (dom && !DOMAINES_PERSO.has(dom)) {
+    const base = (dom.split('.').slice(-2, -1)[0] || '').replace(/[^a-z0-9]/g, '');
+    for (const c of ann.contacts) if (c.email && c.email.toLowerCase().endsWith(`@${dom}`)) trouves.set(c.lead_id, `même domaine que ${nomDe(c) || c.email}`);
+    for (const l of ann.leads) {
+      if (l.site_web && l.site_web.toLowerCase().includes(dom)) trouves.set(l.id, `site ${l.site_web}`);
+      const n = normaliser(l.entreprise).replace(/ /g, '');
+      if (base.length >= 4 && n.length >= 4 && (n === base || n.startsWith(base) || base.startsWith(n))) trouves.set(l.id, `nom proche du domaine ${dom}`);
+    }
+  }
+  const qui = normaliser(nom);
+  if (qui.includes(' ')) {
+    for (const c of ann.contacts) {
+      const n1 = normaliser(nomDe(c));
+      const n2 = normaliser([c.nom, c.prenom].filter(Boolean).join(' '));
+      if (n1.includes(' ') && (qui === n1 || qui === n2)) trouves.set(c.lead_id, `même nom que le contact ${nomDe(c)}`);
+    }
+  }
+  return [...trouves].slice(0, 5).map(([lead_id, raison]) => ({ lead_id, raison }));
+}
+// Le contact du lead qui porte ce nom reçoit l'adresse ; sinon l'expéditeur devient un contact du lead.
+async function contactPourLead(ann, leadId, { email, nom }, suggestion = {}) {
+  const cs = ann.parLead.get(leadId) || [];
+  const exact = cs.find((c) => c.email && c.email.toLowerCase() === email);
+  if (exact) return exact;
+  const qui = normaliser(nom);
+  const meme = qui && cs.find((c) => normaliser(nomDe(c)) === qui);
+  if (meme) {
+    if (!meme.email && email) { await modifier('contacts', meme.id, { email }); meme.email = email; }
+    return meme;
+  }
+  if (!email) return null;
+  const morceaux = String(nom || '').replace(/[."']/g, ' ').split(/\s+/).filter(Boolean);
+  const c = await inserer('contacts', { lead_id: leadId, prenom: suggestion.prenom || morceaux[0] || null, nom: suggestion.nom || morceaux.slice(1).join(' ') || null, email, principal: false });
+  ann.contacts.push(c);
+  if (!ann.parLead.has(leadId)) ann.parLead.set(leadId, []);
+  ann.parLead.get(leadId).push(c);
+  return c;
+}
+
+/* ---------- Claude trie les emails ---------- */
+
+const SCHEMA_TRI = {
+  type: 'object',
+  properties: {
+    decisions: {
+      type: 'array',
+      items: {
+        type: 'object',
+        properties: {
+          ref: { type: 'string' },
+          action: { type: 'string', enum: ['rattacher', 'a_trier', 'ignorer'] },
+          lead_id: { type: 'string', description: 'id copié de la liste, ou vide' },
+          interet: { type: 'string', enum: ['oui', 'a_voir', 'non'] },
+          a_faire: { type: 'string', enum: ['repondre', 'relancer_le', 'rien'] },
+          relance_date: { type: 'string', description: 'AAAA-MM-JJ, ou vide' },
+          tache: { type: 'string' },
+          resume: { type: 'string' },
+          raison: { type: 'string' },
+          type: { type: 'string', enum: ['prospect', 'client', 'partenaire', 'fournisseur', 'formateur'] },
+          entreprise: { type: 'string' },
+          prenom: { type: 'string' },
+          nom: { type: 'string' },
+        },
+        required: ['ref', 'action', 'lead_id', 'interet', 'a_faire', 'relance_date', 'tache', 'resume', 'raison', 'type', 'entreprise', 'prenom', 'nom'],
+        additionalProperties: false,
+      },
+    },
+  },
+  required: ['decisions'],
+  additionalProperties: false,
+};
+
+const CONSIGNES_TRI = `Tu tries la boîte mail professionnelle de Gabriel Vanderbecken (gabriel@ia-entrepreneur.fr), fondateur d'IA-Entrepreneur : un organisme de formation à l'IA pour les entreprises (formations en intra, financées par les OPCO, sous-traitance pour d'autres organismes de formation, partenariats). Son CRM personnel suit ses prospects, clients, partenaires, fournisseurs et formateurs (il recrute et fait travailler des formateurs indépendants). Pour chaque email reçu, tu décides ce qu'il en fait. Gabriel compte sur toi pour ne rien rater et ne pas encombrer son CRM.
+
+action :
+- rattacher : l'email concerne un lead de la liste. lead_id = son id, copié de la liste, jamais inventé. C'est le cas quand l'expéditeur est un contact du lead, travaille dans la même structure (même domaine, collègue, assistante, parent qui répond à sa place), ou quand l'email porte clairement sur ce client ou ce partenaire (un formateur qui parle de sa mission chez ce client, par exemple). Les candidats proposés sont des pistes : vérifie avec le contenu, un même domaine peut cacher une notification sans rapport. Un email « déjà rattaché » reste rattaché à ce lead.
+- a_trier : une relation utile qui n'est pas encore dans le CRM : demande de formation ou de devis, entreprise intéressée, partenaire ou prescripteur qui propose quelque chose d'utile, formateur qui se propose ou envoie son CV, fournisseur avec qui il travaille. Remplis type, entreprise, prenom et nom si tu les vois.
+- ignorer : tout le reste. Élèves et étudiants (TD, devoirs, retards, accès à la visio), notifications et confirmations automatiques, réponses automatiques à une campagne d'emails, démarchage reçu (logiciels, CRM, publicité), newsletters, messages personnels, administratif sans lien avec un lead.
+
+interet : ce que vaut l'email pour l'activité de Gabriel (oui, a_voir, non).
+
+a_faire, pour un email rattaché :
+- repondre : la personne attend une réponse ou une action de Gabriel (question, devis, tarifs, programme, dates, documents, facture à émettre) et Gabriel n'a pas répondu après ce message (voir « dernier message du fil »).
+- relancer_le : l'email annonce un retour à une date (« je reviens vers toi lundi », « Jean te répondra lundi »). relance_date = ce jour-là, en AAAA-MM-JJ.
+- rien : information, remerciement, accusé de réception, ou Gabriel a déjà répondu.
+
+tache : si a_faire n'est pas rien, une phrase à l'infinitif, adressée à Gabriel, qui dit exactement quoi faire avec les détails utiles (quoi, pour qui, chiffres, dates). Par exemple « Envoyer à Sarah tes tarifs et un plan de cours niveau 2 pour sa cliente (1 personne, Supply Chain, 1er semestre 2027) ». Jamais seulement « Répondre à l'email ».
+resume : une phrase qui dit ce que contient l'email, avec les faits.
+raison : pourquoi cette décision, en quelques mots (« élève, rendu de TD », « même domaine que Jean Piron, il répondra lundi »).
+type : la nature de la relation (prospect, client, partenaire, fournisseur, formateur), même pour un email rattaché ou ignoré.
+
+En français. N'invente rien : seulement ce qui est dans l'email et dans la liste.`;
+
+const resumeAnalyse = (d) => ({
+  action: d.action, lead_id: d.lead_id || '', interet: d.interet, a_faire: d.a_faire, relance_date: d.relance_date || '', tache: couper(d.tache, 600),
+  resume: couper(d.resume, 600), raison: couper(d.raison, 300), type: d.type || '', entreprise: couper(d.entreprise, 160), prenom: couper(d.prenom, 80), nom: couper(d.nom, 80), le: new Date().toISOString(),
+});
+
+async function analyserEmails(items, ann) {
+  const decisions = new Map();
+  if (!process.env.ANTHROPIC_API_KEY || !items.length) return decisions;
+  const jourSemaine = new Intl.DateTimeFormat('fr-FR', { timeZone: 'Europe/Paris', weekday: 'long' }).format(new Date());
+  const lignesLeads = ann.leads.map((l) => [l.id, l.entreprise, `${l.type}, ${l.statut}${l.archive ? ', archivé' : ''}`,
+    (ann.parLead.get(l.id) || []).map((c) => `${nomDe(c) || '?'}${c.email ? ` <${c.email}>` : ''}`).join(' ; '),
+    l.prochaine_note ? couper(l.prochaine_note, 140) : ''].join(' | ')).join('\n');
+  const client = new Anthropic({ timeout: 40000, maxRetries: 1 });
+  for (let i = 0; i < items.length; i += 10) {
+    const paquet = items.slice(i, i + 10);
+    const emails = paquet.map((r) => [
+      `--- ref : ${r.ref}`,
+      `De : ${r.de.nom ? `${r.de.nom} ` : ''}<${r.de.email}>`,
+      `Reçu le : ${new Date(r.quand).toLocaleString('fr-FR', { timeZone: 'Europe/Paris' })}`,
+      `Objet : ${r.objet}`,
+      r.agenda ? 'Nature : invitation à un rendez-vous dans son agenda' : '',
+      r.pieces?.length ? `Pièces jointes : ${r.pieces.join(', ')}` : '',
+      `Dernier message du fil : ${r.dernierDeMoi ? 'de Gabriel (il a déjà répondu)' : "de l'expéditeur"}`,
+      r.contact ? `Déjà rattaché à : ${r.contact.lead_id} (adresse ou fil connus)` : '',
+      r.candidats?.length ? `Candidats : ${r.candidats.map((c) => `${c.lead_id} (${c.raison})`).join(' ; ')}` : '',
+      'Texte :',
+      couper(r.texte, 2500),
+      r.complet && r.complet !== r.texte ? `Message transféré, en entier :\n${couper(r.complet, 3000)}` : '',
+    ].filter(Boolean).join('\n')).join('\n\n');
+    const contenu = `Date du jour : ${aujourdHuiParis()} (${jourSemaine})\n\nLeads du CRM (id | entreprise | type, étape | contacts | prévu) :\n${lignesLeads}\n\nEmails à trier :\n${emails}`;
+    try {
+      const r = await client.beta.messages.create({
+        model: MODELE_REDACTION,
+        max_tokens: 8000,
+        output_config: { effort: 'low', format: { type: 'json_schema', schema: SCHEMA_TRI } },
+        betas: ['server-side-fallback-2026-07-01'],
+        fallbacks: 'default',
+        system: [{ type: 'text', text: CONSIGNES_TRI, cache_control: { type: 'ephemeral' } }],
+        messages: [{ role: 'user', content: contenu }],
+      });
+      if (r.stop_reason === 'refusal') continue;
+      const brut = (r.content || []).filter((b) => b.type === 'text').map((b) => b.text).join('');
+      const { decisions: ds } = JSON.parse(brut);
+      for (const d of ds || []) {
+        if (!paquet.some((x) => x.ref === d.ref)) continue;
+        if (d.action === 'rattacher' && !ann.ids.has(d.lead_id)) d.action = 'a_trier';
+        decisions.set(d.ref, d);
+      }
+    } catch (e) {
+      console.error('crm tri', e?.status || '', e?.message || e);
+    }
+  }
+  return decisions;
+}
+
+async function dernierMessageDeMoi(fil) {
+  if (!fil) return false;
+  try {
+    const t = await google(`${GMAIL}/threads/${encodeURIComponent(fil)}?format=metadata&metadataHeaders=From`);
+    const dernier = (t.messages || []).filter((m) => !(m.labelIds || []).includes('DRAFT')).slice(-1)[0];
+    return adresse(enTetes(dernier || {}).from).email === COMPTE;
+  } catch { return false; }
+}
+
+async function lireRecu(id) {
+  const m = await google(`${GMAIL}/messages/${id}?format=full`);
+  const h = enTetes(m);
+  const brut = partieTexte(m.payload);
+  const objet = String(h.subject || '(sans objet)').slice(0, 300);
+  return {
+    m, h, de: adresse(h.from), objet, fil: m.threadId, quand: new Date(Number(m.internalDate) || Date.now()).toISOString(),
+    texte: (sansCitation(brut) || texteBrut(m.snippet)).slice(0, 5000),
+    complet: /^(tr|fwd?)\s*:/i.test(objet) ? propre(brut).slice(0, 8000) : '',
+    pieces: piecesJointes(m.payload),
+  };
+}
+
+// Un email qui concerne un lead : dans son historique, avec la tâche qui dit quoi faire.
+async function rattacherEmail(r, d, leadId, ann) {
+  const lead = ann.lead(leadId);
+  const contact = r.contact?.id ? r.contact : await contactPourLead(ann, leadId, r.de, d || {});
+  const qui = r.de.nom || r.de.email;
+  let aFaire = d ? d.a_faire : 'repondre';
+  if (r.dernierDeMoi && aFaire === 'repondre') aFaire = 'rien';
+  await sb('iae_crm_activites', {
+    methode: 'POST', prefer: 'return=minimal',
+    corps: {
+      lead_id: leadId, contact_id: contact?.id || null, date: r.quand, type: 'email_recu',
+      resume: (d?.resume ? `${qui} : ${d.resume}` : `Email reçu de ${qui} : « ${r.objet} »`).slice(0, 2000),
+      contenu: (r.texte + (r.complet && r.complet !== r.texte ? `\n\nMessage transféré :\n${r.complet}` : '')).slice(0, 12000) || null,
+      source: 'gmail iae',
+      meta: { gmail_id: r.gmailId, fil: r.fil, objet: r.objet, pieces: r.pieces || [], analyse: d ? resumeAnalyse(d) : null },
+    },
+  });
+  const maj = { relances_sans_reponse: 0, archive: false };
+  const jour = jourParis(r.quand);
+  if (!lead?.dernier_contact || lead.dernier_contact < jour) maj.dernier_contact = jour;
+  if (aFaire === 'repondre') {
+    Object.assign(maj, { prochaine_relance: aujourdHuiParis(), prochaine_action: 'email', prochaine_note: (d?.tache || `Répondre à ${qui} : « ${r.objet} »`).slice(0, 2000), tache_fil: r.fil || null });
+  } else if (aFaire === 'relancer_le' && DATE_RE.test(d?.relance_date || '') && d.relance_date >= aujourdHuiParis()) {
+    Object.assign(maj, { prochaine_relance: estOuvreIso(d.relance_date) ? d.relance_date : dansJoursOuvres(0, d.relance_date), prochaine_action: lead?.prochaine_action || 'email', prochaine_note: (d.tache || d.resume || `Retour prévu de ${qui}`).slice(0, 2000), tache_fil: r.fil || null });
+  }
+  await sb(`iae_crm_leads?id=eq.${leadId}`, { methode: 'PATCH', prefer: 'return=minimal', corps: maj });
+  if (lead) Object.assign(lead, maj);
+}
+
 async function synchroGmail() {
   const etat = (await lireReglage('synchro_gmail')) || {};
   const ignores = new Set(((await lireReglage('expediteurs_ignores')) || []).map((x) => String(x).toLowerCase()));
   const depuis = Number(etat.apres) || Math.floor(Date.now() / 1000) - 3 * 86400;
   const debut = Math.floor(Date.now() / 1000);
+  const ann = await annuaire();
   const q = `in:inbox -from:me after:${depuis} -category:promotions -category:social -category:updates -category:forums`;
   const liste = await google(`${GMAIL}/messages?maxResults=50&q=${encodeURIComponent(q)}`);
   const ids = (liste.messages || []).map((m) => m.id).filter((id) => /^[0-9a-f]+$/i.test(id));
-  let reponses = 0;
-  let nouveaux = 0;
+  const items = [];
   if (ids.length) {
     const deja = new Set();
     (await sb(`iae_crm_entrants?select=ref_externe&ref_externe=in.(${ids.join(',')})`)).lignes.forEach((x) => deja.add(x.ref_externe));
     (await sb(`iae_crm_activites?select=meta&meta->>gmail_id=in.(${ids.join(',')})`)).lignes.forEach((x) => deja.add(x.meta.gmail_id));
     for (const id of ids.filter((x) => !deja.has(x))) {
-      const m = await google(`${GMAIL}/messages/${id}?format=metadata&metadataHeaders=From&metadataHeaders=Subject&metadataHeaders=List-Unsubscribe`);
-      const h = Object.fromEntries((m.payload?.headers || []).map((x) => [x.name.toLowerCase(), x.value]));
-      const de = adresse(h.from);
+      const r = await lireRecu(id);
       // Newsletters, robots, équipe : jamais dans le CRM.
-      if (!de.email || interne(de.email) || EXPEDITEURS_AUTOMATIQUES.test(de.email) || h['list-unsubscribe']) continue;
-      if (ignores.has(de.email) || ignores.has(de.email.split('@')[1])) continue;
-      const objet = String(h.subject || '(sans objet)').slice(0, 300);
-      const quand = new Date(Number(m.internalDate) || Date.now()).toISOString();
-      const extrait = texteBrut(m.snippet).slice(0, 1000);
-      let c = await contactParEmail(de.email);
-      if (!c && m.threadId) {
-        const { lignes } = await sb(`iae_crm_activites?select=lead_id,contact_id&meta->>fil=eq.${encodeURIComponent(m.threadId)}&limit=1`);
-        if (lignes[0]) c = { lead_id: lignes[0].lead_id, id: lignes[0].contact_id };
+      if (!r.de.email || interne(r.de.email) || EXPEDITEURS_AUTOMATIQUES.test(r.de.email) || r.h['list-unsubscribe']) continue;
+      if (ignores.has(r.de.email) || ignores.has(r.de.email.split('@')[1])) continue;
+      let contact = await contactParEmail(r.de.email);
+      if (!contact && r.fil) {
+        const { lignes } = await sb(`iae_crm_activites?select=lead_id,contact_id&meta->>fil=eq.${encodeURIComponent(r.fil)}&limit=1`);
+        if (lignes[0]) contact = { lead_id: lignes[0].lead_id, id: lignes[0].contact_id };
       }
-      if (c) {
-        // Si le dernier message du fil est de Gabriel, il a déjà répondu : on note, sans « Répondre à ».
-        let dejaRepondu = false;
-        try {
-          const fil = await google(`${GMAIL}/threads/${encodeURIComponent(m.threadId)}?format=metadata&metadataHeaders=From`);
-          const dernier = (fil.messages || []).slice(-1)[0];
-          const deQui = ((dernier?.payload?.headers || []).find((x) => x.name.toLowerCase() === 'from') || {}).value || '';
-          dejaRepondu = deQui.toLowerCase().includes(COMPTE);
-        } catch { /* au pire, on demande de répondre */ }
-        await sb('iae_crm_activites', { methode: 'POST', prefer: 'return=minimal', corps: { lead_id: c.lead_id, contact_id: c.id || null, date: quand, type: 'email_recu', resume: `Réponse reçue de ${de.nom || de.email} : « ${objet} »`.slice(0, 2000), contenu: extrait, source: 'gmail iae', meta: { gmail_id: id, fil: m.threadId } } });
-        await sb(`iae_crm_leads?id=eq.${c.lead_id}`, { methode: 'PATCH', prefer: 'return=minimal', corps: dejaRepondu
-          ? { relances_sans_reponse: 0, dernier_contact: jourParis(quand) }
-          : { relances_sans_reponse: 0, dernier_contact: jourParis(quand), prochaine_relance: aujourdHuiParis(), prochaine_action: 'email', prochaine_note: `Répondre à « ${objet} »`.slice(0, 2000), archive: false } });
-        reponses++;
-      } else {
-        await sb('iae_crm_entrants?on_conflict=ref_externe', { methode: 'POST', prefer: 'resolution=ignore-duplicates,return=minimal', corps: { recu_le: quand, canal: 'email', de_email: de.email, de_nom: de.nom || null, objet, extrait, ref_externe: id, fil: m.threadId } });
-        nouveaux++;
-      }
+      items.push({ ...r, ref: id, gmailId: id, contact, dernierDeMoi: await dernierMessageDeMoi(r.fil), candidats: contact ? [] : candidatsPour(ann, r.de) });
     }
   }
-  await ecrireReglage('synchro_gmail', { apres: debut - 900, le: new Date().toISOString(), reponses, nouveaux });
-  return { reponses, nouveaux };
+  // Du plus ancien au plus récent : la tâche qui reste est celle du dernier message.
+  items.sort((a, b) => a.quand.localeCompare(b.quand));
+  // Rattrapage : les « À trier » jamais analysés, quelques-uns à chaque passage.
+  const { lignes: enAttente } = await sb('iae_crm_entrants?select=*&statut=eq.a_trier&meta->analyse=is.null&order=recu_le.asc&limit=10');
+  for (const e of enAttente) {
+    let r = { de: { email: e.de_email || '', nom: e.de_nom || '' }, objet: e.objet || '', fil: e.fil, quand: e.recu_le, texte: e.extrait || '', complet: '', pieces: [] };
+    if (e.canal === 'email' && /^[0-9a-f]+$/i.test(e.ref_externe || '')) { try { r = { ...r, ...(await lireRecu(e.ref_externe)) }; } catch { /* on garde l'extrait */ } }
+    items.push({ ...r, ref: `entrant:${e.id}`, gmailId: e.canal === 'email' ? e.ref_externe : null, entrant: e, agenda: e.canal === 'agenda', contact: null, dernierDeMoi: await dernierMessageDeMoi(e.fil), candidats: candidatsPour(ann, r.de) });
+  }
+  const decisions = await analyserEmails(items, ann);
+  let reponses = 0;
+  let nouveaux = 0;
+  let ecartes = 0;
+  for (const r of items) {
+    const d = decisions.get(r.ref);
+    const leadId = r.contact ? r.contact.lead_id : (d?.action === 'rattacher' ? d.lead_id : null);
+    if (r.entrant) {
+      if (!d) continue; // analyse ratée : on réessaiera au prochain passage
+      const meta = { ...(r.entrant.meta || {}), analyse: resumeAnalyse(d) };
+      if (leadId && r.agenda) {
+        await sb(`iae_crm_entrants?id=eq.${r.entrant.id}`, { methode: 'PATCH', prefer: 'return=minimal', corps: { meta } });
+        await traiterEntrant({ id: r.entrant.id, action: 'rattacher', lead_id: leadId });
+        reponses++;
+      } else if (leadId) {
+        await rattacherEmail(r, d, leadId, ann);
+        await sb(`iae_crm_entrants?id=eq.${r.entrant.id}`, { methode: 'PATCH', prefer: 'return=minimal', corps: { statut: 'rattache', lead_id: leadId, meta } });
+        reponses++;
+      } else {
+        await sb(`iae_crm_entrants?id=eq.${r.entrant.id}`, { methode: 'PATCH', prefer: 'return=minimal', corps: { statut: d.action === 'ignorer' ? 'ignore' : 'a_trier', meta } });
+        if (d.action === 'ignorer') ecartes++;
+      }
+      continue;
+    }
+    if (leadId) {
+      await rattacherEmail(r, d, leadId, ann);
+      reponses++;
+      continue;
+    }
+    const ecarte = d?.action === 'ignorer';
+    await sb('iae_crm_entrants?on_conflict=ref_externe', {
+      methode: 'POST', prefer: 'resolution=ignore-duplicates,return=minimal',
+      corps: { recu_le: r.quand, canal: 'email', de_email: r.de.email, de_nom: r.de.nom || null, objet: r.objet, extrait: couper(r.texte, 1500), ref_externe: r.ref, fil: r.fil, statut: ecarte ? 'ignore' : 'a_trier', meta: { ...(d ? { analyse: resumeAnalyse(d) } : {}), candidats: r.candidats } },
+    });
+    if (ecarte) ecartes++; else nouveaux++;
+  }
+  const envoyes = await synchroEnvoyes(depuis, ann);
+  await ecrireReglage('synchro_gmail', { apres: debut - 900, le: new Date().toISOString(), reponses, nouveaux, ecartes, envoyes });
+  return { reponses, nouveaux, ecartes, envoyes };
+}
+
+// Tes emails envoyés depuis Gmail : dans l'historique, et ils règlent la tâche de leur fil.
+async function synchroEnvoyes(depuis, ann) {
+  const liste = await google(`${GMAIL}/messages?maxResults=30&q=${encodeURIComponent(`in:sent after:${depuis}`)}`);
+  const ids = (liste.messages || []).map((m) => m.id).filter((id) => /^[0-9a-f]+$/i.test(id));
+  if (!ids.length) return 0;
+  const deja = new Set((await sb(`iae_crm_activites?select=meta&meta->>gmail_id=in.(${ids.join(',')})`)).lignes.map((x) => x.meta.gmail_id));
+  const parEmail = new Map(ann.contacts.filter((c) => c.email).map((c) => [c.email.toLowerCase(), c]));
+  let n = 0;
+  for (const id of ids.filter((x) => !deja.has(x))) {
+    const m = await google(`${GMAIL}/messages/${id}?format=full`);
+    if ((m.labelIds || []).includes('DRAFT')) continue;
+    const h = enTetes(m);
+    const dest = [...listeAdresses(h.to), ...listeAdresses(h.cc)];
+    const c = dest.map((e) => parEmail.get(e)).find(Boolean);
+    let leadId = c?.lead_id;
+    if (!leadId && m.threadId) {
+      const { lignes } = await sb(`iae_crm_activites?select=lead_id&meta->>fil=eq.${encodeURIComponent(m.threadId)}&limit=1`);
+      leadId = lignes[0]?.lead_id;
+    }
+    if (!leadId || !ann.ids.has(leadId)) continue;
+    const lead = ann.lead(leadId);
+    const objet = String(h.subject || '(sans objet)').slice(0, 300);
+    const quand = new Date(Number(m.internalDate) || Date.now()).toISOString();
+    const jour = jourParis(quand);
+    await sb('iae_crm_activites', {
+      methode: 'POST', prefer: 'return=minimal',
+      corps: { lead_id: leadId, contact_id: c?.id || null, date: quand, type: 'email_envoye', resume: `Email envoyé depuis Gmail : « ${objet} »`.slice(0, 2000), contenu: sansCitation(partieTexte(m.payload)).slice(0, 8000) || null, source: 'gmail iae', meta: { gmail_id: id, fil: m.threadId, objet, a: dest.join(', ') } },
+    });
+    const maj = {};
+    if (!lead.dernier_contact || lead.dernier_contact < jour) maj.dernier_contact = jour;
+    if (lead.tache_fil && lead.tache_fil === m.threadId) {
+      Object.assign(maj, { prochaine_relance: dansJoursOuvres(3), prochaine_action: 'email', prochaine_note: `Tu as répondu le ${dateCourte(jour)} (« ${objet} ») : relancer s'il n'y a pas de réponse.`.slice(0, 2000), tache_fil: null, relances_sans_reponse: 0 });
+    }
+    if (Object.keys(maj).length) {
+      await sb(`iae_crm_leads?id=eq.${leadId}`, { methode: 'PATCH', prefer: 'return=minimal', corps: maj });
+      Object.assign(lead, maj);
+    }
+    n++;
+  }
+  return n;
+}
+
+/* ---------- Le récap d'une relation ---------- */
+
+const SCHEMA_RECAP = {
+  type: 'object',
+  properties: {
+    situation: { type: 'string' },
+    attentes: { type: 'string' },
+    chaleur: { type: 'string', enum: ['chaude', 'bonne', 'neutre', 'froide', 'inconnue'] },
+    reactivite: { type: 'string' },
+    ton: { type: 'string' },
+    points: { type: 'array', items: { type: 'string' } },
+    prochaine_etape: { type: 'string' },
+  },
+  required: ['situation', 'attentes', 'chaleur', 'reactivite', 'ton', 'points', 'prochaine_etape'],
+  additionalProperties: false,
+};
+const CONSIGNES_RECAP = `Tu fais, pour Gabriel Vanderbecken (fondateur d'IA-Entrepreneur, organisme de formation à l'IA pour les entreprises), le récap d'une relation de son CRM : prospect, client, partenaire ou fournisseur. Il le lit avant d'appeler ou d'écrire, pour savoir en dix secondes où il en est et comment parler à la personne.
+- situation : deux ou trois phrases sur où vous en êtes aujourd'hui, avec les faits (dates, montants, documents, décisions).
+- attentes : ce que la personne attend de Gabriel maintenant, ou ce qu'il attend d'elle. Vide si rien.
+- chaleur : la qualité de la relation d'après les échanges. chaude : enthousiaste, proche ; bonne : cordiale et engagée ; neutre ; froide : peu de réponses, réticences ; inconnue : trop peu d'échanges pour juger.
+- reactivite : comment elle répond, d'après les dates (« répond dans la journée », « répond après une relance », « n'a jamais répondu par email »).
+- ton : comment vous vous parlez (tutoiement ou vouvoiement, formel, amical), pour qu'il écrive juste.
+- points : deux à quatre choses à ne pas oublier : engagements pris, chiffres, dates, sujets sensibles, personnes impliquées.
+- prochaine_etape : ce qu'il faut faire ensuite, une phrase à l'infinitif.
+N'invente rien : seulement ce qui est dans l'historique et les emails. Phrases courtes, en français, en tutoyant Gabriel (« tu lui as envoyé… »). Pas de formule.`;
+
+async function recapLead(corps) {
+  if (!process.env.ANTHROPIC_API_KEY) throw new Refus('ia_non_configuree', 503);
+  if (!UUID_RE.test(corps.lead_id || '')) throw new Refus('id_invalide');
+  const [{ lignes: ls }, { lignes: cs }, { lignes: acts }] = await Promise.all([
+    sb(`iae_crm_leads?select=*&id=eq.${corps.lead_id}`),
+    sb(`iae_crm_contacts?select=*&lead_id=eq.${corps.lead_id}&order=principal.desc,created_at.asc`),
+    sb(`iae_crm_activites?select=*&lead_id=eq.${corps.lead_id}&order=date.desc&limit=60`),
+  ]);
+  const lead = ls[0];
+  if (!lead) throw new Refus('introuvable', 404);
+  // Les trois derniers fils Gmail, lus en entier : c'est là qu'est le ton de la relation.
+  const fils = [...new Set(acts.map((a) => a.meta?.fil).filter((f) => /^[0-9a-f]{6,32}$/i.test(f || '')))].slice(0, 3);
+  const textesFils = [];
+  if (gmailConfigure()) {
+    for (const f of fils) {
+      try {
+        const ms = (await lireFil(f)).slice(-6);
+        textesFils.push(`Fil « ${ms[0]?.objet || ''} » :\n${ms.map((x) => `- ${new Date(x.date).toLocaleString('fr-FR', { timeZone: 'Europe/Paris' })}, ${x.moi ? 'Gabriel' : x.de} : ${couper(x.texte, 900)}`).join('\n')}`);
+      } catch { /* fil illisible : on fait avec l'historique */ }
+    }
+  }
+  let historique = acts.slice().reverse().map((a) => `- ${new Date(a.date).toLocaleDateString('fr-FR', { timeZone: 'Europe/Paris' })} ${TYPES_LISIBLES[a.type] || a.type} : ${couper(a.resume, 300)}${a.contenu ? ` / ${couper(a.contenu, 500)}` : ''}`).join('\n');
+  historique = couper(historique, 14000);
+  const contexte = [
+    `Date du jour : ${aujourdHuiParis()}`,
+    `Lead : ${lead.entreprise} (${lead.type}, étape ${lead.statut}${lead.suivi ? `, suivi ${lead.suivi}` : ''})`,
+    lead.besoin ? `Besoin : ${lead.besoin}` : '',
+    lead.source ? `Source : ${lead.source}` : '',
+    `Contacts : ${cs.map((c) => [nomDe(c), c.poste, c.email].filter(Boolean).join(', ')).join(' ; ') || 'aucun'}`,
+    `Prévu : ${lead.prochaine_action} le ${lead.prochaine_relance || 'rien'}${lead.prochaine_note ? `, ${lead.prochaine_note}` : ''}`,
+    `Historique, du plus ancien au plus récent :\n${historique || 'vide'}`,
+    textesFils.length ? `Derniers emails :\n${textesFils.join('\n\n')}` : '',
+  ].filter(Boolean).join('\n\n');
+  const client = new Anthropic({ timeout: 45000, maxRetries: 1 });
+  let reponse;
+  try {
+    reponse = await client.beta.messages.create({
+      model: MODELE_REDACTION,
+      max_tokens: 4000,
+      output_config: { effort: 'low', format: { type: 'json_schema', schema: SCHEMA_RECAP } },
+      betas: ['server-side-fallback-2026-07-01'],
+      fallbacks: 'default',
+      system: [{ type: 'text', text: CONSIGNES_RECAP, cache_control: { type: 'ephemeral' } }],
+      messages: [{ role: 'user', content: contexte }],
+    });
+  } catch (e) {
+    if (e instanceof Anthropic.RateLimitError) throw new Refus('ia_trop_de_demandes', 429);
+    if (e instanceof Anthropic.APIConnectionError) throw new Refus('ia_injoignable', 502);
+    if (e instanceof Anthropic.APIError) { console.error('crm recap', e.status, e.message); throw new Refus('ia_erreur', 502); }
+    throw e;
+  }
+  if (reponse.stop_reason === 'refusal') throw new Refus('ia_refus', 422);
+  let r;
+  try { r = JSON.parse((reponse.content || []).filter((b) => b.type === 'text').map((b) => b.text).join('')); } catch { throw new Refus('ia_erreur', 502); }
+  const recap = {
+    situation: couper(r.situation, 900), attentes: couper(r.attentes, 500),
+    chaleur: SCHEMA_RECAP.properties.chaleur.enum.includes(r.chaleur) ? r.chaleur : 'inconnue',
+    reactivite: couper(r.reactivite, 200), ton: couper(r.ton, 200),
+    points: (Array.isArray(r.points) ? r.points : []).slice(0, 5).map((x) => couper(x, 300)), prochaine_etape: couper(r.prochaine_etape, 400),
+  };
+  return { lead: await modifier('leads', lead.id, { recap, recap_le: new Date().toISOString() }) };
 }
 
 async function synchroAgenda() {
@@ -832,6 +1297,7 @@ async function synchroAgenda() {
   });
   const r = await google(`${CALENDAR}?${params}`);
   const aujourd = aujourdHuiParis();
+  const ann = await annuaire();
   let rdv = 0;
   let nouveaux = 0;
   for (const ev of r.items || []) {
@@ -845,7 +1311,15 @@ async function synchroAgenda() {
     const leadsVus = new Set();
     for (const a of externes) {
       const email = a.email.toLowerCase();
-      const c = await contactParEmail(email);
+      let c = await contactParEmail(email);
+      if (!c) {
+        // Un seul lead possible (même domaine ou même nom) : le RDV va sur ce lead.
+        const pistes = candidatsPour(ann, { email, nom: a.displayName || '' });
+        if (pistes.length === 1) {
+          const ct = await contactPourLead(ann, pistes[0].lead_id, { email, nom: a.displayName || '' });
+          if (ct) c = { id: ct.id, lead_id: ct.lead_id };
+        }
+      }
       if (c && leadsVus.has(c.lead_id)) continue;
       if (c) leadsVus.add(c.lead_id);
       const ref = (c ? `agenda:${ev.id}:${c.lead_id}` : `agenda:${ev.id}:${email}`).slice(0, 500);
@@ -919,6 +1393,10 @@ async function traiterEntrant(corps) {
     }
     return { ignore: true };
   }
+  if (action === 'remettre') {
+    await sb(`iae_crm_entrants?id=eq.${e.id}`, { methode: 'PATCH', corps: { statut: 'a_trier' }, prefer: 'return=minimal' });
+    return { remis: true };
+  }
   if (action !== 'creer' && action !== 'rattacher') throw new Refus('action_inconnue');
   const [prenom, ...reste] = String(e.de_nom || '').split(/\s+/).filter(Boolean);
   let lead;
@@ -934,13 +1412,23 @@ async function traiterEntrant(corps) {
     if (existant && existant.lead_id === lead.id) contactId = existant.id;
     else if (e.de_email) contactId = (await inserer('contacts', { lead_id: lead.id, prenom: prenom || null, nom: reste.join(' ') || null, email: e.de_email, principal: false })).id;
   }
-  const m = e.meta || {};
+  const m = { ...(e.meta || {}) };
   if (e.canal === 'agenda') {
+    // Même référence que la synchro de l'agenda pour un contact connu : jamais de RDV en double.
+    if (m.event_id) m.event_ref = `agenda:${m.event_id}:${lead.id}`;
     await inserer('activites', { lead_id: lead.id, contact_id: contactId, type: 'rdv', resume: `RDV prévu : ${String(e.objet || '').replace(/^RDV : /, '')}`.slice(0, 2000), contenu: e.extrait, source: 'agenda', meta: m });
     if (m.date_rdv && m.date_rdv >= aujourdHuiParis()) await modifier('leads', lead.id, { prochaine_relance: m.date_rdv, prochaine_action: 'rdv', prochaine_note: `RDV${m.heure ? ` à ${m.heure}` : ''}`, relances_sans_reponse: 0 });
   } else {
-    await inserer('activites', { lead_id: lead.id, contact_id: contactId, date: e.recu_le, type: 'email_recu', resume: `Email reçu de ${e.de_nom || e.de_email} : « ${e.objet || ''} »`.slice(0, 2000), contenu: e.extrait, source: 'gmail iae', meta: { gmail_id: e.ref_externe, fil: e.fil } });
-    await modifier('leads', lead.id, { prochaine_relance: aujourdHuiParis(), prochaine_action: 'email', prochaine_note: `Répondre à « ${String(e.objet || '').slice(0, 200)} »`, relances_sans_reponse: 0, dernier_contact: jourParis(e.recu_le) });
+    // L'analyse de Claude, quand elle existe, dit quoi faire ; sinon on demande de répondre.
+    const an = m.analyse || null;
+    const qui = e.de_nom || e.de_email;
+    await inserer('activites', { lead_id: lead.id, contact_id: contactId, date: e.recu_le, type: 'email_recu', resume: (an?.resume ? `${qui} : ${an.resume}` : `Email reçu de ${qui} : « ${e.objet || ''} »`).slice(0, 2000), contenu: e.extrait, source: 'gmail iae', meta: { gmail_id: e.ref_externe, fil: e.fil, objet: e.objet, analyse: an } });
+    const dejaRepondu = await dernierMessageDeMoi(e.fil);
+    const aFaire = dejaRepondu ? 'rien' : (an?.a_faire || 'repondre');
+    const maj = { relances_sans_reponse: 0, dernier_contact: jourParis(e.recu_le) };
+    if (aFaire === 'repondre' || action === 'creer') Object.assign(maj, { prochaine_relance: aujourdHuiParis(), prochaine_action: 'email', prochaine_note: (an?.tache || `Répondre à ${qui} : « ${String(e.objet || '').slice(0, 200)} »`).slice(0, 2000), tache_fil: e.fil || null });
+    else if (aFaire === 'relancer_le' && DATE_RE.test(an?.relance_date || '') && an.relance_date >= aujourdHuiParis()) Object.assign(maj, { prochaine_relance: an.relance_date, prochaine_note: (an.tache || an.resume || '').slice(0, 2000) || null, tache_fil: e.fil || null });
+    await modifier('leads', lead.id, maj);
   }
   await sb(`iae_crm_entrants?id=eq.${e.id}`, { methode: 'PATCH', corps: { statut: action === 'creer' ? 'cree' : 'rattache', lead_id: lead.id }, prefer: 'return=minimal' });
   return { lead_id: lead.id };
@@ -1144,8 +1632,10 @@ export default async function handler(req, res) {
 
   try {
     if (req.method === 'GET') {
-      const logo = new URL(req.url, 'http://local').searchParams.get('logo');
+      const params = new URL(req.url, 'http://local').searchParams;
+      const logo = params.get('logo');
       if (logo !== null) return envoyerLogo(res, logo);
+      if (params.get('fil') !== null) return res.status(200).json(await filDuCrm(params.get('fil')));
       return res.status(200).json(await lireTout());
     }
     let corps = req.body;
@@ -1158,6 +1648,10 @@ export default async function handler(req, res) {
     }
     if (corps && corps.op === 'rediger') return res.status(200).json(await rediger(corps, ip));
     if (corps && corps.op === 'vocal') return res.status(200).json(await interpreterVocal(corps, ip));
+    if (corps && corps.op === 'recap') {
+      if (tropDeRedactions(ip)) throw new Refus('ia_trop_de_demandes', 429);
+      return res.status(200).json(await recapLead(corps));
+    }
     return res.status(200).json(await operation(corps));
   } catch (e) {
     if (e instanceof Refus) return res.status(e.statut).json({ erreur: e.code });
