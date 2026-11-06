@@ -26,6 +26,10 @@
  *        mode 'envoyer' ou 'brouillon', depuis gabriel@ia-entrepreneur.fr
  *   POST /api/crm { op: 'reglage',   cle, valeur }
  *   POST /api/crm { op: 'synchro' }  lit la boîte et l'agenda maintenant
+ *   POST /api/crm { op: 'vocal',     lead_id, texte }
+ *        une phrase dite à l'oral (« pas de réponse, rappelle-le lundi »)
+ *        devient une action proposée ; rien n'est enregistré ici, la page
+ *        relit la proposition et Gabriel valide
  *   POST /api/crm { op: 'entrant',   id, action, lead_id?, lead?, contact? }
  *        traite une ligne « À trier » : créer le lead, rattacher, ignorer
  *   GET  /api/crm?tache=synchro      la même synchro, lancée par Vercel Cron
@@ -795,8 +799,18 @@ async function synchroGmail() {
         if (lignes[0]) c = { lead_id: lignes[0].lead_id, id: lignes[0].contact_id };
       }
       if (c) {
+        // Si le dernier message du fil est de Gabriel, il a déjà répondu : on note, sans « Répondre à ».
+        let dejaRepondu = false;
+        try {
+          const fil = await google(`${GMAIL}/threads/${encodeURIComponent(m.threadId)}?format=metadata&metadataHeaders=From`);
+          const dernier = (fil.messages || []).slice(-1)[0];
+          const deQui = ((dernier?.payload?.headers || []).find((x) => x.name.toLowerCase() === 'from') || {}).value || '';
+          dejaRepondu = deQui.toLowerCase().includes(COMPTE);
+        } catch { /* au pire, on demande de répondre */ }
         await sb('iae_crm_activites', { methode: 'POST', prefer: 'return=minimal', corps: { lead_id: c.lead_id, contact_id: c.id || null, date: quand, type: 'email_recu', resume: `Réponse reçue de ${de.nom || de.email} : « ${objet} »`.slice(0, 2000), contenu: extrait, source: 'gmail iae', meta: { gmail_id: id, fil: m.threadId } } });
-        await sb(`iae_crm_leads?id=eq.${c.lead_id}`, { methode: 'PATCH', prefer: 'return=minimal', corps: { relances_sans_reponse: 0, dernier_contact: jourParis(quand), prochaine_relance: aujourdHuiParis(), prochaine_action: 'email', prochaine_note: `Répondre à « ${objet} »`.slice(0, 2000), archive: false } });
+        await sb(`iae_crm_leads?id=eq.${c.lead_id}`, { methode: 'PATCH', prefer: 'return=minimal', corps: dejaRepondu
+          ? { relances_sans_reponse: 0, dernier_contact: jourParis(quand) }
+          : { relances_sans_reponse: 0, dernier_contact: jourParis(quand), prochaine_relance: aujourdHuiParis(), prochaine_action: 'email', prochaine_note: `Répondre à « ${objet} »`.slice(0, 2000), archive: false } });
         reponses++;
       } else {
         await sb('iae_crm_entrants?on_conflict=ref_externe', { methode: 'POST', prefer: 'resolution=ignore-duplicates,return=minimal', corps: { recu_le: quand, canal: 'email', de_email: de.email, de_nom: de.nom || null, objet, extrait, ref_externe: id, fil: m.threadId } });
@@ -828,12 +842,15 @@ async function synchroAgenda() {
     const heure = ev.start.dateTime ? heureParis(debutEv) : null;
     const libelle = `${(ev.summary || 'Rendez-vous').slice(0, 200)} le ${jour.split('-').reverse().join('/')}${heure ? ` à ${heure}` : ''}`;
     const externes = (ev.attendees || []).filter((a) => a.email && !a.self && !a.resource && !interne(a.email.toLowerCase()));
+    const leadsVus = new Set();
     for (const a of externes) {
       const email = a.email.toLowerCase();
-      const ref = `agenda:${ev.id}:${email}`.slice(0, 500);
+      const c = await contactParEmail(email);
+      if (c && leadsVus.has(c.lead_id)) continue;
+      if (c) leadsVus.add(c.lead_id);
+      const ref = (c ? `agenda:${ev.id}:${c.lead_id}` : `agenda:${ev.id}:${email}`).slice(0, 500);
       const { lignes: dejaAct } = await sb(`iae_crm_activites?select=id&meta->>event_ref=eq.${encodeURIComponent(ref)}&limit=1`);
       if (dejaAct.length) continue;
-      const c = await contactParEmail(email);
       if (c) {
         await sb('iae_crm_activites', { methode: 'POST', prefer: 'return=minimal', corps: { lead_id: c.lead_id, contact_id: c.id, type: 'rdv', resume: `RDV prévu : ${libelle}`.slice(0, 2000), contenu: texteBrut(ev.description).slice(0, 4000) || null, source: 'agenda', meta: { event_id: ev.id, event_ref: ref, date_rdv: jour, heure, lien_agenda: ev.htmlLink } } });
         if (jour >= aujourd) await sb(`iae_crm_leads?id=eq.${c.lead_id}`, { methode: 'PATCH', prefer: 'return=minimal', corps: { prochaine_relance: jour, prochaine_action: 'rdv', prochaine_note: `RDV${heure ? ` à ${heure}` : ''} : ${(ev.summary || '').slice(0, 300)}`, relances_sans_reponse: 0, archive: false } });
@@ -927,6 +944,99 @@ async function traiterEntrant(corps) {
   }
   await sb(`iae_crm_entrants?id=eq.${e.id}`, { methode: 'PATCH', corps: { statut: action === 'creer' ? 'cree' : 'rattache', lead_id: lead.id }, prefer: 'return=minimal' });
   return { lead_id: lead.id };
+}
+
+/* ---------- Fonction orale ---------- */
+
+const SCHEMA_VOCAL = {
+  type: 'object',
+  properties: {
+    action: { type: 'string', enum: ['appel', 'reponse', 'note', 'decaler', 'rdv', 'perdu', 'passer', 'incompris'] },
+    resultat_appel: { type: 'string', enum: ['joint', 'sans_reponse', 'message', ''] },
+    note: { type: 'string' },
+    relance_date: { type: 'string', description: 'AAAA-MM-JJ, ou vide' },
+    relance_action: { type: 'string', enum: ['email', 'appel', 'rdv', 'autre', ''] },
+    rdv_date: { type: 'string' },
+    rdv_heure: { type: 'string', description: 'HH:MM, ou vide' },
+    rdv_lieu: { type: 'string' },
+    raison_perte: { type: 'string' },
+    confirmation: { type: 'string', description: 'Une phrase courte, au tutoiement, lue à voix haute' },
+  },
+  required: ['action', 'resultat_appel', 'note', 'relance_date', 'relance_action', 'rdv_date', 'rdv_heure', 'rdv_lieu', 'raison_perte', 'confirmation'],
+  additionalProperties: false,
+};
+
+const CONSIGNES_VOCAL = `Tu aides Gabriel à traiter ses relances commerciales à la voix, téléphone en main. Il vient de dire une phrase à propos du lead affiché. Transforme-la en une seule action pour son CRM.
+
+Actions possibles :
+- appel : il a appelé. resultat_appel = joint (il a eu la personne), sans_reponse, ou message (messagerie, message laissé). note = ce qui s'est dit, reformulé proprement en une ou deux phrases.
+- reponse : la personne a répondu (email, SMS, WhatsApp, en personne). note = ce qu'elle a répondu.
+- note : une simple information à garder.
+- decaler : il veut seulement déplacer la prochaine relance.
+- rdv : un rendez-vous est fixé. rdv_date, rdv_heure (HH:MM), rdv_lieu si dits.
+- perdu : le lead est perdu. raison_perte si dite.
+- passer : « suivant », « passe », « plus tard » sans date.
+- incompris : la phrase n'est pas claire ; confirmation = la question courte à lui poser.
+
+Dates : la date du jour et le jour de la semaine te sont donnés. Convertis « demain », « lundi », « mardi prochain », « dans deux semaines », « le 20 » en AAAA-MM-JJ, jamais un samedi, un dimanche ni un jour férié (passe alors au jour ouvré suivant). Si une relance est demandée sans date (« rappelle-le »), laisse relance_date vide : le CRM appliquera son rythme. relance_action : appel s'il dit « rappeler » ou « appeler », email s'il dit « écrire », « envoyer », « relancer par mail », sinon vide.
+
+N'invente rien : seulement ce qu'il a dit. Les champs sans objet restent vides. La confirmation se lit à voix haute : courte, au tutoiement, elle dit ce qui sera noté et la prochaine relance, par exemple « Pas de réponse, je te le remets lundi en appel. »`;
+
+async function interpreterVocal(corps, ip) {
+  if (!process.env.ANTHROPIC_API_KEY) throw new Refus('ia_non_configuree', 503);
+  if (!UUID_RE.test(corps.lead_id || '')) throw new Refus('id_invalide');
+  const texte = String(corps.texte || '').trim().slice(0, 1500);
+  if (!texte) throw new Refus('message_invalide');
+  if (tropDeRedactions(ip)) throw new Refus('ia_trop_de_demandes', 429);
+  const { lignes } = await sb(`iae_crm_leads?select=entreprise,statut,prochaine_relance,prochaine_action,prochaine_note,relances_sans_reponse&id=eq.${corps.lead_id}`);
+  const lead = lignes[0];
+  if (!lead) throw new Refus('introuvable', 404);
+  const maintenant = new Date();
+  const jourSemaine = new Intl.DateTimeFormat('fr-FR', { timeZone: 'Europe/Paris', weekday: 'long' }).format(maintenant);
+  const contexte = [
+    `Date du jour : ${aujourdHuiParis()} (${jourSemaine})`,
+    `Lead : ${lead.entreprise}, étape ${lead.statut}`,
+    `Prévu : ${lead.prochaine_action || ''} le ${lead.prochaine_relance || 'rien'}${lead.prochaine_note ? `, ${lead.prochaine_note}` : ''}`,
+    `Relances sans réponse : ${lead.relances_sans_reponse}`,
+    `Ce que Gabriel a dit : « ${texte} »`,
+  ].join('\n');
+  const client = new Anthropic({ timeout: 30000, maxRetries: 1 });
+  let reponse;
+  try {
+    reponse = await client.beta.messages.create({
+      model: MODELE_REDACTION,
+      max_tokens: 4000,
+      output_config: { effort: 'low', format: { type: 'json_schema', schema: SCHEMA_VOCAL } },
+      betas: ['server-side-fallback-2026-07-01'],
+      fallbacks: 'default',
+      system: [{ type: 'text', text: CONSIGNES_VOCAL, cache_control: { type: 'ephemeral' } }],
+      messages: [{ role: 'user', content: contexte }],
+    });
+  } catch (e) {
+    if (e instanceof Anthropic.RateLimitError) throw new Refus('ia_trop_de_demandes', 429);
+    if (e instanceof Anthropic.APIConnectionError) throw new Refus('ia_injoignable', 502);
+    if (e instanceof Anthropic.APIError) { console.error('crm vocal', e.status, e.message); throw new Refus('ia_erreur', 502); }
+    throw e;
+  }
+  if (reponse.stop_reason === 'refusal') throw new Refus('ia_refus', 422);
+  const brut = (reponse.content || []).filter((b) => b.type === 'text').map((b) => b.text).join('');
+  let r;
+  try { r = JSON.parse(brut); } catch { throw new Refus('ia_erreur', 502); }
+  // On ne garde que des valeurs sûres : la page les applique avec ses propres fonctions.
+  const date = (x) => (DATE_RE.test(x || '') ? x : '');
+  return {
+    action: SCHEMA_VOCAL.properties.action.enum.includes(r.action) ? r.action : 'incompris',
+    resultat_appel: ['joint', 'sans_reponse', 'message'].includes(r.resultat_appel) ? r.resultat_appel : '',
+    note: String(r.note || '').slice(0, 2000),
+    relance_date: date(r.relance_date),
+    relance_action: ['email', 'appel', 'rdv', 'autre'].includes(r.relance_action) ? r.relance_action : '',
+    rdv_date: date(r.rdv_date),
+    rdv_heure: /^\d{2}:\d{2}$/.test(r.rdv_heure || '') ? r.rdv_heure : '',
+    rdv_lieu: String(r.rdv_lieu || '').slice(0, 300),
+    raison_perte: String(r.raison_perte || '').slice(0, 500),
+    confirmation: String(r.confirmation || '').slice(0, 400),
+    texte,
+  };
 }
 
 /* ---------- Le récapitulatif du matin ---------- */
@@ -1047,6 +1157,7 @@ export default async function handler(req, res) {
       }
     }
     if (corps && corps.op === 'rediger') return res.status(200).json(await rediger(corps, ip));
+    if (corps && corps.op === 'vocal') return res.status(200).json(await interpreterVocal(corps, ip));
     return res.status(200).json(await operation(corps));
   } catch (e) {
     if (e instanceof Refus) return res.status(e.statut).json({ erreur: e.code });

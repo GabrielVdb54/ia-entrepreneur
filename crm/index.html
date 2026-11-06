@@ -271,6 +271,14 @@
   a.chiffre { text-decoration: none; }
   a.chiffre:hover { border-color: var(--line-strong); }
   .date-lue { font-weight: 600; color: var(--text); }
+  .vocal { border: 1px solid var(--line); background: var(--primary-soft); border-radius: 14px; padding: 14px; display: flex; flex-direction: column; gap: 10px; }
+  .vocal .micro { min-height: 64px; font-size: 18px; width: 100%; }
+  .vocal .micro.ecoute { background: var(--danger); border-color: var(--danger); }
+  .vocal .transcription { font-size: 16px; min-height: 1.5em; }
+  .vocal .saisie { display: flex; gap: 8px; }
+  .vocal .saisie input { flex: 1; min-width: 0; border: 1px solid var(--line-strong); border-radius: 10px; padding: 9px 11px; }
+  .btn-dictee { align-self: flex-start; }
+  .mode-vocal .session-actions :is([data-act="email"], [data-act="appel"], [data-act="sms"], [data-act="decaler"], [data-act="perdu"]) { display: none; }
   .perso { border: 1px solid var(--line); background: var(--bg); border-radius: 12px; padding: 12px; display: flex; flex-direction: column; gap: 10px; }
   .perso-tete { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
   .perso .appuis { font-size: 13px; color: var(--muted); }
@@ -490,6 +498,7 @@ const ERREURS = {
   ia_erreur: "La rédaction n'a pas abouti. Réessaie, ou écris le message toi-même.",
   ia_refus: 'Claude a refusé de rédiger ce message. Écris-le toi-même.',
   ia_coupe: 'La rédaction a été coupée. Réessaie.',
+  micro: "Le micro n'a rien entendu. Réessaie, ou écris la phrase.",
 };
 
 /* ================= Utilitaires ================= */
@@ -998,6 +1007,7 @@ function ouvrirModale(html, monter) {
   m.scrollTop = 0;
   const form = $('form', m);
   monter(form);
+  brancherDictee(form);
   const premier = $('[autofocus]', m);
   if (premier) premier.focus();
 }
@@ -1096,6 +1106,170 @@ async function soumettre(form, travail) {
 /* ----- Email ----- */
 
 const enSession = () => Boolean(S.session && $('#session').open);
+
+/* ----- À l'oral : lire la fiche, écouter, comprendre, relire, valider ----- */
+
+const Reco = window.SpeechRecognition || window.webkitSpeechRecognition || null;
+const voix = () => (window.speechSynthesis ? speechSynthesis.getVoices().find((v) => /^fr(-|_)FR/i.test(v.lang)) || speechSynthesis.getVoices().find((v) => /^fr/i.test(v.lang)) : null);
+function parler(texte, ensuite) {
+  if (!window.speechSynthesis || !texte) { if (ensuite) ensuite(); return; }
+  speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(texte);
+  u.lang = 'fr-FR';
+  u.rate = 1.05;
+  const v = voix();
+  if (v) u.voice = v;
+  if (ensuite) u.onend = () => ensuite();
+  speechSynthesis.speak(u);
+}
+// Une écoute à la fois ; surFin(texte) est appelé une seule fois.
+let ecouteEnCours = null;
+function ecouter(surTexte, surFin) {
+  if (!Reco) { surFin(''); return; }
+  if (ecouteEnCours) { try { ecouteEnCours.abort(); } catch { /* rien */ } }
+  const r = new Reco();
+  r.lang = 'fr-FR';
+  r.interimResults = true;
+  r.continuous = false;
+  let texte = '';
+  let fini = false;
+  const finir = () => { if (!fini) { fini = true; ecouteEnCours = null; surFin(texte.trim()); } };
+  r.onresult = (e) => { texte = [...e.results].map((x) => x[0].transcript).join(' '); surTexte(texte); };
+  r.onerror = finir;
+  r.onend = finir;
+  ecouteEnCours = r;
+  try { r.start(); } catch { finir(); }
+}
+function texteFiche(l) {
+  const c = contactPrincipal(l.id);
+  const prevu = l.prochaine_relance ? `${actionLue(l.prochaine_action)} ${quand(l.prochaine_relance)}` : 'rien de prévu';
+  const d = derniereNote(l.id);
+  return [`${l.entreprise}.`, c && nomContact(c) ? `${nomContact(c)}${c.poste ? `, ${c.poste}` : ''}.` : '', `Prévu : ${prevu}.`,
+    l.prochaine_note ? `${l.prochaine_note}.` : '', l.relances_sans_reponse ? `${l.relances_sans_reponse} relance${l.relances_sans_reponse > 1 ? 's' : ''} sans réponse.` : '',
+    d ? `Dernier échange : ${d}` : ''].filter(Boolean).join(' ');
+}
+function panneauVocal() {
+  return `<div class="vocal" aria-live="polite">
+    ${Reco ? '<button type="button" class="btn primaire micro" data-vocal="parler">Appuie et parle</button>' : ''}
+    <p class="transcription" data-vocal-texte>${Reco ? 'Dis par exemple : « pas de réponse, rappelle-le lundi », « joint, il veut le programme du niveau 2, relance par email vendredi », « RDV jeudi à 14 h en visio », « décale à mardi », « perdu, pas de budget », « suivant ».' : "Ce navigateur n'a pas la dictée : écris la phrase ci-dessous."}</p>
+    <div class="saisie"><input type="text" data-vocal-saisie placeholder="Ou écris : pas de réponse, rappelle lundi" aria-label="Phrase à interpréter"><button type="button" class="btn" data-vocal="ecrit">OK</button></div>
+    <div data-vocal-proposition></div>
+    <div class="actions"><button type="button" class="btn petit" data-vocal="lire">Relire la fiche</button></div>
+  </div>`;
+}
+const LIB_VOCAL = { appel: 'Appel', reponse: 'Réponse reçue', note: 'Note', decaler: 'Relance déplacée', rdv: 'Rendez-vous', perdu: 'Perdu', passer: 'Suivant', incompris: 'Pas compris' };
+async function interpreter(l, texte) {
+  const zone = $('#session [data-vocal-proposition]');
+  if (!zone) return;
+  zone.innerHTML = '<p class="aide">Je réfléchis…</p>';
+  try {
+    const r = await api('POST', { op: 'vocal', lead_id: l.id, texte });
+    S.session.proposition = { leadId: l.id, r };
+    const resume = [r.note, r.relance_date && `Relance le ${dateLongue(r.relance_date)}${r.relance_action ? ` (${LIB_ACTION[r.relance_action].toLowerCase()})` : ''}`,
+      r.rdv_date && `RDV le ${dateLongue(r.rdv_date)}${r.rdv_heure ? ` à ${r.rdv_heure.replace(':', ' h ')}` : ''}${r.rdv_lieu ? `, ${r.rdv_lieu}` : ''}`, r.raison_perte].filter(Boolean).join('. ');
+    zone.innerHTML = `<div class="confirmation"><p><b>${esc(LIB_VOCAL[r.action])}</b>${r.action === 'appel' && r.resultat_appel ? ` (${esc({ joint: 'joint', sans_reponse: 'pas de réponse', message: 'message laissé' }[r.resultat_appel])})` : ''} : ${esc(r.confirmation)}</p>
+      ${resume ? `<p class="meta">${esc(resume)}</p>` : ''}<p class="meta">Tu as dit : « ${esc(texte)} »</p>
+      <div class="actions">${r.action !== 'incompris' ? '<button type="button" class="btn primaire" data-vocal="valider">Valider</button>' : ''}<button type="button" class="btn" data-vocal="${Reco ? 'parler' : 'effacer'}">Recommencer</button></div></div>`;
+    // Validation à la voix : « oui » valide, « non » efface (si le téléphone le permet sans toucher).
+    parler(r.confirmation + (r.action !== 'incompris' ? ' Je valide ?' : ''), () => {
+      if (!Reco || r.action === 'incompris' || !S.session || S.session.proposition?.r !== r) return;
+      ecouter(() => {}, (rep) => {
+        if (/^(oui|ok|ouais|d'accord|valide|vas-y|c'est bon|parfait)/i.test(rep)) validerVocal();
+        else if (/^(non|recommence|annule|efface)/i.test(rep)) { zone.innerHTML = ''; S.session.proposition = null; }
+      });
+    });
+  } catch (e) {
+    zone.innerHTML = `<p class="erreur" role="alert">${esc(e.message)}</p>`;
+  }
+}
+async function validerVocal() {
+  const prop = S.session && S.session.proposition;
+  if (!prop) return;
+  S.session.proposition = null;
+  const l = IDX.lead.get(prop.leadId);
+  const r = prop.r;
+  const t = aujourdhui();
+  const n = (l.relances_sans_reponse || 0) + 1;
+  const suite = (jours, action) => ({ prochaine_relance: r.relance_date || dansJours(jours), prochaine_action: r.relance_action || action, prochaine_note: r.note ? r.note.slice(0, 300) : null });
+  const contacte = l.statut === 'nouveau' ? { statut: 'contacte' } : {};
+  try {
+    if (r.action === 'passer') { S.session.passes.push(l.id); S.session.bilan.passe = (S.session.bilan.passe || 0) + 1; suivantSession(); return; }
+    if (r.action === 'appel' && r.resultat_appel === 'joint') {
+      await journal(l.id, { type: 'appel', resume: `Appel, joint${r.note ? ` : ${r.note}` : ''}`, source: 'crm', meta: { vocal: r.texte } }, { ...suite(7, 'email'), ...contacte, relances_sans_reponse: 0, dernier_contact: t });
+    } else if (r.action === 'appel') {
+      await journal(l.id, { type: 'appel_sans_reponse', resume: `${r.resultat_appel === 'message' ? 'Appel, message laissé' : 'Appel sans réponse'}${r.note ? ` : ${r.note}` : ''}`, source: 'crm', meta: { vocal: r.texte } }, { ...suite(delaiApres(n), 'appel'), ...contacte, relances_sans_reponse: n });
+    } else if (r.action === 'reponse') {
+      await journal(l.id, { type: 'email_recu', resume: `Réponse reçue${r.note ? ` : ${r.note}` : ''}`, source: 'crm', meta: { vocal: r.texte } }, { ...suite(7, 'email'), relances_sans_reponse: 0, dernier_contact: t });
+    } else if (r.action === 'note') {
+      await journal(l.id, { type: 'note', resume: r.note || r.texte, source: 'crm', meta: { vocal: r.texte } }, r.relance_date ? suite(0, l.prochaine_action) : null);
+    } else if (r.action === 'decaler') {
+      const date = r.relance_date || dansJours(1);
+      await journal(l.id, { type: 'relance_decalee', resume: `Relance déplacée au ${dateLongue(date)}${r.note ? ` : ${r.note}` : ''}`, source: 'crm', meta: { vocal: r.texte } }, { prochaine_relance: date, prochaine_action: r.relance_action || l.prochaine_action, prochaine_note: r.note || l.prochaine_note });
+    } else if (r.action === 'rdv') {
+      if (!r.rdv_date) throw new ErreurApi('Il manque la date du rendez-vous : redis-la.');
+      const heure = r.rdv_heure ? ` à ${r.rdv_heure.replace(':', ' h ').replace(/ h 00$/, ' h')}` : '';
+      const ct = contactPrincipal(l.id);
+      await journal(l.id, { type: 'rdv', resume: `RDV prévu le ${dateLongue(r.rdv_date)}${heure}${r.rdv_lieu ? `, ${r.rdv_lieu}` : ''}${r.note ? ` : ${r.note}` : ''}`, source: 'crm', meta: { date_rdv: r.rdv_date, heure: r.rdv_heure || null, lieu: r.rdv_lieu || null, vocal: r.texte } },
+        { prochaine_relance: r.rdv_date, prochaine_action: 'rdv', prochaine_note: `RDV${heure}${r.rdv_lieu ? `, ${r.rdv_lieu}` : ''}`, relances_sans_reponse: 0, dernier_contact: t, ...(['nouveau', 'contacte'].includes(l.statut) ? { statut: 'qualifie' } : {}) },
+        D.agenda ? { agenda: { date: r.rdv_date, heure: r.rdv_heure || null, duree: 30, lieu: r.rdv_lieu || null, titre: `RDV ${l.entreprise}${ct && nomContact(ct) ? ` avec ${nomContact(ct)}` : ''}`, description: r.note || '' } } : {});
+    } else if (r.action === 'perdu') {
+      await journal(l.id, { type: 'statut', resume: `Étape : ${LIB_STATUT[l.statut]}, puis Perdu${r.raison_perte ? ` : ${r.raison_perte}` : ''}`, source: 'crm', meta: { vocal: r.texte } }, { statut: 'perdu', raison_perte: r.raison_perte || null, prochaine_relance: null, prochaine_note: null });
+    } else return;
+    const nature = { appel: 'appel', reponse: 'note', note: 'note', decaler: 'decale', rdv: 'rdv', perdu: 'perdu' }[r.action];
+    toast('Noté.', 1500);
+    actionFaite(l.id, nature);
+  } catch (e) {
+    const zone = $('#session [data-vocal-proposition]');
+    if (zone) zone.innerHTML = `<p class="erreur" role="alert">${esc(e.message)}</p>`;
+  }
+}
+document.addEventListener('click', (ev) => {
+  const b = ev.target.closest('[data-vocal]');
+  if (!b || !S.session) return;
+  const l = IDX.lead.get(S.session.ids[S.session.i]);
+  if (!l) return;
+  const sorte = b.dataset.vocal;
+  if (sorte === 'lire') parler(texteFiche(l));
+  else if (sorte === 'valider') validerVocal();
+  else if (sorte === 'effacer') { $('#session [data-vocal-proposition]').innerHTML = ''; S.session.proposition = null; }
+  else if (sorte === 'ecrit') { const champ = $('#session [data-vocal-saisie]'); if (champ.value.trim()) interpreter(l, champ.value.trim()); }
+  else if (sorte === 'parler') {
+    if (window.speechSynthesis) speechSynthesis.cancel();
+    const zoneTexte = $('#session [data-vocal-texte]');
+    const micro = $('#session [data-vocal="parler"]');
+    micro.classList.add('ecoute');
+    micro.textContent = "J'écoute…";
+    ecouter((t) => { zoneTexte.textContent = t; }, (t) => {
+      micro.classList.remove('ecoute');
+      micro.textContent = 'Appuie et parle';
+      if (!t) { zoneTexte.textContent = ERREURS.micro; return; }
+      if (/^(suivant|passe|au suivant)\.?$/i.test(t)) { S.session.proposition = { leadId: l.id, r: { action: 'passer' } }; validerVocal(); return; }
+      interpreter(l, t);
+    });
+  }
+});
+document.addEventListener('keydown', (ev) => {
+  if (ev.key === 'Enter' && ev.target.matches('[data-vocal-saisie]') && S.session) { ev.preventDefault(); const l = IDX.lead.get(S.session.ids[S.session.i]); if (l && ev.target.value.trim()) interpreter(l, ev.target.value.trim()); }
+});
+
+/* ----- Dicter dans les champs des fenêtres ----- */
+function brancherDictee(form) {
+  if (!Reco) return;
+  for (const champ of $$('textarea, input[name="resume"], input[name="consigne"], input[name="apres_note"]', form)) {
+    if (champ.name === 'texte' || champ.dataset.dictee) continue;
+    champ.dataset.dictee = '1';
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'btn petit btn-dictee';
+    b.textContent = 'Dicter';
+    b.addEventListener('click', () => {
+      const avant = champ.value;
+      b.textContent = "J'écoute…";
+      ecouter((t) => { champ.value = (avant ? `${avant} ` : '') + t; }, () => { b.textContent = 'Dicter'; champ.dispatchEvent(new Event('input')); });
+    });
+    champ.insertAdjacentElement('afterend', b);
+  }
+}
 
 /* ----- À trier : emails et RDV de personnes inconnues du CRM ----- */
 
@@ -2653,10 +2827,10 @@ function rendreSession() {
   const mobile = mobileDe(l);
   const prim = (a) => (l.prochaine_action === a ? ' primaire' : '');
   const acts = activitesDe(l.id).filter((a) => a.type !== 'import').slice(0, 3);
-  d.innerHTML = `<div class="session-cadre" data-id="${l.id}">
+  d.innerHTML = `<div class="session-cadre${s.vocal ? ' mode-vocal' : ''}" data-id="${l.id}">
     <header class="session-tete">
       <div><p class="surtitre">${esc(s.titre)}</p><p class="pos">${s.i + 1} sur ${n}</p></div>
-      <button type="button" class="btn" data-sess="fin" aria-label="Terminer l'enchaînement">Terminer ✕</button>
+      <div class="actions"><button type="button" class="btn${s.vocal ? ' primaire' : ''}" data-sess="vocal" aria-pressed="${Boolean(s.vocal)}">À la voix</button><button type="button" class="btn" data-sess="fin" aria-label="Terminer l'enchaînement">Terminer ✕</button></div>
       <div class="progression" role="progressbar" aria-label="Avancement" aria-valuemin="0" aria-valuemax="${n}" aria-valuenow="${s.i}"><span style="width:${Math.round((s.i / n) * 100)}%"></span></div>
     </header>
     <div class="session-corps">
@@ -2673,6 +2847,7 @@ function rendreSession() {
         ${l.prochaine_note ? `<p style="margin-top:4px">${esc(l.prochaine_note)}</p>` : ''}
         ${l.relances_sans_reponse ? `<p class="meta" style="margin-top:4px">${l.relances_sans_reponse} relance${l.relances_sans_reponse > 1 ? 's' : ''} sans réponse.</p>` : ''}
       </div>
+      ${s.vocal ? panneauVocal() : ''}
       ${l.besoin ? `<p><span class="meta">Besoin :</span> ${esc(l.besoin)}</p>` : ''}
       ${acts.length ? `<p class="meta">Derniers échanges</p><ul class="derniers">${acts.map((a) => `<li><span class="quand">${esc(LIB_ACTIVITE[a.type] || a.type)}, ${esc(instantLisible(a.date))}</span><br>${esc(a.resume.length > 220 ? a.resume.slice(0, 220) + '…' : a.resume)}</li>`).join('')}</ul>` : ''}
     </div>
@@ -2688,6 +2863,8 @@ function rendreSession() {
       <button type="button" class="btn" data-sess="passer">Passer <kbd>P</kbd></button>
     </div></div>`;
   chargerLogos();
+  // À l'oral, chaque nouvelle fiche est lue une fois.
+  if (s.vocal && s.luPour !== l.id) { s.luPour = l.id; setTimeout(() => parler(texteFiche(l)), 250); }
 }
 
 function sauverSession() {
@@ -2705,7 +2882,7 @@ function reprendreSessionSauvee() {
     toast('Enchaînement repris là où tu en étais.');
   } catch { sessionStorage.removeItem('crm_session'); }
 }
-function suivantSession() { if (!S.session) return; S.session.i++; rendreSession(); $('#session').scrollTop = 0; }
+function suivantSession() { if (!S.session) return; S.session.i++; S.session.proposition = null; rendreSession(); $('#session').scrollTop = 0; }
 // Appelée après chaque action réussie : on note, puis on passe au lead suivant.
 function actionFaite(leadId, nature) {
   const s = S.session;
@@ -2724,6 +2901,12 @@ document.addEventListener('click', (ev) => {
   else if (sorte === 'fin') { s.ids = s.ids.slice(0, s.i); rendreSession(); }
   else if (sorte === 'reprendre') demarrerSession(s.passes, `${s.titre}, leads passés`);
   else if (sorte === 'fermer') { $('#session').close(); }
+  else if (sorte === 'vocal') {
+    s.vocal = !s.vocal;
+    s.luPour = null;
+    if (!s.vocal && window.speechSynthesis) speechSynthesis.cancel();
+    rendreSession();
+  }
 });
 $('#session').addEventListener('close', () => {
   if (S.session && S.session.i >= S.session.ids.length) { S.session = null; sauverSession(); }
