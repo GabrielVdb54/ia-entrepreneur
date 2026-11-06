@@ -462,7 +462,7 @@ const actionLue = (a) => (a === 'autre' ? 'À faire' : LIB_ACTION[a] || 'Relance
 const LIB_ACTIVITE = {
   note: 'Note', appel: 'Appel', appel_sans_reponse: 'Appel sans réponse', email_envoye: 'Email envoyé',
   email_recu: 'Réponse reçue', brouillon: 'Brouillon Gmail', rdv: 'Rendez-vous', sms: 'SMS',
-  relance_decalee: 'Relance déplacée', statut: 'Statut', import: 'Import',
+  relance_decalee: 'Relance déplacée', statut: 'Statut', import: 'Import', linkedin: 'LinkedIn',
 };
 const LIB_SOURCE = {
   pomolow: 'Pomolow', gmail: 'Gmail', hubspot: 'HubSpot', agenda: 'Agenda', fathom: 'Fathom',
@@ -759,6 +759,7 @@ function carte(l, { compacte = false } = {}) {
       ${sms ? '<button type="button" class="btn petit" data-act="sms">SMS</button>' : ''}
       <button type="button" class="btn petit" data-act="appel">Noter un appel</button>
       <button type="button" class="btn petit" data-act="decaler">Décaler</button>
+      <button type="button" class="btn petit lien" data-act="perdu">Perdu</button>
     </div>`}
   </article>`;
 }
@@ -796,6 +797,7 @@ function vueJour() {
     </div>`;
     S.dusDuJour = { tout: dus.map((l) => l.id), email: emails.map((l) => l.id), appel: appels.map((l) => l.id), autre: autres.map((l) => l.id) };
   }
+  h += blocATrier();
   if (retard.length) h += `<h2 class="groupe retard" id="g-retard">En retard <span>${retard.length}</span></h2><div class="grille">${retard.map((l) => carte(l)).join('')}</div>`;
   h += `<h2 class="groupe" id="g-jour">Aujourd'hui <span>${jour.length}</span></h2>`;
   const prochain = semaine[0] || D.leads.filter((l) => !l.archive && l.prochaine_relance > fin).sort((a, b) => a.prochaine_relance.localeCompare(b.prochaine_relance))[0];
@@ -935,6 +937,7 @@ function rendreFiche() {
         <button type="button" class="btn" data-act="rdv">Prévoir un RDV</button>
         <button type="button" class="btn" data-act="reponse">Réponse reçue</button>
         <button type="button" class="btn" data-act="note">Ajouter une note</button>
+        <button type="button" class="btn" data-act="linkedin">LinkedIn</button>
       </div>
     </section>
     <section class="bloc">
@@ -945,6 +948,7 @@ function rendreFiche() {
           ${c.poste ? `<span class="meta">${esc(c.poste)}</span>` : ''}
           ${c.email ? `<span>${esc(c.email)}</span>` : ''}
           ${c.telephone ? `<a href="${esc(telLien(c.telephone))}" data-act="tel">${esc(c.telephone)}</a>` : ''}
+          ${lienLinkedin(c.linkedin)}
           ${c.notes ? `<span class="meta">${esc(c.notes)}</span>` : ''}
         </div></div>
         <div class="contact-actions">
@@ -1061,8 +1065,8 @@ function piedFormulaire(boutons) {
 function brancherAnnuler(form) { $$('[data-fermer]', form).forEach((b) => b.addEventListener('click', fermerModale)); }
 function montrerErreur(form, message, champFautif = null) { const e = $('[data-erreur]', form); e.textContent = message; e.hidden = false; if (champFautif) champFautif.focus(); }
 
-async function journal(leadId, activite, majLead) {
-  const r = await api('POST', { op: 'journal', lead_id: leadId, activite, lead: majLead || undefined });
+async function journal(leadId, activite, majLead, extra = {}) {
+  const r = await api('POST', { op: 'journal', lead_id: leadId, activite, lead: majLead || undefined, ...extra });
   ajouterActivite(r.activite);
   remplacerLead(r.lead);
   indexer();
@@ -1093,11 +1097,190 @@ async function soumettre(form, travail) {
 
 const enSession = () => Boolean(S.session && $('#session').open);
 
+/* ----- À trier : emails et RDV de personnes inconnues du CRM ----- */
+
+function blocATrier() {
+  const es = D.entrants || [];
+  if (!es.length) return '';
+  return `<h2 class="groupe" id="g-trier">À trier <span>${es.length}</span></h2>
+    <p class="sous-titre">Emails et rendez-vous de personnes qui ne sont pas encore dans ton CRM. Les newsletters et l'équipe sont déjà écartées.</p>
+    <div class="grille">${es.map((e) => {
+      const qui = e.de_nom || e.de_email || 'Inconnu';
+      return `<article class="carte" data-entrant="${e.id}">
+        <div class="carte-haut"><span class="avatar a-m a-rond" style="--h:${teinte(qui)}" aria-hidden="true">${esc(initiales(qui))}</span>
+          <div class="carte-titre"><h3>${esc(qui)}</h3><p class="meta">${esc(e.de_email || '')}</p></div>
+          <span class="statut">${e.canal === 'agenda' ? 'RDV' : 'Email'}</span></div>
+        <p class="relance">${esc(e.objet || '')}</p>
+        ${e.extrait ? `<p class="extrait">${esc(e.extrait)}</p>` : ''}
+        <p class="meta">Reçu le ${esc(instantLisible(e.recu_le))}</p>
+        <div class="carte-actions">
+          <button type="button" class="btn petit primaire" data-entrant-act="creer">Créer le lead</button>
+          <button type="button" class="btn petit" data-entrant-act="rattacher">Rattacher à un lead</button>
+          <button type="button" class="btn petit" data-entrant-act="ignorer">Ignorer</button>
+          <button type="button" class="btn petit lien" data-entrant-act="ignorer_toujours">Toujours ignorer</button>
+        </div></article>`;
+    }).join('')}</div>`;
+}
+function nomDepuisDomaine(email) {
+  const d = String(email || '').split('@')[1] || '';
+  if (!d || WEBMAILS.test(d)) return '';
+  return d.split('.').slice(0, -1).join(' ').replace(/[-_]+/g, ' ').replace(/\b\p{L}/gu, (c) => c.toUpperCase());
+}
+function ouvrirEntrantCreer(e) {
+  const [prenom, ...reste] = String(e.de_nom || '').split(/\s+/).filter(Boolean);
+  ouvrirModale(`<h2>Créer le lead</h2>
+    <p class="aide">${esc(e.de_nom || '')} ${esc(e.de_email || '')} : « ${esc(e.objet || '')} »</p>
+    ${champ('Entreprise', `<input type="text" name="entreprise" required autofocus value="${esc(nomDepuisDomaine(e.de_email) || e.de_nom || '')}">`)}
+    <div class="deux">${champ('Prénom', `<input type="text" name="prenom" value="${esc(prenom || '')}">`)}${champ('Nom', `<input type="text" name="nom" value="${esc(reste.join(' '))}">`)}</div>
+    ${champ('Besoin', `<textarea name="besoin">${esc(e.objet || '')}</textarea>`)}
+    ${champ('Source', `<input type="text" name="source" list="liste-sources" value="${e.canal === 'agenda' ? 'RDV pris dans ton agenda' : 'Email reçu'}">`)}
+    <datalist id="liste-sources">${sources().map((x) => `<option value="${esc(x)}">`).join('')}</datalist>
+    <p class="aide">${e.canal === 'agenda' ? 'Le rendez-vous devient la prochaine relance.' : "Le message va dans l'historique et le lead est à traiter aujourd'hui."}</p>
+    ${piedFormulaire('<button type="submit" class="btn primaire">Créer le lead</button>')}`, (form) => {
+    brancherAnnuler(form);
+    form.addEventListener('submit', (ev) => {
+      ev.preventDefault();
+      soumettre(form, async () => {
+        const el = form.elements;
+        if (!el.entreprise.value.trim()) throw new ErreurApi("Il manque le nom de l'entreprise.");
+        const r = await api('POST', { op: 'entrant', id: e.id, action: 'creer', lead: { entreprise: el.entreprise.value, besoin: el.besoin.value, source: el.source.value }, contact: { prenom: el.prenom.value, nom: el.nom.value } });
+        fermerModale();
+        await actualiser();
+        ouvrirFiche(r.lead_id);
+        toast('Lead créé.');
+      });
+    });
+  });
+}
+function ouvrirEntrantRattacher(e) {
+  const ls = D.leads.filter((l) => !l.archive).sort((a, b) => a.entreprise.localeCompare(b.entreprise, 'fr'));
+  ouvrirModale(`<h2>Rattacher à un lead</h2>
+    <p class="aide">${esc(e.de_nom || '')} ${esc(e.de_email || '')} : « ${esc(e.objet || '')} »</p>
+    ${champ('Lead', `<select name="lead" autofocus>${ls.map((l) => `<option value="${l.id}">${esc(l.entreprise)}</option>`).join('')}</select>`, "L'adresse est ajoutée aux contacts du lead si elle n'y est pas.")}
+    ${piedFormulaire('<button type="submit" class="btn primaire">Rattacher</button>')}`, (form) => {
+    brancherAnnuler(form);
+    form.addEventListener('submit', (ev) => {
+      ev.preventDefault();
+      soumettre(form, async () => {
+        const id = form.elements.lead.value;
+        await api('POST', { op: 'entrant', id: e.id, action: 'rattacher', lead_id: id });
+        fermerModale();
+        await actualiser();
+        toast(`Rattaché à ${IDX.lead.get(id)?.entreprise || 'ce lead'}.`);
+      });
+    });
+  });
+}
+document.addEventListener('click', async (ev) => {
+  const b = ev.target.closest('[data-entrant-act]');
+  if (!b) return;
+  ev.stopPropagation();
+  const id = b.closest('[data-entrant]').dataset.entrant;
+  const e = (D.entrants || []).find((x) => x.id === id);
+  if (!e) return;
+  const act = b.dataset.entrantAct;
+  if (act === 'creer') return ouvrirEntrantCreer(e);
+  if (act === 'rattacher') return ouvrirEntrantRattacher(e);
+  if (act === 'ignorer_toujours' && !confirm(`Ne plus jamais trier les messages de ${e.de_email} ?`)) return;
+  try {
+    await api('POST', { op: 'entrant', id, action: act });
+    D.entrants = D.entrants.filter((x) => x.id !== id && (act !== 'ignorer_toujours' || x.de_email !== e.de_email));
+    rendre();
+    toast(act === 'ignorer' ? 'Ignoré.' : `Les messages de ${e.de_email} ne seront plus triés.`);
+  } catch (err) { toast(err.message); }
+});
+
+/* ----- Synchro de la boîte et de l'agenda ----- */
+
+function resumeSynchro(r) {
+  const g = r.gmail || {}, a = r.agenda || {};
+  const n = (g.reponses || 0) + (g.nouveaux || 0) + (a.rdv || 0) + (a.nouveaux || 0);
+  const morceaux = [g.reponses && `${g.reponses} réponse${g.reponses > 1 ? 's' : ''}`, (g.nouveaux || a.nouveaux) && `${(g.nouveaux || 0) + (a.nouveaux || 0)} à trier`, a.rdv && `${a.rdv} RDV`].filter(Boolean);
+  return { n, texte: morceaux.join(', ') };
+}
+// À l'ouverture, une synchro discrète si la dernière date de plus de 10 minutes.
+function synchroDiscrete() {
+  if (!D || !D.gmail) return;
+  const le = D.reglages.synchro_gmail && D.reglages.synchro_gmail.le;
+  if (le && Date.now() - Date.parse(le) < 600000) return;
+  api('POST', { op: 'synchro' }).then(async (r) => {
+    const { n, texte } = resumeSynchro(r);
+    if (n) { await actualiser(); toast(`Boîte et agenda : ${texte}.`, 5000); }
+  }).catch(() => {});
+}
+
+/* ----- LinkedIn ----- */
+
+const LINKEDIN_RE = /^https:\/\/([a-z]{2,3}\.)?linkedin\.com\/in\/[^\s"'<>]+$/;
+// Seule une vraie adresse de profil devient un lien (sinon un « javascript: » passerait).
+const lienLinkedin = (url) => (url && LINKEDIN_RE.test(url) ? `<a href="${esc(url)}" target="_blank" rel="noopener noreferrer">Profil LinkedIn</a>` : '');
+const ERREUR_LINKEDIN = "Colle l'adresse du profil, du type https://www.linkedin.com/in/…";
+const ETAPES_LINKEDIN = [
+  ['invitation', 'Invitation envoyée', 3, "LinkedIn : voir si l'invitation est acceptée"],
+  ['acceptee', 'Invitation acceptée', 1, 'LinkedIn : envoyer le message 1'],
+  ['message', 'Message envoyé', 4, 'LinkedIn : relance si pas de réponse'],
+  ['relance', 'Relance envoyée', 4, 'LinkedIn : dernier message (FindIA), puis on arrête'],
+  ['reponse', 'Réponse reçue', 1, 'LinkedIn : répondre'],
+  ['autre', 'Autre', null, ''],
+];
+function ouvrirLinkedin(leadId) {
+  const l = IDX.lead.get(leadId);
+  const c = contactPrincipal(leadId);
+  const profil = contactsDe(leadId).map((x) => x.linkedin).find((u) => u && LINKEDIN_RE.test(u));
+  ouvrirModale(`<h2>Action LinkedIn : ${esc(l.entreprise)}</h2>
+    ${profil ? `<p><a class="btn petit" href="${esc(profil)}" target="_blank" rel="noopener noreferrer">Ouvrir le profil LinkedIn</a></p>` : ''}
+    <fieldset><legend>Étape</legend><div class="puces" data-etapes>${ETAPES_LINKEDIN.map(([k, lib], i) => `<button type="button" data-v="${k}" aria-pressed="${i === 0}">${esc(lib)}</button>`).join('')}</div></fieldset>
+    <div class="deux">${champ('Quand', `<input type="datetime-local" name="date" value="${esc(localPourInput())}">`)}${contactsDe(leadId).length ? champ('Qui', `<select name="contact">${optionsContacts(leadId, c && c.id)}</select>`) : ''}</div>
+    ${champ('En une phrase (facultatif)', '<input type="text" name="resume" placeholder="Par défaut : le nom de l\'étape">')}
+    ${champ('Texte du message (facultatif)', '<textarea name="contenu"></textarea>')}
+    ${blocProchaine('apres', dansJours(3), 'autre', ETAPES_LINKEDIN[0][3])}
+    ${piedFormulaire('<button type="submit" class="btn primaire">Enregistrer</button>')}`, (form) => {
+    brancherAnnuler(form);
+    brancherPuces(form, 'apres');
+    const el = form.elements;
+    let etape = 'invitation';
+    $$('[data-etapes] button', form).forEach((b) => b.addEventListener('click', () => {
+      etape = b.dataset.v;
+      $$('[data-etapes] button', form).forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
+      const def = ETAPES_LINKEDIN.find((x) => x[0] === etape);
+      if (def[2] !== null) {
+        el.apres_date.value = dansJours(def[2]);
+        el.apres_note.value = def[3];
+        el.apres_action.value = 'autre';
+        el.apres_date.dispatchEvent(new Event('input'));
+      }
+    }));
+    form.addEventListener('submit', (ev) => {
+      ev.preventDefault();
+      soumettre(form, async () => {
+        const def = ETAPES_LINKEDIN.find((x) => x[0] === etape);
+        const jour = (el.date.value || aujourdhui()).slice(0, 10);
+        const maj = lireProchaine(form, 'apres');
+        // Compteurs : un message ou une réponse ouvre l'échange, une relance compte comme les autres.
+        if (etape === 'message') { maj.relances_sans_reponse = 0; maj.dernier_contact = jour; if (l.statut === 'nouveau') maj.statut = 'contacte'; }
+        if (etape === 'relance') { maj.relances_sans_reponse = (l.relances_sans_reponse || 0) + 1; maj.dernier_contact = jour; }
+        if (etape === 'reponse') { maj.relances_sans_reponse = 0; maj.dernier_contact = jour; }
+        await journal(l.id, { type: 'linkedin', resume: el.resume.value.trim() || def[1], contenu: el.contenu.value.trim() || null, date: el.date.value ? new Date(el.date.value).toISOString() : new Date().toISOString(), contact_id: el.contact ? el.contact.value || null : null, source: 'crm', meta: { canal: 'linkedin', etape } }, maj);
+        fermerModale();
+        toast('Action LinkedIn notée.');
+        actionFaite(l.id, 'linkedin');
+      });
+    });
+  });
+}
+
+// La salutation suit toujours la personne à qui le message part : on remplace
+// « Bonjour X, » au début du texte quand le destinataire change.
+function salutation(contact) { return `Bonjour${contact && contact.prenom ? ` ${contact.prenom}` : ''},`; }
+function changerSalutation(zone, contact) {
+  if (/^Bonjour( [^,\n]{1,60})?,/.test(zone.value)) zone.value = zone.value.replace(/^Bonjour( [^,\n]{1,60})?,/, salutation(contact));
+}
+
 /* ----- Personnaliser avec mes notes (Claude rédige, Gabriel relit) ----- */
 
 function derniereNote(leadId) {
   // D'abord un vrai échange (appel, email, SMS, RDV, réponse), sinon la dernière note.
-  const echanges = ['appel', 'appel_sans_reponse', 'email_envoye', 'email_recu', 'rdv', 'sms'];
+  const echanges = ['appel', 'appel_sans_reponse', 'email_envoye', 'email_recu', 'rdv', 'sms', 'linkedin'];
   const acts = activitesDe(leadId);
   const a = acts.find((x) => echanges.includes(x.type)) || acts.find((x) => x.type === 'note' && x.source === 'crm') || acts.find((x) => x.type === 'note');
   if (!a) return '';
@@ -1231,7 +1414,7 @@ function ouvrirEmail(leadId, contactId) {
   const n = (l.relances_sans_reponse || 0) + 1;
   const date = dansJours(delaiApres(n));
   const etapeTexte = n <= CADENCE.length ? `relance ${n} sur ${CADENCE.length} du rythme, dans ${delaiApres(n)} jours` : 'prise de nouvelles dans 3 mois, les relances du rythme sont faites';
-  const corpsDepart = `Bonjour${c && c.prenom ? ` ${c.prenom}` : ''},\n\n\n\n${signature}`;
+  const corpsDepart = `${salutation(c)}\n\n\n\n${signature}`;
   ouvrirModale(`
     <h2>Écrire à ${esc(l.entreprise)}</h2>
     <p class="de">De : <b>${esc(D.expediteur || COMPTE)}</b>.${D.gmail ? ' Le message ira dans tes Envoyés Gmail.' : ''}</p>
@@ -1258,6 +1441,7 @@ function ouvrirEmail(leadId, contactId) {
     el.a_contact.addEventListener('change', () => {
       $('[data-autre]', form).hidden = el.a_contact.value !== 'autre';
       c = contactChoisi();
+      changerSalutation(el.corps, c);
     });
     el.modele.addEventListener('change', () => {
       const m = D.modeles.find((x) => x.id === el.modele.value);
@@ -1442,6 +1626,7 @@ function ouvrirRdv(leadId) {
       ${champ('Heure', '<input type="time" name="heure" value="10:00">')}
     </div>
     ${champ('Où', '<input type="text" name="lieu" placeholder="Visio, dans leurs locaux à Nancy…">')}
+    ${D.agenda ? `<div class="deux">${champ('Durée', `<select name="duree">${options([['30', '30 minutes'], ['45', '45 minutes'], ['60', '1 heure'], ['90', '1 h 30']], '30')}</select>`)}<label class="case" style="align-self:end;padding-bottom:10px"><input type="checkbox" name="agenda" checked> Ajouter à mon agenda Google</label></div>` : ''}
     ${contactsDe(leadId).length ? champ('Avec', `<select name="contact">${optionsContacts(leadId, c && c.id)}</select>`) : ''}
     ${champ('Objet du RDV (facultatif)', '<textarea name="note" placeholder="Présenter le niveau 2, découverte des besoins…"></textarea>')}
     ${champ('Étape', `<select name="statut">${options(STATUTS, ['nouveau', 'contacte'].includes(l.statut) ? 'qualifie' : l.statut)}</select>`)}
@@ -1458,11 +1643,17 @@ function ouvrirRdv(leadId) {
         const ou = el.lieu.value.trim();
         const note = el.note.value.trim();
         const texte = `RDV prévu le ${dateLongue(el.date.value)}${heure}${ou ? `, ${ou}` : ''}${note ? ` : ${note}` : ''}`;
-        await journal(l.id, { type: 'rdv', resume: texte, contact_id: el.contact ? el.contact.value || null : null, source: 'crm', meta: { date_rdv: el.date.value, heure: el.heure.value || null, lieu: ou || null } }, {
+        const ct = el.contact ? contactsDe(l.id).find((x) => x.id === el.contact.value) : null;
+        const agenda = el.agenda && el.agenda.checked ? { agenda: {
+          date: el.date.value, heure: el.heure.value || null, duree: Number(el.duree.value), lieu: ou || null,
+          titre: `RDV ${l.entreprise}${ct && nomContact(ct) ? ` avec ${nomContact(ct)}` : ''}`,
+          description: [note, ct && ct.email, ct && ct.telephone].filter(Boolean).join('\n'),
+        } } : {};
+        const rRdv = await journal(l.id, { type: 'rdv', resume: texte, contact_id: el.contact ? el.contact.value || null : null, source: 'crm', meta: { date_rdv: el.date.value, heure: el.heure.value || null, lieu: ou || null } }, {
           prochaine_relance: el.date.value, prochaine_action: 'rdv', prochaine_note: `RDV${heure}${ou ? `, ${ou}` : ''}`, statut: el.statut.value, relances_sans_reponse: 0, dernier_contact: aujourdhui(),
-        });
+        }, agenda);
         fermerModale();
-        toast('Rendez-vous noté.');
+        toast(rRdv.agenda === true ? 'Rendez-vous noté et ajouté à ton agenda.' : rRdv.agenda === false ? "Rendez-vous noté, mais pas ajouté à l'agenda : ajoute-le à la main." : 'Rendez-vous noté.', 5000);
         actionFaite(l.id, 'rdv');
       });
     });
@@ -1477,7 +1668,7 @@ function ouvrirNote(leadId, type = 'note') {
   ouvrirModale(`
     <h2>${reponse ? 'Réponse reçue' : "Ajouter à l'historique"}</h2>
     <div class="deux">
-      ${champ('Type', `<select name="type">${options([['note', 'Note'], ['email_recu', 'Réponse reçue (email, SMS, WhatsApp)'], ['appel', 'Appel'], ['rdv', 'Rendez-vous passé']], type)}</select>`)}
+      ${champ('Type', `<select name="type">${options([['note', 'Note'], ['email_recu', 'Réponse reçue (email, SMS, WhatsApp)'], ['appel', 'Appel'], ['rdv', 'Rendez-vous passé'], ['linkedin', 'LinkedIn']], type)}</select>`)}
       ${champ('Quand', `<input type="datetime-local" name="date" value="${esc(localPourInput())}">`)}
     </div>
     ${contactsDe(leadId).length ? champ('Qui', `<select name="contact">${optionsContacts(leadId, (contactPrincipal(leadId) || {}).id)}</select>`) : ''}
@@ -1523,18 +1714,20 @@ function ouvrirContact(leadId, contactId) {
     <div class="deux">${champ('Prénom', `<input type="text" name="prenom" value="${esc(c?.prenom)}" autofocus>`)}${champ('Nom', `<input type="text" name="nom" value="${esc(c?.nom)}">`)}</div>
     ${champ('Poste', `<input type="text" name="poste" value="${esc(c?.poste)}">`)}
     <div class="deux">${champ('Email', `<input type="email" name="email" value="${esc(c?.email)}" autocomplete="off">`)}${champ('Téléphone', `<input type="tel" name="telephone" value="${esc(c?.telephone)}">`)}</div>
+    ${champ('Profil LinkedIn', `<input type="url" name="linkedin" value="${esc(c?.linkedin)}" placeholder="https://www.linkedin.com/in/…">`)}
     ${champ('Notes', `<textarea name="notes">${esc(c?.notes)}</textarea>`)}
     <label class="case"><input type="checkbox" name="principal" ${c?.principal || (!c && !contactsDe(leadId).length) ? 'checked' : ''}> Contact principal</label>
     ${piedFormulaire(`${c ? '<button type="button" class="btn danger" data-supprimer>Supprimer</button>' : ''}<button type="submit" class="btn primaire">Enregistrer</button>`)}
   `, (form) => {
     brancherAnnuler(form);
     const el = form.elements;
-    const valeurs = () => ({ lead_id: leadId, prenom: el.prenom.value, nom: el.nom.value, poste: el.poste.value, email: el.email.value, telephone: el.telephone.value, notes: el.notes.value, principal: el.principal.checked });
+    const valeurs = () => ({ lead_id: leadId, prenom: el.prenom.value, nom: el.nom.value, poste: el.poste.value, email: el.email.value, telephone: el.telephone.value, notes: el.notes.value, linkedin: el.linkedin.value.trim(), principal: el.principal.checked });
     form.addEventListener('submit', (ev) => {
       ev.preventDefault();
       soumettre(form, async () => {
         const v = valeurs();
         if (v.email && !/^[^@\s]+@[^@\s.]+(\.[^@\s.]+)+$/.test(v.email.trim())) throw new ErreurApi('Adresse email invalide.');
+        if (v.linkedin && !LINKEDIN_RE.test(v.linkedin)) throw new ErreurApi(ERREUR_LINKEDIN);
         if (v.principal) {
           for (const autre of contactsDe(leadId).filter((x) => x.principal && x.id !== contactId)) {
             const r = await api('POST', { op: 'maj', table: 'contacts', id: autre.id, valeurs: { principal: false } });
@@ -1612,7 +1805,7 @@ function ouvrirNouveau() {
     <datalist id="liste-sources">${sources().map((s) => `<option value="${esc(s)}">`).join('')}</datalist>
     <div class="deux">${champ('Prénom', '<input type="text" name="prenom">')}${champ('Nom', '<input type="text" name="nom">')}</div>
     <div class="deux">${champ('Email', '<input type="email" name="email" autocomplete="off">')}${champ('Téléphone', '<input type="tel" name="telephone">')}</div>
-    ${champ('Poste', '<input type="text" name="poste">')}
+    <div class="deux">${champ('Poste', '<input type="text" name="poste">')}${champ('Profil LinkedIn', '<input type="url" name="linkedin" placeholder="https://www.linkedin.com/in/…">')}</div>
     ${champ('Besoin', '<textarea name="besoin" placeholder="Ce qu\'il cherche, où on s\'est vus"></textarea>')}
     ${blocProchaine('apres', dansJours(1), 'email', 'Premier contact', { vide: false })}
     ${piedFormulaire('<button type="submit" class="btn primaire">Créer le lead</button>')}`, (form) => {
@@ -1630,8 +1823,9 @@ function ouvrirNouveau() {
         if (doublon && !confirm(`${doublon.entreprise} est déjà dans le CRM. Créer un nouveau lead quand même ?`)) { ouvrirFiche(doublon.id); fermerModale(); return; }
         const r = await api('POST', { op: 'creer', table: 'leads', valeurs: { entreprise: el.entreprise.value, type: el.type.value, source: el.source.value, besoin: el.besoin.value, ...lireProchaine(form, 'apres') } });
         D.leads.push(r.ligne);
-        if (el.prenom.value.trim() || el.nom.value.trim() || el.email.value.trim() || el.telephone.value.trim()) {
-          const rc = await api('POST', { op: 'creer', table: 'contacts', valeurs: { lead_id: r.ligne.id, prenom: el.prenom.value, nom: el.nom.value, email: el.email.value, telephone: el.telephone.value, poste: el.poste.value, principal: true } });
+        if (el.linkedin.value.trim() && !LINKEDIN_RE.test(el.linkedin.value.trim())) throw new ErreurApi(ERREUR_LINKEDIN);
+        if (el.prenom.value.trim() || el.nom.value.trim() || el.email.value.trim() || el.telephone.value.trim() || el.linkedin.value.trim()) {
+          const rc = await api('POST', { op: 'creer', table: 'contacts', valeurs: { lead_id: r.ligne.id, prenom: el.prenom.value, nom: el.nom.value, email: el.email.value, telephone: el.telephone.value, poste: el.poste.value, linkedin: el.linkedin.value.trim(), principal: true } });
           D.contacts.push(rc.ligne);
         }
         indexer(); rendre(); fermerModale();
@@ -1731,6 +1925,10 @@ function ouvrirReglages() {
     ${champ('Signature des emails', `<textarea name="signature">${esc(D.reglages.signature || SIGNATURE_DEFAUT)}</textarea>`, 'Ajoutée en bas de chaque email écrit depuis le CRM.')}
     <div><button type="submit" class="btn primaire">Enregistrer la signature</button></div>
     <div class="alerte">Rythme des relances tant que personne ne répond : 3 jours après le premier contact, puis 7, puis 14, puis une prise de nouvelles tous les 3 mois. Les week-ends et jours fériés sont sautés. Tu peux toujours décaler à la main.</div>
+    ${D.gmail ? `<fieldset><legend>Boîte et agenda</legend>
+      <p class="aide">Synchronisés toutes les 15 minutes. Dernière lecture de la boîte : ${D.reglages.synchro_gmail && D.reglages.synchro_gmail.le ? esc(instantLisible(D.reglages.synchro_gmail.le)) : 'jamais'}.</p>
+      <div class="actions"><button type="button" class="btn" data-synchro>Synchroniser maintenant</button></div>
+      <label class="case"><input type="checkbox" data-rappel ${D.reglages.rappel_matin === 'non' ? '' : 'checked'}> M'envoyer chaque matin à 7 h (lundi au vendredi) le récapitulatif de mes relances</label></fieldset>` : ''}
     <fieldset><legend>Sauvegarde</legend><div class="actions">
       <button type="button" class="btn" data-export="csv">Exporter les leads (CSV)</button>
       <button type="button" class="btn" data-export="json">Tout télécharger (JSON)</button>
@@ -1748,6 +1946,27 @@ function ouvrirReglages() {
       });
     });
     $('[data-export="csv"]', form).addEventListener('click', () => exporterCsv());
+    const caseRappel = $('[data-rappel]', form);
+    if (caseRappel) caseRappel.addEventListener('change', async () => {
+      try {
+        const r = await api('POST', { op: 'reglage', cle: 'rappel_matin', valeur: caseRappel.checked ? 'oui' : 'non' });
+        D.reglages.rappel_matin = r.reglage.valeur;
+        toast(caseRappel.checked ? 'Récapitulatif du matin activé.' : 'Récapitulatif du matin coupé.');
+      } catch (e) { toast(e.message); caseRappel.checked = !caseRappel.checked; }
+    });
+    const boutonSynchro = $('[data-synchro]', form);
+    if (boutonSynchro) boutonSynchro.addEventListener('click', async () => {
+      boutonSynchro.disabled = true;
+      boutonSynchro.textContent = 'Lecture…';
+      try {
+        const r = await api('POST', { op: 'synchro' });
+        await actualiser();
+        fermerModale();
+        const { n, texte } = resumeSynchro(r);
+        const erreurs = [r.gmail && r.gmail.erreur && 'boîte', r.agenda && r.agenda.erreur && 'agenda'].filter(Boolean);
+        toast(erreurs.length ? `Lecture impossible : ${erreurs.join(' et ')}.` : n ? `Boîte et agenda : ${texte}.` : 'Rien de nouveau.', 5000);
+      } catch (e) { toast(e.message); boutonSynchro.disabled = false; boutonSynchro.textContent = 'Synchroniser maintenant'; }
+    });
     $('[data-export="json"]', form).addEventListener('click', () => telecharger(`crm-sauvegarde-${aujourdhui()}.json`, JSON.stringify(D, null, 2), 'application/json'));
     $('[data-actualiser]', form).addEventListener('click', async () => { await actualiser(); fermerModale(); toast('Données à jour.'); });
     $('[data-deconnexion]', form).addEventListener('click', () => { fermerModale(); deconnecter(''); });
@@ -2392,7 +2611,7 @@ document.addEventListener('keydown', (ev) => {
 
 /* ================= Enchaîner : une file de leads, l'un après l'autre ================= */
 
-const LIB_BILAN = { email: 'Emails envoyés', brouillon: 'Brouillons créés', appel: 'Appels notés', sms: 'SMS envoyés', decale: 'Relances décalées', rdv: 'RDV prévus', note: 'Notes ou réponses', passe: 'Passés' };
+const LIB_BILAN = { email: 'Emails envoyés', brouillon: 'Brouillons créés', appel: 'Appels notés', sms: 'SMS envoyés', decale: 'Relances décalées', rdv: 'RDV prévus', note: 'Notes ou réponses', passe: 'Passés', perdu: 'Passés en perdu', linkedin: 'Actions LinkedIn' };
 
 function demarrerSession(ids, titre) {
   const liste = ids.filter((id) => IDX.lead.has(id));
@@ -2462,6 +2681,7 @@ function rendreSession() {
       <button type="button" class="btn" data-act="appel" aria-keyshortcuts="A">Noter un appel <kbd>A</kbd></button>
       ${mobile ? '<button type="button" class="btn" data-act="sms" aria-keyshortcuts="S">SMS <kbd>S</kbd></button>' : ''}
       <button type="button" class="btn" data-act="decaler">Décaler <kbd>D</kbd></button>
+      <button type="button" class="btn" data-act="perdu">Perdu</button>
       <button type="button" class="btn" data-act="ouvrir">Fiche</button>
       <span class="pousse"></span>
       <button type="button" class="btn" data-sess="precedent" ${s.i === 0 ? 'disabled' : ''}>Précédent</button>
@@ -2546,8 +2766,8 @@ function ouvrirSms(leadId) {
   if (!numeros.length) return toast('Aucun numéro de portable : un SMS ne part que vers un 06 ou un 07.');
   const modeles = D.modeles.filter((m) => m.canal === 'sms');
   const n = (l.relances_sans_reponse || 0) + 1;
-  const c0 = contactPrincipal(leadId);
-  const depart = `Bonjour${c0 && c0.prenom ? ` ${c0.prenom}` : ''},\n\n\nGabriel, IA-Entrepreneur`;
+  const contactDuNumero = (x) => (x && x.id ? contactsDe(leadId).find((ct) => ct.id === x.id) || null : null);
+  const depart = `${salutation(contactDuNumero(numeros[0]))}\n\n\nGabriel, IA-Entrepreneur`;
   ouvrirModale(`
     <h2>SMS à ${esc(l.entreprise)}</h2>
     <p class="de">Part de <b>ton téléphone</b>, avec ton numéro : les réponses arrivent sur ton portable.</p>
@@ -2580,14 +2800,14 @@ function ouvrirSms(leadId) {
     const appliquerModele = (id) => {
       const m = modeles.find((x) => x.id === id);
       if (!m) return;
-      const ct = contactsDe(leadId).find((x) => x.id === choisi().id) || c0;
+      const ct = contactDuNumero(choisi());
       el.texte.value = remplirModele(m.corps, l, ct).trim();
       maj();
     };
     if (el.modele) el.modele.addEventListener('change', () => appliquerModele(el.modele.value));
     if (el.modele && S.session && S.session.modeleSms) { el.modele.value = S.session.modeleSms; appliquerModele(S.session.modeleSms); }
     el.texte.addEventListener('input', maj);
-    el.numero.addEventListener('change', maj);
+    el.numero.addEventListener('change', () => { changerSalutation(el.texte, contactDuNumero(choisi())); maj(); });
     maj();
     brancherPerso(form, leadId, 'sms', () => choisi().id, (r) => { el.texte.value = r.corps.trim(); maj(); });
     for (const a of $$('[data-lien]', form)) {
@@ -2660,6 +2880,8 @@ document.addEventListener('click', (ev) => {
     case 'fermer-fiche': return $('#fiche').close();
     case 'email': return ouvrirEmail(leadId, cible.dataset.contact);
     case 'appel': return ouvrirAppel(leadId);
+    case 'perdu': return changerStatut(leadId, 'perdu').then(() => { if (IDX.lead.get(leadId)?.statut === 'perdu') actionFaite(leadId, 'perdu'); });
+    case 'linkedin': return ouvrirLinkedin(leadId);
     case 'sms': return ouvrirSms(leadId);
     case 'journal-edition': S.journalEdition = !S.journalEdition; return rendreFiche();
     case 'creer-depuis-recherche': { const nom = S.q.trim(); ouvrirNouveau(); const champNom = $('#modale input[name="entreprise"]'); if (champNom) champNom.value = nom; return; }
@@ -2776,6 +2998,7 @@ async function demarrer() {
     await charger();
     rendre();
     reprendreSessionSauvee();
+    synchroDiscrete();
   } catch (e) {
     if (S.cle) $('#vue').innerHTML = `<p class="chargement">${esc(e.message)} <button type="button" class="btn petit" onclick="location.reload()">Réessayer</button></p>`;
   }

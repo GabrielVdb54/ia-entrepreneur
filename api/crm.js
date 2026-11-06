@@ -25,6 +25,19 @@
  *   POST /api/crm { op: 'email',     lead_id, a, objet, corps, mode, fil?, lead? }
  *        mode 'envoyer' ou 'brouillon', depuis gabriel@ia-entrepreneur.fr
  *   POST /api/crm { op: 'reglage',   cle, valeur }
+ *   POST /api/crm { op: 'synchro' }  lit la boîte et l'agenda maintenant
+ *   POST /api/crm { op: 'entrant',   id, action, lead_id?, lead?, contact? }
+ *        traite une ligne « À trier » : créer le lead, rattacher, ignorer
+ *   GET  /api/crm?tache=synchro      la même synchro, lancée par Vercel Cron
+ *        toutes les 15 minutes (en-tête Authorization: Bearer CRON_SECRET)
+ *
+ * Synchro (06/11/2026, choix de Gabriel) : une réponse d'un contact connu va
+ * dans l'historique de son lead et le remet dans « Aujourd'hui » ; un email ou
+ * un RDV d'une personne inconnue va dans « À trier » (iae_crm_entrants), pour
+ * ne jamais créer de lead à partir d'une newsletter ou d'un fournisseur. Un RDV
+ * noté dans le CRM crée l'événement dans l'agenda de gabriel@ia-entrepreneur.fr,
+ * sans inviter personne. Portées Google : gmail.compose, gmail.readonly,
+ * calendar.events (même jeton que l'envoi).
  *
  * Toutes les requêtes portent l'en-tête X-Cle-Crm. Sans la bonne clé, rien :
  * ni lecture ni écriture. La page elle-même est publique (le dépôt l'est), ce
@@ -68,7 +81,7 @@ const STATUTS = ['nouveau', 'contacte', 'qualifie', 'proposition', 'negociation'
 const TYPES_LEAD = ['prospect', 'client', 'partenaire', 'fournisseur'];
 const ACTIONS = ['email', 'appel', 'rdv', 'autre'];
 const TYPES_ACTIVITE = ['note', 'appel', 'appel_sans_reponse', 'email_envoye', 'email_recu',
-  'brouillon', 'rdv', 'sms', 'relance_decalee', 'statut', 'import'];
+  'brouillon', 'rdv', 'sms', 'relance_decalee', 'statut', 'import', 'linkedin'];
 
 const TABLES = {
   leads: {
@@ -86,7 +99,7 @@ const TABLES = {
     nom: 'iae_crm_contacts',
     requis: ['lead_id'],
     colonnes: {
-      lead_id: 'uuid', prenom: T, nom: T, email: T, telephone: T, poste: T, principal: 'bool', notes: L,
+      lead_id: 'uuid', prenom: T, nom: T, email: T, telephone: T, poste: T, principal: 'bool', notes: L, linkedin: T,
     },
   },
   activites: {
@@ -109,7 +122,7 @@ const TABLES = {
   },
 };
 
-const REGLAGES_AUTORISES = ['signature'];
+const REGLAGES_AUTORISES = ['signature', 'rappel_matin'];
 const MAX_LOT = 500;
 
 class Refus extends Error {
@@ -404,18 +417,20 @@ async function emailsEnvoyesAujourdhui() {
 /* ---------- Opérations ---------- */
 
 async function lireTout() {
-  const [leads, contacts, activites, memos, modeles, reglages] = await Promise.all([
+  const [leads, contacts, activites, memos, modeles, reglages, { lignes: entrants }] = await Promise.all([
     toutLire('iae_crm_leads', 'entreprise.asc'),
     toutLire('iae_crm_contacts', 'principal.desc,created_at.asc'),
     toutLire('iae_crm_activites', 'date.desc'),
     toutLire('iae_crm_memos', 'categorie.asc,ordre.asc,titre.asc'),
     toutLire('iae_crm_modeles', 'ordre.asc,nom.asc'),
     toutLire('iae_crm_reglages', 'cle.asc'),
+    sb('iae_crm_entrants?select=*&statut=eq.a_trier&order=recu_le.desc&limit=100'),
   ]);
   return {
-    leads, contacts, activites, memos, modeles,
+    leads, contacts, activites, memos, modeles, entrants,
     reglages: Object.fromEntries(reglages.map((r) => [r.cle, r.valeur])),
     gmail: gmailConfigure(),
+    agenda: gmailConfigure(),
     ia: Boolean(process.env.ANTHROPIC_API_KEY),
     expediteur: COMPTE,
     aujourdhui: aujourdHuiParis(),
@@ -444,11 +459,24 @@ async function operation(corps) {
   if (op === 'journal') {
     if (!UUID_RE.test(corps.lead_id || '')) throw new Refus('id_invalide');
     const activite = nettoyer({ ...corps.activite, lead_id: corps.lead_id }, 'activites', true);
+    let agenda = null;
+    if (corps.agenda && activite.type === 'rdv' && gmailConfigure()) {
+      try {
+        const ev = await creerEvenement(corps.lead_id, corps.agenda);
+        activite.meta = { ...(activite.meta || {}), event_id: ev.id, lien_agenda: ev.htmlLink };
+        agenda = true;
+      } catch (e) {
+        console.error('crm agenda', e.code || e.message);
+        agenda = false;
+      }
+    }
     const ligne = await inserer('activites', activite);
     const lead = corps.lead ? await modifier('leads', corps.lead_id, nettoyer(corps.lead, 'leads', false)) : null;
-    return { activite: ligne, lead };
+    return { activite: ligne, lead, agenda };
   }
   if (op === 'lot') return operationLot(corps);
+  if (op === 'synchro') return synchroniser();
+  if (op === 'entrant') return traiterEntrant(corps);
   if (op === 'importer') return importer(corps);
   if (op === 'email') return envoyerEmail(corps);
   if (op === 'reglage') {
@@ -550,6 +578,10 @@ async function envoyerEmail(corps) {
 /* ---------- Rédaction d'après les notes (Claude) ---------- */
 
 const MODELE_REDACTION = 'claude-opus-5-5';
+const TYPES_LISIBLES = {
+  note: 'Note', appel: 'Appel abouti', appel_sans_reponse: 'Appel sans réponse', email_envoye: 'Email envoyé', email_recu: 'Réponse ou demande reçue',
+  brouillon: 'Brouillon', rdv: 'Rendez-vous', sms: 'SMS envoyé', relance_decalee: 'Relance déplacée', statut: 'Étape', linkedin: 'LinkedIn',
+};
 const CATEGORIES_MEMO = ['À ne jamais dire', "Ce qu'on dit à la place", 'Offre', 'Relances', 'Prix et financement'];
 const redactions = new Map();
 const MAX_REDACTIONS = 40; // par adresse IP et par fenêtre de 10 minutes
@@ -625,7 +657,7 @@ async function rediger(corps, ip) {
   const [{ lignes: leads }, { lignes: contacts }, { lignes: activites }, { lignes: memos }, modele] = await Promise.all([
     sb(`iae_crm_leads?select=*&id=eq.${corps.lead_id}`),
     sb(`iae_crm_contacts?select=*&lead_id=eq.${corps.lead_id}&order=principal.desc,created_at.asc`),
-    sb(`iae_crm_activites?select=date,type,resume,contenu,source&lead_id=eq.${corps.lead_id}&order=date.desc&limit=12`),
+    sb(`iae_crm_activites?select=date,type,resume,contenu,source,meta&lead_id=eq.${corps.lead_id}&order=date.desc&limit=12`),
     sb('iae_crm_memos?select=categorie,titre,contenu&order=categorie.asc,ordre.asc'),
     modeleId ? sb(`iae_crm_modeles?select=nom,objet,corps,canal&id=eq.${modeleId}`).then((r) => r.lignes[0] || null) : Promise.resolve(null),
   ]);
@@ -637,7 +669,8 @@ async function rediger(corps, ip) {
     .map((m) => `## ${m.categorie} : ${m.titre}\n${m.contenu}`).join('\n\n');
   const historique = activites.filter((a) => a.type !== 'import').map((a) => {
     const jour = new Intl.DateTimeFormat('fr-FR', { timeZone: 'Europe/Paris', dateStyle: 'short' }).format(new Date(a.date));
-    return `- ${jour}, ${a.type} : ${couper(a.resume, 600)}${a.contenu ? `\n  Détail : ${couper(a.contenu.replace(/\s+/g, ' '), 1500)}` : ''}`;
+    const quoi = `${TYPES_LISIBLES[a.type] || a.type}${a.type === 'linkedin' && a.meta?.etape ? ` (${a.meta.etape})` : ''}`;
+    return `- ${jour}, ${quoi} : ${couper(a.resume, 600)}${a.contenu ? `\n  Détail : ${couper(a.contenu.replace(/\s+/g, ' '), 1500)}` : ''}`;
   }).join('\n');
   const fiche = [
     `Canal : ${canal === 'sms' ? 'SMS' : 'email'}`,
@@ -694,6 +727,257 @@ async function rediger(corps, ip) {
   return { objet: canal === 'sms' ? '' : objet, corps: message, appuis, alertes };
 }
 
+/* ---------- Boîte de réception, agenda, « À trier » ---------- */
+
+const CALENDAR = 'https://www.googleapis.com/calendar/v3/calendars/primary/events';
+const DOMAINES_INTERNES = ['ia-entrepreneur.fr', 'clindit.com'];
+const EXPEDITEURS_AUTOMATIQUES = /(no-?reply|ne-?pas-?repondre|notification|mailer-daemon|newsletter|bounce|postmaster|calendar-notification|info@mailing|marketing@)/i;
+
+async function google(url, options = {}) {
+  const jeton = await accesGmail();
+  const r = await fetch(url, { ...options, headers: { Authorization: `Bearer ${jeton}`, 'Content-Type': 'application/json', ...(options.headers || {}) } });
+  if (!r.ok) {
+    console.error('crm google', r.status, url.split('?')[0], (await r.text()).slice(0, 300));
+    throw new Refus(r.status === 403 ? 'google_acces' : 'google_erreur', 502);
+  }
+  return r.json();
+}
+async function lireReglage(cle) {
+  const { lignes } = await sb(`iae_crm_reglages?select=valeur&cle=eq.${encodeURIComponent(cle)}`);
+  return lignes[0] ? lignes[0].valeur : null;
+}
+async function ecrireReglage(cle, valeur) {
+  await sb('iae_crm_reglages?on_conflict=cle', { methode: 'POST', corps: { cle, valeur }, prefer: 'resolution=merge-duplicates,return=minimal' });
+}
+const jourParis = (d) => new Intl.DateTimeFormat('fr-CA', { timeZone: 'Europe/Paris', year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date(d));
+const heureParis = (d) => new Intl.DateTimeFormat('fr-FR', { timeZone: 'Europe/Paris', hour: '2-digit', minute: '2-digit' }).format(new Date(d)).replace(':', ' h ').replace(/ h 00$/, ' h');
+const interne = (email) => DOMAINES_INTERNES.some((d) => email.endsWith(`@${d}`));
+function adresse(entete) {
+  const m = String(entete || '').match(/^\s*"?([^"<]*?)"?\s*<([^>]+)>\s*$/);
+  return m ? { nom: m[1].trim(), email: m[2].trim().toLowerCase() } : { nom: '', email: String(entete || '').trim().toLowerCase() };
+}
+function texteBrut(t) {
+  return String(t || '').replace(/<[^>]+>/g, ' ').replace(/&nbsp;/g, ' ').replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>')
+    .replace(/&quot;/g, '"').replace(/&#39;/g, "'").replace(/&#(\d+);/g, (x, n) => String.fromCodePoint(Number(n))).replace(/\s+/g, ' ').trim();
+}
+async function contactParEmail(email) {
+  const { lignes } = await sb(`iae_crm_contacts?select=id,lead_id,prenom,nom&email=ilike.${encodeURIComponent(email)}&limit=1`);
+  return lignes[0] || null;
+}
+
+async function synchroGmail() {
+  const etat = (await lireReglage('synchro_gmail')) || {};
+  const ignores = new Set(((await lireReglage('expediteurs_ignores')) || []).map((x) => String(x).toLowerCase()));
+  const depuis = Number(etat.apres) || Math.floor(Date.now() / 1000) - 3 * 86400;
+  const debut = Math.floor(Date.now() / 1000);
+  const q = `in:inbox -from:me after:${depuis} -category:promotions -category:social -category:updates -category:forums`;
+  const liste = await google(`${GMAIL}/messages?maxResults=50&q=${encodeURIComponent(q)}`);
+  const ids = (liste.messages || []).map((m) => m.id).filter((id) => /^[0-9a-f]+$/i.test(id));
+  let reponses = 0;
+  let nouveaux = 0;
+  if (ids.length) {
+    const deja = new Set();
+    (await sb(`iae_crm_entrants?select=ref_externe&ref_externe=in.(${ids.join(',')})`)).lignes.forEach((x) => deja.add(x.ref_externe));
+    (await sb(`iae_crm_activites?select=meta&meta->>gmail_id=in.(${ids.join(',')})`)).lignes.forEach((x) => deja.add(x.meta.gmail_id));
+    for (const id of ids.filter((x) => !deja.has(x))) {
+      const m = await google(`${GMAIL}/messages/${id}?format=metadata&metadataHeaders=From&metadataHeaders=Subject&metadataHeaders=List-Unsubscribe`);
+      const h = Object.fromEntries((m.payload?.headers || []).map((x) => [x.name.toLowerCase(), x.value]));
+      const de = adresse(h.from);
+      // Newsletters, robots, équipe : jamais dans le CRM.
+      if (!de.email || interne(de.email) || EXPEDITEURS_AUTOMATIQUES.test(de.email) || h['list-unsubscribe']) continue;
+      if (ignores.has(de.email) || ignores.has(de.email.split('@')[1])) continue;
+      const objet = String(h.subject || '(sans objet)').slice(0, 300);
+      const quand = new Date(Number(m.internalDate) || Date.now()).toISOString();
+      const extrait = texteBrut(m.snippet).slice(0, 1000);
+      let c = await contactParEmail(de.email);
+      if (!c && m.threadId) {
+        const { lignes } = await sb(`iae_crm_activites?select=lead_id,contact_id&meta->>fil=eq.${encodeURIComponent(m.threadId)}&limit=1`);
+        if (lignes[0]) c = { lead_id: lignes[0].lead_id, id: lignes[0].contact_id };
+      }
+      if (c) {
+        await sb('iae_crm_activites', { methode: 'POST', prefer: 'return=minimal', corps: { lead_id: c.lead_id, contact_id: c.id || null, date: quand, type: 'email_recu', resume: `Réponse reçue de ${de.nom || de.email} : « ${objet} »`.slice(0, 2000), contenu: extrait, source: 'gmail iae', meta: { gmail_id: id, fil: m.threadId } } });
+        await sb(`iae_crm_leads?id=eq.${c.lead_id}`, { methode: 'PATCH', prefer: 'return=minimal', corps: { relances_sans_reponse: 0, dernier_contact: jourParis(quand), prochaine_relance: aujourdHuiParis(), prochaine_action: 'email', prochaine_note: `Répondre à « ${objet} »`.slice(0, 2000), archive: false } });
+        reponses++;
+      } else {
+        await sb('iae_crm_entrants?on_conflict=ref_externe', { methode: 'POST', prefer: 'resolution=ignore-duplicates,return=minimal', corps: { recu_le: quand, canal: 'email', de_email: de.email, de_nom: de.nom || null, objet, extrait, ref_externe: id, fil: m.threadId } });
+        nouveaux++;
+      }
+    }
+  }
+  await ecrireReglage('synchro_gmail', { apres: debut - 900, le: new Date().toISOString(), reponses, nouveaux });
+  return { reponses, nouveaux };
+}
+
+async function synchroAgenda() {
+  const etat = (await lireReglage('synchro_agenda')) || {};
+  const debut = new Date();
+  const params = new URLSearchParams({
+    singleEvents: 'true', maxResults: '100', showDeleted: 'false',
+    timeMin: new Date(Date.now() - 86400000).toISOString(),
+    updatedMin: etat.depuis || new Date(Date.now() - 14 * 86400000).toISOString(),
+  });
+  const r = await google(`${CALENDAR}?${params}`);
+  const aujourd = aujourdHuiParis();
+  let rdv = 0;
+  let nouveaux = 0;
+  for (const ev of r.items || []) {
+    if (ev.status === 'cancelled' || ev.extendedProperties?.private?.crm_lead) continue; // nos propres RDV
+    const debutEv = ev.start?.dateTime || ev.start?.date;
+    if (!debutEv) continue;
+    const jour = ev.start.dateTime ? jourParis(debutEv) : ev.start.date;
+    const heure = ev.start.dateTime ? heureParis(debutEv) : null;
+    const libelle = `${(ev.summary || 'Rendez-vous').slice(0, 200)} le ${jour.split('-').reverse().join('/')}${heure ? ` à ${heure}` : ''}`;
+    const externes = (ev.attendees || []).filter((a) => a.email && !a.self && !a.resource && !interne(a.email.toLowerCase()));
+    for (const a of externes) {
+      const email = a.email.toLowerCase();
+      const ref = `agenda:${ev.id}:${email}`.slice(0, 500);
+      const { lignes: dejaAct } = await sb(`iae_crm_activites?select=id&meta->>event_ref=eq.${encodeURIComponent(ref)}&limit=1`);
+      if (dejaAct.length) continue;
+      const c = await contactParEmail(email);
+      if (c) {
+        await sb('iae_crm_activites', { methode: 'POST', prefer: 'return=minimal', corps: { lead_id: c.lead_id, contact_id: c.id, type: 'rdv', resume: `RDV prévu : ${libelle}`.slice(0, 2000), contenu: texteBrut(ev.description).slice(0, 4000) || null, source: 'agenda', meta: { event_id: ev.id, event_ref: ref, date_rdv: jour, heure, lien_agenda: ev.htmlLink } } });
+        if (jour >= aujourd) await sb(`iae_crm_leads?id=eq.${c.lead_id}`, { methode: 'PATCH', prefer: 'return=minimal', corps: { prochaine_relance: jour, prochaine_action: 'rdv', prochaine_note: `RDV${heure ? ` à ${heure}` : ''} : ${(ev.summary || '').slice(0, 300)}`, relances_sans_reponse: 0, archive: false } });
+        rdv++;
+      } else if (jour >= aujourd) {
+        const { lignes: dejaTrie } = await sb(`iae_crm_entrants?select=id&ref_externe=eq.${encodeURIComponent(ref)}&limit=1`);
+        if (dejaTrie.length) continue;
+        await sb('iae_crm_entrants?on_conflict=ref_externe', { methode: 'POST', prefer: 'resolution=ignore-duplicates,return=minimal', corps: { recu_le: ev.created || debut.toISOString(), canal: 'agenda', de_email: email, de_nom: a.displayName || null, objet: `RDV : ${libelle}`.slice(0, 300), extrait: texteBrut(ev.description).slice(0, 1000) || null, ref_externe: ref, meta: { event_id: ev.id, event_ref: ref, date_rdv: jour, heure, lien_agenda: ev.htmlLink } } });
+        nouveaux++;
+      }
+    }
+  }
+  await ecrireReglage('synchro_agenda', { depuis: new Date(debut.getTime() - 900000).toISOString(), le: debut.toISOString(), rdv, nouveaux });
+  return { rdv, nouveaux };
+}
+
+async function synchroniser() {
+  if (!gmailConfigure()) throw new Refus('gmail_non_configure', 503);
+  const [g, a] = await Promise.allSettled([synchroGmail(), synchroAgenda()]);
+  const lire = (x) => (x.status === 'fulfilled' ? x.value : { erreur: x.reason?.code || 'erreur' });
+  return { gmail: lire(g), agenda: lire(a) };
+}
+
+// Un RDV noté dans le CRM devient un événement de l'agenda, sans invité :
+// Google n'envoie donc aucune invitation au prospect.
+async function creerEvenement(leadId, a) {
+  if (!DATE_RE.test(a?.date || '')) throw new Refus('date_invalide');
+  const heure = /^\d{2}:\d{2}$/.test(a.heure || '') ? a.heure : null;
+  const duree = Math.min(240, Math.max(15, Number(a.duree) || 30));
+  const titre = String(a.titre || 'Rendez-vous').replace(/[\r\n]+/g, ' ').slice(0, 200);
+  const description = String(a.description || '').slice(0, 4000);
+  const lieu = a.lieu ? String(a.lieu).slice(0, 300) : undefined;
+  let start;
+  let end;
+  if (heure) {
+    const [hh, mm] = heure.split(':').map(Number);
+    const fin = Math.min(hh * 60 + mm + duree, 23 * 60 + 59);
+    const deux = (n) => String(n).padStart(2, '0');
+    start = { dateTime: `${a.date}T${heure}:00`, timeZone: 'Europe/Paris' };
+    end = { dateTime: `${a.date}T${deux(Math.floor(fin / 60))}:${deux(fin % 60)}:00`, timeZone: 'Europe/Paris' };
+  } else {
+    const lendemain = new Date(`${a.date}T00:00:00Z`);
+    lendemain.setUTCDate(lendemain.getUTCDate() + 1);
+    start = { date: a.date };
+    end = { date: lendemain.toISOString().slice(0, 10) };
+  }
+  return google(CALENDAR, {
+    method: 'POST',
+    body: JSON.stringify({ summary: titre, description: `${description}\n\nFiche dans le CRM : https://ia-entrepreneur.fr/crm/`.trim(), location: lieu, start, end, extendedProperties: { private: { crm_lead: leadId } } }),
+  });
+}
+
+async function traiterEntrant(corps) {
+  if (!UUID_RE.test(corps.id || '')) throw new Refus('id_invalide');
+  const { lignes } = await sb(`iae_crm_entrants?select=*&id=eq.${corps.id}`);
+  const e = lignes[0];
+  if (!e) throw new Refus('introuvable', 404);
+  const action = corps.action;
+  if (action === 'ignorer' || action === 'ignorer_toujours') {
+    await sb(`iae_crm_entrants?id=eq.${e.id}`, { methode: 'PATCH', corps: { statut: 'ignore' }, prefer: 'return=minimal' });
+    if (action === 'ignorer_toujours' && e.de_email) {
+      const liste = new Set((await lireReglage('expediteurs_ignores')) || []);
+      liste.add(e.de_email.toLowerCase());
+      await ecrireReglage('expediteurs_ignores', [...liste].slice(-500));
+      await sb(`iae_crm_entrants?de_email=eq.${encodeURIComponent(e.de_email)}&statut=eq.a_trier`, { methode: 'PATCH', corps: { statut: 'ignore' }, prefer: 'return=minimal' });
+    }
+    return { ignore: true };
+  }
+  if (action !== 'creer' && action !== 'rattacher') throw new Refus('action_inconnue');
+  const [prenom, ...reste] = String(e.de_nom || '').split(/\s+/).filter(Boolean);
+  let lead;
+  let contactId = null;
+  if (action === 'creer') {
+    lead = await inserer('leads', nettoyer({ type: 'prospect', statut: 'nouveau', source: e.canal === 'agenda' ? 'RDV pris dans ton agenda' : 'Email reçu', ...corps.lead }, 'leads', true));
+    const c = await inserer('contacts', nettoyer({ prenom: prenom || null, nom: reste.join(' ') || null, ...(corps.contact || {}), email: e.de_email, lead_id: lead.id, principal: true }, 'contacts', true));
+    contactId = c.id;
+  } else {
+    if (!UUID_RE.test(corps.lead_id || '')) throw new Refus('id_invalide');
+    lead = { id: corps.lead_id };
+    const existant = e.de_email ? await contactParEmail(e.de_email) : null;
+    if (existant && existant.lead_id === lead.id) contactId = existant.id;
+    else if (e.de_email) contactId = (await inserer('contacts', { lead_id: lead.id, prenom: prenom || null, nom: reste.join(' ') || null, email: e.de_email, principal: false })).id;
+  }
+  const m = e.meta || {};
+  if (e.canal === 'agenda') {
+    await inserer('activites', { lead_id: lead.id, contact_id: contactId, type: 'rdv', resume: `RDV prévu : ${String(e.objet || '').replace(/^RDV : /, '')}`.slice(0, 2000), contenu: e.extrait, source: 'agenda', meta: m });
+    if (m.date_rdv && m.date_rdv >= aujourdHuiParis()) await modifier('leads', lead.id, { prochaine_relance: m.date_rdv, prochaine_action: 'rdv', prochaine_note: `RDV${m.heure ? ` à ${m.heure}` : ''}`, relances_sans_reponse: 0 });
+  } else {
+    await inserer('activites', { lead_id: lead.id, contact_id: contactId, date: e.recu_le, type: 'email_recu', resume: `Email reçu de ${e.de_nom || e.de_email} : « ${e.objet || ''} »`.slice(0, 2000), contenu: e.extrait, source: 'gmail iae', meta: { gmail_id: e.ref_externe, fil: e.fil } });
+    await modifier('leads', lead.id, { prochaine_relance: aujourdHuiParis(), prochaine_action: 'email', prochaine_note: `Répondre à « ${String(e.objet || '').slice(0, 200)} »`, relances_sans_reponse: 0, dernier_contact: jourParis(e.recu_le) });
+  }
+  await sb(`iae_crm_entrants?id=eq.${e.id}`, { methode: 'PATCH', corps: { statut: action === 'creer' ? 'cree' : 'rattache', lead_id: lead.id }, prefer: 'return=minimal' });
+  return { lead_id: lead.id };
+}
+
+/* ---------- Le récapitulatif du matin ---------- */
+
+// Vercel Cron appelle à 5 h et 6 h UTC du lundi au vendredi : seul l'appel qui
+// tombe à 7 h à Paris envoie (heure d'hiver comme d'été), une fois par jour.
+async function rappelDuMatin(force = false) {
+  if (!gmailConfigure()) return { envoye: false, raison: 'gmail_non_configure' };
+  const heure = Number(new Intl.DateTimeFormat('fr-FR', { timeZone: 'Europe/Paris', hour: '2-digit', hourCycle: 'h23' }).format(new Date()));
+  const jour = aujourdHuiParis();
+  if (!force && heure !== 7) return { envoye: false, raison: 'pas_l_heure' };
+  if ((await lireReglage('rappel_matin')) === 'non') return { envoye: false, raison: 'desactive' };
+  const dernier = await lireReglage('rappel_matin_envoye');
+  if (!force && dernier && dernier.le === jour) return { envoye: false, raison: 'deja_envoye' };
+  // Un premier tour de boîte et d'agenda, pour que le récapitulatif soit à jour.
+  await synchroniser().catch(() => null);
+  const [{ lignes: leads }, { lignes: contacts }, { lignes: entrants }] = await Promise.all([
+    sb(`iae_crm_leads?select=id,entreprise,prochaine_relance,prochaine_action,prochaine_note,relances_sans_reponse&archive=is.false&prochaine_relance=lte.${jour}&order=prochaine_relance.asc,entreprise.asc`),
+    sb('iae_crm_contacts?select=lead_id,prenom,nom,principal&order=principal.desc'),
+    sb('iae_crm_entrants?select=de_nom,de_email,objet,canal&statut=eq.a_trier&order=recu_le.desc&limit=10'),
+  ]);
+  if (!leads.length && !entrants.length) return { envoye: false, raison: 'rien_a_faire' };
+  const qui = (id) => { const c = contacts.find((x) => x.lead_id === id); return c ? [c.prenom, c.nom].filter(Boolean).join(' ') : ''; };
+  const ACTION = { email: 'email', appel: 'appel', rdv: 'rendez-vous', autre: 'à faire' };
+  const ecart = (d) => Math.round((Date.parse(jour) - Date.parse(d)) / 86400000);
+  const ligne = (l) => {
+    const retard = ecart(l.prochaine_relance);
+    const nom = qui(l.id);
+    return `- ${l.entreprise}${nom ? ` (${nom})` : ''} : ${ACTION[l.prochaine_action] || 'relance'}${retard > 0 ? `, en retard de ${retard} jour${retard > 1 ? 's' : ''}` : ''}${l.prochaine_note ? `. ${String(l.prochaine_note).slice(0, 160)}` : ''}`;
+  };
+  const retards = leads.filter((l) => l.prochaine_relance < jour);
+  const dujour = leads.filter((l) => l.prochaine_relance === jour);
+  const dateLongue = new Intl.DateTimeFormat('fr-FR', { timeZone: 'Europe/Paris', weekday: 'long', day: 'numeric', month: 'long' }).format(new Date());
+  const resume = [dujour.length && `${dujour.length} relance${dujour.length > 1 ? 's' : ''} pour aujourd'hui`, retards.length && `${retards.length} en retard`,
+    entrants.length && `${entrants.length} message${entrants.length > 1 ? 's' : ''} à trier`].filter(Boolean).join(', ');
+  const corps = [
+    'Bonjour Gabriel,', '',
+    `Aujourd'hui, ${dateLongue} : ${resume}.`, '',
+    retards.length ? `En retard\n${retards.map(ligne).join('\n')}\n` : null,
+    dujour.length ? `Aujourd'hui\n${dujour.map(ligne).join('\n')}\n` : null,
+    entrants.length ? `À trier\n${entrants.map((e) => `- ${e.de_nom || e.de_email} : ${e.objet || ''}`).join('\n')}\n` : null,
+    "Pour tout enchaîner : https://ia-entrepreneur.fr/crm/ (bouton « Enchaîner les relances »).", '',
+    'Bonne journée,', 'Ton CRM',
+  ].filter((x) => x !== null).join('\n');
+  const total = leads.length;
+  const objet = total ? `Tes ${total} relance${total > 1 ? 's' : ''} du jour${retards.length ? ` (${retards.length} en retard)` : ''}` : `${entrants.length} message${entrants.length > 1 ? 's' : ''} à trier dans ton CRM`;
+  const envoi = await envoyerGmail({ a: COMPTE, objet, corps, mode: 'envoyer' });
+  await ecrireReglage('rappel_matin_envoye', { le: jour, relances: total, a_trier: entrants.length });
+  return { envoye: true, objet, gmail_id: envoi.gmail_id };
+}
+
 /* ---------- Logos des entreprises ---------- */
 
 // Le navigateur ne parle qu'à /api/crm : c'est le serveur qui demande le logo
@@ -730,6 +1014,14 @@ export default async function handler(req, res) {
   if (req.method !== 'GET' && req.method !== 'POST') {
     res.setHeader('Allow', 'GET, POST');
     return res.status(405).json({ erreur: 'methode' });
+  }
+  const tache = req.method === 'GET' ? new URL(req.url, 'http://local').searchParams.get('tache') : null;
+  if (tache === 'synchro' || tache === 'matin') {
+    const attendu = Buffer.from(process.env.CRON_SECRET ? `Bearer ${process.env.CRON_SECRET}` : '');
+    const donne = Buffer.from(String(req.headers.authorization || ''));
+    if (!process.env.CRON_SECRET || attendu.length !== donne.length || !timingSafeEqual(attendu, donne)) return res.status(401).json({ erreur: 'non_autorise' });
+    if (tache === 'matin') return res.status(200).json(await rappelDuMatin(new URL(req.url, 'http://local').searchParams.get('force') === '1'));
+    return res.status(200).json(await synchroniser());
   }
   if (origineEtrangere(req)) return res.status(403).json({ erreur: 'origine' });
 

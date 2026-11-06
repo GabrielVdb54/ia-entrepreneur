@@ -1051,6 +1051,7 @@
       const btn = form.querySelector('button[type=submit]');
       btn.textContent = 'Envoi...'; btn.disabled = true;
       try {
+        try { fetch('/api/demande', { method: 'POST', keepalive: true, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ...Object.fromEntries(new FormData(form)), page: location.pathname }) }); } catch (e) { /* le CRM ne doit jamais bloquer l'envoi */ }
         await fetch(form.action, {method:'POST', body:new FormData(form), headers:{Accept:'application/json'}});
         if (typeof gtag === 'function') { gtag('event', 'conversion', {'send_to': 'AW-18076082295/zkV0CPrKmcUcEPfArKtD'}); }
         document.getElementById('devis-success').style.display = 'block';

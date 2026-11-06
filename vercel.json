@@ -98,5 +98,15 @@
         }
       ]
     }
+  ],
+  "crons": [
+    {
+      "path": "/api/crm?tache=synchro",
+      "schedule": "*/15 * * * *"
+    },
+    {
+      "path": "/api/crm?tache=matin",
+      "schedule": "0 5,6 * * 1-5"
+    }
   ]
 }

@@ -51,7 +51,8 @@ create table if not exists public.iae_crm_contacts (
   telephone  text,
   poste      text,
   principal  boolean not null default false,
-  notes      text
+  notes      text,
+  linkedin   text                           -- URL du profil LinkedIn
 );
 
 -- Le journal : tout ce qui s'est passé avec un lead, d'où que ça vienne
@@ -64,7 +65,7 @@ create table if not exists public.iae_crm_activites (
   date       timestamptz not null default now(),
   type       text not null
              check (type in ('note', 'appel', 'appel_sans_reponse', 'email_envoye', 'email_recu',
-                             'brouillon', 'rdv', 'sms', 'relance_decalee', 'statut', 'import')),
+                             'brouillon', 'rdv', 'sms', 'relance_decalee', 'statut', 'import', 'linkedin')),
   resume     text not null,
   contenu    text,
   source     text not null default 'crm',
@@ -138,3 +139,24 @@ revoke all on public.iae_crm_leads, public.iae_crm_contacts, public.iae_crm_acti
               public.iae_crm_memos, public.iae_crm_modeles, public.iae_crm_reglages
   from anon, authenticated;
 revoke execute on function public.iae_crm_touch() from anon, authenticated, public;
+
+-- Messages et RDV de personnes qui ne sont pas encore dans le CRM (« À trier »).
+create table if not exists public.iae_crm_entrants (
+  id          uuid primary key default gen_random_uuid(),
+  created_at  timestamptz not null default now(),
+  recu_le     timestamptz not null,
+  canal       text not null check (canal in ('email', 'agenda', 'site')),
+  de_email    text,
+  de_nom      text,
+  objet       text,
+  extrait     text,
+  ref_externe text unique,                   -- id Gmail ou agenda:<événement>:<email>
+  fil         text,
+  statut      text not null default 'a_trier' check (statut in ('a_trier', 'cree', 'rattache', 'ignore')),
+  lead_id     uuid references public.iae_crm_leads (id) on delete set null,
+  meta        jsonb
+);
+create index if not exists iae_crm_entrants_statut on public.iae_crm_entrants (statut, recu_le desc);
+create index if not exists iae_crm_contacts_email on public.iae_crm_contacts (lower(email));
+alter table public.iae_crm_entrants enable row level security;
+revoke all on public.iae_crm_entrants from anon, authenticated;
