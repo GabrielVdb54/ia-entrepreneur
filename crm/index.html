@@ -1,0 +1,2809 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>CRM de Gabriel</title>
+<!-- Outil privé : jamais dans Google, jamais dans le sitemap, lié nulle part. -->
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#FFFFFF">
+<link rel="icon" type="image/png" href="/favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #F7F8FD;
+    --card: #FFFFFF;
+    --text: #0A0F2C;
+    --muted: #525880;
+    --line: #E3E7F5;
+    --line-strong: #C9D0EA;
+    --primary: #1A3CFF;
+    --primary-dark: #1532D6;
+    --primary-soft: #EEF1FF;
+    --accent: #10B981;
+    --accent-dark: #0E7A57;
+    --accent-soft: #E7F8F1;
+    --danger: #B42318;
+    --danger-soft: #FDECEA;
+    --warn: #B54708;
+    --warn-soft: #FEF0C7;
+    --radius: 12px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Plus Jakarta Sans', Arial, sans-serif;
+    font-size: 16px;
+    line-height: 1.5;
+    min-height: 100vh;
+  }
+  button, input, select, textarea { font: inherit; color: inherit; }
+  input, select, textarea { font-size: 16px; }
+  [hidden] { display: none !important; }
+  a { color: var(--primary); }
+
+  .btn {
+    display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+    min-height: 40px; padding: 8px 14px; border-radius: 10px;
+    border: 1px solid var(--line); background: var(--card);
+    font-weight: 600; font-size: 14px; cursor: pointer; text-decoration: none; color: var(--text);
+    white-space: nowrap;
+  }
+  .btn:hover { border-color: var(--line-strong); }
+  .btn.primaire { background: var(--primary); border-color: var(--primary); color: #fff; }
+  .btn.primaire:hover { background: var(--primary-dark); }
+  .btn.danger { color: var(--danger); }
+  .btn.lien { border-color: transparent; background: none; color: var(--primary); padding-left: 6px; padding-right: 6px; }
+  #btn-nouveau { gap: .28em; }
+  .btn.petit { min-height: 34px; padding: 5px 10px; font-size: 13px; }
+  .btn[disabled] { opacity: .5; cursor: default; }
+  :focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+
+  /* Écran de la clé */
+  .accueil { min-height: 100vh; display: grid; place-items: center; padding: 24px 16px; }
+  .accueil form { width: 100%; max-width: 380px; background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 24px; display: flex; flex-direction: column; gap: 14px; }
+  .accueil h1 { font-size: 22px; font-weight: 800; }
+  .accueil p { color: var(--muted); font-size: 14px; }
+  .case { display: flex; gap: 8px; align-items: center; font-size: 14px; color: var(--muted); }
+  .case input { width: 18px; height: 18px; }
+  .erreur { color: var(--danger); font-size: 14px; }
+
+  /* Barre du haut */
+  .barre { position: sticky; top: 0; z-index: 20; background: rgba(255, 255, 255, .97); border-bottom: 1px solid var(--line); }
+  .barre-in { max-width: 1280px; margin: 0 auto; display: flex; align-items: center; gap: 10px; padding: 10px 16px; }
+  .marque { font-weight: 800; font-size: 17px; white-space: nowrap; }
+  .marque span { color: var(--primary); }
+  .recherche { flex: 1; min-width: 0; }
+  .recherche input { width: 100%; height: 40px; border: 1px solid var(--line); border-radius: 10px; padding: 0 12px; background: var(--bg); }
+  .onglets { max-width: 1280px; margin: 0 auto; display: flex; gap: 4px; padding: 0 12px; }
+  .onglets button { border: 0; background: none; padding: 10px 12px; font-weight: 600; color: var(--muted); border-bottom: 2px solid transparent; cursor: pointer; }
+  .onglets button[aria-selected="true"] { color: var(--primary); border-bottom-color: var(--primary); }
+  .compteur { display: inline-block; min-width: 20px; padding: 0 6px; border-radius: 10px; background: var(--danger); color: #fff; font-size: 12px; line-height: 20px; text-align: center; margin-left: 4px; }
+  main { max-width: 1280px; margin: 0 auto; padding: 18px 16px 96px; }
+
+  .titre-vue { font-size: 22px; font-weight: 800; line-height: 1.25; }
+  .sous-titre { color: var(--muted); margin: 2px 0 6px; }
+  .resume-jour { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0 4px; }
+  .chiffre { background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 8px 12px; font-size: 14px; color: var(--muted); }
+  .chiffre b { color: var(--text); font-size: 16px; margin-right: 4px; }
+  .chiffre.alerte-chiffre b { color: var(--danger); }
+  .groupe { margin: 26px 0 10px; display: flex; align-items: center; gap: 8px; font-size: 17px; font-weight: 800; color: var(--text); }
+  .groupe span { font-size: 13px; font-weight: 700; color: var(--muted); background: var(--card); border: 1px solid var(--line); border-radius: 999px; padding: 1px 9px; }
+  .groupe.retard span { color: var(--danger); border-color: #F4C7C2; }
+  .groupe.retard { color: var(--danger); }
+  .vide { color: var(--muted); font-size: 14px; padding: 6px 0; }
+  .grille { display: grid; gap: 10px; grid-template-columns: repeat(auto-fill, minmax(310px, 1fr)); }
+
+  /* Carte d'un lead */
+  .carte { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); padding: 14px 16px; cursor: pointer; display: flex; flex-direction: column; gap: 6px; text-align: left; }
+  .carte:hover { border-color: var(--line-strong); }
+  .carte-haut { display: flex; justify-content: space-between; gap: 8px; align-items: flex-start; }
+  .carte h3 { font-size: 16px; font-weight: 700; line-height: 1.3; overflow-wrap: anywhere; }
+  .statut { flex: none; font-size: 12px; font-weight: 600; padding: 2px 8px; border-radius: 6px; background: var(--bg); color: var(--muted); border: 1px solid var(--line); }
+  .statut.s-proposition, .statut.s-negociation { background: var(--primary-soft); color: var(--primary); border-color: transparent; }
+  .statut.s-gagne { background: var(--accent-soft); color: var(--accent-dark); border-color: transparent; }
+  .meta { color: var(--muted); font-size: 14px; overflow-wrap: anywhere; }
+  .relance { font-size: 14px; font-weight: 700; }
+  .relance.retard { color: var(--danger); }
+  .relance.jour { color: var(--warn); }
+  .extrait { font-size: 14px; color: var(--muted); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; overflow-wrap: anywhere; }
+  .carte-actions { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 8px; }
+
+  /* Pipeline */
+  .kanban { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(270px, 1fr); gap: 12px; overflow-x: auto; padding-bottom: 12px; scroll-snap-type: x proximity; margin-top: 14px; }
+  .colonne { scroll-snap-align: start; background: #EEF0F8; border-radius: var(--radius); padding: 10px; display: flex; flex-direction: column; gap: 8px; min-height: 140px; }
+  .colonne > header { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; font-weight: 700; font-size: 14px; padding: 2px 4px 4px; }
+  .colonne > header small { color: var(--muted); font-weight: 600; }
+  .colonne .carte { padding: 10px 12px; }
+
+  /* Tous les leads */
+  .filtres { display: flex; flex-wrap: wrap; gap: 8px; margin: 14px 0 12px; align-items: center; }
+  .filtres select { height: 38px; border: 1px solid var(--line); border-radius: 10px; padding: 0 10px; background: var(--card); font-size: 14px; max-width: 100%; }
+  .tableau { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; }
+  .rangee { display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 1.6fr) minmax(0, 1fr) minmax(0, 1.3fr) minmax(0, 1fr); gap: 12px; padding: 11px 14px; border-top: 1px solid var(--line); align-items: center; cursor: pointer; font-size: 14px; width: 100%; background: none; border-left: 0; border-right: 0; border-bottom: 0; text-align: left; }
+  .rangee:first-child { border-top: 0; }
+  .rangee:hover { background: #FAFBFF; }
+  .rangee.entete { font-size: 12px; font-weight: 700; color: var(--muted); text-transform: uppercase; cursor: default; background: var(--bg); letter-spacing: .03em; }
+  .rangee > span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .rangee b { font-weight: 700; }
+
+  /* Résultats de recherche */
+  .trouve { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); padding: 12px 14px; cursor: pointer; margin-bottom: 8px; }
+  .trouve:hover { border-color: var(--line-strong); }
+  .trouve h3 { font-size: 15px; }
+  .trouve ul { list-style: none; margin-top: 4px; }
+  .trouve li { font-size: 13px; color: var(--muted); margin-top: 3px; overflow-wrap: anywhere; }
+  mark { background: #FFF2B3; color: inherit; border-radius: 3px; padding: 0 1px; }
+
+  /* Mémo */
+  .memo-cat { margin-top: 22px; }
+  .memo { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); margin-bottom: 8px; }
+  .memo summary { padding: 12px 14px; font-weight: 700; cursor: pointer; list-style: none; display: flex; justify-content: space-between; gap: 10px; align-items: baseline; }
+  .memo summary::-webkit-details-marker { display: none; }
+  .memo summary::after { content: '+'; color: var(--muted); font-weight: 600; }
+  .memo[open] summary::after { content: '\2013'; }
+  .memo .corps { padding: 0 14px 14px; font-size: 14px; }
+  .md p, .md ul, .md ol { margin: 6px 0; }
+  .md ul, .md ol { padding-left: 20px; }
+  .md li { margin: 2px 0; }
+  .md h4 { margin: 12px 0 4px; font-size: 14px; }
+  .md pre { white-space: pre-wrap; font-family: inherit; background: var(--bg); border-radius: 8px; padding: 10px; }
+  .petites-sources { font-size: 12px; color: var(--muted); margin-top: 8px; }
+
+  /* Panneaux et fenêtres */
+  dialog { border: 0; padding: 0; background: var(--card); color: var(--text); }
+  dialog::backdrop { background: rgba(10, 15, 44, .45); }
+  dialog.panneau { margin: 0 0 0 auto; height: 100dvh; max-height: 100dvh; width: min(660px, 100vw); max-width: 100vw; overscroll-behavior: contain; }
+  dialog.modale { width: min(580px, calc(100vw - 24px)); max-height: calc(100dvh - 24px); border-radius: 16px; margin: auto; overscroll-behavior: contain; }
+  .fiche-tete { position: sticky; top: 0; background: var(--card); border-bottom: 1px solid var(--line); padding: 14px 16px; display: flex; gap: 12px; justify-content: space-between; align-items: flex-start; z-index: 2; }
+  .fiche-tete h2 { font-size: 20px; font-weight: 800; line-height: 1.25; overflow-wrap: anywhere; }
+  .surtitre { font-size: 13px; font-weight: 600; color: var(--muted); }
+  .fermer { width: 40px; height: 40px; border-radius: 10px; border: 1px solid var(--line); background: var(--card); font-size: 18px; cursor: pointer; flex: none; }
+  .bloc { padding: 16px; border-bottom: 1px solid var(--line); }
+  .bloc > h3 { font-size: 16px; font-weight: 800; color: var(--text); margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+  .ligne-statut { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+  .ligne-statut select { height: 40px; border: 1px solid var(--line); border-radius: 10px; padding: 0 10px; background: var(--card); font-weight: 600; }
+  .prochaine { background: var(--bg); border-radius: 10px; padding: 12px 14px; margin: 12px 0; }
+  .prochaine .valeur { font-weight: 700; font-size: 16px; }
+  .prochaine .valeur.retard { color: var(--danger); }
+  .prochaine .valeur.jour { color: var(--warn); }
+  .actions { display: flex; flex-wrap: wrap; gap: 8px; }
+  dl.infos { display: grid; grid-template-columns: 150px minmax(0, 1fr); gap: 8px 12px; font-size: 15px; }
+  dl.infos dt { color: var(--muted); }
+  dl.infos dd { overflow-wrap: anywhere; white-space: pre-wrap; }
+  .contact { padding: 10px 0; border-top: 1px solid var(--line); display: flex; justify-content: space-between; gap: 10px; align-items: flex-start; }
+  .contact:first-of-type { border-top: 0; padding-top: 0; }
+  .contact .nom { font-weight: 700; }
+  .contact .liens { display: flex; flex-direction: column; gap: 2px; font-size: 14px; overflow-wrap: anywhere; }
+  .contact-actions { display: flex; gap: 6px; flex-wrap: wrap; justify-content: flex-end; }
+  .journal { list-style: none; }
+  .journal li { padding: 0 0 14px 16px; border-left: 2px solid var(--line); position: relative; }
+  .journal li:last-child { padding-bottom: 0; }
+  .journal li::before { content: ''; position: absolute; left: -6px; top: 4px; width: 10px; height: 10px; border-radius: 50%; background: var(--card); border: 2px solid var(--line-strong); }
+  .journal li.t-email_envoye::before, .journal li.t-brouillon::before { border-color: var(--primary); }
+  .journal li.t-email_recu::before, .journal li.t-appel::before, .journal li.t-rdv::before { border-color: var(--accent); background: var(--accent); }
+  .journal .quand { font-size: 12px; color: var(--muted); display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+  .journal .quoi { font-weight: 700; font-size: 13px; color: var(--text); }
+  .journal .resume { font-size: 15px; white-space: pre-wrap; overflow-wrap: anywhere; margin-top: 2px; }
+  .journal details { margin-top: 4px; }
+  .journal summary { cursor: pointer; color: var(--primary); font-size: 13px; }
+  .journal pre { white-space: pre-wrap; font-family: inherit; font-size: 13px; background: var(--bg); padding: 10px; border-radius: 8px; margin-top: 6px; overflow-wrap: anywhere; }
+  .source { font-size: 11px; color: var(--muted); border: 1px solid var(--line); border-radius: 4px; padding: 0 5px; }
+  .suppr-journal { border: 0; background: none; color: var(--muted); font-size: 12px; cursor: pointer; text-decoration: underline; margin-left: auto; }
+  .fiche-pied { padding: 16px; display: flex; gap: 8px; flex-wrap: wrap; }
+
+  /* Formulaires */
+  .form { padding: 18px 16px 0; display: flex; flex-direction: column; gap: 12px; }
+  .form > h2 { font-size: 19px; font-weight: 800; line-height: 1.3; }
+  .champ { display: flex; flex-direction: column; gap: 4px; font-size: 13px; font-weight: 600; color: var(--muted); min-width: 0; }
+  .champ input, .champ select, .champ textarea { border: 1px solid var(--line); border-radius: 10px; padding: 9px 11px; background: var(--card); color: var(--text); font-weight: 400; width: 100%; }
+  .champ textarea { min-height: 96px; resize: vertical; line-height: 1.45; }
+  .champ textarea.grand { min-height: 260px; }
+  .deux { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .puces { display: flex; flex-wrap: wrap; gap: 6px; }
+  .puces button { border: 1px solid var(--line); background: var(--card); border-radius: 999px; padding: 7px 12px; font-size: 13px; cursor: pointer; font-weight: 600; }
+  .puces button[aria-pressed="true"] { background: var(--primary-soft); border-color: var(--primary); color: var(--primary); }
+  .pied { display: flex; flex-wrap: wrap; gap: 8px; justify-content: flex-end; position: sticky; bottom: 0; background: var(--card); padding: 12px 0 calc(16px + env(safe-area-inset-bottom)); border-top: 1px solid var(--line); margin-top: 4px; }
+  .aide { font-size: 13px; color: var(--muted); font-weight: 400; }
+  .alerte { background: var(--warn-soft); color: #7A2E0E; border-radius: 10px; padding: 10px 12px; font-size: 14px; }
+  .confirmation { background: var(--primary-soft); border-radius: 10px; padding: 12px; font-size: 14px; display: flex; flex-direction: column; gap: 10px; }
+  .confirmation .actions { justify-content: flex-end; }
+  .de { font-size: 13px; color: var(--muted); }
+  .de b { color: var(--text); }
+  fieldset { border: 0; display: flex; flex-direction: column; gap: 6px; }
+  legend { font-size: 13px; font-weight: 600; color: var(--muted); margin-bottom: 4px; }
+
+  #toast { position: fixed; inset: auto auto 24px 50%; margin: 0; border: 0; overflow: visible; width: max-content; height: auto; transform: translateX(-50%); background: var(--text); color: #fff; padding: 11px 16px; border-radius: 10px; font-size: 14px; opacity: 0; pointer-events: none; transition: opacity .2s; z-index: 100; max-width: calc(100vw - 32px); text-align: center; }
+  #toast.visible { opacity: 1; }
+  .chargement { color: var(--muted); padding: 40px 0; text-align: center; }
+
+  /* Images : logos des entreprises (ou initiales), portrait, photo d'accueil */
+  .avatar { --h: 225; flex: none; display: inline-grid; place-items: center; border-radius: 10px; background: hsl(var(--h) 70% 95%); color: hsl(var(--h) 45% 30%); border: 1px solid hsl(var(--h) 35% 88%); font-weight: 800; overflow: hidden; line-height: 1; letter-spacing: .02em; }
+  .avatar img { width: 100%; height: 100%; object-fit: contain; background: #fff; padding: 3px; }
+  .a-s { width: 26px; height: 26px; font-size: 10.5px; border-radius: 7px; }
+  .a-m { width: 42px; height: 42px; font-size: 14px; }
+  .a-l { width: 58px; height: 58px; font-size: 19px; border-radius: 14px; }
+  .a-rond { border-radius: 50%; }
+  .photo { width: 30px; height: 30px; border-radius: 50%; object-fit: cover; flex: none; }
+  .marque { display: flex; align-items: center; gap: 8px; text-decoration: none; color: var(--text); }
+  .marque img { height: 24px; width: auto; display: block; }
+  .marque span { font-weight: 800; font-size: 15px; color: var(--muted); border-left: 1px solid var(--line); padding-left: 8px; }
+  #btn-reglages { padding-left: 6px; }
+  .salut { display: flex; align-items: center; gap: 14px; }
+  .salut img { width: 52px; height: 52px; border-radius: 50%; object-fit: cover; border: 2px solid #fff; box-shadow: 0 0 0 1px var(--line); }
+  .salut .meta { font-size: 15px; }
+  .accueil form { padding: 0; overflow: hidden; }
+  .accueil .couverture { display: block; width: 100%; height: 150px; object-fit: cover; }
+  .accueil .dedans { padding: 0 24px 24px; display: flex; flex-direction: column; gap: 14px; }
+  .accueil .portrait { width: 72px; height: 72px; border-radius: 50%; border: 4px solid #fff; margin-top: -36px; object-fit: cover; box-shadow: 0 1px 0 var(--line); }
+  .accueil .logo { height: 22px; width: auto; align-self: flex-start; }
+  .tete-ent { display: flex; gap: 14px; align-items: center; min-width: 0; }
+  .tete-ent > div { min-width: 0; }
+  .carte-haut { display: flex; gap: 12px; align-items: flex-start; }
+  .carte-titre { flex: 1; min-width: 0; }
+  .contact { align-items: center; }
+  .contact .qui { display: flex; gap: 12px; align-items: flex-start; min-width: 0; }
+
+  /* Étapes : une couleur douce chacune, pour lire le pipeline d'un coup d'œil */
+  .statut.s-contacte { background: var(--primary-soft); color: var(--primary); border-color: transparent; }
+  .statut.s-qualifie { background: #E3F4F6; color: #0C6470; border-color: transparent; }
+  .statut.s-proposition { background: #FEF1DC; color: #874A08; border-color: transparent; }
+  .statut.s-negociation { background: #FCE8DA; color: #93390B; border-color: transparent; }
+  .statut.s-perdu { background: #F2F3F6; color: #6B7085; border-color: transparent; }
+  .toast-annuler { pointer-events: auto; margin-left: 10px; border: 0; background: none; color: #fff; font-weight: 700; text-decoration: underline; cursor: pointer; font-size: 14px; }
+  .pied .erreur { flex-basis: 100%; margin: 0; order: -1; }
+  .form { position: relative; }
+  .form > h2 { padding-right: 48px; }
+  .fermer-modale { position: absolute; top: 12px; right: 12px; }
+  .champ input, .champ select, .champ textarea, .filtres select, .outils select, .ligne-statut select { border-color: color-mix(in srgb, var(--muted) 70%, white); }
+  .journal:not(.edition) .suppr-journal { display: none; }
+  .carte { position: relative; }
+  .lien-carte { all: unset; cursor: pointer; overflow-wrap: anywhere; }
+  .lien-carte::after { content: ''; position: absolute; inset: 0; border-radius: var(--radius); }
+  .carte-actions { position: relative; z-index: 1; }
+  .kanban .lien-carte::after { display: none; }
+  .kanban .carte { cursor: pointer; }
+  .carte:has(.lien-carte:focus-visible) { outline: 2px solid var(--primary); outline-offset: 2px; }
+  a.chiffre { text-decoration: none; }
+  a.chiffre:hover { border-color: var(--line-strong); }
+  .date-lue { font-weight: 600; color: var(--text); }
+  .perso { border: 1px solid var(--line); background: var(--bg); border-radius: 12px; padding: 12px; display: flex; flex-direction: column; gap: 10px; }
+  .perso-tete { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+  .perso .appuis { font-size: 13px; color: var(--muted); }
+  .perso .appuis b { color: var(--text); }
+
+
+  /* Tableau (façon tableur) */
+  .outils { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin: 14px 0 10px; }
+  .outils select { height: 38px; border: 1px solid var(--line); border-radius: 10px; padding: 0 10px; background: var(--card); font-size: 14px; max-width: 100%; }
+  .outils .espace { flex: 1; }
+  .barre-lot { position: sticky; top: 0; z-index: 6; display: flex; flex-wrap: wrap; gap: 8px; align-items: center; background: var(--text); color: #fff; border-radius: 12px; padding: 8px 10px; margin-bottom: 10px; }
+  .barre-lot b { margin: 0 6px 0 4px; }
+  .barre-lot .btn { min-height: 34px; padding: 5px 11px; font-size: 13px; background: rgba(255, 255, 255, .1); border-color: rgba(255, 255, 255, .25); color: #fff; }
+  .barre-lot .btn:hover { background: rgba(255, 255, 255, .2); }
+  .barre-lot .btn.primaire { background: #fff; color: var(--text); border-color: #fff; }
+  .grille-zone { overflow: auto; max-height: calc(100dvh - 250px); min-height: 260px; background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); overscroll-behavior: contain; }
+  .tableur { border-collapse: separate; border-spacing: 0; font-size: 13.5px; min-width: 100%; }
+  .tableur thead th { position: sticky; top: 0; z-index: 3; background: #F1F3FA; color: var(--muted); font-size: 12px; font-weight: 700; text-align: left; padding: 0; border-bottom: 1px solid var(--line); border-right: 1px solid var(--line); white-space: nowrap; }
+  .tableur thead th button { all: unset; box-sizing: border-box; display: flex; gap: 4px; align-items: center; width: 100%; padding: 9px 10px; cursor: pointer; }
+  .tableur thead th button:focus-visible { outline: 2px solid var(--primary); outline-offset: -2px; }
+  .tableur thead th[aria-sort="ascending"] button::after { content: '\25B2'; font-size: 9px; }
+  .tableur thead th[aria-sort="descending"] button::after { content: '\25BC'; font-size: 9px; }
+  .tableur td, .tableur tbody th { padding: 0 10px; height: 38px; border-bottom: 1px solid var(--line); border-right: 1px solid var(--line); white-space: nowrap; max-width: 260px; overflow: hidden; text-overflow: ellipsis; background: var(--card); text-align: left; font-weight: 400; cursor: cell; }
+  .tableur .c-sel { position: sticky; left: 0; z-index: 2; width: 40px; min-width: 40px; padding: 0; text-align: center; cursor: default; }
+  .tableur thead .c-sel { z-index: 4; }
+  .tableur .c-sel input { width: 18px; height: 18px; margin: 10px; cursor: pointer; }
+  .tableur .fige { position: sticky; left: 40px; z-index: 2; min-width: 200px; max-width: 240px; font-weight: 700; box-shadow: 1px 0 0 var(--line); }
+  .tableur thead .fige { z-index: 4; }
+  .tableur .ent { display: flex; align-items: center; gap: 8px; min-width: 0; }
+  .tableur .nom-ent { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .tableur .ouvrir-fiche { flex: none; border: 1px solid var(--line); background: var(--card); color: var(--primary); border-radius: 6px; font-size: 12px; font-weight: 700; padding: 2px 7px; cursor: pointer; }
+  @media (pointer: fine) { .tableur tr:not(:hover):not(:focus-within) .ouvrir-fiche { opacity: 0; } }
+  .tableur .statut { font-size: 12px; }
+  .tableur .large { min-width: 220px; }
+  .tableur .lecture { color: var(--muted); cursor: default; text-align: center; }
+  .tableur .vide-cel { color: #A3A9C7; }
+  .tableur tr.choisie td, .tableur tr.choisie th { background: #F2F4FF; }
+  .tableur [data-col]:focus { outline: 2px solid var(--primary); outline-offset: -2px; position: relative; }
+  .tableur .fige:focus { position: sticky; }
+  .tableur .edition { padding: 0; overflow: visible; }
+  .tableur .edition input, .tableur .edition select { width: 100%; min-width: 140px; height: 37px; border: 0; outline: 2px solid var(--primary); outline-offset: -2px; padding: 0 9px; font-size: 14px; background: #fff; border-radius: 0; }
+  .tableur .enregistre { animation: enregistre 1s ease-out; }
+  @keyframes enregistre { from { background: var(--accent-soft); } to { background: var(--card); } }
+  .tableur tr.ajout td { background: #FAFBFF; }
+  .tableur tr.ajout .ajout-cel { position: sticky; left: 40px; padding: 0; }
+  .tableur .ajout-rapide { width: 360px; max-width: 70vw; height: 38px; border: 0; background: transparent; padding: 0 10px; font-size: 14px; }
+  .tableur .ajout-rapide:focus { outline: 2px solid var(--primary); outline-offset: -2px; background: #fff; }
+  .aide-clavier { font-size: 12px; color: var(--muted); margin-top: 8px; }
+  kbd { font-family: inherit; font-size: 11px; font-weight: 700; border: 1px solid var(--line-strong); border-bottom-width: 2px; border-radius: 5px; padding: 0 5px; background: var(--card); color: var(--muted); }
+  .apercu { overflow: auto; max-height: 220px; border: 1px solid var(--line); border-radius: 10px; }
+  .apercu table { border-collapse: collapse; font-size: 12px; }
+  .apercu th, .apercu td { border-bottom: 1px solid var(--line); padding: 5px 8px; white-space: nowrap; text-align: left; }
+  .apercu th { background: var(--bg); position: sticky; top: 0; }
+
+  /* Enchaîner */
+  dialog.session { margin: auto; width: min(780px, 100vw); max-width: 100vw; height: min(100dvh, 940px); max-height: 100dvh; border-radius: 16px; overscroll-behavior: contain; }
+  .session-cadre { display: flex; flex-direction: column; min-height: 100%; }
+  .session-tete { position: sticky; top: 0; z-index: 2; background: var(--card); border-bottom: 1px solid var(--line); padding: 12px 16px; display: grid; grid-template-columns: 1fr auto; gap: 8px 12px; align-items: center; }
+  .session-tete .pos { font-weight: 800; font-size: 16px; }
+  .progression { grid-column: 1 / -1; height: 6px; background: var(--bg); border-radius: 999px; overflow: hidden; }
+  .progression span { display: block; height: 100%; background: var(--primary); border-radius: 999px; transition: width .25s; }
+  .session-corps { padding: 18px 16px; flex: 1; display: flex; flex-direction: column; gap: 10px; }
+  .session-corps h2 { font-size: 24px; font-weight: 800; line-height: 1.2; overflow-wrap: anywhere; }
+  .coord { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+  .coord .tel { font-size: 18px; font-weight: 700; }
+  .derniers { list-style: none; display: flex; flex-direction: column; gap: 6px; font-size: 14px; }
+  .derniers li { background: var(--bg); border-radius: 8px; padding: 8px 10px; overflow-wrap: anywhere; }
+  .derniers .quand { font-size: 12px; color: var(--muted); }
+  .session-actions { position: sticky; bottom: 0; background: var(--card); border-top: 1px solid var(--line); padding: 12px 16px calc(12px + env(safe-area-inset-bottom)); display: flex; flex-wrap: wrap; gap: 8px; }
+  .session-actions .pousse { margin-left: auto; }
+  .bilan { list-style: none; display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 8px; }
+  .bilan li { background: var(--bg); border-radius: 10px; padding: 12px; }
+  .bilan b { display: block; font-size: 24px; }
+
+  /* Pipeline : glisser-déposer et isolation des colonnes */
+  .colonne { content-visibility: auto; contain-intrinsic-size: auto 270px auto 600px; }
+  .colonne.survol { outline: 2px dashed var(--primary); outline-offset: -4px; background: var(--primary-soft); }
+  .carte[draggable="true"] { cursor: grab; }
+  .carte.glisse { opacity: .5; }
+  .compteur-sms { font-size: 12px; color: var(--muted); font-weight: 400; }
+
+  @media (max-width: 760px) {
+    .barre-in { flex-wrap: wrap; padding: 10px 12px; }
+    .recherche { order: 3; flex-basis: 100%; }
+    .marque { margin-right: auto; }
+    .onglets { position: fixed; bottom: 0; left: 0; right: 0; background: var(--card); border-top: 1px solid var(--line); z-index: 30; padding: 0 0 env(safe-area-inset-bottom); justify-content: space-around; max-width: none; gap: 0; }
+    .onglets button { flex: 1 1 auto; padding: 13px 2px; border-bottom: 0; border-top: 2px solid transparent; font-size: 13px; white-space: nowrap; }
+    .compteur { min-width: 18px; padding: 0 5px; font-size: 11px; line-height: 18px; margin-left: 3px; vertical-align: 1px; }
+    .onglets button[aria-selected="true"] { border-top-color: var(--primary); }
+    main { padding: 14px 12px 110px; }
+    .grille { grid-template-columns: 1fr; }
+    .kanban { grid-auto-columns: 86%; }
+    .rangee { grid-template-columns: minmax(0, 1fr) auto; }
+    .rangee .c-large { display: none; }
+    .rangee.entete { display: none; }
+    #toast { bottom: calc(76px + env(safe-area-inset-bottom)); }
+    .grille-zone { max-height: calc(100dvh - 280px); }
+    .tableur .fige { min-width: 150px; max-width: 160px; }
+    .tableur .fige { min-width: 160px; }
+    .tableur .large { min-width: 180px; }
+    .aide-clavier, kbd { display: none; }
+    dialog.session { width: 100vw; height: 100dvh; border-radius: 0; }
+    .session-corps h2 { font-size: 21px; }
+    body:has(dialog[open]) #toast { bottom: calc(24px + env(safe-area-inset-bottom)); }
+    .barre { position: static; }
+    .tableur td, .tableur tbody th { height: 44px; }
+    .barre-lot { position: fixed; left: 8px; right: 8px; bottom: calc(60px + env(safe-area-inset-bottom)); top: auto; z-index: 25; flex-wrap: nowrap; overflow-x: auto; margin: 0; }
+    .barre-lot b { white-space: nowrap; }
+  }
+  @media (max-width: 640px) {
+    .pied > [data-fermer] { display: none; }
+    dialog.modale { width: 100vw; max-width: 100vw; height: 100dvh; max-height: 100dvh; border-radius: 0; }
+  }
+  @media (max-width: 480px) {
+    .deux { grid-template-columns: 1fr; }
+    dl.infos { grid-template-columns: 1fr; gap: 0; }
+    dl.infos dt { margin-top: 8px; }
+    .btn-texte-long { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<div class="accueil" id="ecran-cle" hidden>
+  <form id="form-cle" autocomplete="on">
+    <img class="couverture" src="/images/formation-ia-equipes.jpg" alt="" width="800" height="533">
+    <div class="dedans">
+    <img class="portrait" src="/images/signature/gabriel-vanderbecken.png" alt="" width="72" height="72">
+    <img class="logo" src="/images/logo-ia-entrepreneur-compact.png" alt="IA-Entrepreneur" width="100" height="22">
+    <h1>Bonjour Gabriel</h1>
+    <p>Tes leads, tes relances et tout l'historique, au même endroit. Entre ta clé d'accès.</p>
+    <label class="champ">Clé d'accès
+      <input type="password" id="cle" name="password" autocomplete="current-password" required>
+    </label>
+    <label class="case"><input type="checkbox" id="retenir" checked> Rester connecté sur cet appareil</label>
+    <p class="erreur" id="erreur-cle" hidden></p>
+    <button class="btn primaire" type="submit">Ouvrir le CRM</button>
+    </div>
+  </form>
+</div>
+
+<div id="app" hidden>
+  <header class="barre">
+    <div class="barre-in">
+      <a class="marque" href="/crm/" aria-label="CRM de Gabriel, IA-Entrepreneur"><img src="/images/logo-ia-entrepreneur-compact.png" alt="" width="109" height="24"><span>CRM</span></a>
+      <label class="recherche">
+        <input type="search" id="q" placeholder="Chercher un lead, une note, le mémo" aria-label="Rechercher" autocomplete="off">
+      </label>
+      <button class="btn primaire" id="btn-nouveau" type="button">Nouveau<span class="btn-texte-long">lead</span></button>
+      <button class="btn" id="btn-reglages" type="button"><img class="photo" src="/images/signature/gabriel-vanderbecken.png" alt="" width="30" height="30"><span class="btn-texte-long">Réglages</span></button>
+    </div>
+    <nav class="onglets" aria-label="Vues">
+      <button type="button" data-vue="jour" aria-selected="true">Aujourd'hui<span class="compteur" id="compteur" hidden></span></button>
+      <button type="button" data-vue="pipeline" aria-selected="false">Pipeline</button>
+      <button type="button" data-vue="tableau" aria-selected="false">Tableau</button>
+      <button type="button" data-vue="memo" aria-selected="false">Mémo</button>
+    </nav>
+  </header>
+  <main id="vue"><p class="chargement">Chargement</p></main>
+</div>
+
+<dialog class="panneau" id="fiche" aria-label="Fiche du lead"></dialog>
+<dialog class="session" id="session" aria-label="Enchaîner les leads"></dialog>
+<dialog class="modale" id="modale"></dialog>
+<div id="toast" role="status" aria-live="polite" popover="manual"></div>
+
+<script>
+'use strict';
+
+/* ================= Réglages fixes ================= */
+
+const API = '/api/crm';
+const COMPTE = 'gabriel@ia-entrepreneur.fr';
+// Rythme de relance tant que personne ne répond : 3 jours après le premier
+// contact, puis 7, puis 14, puis une prise de nouvelles tous les 3 mois.
+const CADENCE = [3, 7, 14];
+const NURTURING = 90;
+const SIGNATURE_DEFAUT = 'Gabriel Vanderbecken\nIA-Entrepreneur\nhttps://ia-entrepreneur.fr';
+
+const STATUTS = [['nouveau', 'Nouveau'], ['contacte', 'Contacté'], ['qualifie', 'Qualifié'], ['proposition', 'Proposition'],
+  ['negociation', 'Négociation'], ['gagne', 'Gagné'], ['perdu', 'Perdu']];
+const LIB_STATUT = Object.fromEntries(STATUTS);
+const TYPES = [['prospect', 'Prospect'], ['client', 'Client'], ['partenaire', 'Partenaire'], ['fournisseur', 'Fournisseur']];
+const LIB_TYPE = Object.fromEntries(TYPES);
+const ACTIONS = [['email', 'Email'], ['appel', 'Appel'], ['rdv', 'Rendez-vous'], ['autre', 'Autre']];
+const LIB_ACTION = Object.fromEntries(ACTIONS);
+// Dans une phrase, « Autre aujourd'hui » ne veut rien dire : « À faire aujourd'hui ».
+const actionLue = (a) => (a === 'autre' ? 'À faire' : LIB_ACTION[a] || 'Relance');
+const LIB_ACTIVITE = {
+  note: 'Note', appel: 'Appel', appel_sans_reponse: 'Appel sans réponse', email_envoye: 'Email envoyé',
+  email_recu: 'Réponse reçue', brouillon: 'Brouillon Gmail', rdv: 'Rendez-vous', sms: 'SMS',
+  relance_decalee: 'Relance déplacée', statut: 'Statut', import: 'Import',
+};
+const LIB_SOURCE = {
+  pomolow: 'Pomolow', gmail: 'Gmail', hubspot: 'HubSpot', agenda: 'Agenda', fathom: 'Fathom',
+  conversation: 'Conversation avec Claude', 'mémoire': 'Mémoire de Claude', memoire: 'Mémoire de Claude', claude: 'Claude',
+  fichier: 'Fichier', drive: 'Drive',
+};
+const ERREURS = {
+  cle_invalide: "La clé n'est pas la bonne.",
+  trop_de_tentatives: 'Trop de tentatives. Réessaie dans dix minutes.',
+  crm_non_configure: "Le CRM n'est pas encore configuré sur le serveur.",
+  base_indisponible: 'La base ne répond pas. Réessaie dans un instant.',
+  gmail_non_configure: "L'envoi Gmail n'est pas configuré.",
+  gmail_connexion: "Connexion à Gmail impossible : rien n'est parti.",
+  gmail_mauvaise_boite: "La boîte reliée n'est pas gabriel@ia-entrepreneur.fr : rien n'est parti.",
+  gmail_envoi: "Gmail a refusé le message : rien n'est parti.",
+  trop_d_emails_aujourdhui: "Limite de 60 emails par jour atteinte : rien n'est parti.",
+  adresse_invalide: "L'adresse email n'est pas valide.",
+  objet_invalide: "Il manque l'objet.",
+  message_invalide: 'Le message est vide.',
+  introuvable: "Cette fiche n'existe plus. Actualise la page.",
+  reseau: 'Pas de connexion. Ta saisie est gardée, réessaie quand le réseau revient.',
+  ia_non_configuree: "La rédaction automatique n'est pas branchée sur le serveur.",
+  ia_trop_de_demandes: 'Beaucoup de rédactions en peu de temps : réessaie dans une minute.',
+  ia_injoignable: 'Claude ne répond pas pour le moment. Écris le message toi-même ou réessaie.',
+  ia_erreur: "La rédaction n'a pas abouti. Réessaie, ou écris le message toi-même.",
+  ia_refus: 'Claude a refusé de rédiger ce message. Écris-le toi-même.',
+  ia_coupe: 'La rédaction a été coupée. Réessaie.',
+};
+
+/* ================= Utilitaires ================= */
+
+const $ = (s, r = document) => r.querySelector(s);
+const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+const esc = (t) => String(t ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+const sansAccents = (t) => String(t ?? '').normalize('NFD').replace(/\p{M}/gu, '').toLowerCase();
+const pad = (n) => String(n).padStart(2, '0');
+
+// Référence gardée : le message peut être déplacé dans une fenêtre que l'on
+// redessine ensuite, ce qui le détacherait de la page.
+const TOAST = document.getElementById('toast');
+function toast(message, duree = 3200, annuler = null) {
+  const t = TOAST;
+  t.textContent = message;
+  if (annuler) {
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'toast-annuler';
+    b.textContent = 'Annuler';
+    b.addEventListener('click', () => { t.classList.remove('visible'); try { t.hidePopover(); } catch { /* rien */ } annuler(); });
+    t.append(b);
+    duree = Math.max(duree, 8000);
+  }
+  // Les fenêtres ouvertes sont dans la couche supérieure du navigateur : le
+  // message n'est visible par-dessus que s'il y entre aussi (popover).
+  // Une fenêtre ouverte rend inerte tout ce qui est hors d'elle : le message va
+  // dans la fenêtre active pour que « Annuler » reste cliquable.
+  const hote = (document.activeElement && document.activeElement.closest('dialog[open]')) || ['#modale', '#session', '#fiche'].map((x) => $(x)).find((d) => d.open) || document.body;
+  if (t.parentElement !== hote) { try { t.hidePopover(); } catch { /* déjà masqué */ } hote.append(t); }
+  if (t.showPopover) { try { t.hidePopover(); } catch { /* déjà masqué */ } t.showPopover(); }
+  t.classList.add('visible');
+  clearTimeout(toast.minuteur);
+  toast.minuteur = setTimeout(() => {
+    t.classList.remove('visible');
+    setTimeout(() => { if (t.hidePopover && !t.classList.contains('visible')) { try { t.hidePopover(); } catch { /* rien */ } } }, 250);
+  }, duree);
+}
+
+/* Dates : toujours des chaînes AAAA-MM-JJ, calculées en UTC pour ne jamais
+   glisser d'un jour avec le fuseau. */
+function aujourdhui() {
+  const n = new Date();
+  return `${n.getFullYear()}-${pad(n.getMonth() + 1)}-${pad(n.getDate())}`;
+}
+function versDate(s) { const [y, m, d] = s.split('-').map(Number); return new Date(Date.UTC(y, m - 1, d)); }
+function versIso(d) { return d.toISOString().slice(0, 10); }
+function ajouterJours(s, n) { const d = versDate(s); d.setUTCDate(d.getUTCDate() + n); return versIso(d); }
+function ecartJours(s, depuis = aujourdhui()) { return Math.round((versDate(s) - versDate(depuis)) / 86400000); }
+
+function paques(an) {
+  const a = an % 19, b = Math.floor(an / 100), c = an % 100, d = Math.floor(b / 4), e = b % 4;
+  const f = Math.floor((b + 8) / 25), g = Math.floor((b - f + 1) / 3), h = (19 * a + b - d - g + 15) % 30;
+  const i = Math.floor(c / 4), k = c % 4, l = (32 + 2 * e + 2 * i - h - k) % 7, m = Math.floor((a + 11 * h + 22 * l) / 451);
+  const mois = Math.floor((h + l - 7 * m + 114) / 31), jour = ((h + l - 7 * m + 114) % 31) + 1;
+  return `${an}-${pad(mois)}-${pad(jour)}`;
+}
+const feriesCache = {};
+function feries(an) {
+  if (!feriesCache[an]) {
+    const p = paques(an);
+    feriesCache[an] = new Set([`${an}-01-01`, ajouterJours(p, 1), `${an}-05-01`, `${an}-05-08`, ajouterJours(p, 39),
+      ajouterJours(p, 50), `${an}-07-14`, `${an}-08-15`, `${an}-11-01`, `${an}-11-11`, `${an}-12-25`]);
+  }
+  return feriesCache[an];
+}
+function estOuvre(s) { const j = versDate(s).getUTCDay(); return j !== 0 && j !== 6 && !feries(Number(s.slice(0, 4))).has(s); }
+function prochainOuvre(s) { let d = s; while (!estOuvre(d)) d = ajouterJours(d, 1); return d; }
+function dansJours(n, depuis = aujourdhui()) { return prochainOuvre(ajouterJours(depuis, n)); }
+function lundiProchain() { const t = aujourdhui(); const j = versDate(t).getUTCDay(); return prochainOuvre(ajouterJours(t, ((8 - j) % 7) || 7)); }
+function dansMois(n) { const d = versDate(aujourdhui()); d.setUTCMonth(d.getUTCMonth() + n); return prochainOuvre(versIso(d)); }
+function delaiApres(n) { return n >= 1 && n <= CADENCE.length ? CADENCE[n - 1] : NURTURING; }
+
+const JOURS = ['dimanche', 'lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi', 'samedi'];
+const MOIS = ['janvier', 'février', 'mars', 'avril', 'mai', 'juin', 'juillet', 'août', 'septembre', 'octobre', 'novembre', 'décembre'];
+function dateLongue(s, avecJour = true) {
+  const d = versDate(s);
+  const an = d.getUTCFullYear() !== versDate(aujourdhui()).getUTCFullYear() ? ` ${d.getUTCFullYear()}` : '';
+  return `${avecJour ? JOURS[d.getUTCDay()] + ' ' : ''}${d.getUTCDate()} ${MOIS[d.getUTCMonth()]}${an}`;
+}
+function dateCourte(s) { const d = versDate(s); return `${pad(d.getUTCDate())}/${pad(d.getUTCMonth() + 1)}/${d.getUTCFullYear()}`; }
+function quand(s) {
+  if (!s) return '';
+  const e = ecartJours(s);
+  if (e === 0) return "aujourd'hui";
+  if (e === 1) return 'demain';
+  if (e === -1) return 'hier, en retard';
+  if (e < -1) return `en retard de ${-e} jours`;
+  if (e < 7) return dateLongue(s);
+  return `le ${dateLongue(s)}`;
+}
+function classeQuand(s) { if (!s) return ''; const e = ecartJours(s); return e < 0 ? 'retard' : e === 0 ? 'jour' : ''; }
+function instantLisible(iso) {
+  const d = new Date(iso);
+  const jour = `${pad(d.getDate())}/${pad(d.getMonth() + 1)}/${d.getFullYear()}`;
+  const h = d.getHours(), m = d.getMinutes();
+  return h === 0 && m === 0 ? jour : `${jour} à ${h} h ${pad(m)}`;
+}
+function localPourInput(d = new Date()) {
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+}
+function euros(n) { return n == null ? '' : new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 }).format(n); }
+
+/* Markdown très réduit pour le mémo : le texte est échappé d'abord, puis
+   seuls gras, italique, titres, listes et liens https sont reconnus. */
+function markdown(src) {
+  const lignes = esc(src).split('\n');
+  let html = '', liste = null;
+  const fermer = () => { if (liste) { html += `</${liste}>`; liste = null; } };
+  const enLigne = (t) => t
+    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+    .replace(/(^|[\s(])\*(?!\s)(.+?)\*(?=[\s).,;:!?]|$)/g, '$1<em>$2</em>')
+    .replace(/\[([^\]]+)\]\((https:\/\/[^)\s]+)\)/g, '<a href="$2" target="_blank" rel="noopener">$1</a>');
+  for (const brute of lignes) {
+    const l = brute.trimEnd();
+    let m;
+    if (!l.trim()) { fermer(); continue; }
+    if ((m = l.match(/^#{1,4}\s+(.*)$/))) { fermer(); html += `<h4>${enLigne(m[1])}</h4>`; continue; }
+    if ((m = l.match(/^\s*[-*•]\s+(.*)$/))) { if (liste !== 'ul') { fermer(); html += '<ul>'; liste = 'ul'; } html += `<li>${enLigne(m[1])}</li>`; continue; }
+    if ((m = l.match(/^\s*\d+[.)]\s+(.*)$/))) { if (liste !== 'ol') { fermer(); html += '<ol>'; liste = 'ol'; } html += `<li>${enLigne(m[1])}</li>`; continue; }
+    fermer();
+    html += `<p>${enLigne(l)}</p>`;
+  }
+  fermer();
+  return `<div class="md">${html}</div>`;
+}
+
+function surligner(texte, q) {
+  const t = String(texte ?? '');
+  if (!q) return esc(t);
+  const n = sansAccents(t);
+  const i = n.indexOf(q);
+  if (i < 0) return esc(t);
+  // On travaille sur un texte sans accents de même longueur (NFD retire
+  // seulement les marques) : on recale sur l'original par caractère.
+  const plat = [...t].map((c) => sansAccents(c));
+  let pos = 0, debut = -1, fin = -1;
+  for (let k = 0; k < plat.length; k++) {
+    if (pos === i) debut = k;
+    pos += plat[k].length;
+    if (pos >= i + q.length && debut >= 0) { fin = k + 1; break; }
+  }
+  if (debut < 0 || fin < 0) return esc(t);
+  const car = [...t];
+  return esc(car.slice(0, debut).join('')) + '<mark>' + esc(car.slice(debut, fin).join('')) + '</mark>' + esc(car.slice(fin).join(''));
+}
+function extraitAutour(texte, q, rayon = 70) {
+  const t = String(texte ?? '').replace(/\s+/g, ' ');
+  const i = sansAccents(t).indexOf(q);
+  if (i < 0) return t.slice(0, rayon * 2);
+  const debut = Math.max(0, i - rayon);
+  return (debut > 0 ? '…' : '') + t.slice(debut, i + q.length + rayon) + (i + q.length + rayon < t.length ? '…' : '');
+}
+
+/* ================= État et API ================= */
+
+const S = {
+  cle: localStorage.getItem('crm_cle') || sessionStorage.getItem('crm_cle') || '',
+  vue: 'jour',
+  q: '',
+  filtres: { type: '', statut: '', source: '', action: '', relance: '', archives: false },
+  fiche: null,
+  chargeA: 0,
+};
+let D = null;
+const IDX = { lead: new Map(), contacts: new Map(), activites: new Map() };
+
+function indexer() {
+  IDX.lead = new Map(D.leads.map((l) => [l.id, l]));
+  IDX.contacts = new Map();
+  for (const c of D.contacts) { if (!IDX.contacts.has(c.lead_id)) IDX.contacts.set(c.lead_id, []); IDX.contacts.get(c.lead_id).push(c); }
+  D.activites.sort((a, b) => (a.date < b.date ? 1 : a.date > b.date ? -1 : 0));
+  IDX.activites = new Map();
+  for (const a of D.activites) { if (!IDX.activites.has(a.lead_id)) IDX.activites.set(a.lead_id, []); IDX.activites.get(a.lead_id).push(a); }
+}
+
+class ErreurApi extends Error {}
+
+async function api(methode, corps) {
+  let r;
+  try {
+    r = await fetch(API, {
+      method: methode,
+      headers: { 'X-Cle-Crm': S.cle, ...(corps ? { 'Content-Type': 'application/json' } : {}) },
+      body: corps ? JSON.stringify(corps) : undefined,
+    });
+  } catch {
+    throw new ErreurApi(ERREURS.reseau);
+  }
+  const j = await r.json().catch(() => ({}));
+  if (r.status === 401) { deconnecter(ERREURS.cle_invalide); throw new ErreurApi(ERREURS.cle_invalide); }
+  if (!r.ok) {
+    const code = String(j.erreur || '');
+    throw new ErreurApi(ERREURS[code] || ERREURS[code.split(':')[0]] || `Ça n'a pas marché (${code || r.status}). Ta saisie est gardée, réessaie.`);
+  }
+  return j;
+}
+
+async function charger() {
+  D = await api('GET');
+  S.chargeA = Date.now();
+  indexer();
+}
+
+function remplacerLead(l) { if (!l) return; const i = D.leads.findIndex((x) => x.id === l.id); if (i >= 0) D.leads[i] = l; else D.leads.push(l); }
+function ajouterActivite(a) { if (a) D.activites.unshift(a); }
+
+/* ================= Lecture des données ================= */
+
+const actif = (l) => !l.archive && l.statut !== 'gagne' && l.statut !== 'perdu';
+const contactsDe = (id) => IDX.contacts.get(id) || [];
+const activitesDe = (id) => IDX.activites.get(id) || [];
+function contactPrincipal(id) {
+  const cs = contactsDe(id);
+  return cs.find((c) => c.principal) || cs.find((c) => c.email || c.telephone) || cs[0] || null;
+}
+const nomContact = (c) => (c ? [c.prenom, c.nom].filter(Boolean).join(' ') : '');
+const telLien = (t) => `tel:${String(t).replace(/[^\d+]/g, '')}`;
+function contactJoignable(id) { const cs = contactsDe(id); return cs.find((c) => c.principal && c.telephone) || cs.find((c) => c.telephone) || null; }
+function telephoneDe(l) { const c = contactJoignable(l.id); return (c && c.telephone) || l.telephone || ''; }
+// Un SMS ne part que vers un portable (06, 07, ou 069x à La Réunion).
+function estMobile(t) { const n = numeroInternational(t); return /^33[67]\d{8}$/.test(n) || /^262(69|63)\d{7}$/.test(n) || (/^\d{10,15}$/.test(n) && !n.startsWith('33') && !n.startsWith('262')); }
+function mobileDe(l) { const c = contactsDe(l.id).find((x) => x.telephone && estMobile(x.telephone)); return (c && c.telephone) || (l.telephone && estMobile(l.telephone) ? l.telephone : ''); }
+function emailDe(l) { const c = contactsDe(l.id).find((x) => x.email); return c ? c.email : ''; }
+function sources() { return [...new Set(D.leads.map((l) => l.source).filter(Boolean))].sort((a, b) => a.localeCompare(b, 'fr')); }
+
+/* ================= Rendu des vues ================= */
+
+function rendre() {
+  const vue = $('#vue');
+  $$('.onglets button').forEach((b) => b.setAttribute('aria-selected', String(b.dataset.vue === S.vue && (!S.q || S.vue === 'tableau'))));
+  const aFaire = D.leads.filter((l) => !l.archive && l.prochaine_relance && ecartJours(l.prochaine_relance) <= 0).length;
+  const compteur = $('#compteur');
+  compteur.hidden = aFaire === 0;
+  compteur.textContent = aFaire;
+  document.title = aFaire ? `(${aFaire}) CRM de Gabriel` : 'CRM de Gabriel';
+  // Dans le tableau, la recherche filtre les lignes ; ailleurs, elle ouvre les résultats.
+  if (S.vue === 'tableau') vue.innerHTML = vueTableau();
+  else if (S.q) vue.innerHTML = vueRecherche();
+  else if (S.vue === 'pipeline') vue.innerHTML = vuePipeline();
+  else if (S.vue === 'memo') vue.innerHTML = vueMemo();
+  else vue.innerHTML = vueJour();
+  chargerLogos();
+}
+
+function carte(l, { compacte = false } = {}) {
+  const c = contactPrincipal(l.id);
+  const tel = telephoneDe(l);
+  const email = emailDe(l);
+  const qui = [nomContact(c), c && c.poste].filter(Boolean).join(', ');
+  const relance = l.prochaine_relance
+    ? `<p class="relance ${classeQuand(l.prochaine_relance)}">${esc(actionLue(l.prochaine_action))} ${esc(quand(l.prochaine_relance))}${l.relances_sans_reponse ? ` <span class="meta">(${l.relances_sans_reponse} sans réponse)</span>` : ''}</p>`
+    : (actif(l) ? '<p class="relance meta">Aucune relance prévue</p>' : '');
+  const texte = l.prochaine_note || l.besoin || '';
+  const sms = mobileDe(l);
+  const prim = (a) => (l.prochaine_action === a ? ' primaire' : '');
+  // Dans le Pipeline, la carte entière se glisse (un bouton ne démarre pas de glisser) :
+  // le clic sur la carte ouvre la fiche, le titre reste un bouton pour le clavier.
+  return `<article class="carte" data-id="${l.id}"${compacte ? ' data-act="ouvrir"' : ''}${compacte && matchMedia('(pointer: fine)').matches ? ' draggable="true"' : ''}>
+    <div class="carte-haut">${avatar(l, compacte ? 's' : 'm')}<div class="carte-titre"><h3><button type="button" class="lien-carte" data-act="ouvrir">${esc(l.entreprise)}</button></h3>${qui ? `<p class="meta">${esc(qui)}</p>` : ''}</div><span class="statut s-${l.statut}">${esc(LIB_STATUT[l.statut])}</span></div>
+    ${relance}
+    ${texte ? `<p class="extrait">${esc(texte)}</p>` : ''}
+    ${compacte ? '' : `<div class="carte-actions">
+      ${tel ? `<a class="btn petit${prim('appel')}" href="${esc(telLien(tel))}" data-act="tel">Appeler</a>` : ''}
+      ${email ? `<button type="button" class="btn petit${prim('email')}" data-act="email">Email</button>` : ''}
+      ${sms ? '<button type="button" class="btn petit" data-act="sms">SMS</button>' : ''}
+      <button type="button" class="btn petit" data-act="appel">Noter un appel</button>
+      <button type="button" class="btn petit" data-act="decaler">Décaler</button>
+    </div>`}
+  </article>`;
+}
+
+function vueJour() {
+  const t = aujourdhui();
+  const avecDate = D.leads.filter((l) => !l.archive && l.prochaine_relance);
+  const tri = (a, b) => (a.prochaine_relance < b.prochaine_relance ? -1 : a.prochaine_relance > b.prochaine_relance ? 1 : a.entreprise.localeCompare(b.entreprise, 'fr'));
+  const retard = avecDate.filter((l) => l.prochaine_relance < t).sort(tri);
+  const jour = avecDate.filter((l) => l.prochaine_relance === t).sort(tri);
+  const fin = ajouterJours(t, 7);
+  const semaine = avecDate.filter((l) => l.prochaine_relance > t && l.prochaine_relance <= fin).sort(tri);
+  const sansDate = D.leads.filter((l) => actif(l) && !l.prochaine_relance).sort((a, b) => a.entreprise.localeCompare(b.entreprise, 'fr'));
+  const parJour = new Map();
+  for (const l of semaine) { if (!parJour.has(l.prochaine_relance)) parJour.set(l.prochaine_relance, []); parJour.get(l.prochaine_relance).push(l); }
+  const enCours = D.leads.filter(actif).length;
+  const heure = new Date().getHours();
+  let h = `<div class="salut"><img src="/images/signature/gabriel-vanderbecken.png" alt="" width="52" height="52"><div><p class="meta">${heure < 18 ? 'Bonjour' : 'Bonsoir'} Gabriel</p><h1 class="titre-vue">${esc(dateLongue(t).replace(/^./, (c) => c.toUpperCase()))}</h1></div></div>
+    <div class="resume-jour">
+      <a class="chiffre ${retard.length ? 'alerte-chiffre' : ''}" href="#g-retard"><b>${retard.length}</b>en retard</a>
+      <a class="chiffre" href="#g-jour"><b>${jour.length}</b>pour aujourd'hui</a>
+      <a class="chiffre" href="#g-semaine"><b>${semaine.length}</b>dans les 7 jours</a>
+      <span class="chiffre"><b>${enCours}</b>leads en cours</span>
+    </div>`;
+  const dus = [...retard, ...jour];
+  if (dus.length) {
+    const parAction = (a) => dus.filter((l) => l.prochaine_action === a);
+    const emails = parAction('email'), appels = parAction('appel');
+    const autres = dus.filter((l) => l.prochaine_action !== 'email' && l.prochaine_action !== 'appel');
+    h += `<div class="actions" style="margin-top:14px">
+      <button type="button" class="btn primaire" data-enchainer="tout">Enchaîner les ${dus.length} relances</button>
+      ${emails.length && emails.length < dus.length ? `<button type="button" class="btn" data-enchainer="email">Les emails (${emails.length})</button>` : ''}
+      ${appels.length && appels.length < dus.length ? `<button type="button" class="btn" data-enchainer="appel">Les appels (${appels.length})</button>` : ''}
+      ${autres.length && autres.length < dus.length ? `<button type="button" class="btn" data-enchainer="autre">Le reste (${autres.length})</button>` : ''}
+    </div>`;
+    S.dusDuJour = { tout: dus.map((l) => l.id), email: emails.map((l) => l.id), appel: appels.map((l) => l.id), autre: autres.map((l) => l.id) };
+  }
+  if (retard.length) h += `<h2 class="groupe retard" id="g-retard">En retard <span>${retard.length}</span></h2><div class="grille">${retard.map((l) => carte(l)).join('')}</div>`;
+  h += `<h2 class="groupe" id="g-jour">Aujourd'hui <span>${jour.length}</span></h2>`;
+  const prochain = semaine[0] || D.leads.filter((l) => !l.archive && l.prochaine_relance > fin).sort((a, b) => a.prochaine_relance.localeCompare(b.prochaine_relance))[0];
+  const nbProchain = prochain ? D.leads.filter((l) => !l.archive && l.prochaine_relance === prochain.prochaine_relance).length : 0;
+  h += jour.length ? `<div class="grille">${jour.map((l) => carte(l)).join('')}</div>` : `<p class="vide">${retard.length ? "Rien d'autre de prévu aujourd'hui." : "Rien de prévu aujourd'hui."}${prochain ? ` Prochaines relances : ${esc(dateLongue(prochain.prochaine_relance))} (${nbProchain} lead${nbProchain > 1 ? 's' : ''}).` : ''}</p>`;
+  let premierJour = true;
+  for (const [d, ls] of parJour) h += `<h2 class="groupe"${premierJour ? ((premierJour = false), ' id="g-semaine"') : ''}>${esc(dateLongue(d))} <span>${ls.length}</span></h2><div class="grille">${ls.map((l) => carte(l)).join('')}</div>`;
+  if (sansDate.length) h += `<h2 class="groupe">Sans relance prévue <span>${sansDate.length}</span></h2><div class="grille">${sansDate.map((l) => carte(l)).join('')}</div>`;
+  return h;
+}
+
+function vuePipeline() {
+  const leads = D.leads.filter((l) => !l.archive);
+  const tri = (a, b) => (a.prochaine_relance || '9999') < (b.prochaine_relance || '9999') ? -1 : (a.prochaine_relance || '9999') > (b.prochaine_relance || '9999') ? 1 : a.entreprise.localeCompare(b.entreprise, 'fr');
+  const total = leads.filter(actif).reduce((s, l) => s + (Number(l.valeur) || 0), 0);
+  let h = `<h1 class="titre-vue">Pipeline</h1><p class="sous-titre">${leads.filter(actif).length} leads en cours${total ? `, ${esc(euros(total))} en jeu` : ''}. Pour changer d'étape, ouvre la fiche.</p><div class="kanban">`;
+  for (const [cle, lib] of STATUTS) {
+    const ls = leads.filter((l) => l.statut === cle).sort(tri);
+    const valeur = ls.reduce((s, l) => s + (Number(l.valeur) || 0), 0);
+    h += `<section class="colonne" data-statut="${cle}" aria-label="${esc(lib)}"><header><span>${esc(lib)} <small>${ls.length}</small></span>${valeur ? `<small>${esc(euros(valeur))}</small>` : ''}</header>
+      ${ls.map((l) => carte(l, { compacte: true })).join('') || '<p class="vide">Aucun lead</p>'}</section>`;
+  }
+  return h + '</div>';
+}
+
+function vueRecherche() {
+  const q = sansAccents(S.q.trim());
+  const trouves = [];
+  for (const l of D.leads) {
+    const lignes = [];
+    const champs = [['Besoin', l.besoin], ['Source', l.source], ['Secteur', l.secteur], ['Lieu', l.localisation], ['Prochaine étape', l.prochaine_note],
+      ['Tags', (l.tags || []).join(', ')], ['SIRET', l.siret], ['Téléphone', l.telephone]];
+    const nomOk = sansAccents(l.entreprise).includes(q);
+    for (const [nom, v] of champs) if (v && sansAccents(v).includes(q)) lignes.push(`${esc(nom)} : ${surligner(extraitAutour(v, q), q)}`);
+    for (const c of contactsDe(l.id)) {
+      const t = [nomContact(c), c.poste, c.email, c.telephone, c.notes].filter(Boolean).join(', ');
+      if (sansAccents(t).includes(q)) lignes.push(`Contact : ${surligner(extraitAutour(t, q), q)}`);
+    }
+    for (const a of activitesDe(l.id)) {
+      const t = `${a.resume} ${a.contenu || ''}`;
+      if (sansAccents(t).includes(q)) lignes.push(`${esc(LIB_ACTIVITE[a.type])} du ${esc(instantLisible(a.date))} : ${surligner(extraitAutour(t, q), q)}`);
+    }
+    if (nomOk || lignes.length) trouves.push({ l, lignes, score: (nomOk ? 100 : 0) + lignes.length });
+  }
+  trouves.sort((a, b) => b.score - a.score);
+  const memos = D.memos.filter((m) => sansAccents(`${m.titre} ${m.contenu} ${m.categorie}`).includes(q));
+  const modeles = D.modeles.filter((m) => sansAccents(`${m.nom} ${m.objet} ${m.corps} ${m.usage || ''}`).includes(q));
+  let h = `<h1 class="titre-vue">Résultats pour « ${esc(S.q.trim())} »</h1>
+    <p class="sous-titre">${trouves.length} lead${trouves.length > 1 ? 's' : ''}, ${memos.length + modeles.length} fiche${memos.length + modeles.length > 1 ? 's' : ''} du mémo</p>`;
+  h += trouves.map(({ l, lignes }) => `<div class="trouve" data-id="${l.id}" data-act="ouvrir" tabindex="0" role="button">
+      <h3>${surligner(l.entreprise, q)} <span class="statut s-${l.statut}">${esc(LIB_STATUT[l.statut])}</span></h3>
+      <ul>${lignes.slice(0, 6).map((x) => `<li>${x}</li>`).join('')}${lignes.length > 6 ? `<li>et ${lignes.length - 6} autres passages</li>` : ''}</ul></div>`).join('');
+  if (memos.length || modeles.length) {
+    h += '<h2 class="groupe">Dans le mémo</h2>';
+    h += memos.map((m) => `<div class="trouve" data-act="voir-memo" data-memo="${m.id}" tabindex="0" role="button"><h3>${surligner(m.titre, q)}</h3><ul><li>${esc(m.categorie)} : ${surligner(extraitAutour(m.contenu, q), q)}</li></ul></div>`).join('');
+    h += modeles.map((m) => `<div class="trouve" data-act="voir-memo" data-memo="modeles" tabindex="0" role="button"><h3>Modèle : ${surligner(m.nom, q)}</h3><ul><li>${surligner(extraitAutour(`${m.objet} ${m.corps}`, q), q)}</li></ul></div>`).join('');
+  }
+  if (!trouves.length && !memos.length && !modeles.length) h += `<p class="vide">Rien trouvé. Essaie un autre mot (prénom, entreprise, ville, mot du besoin).</p><p><button type="button" class="btn" data-act="creer-depuis-recherche">Créer le lead « ${esc(S.q.trim())} »</button></p>`;
+  return h;
+}
+
+function vueMemo() {
+  const cats = new Map();
+  for (const m of D.memos) { if (!cats.has(m.categorie)) cats.set(m.categorie, []); cats.get(m.categorie).push(m); }
+  let h = `<h1 class="titre-vue">Mémo commercial</h1>
+    <p class="sous-titre">Ce qu'on a décidé sur l'offre, les prix, les relances et la façon de parler aux prospects. La recherche en haut fouille aussi ici.</p>
+    <div class="actions" style="margin-top:10px"><button type="button" class="btn petit" data-act="memo-nouveau">Ajouter une fiche</button><button type="button" class="btn petit" data-act="modele-nouveau">Ajouter un modèle d'email</button></div>`;
+  if (!D.memos.length) h += '<p class="vide" style="margin-top:14px">Le mémo est vide pour le moment.</p>';
+  for (const [cat, ms] of cats) {
+    h += `<section class="memo-cat"><h2 class="groupe">${esc(cat)} <span>${ms.length}</span></h2>`;
+    h += ms.map((m) => `<details class="memo" id="memo-${m.id}"><summary>${esc(m.titre)}</summary><div class="corps">${markdown(m.contenu)}
+      ${(m.sources || []).length || m.date_maj ? `<p class="petites-sources">${m.date_maj ? `À jour du ${esc(dateCourte(m.date_maj))}. ` : ''}${(m.sources || []).length ? `Sources : ${esc(m.sources.join(' ; '))}` : ''}</p>` : ''}
+      <div class="actions" style="margin-top:10px"><button type="button" class="btn petit" data-act="memo-modifier" data-memo="${m.id}">Modifier</button></div></div></details>`).join('');
+    h += '</section>';
+  }
+  h += `<section class="memo-cat" id="memo-modeles"><h2 class="groupe">Modèles d'emails <span>${D.modeles.length}</span></h2>`;
+  h += D.modeles.map((m) => `<details class="memo"><summary>${m.canal === 'sms' ? 'SMS : ' : ''}${esc(m.nom)}</summary><div class="corps">
+      ${m.usage ? `<p class="aide">${esc(m.usage)}</p>` : ''}
+      <p style="margin-top:8px"><b>Objet :</b> ${esc(m.objet)}</p>
+      <div class="md"><pre>${esc(m.corps)}</pre></div>
+      <div class="actions" style="margin-top:10px"><button type="button" class="btn petit" data-act="modele-modifier" data-modele="${m.id}">Modifier</button></div></div></details>`).join('') || '<p class="vide">Aucun modèle.</p>';
+  return h + '</section>';
+}
+
+/* ================= Fiche d'un lead ================= */
+
+function ouvrirFiche(id) {
+  S.fiche = id;
+  rendreFiche();
+  const f = $('#fiche');
+  if (!f.open) { f.showModal(); f.scrollTop = 0; }
+}
+
+function rendreFiche() {
+  const f = $('#fiche');
+  const l = IDX.lead.get(S.fiche);
+  if (!l) { if (f.open) f.close(); return; }
+  const defile = f.scrollTop;
+  const cs = contactsDe(l.id);
+  const acts = activitesDe(l.id);
+  const sous = [l.secteur, l.localisation].filter(Boolean).join(', ');
+  const infos = [['Besoin', l.besoin], ['Source', l.source], ['Valeur', l.valeur != null ? euros(l.valeur) : ''], ['Service demandé', l.service], ['Budget', l.budget],
+    ['Téléphone', l.telephone], ['Site web', l.site_web], ['Adresse', l.adresse], ['SIRET', l.siret], ['Tags', (l.tags || []).join(', ')],
+    ['Dernier contact', l.dernier_contact ? dateCourte(l.dernier_contact) : ''], ['Fiche HubSpot', l.hubspot_id], ['Raison de la perte', l.raison_perte],
+    ['Créé le', l.created_at ? instantLisible(l.created_at) : '']].filter(([, v]) => v);
+  const lienInfo = (nom, v) => {
+    if (nom === 'Téléphone') return `<a href="${esc(telLien(v))}">${esc(v)}</a>`;
+    if (nom === 'Site web') { const u = /^https?:\/\//.test(v) ? v : `https://${v}`; return `<a href="${esc(u)}" target="_blank" rel="noopener">${esc(v)}</a>`; }
+    return esc(v);
+  };
+  f.setAttribute('aria-labelledby', 'titre-fiche');
+  f.innerHTML = `
+    <header class="fiche-tete">
+      <div class="tete-ent">${avatar(l, 'l')}<div><h2 id="titre-fiche">${esc(l.entreprise)}</h2><p class="meta">${esc([LIB_TYPE[l.type] + (l.archive ? ', archivé' : ''), sous].filter(Boolean).join(', '))}</p></div></div>
+      <button type="button" class="fermer" data-act="fermer-fiche" aria-label="Fermer">✕</button>
+    </header>
+    <section class="bloc">
+      <div class="ligne-statut">
+        <label class="meta" for="statut-fiche">Étape</label>
+        <select id="statut-fiche" data-lead="${l.id}">${STATUTS.map(([k, v]) => `<option value="${k}" ${k === l.statut ? 'selected' : ''}>${esc(v)}</option>`).join('')}</select>
+      </div>
+      <div class="prochaine">
+        <p class="meta">Prochaine relance</p>
+        ${l.prochaine_relance
+          ? `<p class="valeur ${classeQuand(l.prochaine_relance)}">${esc(actionLue(l.prochaine_action))} ${esc(quand(l.prochaine_relance))}</p>
+             ${!/^(aujourd|demain|hier|en retard)/.test(quand(l.prochaine_relance)) ? '' : `<p class="meta">${esc(dateLongue(l.prochaine_relance).replace(/^./, (c) => c.toUpperCase()))}</p>`}`
+          : '<p class="valeur">Rien de prévu</p>'}
+        ${l.prochaine_note ? `<p style="margin-top:6px">${esc(l.prochaine_note)}</p>` : ''}
+        ${l.relances_sans_reponse ? `<p class="meta" style="margin-top:6px">${l.relances_sans_reponse} relance${l.relances_sans_reponse > 1 ? 's' : ''} sans réponse depuis le dernier échange.</p>` : ''}
+      </div>
+      <div class="actions">
+        ${telephoneDe(l) ? `<a class="btn${l.prochaine_action === 'appel' ? ' primaire' : ''}" href="${esc(telLien(telephoneDe(l)))}" data-act="tel">Appeler</a>` : ''}
+        <button type="button" class="btn${l.prochaine_action !== 'appel' ? ' primaire' : ''}" data-act="email">Écrire un email</button>
+        ${mobileDe(l) ? '<button type="button" class="btn" data-act="sms">SMS</button>' : ''}
+        <button type="button" class="btn" data-act="appel">Noter un appel</button>
+        <button type="button" class="btn" data-act="decaler">Décaler la relance</button>
+        <button type="button" class="btn" data-act="rdv">Prévoir un RDV</button>
+        <button type="button" class="btn" data-act="reponse">Réponse reçue</button>
+        <button type="button" class="btn" data-act="note">Ajouter une note</button>
+      </div>
+    </section>
+    <section class="bloc">
+      <h3>Contacts <button type="button" class="btn petit" data-act="contact-nouveau">Ajouter</button></h3>
+      ${cs.map((c) => `<div class="contact">
+        <div class="qui">${avatarContact(c)}<div class="liens">
+          <span class="nom">${esc(nomContact(c) || 'Sans nom')}${c.principal ? ' <span class="meta">(principal)</span>' : ''}</span>
+          ${c.poste ? `<span class="meta">${esc(c.poste)}</span>` : ''}
+          ${c.email ? `<span>${esc(c.email)}</span>` : ''}
+          ${c.telephone ? `<a href="${esc(telLien(c.telephone))}" data-act="tel">${esc(c.telephone)}</a>` : ''}
+          ${c.notes ? `<span class="meta">${esc(c.notes)}</span>` : ''}
+        </div></div>
+        <div class="contact-actions">
+          ${c.email ? `<button type="button" class="btn petit" data-act="email" data-contact="${c.id}">Écrire</button>` : ''}
+          <button type="button" class="btn petit" data-act="contact-modifier" data-contact="${c.id}">Modifier</button>
+        </div></div>`).join('') || '<p class="vide">Aucun contact.</p>'}
+    </section>
+    <section class="bloc">
+      <h3>Infos <button type="button" class="btn petit" data-act="infos">Modifier</button></h3>
+      ${infos.length ? `<dl class="infos">${infos.map(([k, v]) => `<dt>${esc(k)}</dt><dd>${lienInfo(k, v)}</dd>`).join('')}</dl>` : '<p class="vide">Aucune info.</p>'}
+    </section>
+    <section class="bloc">
+      <h3>Historique <span class="meta" style="text-transform:none;letter-spacing:0">${acts.length} élément${acts.length > 1 ? 's' : ''}${acts.length ? ` <button type="button" class="btn petit" data-act="journal-edition">${S.journalEdition ? 'Terminé' : 'Modifier'}</button>` : ''}</span></h3>
+      ${acts.length ? `<ol class="journal${S.journalEdition ? ' edition' : ''}">${acts.map((a) => {
+        const src = libelleSource(a.source);
+        return `<li class="t-${a.type}">
+          <div class="quand"><span class="quoi">${esc(LIB_ACTIVITE[a.type] || a.type)}</span><span>${esc(instantLisible(a.date))}</span>${src ? `<span class="source" title="${esc(a.source)}">${esc(src)}</span>` : ''}
+            <button type="button" class="suppr-journal" data-act="suppr-activite" data-activite="${a.id}">Supprimer</button></div>
+          <p class="resume">${esc(a.resume)}</p>
+          ${a.contenu ? `<details><summary>Voir le texte</summary><pre>${esc(a.contenu)}</pre></details>` : ''}
+        </li>`;
+      }).join('')}</ol>` : '<p class="vide">Rien encore. Chaque email, appel ou note s\'ajoute ici.</p>'}
+    </section>
+    <footer class="fiche-pied">
+      <button type="button" class="btn" data-act="archiver">${l.archive ? 'Désarchiver' : 'Archiver'}</button>
+      <button type="button" class="btn danger" data-act="supprimer-lead">Supprimer le lead</button>
+    </footer>`;
+  f.scrollTop = defile;
+  chargerLogos();
+}
+
+function libelleSource(s) {
+  if (!s || s === 'crm') return '';
+  const premier = sansAccents(s.split(/[\s:]/)[0]);
+  return LIB_SOURCE[premier] || s.slice(0, 30);
+}
+
+/* ================= Fenêtres d'action ================= */
+
+const modale = () => $('#modale');
+function ouvrirModale(html, monter) {
+  const m = modale();
+  m.innerHTML = `<form class="form" novalidate><button type="button" class="fermer fermer-modale" data-fermer aria-label="Fermer">✕</button>${html}</form>`;
+  const titre = $('h2', m);
+  if (titre) { titre.id = 'titre-modale'; m.setAttribute('aria-labelledby', 'titre-modale'); }
+  if (!m.open) m.showModal();
+  m.scrollTop = 0;
+  const form = $('form', m);
+  monter(form);
+  const premier = $('[autofocus]', m);
+  if (premier) premier.focus();
+}
+function fermerModale() { const m = modale(); if (m.open) m.close(); }
+const champ = (label, html, aide = '') => `<label class="champ">${esc(label)}${html}${aide ? `<span class="aide">${aide}</span>` : ''}</label>`;
+const options = (liste, val) => liste.map(([k, v]) => `<option value="${esc(k)}" ${k === val ? 'selected' : ''}>${esc(v)}</option>`).join('');
+const optionsContacts = (id, val, avecVide = true) => (avecVide ? '<option value="">Personne en particulier</option>' : '') + contactsDe(id).map((c) => `<option value="${c.id}" ${c.id === val ? 'selected' : ''}>${esc(nomContact(c) || c.email || 'Sans nom')}</option>`).join('');
+
+function puces() {
+  // Le vendredi, « demain », « dans 3 jours » et « lundi prochain » tombent le
+  // même lundi : on garde la première, avec la vraie date si ce n'est pas demain.
+  const demain = dansJours(1);
+  const brut = [[demain === ajouterJours(aujourdhui(), 1) ? 'Demain' : dateLongue(demain).replace(/^./, (c) => c.toUpperCase()), demain],
+    ['Dans 3 jours', dansJours(3)], ['Lundi prochain', lundiProchain()], ['Dans 2 semaines', dansJours(14)], ['Dans 1 mois', dansMois(1)], ['Dans 3 mois', dansMois(3)]];
+  const vues = new Set();
+  return brut.filter(([, d]) => (vues.has(d) ? false : vues.add(d)));
+}
+function blocProchaine(prefixe, date, action, note, { aide = '', vide = true } = {}) {
+  return `<fieldset><legend>Prochaine relance</legend>
+    <div class="puces" data-puces="${prefixe}">
+      ${puces().map(([lib, d]) => `<button type="button" data-date="${d}">${esc(lib)}</button>`).join('')}
+      ${vide ? '<button type="button" data-date="">Aucune relance</button>' : ''}
+    </div>
+    <div class="deux">
+      ${champ('Date', `<input type="date" name="${prefixe}_date" value="${esc(date || '')}">`)}
+      ${champ('Action', `<select name="${prefixe}_action">${options(ACTIONS, action || 'email')}</select>`)}
+    </div>
+    <p class="aide" data-date-lue="${prefixe}"></p>
+    ${champ('Ce qui est prévu (facultatif)', `<input type="text" name="${prefixe}_note" value="${esc(note || '')}" placeholder="Appel prévu jeudi avec Eric, envoyer le programme…">`)}
+    ${aide ? `<p class="aide">${aide}</p>` : ''}
+  </fieldset>`;
+}
+function brancherPuces(form, prefixe, { direct = false } = {}) {
+  const input = form.elements[`${prefixe}_date`];
+  const lue = $(`[data-date-lue="${prefixe}"]`, form);
+  // Le vendredi, « demain », « dans 3 jours » et « lundi prochain » tombent
+  // le même lundi : seule la première puce correspondante s'allume.
+  const maj = () => {
+    let allumee = false;
+    $$(`[data-puces="${prefixe}"] button`, form).forEach((b) => {
+      const oui = !allumee && b.dataset.date === input.value;
+      if (oui) allumee = true;
+      b.setAttribute('aria-pressed', String(oui));
+    });
+    if (lue) lue.innerHTML = input.value ? `Relance prévue : <span class="date-lue">${esc(dateLongue(input.value))}</span>.` : 'Aucune relance prévue.';
+  };
+  $$(`[data-puces="${prefixe}"] button`, form).forEach((b) => b.addEventListener('click', () => {
+    input.value = b.dataset.date;
+    maj();
+    if (direct) form.requestSubmit();
+  }));
+  input.addEventListener('input', maj);
+  maj();
+}
+function lireProchaine(form, prefixe) {
+  return {
+    prochaine_relance: form.elements[`${prefixe}_date`].value || null,
+    prochaine_action: form.elements[`${prefixe}_action`].value,
+    prochaine_note: form.elements[`${prefixe}_note`].value.trim() || null,
+  };
+}
+function piedFormulaire(boutons) {
+  return `<div class="pied"><p class="erreur" data-erreur role="alert" hidden></p>${boutons}<button type="button" class="btn" data-fermer>Annuler</button></div>`;
+}
+function brancherAnnuler(form) { $$('[data-fermer]', form).forEach((b) => b.addEventListener('click', fermerModale)); }
+function montrerErreur(form, message, champFautif = null) { const e = $('[data-erreur]', form); e.textContent = message; e.hidden = false; if (champFautif) champFautif.focus(); }
+
+async function journal(leadId, activite, majLead) {
+  const r = await api('POST', { op: 'journal', lead_id: leadId, activite, lead: majLead || undefined });
+  ajouterActivite(r.activite);
+  remplacerLead(r.lead);
+  indexer();
+  rendre();
+  if (S.fiche) rendreFiche();
+  if (S.session && $('#session').open) rendreSession();
+  return r;
+}
+
+async function soumettre(form, travail) {
+  const boutons = $$('button', form);
+  const clique = document.activeElement && form.contains(document.activeElement) && document.activeElement.tagName === 'BUTTON' ? document.activeElement : $('[type="submit"]', form);
+  const texte = clique ? clique.textContent : '';
+  if (clique && !clique.classList.contains('fermer')) clique.textContent = /envoy/i.test(texte) ? 'Envoi…' : 'Enregistrement…';
+  boutons.forEach((b) => (b.disabled = true));
+  try {
+    await travail();
+  } catch (e) {
+    montrerErreur(form, e.message || "Ça n'a pas marché. Ta saisie est gardée, réessaie.");
+    boutons.forEach((b) => (b.disabled = false));
+    if (clique) clique.textContent = texte;
+    return false;
+  }
+  return true;
+}
+
+/* ----- Email ----- */
+
+const enSession = () => Boolean(S.session && $('#session').open);
+
+/* ----- Personnaliser avec mes notes (Claude rédige, Gabriel relit) ----- */
+
+function derniereNote(leadId) {
+  // D'abord un vrai échange (appel, email, SMS, RDV, réponse), sinon la dernière note.
+  const echanges = ['appel', 'appel_sans_reponse', 'email_envoye', 'email_recu', 'rdv', 'sms'];
+  const acts = activitesDe(leadId);
+  const a = acts.find((x) => echanges.includes(x.type)) || acts.find((x) => x.type === 'note' && x.source === 'crm') || acts.find((x) => x.type === 'note');
+  if (!a) return '';
+  const r = a.resume.length > 170 ? `${a.resume.slice(0, 170)}…` : a.resume;
+  return `${LIB_ACTIVITE[a.type] || a.type} du ${instantLisible(a.date).split(' à ')[0]} : ${r}`;
+}
+function blocPerso(leadId) {
+  if (!D.ia) return '';
+  const derniere = derniereNote(leadId);
+  return `<div class="perso">
+    <div class="perso-tete">
+      <button type="button" class="btn" data-perso>Personnaliser avec mes notes</button>
+      <label class="case"><input type="checkbox" name="tutoyer"> Tutoyer</label>
+    </div>
+    <p class="aide">${derniere ? `Dernier échange : ${esc(derniere)}` : "Aucun échange noté : le message restera général."}</p>
+    ${champ('Consigne (facultatif)', '<input type="text" name="consigne" maxlength="500" placeholder="Proposer un appel jeudi, rappeler le programme du niveau 2…">')}
+    ${enSession() ? `<label class="case"><input type="checkbox" name="autoperso" ${S.session.autoPerso ? 'checked' : ''}> Personnaliser chaque message de l'enchaînement</label>` : ''}
+    <div class="appuis" data-appuis hidden></div>
+  </div>`;
+}
+// canal : 'email' ou 'sms' ; contact() renvoie l'id du contact visé ; appliquer(r) remplit la fenêtre.
+function brancherPerso(form, leadId, canal, contact, appliquer) {
+  const bouton = $('[data-perso]', form);
+  if (!bouton) return;
+  const el = form.elements;
+  bouton.addEventListener('click', async () => {
+    const zone = $('[data-appuis]', form);
+    const texte = bouton.textContent;
+    bouton.disabled = true;
+    bouton.textContent = 'Rédaction…';
+    $('[data-erreur]', form).hidden = true;
+    try {
+      const r = await api('POST', {
+        op: 'rediger', lead_id: leadId, canal, contact_id: contact() || null,
+        modele_id: (el.modele && el.modele.value) || null, consigne: el.consigne.value.trim(), tutoyer: el.tutoyer.checked,
+      });
+      appliquer(r);
+      zone.innerHTML = `${r.appuis.length ? `<p><b>Appuyé sur :</b> ${esc(r.appuis.join(' ; '))}</p>` : ''}
+        ${r.alertes.length ? `<div class="alerte" role="alert">À vérifier avant l'envoi : ${esc(r.alertes.join(' '))}</div>` : '<p>Relis le texte, puis envoie.</p>'}`;
+      zone.hidden = false;
+      if (el.autoperso && S.session) S.session.autoPerso = el.autoperso.checked;
+    } catch (e) {
+      montrerErreur(form, e.message);
+    } finally {
+      bouton.disabled = false;
+      bouton.textContent = texte === 'Rédaction…' ? 'Personnaliser avec mes notes' : 'Refaire avec mes notes';
+    }
+  });
+  if (el.autoperso) el.autoperso.addEventListener('change', () => { S.session.autoPerso = el.autoperso.checked; });
+  if (enSession() && S.session.autoPerso) bouton.click();
+}
+
+/* ================= Logos des entreprises ================= */
+// Le logo vient du site de l'entreprise (ou du domaine de l'email pro), lu par
+// le serveur : le navigateur n'appelle personne d'autre que /api/crm.
+const WEBMAILS = /^(gmail|googlemail|hotmail|outlook|live|msn|yahoo|ymail|orange|wanadoo|free|sfr|neuf|laposte|icloud|me|mac|aol|gmx|proton|protonmail|bbox|numericable|club-internet|aliceadsl)\./;
+const LOGOS = new Map();   // domaine : URL de l'image, 'attente', ou null s'il n'y en a pas
+function domaineDe(l) {
+  if (l.site_web) {
+    try { return new URL(/^https?:/i.test(l.site_web) ? l.site_web : `https://${l.site_web}`).hostname.replace(/^www\./, '').toLowerCase(); } catch { /* site mal écrit */ }
+  }
+  const email = contactsDe(l.id).map((c) => c.email).find((x) => x && x.includes('@'));
+  if (!email) return '';
+  const d = email.split('@')[1].toLowerCase().trim();
+  return WEBMAILS.test(d) ? '' : d;
+}
+function initiales(t) {
+  const mots = String(t || '?').replace(/[^\p{L}\p{N} ]/gu, ' ').trim().split(/\s+/).filter(Boolean);
+  if (!mots.length) return '?';
+  return ((mots[0][0] || '') + (mots[1] ? mots[1][0] : (mots[0][1] || ''))).toUpperCase();
+}
+function teinte(t) { let h = 7; for (const c of String(t)) h = (h * 31 + c.codePointAt(0)) % 360; return h; }
+function avatar(l, taille = 'm') {
+  const d = domaineDe(l);
+  const url = d ? LOGOS.get(d) : null;
+  const pret = url && url !== 'attente';
+  const attendre = d && !pret && url !== null;
+  return `<span class="avatar a-${taille}" style="--h:${teinte(l.entreprise)}"${attendre ? ` data-logo="${esc(d)}"` : ''} aria-hidden="true">${pret ? `<img src="${url}" alt="">` : esc(initiales(l.entreprise))}</span>`;
+}
+function avatarContact(c) {
+  return `<span class="avatar a-s a-rond" style="--h:${teinte(nomContact(c) || c.email || '?')}" aria-hidden="true">${esc(initiales(nomContact(c) || c.email || '?'))}</span>`;
+}
+let logosPrevus = false;
+function chargerLogos() {
+  if (logosPrevus) return;
+  logosPrevus = true;
+  setTimeout(async () => {
+    logosPrevus = false;
+    const file = [...new Set($$('[data-logo]').map((x) => x.dataset.logo))].filter((d) => !LOGOS.has(d));
+    file.forEach((d) => LOGOS.set(d, 'attente'));
+    const appliquer = (d) => {
+      const url = LOGOS.get(d);
+      for (const el of $$(`[data-logo="${CSS.escape(d)}"]`)) {
+        el.removeAttribute('data-logo');
+        if (url) el.innerHTML = `<img src="${url}" alt="">`;
+      }
+    };
+    const ouvrier = async () => {
+      while (file.length) {
+        const d = file.shift();
+        try {
+          const r = await fetch(`${API}?logo=${encodeURIComponent(d)}`, { headers: { 'X-Cle-Crm': S.cle } });
+          if (r.status !== 200) throw new Error('pas de logo');
+          LOGOS.set(d, URL.createObjectURL(await r.blob()));
+        } catch { LOGOS.set(d, null); }
+        appliquer(d);
+      }
+    };
+    await Promise.all(Array.from({ length: Math.min(6, file.length) }, ouvrier));
+  }, 30);
+}
+
+function remplirModele(texte, l, c) {
+  const rdv = l.prochaine_action === 'rdv' && l.prochaine_relance ? dateLongue(l.prochaine_relance) : null;
+  return String(texte)
+    .replace(/\{prenom\}/g, (c && c.prenom) || '')
+    .replace(/\{nom\}/g, (c && c.nom) || '')
+    .replace(/\{entreprise\}/g, l.entreprise)
+    // {besoin} reste à écrire à la main : la note du lead est une note
+    // pour soi (« rencontre BNI, m'a dit intéressé »), pas une phrase d'email.
+    .replace(/\{date_rdv\}/g, rdv || '{date_rdv}')
+    .replace(/Bonjour ,/g, 'Bonjour,');
+}
+
+function ouvrirEmail(leadId, contactId) {
+  const l = IDX.lead.get(leadId);
+  const avecEmail = contactsDe(leadId).filter((c) => c.email);
+  let c = avecEmail.find((x) => x.id === contactId) || avecEmail.find((x) => x.principal) || avecEmail[0] || null;
+  const signature = (D.reglages.signature || SIGNATURE_DEFAUT).trim();
+  const precedent = activitesDe(leadId).find((a) => (a.type === 'email_envoye' || a.type === 'brouillon') && a.meta && a.meta.fil && a.meta.objet);
+  const n = (l.relances_sans_reponse || 0) + 1;
+  const date = dansJours(delaiApres(n));
+  const etapeTexte = n <= CADENCE.length ? `relance ${n} sur ${CADENCE.length} du rythme, dans ${delaiApres(n)} jours` : 'prise de nouvelles dans 3 mois, les relances du rythme sont faites';
+  const corpsDepart = `Bonjour${c && c.prenom ? ` ${c.prenom}` : ''},\n\n\n\n${signature}`;
+  ouvrirModale(`
+    <h2>Écrire à ${esc(l.entreprise)}</h2>
+    <p class="de">De : <b>${esc(D.expediteur || COMPTE)}</b>.${D.gmail ? ' Le message ira dans tes Envoyés Gmail.' : ''}</p>
+    ${champ('À', `<select name="a_contact">${avecEmail.map((x) => `<option value="${x.id}" ${c && x.id === c.id ? 'selected' : ''}>${esc(nomContact(x) || x.email)} (${esc(x.email)})</option>`).join('')}<option value="autre" ${c ? '' : 'selected'}>Autre adresse</option></select>`)}
+    <label class="champ" data-autre ${c ? 'hidden' : ''}>Adresse<input type="email" name="a_autre" placeholder="prenom@entreprise.fr" autocomplete="off"></label>
+    ${champ('Modèle', `<select name="modele"><option value="">Sans modèle</option>${D.modeles.filter((m) => m.canal !== 'sms').map((m) => `<option value="${m.id}">${esc(m.nom)}</option>`).join('')}</select>`, l.besoin ? `Ta note sur ce lead : ${esc(l.besoin)}` : '')}
+    ${blocPerso(l.id)}
+    ${enSession() ? `<label class="case"><input type="checkbox" name="garder" ${S.session.modeleEmail ? 'checked' : ''}> Reprendre ce modèle pour les leads suivants</label>
+    <label class="case"><input type="checkbox" name="direct" ${S.session.sansConfirmation ? 'checked' : ''}> Envoyer sans me redemander pendant cet enchaînement</label>` : ''}
+    ${precedent ? `<label class="case"><input type="checkbox" name="fil" ${l.relances_sans_reponse > 0 ? 'checked' : ''}> Répondre dans le fil de « ${esc(precedent.meta.objet)} » (${esc(instantLisible(precedent.date))})</label>` : ''}
+    ${champ('Objet', '<input type="text" name="objet" maxlength="250" required>')}
+    ${champ('Message', `<textarea name="corps" class="grand" required>${esc(corpsDepart)}</textarea>`, 'La signature est déjà dans le texte : tu peux tout modifier.')}
+    ${blocProchaine('apres', date, 'email', n <= CADENCE.length ? `Relance ${n}` : 'Prise de nouvelles', { aide: `${n <= CADENCE.length ? `Relance ${n} sur ${CADENCE.length}` : 'Prise de nouvelles'}, proposée d'après le rythme. Change la date si un appel est prévu.` })}
+    <div class="confirmation" data-confirmation hidden></div>
+    ${piedFormulaire(`<button type="button" class="btn lien" data-mode="noter">Noter sans envoyer</button>${D.gmail ? '<button type="button" class="btn" data-mode="brouillon">Brouillon</button><button type="submit" class="btn primaire" data-mode="envoyer">Envoyer</button>' : ''}`)}
+    ${D.gmail ? '' : '<p class="aide">L\'envoi direct n\'est pas encore branché : copie le texte dans Gmail (vérifie la ligne De), puis note-le ici.</p>'}
+  `, (form) => {
+    brancherAnnuler(form);
+    brancherPuces(form, 'apres');
+    const el = form.elements;
+    const objetParDefaut = () => (precedent && el.fil && el.fil.checked ? `Re: ${precedent.meta.objet.replace(/^(re|tr|fwd?)\s*:\s*/i, '')}` : '');
+    el.objet.value = objetParDefaut();
+    const contactChoisi = () => avecEmail.find((x) => x.id === el.a_contact.value) || null;
+    el.a_contact.addEventListener('change', () => {
+      $('[data-autre]', form).hidden = el.a_contact.value !== 'autre';
+      c = contactChoisi();
+    });
+    el.modele.addEventListener('change', () => {
+      const m = D.modeles.find((x) => x.id === el.modele.value);
+      if (!m) return;
+      if (!(el.fil && el.fil.checked)) el.objet.value = remplirModele(m.objet, l, c);
+      el.corps.value = `${remplirModele(m.corps, l, c).trim()}\n\n${signature}`;
+    });
+    if (el.fil) el.fil.addEventListener('change', () => { el.objet.value = el.fil.checked ? objetParDefaut() : ''; });
+    if (enSession() && S.session.modeleEmail && D.modeles.some((m) => m.id === S.session.modeleEmail)) {
+      el.modele.value = S.session.modeleEmail;
+      el.modele.dispatchEvent(new Event('change'));
+    }
+    brancherPerso(form, l.id, 'email', () => (el.a_contact.value === 'autre' ? null : el.a_contact.value), (r) => {
+      if (!(el.fil && el.fil.checked) && r.objet) el.objet.value = r.objet;
+      el.corps.value = `${r.corps.trim()}\n\n${signature}`;
+    });
+    const memoriserSession = () => {
+      if (!enSession()) return;
+      if (el.garder) S.session.modeleEmail = el.garder.checked ? el.modele.value || null : null;
+      if (el.direct) S.session.sansConfirmation = el.direct.checked;
+    };
+    const destinataire = () => (el.a_contact.value === 'autre' ? el.a_autre.value.trim() : (contactChoisi() || {}).email || '');
+    const verifier = () => {
+      const a = destinataire();
+      if (!/^[^@\s<>,;"]+@[^@\s<>,;".]+(\.[^@\s<>,;".]+)+$/.test(a)) { (el.a_contact.value === 'autre' ? el.a_autre : el.a_contact).focus(); return 'Adresse email invalide.'; }
+      if (!el.objet.value.trim()) { el.objet.focus(); return "Il manque l'objet."; }
+      if (!el.corps.value.trim()) { el.corps.focus(); return 'Le message est vide.'; }
+      for (const zone of [el.objet, el.corps]) {
+        const reste = zone.value.match(/\{[a-z_]+\}/);
+        if (reste) {
+          const i = zone.value.indexOf(reste[0]);
+          zone.focus();
+          zone.setSelectionRange(i, i + reste[0].length);
+          return `Remplace ${reste[0]} par ton texte : il est sélectionné dans le message.`;
+        }
+      }
+      return '';
+    };
+    const majLead = (mode = 'envoyer') => {
+      // Un brouillon n'est pas une relance : il reste dans Aujourd'hui jusqu'à l'envoi.
+      if (mode === 'brouillon') return { prochaine_relance: aujourdhui(), prochaine_action: 'email', prochaine_note: `Brouillon à envoyer : « ${el.objet.value.trim()} »` };
+      const p = lireProchaine(form, 'apres');
+      const m = { ...p, relances_sans_reponse: n, dernier_contact: aujourdhui() };
+      if (l.statut === 'nouveau') m.statut = 'contacte';
+      return m;
+    };
+    const envoyer = (mode) => soumettre(form, async () => {
+      const a = destinataire();
+      const ch = contactChoisi();
+      const fil = el.fil && el.fil.checked && precedent ? precedent.meta : null;
+      memoriserSession();
+      if (mode === 'noter') {
+        await journal(l.id, { type: 'email_envoye', resume: `Email envoyé à ${a} : « ${el.objet.value.trim()} »`, contenu: el.corps.value, contact_id: ch ? ch.id : null, source: 'crm' }, majLead());
+        fermerModale();
+        toast("Noté dans l'historique.");
+        actionFaite(l.id, 'email');
+        return;
+      }
+      const r = await api('POST', {
+        op: 'email', mode, lead_id: l.id, contact_id: ch ? ch.id : null, a, objet: el.objet.value.trim(), corps: el.corps.value,
+        fil: fil ? fil.fil : null, en_reponse_a: fil ? fil.message_id : null, lead: majLead(mode),
+      });
+      ajouterActivite(r.activite);
+      remplacerLead(r.lead);
+      indexer();
+      rendre();
+      if (S.fiche) rendreFiche();
+      fermerModale();
+      if (!r.journal) toast(mode === 'brouillon' ? "Brouillon créé, mais pas noté dans l'historique : ajoute une note." : "L'email est parti, mais il n'a pas été noté dans l'historique : ajoute une note.", 6000);
+      else if (mode === 'brouillon') toast("Brouillon créé dans gabriel@ia-entrepreneur.fr. Il reste dans Aujourd'hui jusqu'à l'envoi.", 5000);
+      else toast(`Email envoyé à ${a}.`);
+      actionFaite(l.id, mode === 'brouillon' ? 'brouillon' : 'email');
+    });
+    $$('[data-mode]', form).forEach((b) => b.addEventListener('click', (ev) => {
+      ev.preventDefault();
+      const probleme = verifier();
+      if (probleme) { montrerErreur(form, probleme); return; }
+      $('[data-erreur]', form).hidden = true;
+      const mode = b.dataset.mode;
+      if (mode !== 'envoyer' || (enSession() && el.direct && el.direct.checked)) { envoyer(mode); return; }
+      const conf = $('[data-confirmation]', form);
+      conf.hidden = false;
+      conf.innerHTML = `<p>Envoyer maintenant à <b>${esc(destinataire())}</b> depuis <b>${esc(D.expediteur || COMPTE)}</b> ?</p>
+        <div class="actions"><button type="button" class="btn" data-revenir>Revenir</button><button type="button" class="btn primaire" data-confirmer>Oui, envoyer</button></div>`;
+      conf.scrollIntoView({ block: 'nearest' });
+      $('[data-revenir]', conf).addEventListener('click', () => { conf.hidden = true; });
+      $('[data-confirmer]', conf).addEventListener('click', () => envoyer('envoyer'));
+    }));
+    form.addEventListener('submit', (ev) => ev.preventDefault());
+  });
+}
+
+/* ----- Appel ----- */
+
+function ouvrirAppel(leadId) {
+  const l = IDX.lead.get(leadId);
+  const c = contactJoignable(leadId) || contactPrincipal(leadId);
+  const tel = telephoneDe(l);
+  ouvrirModale(`
+    <h2>Appel avec ${esc(l.entreprise)}</h2>
+    ${tel ? `<p><a class="btn petit" href="${esc(telLien(tel))}">Appeler le ${esc(tel)}</a></p>` : ''}
+    <fieldset><legend>Résultat</legend><div class="puces" data-resultat>
+      <button type="button" data-v="joint" aria-pressed="false">Joint</button>
+      <button type="button" data-v="sans_reponse" aria-pressed="false">Pas de réponse</button>
+      <button type="button" data-v="message" aria-pressed="false">Message laissé</button>
+    </div></fieldset>
+    ${contactsDe(leadId).length ? champ('Avec', `<select name="contact">${optionsContacts(leadId, c && c.id)}</select>`) : ''}
+    ${champ('Ce qui s\'est dit', '<textarea name="note" placeholder="Intéressé par le niveau 2, rappeler après le comité du 20…"></textarea>')}
+    ${champ('Étape', `<select name="statut">${options(STATUTS, l.statut === 'nouveau' ? 'contacte' : l.statut)}</select>`)}
+    ${blocProchaine('apres', dansJours(7), 'email', '')}
+    ${piedFormulaire('<button type="submit" class="btn primaire">Enregistrer</button>')}
+  `, (form) => {
+    brancherAnnuler(form);
+    brancherPuces(form, 'apres');
+    let resultat = '';
+    const n = (l.relances_sans_reponse || 0) + 1;
+    $$('[data-resultat] button', form).forEach((b) => b.addEventListener('click', () => {
+      resultat = b.dataset.v;
+      $$('[data-resultat] button', form).forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
+      const el = form.elements;
+      el.apres_date.value = resultat === 'joint' ? dansJours(7) : dansJours(delaiApres(n));
+      el.apres_action.value = resultat === 'joint' ? 'email' : 'appel';
+      el.apres_date.dispatchEvent(new Event('input'));
+    }));
+    form.addEventListener('submit', (ev) => {
+      ev.preventDefault();
+      soumettre(form, async () => {
+        const el = form.elements;
+        if (!resultat) throw new ErreurApi("Choisis le résultat de l'appel.");
+        const joint = resultat === 'joint';
+        const note = el.note.value.trim();
+        const lib = { joint: 'Appel, joint', sans_reponse: 'Appel sans réponse', message: 'Appel, message laissé' }[resultat];
+        const maj = { ...lireProchaine(form, 'apres'), statut: el.statut.value, relances_sans_reponse: joint ? 0 : n };
+        if (joint) maj.dernier_contact = aujourdhui();
+        await journal(l.id, { type: joint ? 'appel' : 'appel_sans_reponse', resume: note ? `${lib} : ${note}` : lib, contact_id: el.contact ? el.contact.value || null : null, source: 'crm' }, maj);
+        fermerModale();
+        toast('Appel noté.');
+        actionFaite(l.id, 'appel');
+      });
+    });
+  });
+}
+
+/* ----- Décaler ----- */
+
+function ouvrirDecaler(leadId) {
+  const l = IDX.lead.get(leadId);
+  ouvrirModale(`
+    <h2>Décaler la relance</h2>
+    <p class="aide">${esc(l.entreprise)}. ${l.prochaine_relance ? `Prévue ${esc(quand(l.prochaine_relance))}.` : 'Aucune relance prévue pour le moment.'} Une puce enregistre tout de suite. Décaler ne compte pas comme une relance.</p>
+    ${blocProchaine('apres', l.prochaine_relance || dansJours(1), l.prochaine_action, l.prochaine_note)}
+    ${piedFormulaire('<button type="submit" class="btn primaire">Enregistrer</button>')}
+  `, (form) => {
+    brancherAnnuler(form);
+    brancherPuces(form, 'apres', { direct: true });
+    const avant = { prochaine_relance: l.prochaine_relance, prochaine_action: l.prochaine_action, prochaine_note: l.prochaine_note };
+    form.addEventListener('submit', (ev) => {
+      ev.preventDefault();
+      soumettre(form, async () => {
+        const p = lireProchaine(form, 'apres');
+        const texte = p.prochaine_relance
+          ? `Relance déplacée au ${dateLongue(p.prochaine_relance)} (${actionLue(p.prochaine_action).toLowerCase()})${p.prochaine_note ? ` : ${p.prochaine_note}` : ''}`
+          : `Plus de relance prévue${p.prochaine_note ? ` : ${p.prochaine_note}` : ''}`;
+        const r = await journal(l.id, { type: 'relance_decalee', resume: texte, source: 'crm' }, p);
+        fermerModale();
+        toast(p.prochaine_relance ? `Relance ${quand(p.prochaine_relance)}.` : 'Plus de relance prévue.', 3200, () => annulerAction(l.id, r.activite, avant));
+        actionFaite(l.id, 'decale');
+      });
+    });
+  });
+}
+
+/* ----- Rendez-vous ----- */
+
+function ouvrirRdv(leadId) {
+  const l = IDX.lead.get(leadId);
+  const c = contactPrincipal(leadId);
+  ouvrirModale(`
+    <h2>Rendez-vous avec ${esc(l.entreprise)}</h2>
+    <div class="deux">
+      ${champ('Date', `<input type="date" name="date" required value="${esc(dansJours(3))}">`)}
+      ${champ('Heure', '<input type="time" name="heure" value="10:00">')}
+    </div>
+    ${champ('Où', '<input type="text" name="lieu" placeholder="Visio, dans leurs locaux à Nancy…">')}
+    ${contactsDe(leadId).length ? champ('Avec', `<select name="contact">${optionsContacts(leadId, c && c.id)}</select>`) : ''}
+    ${champ('Objet du RDV (facultatif)', '<textarea name="note" placeholder="Présenter le niveau 2, découverte des besoins…"></textarea>')}
+    ${champ('Étape', `<select name="statut">${options(STATUTS, ['nouveau', 'contacte'].includes(l.statut) ? 'qualifie' : l.statut)}</select>`)}
+    <p class="aide">La prochaine relance devient ce rendez-vous. Pense à l'ajouter à ton agenda.</p>
+    ${piedFormulaire('<button type="submit" class="btn primaire">Enregistrer</button>')}
+  `, (form) => {
+    brancherAnnuler(form);
+    form.addEventListener('submit', (ev) => {
+      ev.preventDefault();
+      soumettre(form, async () => {
+        const el = form.elements;
+        if (!el.date.value) throw new ErreurApi('Choisis une date.');
+        const heure = el.heure.value ? ` à ${el.heure.value.replace(/^0/, '').replace(/:00$/, ' h').replace(':', ' h ')}` : '';
+        const ou = el.lieu.value.trim();
+        const note = el.note.value.trim();
+        const texte = `RDV prévu le ${dateLongue(el.date.value)}${heure}${ou ? `, ${ou}` : ''}${note ? ` : ${note}` : ''}`;
+        await journal(l.id, { type: 'rdv', resume: texte, contact_id: el.contact ? el.contact.value || null : null, source: 'crm', meta: { date_rdv: el.date.value, heure: el.heure.value || null, lieu: ou || null } }, {
+          prochaine_relance: el.date.value, prochaine_action: 'rdv', prochaine_note: `RDV${heure}${ou ? `, ${ou}` : ''}`, statut: el.statut.value, relances_sans_reponse: 0, dernier_contact: aujourdhui(),
+        });
+        fermerModale();
+        toast('Rendez-vous noté.');
+        actionFaite(l.id, 'rdv');
+      });
+    });
+  });
+}
+
+/* ----- Note, réponse reçue ----- */
+
+function ouvrirNote(leadId, type = 'note') {
+  const l = IDX.lead.get(leadId);
+  const reponse = type === 'email_recu';
+  ouvrirModale(`
+    <h2>${reponse ? 'Réponse reçue' : "Ajouter à l'historique"}</h2>
+    <div class="deux">
+      ${champ('Type', `<select name="type">${options([['note', 'Note'], ['email_recu', 'Réponse reçue (email, SMS, WhatsApp)'], ['appel', 'Appel'], ['rdv', 'Rendez-vous passé']], type)}</select>`)}
+      ${champ('Quand', `<input type="datetime-local" name="date" value="${esc(localPourInput())}">`)}
+    </div>
+    ${contactsDe(leadId).length ? champ('Qui', `<select name="contact">${optionsContacts(leadId, (contactPrincipal(leadId) || {}).id)}</select>`) : ''}
+    ${champ(reponse ? 'Ce qu\'il a répondu, en une phrase' : 'En une phrase', '<input type="text" name="resume" required autofocus>')}
+    ${champ('Détail (facultatif)', `<textarea name="contenu" placeholder="${reponse ? 'Colle sa réponse si tu veux la garder' : ''}"></textarea>`)}
+    <div data-reponse ${reponse ? '' : 'hidden'}>
+      ${blocProchaine('apres', dansJours(7), 'email', '', { aide: 'Une réponse remet le compteur de relances à zéro.' })}
+    </div>
+    ${piedFormulaire('<button type="submit" class="btn primaire">Enregistrer</button>')}
+  `, (form) => {
+    brancherAnnuler(form);
+    brancherPuces(form, 'apres');
+    const el = form.elements;
+    const echange = () => ['email_recu', 'appel', 'rdv'].includes(el.type.value);
+    el.type.addEventListener('change', () => { $('[data-reponse]', form).hidden = !echange(); });
+    $('[data-reponse]', form).hidden = !echange();
+    form.addEventListener('submit', (ev) => {
+      ev.preventDefault();
+      soumettre(form, async () => {
+        const resume = el.resume.value.trim();
+        if (!resume) throw new ErreurApi('Écris au moins une phrase.');
+        const date = el.date.value ? new Date(el.date.value).toISOString() : new Date().toISOString();
+        let maj = null;
+        if (echange()) {
+          maj = { ...lireProchaine(form, 'apres'), dernier_contact: (el.date.value || aujourdhui()).slice(0, 10) };
+          if (el.type.value === 'email_recu' || el.type.value === 'appel' || el.type.value === 'rdv') maj.relances_sans_reponse = 0;
+        }
+        await journal(l.id, { type: el.type.value, resume, contenu: el.contenu.value.trim() || null, date, contact_id: el.contact ? el.contact.value || null : null, source: 'crm' }, maj);
+        fermerModale();
+        toast("Ajouté à l'historique.");
+        actionFaite(l.id, 'note');
+      });
+    });
+  });
+}
+
+/* ----- Contact ----- */
+
+function ouvrirContact(leadId, contactId) {
+  const c = contactId ? D.contacts.find((x) => x.id === contactId) : null;
+  ouvrirModale(`
+    <h2>${c ? 'Modifier le contact' : 'Nouveau contact'}</h2>
+    <div class="deux">${champ('Prénom', `<input type="text" name="prenom" value="${esc(c?.prenom)}" autofocus>`)}${champ('Nom', `<input type="text" name="nom" value="${esc(c?.nom)}">`)}</div>
+    ${champ('Poste', `<input type="text" name="poste" value="${esc(c?.poste)}">`)}
+    <div class="deux">${champ('Email', `<input type="email" name="email" value="${esc(c?.email)}" autocomplete="off">`)}${champ('Téléphone', `<input type="tel" name="telephone" value="${esc(c?.telephone)}">`)}</div>
+    ${champ('Notes', `<textarea name="notes">${esc(c?.notes)}</textarea>`)}
+    <label class="case"><input type="checkbox" name="principal" ${c?.principal || (!c && !contactsDe(leadId).length) ? 'checked' : ''}> Contact principal</label>
+    ${piedFormulaire(`${c ? '<button type="button" class="btn danger" data-supprimer>Supprimer</button>' : ''}<button type="submit" class="btn primaire">Enregistrer</button>`)}
+  `, (form) => {
+    brancherAnnuler(form);
+    const el = form.elements;
+    const valeurs = () => ({ lead_id: leadId, prenom: el.prenom.value, nom: el.nom.value, poste: el.poste.value, email: el.email.value, telephone: el.telephone.value, notes: el.notes.value, principal: el.principal.checked });
+    form.addEventListener('submit', (ev) => {
+      ev.preventDefault();
+      soumettre(form, async () => {
+        const v = valeurs();
+        if (v.email && !/^[^@\s]+@[^@\s.]+(\.[^@\s.]+)+$/.test(v.email.trim())) throw new ErreurApi('Adresse email invalide.');
+        if (v.principal) {
+          for (const autre of contactsDe(leadId).filter((x) => x.principal && x.id !== contactId)) {
+            const r = await api('POST', { op: 'maj', table: 'contacts', id: autre.id, valeurs: { principal: false } });
+            Object.assign(autre, r.ligne);
+          }
+        }
+        const r = c ? await api('POST', { op: 'maj', table: 'contacts', id: c.id, valeurs: v }) : await api('POST', { op: 'creer', table: 'contacts', valeurs: v });
+        if (c) Object.assign(c, r.ligne); else D.contacts.push(r.ligne);
+        indexer(); rendre(); rendreFiche(); fermerModale();
+        toast('Contact enregistré.');
+      });
+    });
+    const suppr = $('[data-supprimer]', form);
+    if (suppr) suppr.addEventListener('click', () => {
+      if (!confirm(`Supprimer ${nomContact(c) || 'ce contact'} ?`)) return;
+      soumettre(form, async () => {
+        await api('POST', { op: 'supprimer', table: 'contacts', id: c.id });
+        D.contacts = D.contacts.filter((x) => x.id !== c.id);
+        indexer(); rendre(); rendreFiche(); fermerModale();
+        toast('Contact supprimé.');
+      });
+    });
+  });
+}
+
+/* ----- Infos du lead, nouveau lead ----- */
+
+function champsLead(l = {}) {
+  return `
+    ${champ('Entreprise', `<input type="text" name="entreprise" value="${esc(l.entreprise)}" required autofocus>`)}
+    <div class="deux">${champ('Type', `<select name="type">${options(TYPES, l.type || 'prospect')}</select>`)}${champ('Étape', `<select name="statut">${options(STATUTS, l.statut || 'nouveau')}</select>`)}</div>
+    ${champ('Besoin', `<textarea name="besoin" placeholder="Ce qu'il cherche, comment on s'est connus">${esc(l.besoin)}</textarea>`)}
+    <div class="deux">${champ('Source', `<input type="text" name="source" list="liste-sources" value="${esc(l.source)}" placeholder="BNI, recommandation…">`)}${champ('Valeur estimée (€ HT)', `<input type="text" inputmode="decimal" name="valeur" value="${esc(l.valeur ?? '')}">`)}</div>
+    <datalist id="liste-sources">${sources().map((s) => `<option value="${esc(s)}">`).join('')}</datalist>
+    <div class="deux">${champ('Secteur', `<input type="text" name="secteur" value="${esc(l.secteur)}">`)}${champ('Ville', `<input type="text" name="localisation" value="${esc(l.localisation)}">`)}</div>
+    <div class="deux">${champ('Téléphone de l\'entreprise', `<input type="tel" name="telephone" value="${esc(l.telephone)}">`)}${champ('Site web', `<input type="text" name="site_web" value="${esc(l.site_web)}">`)}</div>
+    ${champ('Adresse', `<input type="text" name="adresse" value="${esc(l.adresse)}">`)}
+    <div class="deux">${champ('SIRET', `<input type="text" name="siret" value="${esc(l.siret)}">`)}${champ('Fiche HubSpot', `<input type="text" name="hubspot_id" value="${esc(l.hubspot_id)}">`)}</div>
+    <div class="deux">${champ('Service demandé', `<input type="text" name="service" value="${esc(l.service)}">`)}${champ('Budget', `<input type="text" name="budget" value="${esc(l.budget)}">`)}</div>
+    ${champ('Tags (séparés par des virgules)', `<input type="text" name="tags" value="${esc((l.tags || []).join(', '))}">`)}
+    ${champ('Raison de la perte', `<input type="text" name="raison_perte" value="${esc(l.raison_perte)}">`)}`;
+}
+function lireLead(form) {
+  const el = form.elements;
+  const v = {};
+  for (const k of ['entreprise', 'type', 'statut', 'besoin', 'source', 'secteur', 'localisation', 'telephone', 'site_web', 'adresse', 'siret', 'hubspot_id', 'service', 'budget', 'raison_perte']) v[k] = el[k].value;
+  v.valeur = el.valeur.value.trim() === '' ? null : el.valeur.value;
+  v.tags = el.tags.value.split(',').map((t) => t.trim()).filter(Boolean);
+  return v;
+}
+
+function ouvrirInfos(leadId) {
+  const l = IDX.lead.get(leadId);
+  ouvrirModale(`<h2>Infos de ${esc(l.entreprise)}</h2>${champsLead(l)}${piedFormulaire('<button type="submit" class="btn primaire">Enregistrer</button>')}`, (form) => {
+    brancherAnnuler(form);
+    form.addEventListener('submit', (ev) => {
+      ev.preventDefault();
+      soumettre(form, async () => {
+        const v = lireLead(form);
+        if (!v.entreprise.trim()) throw new ErreurApi("Il manque le nom de l'entreprise.");
+        const r = await api('POST', { op: 'maj', table: 'leads', id: l.id, valeurs: v });
+        remplacerLead(r.ligne);
+        if (v.statut !== l.statut) await journal(l.id, { type: 'statut', resume: `Étape : ${LIB_STATUT[l.statut]}, puis ${LIB_STATUT[v.statut]}`, source: 'crm' });
+        indexer(); rendre(); rendreFiche(); fermerModale();
+        toast('Infos enregistrées.');
+      });
+    });
+  });
+}
+
+function ouvrirNouveau() {
+  ouvrirModale(`<h2>Nouveau lead</h2>
+    ${champ('Entreprise', '<input type="text" name="entreprise" required autofocus>')}
+    <div class="deux">${champ('Type', `<select name="type">${options(TYPES, 'prospect')}</select>`)}${champ('Source', `<input type="text" name="source" list="liste-sources" placeholder="BNI Moncel-lès-Lunéville, recommandation…">`)}</div>
+    <datalist id="liste-sources">${sources().map((s) => `<option value="${esc(s)}">`).join('')}</datalist>
+    <div class="deux">${champ('Prénom', '<input type="text" name="prenom">')}${champ('Nom', '<input type="text" name="nom">')}</div>
+    <div class="deux">${champ('Email', '<input type="email" name="email" autocomplete="off">')}${champ('Téléphone', '<input type="tel" name="telephone">')}</div>
+    ${champ('Poste', '<input type="text" name="poste">')}
+    ${champ('Besoin', '<textarea name="besoin" placeholder="Ce qu\'il cherche, où on s\'est vus"></textarea>')}
+    ${blocProchaine('apres', dansJours(1), 'email', 'Premier contact', { vide: false })}
+    ${piedFormulaire('<button type="submit" class="btn primaire">Créer le lead</button>')}`, (form) => {
+    brancherAnnuler(form);
+    brancherPuces(form, 'apres');
+    form.addEventListener('submit', (ev) => {
+      ev.preventDefault();
+      soumettre(form, async () => {
+        const el = form.elements;
+        if (!el.entreprise.value.trim()) throw new ErreurApi("Il manque le nom de l'entreprise.");
+        if (el.email.value.trim() && !/^[^@\s]+@[^@\s.]+(\.[^@\s.]+)+$/.test(el.email.value.trim())) throw new ErreurApi('Adresse email invalide.');
+        const memeNom = D.leads.find((x) => sansAccents(x.entreprise) === sansAccents(el.entreprise.value.trim()));
+        const memeEmail = el.email.value.trim() && D.contacts.find((x) => sansAccents(x.email) === sansAccents(el.email.value.trim()));
+        const doublon = memeNom || (memeEmail && IDX.lead.get(memeEmail.lead_id));
+        if (doublon && !confirm(`${doublon.entreprise} est déjà dans le CRM. Créer un nouveau lead quand même ?`)) { ouvrirFiche(doublon.id); fermerModale(); return; }
+        const r = await api('POST', { op: 'creer', table: 'leads', valeurs: { entreprise: el.entreprise.value, type: el.type.value, source: el.source.value, besoin: el.besoin.value, ...lireProchaine(form, 'apres') } });
+        D.leads.push(r.ligne);
+        if (el.prenom.value.trim() || el.nom.value.trim() || el.email.value.trim() || el.telephone.value.trim()) {
+          const rc = await api('POST', { op: 'creer', table: 'contacts', valeurs: { lead_id: r.ligne.id, prenom: el.prenom.value, nom: el.nom.value, email: el.email.value, telephone: el.telephone.value, poste: el.poste.value, principal: true } });
+          D.contacts.push(rc.ligne);
+        }
+        indexer(); rendre(); fermerModale();
+        ouvrirFiche(r.ligne.id);
+        toast('Lead créé.');
+      });
+    });
+  });
+}
+
+/* ----- Mémo et modèles ----- */
+
+function ouvrirMemo(memoId) {
+  const m = memoId ? D.memos.find((x) => x.id === memoId) : null;
+  const cats = [...new Set(D.memos.map((x) => x.categorie))];
+  ouvrirModale(`<h2>${m ? 'Modifier la fiche' : 'Nouvelle fiche du mémo'}</h2>
+    ${champ('Catégorie', `<input type="text" name="categorie" list="liste-cats" value="${esc(m?.categorie)}" required>`)}<datalist id="liste-cats">${cats.map((c) => `<option value="${esc(c)}">`).join('')}</datalist>
+    ${champ('Titre', `<input type="text" name="titre" value="${esc(m?.titre)}" required>`)}
+    ${champ('Contenu', `<textarea name="contenu" class="grand">${esc(m?.contenu)}</textarea>`, 'Listes avec « - », gras avec **mot**.')}
+    ${piedFormulaire(`${m ? '<button type="button" class="btn danger" data-supprimer>Supprimer</button>' : ''}<button type="submit" class="btn primaire">Enregistrer</button>`)}`, (form) => {
+    brancherAnnuler(form);
+    const el = form.elements;
+    form.addEventListener('submit', (ev) => {
+      ev.preventDefault();
+      soumettre(form, async () => {
+        if (!el.categorie.value.trim() || !el.titre.value.trim() || !el.contenu.value.trim()) throw new ErreurApi('Catégorie, titre et contenu sont nécessaires.');
+        const v = { categorie: el.categorie.value, titre: el.titre.value, contenu: el.contenu.value, date_maj: aujourdhui() };
+        const r = m ? await api('POST', { op: 'maj', table: 'memos', id: m.id, valeurs: v }) : await api('POST', { op: 'creer', table: 'memos', valeurs: { ...v, ordre: 999 } });
+        if (m) Object.assign(m, r.ligne); else D.memos.push(r.ligne);
+        rendre(); fermerModale(); toast('Mémo enregistré.');
+      });
+    });
+    const suppr = $('[data-supprimer]', form);
+    if (suppr) suppr.addEventListener('click', () => {
+      if (!confirm('Supprimer cette fiche du mémo ?')) return;
+      soumettre(form, async () => {
+        await api('POST', { op: 'supprimer', table: 'memos', id: m.id });
+        D.memos = D.memos.filter((x) => x.id !== m.id);
+        rendre(); fermerModale(); toast('Fiche supprimée.');
+      });
+    });
+  });
+}
+
+function ouvrirModele(modeleId) {
+  const m = modeleId ? D.modeles.find((x) => x.id === modeleId) : null;
+  ouvrirModale(`<h2>${m ? 'Modifier le modèle' : 'Nouveau modèle d\'email'}</h2>
+    <div class="deux">${champ('Nom', `<input type="text" name="nom" value="${esc(m?.nom)}" required>`)}${champ('Canal', `<select name="canal">${options([['email', 'Email'], ['sms', 'SMS']], m?.canal || 'email')}</select>`)}</div>
+    ${champ('Quand l\'utiliser', `<input type="text" name="usage" value="${esc(m?.usage)}">`)}
+    ${champ('Objet', `<input type="text" name="objet" value="${esc(m?.objet)}" required>`)}
+    ${champ('Texte', `<textarea name="corps" class="grand">${esc(m?.corps)}</textarea>`, 'Variables : {prenom}, {nom}, {entreprise}, {besoin}, {date_rdv}. La signature est ajoutée à l\'écriture.')}
+    ${piedFormulaire(`${m ? '<button type="button" class="btn danger" data-supprimer>Supprimer</button>' : ''}<button type="submit" class="btn primaire">Enregistrer</button>`)}`, (form) => {
+    brancherAnnuler(form);
+    const el = form.elements;
+    form.addEventListener('submit', (ev) => {
+      ev.preventDefault();
+      soumettre(form, async () => {
+        if (!el.nom.value.trim() || !el.objet.value.trim() || !el.corps.value.trim()) throw new ErreurApi('Nom, objet et texte sont nécessaires.');
+        const v = { nom: el.nom.value, usage: el.usage.value, objet: el.objet.value, corps: el.corps.value, canal: el.canal.value };
+        const r = m ? await api('POST', { op: 'maj', table: 'modeles', id: m.id, valeurs: v }) : await api('POST', { op: 'creer', table: 'modeles', valeurs: { ...v, ordre: 999 } });
+        if (m) Object.assign(m, r.ligne); else D.modeles.push(r.ligne);
+        rendre(); fermerModale(); toast('Modèle enregistré.');
+      });
+    });
+    const suppr = $('[data-supprimer]', form);
+    if (suppr) suppr.addEventListener('click', () => {
+      if (!confirm('Supprimer ce modèle ?')) return;
+      soumettre(form, async () => {
+        await api('POST', { op: 'supprimer', table: 'modeles', id: m.id });
+        D.modeles = D.modeles.filter((x) => x.id !== m.id);
+        rendre(); fermerModale(); toast('Modèle supprimé.');
+      });
+    });
+  });
+}
+
+/* ----- Réglages ----- */
+
+function telecharger(nom, contenu, type) {
+  const url = URL.createObjectURL(new Blob([contenu], { type }));
+  const a = document.createElement('a');
+  a.href = url; a.download = nom; document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 2000);
+}
+function exporterCsv(leads = D.leads, suffixe = 'leads') {
+  const cellule = (v) => { const t = String(v ?? ''); return /[;"\n]/.test(t) ? `"${t.replace(/"/g, '""')}"` : t; };
+  const entete = ['Entreprise', 'Type', 'Étape', 'Prénom', 'Nom', 'Email', 'Téléphone', 'Poste', 'Besoin', 'Source', 'Valeur', 'Prochaine relance', 'Action', 'Ce qui est prévu', 'Relances sans réponse', 'Dernier contact', 'Archivé'];
+  const lignes = leads.map((l) => {
+    const c = contactPrincipal(l.id) || {};
+    return [l.entreprise, LIB_TYPE[l.type], LIB_STATUT[l.statut], c.prenom, c.nom, c.email, c.telephone || l.telephone, c.poste, l.besoin, l.source, l.valeur, l.prochaine_relance, LIB_ACTION[l.prochaine_action], l.prochaine_note, l.relances_sans_reponse, l.dernier_contact, l.archive ? 'oui' : ''].map(cellule).join(';');
+  });
+  telecharger(`crm-${suffixe}-${aujourdhui()}.csv`, '﻿' + [entete.join(';'), ...lignes].join('\r\n'), 'text/csv;charset=utf-8');
+}
+
+function ouvrirReglages() {
+  ouvrirModale(`<h2>Réglages</h2>
+    ${champ('Signature des emails', `<textarea name="signature">${esc(D.reglages.signature || SIGNATURE_DEFAUT)}</textarea>`, 'Ajoutée en bas de chaque email écrit depuis le CRM.')}
+    <div><button type="submit" class="btn primaire">Enregistrer la signature</button></div>
+    <div class="alerte">Rythme des relances tant que personne ne répond : 3 jours après le premier contact, puis 7, puis 14, puis une prise de nouvelles tous les 3 mois. Les week-ends et jours fériés sont sautés. Tu peux toujours décaler à la main.</div>
+    <fieldset><legend>Sauvegarde</legend><div class="actions">
+      <button type="button" class="btn" data-export="csv">Exporter les leads (CSV)</button>
+      <button type="button" class="btn" data-export="json">Tout télécharger (JSON)</button>
+      <button type="button" class="btn" data-actualiser>Actualiser les données</button>
+    </div></fieldset>
+    <p class="aide">Envoi des emails : ${D.gmail ? `branché, depuis ${esc(D.expediteur)}.` : 'pas encore branché.'}</p>
+    ${piedFormulaire('<button type="button" class="btn danger" data-deconnexion>Oublier la clé sur cet appareil</button>')}`, (form) => {
+    brancherAnnuler(form);
+    form.addEventListener('submit', (ev) => {
+      ev.preventDefault();
+      soumettre(form, async () => {
+        const r = await api('POST', { op: 'reglage', cle: 'signature', valeur: form.elements.signature.value });
+        D.reglages.signature = r.reglage.valeur;
+        fermerModale(); toast('Signature enregistrée.');
+      });
+    });
+    $('[data-export="csv"]', form).addEventListener('click', () => exporterCsv());
+    $('[data-export="json"]', form).addEventListener('click', () => telecharger(`crm-sauvegarde-${aujourdhui()}.json`, JSON.stringify(D, null, 2), 'application/json'));
+    $('[data-actualiser]', form).addEventListener('click', async () => { await actualiser(); fermerModale(); toast('Données à jour.'); });
+    $('[data-deconnexion]', form).addEventListener('click', () => { fermerModale(); deconnecter(''); });
+  });
+}
+
+/* ----- Étape, archive, suppression ----- */
+
+function demanderRaisonPerte(l) {
+  return new Promise((resoudre) => {
+    let fini = false;
+    ouvrirModale(`<h2>${esc(l.entreprise)} passe en perdu</h2>
+      ${champ('Pourquoi ? (facultatif)', '<input type="text" name="raison" autofocus placeholder="Pas de budget cette année, a choisi un autre organisme…">')}
+      <p class="aide">La relance prévue est supprimée.</p>
+      ${piedFormulaire('<button type="submit" class="btn primaire">Passer en perdu</button>')}`, (form) => {
+      brancherAnnuler(form);
+      form.addEventListener('submit', (ev) => { ev.preventDefault(); fini = true; const r = form.elements.raison.value.trim(); fermerModale(); resoudre(r); });
+      modale().addEventListener('close', () => { if (!fini) resoudre(null); }, { once: true });
+    });
+  });
+}
+
+// « Annuler » d'un toast : on retire la ligne d'historique et on remet les anciennes valeurs.
+async function annulerAction(leadId, activite, valeurs) {
+  try {
+    if (activite) {
+      await api('POST', { op: 'supprimer', table: 'activites', id: activite.id });
+      D.activites = D.activites.filter((x) => x.id !== activite.id);
+    }
+    const r = await api('POST', { op: 'maj', table: 'leads', id: leadId, valeurs });
+    remplacerLead(r.ligne);
+    indexer(); rendre(); if (S.fiche) rendreFiche();
+    toast('Annulé.');
+  } catch (e) { toast(e.message); }
+}
+
+async function changerStatut(leadId, statut) {
+  const l = IDX.lead.get(leadId);
+  if (!l || statut === l.statut) return;
+  const avant = l.statut;
+  const maj = { statut };
+  let resume = `Étape : ${LIB_STATUT[avant]}, puis ${LIB_STATUT[statut]}`;
+  if (statut === 'perdu') {
+    const raison = await demanderRaisonPerte(l);
+    if (raison === null) { rendre(); if (S.fiche) rendreFiche(); return; }
+    if (raison.trim()) { maj.raison_perte = raison.trim(); resume += ` : ${raison.trim()}`; }
+    maj.prochaine_relance = null;
+    maj.prochaine_note = null;
+  }
+  if (statut === 'gagne' && l.type === 'prospect') { maj.type = 'client'; resume += ', devient client'; }
+  try {
+    const r = await journal(leadId, { type: 'statut', resume, source: 'crm' }, maj);
+    toast(`Étape : ${LIB_STATUT[statut]}.`, 3200, statut === 'perdu' || avant === 'perdu' ? null : () => annulerAction(leadId, r.activite, { statut: avant, type: l.type }));
+  } catch (e) {
+    toast(e.message);
+    rendreFiche();
+  }
+}
+
+async function archiver(leadId) {
+  const l = IDX.lead.get(leadId);
+  try {
+    const etaitArchive = l.archive;
+    const r = await journal(leadId, { type: 'note', resume: etaitArchive ? 'Lead désarchivé' : 'Lead archivé', source: 'crm' }, { archive: !etaitArchive });
+    toast(etaitArchive ? 'Lead désarchivé.' : 'Lead archivé.', 3200, () => annulerAction(leadId, r.activite, { archive: etaitArchive }));
+  } catch (e) { toast(e.message); }
+}
+
+async function supprimerLead(leadId) {
+  const l = IDX.lead.get(leadId);
+  if (!confirm(`Supprimer définitivement ${l.entreprise}, ses contacts et tout son historique ?\nPour le garder sans le voir, choisis plutôt Archiver.`)) return;
+  try {
+    await api('POST', { op: 'supprimer', table: 'leads', id: leadId });
+    D.leads = D.leads.filter((x) => x.id !== leadId);
+    D.contacts = D.contacts.filter((x) => x.lead_id !== leadId);
+    D.activites = D.activites.filter((x) => x.lead_id !== leadId);
+    indexer(); $('#fiche').close(); rendre();
+    toast('Lead supprimé.');
+  } catch (e) { toast(e.message); }
+}
+
+async function supprimerActivite(id) {
+  if (!confirm('Supprimer cette ligne de l\'historique ?')) return;
+  try {
+    await api('POST', { op: 'supprimer', table: 'activites', id });
+    D.activites = D.activites.filter((x) => x.id !== id);
+    indexer(); rendre(); rendreFiche();
+  } catch (e) { toast(e.message); }
+}
+
+/* ================= Vue Tableau (façon tableur) ================= */
+
+const COLS = [
+  { cle: 'entreprise', titre: 'Entreprise', src: 'lead', type: 'texte', fige: true },
+  { cle: 'prenom', titre: 'Prénom', src: 'contact', type: 'texte' },
+  { cle: 'nom', titre: 'Nom', src: 'contact', type: 'texte' },
+  { cle: 'email', titre: 'Email', src: 'contact', type: 'email' },
+  { cle: 'telephone', titre: 'Téléphone', src: 'contact', type: 'tel' },
+  { cle: 'statut', titre: 'Étape', src: 'lead', type: 'choix', options: STATUTS },
+  { cle: 'prochaine_relance', titre: 'Relance', src: 'lead', type: 'date' },
+  { cle: 'prochaine_action', titre: 'Action', src: 'lead', type: 'choix', options: ACTIONS },
+  { cle: 'prochaine_note', titre: 'Ce qui est prévu', src: 'lead', type: 'texte', large: true },
+  { cle: 'relances_sans_reponse', titre: 'Sans réponse', src: 'lead', type: 'lecture' },
+  { cle: 'dernier_contact', titre: 'Dernier contact', src: 'lead', type: 'date' },
+  { cle: 'source', titre: 'Source', src: 'lead', type: 'texte' },
+  { cle: 'type', titre: 'Type', src: 'lead', type: 'choix', options: TYPES },
+  { cle: 'besoin', titre: 'Besoin', src: 'lead', type: 'texte', large: true },
+  { cle: 'valeur', titre: 'Valeur (€ HT)', src: 'lead', type: 'nombre' },
+  { cle: 'localisation', titre: 'Ville', src: 'lead', type: 'texte' },
+  { cle: 'poste', titre: 'Poste', src: 'contact', type: 'texte' },
+];
+S.selection = new Set();
+S.tri = { col: 'prochaine_relance', sens: 1 };
+S.actif = null;          // { id, col } : la cellule active du tableau
+S.derniereSelection = null;
+
+function valeurCellule(l, c) {
+  if (c.src === 'contact') {
+    const ct = contactPrincipal(l.id);
+    if (c.cle === 'telephone') { const j = contactJoignable(l.id); return (j && j.telephone) || l.telephone || ''; }
+    return ct ? ct[c.cle] ?? '' : '';
+  }
+  return l[c.cle] ?? '';
+}
+function quandCourt(s) {
+  const e = ecartJours(s);
+  if (e === 0) return "aujourd'hui";
+  if (e === 1) return 'demain';
+  if (e < 0) return `en retard (${-e} j)`;
+  const d = versDate(s);
+  const an = d.getUTCFullYear() !== versDate(aujourdhui()).getUTCFullYear() ? ` ${d.getUTCFullYear()}` : '';
+  const moisCourts = ['janv.', 'févr.', 'mars', 'avr.', 'mai', 'juin', 'juil.', 'août', 'sept.', 'oct.', 'nov.', 'déc.'];
+  return `${JOURS[d.getUTCDay()].slice(0, 3)}. ${d.getUTCDate()} ${moisCourts[d.getUTCMonth()]}${an}`;
+}
+function celluleEntreprise(l) {
+  return `<div class="ent">${avatar(l, 's')}<span class="nom-ent">${esc(l.entreprise)}</span><button type="button" class="ouvrir-fiche" data-act="ouvrir" tabindex="-1">Fiche</button></div>`;
+}
+function affichageCellule(l, c, v) {
+  if (v === '' || v == null) return '';
+  if (c.cle === 'statut') return `<span class="statut s-${esc(v)}">${esc(LIB_STATUT[v])}</span>`;
+  if (c.cle === 'type') return esc(LIB_TYPE[v]);
+  if (c.cle === 'prochaine_action') return esc(LIB_ACTION[v]);
+  if (c.cle === 'prochaine_relance') return `<span class="relance ${classeQuand(v)}" title="${esc(dateCourte(v))}">${esc(quandCourt(v))}</span>`;
+  if (c.type === 'date') return esc(dateCourte(v));
+  if (c.cle === 'valeur') return esc(euros(v));
+  if (c.cle === 'relances_sans_reponse') return v ? esc(v) : '<span class="vide-cel">0</span>';
+  if (c.cle === 'email') return `<span title="${esc(v)}">${esc(v)}</span>`;
+  return esc(v);
+}
+
+function leadsDuTableau() {
+  const f = S.filtres;
+  const t = aujourdhui();
+  const fin = ajouterJours(t, 7);
+  const q = sansAccents(S.q.trim());
+  let ls = D.leads.filter((l) => (f.archives ? true : !l.archive)
+    && (!f.type || l.type === f.type) && (!f.statut || l.statut === f.statut) && (!f.source || l.source === f.source)
+    && (!f.action || l.prochaine_action === f.action)
+    && (!f.relance
+      || (f.relance === 'retard' && l.prochaine_relance && l.prochaine_relance < t)
+      || (f.relance === 'jour' && l.prochaine_relance && l.prochaine_relance <= t)
+      || (f.relance === 'semaine' && l.prochaine_relance && l.prochaine_relance <= fin)
+      || (f.relance === 'sans' && !l.prochaine_relance)));
+  if (q) {
+    ls = ls.filter((l) => {
+      const c = contactsDe(l.id).map((x) => [nomContact(x), x.email, x.telephone, x.poste].join(' ')).join(' ');
+      return sansAccents([l.entreprise, l.besoin, l.source, l.prochaine_note, l.localisation, l.secteur, (l.tags || []).join(' '), c].join(' ')).includes(q);
+    });
+  }
+  const col = COLS.find((c) => c.cle === S.tri.col) || COLS[0];
+  const cle = (l) => {
+    const v = valeurCellule(l, col);
+    if (v === '' || v == null) return null;
+    return typeof v === 'number' ? v : sansAccents(v);
+  };
+  return ls.sort((a, b) => {
+    const x = cle(a), y = cle(b);
+    if (x === null && y === null) return a.entreprise.localeCompare(b.entreprise, 'fr');
+    if (x === null) return 1;      // les cases vides toujours à la fin
+    if (y === null) return -1;
+    return (x < y ? -1 : x > y ? 1 : 0) * S.tri.sens || a.entreprise.localeCompare(b.entreprise, 'fr');
+  });
+}
+
+function ligneTableau(l) {
+  const choisie = S.selection.has(l.id);
+  return `<tr data-id="${l.id}" class="${choisie ? 'choisie' : ''}">
+    <td class="c-sel"><input type="checkbox" data-sel aria-label="Sélectionner ${esc(l.entreprise)}" ${choisie ? 'checked' : ''}></td>
+    ${COLS.map((c, j) => {
+      const contenu = affichageCellule(l, c, valeurCellule(l, c));
+      const classes = `c-${c.cle}${c.fige ? ' fige' : ''}${c.large ? ' large' : ''}${c.type === 'lecture' ? ' lecture' : ''}`;
+      if (c.fige) return `<th scope="row" class="${classes}" data-col="${j}" tabindex="-1">${celluleEntreprise(l)}</th>`;
+      return `<td class="${classes}" data-col="${j}" tabindex="-1">${contenu}</td>`;
+    }).join('')}
+  </tr>`;
+}
+
+function vueTableau() {
+  const f = S.filtres;
+  const ls = leadsDuTableau();
+  S.lignesAffichees = ls.map((l) => l.id);
+  const toutes = ls.length > 0 && ls.every((l) => S.selection.has(l.id));
+  const opt = (liste, val, tous) => `<option value="">${tous}</option>` + liste.map(([k, v]) => `<option value="${esc(k)}" ${k === val ? 'selected' : ''}>${esc(v)}</option>`).join('');
+  const n = S.selection.size;
+  return `<div class="outils" style="margin-top:0"><h1 class="titre-vue">Tableau</h1><span class="espace"></span>
+      <button type="button" class="btn petit" data-act="importer">Coller depuis Excel</button>
+      <button type="button" class="btn petit" data-act="exporter-tableau">Exporter</button></div>
+    <div class="outils">
+      <select data-filtre="relance" aria-label="Relance">${opt([['retard', 'En retard'], ['jour', "Jusqu'à aujourd'hui"], ['semaine', 'Dans les 7 jours'], ['sans', 'Sans relance prévue']], f.relance, 'Toutes les relances')}</select>
+      <select data-filtre="statut" aria-label="Étape">${opt(STATUTS, f.statut, 'Toutes les étapes')}</select>
+      <select data-filtre="action" aria-label="Action">${opt(ACTIONS, f.action, 'Toutes les actions')}</select>
+      <select data-filtre="type" aria-label="Type">${opt(TYPES, f.type, 'Tous les types')}</select>
+      <select data-filtre="source" aria-label="Source">${opt(sources().map((x) => [x, x]), f.source, 'Toutes les sources')}</select>
+      <label class="case"><input type="checkbox" data-filtre="archives" ${f.archives ? 'checked' : ''}> Archivés</label>
+    </div>
+    ${n ? `<div class="barre-lot" role="toolbar" aria-label="Actions sur la sélection">
+      <b>${n} sélectionné${n > 1 ? 's' : ''}</b>
+      <button type="button" class="btn primaire" data-lot="enchainer">Enchaîner</button>
+      <button type="button" class="btn" data-lot="etape">Changer l'étape</button>
+      <button type="button" class="btn" data-lot="decaler">Décaler la relance</button>
+      <button type="button" class="btn" data-lot="action">Changer l'action</button>
+      <button type="button" class="btn" data-lot="emails">Copier les emails</button>
+      <button type="button" class="btn" data-lot="exporter">Exporter</button>
+      <button type="button" class="btn" data-lot="archiver">Archiver</button>
+      <button type="button" class="btn" data-lot="vider">Tout désélectionner</button>
+    </div>` : ''}
+    <p class="sous-titre">${ls.length} lead${ls.length > 1 ? 's' : ''}${S.q ? ` contenant « ${esc(S.q.trim())} »` : ''}</p>
+    <div class="grille-zone" tabindex="0" role="region" aria-label="Tableau des leads">
+      <table class="tableur" aria-rowcount="${ls.length + 1}">
+        <thead><tr>
+          <th class="c-sel"><input type="checkbox" data-sel-tout aria-label="Tout sélectionner" ${toutes ? 'checked' : ''}></th>
+          ${COLS.map((c) => `<th class="${c.fige ? 'fige' : ''}${c.large ? ' large' : ''}" aria-sort="${S.tri.col === c.cle ? (S.tri.sens > 0 ? 'ascending' : 'descending') : 'none'}"><button type="button" data-tri="${c.cle}">${esc(c.titre)}</button></th>`).join('')}
+        </tr></thead>
+        <tbody>
+          ${ls.map(ligneTableau).join('')}
+          <tr class="ajout"><td class="c-sel"></td><td class="ajout-cel" colspan="${COLS.length}"><input type="text" class="ajout-rapide" aria-label="Ajouter un lead" placeholder="Nouvelle ligne : nom de l'entreprise, puis Entrée"></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="aide-clavier">Flèches pour se déplacer, <kbd>Entrée</kbd> ou une lettre pour modifier, <kbd>Entrée</kbd> ou <kbd>Tab</kbd> pour valider, <kbd>Échap</kbd> pour annuler, <kbd>Maj</kbd> + <kbd>Espace</kbd> pour sélectionner la ligne, <kbd>Maj</kbd> + clic pour une plage.</p>`;
+}
+
+function celluleTableau(id, col) { return $(`.tableur tr[data-id="${id}"] [data-col="${col}"]`); }
+function activerCellule(cel, focus = true) {
+  if (!cel) return;
+  $$('.tableur [data-col][tabindex="0"]').forEach((x) => x.setAttribute('tabindex', '-1'));
+  cel.setAttribute('tabindex', '0');
+  S.actif = { id: cel.closest('tr').dataset.id, col: Number(cel.dataset.col) };
+  if (focus) cel.focus({ preventScroll: false });
+}
+function restaurerCellule() {
+  if (S.vue !== 'tableau' || !S.actif) return;
+  const cel = celluleTableau(S.actif.id, S.actif.col);
+  if (cel) activerCellule(cel, true);
+}
+function deplacerCellule(cel, dLigne, dCol) {
+  const lignes = $$('.tableur tbody tr[data-id]');
+  const i = lignes.indexOf(cel.closest('tr'));
+  const j = Math.min(COLS.length - 1, Math.max(0, Number(cel.dataset.col) + dCol));
+  const k = Math.min(lignes.length - 1, Math.max(0, i + dLigne));
+  activerCellule($(`[data-col="${j}"]`, lignes[k]));
+}
+
+function editerCellule(cel, depart = null) {
+  const c = COLS[Number(cel.dataset.col)];
+  if (!c || c.type === 'lecture' || cel.classList.contains('edition')) return;
+  const l = IDX.lead.get(cel.closest('tr').dataset.id);
+  const avant = valeurCellule(l, c);
+  let champ;
+  if (c.type === 'choix') {
+    champ = document.createElement('select');
+    if (c.cle !== 'statut' && c.cle !== 'type' && c.cle !== 'prochaine_action') champ.add(new Option('', ''));
+    for (const [k, v] of c.options) champ.add(new Option(v, k, false, k === avant));
+  } else {
+    champ = document.createElement('input');
+    champ.type = c.type === 'date' ? 'date' : c.type === 'email' ? 'email' : c.type === 'tel' ? 'tel' : 'text';
+    if (c.type === 'nombre') champ.inputMode = 'decimal';
+    champ.value = depart !== null ? depart : String(avant ?? '');
+  }
+  champ.setAttribute('aria-label', c.titre);
+  cel.classList.add('edition');
+  cel.innerHTML = '';
+  cel.appendChild(champ);
+  champ.focus();
+  if (champ.select && depart === null && champ.type === 'text') champ.select();
+  let fini = false;
+  const terminer = async (garder, dLigne = 0, dCol = 0) => {
+    if (fini) return;
+    fini = true;
+    const nouvelle = champ.value.trim();
+    cel.classList.remove('edition');
+    if (!garder || nouvelle === String(avant ?? '').trim()) {
+      cel.innerHTML = c.fige ? celluleEntreprise(l) : affichageCellule(l, c, avant);
+      activerCellule(cel);
+      if (dLigne || dCol) deplacerCellule(cel, dLigne, dCol);
+      return;
+    }
+    S.actif = { id: l.id, col: Number(cel.dataset.col) };
+    try {
+      await enregistrerCellule(l, c, nouvelle);
+      const cible = celluleTableau(l.id, Number(cel.dataset.col));
+      if (cible) { cible.classList.add('enregistre'); activerCellule(cible); if (dLigne || dCol) deplacerCellule(cible, dLigne, dCol); }
+    } catch (e) {
+      toast(e.message || 'Pas enregistré.');
+      rendre();
+      restaurerCellule();
+    }
+  };
+  champ.addEventListener('keydown', (ev) => {
+    if (ev.key === 'Enter') { ev.preventDefault(); terminer(true, ev.shiftKey ? -1 : 1, 0); }
+    else if (ev.key === 'Tab') { ev.preventDefault(); terminer(true, 0, ev.shiftKey ? -1 : 1); }
+    else if (ev.key === 'Escape') { ev.preventDefault(); ev.stopPropagation(); terminer(false); }
+  });
+  champ.addEventListener('blur', () => terminer(true));
+  if (c.type === 'choix') champ.addEventListener('change', () => champ.blur());
+}
+
+async function enregistrerCellule(l, c, v) {
+  if (c.src === 'contact') {
+    if (c.cle === 'email' && v && !/^[^@\s]+@[^@\s.]+(\.[^@\s.]+)+$/.test(v)) throw new ErreurApi('Adresse email invalide.');
+    const ct = contactPrincipal(l.id);
+    if (ct) {
+      const r = await api('POST', { op: 'maj', table: 'contacts', id: ct.id, valeurs: { [c.cle]: v } });
+      Object.assign(ct, r.ligne);
+    } else {
+      const r = await api('POST', { op: 'creer', table: 'contacts', valeurs: { lead_id: l.id, [c.cle]: v, principal: true } });
+      D.contacts.push(r.ligne);
+    }
+    indexer(); rendre(); restaurerCellule();
+    return;
+  }
+  if (c.cle === 'entreprise' && !v) throw new ErreurApi("Le nom de l'entreprise ne peut pas être vide.");
+  if (c.cle === 'statut') { await changerStatut(l.id, v); restaurerCellule(); return; }
+  if (c.cle === 'prochaine_relance' || c.cle === 'prochaine_action') {
+    const p = { prochaine_relance: l.prochaine_relance, prochaine_action: l.prochaine_action, [c.cle]: v || null };
+    if (!p.prochaine_action) p.prochaine_action = 'email';
+    await journal(l.id, { type: 'relance_decalee', resume: p.prochaine_relance ? `Relance prévue le ${dateLongue(p.prochaine_relance)} (${actionLue(p.prochaine_action).toLowerCase()}), depuis le tableau` : 'Plus de relance prévue, depuis le tableau', source: 'crm' }, { [c.cle]: v || (c.cle === 'prochaine_action' ? 'email' : null) });
+    restaurerCellule();
+    return;
+  }
+  const valeur = c.type === 'nombre' ? (v === '' ? null : v) : v;
+  const r = await api('POST', { op: 'maj', table: 'leads', id: l.id, valeurs: { [c.cle]: valeur } });
+  remplacerLead(r.ligne);
+  if (c.cle === 'source' && v) S.derniereSource = v;
+  indexer(); rendre(); restaurerCellule();
+}
+
+async function ajoutRapide(input) {
+  const nom = input.value.trim();
+  if (!nom) return;
+  if (D.leads.some((l) => sansAccents(l.entreprise) === sansAccents(nom)) && !confirm(`« ${nom} » existe déjà. Créer une deuxième ligne quand même ?`)) return;
+  input.disabled = true;
+  try {
+    const r = await api('POST', { op: 'creer', table: 'leads', valeurs: { entreprise: nom, source: S.derniereSource || null, prochaine_relance: dansJours(1), prochaine_action: 'email' } });
+    D.leads.push(r.ligne);
+    indexer();
+    S.actif = { id: r.ligne.id, col: 1 };
+    rendre();
+    restaurerCellule();
+    toast(`${nom} ajouté. Complète la ligne, puis Entrée.`);
+  } catch (e) {
+    toast(e.message);
+    input.disabled = false;
+  }
+}
+
+/* ----- Actions groupées ----- */
+
+const idsChoisis = () => (S.lignesAffichees || []).filter((id) => S.selection.has(id)).concat([...S.selection].filter((id) => !(S.lignesAffichees || []).includes(id)));
+
+async function lot(ids, majLead, activite, message) {
+  const r = await api('POST', { op: 'lot', ids, lead: majLead, activite });
+  for (const l of r.leads || []) remplacerLead(l);
+  for (const a of r.activites || []) ajouterActivite(a);
+  indexer(); rendre();
+  toast(message);
+}
+
+function ouvrirLot(sorte) {
+  const ids = idsChoisis();
+  if (!ids.length) return;
+  const n = ids.length;
+  if (sorte === 'vider') { S.selection.clear(); rendre(); return; }
+  if (sorte === 'enchainer') return demarrerSession(ids, 'Sélection du tableau');
+  if (sorte === 'emails') {
+    const adresses = [...new Set(ids.flatMap((id) => contactsDe(id).map((c) => c.email)).filter(Boolean))];
+    const sans = ids.filter((id) => !contactsDe(id).some((c) => c.email)).length;
+    if (!adresses.length) return toast('Aucune adresse email dans la sélection.');
+    navigator.clipboard.writeText(adresses.join(', ')).then(() => toast(`${adresses.length} adresse${adresses.length > 1 ? 's' : ''} copiée${adresses.length > 1 ? 's' : ''}${sans ? `, ${sans} lead${sans > 1 ? 's' : ''} sans email` : ''}.`), () => toast('Copie impossible dans ce navigateur.'));
+    return;
+  }
+  if (sorte === 'exporter') return exporterCsv(ids.map((id) => IDX.lead.get(id)).filter(Boolean), 'selection');
+  if (sorte === 'archiver') {
+    if (!confirm(`Archiver ${n} lead${n > 1 ? 's' : ''} ? Ils restent dans « Archivés ».`)) return;
+    return lot(ids, { archive: true }, { type: 'note', resume: 'Lead archivé (modification groupée)', source: 'crm' }, `${n} lead${n > 1 ? 's' : ''} archivé${n > 1 ? 's' : ''}.`).then(() => S.selection.clear()).catch((e) => toast(e.message));
+  }
+  if (sorte === 'etape' || sorte === 'action') {
+    const liste = sorte === 'etape' ? STATUTS : ACTIONS;
+    ouvrirModale(`<h2>${sorte === 'etape' ? "Changer l'étape" : "Changer l'action"} de ${n} lead${n > 1 ? 's' : ''}</h2>
+      ${champ(sorte === 'etape' ? 'Nouvelle étape' : 'Nouvelle action', `<select name="valeur" autofocus>${options(liste, sorte === 'etape' ? 'contacte' : 'appel')}</select>`)}
+      ${piedFormulaire('<button type="submit" class="btn primaire">Appliquer</button>')}`, (form) => {
+      brancherAnnuler(form);
+      form.addEventListener('submit', (ev) => {
+        ev.preventDefault();
+        soumettre(form, async () => {
+          const v = form.elements.valeur.value;
+          if (sorte === 'etape') {
+            const maj = { statut: v };
+            if (v === 'perdu') { maj.prochaine_relance = null; maj.prochaine_note = null; }
+            await lot(ids, maj, { type: 'statut', resume: `Étape : ${LIB_STATUT[v]} (modification groupée)`, source: 'crm' }, `${n} lead${n > 1 ? 's' : ''} en ${LIB_STATUT[v]}.`);
+          } else {
+            await lot(ids, { prochaine_action: v }, null, `Action : ${LIB_ACTION[v]} pour ${n} lead${n > 1 ? 's' : ''}.`);
+          }
+          fermerModale();
+        });
+      });
+    });
+    return;
+  }
+  if (sorte === 'decaler') {
+    ouvrirModale(`<h2>Décaler la relance de ${n} lead${n > 1 ? 's' : ''}</h2>
+      ${blocProchaine('apres', dansJours(1), 'email', '', { aide: 'Même date et même action pour toute la sélection. Le compteur du rythme ne bouge pas.' })}
+      ${piedFormulaire('<button type="submit" class="btn primaire">Appliquer</button>')}`, (form) => {
+      brancherAnnuler(form);
+      brancherPuces(form, 'apres');
+      form.addEventListener('submit', (ev) => {
+        ev.preventDefault();
+        soumettre(form, async () => {
+          const p = lireProchaine(form, 'apres');
+          if (!p.prochaine_note) delete p.prochaine_note;
+          const texte = p.prochaine_relance ? `Relance déplacée au ${dateLongue(p.prochaine_relance)} (${actionLue(p.prochaine_action).toLowerCase()}), modification groupée` : 'Plus de relance prévue (modification groupée)';
+          await lot(ids, p, { type: 'relance_decalee', resume: texte, source: 'crm' }, `${n} relance${n > 1 ? 's' : ''} décalée${n > 1 ? 's' : ''}.`);
+          fermerModale();
+        });
+      });
+    });
+  }
+}
+
+/* ----- Coller depuis Excel ----- */
+
+const ENTETES = [
+  ['entreprise', ['entreprise', 'nom entreprise', 'societe', 'raison sociale', 'company', 'organisation', 'structure']],
+  ['prenom', ['prenom', 'prenom contact', 'first name', 'firstname']],
+  ['nom', ['nom', 'nom contact', 'last name', 'lastname', 'nom de famille']],
+  ['email', ['email', 'e-mail', 'mail', 'email contact', 'adresse email', 'courriel']],
+  ['telephone', ['telephone', 'tel', 'telephone contact', 'portable', 'mobile', 'phone', 'numero']],
+  ['poste', ['poste', 'fonction', 'poste contact', 'titre', 'job title']],
+  ['tel_entreprise', ['telephone entreprise', 'standard']],
+  ['besoin', ['besoin', 'note', 'notes', 'commentaire', 'commentaires', 'remarque']],
+  ['source', ['source', 'origine', 'provenance']],
+  ['localisation', ['ville', 'localisation', 'city', 'commune']],
+  ['secteur', ['secteur', 'activite', 'naf', 'industry']],
+  ['site_web', ['site', 'site web', 'website', 'url']],
+  ['siret', ['siret', 'siren']],
+  ['adresse', ['adresse', 'address']],
+  ['statut', ['statut', 'etape', 'statut pipeline', 'stage']],
+  ['valeur', ['valeur', 'montant', 'valeur deal', 'valeur deal (€)']],
+];
+const STATUT_DEPUIS_TEXTE = Object.fromEntries(STATUTS.flatMap(([k, v]) => [[sansAccents(v), k], [k, k]]));
+
+function lireTableauColle(texte) {
+  const lignesBrutes = texte.replace(/\r\n?/g, '\n').split('\n').filter((l) => l.trim());
+  if (lignesBrutes.length < 2) return null;
+  const premiere = lignesBrutes[0];
+  const sep = premiere.includes('\t') ? '\t' : (premiere.split(';').length >= premiere.split(',').length ? ';' : ',');
+  const decouper = (ligne) => {
+    if (sep === '\t') return ligne.split('\t').map((x) => x.trim());
+    const cases = []; let cur = ''; let guillemets = false;
+    for (let i = 0; i < ligne.length; i++) {
+      const ch = ligne[i];
+      if (ch === '"') { if (guillemets && ligne[i + 1] === '"') { cur += '"'; i++; } else guillemets = !guillemets; }
+      else if (ch === sep && !guillemets) { cases.push(cur.trim()); cur = ''; }
+      else cur += ch;
+    }
+    cases.push(cur.trim());
+    return cases;
+  };
+  const entetes = decouper(premiere.replace(/^﻿/, ''));
+  const carte = entetes.map((h) => {
+    const n = sansAccents(h).replace(/\s+/g, ' ').trim();
+    const trouve = ENTETES.find(([, noms]) => noms.includes(n));
+    return trouve ? trouve[0] : null;
+  });
+  // « Nom » seul vaut nom du contact, sauf s'il n'y a aucune colonne Entreprise.
+  if (!carte.includes('entreprise')) {
+    const i = carte.indexOf('nom');
+    if (i >= 0 && !carte.includes('prenom')) carte[i] = 'entreprise';
+  }
+  const lignes = lignesBrutes.slice(1).map(decouper).map((cases) => Object.fromEntries(carte.map((k, i) => [k, cases[i] || '']).filter(([k, v]) => k && v)));
+  return { entetes, carte, lignes };
+}
+
+function ouvrirImport() {
+  ouvrirModale(`<h2>Coller des leads depuis Excel ou Google Sheets</h2>
+    <p class="aide">Copie les lignes avec la ligne des titres de colonnes (Entreprise, Prénom, Nom, Email, Téléphone, Besoin, Source, Ville…), puis colle ici. Un fichier CSV marche aussi.</p>
+    ${champ('Tableau collé', '<textarea name="texte" class="grand" autofocus placeholder="Entreprise	Prénom	Nom	Email	Téléphone"></textarea>')}
+    ${champ('Ou un fichier CSV', '<input type="file" name="fichier" accept=".csv,.tsv,.txt,text/csv">')}
+    <div data-apercu></div>
+    <div class="deux">
+      ${champ('Source pour toutes les lignes', `<input type="text" name="source" list="liste-sources" value="${esc(`Import du ${dateCourte(aujourdhui())}`)}">`)}
+      ${champ('Première relance', `<input type="date" name="debut" value="${esc(dansJours(1))}">`)}
+    </div>
+    <datalist id="liste-sources">${sources().map((x) => `<option value="${esc(x)}">`).join('')}</datalist>
+    <div class="deux">
+      ${champ('Relances par jour', '<input type="number" name="parjour" min="1" max="200" value="10">', 'Les relances sont étalées sur les jours ouvrés suivants.')}
+      ${champ('Action', `<select name="action">${options(ACTIONS, 'email')}</select>`)}
+    </div>
+    <label class="case"><input type="checkbox" name="doublons"> Importer aussi les lignes déjà présentes dans le CRM</label>
+    ${piedFormulaire('<button type="submit" class="btn primaire" disabled data-importer>Importer</button>')}`, (form) => {
+    brancherAnnuler(form);
+    const el = form.elements;
+    let analyse = null;
+    const existants = new Set(D.leads.map((l) => sansAccents(l.entreprise)));
+    const emails = new Set(D.contacts.map((c) => sansAccents(c.email)).filter(Boolean));
+    const estDoublon = (x) => existants.has(sansAccents(x.entreprise)) || (x.email && emails.has(sansAccents(x.email)));
+    const apercu = () => {
+      analyse = lireTableauColle(el.texte.value);
+      const zone = $('[data-apercu]', form);
+      const bouton = $('[data-importer]', form);
+      if (!analyse) { zone.innerHTML = ''; bouton.disabled = true; return; }
+      const reconnues = analyse.entetes.filter((h, i) => analyse.carte[i]);
+      const ignorees = analyse.entetes.filter((h, i) => !analyse.carte[i] && h);
+      const utiles = analyse.lignes.filter((x) => x.entreprise || x.nom || x.email);
+      const doublons = utiles.filter(estDoublon).length;
+      if (!analyse.carte.includes('entreprise')) { zone.innerHTML = '<p class="erreur">Je ne trouve pas de colonne « Entreprise ». Vérifie la ligne des titres.</p>'; bouton.disabled = true; return; }
+      zone.innerHTML = `<p class="aide"><b>${utiles.length} ligne${utiles.length > 1 ? 's' : ''}</b>${doublons ? `, dont ${doublons} déjà dans le CRM` : ''}. Colonnes reprises : ${esc(reconnues.join(', '))}${ignorees.length ? `. Ignorées : ${esc(ignorees.join(', '))}` : ''}.</p>
+        <div class="apercu"><table><thead><tr>${['Entreprise', 'Prénom', 'Nom', 'Email', 'Téléphone', 'Besoin'].map((t) => `<th>${t}</th>`).join('')}</tr></thead><tbody>
+        ${utiles.slice(0, 8).map((x) => `<tr>${['entreprise', 'prenom', 'nom', 'email', 'telephone', 'besoin'].map((k) => `<td>${esc(x[k] || '')}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`;
+      bouton.disabled = utiles.length === 0;
+      bouton.textContent = `Importer ${utiles.length} ligne${utiles.length > 1 ? 's' : ''}`;
+    };
+    el.texte.addEventListener('input', apercu);
+    el.fichier.addEventListener('change', async () => { const f = el.fichier.files[0]; if (f) { el.texte.value = await f.text(); apercu(); } });
+    form.addEventListener('submit', (ev) => {
+      ev.preventDefault();
+      soumettre(form, async () => {
+        if (!analyse) throw new ErreurApi('Colle un tableau d\'abord.');
+        let lignes = analyse.lignes.filter((x) => x.entreprise || x.nom || x.email);
+        if (!el.doublons.checked) lignes = lignes.filter((x) => !estDoublon(x));
+        if (!lignes.length) throw new ErreurApi('Toutes les lignes sont déjà dans le CRM.');
+        if (lignes.length > 500) throw new ErreurApi('500 lignes au plus par import.');
+        const parJour = Math.max(1, Number(el.parjour.value) || 10);
+        let jour = prochainOuvre(el.debut.value || dansJours(1));
+        const envoi = lignes.map((x, i) => {
+          if (i > 0 && i % parJour === 0) jour = dansJours(1, jour);
+          const id = crypto.randomUUID();
+          const statut = STATUT_DEPUIS_TEXTE[sansAccents(x.statut || '')] || 'nouveau';
+          const lead = { id, entreprise: x.entreprise || [x.prenom, x.nom].filter(Boolean).join(' ') || x.email, statut, source: x.source || el.source.value || null,
+            besoin: x.besoin, localisation: x.localisation, secteur: x.secteur, site_web: x.site_web, siret: x.siret, adresse: x.adresse,
+            telephone: x.tel_entreprise, valeur: x.valeur ? x.valeur.replace(/[^\d,.-]/g, '') || null : null,
+            prochaine_relance: jour, prochaine_action: el.action.value, tags: ['import tableau'] };
+          const aContact = x.prenom || x.nom || x.email || x.telephone;
+          const tel = x.telephone && /^[1-9]\d{8}$/.test(x.telephone.replace(/\s/g, '')) ? `0${x.telephone.replace(/\s/g, '')}` : x.telephone;
+          return { lead, contact: aContact ? { id: crypto.randomUUID(), prenom: x.prenom, nom: x.entreprise ? x.nom : null, email: x.email, telephone: tel, poste: x.poste, principal: true } : null };
+        });
+        const r = await api('POST', { op: 'importer', lignes: envoi });
+        D.leads.push(...r.leads); D.contacts.push(...r.contacts); r.activites.forEach(ajouterActivite);
+        indexer(); fermerModale();
+        S.filtres.source = ''; rendre();
+        toast(`${r.leads.length} lead${r.leads.length > 1 ? 's' : ''} importé${r.leads.length > 1 ? 's' : ''}.`, 5000);
+      });
+    });
+  });
+}
+
+/* ----- Événements du tableau ----- */
+
+document.addEventListener('click', (ev) => {
+  const t = ev.target;
+  if (t.matches('.tableur [data-sel]')) {
+    const id = t.closest('tr').dataset.id;
+    const ids = S.lignesAffichees || [];
+    if (ev.shiftKey && S.derniereSelection && ids.includes(S.derniereSelection)) {
+      const [a, b] = [ids.indexOf(S.derniereSelection), ids.indexOf(id)].sort((x, y) => x - y);
+      ids.slice(a, b + 1).forEach((x) => (t.checked ? S.selection.add(x) : S.selection.delete(x)));
+    } else if (t.checked) S.selection.add(id); else S.selection.delete(id);
+    S.derniereSelection = id;
+    rendre();
+    return;
+  }
+  if (t.matches('[data-sel-tout]')) {
+    (S.lignesAffichees || []).forEach((id) => (t.checked ? S.selection.add(id) : S.selection.delete(id)));
+    rendre();
+    return;
+  }
+  const tri = t.closest('[data-tri]');
+  if (tri) {
+    S.tri = S.tri.col === tri.dataset.tri ? { col: tri.dataset.tri, sens: -S.tri.sens } : { col: tri.dataset.tri, sens: 1 };
+    rendre();
+    return;
+  }
+  const lotBouton = t.closest('[data-lot]');
+  if (lotBouton) return ouvrirLot(lotBouton.dataset.lot);
+  const cel = t.closest('.tableur [data-col]');
+  if (cel && !t.closest('button') && !cel.classList.contains('edition')) {
+    activerCellule(cel);
+    if (matchMedia('(pointer: coarse)').matches) editerCelluleMobile(cel);
+  }
+});
+
+function editerCelluleMobile(cel) {
+  const c = COLS[Number(cel.dataset.col)];
+  if (!c || c.type === 'lecture') return;
+  const l = IDX.lead.get(cel.closest('tr').dataset.id);
+  const v = valeurCellule(l, c);
+  const html = c.type === 'choix' ? `<select name="v" autofocus>${c.cle === 'statut' || c.cle === 'type' || c.cle === 'prochaine_action' ? '' : '<option value=""></option>'}${options(c.options, v)}</select>`
+    : `<input name="v" autofocus type="${c.type === 'date' ? 'date' : c.type === 'email' ? 'email' : c.type === 'tel' ? 'tel' : 'text'}" ${c.type === 'nombre' ? 'inputmode="decimal"' : ''} value="${esc(v ?? '')}">`;
+  ouvrirModale(`<h2>${esc(c.titre)}</h2><p class="aide">${esc(l.entreprise)}</p>${champ(c.titre, html)}${piedFormulaire('<button type="submit" class="btn primaire">Enregistrer</button>')}`, (form) => {
+    brancherAnnuler(form);
+    form.addEventListener('submit', async (ev) => {
+      ev.preventDefault();
+      const nouvelle = form.elements.v.value.trim();
+      fermerModale();
+      if (nouvelle === String(v ?? '').trim()) return;
+      try { await enregistrerCellule(l, c, nouvelle); toast('Enregistré.', 1500); } catch (e) { toast(e.message); }
+    });
+  });
+}
+document.addEventListener('dblclick', (ev) => {
+  const cel = ev.target.closest('.tableur [data-col]');
+  if (cel && !ev.target.closest('button')) editerCellule(cel);
+});
+document.addEventListener('keydown', (ev) => {
+  const t = ev.target;
+  if (t.matches('.ajout-rapide') && ev.key === 'Enter') { ev.preventDefault(); ajoutRapide(t); return; }
+  if (!t.matches('.tableur [data-col]') || t.classList.contains('edition')) return;
+  const k = ev.key;
+  const mouvements = { ArrowUp: [-1, 0], ArrowDown: [1, 0], ArrowLeft: [0, -1], ArrowRight: [0, 1] };
+  if (mouvements[k]) { ev.preventDefault(); deplacerCellule(t, ...mouvements[k]); return; }
+  if (k === 'Tab') { ev.preventDefault(); deplacerCellule(t, 0, ev.shiftKey ? -1 : 1); return; }
+  if (k === 'Home' || k === 'End') { ev.preventDefault(); deplacerCellule(t, 0, k === 'Home' ? -99 : 99); return; }
+  if (k === ' ' && ev.shiftKey) { ev.preventDefault(); const box = $('[data-sel]', t.closest('tr')); box.click(); restaurerCellule(); return; }
+  if ((ev.metaKey || ev.ctrlKey) && k.toLowerCase() === 'c') { navigator.clipboard?.writeText(String(valeurCellule(IDX.lead.get(t.closest('tr').dataset.id), COLS[Number(t.dataset.col)]) ?? '')); toast('Copié.', 1200); return; }
+  if (k === 'Enter' || k === 'F2') { ev.preventDefault(); editerCellule(t); return; }
+  if (k === 'Backspace' || k === 'Delete') { ev.preventDefault(); const c = COLS[Number(t.dataset.col)]; if (c.type !== 'choix' && !c.fige) editerCellule(t, ''); return; }
+  if (k.length === 1 && !ev.metaKey && !ev.ctrlKey && !ev.altKey) {
+    const c = COLS[Number(t.dataset.col)];
+    if (c.type === 'texte' || c.type === 'email' || c.type === 'tel' || c.type === 'nombre') { ev.preventDefault(); editerCellule(t, k); }
+  }
+});
+
+/* ================= Enchaîner : une file de leads, l'un après l'autre ================= */
+
+const LIB_BILAN = { email: 'Emails envoyés', brouillon: 'Brouillons créés', appel: 'Appels notés', sms: 'SMS envoyés', decale: 'Relances décalées', rdv: 'RDV prévus', note: 'Notes ou réponses', passe: 'Passés' };
+
+function demarrerSession(ids, titre) {
+  const liste = ids.filter((id) => IDX.lead.has(id));
+  if (!liste.length) return toast('Rien à enchaîner.');
+  S.session = { ids: liste, i: 0, titre, bilan: {}, passes: [], modeleEmail: null, modeleSms: null, sansConfirmation: false };
+  rendreSession();
+  const d = $('#session');
+  if (!d.open) d.showModal();
+}
+
+function rendreSession() {
+  const s = S.session;
+  const d = $('#session');
+  if (!s) return;
+  sauverSession();
+  const n = s.ids.length;
+  if (s.i >= n) {
+    const lignes = Object.entries(s.bilan).filter(([, v]) => v);
+    d.innerHTML = `<div class="session-cadre">
+      <header class="session-tete"><div><p class="surtitre">${esc(s.titre)}</p><p class="pos">Terminé</p></div>
+        <button type="button" class="btn" data-sess="fermer">Fermer</button>
+        <div class="progression"><span style="width:100%"></span></div></header>
+      <div class="session-corps">
+        <h2>${n} lead${n > 1 ? 's' : ''} parcouru${n > 1 ? 's' : ''}</h2>
+        ${lignes.length ? `<ul class="bilan">${lignes.map(([k, v]) => `<li><b>${v}</b>${esc(LIB_BILAN[k] || k)}</li>`).join('')}</ul>` : '<p class="vide">Aucune action enregistrée.</p>'}
+        ${s.passes.length ? `<p class="aide">${s.passes.length} lead${s.passes.length > 1 ? 's' : ''} passé${s.passes.length > 1 ? 's' : ''} sans action.</p>` : ''}
+      </div>
+      <div class="session-actions">
+        ${s.passes.length ? '<button type="button" class="btn" data-sess="reprendre">Reprendre les leads passés</button>' : ''}
+        <button type="button" class="btn primaire pousse" data-sess="fermer">Fermer</button>
+      </div></div>`;
+    return;
+  }
+  const l = IDX.lead.get(s.ids[s.i]);
+  if (!l) { s.i++; return rendreSession(); }
+  const c = contactPrincipal(l.id);
+  const tel = telephoneDe(l);
+  const email = emailDe(l);
+  const mobile = mobileDe(l);
+  const prim = (a) => (l.prochaine_action === a ? ' primaire' : '');
+  const acts = activitesDe(l.id).filter((a) => a.type !== 'import').slice(0, 3);
+  d.innerHTML = `<div class="session-cadre" data-id="${l.id}">
+    <header class="session-tete">
+      <div><p class="surtitre">${esc(s.titre)}</p><p class="pos">${s.i + 1} sur ${n}</p></div>
+      <button type="button" class="btn" data-sess="fin" aria-label="Terminer l'enchaînement">Terminer ✕</button>
+      <div class="progression" role="progressbar" aria-label="Avancement" aria-valuemin="0" aria-valuemax="${n}" aria-valuenow="${s.i}"><span style="width:${Math.round((s.i / n) * 100)}%"></span></div>
+    </header>
+    <div class="session-corps">
+      <p class="surtitre">${esc(LIB_TYPE[l.type])}, ${esc(LIB_STATUT[l.statut])}</p>
+      <div class="tete-ent">${avatar(l, 'l')}<h2>${esc(l.entreprise)}</h2></div>
+      ${c ? `<p class="meta">${esc([nomContact(c), c.poste].filter(Boolean).join(', '))}</p>` : '<p class="meta">Aucun contact</p>'}
+      <div class="coord">
+        ${tel ? `<a class="btn${prim('appel')}" href="${esc(telLien(tel))}" data-act="tel">Appeler le ${esc(tel)}</a>` : ''}
+        ${email ? `<span class="meta">${esc(email)}</span>` : ''}
+      </div>
+      <div class="prochaine">
+        <p class="meta">Prévu</p>
+        <p class="valeur ${classeQuand(l.prochaine_relance)}">${l.prochaine_relance ? `${esc(actionLue(l.prochaine_action))} ${esc(quand(l.prochaine_relance))}` : 'Rien de prévu'}</p>
+        ${l.prochaine_note ? `<p style="margin-top:4px">${esc(l.prochaine_note)}</p>` : ''}
+        ${l.relances_sans_reponse ? `<p class="meta" style="margin-top:4px">${l.relances_sans_reponse} relance${l.relances_sans_reponse > 1 ? 's' : ''} sans réponse.</p>` : ''}
+      </div>
+      ${l.besoin ? `<p><span class="meta">Besoin :</span> ${esc(l.besoin)}</p>` : ''}
+      ${acts.length ? `<p class="meta">Derniers échanges</p><ul class="derniers">${acts.map((a) => `<li><span class="quand">${esc(LIB_ACTIVITE[a.type] || a.type)}, ${esc(instantLisible(a.date))}</span><br>${esc(a.resume.length > 220 ? a.resume.slice(0, 220) + '…' : a.resume)}</li>`).join('')}</ul>` : ''}
+    </div>
+    <div class="session-actions">
+      ${email ? `<button type="button" class="btn${prim('email')}" data-act="email" aria-keyshortcuts="E">Email <kbd>E</kbd></button>` : ''}
+      <button type="button" class="btn" data-act="appel" aria-keyshortcuts="A">Noter un appel <kbd>A</kbd></button>
+      ${mobile ? '<button type="button" class="btn" data-act="sms" aria-keyshortcuts="S">SMS <kbd>S</kbd></button>' : ''}
+      <button type="button" class="btn" data-act="decaler">Décaler <kbd>D</kbd></button>
+      <button type="button" class="btn" data-act="ouvrir">Fiche</button>
+      <span class="pousse"></span>
+      <button type="button" class="btn" data-sess="precedent" ${s.i === 0 ? 'disabled' : ''}>Précédent</button>
+      <button type="button" class="btn" data-sess="passer">Passer <kbd>P</kbd></button>
+    </div></div>`;
+  chargerLogos();
+}
+
+function sauverSession() {
+  const s = S.session;
+  if (!s) { sessionStorage.removeItem('crm_session'); return; }
+  sessionStorage.setItem('crm_session', JSON.stringify({ ids: s.ids, i: s.i, titre: s.titre, bilan: s.bilan, passes: s.passes }));
+}
+function reprendreSessionSauvee() {
+  try {
+    const x = JSON.parse(sessionStorage.getItem('crm_session') || 'null');
+    if (!x || !Array.isArray(x.ids) || x.i >= x.ids.length) return;
+    S.session = { ...x, modeleEmail: null, modeleSms: null, sansConfirmation: false };
+    rendreSession();
+    $('#session').showModal();
+    toast('Enchaînement repris là où tu en étais.');
+  } catch { sessionStorage.removeItem('crm_session'); }
+}
+function suivantSession() { if (!S.session) return; S.session.i++; rendreSession(); $('#session').scrollTop = 0; }
+// Appelée après chaque action réussie : on note, puis on passe au lead suivant.
+function actionFaite(leadId, nature) {
+  const s = S.session;
+  if (!s || !$('#session').open || s.ids[s.i] !== leadId) return;
+  s.bilan[nature] = (s.bilan[nature] || 0) + 1;
+  setTimeout(suivantSession, 300);
+}
+
+document.addEventListener('click', (ev) => {
+  const b = ev.target.closest('[data-sess]');
+  if (!b || !S.session) return;
+  const s = S.session;
+  const sorte = b.dataset.sess;
+  if (sorte === 'passer') { s.passes.push(s.ids[s.i]); s.bilan.passe = (s.bilan.passe || 0) + 1; suivantSession(); }
+  else if (sorte === 'precedent' && s.i > 0) { s.i--; rendreSession(); }
+  else if (sorte === 'fin') { s.ids = s.ids.slice(0, s.i); rendreSession(); }
+  else if (sorte === 'reprendre') demarrerSession(s.passes, `${s.titre}, leads passés`);
+  else if (sorte === 'fermer') { $('#session').close(); }
+});
+$('#session').addEventListener('close', () => {
+  if (S.session && S.session.i >= S.session.ids.length) { S.session = null; sauverSession(); }
+  else if (S.session) { S.session = null; sauverSession(); }
+});
+document.addEventListener('keydown', (ev) => {
+  if (!$('#session').open || $('#modale').open || $('#fiche').open || ev.metaKey || ev.ctrlKey || ev.altKey) return;
+  if (ev.target.matches('input, textarea, select')) return;
+  const raccourcis = { e: '[data-act="email"]', a: '[data-act="appel"]', s: '[data-act="sms"]', d: '[data-act="decaler"]', p: '[data-sess="passer"]' };
+  const sel = raccourcis[ev.key.toLowerCase()] || (ev.key === 'ArrowRight' ? '[data-sess="passer"]' : ev.key === 'ArrowLeft' ? '[data-sess="precedent"]' : null);
+  const bouton = sel && $(`#session ${sel}`);
+  if (bouton && !bouton.disabled) { ev.preventDefault(); bouton.click(); }
+});
+
+/* ================= SMS et WhatsApp depuis ton téléphone ================= */
+
+const GSM = '@£$¥èéùìòÇ\nØø\rÅåΔ_ΦΓΛΩΠΨΣΘΞÆæßÉ !"#¤%&\'()*+,-./0123456789:;<=>?¡ABCDEFGHIJKLMNOPQRSTUVWXYZÄÖÑÜ§¿abcdefghijklmnopqrstuvwxyzäöñüà^{}\\[~]|€';
+function compteSms(t) {
+  const car = [...t];
+  const gsm = car.every((x) => GSM.includes(x));
+  const par = gsm ? (car.length <= 160 ? 160 : 153) : (car.length <= 70 ? 70 : 67);
+  return { n: car.length, sms: Math.max(1, Math.ceil(car.length / par)), gsm };
+}
+// 06 12 34 56 78 donne 33612345678 ; 0692… (La Réunion) donne 262692…
+function numeroInternational(t) {
+  const d = String(t || '').replace(/[^\d+]/g, '');
+  if (d.startsWith('+')) return d.slice(1);
+  if (d.startsWith('00')) return d.slice(2);
+  if (/^0(262|263|269|639|692|693)\d{6}$/.test(d)) return `262${d.slice(1)}`;
+  if (/^0\d{9}$/.test(d)) return `33${d.slice(1)}`;
+  return d;
+}
+const lienSms = (tel, texte) => `sms:+${numeroInternational(tel)}?&body=${encodeURIComponent(texte)}`;
+const lienWhatsapp = (tel, texte) => `https://wa.me/${numeroInternational(tel)}?text=${encodeURIComponent(texte)}`;
+
+function ouvrirSms(leadId) {
+  const l = IDX.lead.get(leadId);
+  const numeros = contactsDe(leadId).filter((c) => c.telephone && estMobile(c.telephone)).map((c) => ({ id: c.id, tel: c.telephone, nom: nomContact(c) || 'Contact' }));
+  if (l.telephone && estMobile(l.telephone) && !numeros.some((x) => x.tel === l.telephone)) numeros.push({ id: '', tel: l.telephone, nom: 'Entreprise' });
+  if (!numeros.length) return toast('Aucun numéro de portable : un SMS ne part que vers un 06 ou un 07.');
+  const modeles = D.modeles.filter((m) => m.canal === 'sms');
+  const n = (l.relances_sans_reponse || 0) + 1;
+  const c0 = contactPrincipal(leadId);
+  const depart = `Bonjour${c0 && c0.prenom ? ` ${c0.prenom}` : ''},\n\n\nGabriel, IA-Entrepreneur`;
+  ouvrirModale(`
+    <h2>SMS à ${esc(l.entreprise)}</h2>
+    <p class="de">Part de <b>ton téléphone</b>, avec ton numéro : les réponses arrivent sur ton portable.</p>
+    ${champ('À', `<select name="numero">${numeros.map((x, i) => `<option value="${i}">${esc(x.nom)} (${esc(x.tel)})</option>`).join('')}</select>`)}
+    ${modeles.length ? champ('Modèle', `<select name="modele"><option value="">Sans modèle</option>${modeles.map((m) => `<option value="${m.id}">${esc(m.nom)}</option>`).join('')}</select>`) : ''}
+    ${blocPerso(leadId)}
+    <label class="champ">Message <span class="compteur-sms" data-compte></span><textarea name="texte" required>${esc(depart)}</textarea></label>
+    ${S.session && $('#session').open && modeles.length ? '<label class="case"><input type="checkbox" name="garder"> Reprendre ce modèle pour les leads suivants</label>' : ''}
+    <div class="actions">
+      <a class="btn primaire" data-lien="sms" href="#">Ouvrir dans Messages</a>
+      <a class="btn" data-lien="wa" href="#" target="_blank" rel="noopener">Ouvrir dans WhatsApp</a>
+    </div>
+    <p class="aide">Sur Mac, Messages envoie le SMS si le transfert de SMS est activé sur ton iPhone (Réglages, Messages, Transfert de SMS).</p>
+    <div class="confirmation" data-confirmation hidden><p>Le message est parti ?</p><div class="actions"><button type="button" class="btn" data-pas-encore>Pas encore</button><button type="button" class="btn primaire" data-noter>Oui, le noter</button></div></div>
+    ${blocProchaine('apres', dansJours(delaiApres(n)), l.prochaine_action === 'appel' ? 'appel' : 'email', n <= CADENCE.length ? `Relance ${n}` : 'Prise de nouvelles', { aide: 'Proposé d\'après le rythme des relances.' })}
+    ${piedFormulaire('<button type="button" class="btn lien" data-noter>Déjà envoyé, noter</button>')}
+  `, (form) => {
+    brancherAnnuler(form);
+    brancherPuces(form, 'apres');
+    const el = form.elements;
+    let canal = 'sms';
+    const choisi = () => numeros[Number(el.numero.value)];
+    const maj = () => {
+      const t = el.texte.value;
+      const k = compteSms(t);
+      $('[data-compte]', form).textContent = `${k.n} caractères`;
+      $('[data-lien="sms"]', form).href = lienSms(choisi().tel, t);
+      $('[data-lien="wa"]', form).href = lienWhatsapp(choisi().tel, t);
+    };
+    const appliquerModele = (id) => {
+      const m = modeles.find((x) => x.id === id);
+      if (!m) return;
+      const ct = contactsDe(leadId).find((x) => x.id === choisi().id) || c0;
+      el.texte.value = remplirModele(m.corps, l, ct).trim();
+      maj();
+    };
+    if (el.modele) el.modele.addEventListener('change', () => appliquerModele(el.modele.value));
+    if (el.modele && S.session && S.session.modeleSms) { el.modele.value = S.session.modeleSms; appliquerModele(S.session.modeleSms); }
+    el.texte.addEventListener('input', maj);
+    el.numero.addEventListener('change', maj);
+    maj();
+    brancherPerso(form, leadId, 'sms', () => choisi().id, (r) => { el.texte.value = r.corps.trim(); maj(); });
+    for (const a of $$('[data-lien]', form)) {
+      a.addEventListener('click', (ev) => {
+        const reste = el.texte.value.match(/\{[a-z_]+\}/);
+        if (reste) { ev.preventDefault(); montrerErreur(form, `Il reste ${reste[0]} à remplacer par ton texte.`); return; }
+        canal = a.dataset.lien === 'wa' ? 'whatsapp' : 'sms';
+        setTimeout(() => { const conf = $('[data-confirmation]', form); conf.hidden = false; conf.scrollIntoView({ block: 'nearest' }); }, 400);
+      });
+    }
+    $('[data-pas-encore]', form).addEventListener('click', () => { $('[data-confirmation]', form).hidden = true; });
+    for (const b of $$('[data-noter]', form)) {
+      b.addEventListener('click', () => soumettre(form, async () => {
+        const x = choisi();
+        if (el.garder && el.garder.checked && el.modele) S.session.modeleSms = el.modele.value || null;
+        const m = { ...lireProchaine(form, 'apres'), relances_sans_reponse: n, dernier_contact: aujourdhui() };
+        if (l.statut === 'nouveau') m.statut = 'contacte';
+        await journal(l.id, { type: 'sms', resume: `${canal === 'whatsapp' ? 'Message WhatsApp' : 'SMS'} envoyé au ${x.tel}`, contenu: el.texte.value, contact_id: x.id || null, source: 'crm', meta: { canal } }, m);
+        fermerModale();
+        toast(canal === 'whatsapp' ? 'WhatsApp noté.' : 'SMS noté.');
+        actionFaite(l.id, 'sms');
+      }));
+    }
+  });
+}
+
+/* ================= Pipeline : glisser une carte vers une autre étape ================= */
+
+document.addEventListener('dragstart', (ev) => {
+  const carteGlissee = ev.target.closest && ev.target.closest('.kanban .carte');
+  if (!carteGlissee) return;
+  ev.dataTransfer.setData('text/plain', carteGlissee.dataset.id);
+  ev.dataTransfer.effectAllowed = 'move';
+  carteGlissee.classList.add('glisse');
+});
+document.addEventListener('dragend', (ev) => { if (ev.target.classList) ev.target.classList.remove('glisse'); $$('.colonne.survol').forEach((c) => c.classList.remove('survol')); });
+document.addEventListener('dragover', (ev) => {
+  const col = ev.target.closest && ev.target.closest('.kanban .colonne');
+  if (!col) return;
+  ev.preventDefault();
+  $$('.colonne.survol').forEach((c) => c !== col && c.classList.remove('survol'));
+  col.classList.add('survol');
+});
+document.addEventListener('drop', (ev) => {
+  const col = ev.target.closest && ev.target.closest('.kanban .colonne');
+  if (!col) return;
+  ev.preventDefault();
+  col.classList.remove('survol');
+  const id = ev.dataTransfer.getData('text/plain');
+  if (id && IDX.lead.has(id)) changerStatut(id, col.dataset.statut);
+});
+
+/* ================= Événements ================= */
+
+document.addEventListener('click', (ev) => {
+  const cible = ev.target.closest('[data-act]');
+  if (!cible) return;
+  const act = cible.dataset.act;
+  if (act === 'tel') {
+    // Le lien tel: lance l'appel ; au retour sur la page, on propose de le noter.
+    const zone = cible.closest('[data-id]');
+    S.appel = { id: (zone && zone.dataset.id) || S.fiche, t: Date.now() };
+    return;
+  }
+  const conteneur = cible.closest('[data-id]');
+  const leadId = (conteneur && conteneur.dataset.id) || S.fiche;
+  if (cible.tagName === 'BUTTON' || act !== 'ouvrir') ev.stopPropagation();
+  switch (act) {
+    case 'ouvrir': S.journalEdition = false; return ouvrirFiche(leadId);
+    case 'fermer-fiche': return $('#fiche').close();
+    case 'email': return ouvrirEmail(leadId, cible.dataset.contact);
+    case 'appel': return ouvrirAppel(leadId);
+    case 'sms': return ouvrirSms(leadId);
+    case 'journal-edition': S.journalEdition = !S.journalEdition; return rendreFiche();
+    case 'creer-depuis-recherche': { const nom = S.q.trim(); ouvrirNouveau(); const champNom = $('#modale input[name="entreprise"]'); if (champNom) champNom.value = nom; return; }
+    case 'importer': return ouvrirImport();
+    case 'exporter-tableau': return exporterCsv(leadsDuTableau(), 'tableau');
+    case 'decaler': return ouvrirDecaler(leadId);
+    case 'rdv': return ouvrirRdv(leadId);
+    case 'note': return ouvrirNote(leadId, 'note');
+    case 'reponse': return ouvrirNote(leadId, 'email_recu');
+    case 'contact-nouveau': return ouvrirContact(S.fiche);
+    case 'contact-modifier': return ouvrirContact(S.fiche, cible.dataset.contact);
+    case 'infos': return ouvrirInfos(S.fiche);
+    case 'archiver': return archiver(S.fiche);
+    case 'supprimer-lead': return supprimerLead(S.fiche);
+    case 'suppr-activite': return supprimerActivite(cible.dataset.activite);
+    case 'memo-nouveau': return ouvrirMemo(null);
+    case 'memo-modifier': return ouvrirMemo(cible.dataset.memo);
+    case 'modele-nouveau': return ouvrirModele(null);
+    case 'modele-modifier': return ouvrirModele(cible.dataset.modele);
+    case 'voir-memo': {
+      $('#q').value = ''; S.q = ''; S.vue = 'memo'; rendre();
+      const cibleMemo = cible.dataset.memo === 'modeles' ? $('#memo-modeles') : $(`#memo-${cible.dataset.memo}`);
+      if (cibleMemo) { if (cibleMemo.tagName === 'DETAILS') cibleMemo.open = true; cibleMemo.scrollIntoView({ block: 'start' }); }
+      return;
+    }
+    default:
+  }
+});
+
+document.addEventListener('keydown', (ev) => {
+  if ((ev.key === 'Enter' || ev.key === ' ') && ev.target.matches('[role="button"][data-act]')) { ev.preventDefault(); ev.target.click(); }
+  const libre = !ev.target.matches('input, textarea, select, [data-col]') && !$('#modale').open && !$('#fiche').open && !$('#session').open && !ev.metaKey && !ev.ctrlKey;
+  if (ev.key === '/' && libre) { ev.preventDefault(); $('#q').focus(); }
+  if (ev.key === 'n' && libre) { ev.preventDefault(); ouvrirNouveau(); }
+});
+
+document.addEventListener('click', (ev) => {
+  const b = ev.target.closest('[data-enchainer]');
+  if (!b || !S.dusDuJour) return;
+  const titres = { tout: 'Relances du jour', email: 'Emails du jour', appel: 'Appels du jour', autre: 'Le reste du jour' };
+  demarrerSession(S.dusDuJour[b.dataset.enchainer] || [], titres[b.dataset.enchainer]);
+});
+
+document.addEventListener('change', (ev) => {
+  const t = ev.target;
+  if (t.id === 'statut-fiche') return changerStatut(t.dataset.lead, t.value);
+  if (t.dataset.filtre) {
+    S.filtres[t.dataset.filtre] = t.type === 'checkbox' ? t.checked : t.value;
+    rendre();
+  }
+});
+
+$$('.onglets button').forEach((b) => b.addEventListener('click', () => {
+  S.vue = b.dataset.vue;
+  S.q = ''; $('#q').value = '';
+  rendre();
+  window.scrollTo(0, 0);
+}));
+
+let minuteurRecherche;
+$('#q').addEventListener('input', (ev) => {
+  clearTimeout(minuteurRecherche);
+  minuteurRecherche = setTimeout(() => { S.q = ev.target.value.trim().length >= 2 ? ev.target.value : ''; rendre(); }, 150);
+});
+$('#btn-nouveau').addEventListener('click', ouvrirNouveau);
+$('#btn-reglages').addEventListener('click', ouvrirReglages);
+$('#fiche').addEventListener('close', () => { S.fiche = null; });
+// Un clic sur le voile ferme le panneau ou la fenêtre.
+for (const d of [$('#fiche'), $('#modale')]) {
+  d.addEventListener('click', (ev) => { if (ev.target === d) d.close(); });
+}
+
+/* Claude peut aussi écrire dans la base (relances préparées depuis Claude
+   Code) : on relit en revenant sur l'onglet après 3 minutes. */
+async function actualiser() {
+  await charger();
+  rendre();
+  if (S.fiche) rendreFiche();
+}
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState !== 'visible' || !D) return;
+  if (S.appel && Date.now() - S.appel.t > 4000 && !$('#modale').open && IDX.lead.has(S.appel.id)) {
+    const id = S.appel.id;
+    S.appel = null;
+    ouvrirAppel(id);
+    return;
+  }
+  // Pas d'actualisation pendant une saisie ou une sélection dans le tableau.
+  const occupe = $('#modale').open || $('.tableur .edition') || (S.vue === 'tableau' && S.selection.size);
+  if (Date.now() - S.chargeA > 180000 && !occupe) actualiser().catch(() => {});
+});
+
+/* ================= Connexion ================= */
+
+function deconnecter(message) {
+  localStorage.removeItem('crm_cle');
+  sessionStorage.removeItem('crm_cle');
+  S.cle = '';
+  D = null;
+  for (const d of [$('#fiche'), $('#modale')]) if (d.open) d.close();
+  $('#app').hidden = true;
+  $('#ecran-cle').hidden = false;
+  const e = $('#erreur-cle');
+  e.textContent = message || '';
+  e.hidden = !message;
+  $('#cle').value = '';
+  $('#cle').focus();
+}
+
+async function demarrer() {
+  $('#ecran-cle').hidden = true;
+  $('#app').hidden = false;
+  try {
+    await charger();
+    rendre();
+    reprendreSessionSauvee();
+  } catch (e) {
+    if (S.cle) $('#vue').innerHTML = `<p class="chargement">${esc(e.message)} <button type="button" class="btn petit" onclick="location.reload()">Réessayer</button></p>`;
+  }
+}
+
+$('#form-cle').addEventListener('submit', async (ev) => {
+  ev.preventDefault();
+  const cle = $('#cle').value.trim();
+  if (!cle) return;
+  S.cle = cle;
+  const bouton = $('#form-cle button');
+  bouton.disabled = true;
+  try {
+    await charger();
+    (($('#retenir').checked) ? localStorage : sessionStorage).setItem('crm_cle', cle);
+    $('#ecran-cle').hidden = true;
+    $('#app').hidden = false;
+    rendre();
+  } catch (e) {
+    const err = $('#erreur-cle');
+    err.textContent = e.message;
+    err.hidden = false;
+  } finally {
+    bouton.disabled = false;
+  }
+});
+
+if (S.cle) demarrer(); else deconnecter('');
+</script>
+</body>
+</html>
