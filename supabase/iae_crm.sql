@@ -15,7 +15,7 @@ create table if not exists public.iae_crm_leads (
   updated_at            timestamptz not null default now(),
   entreprise            text not null,
   type                  text not null default 'prospect'
-                        check (type in ('prospect', 'client', 'partenaire', 'fournisseur')),
+                        check (type in ('prospect', 'client', 'partenaire', 'fournisseur', 'formateur')),
   statut                text not null default 'nouveau'
                         check (statut in ('nouveau', 'contacte', 'qualifie', 'proposition', 'negociation', 'gagne', 'perdu')),
   secteur               text,
@@ -38,7 +38,17 @@ create table if not exists public.iae_crm_leads (
   dernier_contact       date,
   raison_perte          text,
   hubspot_id            text,
-  archive               boolean not null default false
+  archive               boolean not null default false,
+  recap                 jsonb,                -- récap de la relation fait par Claude
+  recap_le              timestamptz,
+  tache_fil             text,                 -- fil Gmail de la tâche en cours
+  -- Suivi client après « Gagné » (06/11/2026)
+  suivi                 text check (suivi in ('a_lancer', 'financement_demande', 'financement_accepte', 'programme_valide', 'dates_placees',
+                                              'convention_signee', 'convocations', 'formation_terminee', 'facturee', 'payee')),
+  formation_debut       date,
+  formation_fin         date,
+  financeur             text,
+  financement_ref       text
 );
 
 create table if not exists public.iae_crm_contacts (
