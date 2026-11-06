@@ -273,7 +273,11 @@
   .date-lue { font-weight: 600; color: var(--text); }
   .vocal { border: 1px solid var(--line); background: var(--primary-soft); border-radius: 14px; padding: 14px; display: flex; flex-direction: column; gap: 10px; }
   .vocal .micro { min-height: 64px; font-size: 18px; width: 100%; }
-  .vocal .micro.ecoute { background: var(--danger); border-color: var(--danger); }
+  .vocal .micro.ecoute { background: var(--danger); border-color: var(--danger); animation: pouls 1.4s ease-in-out infinite; }
+  @keyframes pouls { 50% { box-shadow: 0 0 0 8px color-mix(in srgb, var(--danger) 22%, transparent); } }
+  @media (prefers-reduced-motion: reduce) { .vocal .micro.ecoute { animation: none; } }
+  .vocal .etat-vocal { font-weight: 700; font-size: 17px; margin: 0; }
+  .vocal .alerte-vocal { background: #FEF1DC; color: #874A08; border-radius: 10px; padding: 10px 12px; font-size: 14px; margin: 0; }
   .vocal .transcription { font-size: 16px; min-height: 1.5em; }
   .vocal .saisie { display: flex; gap: 8px; }
   .vocal .saisie input { flex: 1; min-width: 0; border: 1px solid var(--line-strong); border-radius: 10px; padding: 9px 11px; }
@@ -800,6 +804,7 @@ function vueJour() {
     const autres = dus.filter((l) => l.prochaine_action !== 'email' && l.prochaine_action !== 'appel');
     h += `<div class="actions" style="margin-top:14px">
       <button type="button" class="btn primaire" data-enchainer="tout">Enchaîner les ${dus.length} relances</button>
+      <button type="button" class="btn" data-enchainer="tout" data-a-la-voix>Les traiter à la voix</button>
       ${emails.length && emails.length < dus.length ? `<button type="button" class="btn" data-enchainer="email">Les emails (${emails.length})</button>` : ''}
       ${appels.length && appels.length < dus.length ? `<button type="button" class="btn" data-enchainer="appel">Les appels (${appels.length})</button>` : ''}
       ${autres.length && autres.length < dus.length ? `<button type="button" class="btn" data-enchainer="autre">Le reste (${autres.length})</button>` : ''}
@@ -1107,39 +1112,84 @@ async function soumettre(form, travail) {
 
 const enSession = () => Boolean(S.session && $('#session').open);
 
-/* ----- À l'oral : lire la fiche, écouter, comprendre, relire, valider ----- */
+/* ----- À l'oral : je lis la relance, j'écoute ta réponse, j'exécute ----- */
 
 const Reco = window.SpeechRecognition || window.webkitSpeechRecognition || null;
 const voix = () => (window.speechSynthesis ? speechSynthesis.getVoices().find((v) => /^fr(-|_)FR/i.test(v.lang)) || speechSynthesis.getVoices().find((v) => /^fr/i.test(v.lang)) : null);
-function parler(texte, ensuite) {
-  if (!window.speechSynthesis || !texte) { if (ensuite) ensuite(); return; }
-  speechSynthesis.cancel();
-  const u = new SpeechSynthesisUtterance(texte);
-  u.lang = 'fr-FR';
-  u.rate = 1.05;
-  const v = voix();
-  if (v) u.voice = v;
-  if (ensuite) u.onend = () => ensuite();
-  speechSynthesis.speak(u);
+// Chrome coupe une lecture longue (vers 15 s) et oublie parfois de dire qu'elle est finie :
+// on lit phrase par phrase, et un minuteur de secours enchaîne quand même.
+let paroleJeton = 0;
+function morceauxParole(texte) {
+  const phrases = String(texte).replace(/\s+/g, ' ').match(/[^.!?…;:]+[.!?…;:]*/g) || [String(texte)];
+  const out = [];
+  let cur = '';
+  for (const ph of phrases) { if (cur && (cur + ph).length > 180) { out.push(cur.trim()); cur = ''; } cur += ph; }
+  if (cur.trim()) out.push(cur.trim());
+  return out;
 }
-// Une écoute à la fois ; surFin(texte) est appelé une seule fois.
+function parler(texte, ensuite) {
+  const jeton = ++paroleJeton;
+  let fait = false;
+  let garde = null;
+  const fin = () => { if (fait || jeton !== paroleJeton) return; fait = true; clearTimeout(garde); if (ensuite) ensuite(); };
+  if (!window.speechSynthesis || !texte) { fin(); return; }
+  speechSynthesis.cancel();
+  const morceaux = morceauxParole(texte);
+  garde = setTimeout(fin, 3000 + String(texte).length * 85);
+  setTimeout(() => {
+    if (jeton !== paroleJeton) return;
+    morceaux.forEach((m, i) => {
+      const u = new SpeechSynthesisUtterance(m);
+      u.lang = 'fr-FR';
+      u.rate = 1.05;
+      const v = voix();
+      if (v) u.voice = v;
+      if (i === morceaux.length - 1) { u.onend = fin; u.onerror = fin; }
+      speechSynthesis.speak(u);
+    });
+  }, 60);
+}
+// Une écoute à la fois ; surFin(texte, erreur) n'est appelé qu'une fois.
+// longue : on laisse finir la phrase et on coupe après 2 s de silence.
 let ecouteEnCours = null;
-function ecouter(surTexte, surFin) {
-  if (!Reco) { surFin(''); return; }
-  if (ecouteEnCours) { try { ecouteEnCours.abort(); } catch { /* rien */ } }
+function arreterEcoute() {
+  const r = ecouteEnCours;
+  ecouteEnCours = null;
+  if (r) { r.ignorer = true; try { r.abort(); } catch { /* rien */ } }
+}
+function ecouter(surTexte, surFin, { longue = false } = {}) {
+  if (!Reco) { surFin('', 'indisponible'); return; }
+  arreterEcoute();
   const r = new Reco();
   r.lang = 'fr-FR';
   r.interimResults = true;
-  r.continuous = false;
+  r.continuous = longue;
   let texte = '';
+  let erreur = '';
   let fini = false;
-  const finir = () => { if (!fini) { fini = true; ecouteEnCours = null; surFin(texte.trim()); } };
-  r.onresult = (e) => { texte = [...e.results].map((x) => x[0].transcript).join(' '); surTexte(texte); };
-  r.onerror = finir;
+  let silence = null;
+  const couper = () => { try { r.stop(); } catch { finir(); } };
+  const maxi = setTimeout(couper, longue ? 30000 : 15000);
+  const finir = () => {
+    if (fini) return;
+    fini = true;
+    clearTimeout(silence);
+    clearTimeout(maxi);
+    if (ecouteEnCours === r) ecouteEnCours = null;
+    if (!r.ignorer) surFin(texte.trim(), erreur);
+  };
+  r.onresult = (e) => {
+    texte = [...e.results].map((x) => x[0].transcript).join(' ');
+    surTexte(texte);
+    if (longue) { clearTimeout(silence); silence = setTimeout(couper, 2000); }
+  };
+  r.onerror = (e) => { erreur = e.error || 'erreur'; finir(); };
   r.onend = finir;
   ecouteEnCours = r;
-  try { r.start(); } catch { finir(); }
+  try { r.start(); } catch { erreur = 'demarrage'; finir(); }
 }
+function arreterVocal() { paroleJeton++; if (window.speechSynthesis) speechSynthesis.cancel(); arreterEcoute(); }
+
 function texteFiche(l) {
   const c = contactPrincipal(l.id);
   const prevu = l.prochaine_relance ? `${actionLue(l.prochaine_action)} ${quand(l.prochaine_relance)}` : 'rien de prévu';
@@ -1148,108 +1198,226 @@ function texteFiche(l) {
     l.prochaine_note ? `${l.prochaine_note}.` : '', l.relances_sans_reponse ? `${l.relances_sans_reponse} relance${l.relances_sans_reponse > 1 ? 's' : ''} sans réponse.` : '',
     d ? `Dernier échange : ${d}` : ''].filter(Boolean).join(' ');
 }
+const LIB_VOCAL = { appel: 'Appel', reponse: 'Réponse reçue', note: 'Note', decaler: 'Relance déplacée', rdv: 'Rendez-vous', perdu: 'Perdu', passer: 'Suivant', incompris: 'Pas compris' };
+const ETATS_VOCAL = { lecture: 'Je te lis la relance…', ecoute: "Je t'écoute…", reflexion: 'Je note…', pause: 'En pause.' };
 function panneauVocal() {
+  const s = S.session;
+  const etat = s.etat || 'lecture';
+  const bouton = !Reco ? ''
+    : etat === 'ecoute' ? '<button type="button" class="btn primaire micro ecoute" data-vocal="micro">J\'ai fini de parler</button>'
+    : etat === 'reflexion' ? '<button type="button" class="btn primaire micro" disabled>Je note…</button>'
+    : etat === 'pause' ? '<button type="button" class="btn primaire micro" data-vocal="reprendre">Reprendre</button>'
+    : '<button type="button" class="btn primaire micro" data-vocal="micro">Répondre tout de suite</button>';
   return `<div class="vocal" aria-live="polite">
-    ${Reco ? '<button type="button" class="btn primaire micro" data-vocal="parler">Appuie et parle</button>' : ''}
-    <p class="transcription" data-vocal-texte>${Reco ? 'Dis par exemple : « pas de réponse, rappelle-le lundi », « joint, il veut le programme du niveau 2, relance par email vendredi », « RDV jeudi à 14 h en visio », « décale à mardi », « perdu, pas de budget », « suivant ».' : "Ce navigateur n'a pas la dictée : écris la phrase ci-dessous."}</p>
-    <div class="saisie"><input type="text" data-vocal-saisie placeholder="Ou écris : pas de réponse, rappelle lundi" aria-label="Phrase à interpréter"><button type="button" class="btn" data-vocal="ecrit">OK</button></div>
-    <div data-vocal-proposition></div>
-    <div class="actions"><button type="button" class="btn petit" data-vocal="lire">Relire la fiche</button></div>
+    <p class="etat-vocal" data-vocal-etat>${esc(s.etatTexte || ETATS_VOCAL[etat] || '')}</p>
+    ${bouton}
+    <p class="transcription" data-vocal-texte>${esc(s.transcrit || '')}</p>
+    ${Reco ? '' : `<p class="alerte-vocal">Ce navigateur ne sait pas t'écouter. Sur iPhone, ouvre le CRM dans Safari ; sur ordinateur ou Android, dans Chrome. Ici, écris ta réponse (ou dicte-la avec le micro du clavier) : elle est exécutée pareil.</p>`}
+    <div class="saisie"><input type="text" data-vocal-saisie placeholder="Ou écris : pas de réponse, rappelle lundi" aria-label="Ta réponse"><button type="button" class="btn" data-vocal="ecrit">OK</button></div>
+    ${s.dernierTexte ? `<div class="confirmation"><p>${esc(s.dernierTexte)}</p><div class="actions"><button type="button" class="btn petit" data-vocal="annuler">Annuler</button></div></div>` : ''}
+    <div class="actions">${etat !== 'pause' ? '<button type="button" class="btn petit" data-vocal="pause">Pause</button>' : ''}<button type="button" class="btn petit" data-vocal="lire">Relire</button></div>
+    <p class="aide">Réponds comme à quelqu'un : « pas de réponse, rappelle-le lundi », « joint, il veut le programme, relance vendredi par email », « RDV jeudi à 14 h en visio », « perdu, pas de budget ». Tu peux aussi dire « suivant », « annule », « relis » ou « stop ».</p>
   </div>`;
 }
-const LIB_VOCAL = { appel: 'Appel', reponse: 'Réponse reçue', note: 'Note', decaler: 'Relance déplacée', rdv: 'Rendez-vous', perdu: 'Perdu', passer: 'Suivant', incompris: 'Pas compris' };
-async function interpreter(l, texte) {
-  const zone = $('#session [data-vocal-proposition]');
+// Met le panneau à jour sans perdre ce qui est en train d'être écrit.
+function etatVocal(etat, texte = '') {
+  const s = S.session;
+  if (!s) return;
+  s.etat = etat;
+  s.etatTexte = texte;
+  const zone = $('#session .vocal');
   if (!zone) return;
-  zone.innerHTML = '<p class="aide">Je réfléchis…</p>';
-  try {
-    const r = await api('POST', { op: 'vocal', lead_id: l.id, texte });
-    S.session.proposition = { leadId: l.id, r };
-    const resume = [r.note, r.relance_date && `Relance le ${dateLongue(r.relance_date)}${r.relance_action ? ` (${LIB_ACTION[r.relance_action].toLowerCase()})` : ''}`,
-      r.rdv_date && `RDV le ${dateLongue(r.rdv_date)}${r.rdv_heure ? ` à ${r.rdv_heure.replace(':', ' h ')}` : ''}${r.rdv_lieu ? `, ${r.rdv_lieu}` : ''}`, r.raison_perte].filter(Boolean).join('. ');
-    zone.innerHTML = `<div class="confirmation"><p><b>${esc(LIB_VOCAL[r.action])}</b>${r.action === 'appel' && r.resultat_appel ? ` (${esc({ joint: 'joint', sans_reponse: 'pas de réponse', message: 'message laissé' }[r.resultat_appel])})` : ''} : ${esc(r.confirmation)}</p>
-      ${resume ? `<p class="meta">${esc(resume)}</p>` : ''}<p class="meta">Tu as dit : « ${esc(texte)} »</p>
-      <div class="actions">${r.action !== 'incompris' ? '<button type="button" class="btn primaire" data-vocal="valider">Valider</button>' : ''}<button type="button" class="btn" data-vocal="${Reco ? 'parler' : 'effacer'}">Recommencer</button></div></div>`;
-    // Validation à la voix : « oui » valide, « non » efface (si le téléphone le permet sans toucher).
-    parler(r.confirmation + (r.action !== 'incompris' ? ' Je valide ?' : ''), () => {
-      if (!Reco || r.action === 'incompris' || !S.session || S.session.proposition?.r !== r) return;
-      ecouter(() => {}, (rep) => {
-        if (/^(oui|ok|ouais|d'accord|valide|vas-y|c'est bon|parfait)/i.test(rep)) validerVocal();
-        else if (/^(non|recommence|annule|efface)/i.test(rep)) { zone.innerHTML = ''; S.session.proposition = null; }
-      });
-    });
-  } catch (e) {
-    zone.innerHTML = `<p class="erreur" role="alert">${esc(e.message)}</p>`;
-  }
+  const saisie = $('[data-vocal-saisie]', zone);
+  const valeur = saisie ? saisie.value : '';
+  const avaitFocus = saisie && document.activeElement === saisie;
+  const tmp = document.createElement('div');
+  tmp.innerHTML = panneauVocal();
+  zone.replaceWith(tmp.firstElementChild);
+  const nouvelle = $('#session [data-vocal-saisie]');
+  if (nouvelle) { nouvelle.value = valeur; if (avaitFocus) nouvelle.focus(); }
 }
-async function validerVocal() {
-  const prop = S.session && S.session.proposition;
-  if (!prop) return;
-  S.session.proposition = null;
-  const l = IDX.lead.get(prop.leadId);
-  const r = prop.r;
+function voixActive(l, tour) {
+  const s = S.session;
+  return Boolean(s && s.vocal && !s.pause && $('#session').open && s.tour === tour && s.ids[s.i] === l.id);
+}
+function nouveauTour() { const s = S.session; s.tour = (s.tour || 0) + 1; return s.tour; }
+// Un tour : je lis (avec ce que je viens de faire sur le lead d'avant), puis j'écoute.
+function cycleVocal(l, tour, { relire = true } = {}) {
+  const s = S.session;
+  if (!voixActive(l, tour)) return;
+  const intro = s.annonce ? `${s.annonce} ${s.annonceSuivant && relire ? 'Suivant : ' : ''}` : '';
+  s.annonce = null;
+  s.annonceSuivant = false;
+  s.transcrit = '';
+  etatVocal('lecture');
+  parler(`${intro}${relire ? `${texteFiche(l)} ` : ''}Qu'est-ce que je note ?`, () => ecouterVocal(l, tour));
+}
+function ecouterVocal(l, tour, essai = 0) {
+  if (!voixActive(l, tour)) return;
+  if (!Reco) { etatVocal('pause', 'Écris ta réponse ci-dessous.'); return; }
+  etatVocal('ecoute');
+  ecouter((t) => {
+    S.session.transcrit = t;
+    const z = $('#session [data-vocal-texte]');
+    if (z) z.textContent = t;
+  }, (t, erreur) => {
+    if (!voixActive(l, tour)) return;
+    if (t) { traiterPhrase(l, t); return; }
+    if (['not-allowed', 'service-not-allowed'].includes(erreur)) { pauseVocal("Le micro est bloqué pour ce site : autorise-le (l'icône à gauche de l'adresse), puis touche Reprendre."); return; }
+    if (erreur === 'audio-capture') { pauseVocal('Aucun micro trouvé sur cet appareil.'); return; }
+    if (erreur === 'network') { pauseVocal("La reconnaissance vocale n'a pas de réseau. Touche Reprendre, ou écris ta réponse."); return; }
+    if (essai < 1) { parler("Je t'écoute.", () => ecouterVocal(l, tour, essai + 1)); return; }
+    pauseVocal('Je me mets en pause. Touche Reprendre quand tu es prêt.');
+  }, { longue: true });
+}
+function pauseVocal(message = '') {
+  const s = S.session;
+  if (!s) return;
+  s.pause = true;
+  arreterVocal();
+  etatVocal('pause', message);
+  if (message) parler(message);
+}
+function reprendreVocal() {
+  const s = S.session;
+  const l = s && IDX.lead.get(s.ids[s.i]);
+  if (!l) return;
+  s.pause = false;
+  cycleVocal(l, nouveauTour());
+}
+function erreurVocal(l, message) {
+  const s = S.session;
+  if (!s) return;
+  const tour = nouveauTour();
+  etatVocal('lecture', message);
+  if (s.vocal && !s.pause && Reco) parler(`${message} Redis-le.`, () => ecouterVocal(l, tour));
+}
+// Ta réponse : les mots de commande d'abord, sinon Claude la comprend et je l'exécute.
+async function traiterPhrase(l, texte) {
+  const s = S.session;
+  const brut = texte.trim();
+  const cmd = sansAccents(brut).replace(/[’]/g, "'").replace(/[.!?,;]/g, '').trim();
+  s.transcrit = brut;
+  if (/^(suivant|passe|on passe|au suivant|je passe|passer)\b/.test(cmd)) { executerVocal(l, { action: 'passer', confirmation: 'Je passe.', texte: brut }); return; }
+  if (/^(annule|annuler|non annule|c'?est pas ca|reviens|retour)\b/.test(cmd)) { annulerDerniere(); return; }
+  if (/^(stop|arrete|pause|on arrete|termine|c'?est fini|fin)\b/.test(cmd)) { pauseVocal('Je me mets en pause.'); return; }
+  if (/^(relis|repete|redis|tu peux repeter)\b/.test(cmd)) { s.pause = false; cycleVocal(l, nouveauTour()); return; }
+  etatVocal('reflexion');
+  let r;
+  try { r = await api('POST', { op: 'vocal', lead_id: l.id, texte: brut }); } catch (e) { erreurVocal(l, e.message); return; }
+  if (S.session !== s || s.ids[s.i] !== l.id) return; // la fiche a changé entre-temps
+  if (r.action === 'incompris') {
+    const question = r.confirmation || "Je n'ai pas compris. Redis-le autrement.";
+    const tour = nouveauTour();
+    etatVocal('lecture', question);
+    parler(question, () => ecouterVocal(l, tour));
+    return;
+  }
+  executerVocal(l, r);
+}
+async function executerVocal(l, r) {
+  const s = S.session;
   const t = aujourdhui();
   const n = (l.relances_sans_reponse || 0) + 1;
   const suite = (jours, action) => ({ prochaine_relance: r.relance_date || dansJours(jours), prochaine_action: r.relance_action || action, prochaine_note: r.note ? r.note.slice(0, 300) : null });
   const contacte = l.statut === 'nouveau' ? { statut: 'contacte' } : {};
+  // Ce qu'il faut pour revenir en arrière si tu dis « annule ».
+  const avant = Object.fromEntries(['statut', 'prochaine_relance', 'prochaine_action', 'prochaine_note', 'relances_sans_reponse', 'dernier_contact', 'raison_perte'].map((k) => [k, l[k] ?? null]));
+  const i = s.i;
+  let res = null;
   try {
-    if (r.action === 'passer') { S.session.passes.push(l.id); S.session.bilan.passe = (S.session.bilan.passe || 0) + 1; suivantSession(); return; }
+    if (r.action === 'passer') {
+      s.passes.push(l.id);
+      s.bilan.passe = (s.bilan.passe || 0) + 1;
+      s.derniere = { leadId: l.id, i, nature: 'passe', passe: true };
+      s.annonce = r.confirmation || 'Je passe.';
+      s.annonceSuivant = true;
+      s.dernierTexte = '';
+      suivantSession();
+      return;
+    }
     if (r.action === 'appel' && r.resultat_appel === 'joint') {
-      await journal(l.id, { type: 'appel', resume: `Appel, joint${r.note ? ` : ${r.note}` : ''}`, source: 'crm', meta: { vocal: r.texte } }, { ...suite(7, 'email'), ...contacte, relances_sans_reponse: 0, dernier_contact: t });
+      res = await journal(l.id, { type: 'appel', resume: `Appel, joint${r.note ? ` : ${r.note}` : ''}`, source: 'crm', meta: { vocal: r.texte } }, { ...suite(7, 'email'), ...contacte, relances_sans_reponse: 0, dernier_contact: t });
     } else if (r.action === 'appel') {
-      await journal(l.id, { type: 'appel_sans_reponse', resume: `${r.resultat_appel === 'message' ? 'Appel, message laissé' : 'Appel sans réponse'}${r.note ? ` : ${r.note}` : ''}`, source: 'crm', meta: { vocal: r.texte } }, { ...suite(delaiApres(n), 'appel'), ...contacte, relances_sans_reponse: n });
+      res = await journal(l.id, { type: 'appel_sans_reponse', resume: `${r.resultat_appel === 'message' ? 'Appel, message laissé' : 'Appel sans réponse'}${r.note ? ` : ${r.note}` : ''}`, source: 'crm', meta: { vocal: r.texte } }, { ...suite(delaiApres(n), 'appel'), ...contacte, relances_sans_reponse: n });
     } else if (r.action === 'reponse') {
-      await journal(l.id, { type: 'email_recu', resume: `Réponse reçue${r.note ? ` : ${r.note}` : ''}`, source: 'crm', meta: { vocal: r.texte } }, { ...suite(7, 'email'), relances_sans_reponse: 0, dernier_contact: t });
+      res = await journal(l.id, { type: 'email_recu', resume: `Réponse reçue${r.note ? ` : ${r.note}` : ''}`, source: 'crm', meta: { vocal: r.texte } }, { ...suite(7, 'email'), relances_sans_reponse: 0, dernier_contact: t });
     } else if (r.action === 'note') {
-      await journal(l.id, { type: 'note', resume: r.note || r.texte, source: 'crm', meta: { vocal: r.texte } }, r.relance_date ? suite(0, l.prochaine_action) : null);
+      res = await journal(l.id, { type: 'note', resume: r.note || r.texte, source: 'crm', meta: { vocal: r.texte } }, r.relance_date ? suite(0, l.prochaine_action) : null);
     } else if (r.action === 'decaler') {
       const date = r.relance_date || dansJours(1);
-      await journal(l.id, { type: 'relance_decalee', resume: `Relance déplacée au ${dateLongue(date)}${r.note ? ` : ${r.note}` : ''}`, source: 'crm', meta: { vocal: r.texte } }, { prochaine_relance: date, prochaine_action: r.relance_action || l.prochaine_action, prochaine_note: r.note || l.prochaine_note });
+      res = await journal(l.id, { type: 'relance_decalee', resume: `Relance déplacée au ${dateLongue(date)}${r.note ? ` : ${r.note}` : ''}`, source: 'crm', meta: { vocal: r.texte } }, { prochaine_relance: date, prochaine_action: r.relance_action || l.prochaine_action, prochaine_note: r.note || l.prochaine_note });
     } else if (r.action === 'rdv') {
-      if (!r.rdv_date) throw new ErreurApi('Il manque la date du rendez-vous : redis-la.');
+      if (!r.rdv_date) throw new ErreurApi('Il manque la date du rendez-vous.');
       const heure = r.rdv_heure ? ` à ${r.rdv_heure.replace(':', ' h ').replace(/ h 00$/, ' h')}` : '';
       const ct = contactPrincipal(l.id);
-      await journal(l.id, { type: 'rdv', resume: `RDV prévu le ${dateLongue(r.rdv_date)}${heure}${r.rdv_lieu ? `, ${r.rdv_lieu}` : ''}${r.note ? ` : ${r.note}` : ''}`, source: 'crm', meta: { date_rdv: r.rdv_date, heure: r.rdv_heure || null, lieu: r.rdv_lieu || null, vocal: r.texte } },
+      res = await journal(l.id, { type: 'rdv', resume: `RDV prévu le ${dateLongue(r.rdv_date)}${heure}${r.rdv_lieu ? `, ${r.rdv_lieu}` : ''}${r.note ? ` : ${r.note}` : ''}`, source: 'crm', meta: { date_rdv: r.rdv_date, heure: r.rdv_heure || null, lieu: r.rdv_lieu || null, vocal: r.texte } },
         { prochaine_relance: r.rdv_date, prochaine_action: 'rdv', prochaine_note: `RDV${heure}${r.rdv_lieu ? `, ${r.rdv_lieu}` : ''}`, relances_sans_reponse: 0, dernier_contact: t, ...(['nouveau', 'contacte'].includes(l.statut) ? { statut: 'qualifie' } : {}) },
         D.agenda ? { agenda: { date: r.rdv_date, heure: r.rdv_heure || null, duree: 30, lieu: r.rdv_lieu || null, titre: `RDV ${l.entreprise}${ct && nomContact(ct) ? ` avec ${nomContact(ct)}` : ''}`, description: r.note || '' } } : {});
     } else if (r.action === 'perdu') {
-      await journal(l.id, { type: 'statut', resume: `Étape : ${LIB_STATUT[l.statut]}, puis Perdu${r.raison_perte ? ` : ${r.raison_perte}` : ''}`, source: 'crm', meta: { vocal: r.texte } }, { statut: 'perdu', raison_perte: r.raison_perte || null, prochaine_relance: null, prochaine_note: null });
+      res = await journal(l.id, { type: 'statut', resume: `Étape : ${LIB_STATUT[l.statut]}, puis Perdu${r.raison_perte ? ` : ${r.raison_perte}` : ''}`, source: 'crm', meta: { vocal: r.texte } }, { statut: 'perdu', raison_perte: r.raison_perte || null, prochaine_relance: null, prochaine_note: null });
     } else return;
     const nature = { appel: 'appel', reponse: 'note', note: 'note', decaler: 'decale', rdv: 'rdv', perdu: 'perdu' }[r.action];
+    s.derniere = { leadId: l.id, i, nature, activite: res && res.activite, avant, rdvAgenda: r.action === 'rdv' && Boolean(D.agenda) };
+    s.annonce = r.confirmation || 'Noté.';
+    s.annonceSuivant = true;
+    s.dernierTexte = `${l.entreprise} : ${r.confirmation || 'noté.'}`;
     toast('Noté.', 1500);
     actionFaite(l.id, nature);
   } catch (e) {
-    const zone = $('#session [data-vocal-proposition]');
-    if (zone) zone.innerHTML = `<p class="erreur" role="alert">${esc(e.message)}</p>`;
+    erreurVocal(l, e.message || "Ça n'a pas marché.");
   }
+}
+// « Annule » : la dernière action est défaite et on revient sur ce lead.
+async function annulerDerniere() {
+  const s = S.session;
+  if (!s) return;
+  const d = s.derniere;
+  const ici = IDX.lead.get(s.ids[Math.min(s.i, s.ids.length - 1)]);
+  if (!d) { if (ici && s.vocal) { const tour = nouveauTour(); parler('Rien à annuler.', () => ecouterVocal(ici, tour)); } return; }
+  s.derniere = null;
+  arreterVocal();
+  if (!d.passe) await annulerAction(d.leadId, d.activite, d.avant);
+  if (d.nature && s.bilan[d.nature]) s.bilan[d.nature]--;
+  if (d.passe) { const k = s.passes.lastIndexOf(d.leadId); if (k >= 0) s.passes.splice(k, 1); }
+  s.i = d.i;
+  s.luPour = null;
+  s.finAnnoncee = false;
+  s.pause = false;
+  s.dernierTexte = '';
+  s.annonceSuivant = false;
+  s.annonce = `J'ai annulé${d.rdvAgenda ? ' ; le rendez-vous reste dans ton agenda, supprime-le à la main' : ''}. On reprend.`;
+  rendreSession();
 }
 document.addEventListener('click', (ev) => {
   const b = ev.target.closest('[data-vocal]');
   if (!b || !S.session) return;
-  const l = IDX.lead.get(S.session.ids[S.session.i]);
-  if (!l) return;
+  const s = S.session;
   const sorte = b.dataset.vocal;
-  if (sorte === 'lire') parler(texteFiche(l));
-  else if (sorte === 'valider') validerVocal();
-  else if (sorte === 'effacer') { $('#session [data-vocal-proposition]').innerHTML = ''; S.session.proposition = null; }
-  else if (sorte === 'ecrit') { const champ = $('#session [data-vocal-saisie]'); if (champ.value.trim()) interpreter(l, champ.value.trim()); }
-  else if (sorte === 'parler') {
-    if (window.speechSynthesis) speechSynthesis.cancel();
-    const zoneTexte = $('#session [data-vocal-texte]');
-    const micro = $('#session [data-vocal="parler"]');
-    micro.classList.add('ecoute');
-    micro.textContent = "J'écoute…";
-    ecouter((t) => { zoneTexte.textContent = t; }, (t) => {
-      micro.classList.remove('ecoute');
-      micro.textContent = 'Appuie et parle';
-      if (!t) { zoneTexte.textContent = ERREURS.micro; return; }
-      if (/^(suivant|passe|au suivant)\.?$/i.test(t)) { S.session.proposition = { leadId: l.id, r: { action: 'passer' } }; validerVocal(); return; }
-      interpreter(l, t);
-    });
+  if (sorte === 'annuler') { annulerDerniere(); return; }
+  const l = IDX.lead.get(s.ids[s.i]);
+  if (!l) return;
+  if (sorte === 'lire') { s.pause = false; cycleVocal(l, nouveauTour()); }
+  else if (sorte === 'pause') pauseVocal();
+  else if (sorte === 'reprendre') reprendreVocal();
+  else if (sorte === 'ecrit') {
+    const champ = $('#session [data-vocal-saisie]');
+    const v = champ.value.trim();
+    if (v) { arreterVocal(); champ.value = ''; traiterPhrase(l, v); }
+  } else if (sorte === 'micro') {
+    // Pendant l'écoute : tu as fini. Pendant la lecture : on coupe et j'écoute tout de suite.
+    if (s.etat === 'ecoute' && ecouteEnCours) { try { ecouteEnCours.stop(); } catch { /* rien */ } return; }
+    arreterVocal();
+    s.pause = false;
+    ecouterVocal(l, nouveauTour());
   }
 });
 document.addEventListener('keydown', (ev) => {
-  if (ev.key === 'Enter' && ev.target.matches('[data-vocal-saisie]') && S.session) { ev.preventDefault(); const l = IDX.lead.get(S.session.ids[S.session.i]); if (l && ev.target.value.trim()) interpreter(l, ev.target.value.trim()); }
+  if (ev.key !== 'Enter' || !ev.target.matches('[data-vocal-saisie]') || !S.session) return;
+  ev.preventDefault();
+  const l = IDX.lead.get(S.session.ids[S.session.i]);
+  const v = ev.target.value.trim();
+  if (l && v) { arreterVocal(); ev.target.value = ''; traiterPhrase(l, v); }
 });
 
 /* ----- Dicter dans les champs des fenêtres ----- */
@@ -2787,10 +2955,10 @@ document.addEventListener('keydown', (ev) => {
 
 const LIB_BILAN = { email: 'Emails envoyés', brouillon: 'Brouillons créés', appel: 'Appels notés', sms: 'SMS envoyés', decale: 'Relances décalées', rdv: 'RDV prévus', note: 'Notes ou réponses', passe: 'Passés', perdu: 'Passés en perdu', linkedin: 'Actions LinkedIn' };
 
-function demarrerSession(ids, titre) {
+function demarrerSession(ids, titre, { vocal = false } = {}) {
   const liste = ids.filter((id) => IDX.lead.has(id));
   if (!liste.length) return toast('Rien à enchaîner.');
-  S.session = { ids: liste, i: 0, titre, bilan: {}, passes: [], modeleEmail: null, modeleSms: null, sansConfirmation: false };
+  S.session = { ids: liste, i: 0, titre, bilan: {}, passes: [], modeleEmail: null, modeleSms: null, sansConfirmation: false, vocal, tour: 0 };
   rendreSession();
   const d = $('#session');
   if (!d.open) d.showModal();
@@ -2804,6 +2972,12 @@ function rendreSession() {
   const n = s.ids.length;
   if (s.i >= n) {
     const lignes = Object.entries(s.bilan).filter(([, v]) => v);
+    if (s.vocal && !s.finAnnoncee) {
+      s.finAnnoncee = true;
+      const faits = lignes.filter(([k]) => k !== 'passe').reduce((a, [, v]) => a + v, 0);
+      parler(`${s.annonce ? `${s.annonce} ` : ''}C'est fini : ${faits} relance${faits > 1 ? 's' : ''} traitée${faits > 1 ? 's' : ''}${s.passes.length ? `, ${s.passes.length} passée${s.passes.length > 1 ? 's' : ''}` : ''}.`);
+      s.annonce = null;
+    }
     d.innerHTML = `<div class="session-cadre">
       <header class="session-tete"><div><p class="surtitre">${esc(s.titre)}</p><p class="pos">Terminé</p></div>
         <button type="button" class="btn" data-sess="fermer">Fermer</button>
@@ -2864,7 +3038,7 @@ function rendreSession() {
     </div></div>`;
   chargerLogos();
   // À l'oral, chaque nouvelle fiche est lue une fois.
-  if (s.vocal && s.luPour !== l.id) { s.luPour = l.id; setTimeout(() => parler(texteFiche(l)), 250); }
+  if (s.vocal && !s.pause && s.luPour !== l.id) { s.luPour = l.id; const tour = nouveauTour(); setTimeout(() => cycleVocal(l, tour), 250); }
 }
 
 function sauverSession() {
@@ -2904,11 +3078,16 @@ document.addEventListener('click', (ev) => {
   else if (sorte === 'vocal') {
     s.vocal = !s.vocal;
     s.luPour = null;
-    if (!s.vocal && window.speechSynthesis) speechSynthesis.cancel();
+    s.pause = false;
+    s.etat = null;
+    s.etatTexte = '';
+    s.dernierTexte = '';
+    arreterVocal();
     rendreSession();
   }
 });
 $('#session').addEventListener('close', () => {
+  arreterVocal();
   if (S.session && S.session.i >= S.session.ids.length) { S.session = null; sauverSession(); }
   else if (S.session) { S.session = null; sauverSession(); }
 });
@@ -3105,7 +3284,8 @@ document.addEventListener('click', (ev) => {
   const b = ev.target.closest('[data-enchainer]');
   if (!b || !S.dusDuJour) return;
   const titres = { tout: 'Relances du jour', email: 'Emails du jour', appel: 'Appels du jour', autre: 'Le reste du jour' };
-  demarrerSession(S.dusDuJour[b.dataset.enchainer] || [], titres[b.dataset.enchainer]);
+  const vocal = b.hasAttribute('data-a-la-voix');
+  demarrerSession(S.dusDuJour[b.dataset.enchainer] || [], vocal ? 'Relances du jour, à la voix' : titres[b.dataset.enchainer], { vocal });
 });
 
 document.addEventListener('change', (ev) => {
