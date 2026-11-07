@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Ton dossier formateur · IA-Entrepreneur</title>
+<!-- Page privée, ouverte avec un lien personnel : jamais dans Google, liée nulle part. -->
+<meta name="robots" content="noindex, nofollow">
+<meta name="referrer" content="no-referrer">
+<meta name="theme-color" content="#FFFFFF">
+<link rel="icon" type="image/png" href="/favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #F7F8FD; --card: #FFFFFF; --text: #0A0F2C; --muted: #525880; --line: #E3E7F5; --line-strong: #C9D0EA;
+    --primary: #1A3CFF; --primary-dark: #1532D6; --primary-soft: #EEF1FF;
+    --accent: #10B981; --accent-dark: #0E7A57; --accent-soft: #E7F8F1;
+    --danger: #B42318; --danger-soft: #FDECEA; --warn: #B54708; --warn-soft: #FEF0C7; --radius: 14px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { -webkit-text-size-adjust: 100%; }
+  body { background: var(--bg); color: var(--text); font-family: 'Plus Jakarta Sans', Arial, sans-serif; font-size: 16px; line-height: 1.55; padding-bottom: 60px; }
+  a { color: var(--primary); }
+  .haut { background: #fff; border-bottom: 1px solid var(--line); padding: 14px 20px; display: flex; align-items: center; gap: 12px; position: sticky; top: 0; z-index: 5; }
+  .haut img { height: 26px; width: auto; }
+  .haut .avance { margin-left: auto; font-size: 13px; color: var(--muted); font-weight: 600; text-align: right; }
+  .barre { height: 4px; background: var(--line); }
+  .barre span { display: block; height: 100%; background: var(--accent); transition: width .3s; }
+  main { max-width: 760px; margin: 0 auto; padding: 22px 16px; display: flex; flex-direction: column; gap: 18px; }
+  h1 { font-size: 26px; line-height: 1.2; letter-spacing: -0.01em; }
+  .intro { color: var(--muted); }
+  .bandeau { border-radius: var(--radius); padding: 14px 16px; background: var(--primary-soft); font-weight: 600; }
+  .bandeau.ok { background: var(--accent-soft); color: var(--accent-dark); }
+  .bandeau.attention { background: var(--warn-soft); color: var(--warn); }
+  section.etape { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); padding: 18px; display: flex; flex-direction: column; gap: 14px; }
+  .etape > header { display: flex; justify-content: space-between; gap: 10px; align-items: baseline; flex-wrap: wrap; }
+  .etape h2 { font-size: 19px; }
+  .puce { font-size: 13px; font-weight: 700; padding: 3px 10px; border-radius: 999px; background: #F2F3F6; color: #3D4258; white-space: nowrap; }
+  .puce.fait { background: var(--accent-soft); color: var(--accent-dark); }
+  .puce.afaire { background: var(--primary-soft); color: var(--primary); }
+  .puce.alerte { background: var(--warn-soft); color: var(--warn); }
+  .puce.refus { background: var(--danger-soft); color: var(--danger); }
+  label.champ { display: flex; flex-direction: column; gap: 5px; font-size: 14px; font-weight: 600; }
+  .champ input, .champ select, .champ textarea { font: inherit; font-weight: 400; font-size: 16px; padding: 10px 12px; border: 1px solid var(--line-strong); border-radius: 10px; background: #fff; color: var(--text); min-height: 46px; width: 100%; }
+  .champ textarea { min-height: 84px; resize: vertical; }
+  .champ .aide, .aide { font-size: 13px; font-weight: 400; color: var(--muted); }
+  .deux { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .ligne { display: flex; gap: 8px; align-items: flex-end; }
+  .ligne .champ { flex: 1; }
+  .choix { display: flex; flex-direction: column; gap: 8px; }
+  .choix label:not(.champ) { display: flex; gap: 10px; align-items: flex-start; font-size: 15px; font-weight: 400; cursor: pointer; }
+  .choix label:not(.champ) input { width: 20px; height: 20px; margin-top: 2px; flex: none; accent-color: var(--primary); }
+  fieldset { border: 0; display: flex; flex-direction: column; gap: 8px; }
+  legend { font-size: 14px; font-weight: 600; margin-bottom: 6px; }
+  .btn { font: inherit; font-weight: 700; font-size: 15px; border: 1px solid var(--line-strong); background: #fff; color: var(--text); border-radius: 10px; padding: 10px 16px; min-height: 46px; cursor: pointer; }
+  .btn.primaire { background: var(--primary); border-color: var(--primary); color: #fff; }
+  .btn:disabled { opacity: .55; cursor: default; }
+  .actions { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+  .message { font-size: 14px; }
+  .message.erreur { color: var(--danger); font-weight: 600; }
+  .message.ok { color: var(--accent-dark); font-weight: 600; }
+  .verif { font-size: 14px; border-radius: 10px; padding: 10px 12px; background: #F4F5FA; }
+  .verif.ok { background: var(--accent-soft); color: var(--accent-dark); }
+  .verif.ko { background: var(--danger-soft); color: var(--danger); }
+  .pieces { display: flex; flex-direction: column; gap: 10px; list-style: none; }
+  .piece { border: 1px solid var(--line); border-radius: 12px; padding: 12px 14px; display: flex; flex-direction: column; gap: 6px; }
+  .piece .tete { display: flex; justify-content: space-between; gap: 10px; align-items: baseline; flex-wrap: wrap; }
+  .piece h3 { font-size: 16px; }
+  .piece .lu { font-size: 14px; }
+  .piece .alertes { font-size: 14px; color: var(--warn); padding-left: 18px; }
+  .contrat { border: 1px solid var(--line); border-radius: 12px; padding: 16px; max-height: 60vh; overflow: auto; font-size: 14px; background: #FBFBFE; }
+  .contrat h4 { font-size: 15px; margin: 16px 0 6px; }
+  .contrat h5 { font-size: 14px; margin: 10px 0 4px; }
+  .contrat p { margin: 6px 0; }
+  .contrat ul { margin: 6px 0 6px 18px; }
+  .contrat table { border-collapse: collapse; margin: 8px 0; font-size: 13px; }
+  .contrat td { border: 1px solid var(--line-strong); padding: 6px 8px; vertical-align: top; }
+  .contrat .titre-contrat { text-align: center; margin-bottom: 10px; }
+  .contrat .signatures { margin-top: 14px; display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .pied-page { font-size: 13px; color: var(--muted); text-align: center; padding: 10px; }
+  .cache { display: none !important; }
+  .chargement { text-align: center; color: var(--muted); padding: 60px 20px; }
+  @media (max-width: 560px) { .deux, .contrat .signatures { grid-template-columns: 1fr; } h1 { font-size: 23px; } }
+  @media print {
+    body { background: #fff; padding: 0; }
+    .haut, .barre, main > *:not(#etape-contrat), #etape-contrat > *:not(.contrat), .pied-page { display: none !important; }
+    #etape-contrat { border: 0; padding: 0; }
+    .contrat { max-height: none; overflow: visible; border: 0; background: #fff; font-size: 11pt; }
+  }
+</style>
+</head>
+<body>
+<div class="haut"><img src="/images/logo-ia-entrepreneur-compact.png" alt="IA-Entrepreneur" width="120" height="26"><p class="avance" id="avance"></p></div>
+<div class="barre" aria-hidden="true"><span id="barre" style="width:0"></span></div>
+<main id="page"><p class="chargement">Chargement de ton dossier…</p></main>
+<p class="pied-page">Une question ? Écris à <a href="mailto:gabriel@ia-entrepreneur.fr">gabriel@ia-entrepreneur.fr</a>. Tes pièces restent privées : seules les personnes d'IA-Entrepreneur chargées de ton dossier y ont accès, le temps de notre collaboration et de nos obligations légales et Qualiopi.</p>
+<script>
+'use strict';
+const API = '/api/formateur';
+const $ = (s, r = document) => r.querySelector(s);
+const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+const esc = (t) => String(t ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const dateFr = (iso) => (iso ? new Date(iso.length === 10 ? `${iso}T12:00:00` : iso).toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric' }) : '');
+const ERREURS = {
+  lien_invalide: "Ce lien n'est pas valable. Utilise le lien reçu par email, ou demande-en un nouveau à Gabriel.",
+  lien_expire: 'Ce lien a expiré. Demande un nouveau lien à Gabriel.',
+  dossier_clos: 'Ce dossier est clos. Écris à Gabriel si tu penses que c\'est une erreur.',
+  siret_invalide: 'Le SIRET compte 14 chiffres.',
+  deja_signe: 'Le contrat est signé : ces informations ne se modifient plus ici. Écris à Gabriel pour un changement.',
+  nda_invalide: 'Le numéro de déclaration d\'activité compte 11 chiffres.',
+  fichier_trop_lourd: 'Fichier trop lourd : 3,4 Mo au plus. Envoie une photo de chaque page, ou un PDF compressé.',
+  format_refuse: 'Format non accepté : envoie un PDF, ou une photo (JPEG, PNG).',
+  fichier_vide: 'Le fichier est vide.',
+  identite_incomplete: "Complète d'abord ton entreprise (étape 1) et fais vérifier ton SIRET : le contrat se remplit avec ces informations.",
+  mention_invalide: 'Recopie la mention exacte : « Lu et approuvé, bon pour accord ».',
+  signature_incomplete: 'Indique le lieu et ton nom, et coche la case.',
+  trop_de_demandes: 'Beaucoup de demandes en peu de temps : réessaie dans quelques minutes.',
+  base_indisponible: 'Le serveur ne répond pas pour le moment. Réessaie dans un instant.',
+  stockage_indisponible: "L'envoi du fichier n'a pas abouti. Réessaie dans un instant.",
+};
+let D = null;
+
+// Le lien arrive avec #<jeton> ; on le garde pour la session et on le retire de la barre d'adresse.
+let jeton = location.hash.replace(/^#/, '');
+if (jeton) { sessionStorage.setItem('jeton_formateur', jeton); history.replaceState(null, '', location.pathname); }
+else jeton = sessionStorage.getItem('jeton_formateur') || '';
+
+async function api(methode, corps) {
+  let r;
+  try {
+    r = await fetch(API, { method: methode, headers: { 'X-Jeton': jeton, ...(corps ? { 'Content-Type': 'application/json' } : {}) }, body: corps ? JSON.stringify(corps) : undefined });
+  } catch { throw new Error('Pas de réseau : vérifie ta connexion et réessaie.'); }
+  const j = await r.json().catch(() => ({}));
+  if (!r.ok) throw Object.assign(new Error(ERREURS[j.erreur] || "Ça n'a pas marché. Réessaie dans un instant."), { code: j.erreur });
+  return j;
+}
+
+const NIVEAUX = [[1, 'Niveau 1 : acculturation, bons usages de l\'IA'], [2, 'Niveau 2 : IA métier, adaptée aux outils de l\'entreprise'], [3, 'Niveau 3 : automatisation et intégration']];
+const FORMES = [['micro', 'Micro-entreprise'], ['ei', 'Entreprise individuelle'], ['eurl', 'EURL'], ['sarl', 'SARL'], ['sasu', 'SASU'], ['sas', 'SAS'], ['autre', 'Autre forme']];
+const ETAT_PIECE = { manquante: ['À envoyer', 'afaire'], facultative: ['Facultative', ''], a_verifier: ['Reçue, en vérification', ''], verifiee: ['Vérifiée', 'fait'], refusee: ['À refaire', 'refus'], expiree: ['Expirée, à renvoyer', 'refus'] };
+
+function avancement() {
+  const requises = D.pieces.filter((p) => !p.facultatif);
+  const recues = requises.filter((p) => ['a_verifier', 'verifiee'].includes(p.etat)).length;
+  const etapes = [D.identite_ok && D.siret_ok, D.profil.competences.length > 0, recues === requises.length, Boolean(D.signature)];
+  return { recues, total: requises.length, etapes, faites: etapes.filter(Boolean).length };
+}
+
+function rendre() {
+  const a = avancement();
+  $('#avance').textContent = `${a.faites} étape${a.faites > 1 ? 's' : ''} sur 4`;
+  $('#barre').style.width = `${Math.round((a.faites / 4) * 100)}%`;
+  const id = D.identite || {};
+  const fige = Boolean(D.signature);
+  const bandeau = D.statut === 'valide' ? ['ok', 'Ton dossier est validé : tu peux être positionné sur des missions. Merci !']
+    : D.statut === 'a_verifier' ? ['ok', 'Merci, tout est arrivé. Gabriel vérifie ton dossier et revient vers toi.']
+    : D.statut === 'a_renouveler' ? ['attention', `Une pièce est à mettre à jour : ${D.pieces.filter((p) => ['manquante', 'refusee', 'expiree'].includes(p.etat) && !p.facultatif).map((p) => p.titre).join(', ') || 'regarde l\'étape 3'}.`]
+    : ['', `Ton dossier avance : ${a.recues} pièce${a.recues > 1 ? 's' : ''} sur ${a.total}, contrat ${D.signature ? 'signé' : 'à signer'}. Tu peux t'arrêter et revenir avec le même lien.`];
+  $('#page').innerHTML = `
+    <div><h1>Bonjour${D.prenom ? ` ${esc(D.prenom)}` : ''}, voici ton dossier formateur</h1>
+      <p class="intro">Pour travailler avec IA-Entrepreneur, il nous faut ton entreprise, ton profil, quelques pièces et ta signature du contrat-cadre. Tout se fait ici, en une vingtaine de minutes.</p></div>
+    <p class="bandeau ${bandeau[0]}" role="status">${esc(bandeau[1])}</p>
+
+    <section class="etape" id="etape-entreprise">
+      <header><h2>1. Ton entreprise</h2><span class="puce ${a.etapes[0] ? 'fait' : 'afaire'}">${a.etapes[0] ? 'Fait' : 'À faire'}</span></header>
+      ${fige ? '<p class="aide">Le contrat est signé avec ces informations : pour un changement, écris à Gabriel.</p>' : ''}
+      <div class="ligne"><label class="champ">SIRET<input name="siret" inputmode="numeric" autocomplete="off" value="${esc(D.siret)}" placeholder="14 chiffres" ${fige ? 'disabled' : ''}></label><button type="button" class="btn" data-act="siret" ${fige ? 'disabled' : ''}>Vérifier</button></div>
+      ${D.siret_verif ? `<p class="verif ${D.siret_verif.trouve && D.siret_verif.actif ? 'ok' : 'ko'}">${D.siret_verif.trouve ? (D.siret_verif.actif ? `Entreprise active au registre : ${esc(D.siret_verif.nom)}${D.siret_verif.adresse ? `, ${esc(D.siret_verif.adresse)}` : ''}.` : `Ce SIRET correspond à un établissement fermé (${esc(D.siret_verif.nom)}). Indique ton SIRET actuel.`) : D.siret_verif.joignable === false ? 'Le registre des entreprises ne répond pas : réessaie dans un instant.' : 'Ce SIRET est introuvable au registre des entreprises.'}</p>` : '<p class="aide">Nous le vérifions au registre public des entreprises, et il pré-remplit les champs ci-dessous.</p>'}
+      <form id="form-identite" class="choix" style="gap:12px">
+        <label class="champ">Nom de ta structure<input name="raison_sociale" value="${esc(id.raison_sociale)}" ${fige ? 'disabled' : ''} required></label>
+        <div class="deux">
+          <label class="champ">Forme juridique<select name="forme" ${fige ? 'disabled' : ''}><option value="">Choisis</option>${FORMES.map(([k, v]) => `<option value="${k}" ${id.forme === k ? 'selected' : ''}>${v}</option>`).join('')}</select></label>
+          <label class="champ">Capital (société)<input name="capital" inputmode="numeric" value="${esc(id.capital)}" placeholder="Ex. 1 000" ${fige ? 'disabled' : ''}></label>
+        </div>
+        <label class="champ">Adresse du siège<input name="siege" value="${esc(id.siege)}" autocomplete="street-address" ${fige ? 'disabled' : ''}></label>
+        <label class="champ">Immatriculation<input name="immatriculation" value="${esc(id.immatriculation)}" placeholder="Ex. RCS de Nancy. Vide pour une micro-entreprise" ${fige ? 'disabled' : ''}></label>
+        <div class="deux">
+          <label class="champ">Représentant (prénom et nom)<input name="representant" value="${esc(id.representant || [D.prenom, D.nom].filter(Boolean).join(' '))}" autocomplete="name" ${fige ? 'disabled' : ''}></label>
+          <label class="champ">En qualité de<input name="qualite" value="${esc(id.qualite)}" placeholder="Gérant, président, entrepreneur individuel" ${fige ? 'disabled' : ''}></label>
+        </div>
+        <fieldset><legend>Ton régime de TVA</legend>
+          ${[['exonere', 'Exonéré de TVA, avec un numéro de déclaration d\'activité (NDA)'], ['franchise', 'Franchise en base (art. 293 B du CGI), cas de la plupart des micro-entreprises'], ['assujetti', 'Assujetti à la TVA']].map(([k, v]) => `<label><input type="radio" name="regime_tva" value="${k}" ${D.regime_tva === k ? 'checked' : ''} ${fige ? 'disabled' : ''}> ${v}</label>`).join('')}
+        </fieldset>
+        <label class="champ ${D.regime_tva === 'exonere' ? '' : 'cache'}" id="champ-nda">Numéro de déclaration d'activité<input name="nda" inputmode="numeric" value="${esc(D.nda)}" placeholder="11 chiffres" ${fige ? 'disabled' : ''}></label>
+        <label class="champ">Qui intervient en formation ?<input name="intervenants" value="${esc(D.intervenants || id.representant || [D.prenom, D.nom].filter(Boolean).join(' '))}" ${fige ? 'disabled' : ''}><span class="aide">Toi, ou les personnes de ta structure qui animeront.</span></label>
+        ${fige ? '' : '<div class="actions"><button type="submit" class="btn primaire">Enregistrer</button><p class="message" data-message></p></div>'}
+      </form>
+    </section>
+
+    <section class="etape" id="etape-profil">
+      <header><h2>2. Ton profil</h2><span class="puce ${a.etapes[1] ? 'fait' : 'afaire'}">${a.etapes[1] ? 'Fait' : 'À faire'}</span></header>
+      <p class="aide">Il nous sert à te proposer les missions qui te correspondent.</p>
+      <form id="form-profil" class="choix" style="gap:12px">
+        <label class="champ">Tes sujets de formation<textarea name="competences" placeholder="Ex. IA générative en entreprise, prompts, IA pour la comptabilité, automatisation">${esc(D.profil.competences.join(', '))}</textarea><span class="aide">Sépare-les par des virgules.</span></label>
+        <label class="champ">Les outils que tu maîtrises<input name="outils" value="${esc(D.profil.outils.join(', '))}" placeholder="Ex. ChatGPT, Claude, Copilot, n8n, Make"></label>
+        <fieldset><legend>Les niveaux que tu animes</legend>${NIVEAUX.map(([n, t]) => `<label><input type="checkbox" name="niveaux" value="${n}" ${D.profil.niveaux.includes(n) ? 'checked' : ''}> ${esc(t)}</label>`).join('')}</fieldset>
+        <label class="champ">Secteurs que tu connais bien<input name="secteurs" value="${esc(D.profil.secteurs.join(', '))}" placeholder="Ex. BTP, immobilier, santé, cabinets comptables"></label>
+        <div class="deux">
+          <label class="champ">Où tu peux te déplacer<input name="zone" value="${esc(D.profil.zone)}" placeholder="Ex. Nancy et 150 km"></label>
+          <label class="champ">Tes disponibilités<input name="disponibilites" value="${esc(D.profil.disponibilites)}" placeholder="Ex. 2 jours par semaine, pas le lundi"></label>
+        </div>
+        <label><input type="checkbox" name="distanciel" ${D.profil.distanciel ? 'checked' : ''}> J'anime aussi à distance (visio)</label>
+        <label class="champ">Présentation en quelques lignes<textarea name="bio">${esc(D.profil.bio)}</textarea></label>
+        <div class="actions"><button type="submit" class="btn primaire">Enregistrer</button><p class="message" data-message></p></div>
+      </form>
+    </section>
+
+    <section class="etape" id="etape-pieces">
+      <header><h2>3. Tes pièces</h2><span class="puce ${a.etapes[2] ? 'fait' : 'afaire'}">${a.recues} sur ${a.total}</span></header>
+      <p class="aide">PDF ou photo bien lisible, 3,4 Mo au plus. Chaque pièce est lue tout de suite par notre assistant, qui te signale ce qui manque ; Gabriel vérifie ensuite.</p>
+      <ul class="pieces">${D.pieces.map((p) => {
+        const [lib, classe] = ETAT_PIECE[p.etat] || [p.etat, ''];
+        const d = p.document;
+        return `<li class="piece" data-type="${p.type}">
+          <div class="tete"><h3>${esc(p.titre)}</h3><span class="puce ${p.bientot ? 'alerte' : classe}">${p.bientot ? `Expire le ${dateFr(d.expire_le)}` : esc(lib)}</span></div>
+          <p class="aide">${esc(p.aide)}</p>
+          ${d ? `<p class="lu">${esc(d.nom)}, reçue le ${dateFr(d.recu_le)}${d.expire_le && !p.bientot ? `, valable jusqu'au ${dateFr(d.expire_le)}` : ''}${d.lu && d.lu.details ? `. ${esc(d.lu.details)}` : ''}</p>` : ''}
+          ${d && d.motif ? `<p class="message erreur">À refaire : ${esc(d.motif)}</p>` : ''}
+          ${d && d.lu && d.lu.alertes && d.lu.alertes.length && p.etat === 'a_verifier' ? `<ul class="alertes">${d.lu.alertes.map((x) => `<li>${esc(x)}</li>`).join('')}</ul>` : ''}
+          <div class="actions"><button type="button" class="btn${!d && !p.facultatif ? ' primaire' : ''}" data-act="envoyer">${d ? 'Remplacer' : 'Envoyer'}</button><p class="message" data-message></p></div>
+        </li>`;
+      }).join('')}</ul>
+      <input type="file" id="fichier" accept="application/pdf,image/*" class="cache">
+    </section>
+
+    <section class="etape" id="etape-contrat">
+      <header><h2>4. Le contrat-cadre</h2><span class="puce ${a.etapes[3] ? 'fait' : 'afaire'}">${D.signature ? 'Signé' : 'À signer'}</span></header>
+      ${D.signature ? `<p class="verif ok">Signé le ${dateFr(D.signature.date)} à ${esc(D.signature.lieu)} par ${esc(D.signature.nom)}. Gabriel le contresigne en validant ton dossier.</p>` : `<p class="aide">Lis-le en entier. Il se remplit avec les informations de l'étape 1${D.identite_ok && D.siret_ok ? '' : ', à compléter d\'abord'}.</p>`}
+      <div class="contrat" id="contrat" tabindex="0" aria-label="Texte du contrat-cadre">${contratHtml(D.contrat.blocs)}</div>
+      <div class="actions"><button type="button" class="btn" data-act="imprimer">Imprimer ou enregistrer en PDF</button></div>
+      ${D.signature ? '' : `<form id="form-signer" class="choix" style="gap:12px">
+        <div class="deux"><label class="champ">Fait à<input name="lieu" placeholder="Ta ville" required></label><label class="champ">Ton nom et prénom<input name="nom" autocomplete="name" value="${esc(id.representant || '')}" required></label></div>
+        <label class="champ">Recopie la mention « Lu et approuvé, bon pour accord »<input name="mention" autocomplete="off" required></label>
+        <label><input type="checkbox" name="accepte"> J'ai lu le contrat-cadre en entier et je l'accepte. Je signe électroniquement : cette signature m'engage comme une signature manuscrite.</label>
+        <div class="actions"><button type="submit" class="btn primaire" ${D.identite_ok && D.siret_ok ? '' : 'disabled'}>Signer le contrat</button><p class="message" data-message></p></div>
+      </form>`}
+    </section>`;
+}
+
+function contratHtml(blocs) {
+  let h = '<div class="titre-contrat"><p><b>IA-ENTREPRENEUR</b>, organisme de formation certifié Qualiopi</p><p><b>CONTRAT DE SOUS-TRAITANCE DE PRESTATION DE FORMATION</b></p><p>Contrat-cadre de collaboration avec un formateur indépendant</p></div>';
+  let liste = false;
+  for (const b of blocs) {
+    if (b.k !== 'li' && liste) { h += '</ul>'; liste = false; }
+    if (b.k === 'h') h += `<h4>${esc(b.x)}</h4>`;
+    else if (b.k === 'h3') h += `<h5>${esc(b.x)}</h5>`;
+    else if (b.k === 'li') { if (!liste) { h += '<ul>'; liste = true; } h += `<li>${esc(b.x)}</li>`; }
+    else if (b.k === 'tableau') h += `<table>${b.lignes.map((l, i) => `<tr>${l.map((c) => (i === 0 ? `<td><b>${esc(c)}</b></td>` : `<td>${esc(c)}</td>`)).join('')}</tr>`).join('')}</table>`;
+    else if (b.k === 'signatures') h += `<div class="signatures"><div><b>Pour le Donneur d'ordre</b><br>${esc(b.donneur)}</div><div><b>Pour le Formateur</b><br>${esc(b.formateur)}</div></div>`;
+    else h += `<p>${esc(b.x)}</p>`;
+  }
+  return h + (liste ? '</ul>' : '');
+}
+
+function message(zone, texte, sorte = '') { const m = $('[data-message]', zone); if (m) { m.textContent = texte; m.className = `message ${sorte}`; } }
+async function envoyer(zone, bouton, travail, ok) {
+  bouton.disabled = true;
+  const avant = bouton.textContent;
+  bouton.textContent = 'Un instant…';
+  try {
+    D = await travail();
+    rendre();
+    const nouvelle = zone.id ? $(`#${zone.id}`) : $(`[data-type="${zone.dataset.type}"]`);
+    if (nouvelle && ok) message(nouvelle, ok, 'ok');
+  } catch (e) {
+    message(zone, e.message, 'erreur');
+    bouton.disabled = false;
+    bouton.textContent = avant;
+  }
+}
+
+// Une photo est réduite avant l'envoi (une photo de téléphone dépasse souvent la limite).
+async function preparer(fichier) {
+  if (fichier.type === 'application/pdf') return { donnees: fichier, nom: fichier.name };
+  if (!fichier.type.startsWith('image/')) throw new Error(ERREURS.format_refuse);
+  const image = await createImageBitmap(fichier).catch(() => null);
+  if (!image) throw new Error(ERREURS.format_refuse);
+  const echelle = Math.min(1, 2000 / Math.max(image.width, image.height));
+  const c = document.createElement('canvas');
+  c.width = Math.round(image.width * echelle);
+  c.height = Math.round(image.height * echelle);
+  c.getContext('2d').drawImage(image, 0, 0, c.width, c.height);
+  const blob = await new Promise((r) => c.toBlob(r, 'image/jpeg', 0.85));
+  return { donnees: blob, nom: fichier.name.replace(/\.[a-z0-9]+$/i, '') + '.jpg' };
+}
+const enBase64 = (blob) => new Promise((resoudre, rejeter) => { const l = new FileReader(); l.onload = () => resoudre(String(l.result).split(',')[1]); l.onerror = rejeter; l.readAsDataURL(blob); });
+
+let typeEnCours = null;
+document.addEventListener('click', async (ev) => {
+  const b = ev.target.closest('[data-act]');
+  if (!b) return;
+  const act = b.dataset.act;
+  if (act === 'imprimer') return window.print();
+  if (act === 'siret') {
+    const zone = $('#etape-entreprise');
+    const siret = $('input[name="siret"]', zone).value.replace(/\s/g, '');
+    if (!/^\d{14}$/.test(siret)) return message($('#form-identite'), ERREURS.siret_invalide, 'erreur');
+    return envoyer(zone, b, () => api('POST', { op: 'siret', siret }));
+  }
+  if (act === 'envoyer') {
+    typeEnCours = b.closest('[data-type]').dataset.type;
+    $('#fichier').value = '';
+    $('#fichier').click();
+  }
+});
+document.addEventListener('change', async (ev) => {
+  if (ev.target.name === 'regime_tva') $('#champ-nda').classList.toggle('cache', ev.target.value !== 'exonere');
+  if (ev.target.id !== 'fichier' || !typeEnCours) return;
+  const fichier = ev.target.files[0];
+  const zone = $(`[data-type="${typeEnCours}"]`);
+  const bouton = $('[data-act="envoyer"]', zone);
+  if (!fichier) return;
+  try {
+    message(zone, 'Envoi, puis lecture par notre assistant (une vingtaine de secondes)…');
+    const { donnees, nom } = await preparer(fichier);
+    if (donnees.size > 3.4 * 1024 * 1024) throw new Error(ERREURS.fichier_trop_lourd);
+    const base64 = await enBase64(donnees);
+    const type = typeEnCours;
+    await envoyer(zone, bouton, () => api('POST', { op: 'piece', type, nom, base64 }), 'Reçue, merci.');
+  } catch (e) { message(zone, e.message, 'erreur'); }
+});
+document.addEventListener('submit', (ev) => {
+  ev.preventDefault();
+  const f = ev.target;
+  const el = f.elements;
+  const bouton = $('[type="submit"]', f);
+  if (f.id === 'form-identite') {
+    const identite = Object.fromEntries(['raison_sociale', 'forme', 'capital', 'siege', 'immatriculation', 'representant', 'qualite'].map((k) => [k, el[k].value]));
+    const regime = (f.querySelector('input[name="regime_tva"]:checked') || {}).value || null;
+    if (regime === 'exonere' && !/^\d{11}$/.test(el.nda.value.replace(/\s/g, ''))) return message(f, ERREURS.nda_invalide, 'erreur');
+    return envoyer($('#etape-entreprise'), bouton, () => api('POST', { op: 'identite', identite, regime_tva: regime, nda: el.nda.value, intervenants: el.intervenants.value }), 'Enregistré.');
+  }
+  if (f.id === 'form-profil') {
+    const niveaux = $$('input[name="niveaux"]:checked', f).map((x) => Number(x.value));
+    return envoyer($('#etape-profil'), bouton, () => api('POST', { op: 'profil', competences: el.competences.value, outils: el.outils.value, secteurs: el.secteurs.value, niveaux, zone: el.zone.value, distanciel: el.distanciel.checked, disponibilites: el.disponibilites.value, bio: el.bio.value }), 'Enregistré.');
+  }
+  if (f.id === 'form-signer') {
+    if (!el.accepte.checked) return message(f, ERREURS.signature_incomplete, 'erreur');
+    return envoyer($('#etape-contrat'), bouton, () => api('POST', { op: 'signer', lieu: el.lieu.value, nom: el.nom.value, mention: el.mention.value, accepte: true }), 'Contrat signé. Merci !');
+  }
+});
+
+(async () => {
+  if (!jeton) { $('#page').innerHTML = `<p class="bandeau attention">${esc(ERREURS.lien_invalide)}</p>`; return; }
+  try { D = await api('GET'); rendre(); } catch (e) { $('#page').innerHTML = `<p class="bandeau attention">${esc(e.message)}</p>`; }
+})();
+</script>
+</body>
+</html>

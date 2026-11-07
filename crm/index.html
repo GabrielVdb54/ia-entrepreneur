@@ -306,6 +306,30 @@
   .analyse { font-size: 14px; margin: 4px 0; }
   .analyse .meta { display: block; margin-top: 2px; }
   .ecartes { margin-top: 28px; border-top: 1px solid var(--line); padding-top: 12px; }
+  .tete-vue { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; flex-wrap: wrap; }
+  .statut.f-valide { background: var(--accent-soft); color: var(--accent-dark); border-color: transparent; }
+  .statut.f-verifier { background: #FEF1DC; color: #874A08; border-color: transparent; }
+  .statut.f-cours { background: var(--primary-soft); color: var(--primary); border-color: transparent; }
+  .statut.f-inviter { background: #F2F3F6; color: #3D4258; border-color: transparent; }
+  .statut.f-renouveler, .statut.f-refuse { background: #FCE8DA; color: #93390B; border-color: transparent; }
+  .etiquettes { list-style: none; padding: 0; margin: 8px 0 0; display: flex; flex-wrap: wrap; gap: 6px; }
+  .etiquettes li { font-size: 12.5px; padding: 3px 9px; border-radius: 999px; background: #F2F3F6; color: #3D4258; }
+  .pieces-f { list-style: none; padding: 0; margin: 8px 0 0; display: flex; flex-direction: column; gap: 8px; }
+  .pieces-f > li { border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; display: flex; flex-direction: column; gap: 5px; font-size: 14px; }
+  .pieces-f .tete { display: flex; justify-content: space-between; gap: 8px; align-items: baseline; flex-wrap: wrap; }
+  .pieces-f .etat { font-size: 12.5px; font-weight: 700; padding: 2px 9px; border-radius: 999px; }
+  .e-ok { background: var(--accent-soft); color: var(--accent-dark); }
+  .e-verifier { background: #FEF1DC; color: #874A08; }
+  .e-manque { background: var(--primary-soft); color: var(--primary); }
+  .e-facultatif { background: #F2F3F6; color: #6B7085; }
+  .e-refus { background: #FCE8DA; color: #93390B; }
+  .pieces-f .lecture.conforme { color: var(--accent-dark); }
+  .alertes-f { margin: 0; padding-left: 18px; color: #874A08; }
+  .code-urssaf code { font-size: 14px; background: #F2F3F6; padding: 1px 6px; border-radius: 6px; }
+  .message-refus { color: #93390B; font-weight: 600; }
+  .texte-contrat { white-space: pre-wrap; font-size: 13px; max-height: 50vh; overflow: auto; background: #FBFBFE; border: 1px solid var(--line); border-radius: 10px; padding: 12px; }
+  fieldset.cases { border: 0; display: flex; flex-wrap: wrap; gap: 6px 16px; }
+  fieldset.cases legend { font-weight: 600; font-size: 14px; margin-bottom: 4px; }
   .ecartes > summary { cursor: pointer; color: var(--muted); font-weight: 600; }
   .ecartes ul { list-style: none; padding: 0; margin: 10px 0 0; display: flex; flex-direction: column; gap: 8px; }
   .ecartes li { display: flex; justify-content: space-between; gap: 10px; align-items: center; flex-wrap: wrap; font-size: 14px; background: #fff; border: 1px solid var(--line); border-radius: 10px; padding: 8px 10px; }
@@ -470,6 +494,7 @@
       <button type="button" data-vue="jour" aria-selected="true">Aujourd'hui<span class="compteur" id="compteur" hidden></span></button>
       <button type="button" data-vue="pipeline" aria-selected="false">Pipeline</button>
       <button type="button" data-vue="tableau" aria-selected="false">Tableau</button>
+      <button type="button" data-vue="formateurs" aria-selected="false">Formateurs</button>
       <button type="button" data-vue="memo" aria-selected="false">Mémo</button>
     </nav>
   </header>
@@ -733,6 +758,9 @@ function indexer() {
   D.activites.sort((a, b) => (a.date < b.date ? 1 : a.date > b.date ? -1 : 0));
   IDX.activites = new Map();
   for (const a of D.activites) { if (!IDX.activites.has(a.lead_id)) IDX.activites.set(a.lead_id, []); IDX.activites.get(a.lead_id).push(a); }
+  IDX.formateur = new Map((D.formateurs || []).map((f) => [f.lead_id, f]));
+  IDX.documents = new Map();
+  for (const d of D.documents || []) { if (!IDX.documents.has(d.lead_id)) IDX.documents.set(d.lead_id, []); IDX.documents.get(d.lead_id).push(d); }
 }
 
 class ErreurApi extends Error {}
@@ -768,7 +796,7 @@ function ajouterActivite(a) { if (a) D.activites.unshift(a); }
 
 /* ================= Lecture des données ================= */
 
-const actif = (l) => !l.archive && l.statut !== 'gagne' && l.statut !== 'perdu';
+const actif = (l) => !l.archive && l.type !== 'formateur' && l.statut !== 'gagne' && l.statut !== 'perdu';
 const contactsDe = (id) => IDX.contacts.get(id) || [];
 const activitesDe = (id) => IDX.activites.get(id) || [];
 function contactPrincipal(id) {
@@ -800,6 +828,7 @@ function rendre() {
   else if (S.q) vue.innerHTML = vueRecherche();
   else if (S.vue === 'pipeline') vue.innerHTML = vuePipeline();
   else if (S.vue === 'memo') vue.innerHTML = vueMemo();
+  else if (S.vue === 'formateurs') vue.innerHTML = vueFormateurs();
   else vue.innerHTML = vueJour();
   chargerLogos();
 }
@@ -906,11 +935,11 @@ function vueSuivi() {
 }
 function vuePipeline() {
   if (S.pipeline === 'suivi') return vueSuivi();
-  const tous = D.leads.filter((l) => !l.archive);
+  const tous = D.leads.filter((l) => !l.archive && l.type !== 'formateur');
   const leads = tous.filter((l) => S.typePipeline === 'tous' || l.type === S.typePipeline);
   const tri = (a, b) => (a.prochaine_relance || '9999') < (b.prochaine_relance || '9999') ? -1 : (a.prochaine_relance || '9999') > (b.prochaine_relance || '9999') ? 1 : a.entreprise.localeCompare(b.entreprise, 'fr');
   const total = leads.filter(actif).reduce((s, l) => s + (Number(l.valeur) || 0), 0);
-  const puces = [['tous', 'Tous'], ...TYPES].map(([k, v]) => { const n = k === 'tous' ? tous.length : tous.filter((l) => l.type === k).length; return n || k === 'tous' ? `<button type="button" class="puce-type" data-type-pipeline="${k}" aria-pressed="${S.typePipeline === k}">${esc(v)} <small>${n}</small></button>` : ''; }).join('');
+  const puces = [['tous', 'Tous'], ...TYPES.filter(([k]) => k !== 'formateur')].map(([k, v]) => { const n = k === 'tous' ? tous.length : tous.filter((l) => l.type === k).length; return n || k === 'tous' ? `<button type="button" class="puce-type" data-type-pipeline="${k}" aria-pressed="${S.typePipeline === k}">${esc(v)} <small>${n}</small></button>` : ''; }).join('');
   let h = `<h1 class="titre-vue">Pipeline</h1>${ongletsPipeline()}<div class="puces-type" role="group" aria-label="Type">${puces}</div><p class="sous-titre">${leads.filter(actif).length} en cours${total ? `, ${esc(euros(total))} en jeu` : ''}. Glisse une carte pour changer d'étape. Passer en « Gagné » envoie le lead dans le suivi client.</p><div class="kanban">`;
   for (const [cle, lib] of STATUTS) {
     const ls = leads.filter((l) => l.statut === cle).sort(tri);
@@ -1045,6 +1074,7 @@ function rendreFiche() {
       </div>
     </section>
     ${blocRecap(l)}
+    ${l.type === 'formateur' ? blocDossierFormateur(l) : ''}
     <section class="bloc">
       <h3>Contacts <button type="button" class="btn petit" data-act="contact-nouveau">Ajouter</button></h3>
       ${cs.map((c) => `<div class="contact">
@@ -1540,6 +1570,303 @@ function brancherDictee(form) {
     champ.insertAdjacentElement('afterend', b);
   }
 }
+
+/* ----- Formateurs : le dossier (lien d'envoi, pièces, contrat), validé par Gabriel ----- */
+
+const PIECES_F = [['kbis', "Justificatif d'immatriculation"], ['identite', "Pièce d'identité"], ['rib', 'RIB'], ['tva', 'Régime de TVA'], ['rc_pro', 'Assurance RC Pro'],
+  ['urssaf', 'Attestation de vigilance URSSAF'], ['cv', 'CV à jour'], ['competences', 'Justificatifs de compétences'], ['formation_continue', 'Formation continue'], ['nda', 'Déclaration d\'activité (NDA)']];
+const LIB_PIECE = Object.fromEntries([...PIECES_F, ['contrat', 'Contrat signé (ancien)'], ['autre', 'Autre pièce']]);
+const STATUTS_F = { valide: ['Validé', 'f-valide'], a_verifier: ['À vérifier', 'f-verifier'], en_cours: ['Dossier en cours', 'f-cours'], a_inviter: ['À inviter', 'f-inviter'], a_renouveler: ['À mettre à jour', 'f-renouveler'], refuse: ['Refusé', 'f-refuse'] };
+const ETATS_PIECE = { manquante: ['Manquante', 'e-manque'], facultative: ['Facultative', 'e-facultatif'], a_verifier: ['À vérifier', 'e-verifier'], verifiee: ['Vérifiée', 'e-ok'], refusee: ['À refaire', 'e-refus'], expiree: ['Expirée', 'e-refus'] };
+const URSSAF_VERIF = 'https://www.urssaf.fr/accueil/outils-documentation/outils/verification-attestation.html';
+const NIVEAUX_F = { 1: 'Niveau 1', 2: 'Niveau 2', 3: 'Niveau 3' };
+const dossierDe = (id) => IDX.formateur.get(id) || { lead_id: id, statut: 'a_inviter', competences: [], outils: [], niveaux: [], secteurs: [], distanciel: true };
+function piecesDe(id) {
+  const t = aujourdhui();
+  const docs = (IDX.documents.get(id) || []).filter((d) => !d.archive);
+  return PIECES_F.map(([type, titre]) => {
+    const d = docs.filter((x) => x.type === type).sort((a, b) => (a.created_at < b.created_at ? 1 : -1))[0] || null;
+    const expiree = Boolean(d && d.expire_le && d.expire_le < t);
+    const etat = !d ? (type === 'nda' ? 'facultative' : 'manquante') : d.statut === 'refuse' ? 'refusee' : expiree ? 'expiree' : d.statut === 'verifie' ? 'verifiee' : 'a_verifier';
+    return { type, titre, d, etat, bientot: Boolean(d && d.expire_le && !expiree && ecartJours(d.expire_le) <= 15) };
+  });
+}
+function compteF(id) {
+  const ps = piecesDe(id).filter((p) => p.type !== 'nda');
+  return { recues: ps.filter((p) => ['a_verifier', 'verifiee'].includes(p.etat)).length, verifiees: ps.filter((p) => p.etat === 'verifiee').length, total: ps.length };
+}
+const formateurs = () => D.leads.filter((l) => l.type === 'formateur' && !l.archive);
+S.filtreF = 'tous';
+function vueFormateurs() {
+  const tous = formateurs();
+  const ordre = ['a_verifier', 'a_renouveler', 'valide', 'en_cours', 'a_inviter', 'refuse'];
+  const n = (k) => tous.filter((l) => dossierDe(l.id).statut === k).length;
+  const liste = tous.filter((l) => S.filtreF === 'tous' || dossierDe(l.id).statut === S.filtreF)
+    .sort((a, b) => ordre.indexOf(dossierDe(a.id).statut) - ordre.indexOf(dossierDe(b.id).statut) || a.entreprise.localeCompare(b.entreprise, 'fr'));
+  const puces = [['tous', 'Tous', tous.length], ...ordre.map((k) => [k, STATUTS_F[k][0], n(k)])].filter(([k, , c]) => c || k === 'tous')
+    .map(([k, v, c]) => `<button type="button" class="puce-type" data-filtre-f="${k}" aria-pressed="${S.filtreF === k}">${esc(v)} <small>${c}</small></button>`).join('');
+  return `<div class="tete-vue"><div><h1 class="titre-vue">Formateurs</h1>
+      <p class="sous-titre">${n('valide')} validé${n('valide') > 1 ? 's' : ''} sur ${tous.length}. Un formateur n'est positionné sur une mission qu'une fois validé : contrat-cadre signé dans son lien d'envoi, toutes les pièces vérifiées.</p></div>
+      <button type="button" class="btn primaire" data-act="formateur-nouveau">Nouveau formateur</button></div>
+    <div class="puces-type" role="group" aria-label="Statut du dossier">${puces}</div>
+    <div class="grille">${liste.map(carteFormateur).join('') || '<p class="vide">Aucun formateur ici.</p>'}</div>`;
+}
+function carteFormateur(l) {
+  const f = dossierDe(l.id);
+  const [lib, cls] = STATUTS_F[f.statut] || [f.statut, ''];
+  const c = compteF(l.id);
+  const comp = (f.competences || []).slice(0, 4);
+  return `<article class="carte" data-id="${l.id}">
+    <div class="carte-haut">${avatar(l, 'm')}<div class="carte-titre"><h3><button type="button" class="lien-carte" data-act="ouvrir">${esc(l.entreprise)}</button></h3><p class="meta">${esc([f.zone || l.localisation, f.distanciel ? 'distanciel' : ''].filter(Boolean).join(', '))}</p></div><span class="statut ${cls}">${esc(lib)}</span></div>
+    <p class="meta">Pièces : ${c.recues} sur ${c.total}${c.verifiees ? `, ${c.verifiees} vérifiée${c.verifiees > 1 ? 's' : ''}` : ''}. Contrat ${f.signature ? 'signé' : 'à signer'}.${(f.niveaux || []).length ? ` ${f.niveaux.map((x) => NIVEAUX_F[x]).join(', ')}.` : ''}</p>
+    ${comp.length ? `<ul class="etiquettes">${comp.map((x) => `<li>${esc(x.length > 60 ? `${x.slice(0, 58)}…` : x)}</li>`).join('')}</ul>` : ''}
+  </article>`;
+}
+function explicationF(f, ps) {
+  const manque = ps.filter((p) => ['manquante', 'refusee', 'expiree'].includes(p.etat)).map((p) => p.titre.toLowerCase());
+  const aVerifier = ps.filter((p) => p.etat === 'a_verifier').length;
+  if (f.statut === 'valide') return `Validé le ${dateCourte(String(f.valide_le).slice(0, 10))} : il peut être positionné sur une mission.`;
+  if (f.statut === 'refuse') return 'Dossier refusé : le lien d\'envoi ne fonctionne plus.';
+  if (f.statut === 'a_verifier') return `Tout est arrivé. ${aVerifier ? `${aVerifier} pièce${aVerifier > 1 ? 's' : ''} à regarder, ` : ''}puis valide le formateur : ça contresigne son contrat.`;
+  if (f.statut === 'a_renouveler') return `À mettre à jour : ${manque.join(', ') || 'des pièces à revérifier'}. Il reste positionnable seulement une fois à jour.`;
+  if (f.statut === 'a_inviter') return 'Crée son lien d\'envoi : il y remplira son entreprise et son profil, déposera ses pièces et signera le contrat-cadre.';
+  return `En attente${!f.signature ? ' de sa signature' : ''}${manque.length ? `${!f.signature ? ' et' : ''} de : ${manque.join(', ')}` : ''}.`;
+}
+function blocDossierFormateur(l) {
+  const f = dossierDe(l.id);
+  const [lib, cls] = STATUTS_F[f.statut] || [f.statut, ''];
+  const ps = piecesDe(l.id);
+  const id = f.identite || {};
+  const sv = f.siret_verif;
+  const c = compteF(l.id);
+  const siret = f.siret ? `${esc(f.siret)}${sv ? (sv.trouve ? (sv.actif ? ` : actif au registre (${esc(sv.nom)}${sv.activite ? `, APE ${esc(sv.activite)}` : ''})` : ' : établissement FERMÉ au registre') : sv.joignable === false ? ' : registre injoignable, à revérifier' : ' : INTROUVABLE au registre') : ' : pas encore vérifié'}` : 'pas encore saisi';
+  const tva = { exonere: `exonéré (NDA ${esc(f.nda || '?')})`, franchise: 'franchise en base (art. 293 B)', assujetti: 'assujetti à la TVA' }[f.regime_tva] || 'pas encore indiqué';
+  return `<section class="bloc dossier-f" data-dossier="${l.id}">
+    <h3>Dossier formateur <span class="statut ${cls}">${esc(lib)}</span></h3>
+    <p class="aide">${esc(explicationF(f, ps))}</p>
+    <div class="actions">
+      ${['a_verifier', 'a_renouveler'].includes(f.statut) && c.recues === c.total && f.signature ? '<button type="button" class="btn primaire" data-act="formateur-valider">Valider le formateur</button>' : ''}
+      ${f.statut !== 'refuse' ? `<button type="button" class="btn${f.statut === 'a_inviter' ? ' primaire' : ''}" data-act="formateur-lien">${f.jeton_cree_le ? 'Nouveau lien d\'envoi' : 'Créer le lien d\'envoi'}</button>` : ''}
+      <button type="button" class="btn" data-act="formateur-profil">Modifier le profil</button>
+      <button type="button" class="btn" data-act="piece-deposer">Déposer une pièce</button>
+      <button type="button" class="btn lien" data-act="formateur-refuser">${f.statut === 'refuse' ? 'Rouvrir le dossier' : 'Refuser'}</button>
+    </div>
+    <dl class="infos">
+      <dt>Structure</dt><dd>${esc([id.raison_sociale, { ei: 'entreprise individuelle', micro: 'micro-entreprise', eurl: 'EURL', sarl: 'SARL', sasu: 'SASU', sas: 'SAS' }[id.forme] || id.forme_libre].filter(Boolean).join(', ') || 'pas encore saisie')}${id.siege ? `<br><span class="meta">${esc(id.siege)}</span>` : ''}</dd>
+      <dt>SIRET</dt><dd>${siret}${f.siret ? ' <button type="button" class="btn petit" data-act="formateur-siret">Revérifier</button>' : ''}</dd>
+      <dt>TVA</dt><dd>${tva}</dd>
+      ${f.intervenants ? `<dt>Intervenants</dt><dd>${esc(f.intervenants)}</dd>` : ''}
+      <dt>Contrat-cadre</dt><dd>${f.signature ? `Signé le ${esc(instantLisible(f.signature.date))} à ${esc(f.signature.lieu)} par ${esc(f.signature.nom)}${f.contre_signature ? `, contresigné le ${esc(dateCourte(String(f.contre_signature.date).slice(0, 10)))}` : ''} <button type="button" class="btn petit" data-act="contrat-voir">Voir</button>` : 'pas encore signé'}</dd>
+      <dt>Lien d'envoi</dt><dd>${f.jeton_cree_le ? `créé le ${esc(dateCourte(String(f.jeton_cree_le).slice(0, 10)))}, valable jusqu'au ${esc(dateCourte(String(f.jeton_expire).slice(0, 10)))}` : 'pas encore créé'}</dd>
+    </dl>
+    <h4 class="sous-groupe">Profil</h4>
+    ${(f.competences || []).length ? `<ul class="etiquettes">${f.competences.map((x) => `<li>${esc(x)}</li>`).join('')}</ul>` : '<p class="vide">Pas encore de compétences.</p>'}
+    <dl class="infos">
+      ${(f.outils || []).length ? `<dt>Outils</dt><dd>${esc(f.outils.join(', '))}</dd>` : ''}
+      ${(f.niveaux || []).length ? `<dt>Niveaux</dt><dd>${esc(f.niveaux.map((x) => NIVEAUX_F[x]).join(', '))}</dd>` : ''}
+      ${(f.secteurs || []).length ? `<dt>Secteurs</dt><dd>${esc(f.secteurs.join(', '))}</dd>` : ''}
+      <dt>Zone</dt><dd>${esc(f.zone || 'non précisée')}${f.distanciel ? ', anime aussi à distance' : ''}</dd>
+      ${f.disponibilites ? `<dt>Disponibilités</dt><dd>${esc(f.disponibilites)}</dd>` : ''}
+      ${f.tarif_jour ? `<dt>Tarif jour (interne)</dt><dd>${esc(euros(f.tarif_jour))}</dd>` : ''}
+      ${f.page_site ? `<dt>Page du site</dt><dd><a href="${esc(f.page_site)}" target="_blank" rel="noopener">${esc(f.page_site)}</a></dd>` : ''}
+    </dl>
+    <h4 class="sous-groupe">Pièces <span class="meta">${c.recues} sur ${c.total} reçues, ${c.verifiees} vérifiée${c.verifiees > 1 ? 's' : ''}</span></h4>
+    <ul class="pieces-f">${ps.map((p) => {
+      const [elib, ecls] = ETATS_PIECE[p.etat];
+      const d = p.d;
+      const lu = d && d.lecture && !d.lecture.erreur ? d.lecture : null;
+      return `<li${d ? ` data-doc="${d.id}"` : ''}>
+        <div class="tete"><b>${esc(p.titre)}</b><span class="etat ${p.bientot ? 'e-verifier' : ecls}">${p.bientot ? `Expire le ${esc(dateCourte(d.expire_le))}` : esc(elib)}</span></div>
+        ${d ? `<p class="meta">${esc(d.nom)}, ${d.depose_par === 'gabriel' ? 'déposée par toi' : 'envoyée'} le ${esc(instantLisible(d.created_at))}${d.expire_le ? `, valable jusqu'au ${esc(dateCourte(d.expire_le))}` : ''}</p>
+          ${lu ? `<p class="lecture${lu.conforme ? ' conforme' : ''}">${lu.conforme ? 'Claude : conforme. ' : 'Claude : '}${esc(lu.details)}</p>` : d.lecture && d.lecture.erreur ? '<p class="aide">Claude n\'a pas pu lire cette pièce : regarde-la toi-même.</p>' : ''}
+          ${lu && lu.alertes && lu.alertes.length ? `<ul class="alertes-f">${lu.alertes.map((x) => `<li>${esc(x)}</li>`).join('')}</ul>` : ''}
+          ${lu && lu.code_verification ? `<p class="code-urssaf">Code de sécurité : <code>${esc(lu.code_verification)}</code> <button type="button" class="btn petit" data-copier="${esc(lu.code_verification)}">Copier</button> <a href="${URSSAF_VERIF}" target="_blank" rel="noopener noreferrer">Vérifier sur urssaf.fr</a></p>` : ''}
+          ${d.statut === 'refuse' && d.motif ? `<p class="message-refus">À refaire : ${esc(d.motif)}</p>` : ''}
+          <div class="actions"><button type="button" class="btn petit" data-act="piece-voir">Voir</button>${p.etat === 'a_verifier' ? '<button type="button" class="btn petit primaire" data-act="piece-ok">Vérifiée</button>' : ''}${['a_verifier', 'verifiee'].includes(p.etat) ? '<button type="button" class="btn petit" data-act="piece-refaire">À refaire</button>' : ''}</div>` : ''}
+      </li>`;
+    }).join('')}</ul>
+  </section>`;
+}
+function majFormateur(r) {
+  if (!r) return;
+  if (r.formateur) { D.formateurs = (D.formateurs || []).filter((x) => x.lead_id !== r.formateur.lead_id).concat([r.formateur]); }
+  if (r.documents && r.lead) { D.documents = (D.documents || []).filter((x) => x.lead_id !== r.lead.id).concat(r.documents); }
+  if (r.lead) remplacerLead(r.lead);
+  indexer(); rendre(); if (S.fiche) rendreFiche();
+}
+async function opFormateur(corps, message) {
+  try { const r = await api('POST', corps); majFormateur(r); if (message) toast(message); return r; } catch (e) { toast(e.message); return null; }
+}
+// Une photo est réduite avant l'envoi : une requête est limitée à quelques Mo.
+async function preparerFichier(fichier) {
+  if (fichier.type === 'application/pdf') return { donnees: fichier, nom: fichier.name };
+  if (!fichier.type.startsWith('image/')) throw new ErreurApi('Format non accepté : PDF, JPEG ou PNG.');
+  const image = await createImageBitmap(fichier).catch(() => null);
+  if (!image) throw new ErreurApi('Image illisible : envoie un PDF, ou une photo JPEG ou PNG.');
+  const k = Math.min(1, 2000 / Math.max(image.width, image.height));
+  const c = document.createElement('canvas');
+  c.width = Math.round(image.width * k); c.height = Math.round(image.height * k);
+  c.getContext('2d').drawImage(image, 0, 0, c.width, c.height);
+  const blob = await new Promise((r) => c.toBlob(r, 'image/jpeg', 0.85));
+  return { donnees: blob, nom: fichier.name.replace(/\.[a-z0-9]+$/i, '') + '.jpg' };
+}
+const enBase64 = (blob) => new Promise((ok, ko) => { const l = new FileReader(); l.onload = () => ok(String(l.result).split(',')[1]); l.onerror = ko; l.readAsDataURL(blob); });
+async function voirPiece(id) {
+  const fenetre = window.open('', '_blank');
+  try {
+    const r = await fetch(`${API}?document=${encodeURIComponent(id)}`, { headers: { 'X-Cle-Crm': S.cle } });
+    if (!r.ok) throw new Error();
+    const url = URL.createObjectURL(await r.blob());
+    if (fenetre) fenetre.location.href = url; else location.href = url;
+    setTimeout(() => URL.revokeObjectURL(url), 120000);
+  } catch { if (fenetre) fenetre.close(); toast("La pièce n'a pas pu s'ouvrir. Réessaie."); }
+}
+function ouvrirLienFormateur(l, r) {
+  const lien = `${location.origin}/espace-formateur/#${r.jeton}`;
+  const c = contactsDe(l.id).find((x) => x.email) || null;
+  const jusquau = dateLongue(String(r.expire).slice(0, 10));
+  ouvrirModale(`<h2>Lien d'envoi de ${esc(l.entreprise)}</h2>
+    <p class="aide">Personnel, valable jusqu'au ${esc(jusquau)}. Il n'ouvre que son dossier. Il ne s'affiche qu'une fois : copie-le ou prépare l'email maintenant. Un nouveau lien remplace celui-ci.</p>
+    ${champ('Lien', `<input type="text" name="lien" readonly value="${esc(lien)}">`)}
+    <div class="pied"><button type="button" class="btn" data-copier="${esc(lien)}">Copier le lien</button>${c && D.gmail ? '<button type="button" class="btn primaire" data-email-lien>Préparer l\'email</button>' : ''}<button type="button" class="btn" data-fermer>Fermer</button></div>`, (form) => {
+    brancherAnnuler(form);
+    const b = $('[data-email-lien]', form);
+    if (b) b.addEventListener('click', () => {
+      fermerModale();
+      ouvrirEmail(l.id, c.id);
+      const el = $('#modale form').elements;
+      const signature = (D.reglages.signature || SIGNATURE_DEFAUT).trim();
+      el.objet.value = 'Ton dossier formateur IA-Entrepreneur';
+      el.corps.value = `${salutation(c)}\n\nPour travailler ensemble sur les prochaines missions, voici ton espace formateur IA-Entrepreneur. Tu y renseignes ton entreprise et ton profil, tu déposes tes pièces (Kbis, attestation URSSAF, RC Pro, etc.) et tu signes le contrat-cadre en ligne. Compte une vingtaine de minutes ; tu peux t'arrêter et reprendre avec le même lien.\n\n${lien}\n\nLe lien est personnel et valable jusqu'au ${jusquau}.\n\n${signature}`;
+      el.corps.dispatchEvent(new Event('input'));
+    });
+  });
+}
+function ouvrirProfilFormateur(l) {
+  const f = dossierDe(l.id);
+  ouvrirModale(`<h2>Profil de ${esc(l.entreprise)}</h2>
+    ${champ('Compétences', `<textarea name="competences">${esc((f.competences || []).join(', '))}</textarea>`, 'Séparées par des virgules. Elles servent aux recommandations de formateurs.')}
+    ${champ('Outils', `<input type="text" name="outils" value="${esc((f.outils || []).join(', '))}">`)}
+    <fieldset class="cases"><legend>Niveaux animés</legend>${[1, 2, 3].map((n) => `<label class="case"><input type="checkbox" name="niveaux" value="${n}" ${(f.niveaux || []).includes(n) ? 'checked' : ''}> ${NIVEAUX_F[n]}</label>`).join('')}</fieldset>
+    ${champ('Secteurs', `<input type="text" name="secteurs" value="${esc((f.secteurs || []).join(', '))}">`)}
+    <div class="deux">${champ('Zone', `<input type="text" name="zone" value="${esc(f.zone)}">`)}${champ('Tarif jour (interne)', `<input type="text" inputmode="decimal" name="tarif_jour" value="${esc(f.tarif_jour ?? '')}">`, 'Jamais montré au client.')}</div>
+    <label class="case"><input type="checkbox" name="distanciel" ${f.distanciel !== false ? 'checked' : ''}> Anime aussi à distance</label>
+    ${champ('Disponibilités', `<input type="text" name="disponibilites" value="${esc(f.disponibilites)}">`)}
+    ${champ('Présentation', `<textarea name="bio">${esc(f.bio)}</textarea>`)}
+    ${champ('Notes (internes)', `<textarea name="notes">${esc(f.notes)}</textarea>`)}
+    ${piedFormulaire('<button type="submit" class="btn primaire">Enregistrer</button>')}`, (form) => {
+    brancherAnnuler(form);
+    form.addEventListener('submit', (ev) => {
+      ev.preventDefault();
+      soumettre(form, async () => {
+        const el = form.elements;
+        const liste = (v) => v.split(',').map((x) => x.trim()).filter(Boolean);
+        const r = await api('POST', { op: 'formateur_maj', lead_id: l.id, valeurs: { competences: liste(el.competences.value), outils: liste(el.outils.value), secteurs: liste(el.secteurs.value), niveaux: $$('input[name="niveaux"]:checked', form).map((x) => Number(x.value)), zone: el.zone.value, tarif_jour: el.tarif_jour.value, distanciel: el.distanciel.checked, disponibilites: el.disponibilites.value, bio: el.bio.value, notes: el.notes.value } });
+        majFormateur(r);
+        fermerModale();
+        toast('Profil enregistré.');
+      });
+    });
+  });
+}
+function ouvrirDepotPiece(l) {
+  ouvrirModale(`<h2>Déposer une pièce pour ${esc(l.entreprise)}</h2>
+    ${champ('Pièce', `<select name="type">${[...PIECES_F, ['contrat', 'Contrat signé (ancien)'], ['autre', 'Autre pièce']].map(([k, v]) => `<option value="${k}">${esc(v)}</option>`).join('')}</select>`)}
+    ${champ('Fichier', '<input type="file" name="fichier" accept="application/pdf,image/*" required>', 'PDF ou photo, 3,4 Mo au plus. Claude la lit, puis tu la vérifies.')}
+    ${piedFormulaire('<button type="submit" class="btn primaire">Déposer</button>')}`, (form) => {
+    brancherAnnuler(form);
+    form.addEventListener('submit', (ev) => {
+      ev.preventDefault();
+      soumettre(form, async () => {
+        const fichier = form.elements.fichier.files[0];
+        if (!fichier) throw new ErreurApi('Choisis un fichier.');
+        const { donnees, nom } = await preparerFichier(fichier);
+        if (donnees.size > 3.4 * 1024 * 1024) throw new ErreurApi('Fichier trop lourd : 3,4 Mo au plus.');
+        const r = await api('POST', { op: 'piece_deposer', lead_id: l.id, type: form.elements.type.value, nom, base64: await enBase64(donnees) });
+        majFormateur(r);
+        fermerModale();
+        toast('Pièce déposée et lue.');
+      });
+    });
+  });
+}
+function ouvrirValiderFormateur(l) {
+  const ps = piecesDe(l.id);
+  const aVerifier = ps.filter((p) => p.etat === 'a_verifier');
+  const alertes = aVerifier.filter((p) => p.d.lecture && p.d.lecture.alertes && p.d.lecture.alertes.length);
+  ouvrirModale(`<h2>Valider ${esc(l.entreprise)} ?</h2>
+    <p>${aVerifier.length ? `Les ${aVerifier.length} pièce${aVerifier.length > 1 ? 's' : ''} encore « À vérifier » passeront en « Vérifiée » : tu confirmes les avoir regardées. ` : ''}Tu contresignes son contrat-cadre (Gabriel VANDERBECKEN, Président), et il pourra être positionné sur une mission.</p>
+    ${alertes.length ? `<div class="alerte-vocal"><b>Claude a signalé :</b><ul>${alertes.map((p) => `<li>${esc(p.titre)} : ${esc(p.d.lecture.alertes.join(' ; '))}</li>`).join('')}</ul></div>` : ''}
+    ${ps.some((p) => p.type === 'urssaf' && p.d && p.d.lecture && p.d.lecture.code_verification && p.etat === 'a_verifier') ? `<p class="aide">Pense à vérifier l'attestation URSSAF avec son code de sécurité sur <a href="${URSSAF_VERIF}" target="_blank" rel="noopener noreferrer">urssaf.fr</a> : c'est l'obligation de vigilance du contrat (article 13).</p>` : ''}
+    ${piedFormulaire('<button type="submit" class="btn primaire">Valider le formateur</button>')}`, (form) => {
+    brancherAnnuler(form);
+    form.addEventListener('submit', (ev) => {
+      ev.preventDefault();
+      soumettre(form, async () => {
+        const r = await api('POST', { op: 'formateur_valider', lead_id: l.id, tout_verifier: true });
+        majFormateur(r);
+        fermerModale();
+        toast('Formateur validé.');
+      });
+    });
+  });
+}
+async function ouvrirContratSigne(l) {
+  try {
+    const r = await api('GET', null, `?contrat=${l.id}`);
+    const s = r.signature;
+    ouvrirModale(`<h2>Contrat-cadre de ${esc(l.entreprise)}</h2>
+      <dl class="infos"><dt>Signé</dt><dd>le ${esc(instantLisible(s.date))} à ${esc(s.lieu)} par ${esc(s.nom)}, mention « ${esc(s.mention)} »</dd>
+        <dt>Preuve</dt><dd>adresse IP ${esc(s.ip)}, version ${esc(s.version)}, empreinte ${esc(String(s.empreinte).slice(0, 16))}… ${r.intact ? '(texte intact)' : '<b>(le texte ne correspond plus à l\'empreinte)</b>'}</dd>
+        ${r.contre_signature ? `<dt>Contresigné</dt><dd>le ${esc(instantLisible(r.contre_signature.date))} par ${esc(r.contre_signature.nom)}</dd>` : ''}</dl>
+      <pre class="texte-contrat">${esc(s.texte)}</pre>
+      <div class="pied"><button type="button" class="btn" data-fermer>Fermer</button></div>`, (form) => brancherAnnuler(form));
+  } catch (e) { toast(e.message); }
+}
+function ouvrirMotifPiece(id) {
+  ouvrirModale(`<h2>Pièce à refaire</h2>${champ('Ce qui ne va pas (le formateur le lit)', '<input type="text" name="motif" autofocus placeholder="Ex. attestation de plus de 6 mois, nom différent">')}${piedFormulaire('<button type="submit" class="btn primaire">Demander de la refaire</button>')}`, (form) => {
+    brancherAnnuler(form);
+    form.addEventListener('submit', (ev) => {
+      ev.preventDefault();
+      soumettre(form, async () => {
+        majFormateur(await api('POST', { op: 'document_verifier', id, statut: 'refuse', motif: form.elements.motif.value }));
+        fermerModale();
+        toast('Le formateur verra le motif dans son espace.');
+      });
+    });
+  });
+}
+function ouvrirNouveauFormateur() {
+  ouvrirModale(`<h2>Nouveau formateur</h2>
+    <div class="deux">${champ('Prénom', '<input type="text" name="prenom" required autofocus>')}${champ('Nom', '<input type="text" name="nom" required>')}</div>
+    <div class="deux">${champ('Email', '<input type="email" name="email">')}${champ('Téléphone', '<input type="tel" name="telephone">')}</div>
+    ${champ('Compétences', '<textarea name="competences" placeholder="Séparées par des virgules"></textarea>')}
+    ${champ('Zone', '<input type="text" name="zone" placeholder="Ex. Nancy et 100 km, distanciel">')}
+    ${piedFormulaire('<button type="submit" class="btn primaire">Créer la fiche</button>')}`, (form) => {
+    brancherAnnuler(form);
+    form.addEventListener('submit', (ev) => {
+      ev.preventDefault();
+      soumettre(form, async () => {
+        const el = form.elements;
+        const nom = `${el.prenom.value.trim()} ${el.nom.value.trim()}`.trim();
+        if (!el.prenom.value.trim() || !el.nom.value.trim()) throw new ErreurApi('Il faut le prénom et le nom.');
+        const { ligne: lead } = await api('POST', { op: 'creer', table: 'leads', valeurs: { entreprise: nom, type: 'formateur', statut: 'nouveau', source: 'Formateur', localisation: el.zone.value } });
+        await api('POST', { op: 'creer', table: 'contacts', valeurs: { lead_id: lead.id, prenom: el.prenom.value, nom: el.nom.value, email: el.email.value, telephone: el.telephone.value, principal: true } });
+        await api('POST', { op: 'formateur_maj', lead_id: lead.id, valeurs: { competences: el.competences.value.split(',').map((x) => x.trim()).filter(Boolean), zone: el.zone.value } });
+        fermerModale();
+        await actualiser();
+        ouvrirFiche(lead.id);
+        toast('Fiche formateur créée. Crée son lien d\'envoi quand tu veux.');
+      });
+    });
+  });
+}
+document.addEventListener('click', (ev) => {
+  const c = ev.target.closest('[data-copier]');
+  if (c) { navigator.clipboard.writeText(c.dataset.copier).then(() => toast('Copié.'), () => toast('Copie impossible : sélectionne le texte.')); return; }
+  const filtre = ev.target.closest('[data-filtre-f]');
+  if (filtre) { S.filtreF = filtre.dataset.filtreF; rendre(); }
+});
 
 /* ----- Les échanges d'un lead : ses fils Gmail, lus en entier ----- */
 
@@ -3622,6 +3949,17 @@ document.addEventListener('click', (ev) => {
   switch (act) {
     case 'ouvrir': S.journalEdition = false; return ouvrirFiche(leadId);
     case 'echanges': return ouvrirEchanges(leadId, cible.dataset.fil || null);
+    case 'formateur-nouveau': return ouvrirNouveauFormateur();
+    case 'formateur-lien': { const l = IDX.lead.get(leadId); return opFormateur({ op: 'formateur_lien', lead_id: leadId }).then((r) => { if (r && r.jeton) ouvrirLienFormateur(l, r); }); }
+    case 'formateur-profil': return ouvrirProfilFormateur(IDX.lead.get(leadId));
+    case 'formateur-valider': return ouvrirValiderFormateur(IDX.lead.get(leadId));
+    case 'formateur-siret': return opFormateur({ op: 'formateur_siret', lead_id: leadId }, 'SIRET revérifié.');
+    case 'formateur-refuser': { const f = dossierDe(leadId); if (f.statut !== 'refuse' && !confirm('Refuser ce formateur ? Son lien d\'envoi ne fonctionnera plus.')) return; return opFormateur({ op: 'formateur_refuser', lead_id: leadId, annuler: f.statut === 'refuse' }, f.statut === 'refuse' ? 'Dossier rouvert.' : 'Formateur refusé.'); }
+    case 'piece-deposer': return ouvrirDepotPiece(IDX.lead.get(leadId));
+    case 'contrat-voir': return ouvrirContratSigne(IDX.lead.get(leadId));
+    case 'piece-voir': return voirPiece(cible.closest('[data-doc]').dataset.doc);
+    case 'piece-ok': return opFormateur({ op: 'document_verifier', id: cible.closest('[data-doc]').dataset.doc, statut: 'verifie' }, 'Pièce vérifiée.');
+    case 'piece-refaire': return ouvrirMotifPiece(cible.closest('[data-doc]').dataset.doc);
     case 'recap': return faireRecap(leadId);
     case 'fermer-fiche': return $('#fiche').close();
     case 'email': return ouvrirEmail(leadId, cible.dataset.contact);

@@ -36,6 +36,10 @@
  *        Claude fait le récap de la relation (où on en est, ce qu'elle attend,
  *        chaleur, réactivité, ton, points à retenir, prochaine étape)
  *   GET  /api/crm?fil=<id Gmail>     les messages d'un fil lié au CRM, en entier
+ *   GET  /api/crm?document=<id>      une pièce d'un formateur (bucket privé), pour la regarder
+ *   POST { op: 'formateur_lien' | 'formateur_maj' | 'formateur_siret' | 'piece_deposer'
+ *          | 'document_verifier' | 'formateur_valider' | 'formateur_refuser', … }
+ *        le dossier des formateurs (voir api/_formateurs.js et api/formateur.js)
  *   GET  /api/crm?tache=synchro      la même synchro, lancée par Vercel Cron
  *        toutes les 15 minutes (en-tête Authorization: Bearer CRON_SECRET)
  *
@@ -72,6 +76,9 @@
 
 import { timingSafeEqual, randomBytes } from 'node:crypto';
 import Anthropic from '@anthropic-ai/sdk';
+import {
+  deposerPiece, empreinte as empreinteTexte, etatDossier, lireFichier, majStatut, nouveauJeton, verifierSiret, aujourdHui as aujourdHuiF,
+} from './_formateurs.js';
 
 // La rédaction par Claude peut prendre une quinzaine de secondes.
 export const maxDuration = 60;
@@ -433,7 +440,7 @@ async function emailsEnvoyesAujourdhui() {
 /* ---------- Opérations ---------- */
 
 async function lireTout() {
-  const [leads, contacts, activites, memos, modeles, reglages, { lignes: entrants }, { lignes: ecartes }] = await Promise.all([
+  const [leads, contacts, activites, memos, modeles, reglages, { lignes: entrants }, { lignes: ecartes }, formateurs, documents, programmes] = await Promise.all([
     toutLire('iae_crm_leads', 'entreprise.asc'),
     toutLire('iae_crm_contacts', 'principal.desc,created_at.asc'),
     toutLire('iae_crm_activites', 'date.desc'),
@@ -442,9 +449,13 @@ async function lireTout() {
     toutLire('iae_crm_reglages', 'cle.asc'),
     sb('iae_crm_entrants?select=*&statut=eq.a_trier&order=recu_le.desc&limit=100'),
     sb('iae_crm_entrants?select=id,recu_le,canal,de_email,de_nom,objet,fil,meta&statut=eq.ignore&order=recu_le.desc&limit=60'),
+    toutLire('iae_crm_formateurs', 'created_at.asc'),
+    sb('iae_crm_documents?select=id,created_at,lead_id,type,nom,mime,taille,depose_par,lecture,statut,motif,verifie_le,expire_le,archive&order=created_at.desc&limit=2000').then((x) => x.lignes),
+    toutLire('iae_crm_programmes', 'created_at.desc'),
   ]);
   return {
-    leads, contacts, activites, memos, modeles, entrants, ecartes,
+    leads, contacts, activites, memos, modeles, entrants, ecartes, documents, programmes,
+    formateurs: formateurs.map(({ jeton_hash: _h, signature, ...f }) => ({ ...f, signature: signature ? { nom: signature.nom, lieu: signature.lieu, date: signature.date, version: signature.version, empreinte: signature.empreinte, ip: signature.ip } : null })),
     reglages: Object.fromEntries(reglages.map((r) => [r.cle, r.valeur])),
     gmail: gmailConfigure(),
     agenda: gmailConfigure(),
@@ -495,6 +506,7 @@ async function operation(corps) {
   if (op === 'synchro') return synchroniser();
   if (op === 'entrant') return traiterEntrant(corps);
   if (op === 'recap') return recapLead(corps);
+  if (op && op.startsWith('formateur_') || op === 'piece_deposer' || op === 'document_verifier') return operationFormateur(corps);
   if (op === 'importer') return importer(corps);
   if (op === 'email') return envoyerEmail(corps);
   if (op === 'reglage') {
@@ -1198,6 +1210,113 @@ async function synchroEnvoyes(depuis, ann) {
   return n;
 }
 
+/* ---------- Les formateurs (dossier, pièces, validation) ---------- */
+
+const PROFIL_FORMATEUR = {
+  competences: 'tags', outils: 'tags', secteurs: 'tags', zone: T, distanciel: 'bool', tarif_jour: 'nombre', bio: L, disponibilites: T, notes: L, page_site: T,
+};
+async function ligneFormateur(leadId) {
+  if (!UUID_RE.test(leadId || '')) throw new Refus('id_invalide');
+  const [lead] = (await sb(`iae_crm_leads?id=eq.${leadId}&select=id,entreprise,type`)).lignes;
+  if (!lead) throw new Refus('introuvable', 404);
+  await sb('iae_crm_formateurs?on_conflict=lead_id', { methode: 'POST', corps: { lead_id: leadId }, prefer: 'resolution=ignore-duplicates,return=minimal' });
+  if (lead.type !== 'formateur') await sb(`iae_crm_leads?id=eq.${leadId}`, { methode: 'PATCH', corps: { type: 'formateur' }, prefer: 'return=minimal' });
+  const [f] = (await sb(`iae_crm_formateurs?lead_id=eq.${leadId}&select=*`)).lignes;
+  return { lead, f };
+}
+const sansSecret = ({ jeton_hash: _h, signature, ...f }) => ({ ...f, signature: signature ? { nom: signature.nom, lieu: signature.lieu, date: signature.date, version: signature.version, empreinte: signature.empreinte, ip: signature.ip } : null });
+async function retourFormateur(leadId) {
+  const [[f], { lignes: documents }, { lignes: [lead] }] = await Promise.all([
+    sb(`iae_crm_formateurs?lead_id=eq.${leadId}&select=*`).then((x) => x.lignes),
+    sb(`iae_crm_documents?lead_id=eq.${leadId}&select=id,created_at,lead_id,type,nom,mime,taille,depose_par,lecture,statut,motif,verifie_le,expire_le,archive&order=created_at.desc`),
+    sb(`iae_crm_leads?id=eq.${leadId}&select=*`),
+  ]);
+  return { formateur: f ? sansSecret(f) : null, documents, lead };
+}
+async function operationFormateur(corps) {
+  const op = corps.op;
+  if (op === 'document_verifier') {
+    if (!UUID_RE.test(corps.id || '')) throw new Refus('id_invalide');
+    const statut = ['verifie', 'refuse', 'a_verifier'].includes(corps.statut) ? corps.statut : null;
+    if (!statut) throw new Refus('valeur_invalide:statut');
+    const maj = { statut, motif: statut === 'refuse' ? (convertir(corps.motif ?? '', T, 'motif') || 'À refaire') : null, verifie_le: statut === 'verifie' ? new Date().toISOString() : null };
+    if (corps.expire_le !== undefined) maj.expire_le = convertir(corps.expire_le, 'date', 'expire_le');
+    const { lignes: [d] } = await sb(`iae_crm_documents?id=eq.${corps.id}`, { methode: 'PATCH', corps: maj, prefer: 'return=representation' });
+    if (!d) throw new Refus('introuvable', 404);
+    await majStatut(d.lead_id);
+    return retourFormateur(d.lead_id);
+  }
+  const { lead, f } = await ligneFormateur(corps.lead_id);
+  if (op === 'formateur_maj') {
+    const v = corps.valeurs || {};
+    const maj = {};
+    for (const [k, type] of Object.entries(PROFIL_FORMATEUR)) if (v[k] !== undefined) maj[k] = convertir(v[k], type, k);
+    if (v.niveaux !== undefined) maj.niveaux = (Array.isArray(v.niveaux) ? v.niveaux : []).map(Number).filter((n) => [1, 2, 3].includes(n));
+    if (Object.keys(maj).length) await sb(`iae_crm_formateurs?lead_id=eq.${lead.id}`, { methode: 'PATCH', corps: maj, prefer: 'return=minimal' });
+    return retourFormateur(lead.id);
+  }
+  if (op === 'formateur_lien') {
+    // Un nouveau lien remplace l'ancien ; la base ne garde que son empreinte.
+    const jeton = nouveauJeton();
+    const expire = new Date(Date.now() + 30 * 86400000).toISOString();
+    await sb(`iae_crm_formateurs?lead_id=eq.${lead.id}`, { methode: 'PATCH', corps: { jeton_hash: empreinteTexte(jeton), jeton_expire: expire, jeton_cree_le: new Date().toISOString() }, prefer: 'return=minimal' });
+    await inserer('activites', { lead_id: lead.id, type: 'note', resume: `Lien d'envoi du dossier formateur créé (valable jusqu'au ${new Date(expire).toLocaleDateString('fr-FR', { timeZone: 'Europe/Paris' })}).`, source: 'crm' });
+    await majStatut(lead.id);
+    return { jeton, expire, ...(await retourFormateur(lead.id)) };
+  }
+  if (op === 'formateur_siret') {
+    const v = await verifierSiret(corps.siret || f.siret);
+    const id = { ...(f.identite || {}) };
+    if (v.trouve) { if (!id.raison_sociale) id.raison_sociale = v.nom; if (!id.siege) id.siege = v.adresse; if (!id.forme && v.forme) id.forme = v.forme; }
+    await sb(`iae_crm_formateurs?lead_id=eq.${lead.id}`, { methode: 'PATCH', corps: { siret: v.siret, siret_verif: v, ...(f.signature ? {} : { identite: id }) }, prefer: 'return=minimal' });
+    await majStatut(lead.id);
+    return retourFormateur(lead.id);
+  }
+  if (op === 'piece_deposer') {
+    const doc = await deposerPiece({ f, leadId: lead.id, type: String(corps.type || ''), nom: corps.nom, base64: corps.base64, deposePar: 'gabriel' });
+    await inserer('activites', { lead_id: lead.id, type: 'note', resume: `Pièce déposée depuis le CRM : ${doc.nom}`.slice(0, 2000), source: 'crm' });
+    await majStatut(lead.id);
+    return retourFormateur(lead.id);
+  }
+  if (op === 'formateur_valider') {
+    // « Valider » : les pièces relues passent en vérifiées, puis le dossier doit être complet.
+    if (corps.tout_verifier === true) {
+      await sb(`iae_crm_documents?lead_id=eq.${lead.id}&archive=is.false&statut=eq.a_verifier`, { methode: 'PATCH', corps: { statut: 'verifie', verifie_le: new Date().toISOString() }, prefer: 'return=minimal' });
+    }
+    const { lignes: docs } = await sb(`iae_crm_documents?lead_id=eq.${lead.id}&select=*`);
+    const e = etatDossier(f, docs);
+    if (!e.verifie) throw new Refus('dossier_incomplet', 409);
+    await sb(`iae_crm_formateurs?lead_id=eq.${lead.id}`, { methode: 'PATCH', corps: { valide_le: new Date().toISOString(), contre_signature: { nom: 'Gabriel VANDERBECKEN', qualite: 'Président', date: new Date().toISOString(), version: f.signature && f.signature.version }, statut: 'valide' }, prefer: 'return=minimal' });
+    await inserer('activites', { lead_id: lead.id, type: 'statut', resume: 'Formateur validé : contrat contresigné, toutes les pièces vérifiées. Il peut être positionné sur une mission.', source: 'crm' });
+    await sb(`iae_crm_leads?id=eq.${lead.id}`, { methode: 'PATCH', corps: { prochaine_relance: null, prochaine_note: 'Formateur validé, prêt pour une mission.' }, prefer: 'return=minimal' });
+    return retourFormateur(lead.id);
+  }
+  if (op === 'formateur_refuser') {
+    await sb(`iae_crm_formateurs?lead_id=eq.${lead.id}`, { methode: 'PATCH', corps: { statut: corps.annuler ? 'en_cours' : 'refuse', jeton_hash: null, valide_le: corps.annuler ? f.valide_le : null }, prefer: 'return=minimal' });
+    await inserer('activites', { lead_id: lead.id, type: 'statut', resume: corps.annuler ? 'Dossier formateur rouvert.' : `Dossier formateur refusé${corps.motif ? ` : ${String(corps.motif).slice(0, 300)}` : ''}.`, source: 'crm' });
+    if (corps.annuler) await majStatut(lead.id);
+    return retourFormateur(lead.id);
+  }
+  throw new Refus('operation_inconnue');
+}
+// Chaque matin : les pièces qui expirent dans 15 jours, ou déjà expirées, deviennent des tâches.
+async function echeancesFormateurs() {
+  const { lignes: fs } = await sb('iae_crm_formateurs?select=*&valide_le=not.is.null');
+  let n = 0;
+  for (const f of fs) {
+    const { lignes: docs } = await sb(`iae_crm_documents?lead_id=eq.${f.lead_id}&select=*`);
+    const e = etatDossier(f, docs);
+    if (e.statut !== f.statut) { await majStatut(f.lead_id); n++; continue; }
+    if (!e.bientot.length) continue;
+    const [lead] = (await sb(`iae_crm_leads?id=eq.${f.lead_id}&select=entreprise,prochaine_relance,prochaine_note`)).lignes;
+    const note = `Demander à ${lead.entreprise} : ${e.bientot.map((b) => `${b.titre.toLowerCase()} (expire le ${b.expire_le.split('-').reverse().join('/')})`).join(', ')}.`;
+    if (lead.prochaine_note === note) continue;
+    await sb(`iae_crm_leads?id=eq.${f.lead_id}`, { methode: 'PATCH', corps: { prochaine_relance: aujourdHuiF(), prochaine_action: 'email', prochaine_note: note }, prefer: 'return=minimal' });
+    n++;
+  }
+  return n;
+}
+
 /* ---------- Le récap d'une relation ---------- */
 
 const SCHEMA_RECAP = {
@@ -1546,8 +1665,9 @@ async function rappelDuMatin(force = false) {
   if ((await lireReglage('rappel_matin')) === 'non') return { envoye: false, raison: 'desactive' };
   const dernier = await lireReglage('rappel_matin_envoye');
   if (!force && dernier && dernier.le === jour) return { envoye: false, raison: 'deja_envoye' };
-  // Un premier tour de boîte et d'agenda, pour que le récapitulatif soit à jour.
+  // Un premier tour de boîte et d'agenda, pour que le récapitulatif soit à jour, et les échéances des formateurs.
   await synchroniser().catch(() => null);
+  await echeancesFormateurs().catch((e) => console.error('crm échéances formateurs', e?.message || e));
   const [{ lignes: leads }, { lignes: contacts }, { lignes: entrants }] = await Promise.all([
     sb(`iae_crm_leads?select=id,entreprise,prochaine_relance,prochaine_action,prochaine_note,relances_sans_reponse&archive=is.false&prochaine_relance=lte.${jour}&order=prochaine_relance.asc,entreprise.asc`),
     sb('iae_crm_contacts?select=lead_id,prenom,nom,principal&order=principal.desc'),
@@ -1643,6 +1763,24 @@ export default async function handler(req, res) {
       const logo = params.get('logo');
       if (logo !== null) return envoyerLogo(res, logo);
       if (params.get('fil') !== null) return res.status(200).json(await filDuCrm(params.get('fil')));
+      if (params.get('document') !== null) {
+        const id = params.get('document');
+        if (!UUID_RE.test(id)) throw new Refus('id_invalide');
+        const [d] = (await sb(`iae_crm_documents?id=eq.${id}&select=chemin,mime,nom`)).lignes;
+        if (!d) throw new Refus('introuvable', 404);
+        const octets = await lireFichier(d.chemin);
+        res.setHeader('Content-Type', d.mime || 'application/octet-stream');
+        res.setHeader('Content-Disposition', `inline; filename*=UTF-8''${encodeURIComponent(d.nom)}`);
+        res.setHeader('X-Content-Type-Options', 'nosniff');
+        return res.status(200).send(octets);
+      }
+      if (params.get('contrat') !== null) {
+        const id = params.get('contrat');
+        if (!UUID_RE.test(id)) throw new Refus('id_invalide');
+        const [f] = (await sb(`iae_crm_formateurs?lead_id=eq.${id}&select=signature,contre_signature`)).lignes;
+        if (!f || !f.signature) throw new Refus('introuvable', 404);
+        return res.status(200).json({ signature: f.signature, contre_signature: f.contre_signature, intact: empreinteTexte(f.signature.texte) === f.signature.empreinte });
+      }
       return res.status(200).json(await lireTout());
     }
     let corps = req.body;
@@ -1661,7 +1799,7 @@ export default async function handler(req, res) {
     }
     return res.status(200).json(await operation(corps));
   } catch (e) {
-    if (e instanceof Refus) return res.status(e.statut).json({ erreur: e.code });
+    if (e instanceof Refus || (e && e.refus)) return res.status(e.statut || 400).json({ erreur: e.code });
     console.error('crm', e);
     return res.status(500).json({ erreur: 'erreur_interne' });
   }

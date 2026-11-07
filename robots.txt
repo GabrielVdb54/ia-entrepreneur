@@ -10,6 +10,7 @@ Disallow: /.git/
 Disallow: /.DS_Store
 Disallow: /quiz/
 Disallow: /crm/
+Disallow: /espace-formateur/
 Disallow: /rdv-confirme.html
 Disallow: /rendez-vous.html
 Disallow: /supabase/
