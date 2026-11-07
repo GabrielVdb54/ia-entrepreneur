@@ -1273,12 +1273,56 @@ function morceauxParole(texte) {
   if (cur.trim()) out.push(cur.trim());
   return out;
 }
+// Voix ElevenLabs quand le serveur l'a (D.voix) : bien plus naturelle que celle du navigateur.
+// Un seul lecteur audio, « déverrouillé » au clic qui lance l'oral (iPhone exige un geste pour le premier son).
+const LECTEUR = new Audio();
+const VOIX_CACHE = new Map();
+function deverrouillerAudio() {
+  if (!D || !D.voix || LECTEUR.dataset.ok) return;
+  const n = 400, o = new ArrayBuffer(44 + n), v = new DataView(o);
+  const ecrire = (i, t) => [...t].forEach((c, k) => v.setUint8(i + k, c.charCodeAt(0)));
+  ecrire(0, 'RIFF'); v.setUint32(4, 36 + n, true); ecrire(8, 'WAVEfmt '); v.setUint32(16, 16, true); v.setUint16(20, 1, true); v.setUint16(22, 1, true);
+  v.setUint32(24, 8000, true); v.setUint32(28, 8000, true); v.setUint16(32, 1, true); v.setUint16(34, 8, true); ecrire(36, 'data'); v.setUint32(40, n, true);
+  for (let i = 0; i < n; i++) v.setUint8(44 + i, 128);
+  LECTEUR.src = URL.createObjectURL(new Blob([o], { type: 'audio/wav' }));
+  LECTEUR.play().then(() => { LECTEUR.dataset.ok = '1'; }).catch(() => {});
+}
+async function audioPour(texte) {
+  if (VOIX_CACHE.has(texte)) return VOIX_CACHE.get(texte);
+  const r = await fetch(API, { method: 'POST', headers: { 'X-Cle-Crm': S.cle, 'Content-Type': 'application/json' }, body: JSON.stringify({ op: 'voix', texte }) });
+  if (!r.ok) throw new Error('voix');
+  const url = URL.createObjectURL(await r.blob());
+  if (texte.length <= 80) VOIX_CACHE.set(texte, url);
+  return url;
+}
 function parler(texte, ensuite) {
   const jeton = ++paroleJeton;
   let fait = false;
   let garde = null;
   const fin = () => { if (fait || jeton !== paroleJeton) return; fait = true; clearTimeout(garde); if (ensuite) ensuite(); };
-  if (!window.speechSynthesis || !texte) { fin(); return; }
+  if (!texte) { fin(); return; }
+  if (D && D.voix && !S.voixNavigateur) {
+    if (window.speechSynthesis) speechSynthesis.cancel();
+    LECTEUR.pause();
+    garde = setTimeout(fin, 15000 + String(texte).length * 90);
+    // La voix ElevenLabs ne répond pas ou le son ne se lit pas : la voix du navigateur prend le relais pour toute la séance.
+    const secours = () => {
+      if (fait || jeton !== paroleJeton) return;
+      S.voixNavigateur = true;
+      clearTimeout(garde);
+      fait = true;
+      parler(texte, ensuite);
+    };
+    audioPour(String(texte)).then((url) => {
+      if (jeton !== paroleJeton) return;
+      LECTEUR.onended = fin;
+      LECTEUR.onerror = secours;
+      LECTEUR.src = url;
+      return LECTEUR.play();
+    }).catch(secours);
+    return;
+  }
+  if (!window.speechSynthesis) { fin(); return; }
   speechSynthesis.cancel();
   const morceaux = morceauxParole(texte);
   garde = setTimeout(fin, 3000 + String(texte).length * 85);
@@ -1334,7 +1378,7 @@ function ecouter(surTexte, surFin, { longue = false } = {}) {
   ecouteEnCours = r;
   try { r.start(); } catch { erreur = 'demarrage'; finir(); }
 }
-function arreterVocal() { paroleJeton++; if (window.speechSynthesis) speechSynthesis.cancel(); arreterEcoute(); }
+function arreterVocal() { paroleJeton++; if (window.speechSynthesis) speechSynthesis.cancel(); LECTEUR.pause(); arreterEcoute(); }
 
 function texteFiche(l) {
   const c = contactPrincipal(l.id);
@@ -4032,6 +4076,7 @@ document.addEventListener('click', (ev) => {
   else if (sorte === 'fermer') { $('#session').close(); }
   else if (sorte === 'vocal') {
     s.vocal = !s.vocal;
+    if (s.vocal) deverrouillerAudio();
     s.luPour = null;
     s.pause = false;
     s.etat = null;
@@ -4264,6 +4309,7 @@ document.addEventListener('click', (ev) => {
   if (!b || !S.dusDuJour) return;
   const titres = { tout: 'Relances du jour', email: 'Emails du jour', appel: 'Appels du jour', autre: 'Le reste du jour' };
   const vocal = b.hasAttribute('data-a-la-voix');
+  if (vocal) deverrouillerAudio();
   demarrerSession(S.dusDuJour[b.dataset.enchainer] || [], vocal ? 'Relances du jour, à la voix' : titres[b.dataset.enchainer], { vocal });
 });
 

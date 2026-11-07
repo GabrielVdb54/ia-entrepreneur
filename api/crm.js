@@ -37,6 +37,8 @@
  *        chaleur, réactivité, ton, points à retenir, prochaine étape)
  *   GET  /api/crm?fil=<id Gmail>     les messages d'un fil lié au CRM, en entier
  *   GET  /api/crm?document=<id>      une pièce d'un formateur (bucket privé), pour la regarder
+ *   POST { op: 'voix', texte }       le mode oral lu par ElevenLabs (ELEVENLABS_API_KEY,
+ *        ELEVENLABS_VOIX, ELEVENLABS_MODELE) ; sans clé, la page garde la voix du navigateur
  *   POST { op: 'formateur_lien' | 'formateur_maj' | 'formateur_siret' | 'piece_deposer'
  *          | 'document_verifier' | 'formateur_valider' | 'formateur_refuser', … }
  *        le dossier des formateurs (voir api/_formateurs.js et api/formateur.js)
@@ -465,6 +467,7 @@ async function lireTout() {
     gmail: gmailConfigure(),
     agenda: gmailConfigure(),
     ia: Boolean(process.env.ANTHROPIC_API_KEY),
+    voix: Boolean(process.env.ELEVENLABS_API_KEY),
     expediteur: COMPTE,
     aujourdhui: aujourdHuiParis(),
   };
@@ -1758,6 +1761,41 @@ async function traiterEntrant(corps) {
   return { lead_id: lead.id };
 }
 
+/* ---------- La voix du mode oral (ElevenLabs) ---------- */
+
+const VOIX_DEFAUT = 'JBFqnCBsd6RMkjVDRZzb'; // voix multilingue d'ElevenLabs, à remplacer par une voix française (ELEVENLABS_VOIX)
+const passagesVoix = new Map();
+async function envoyerVoix(res, corps, ip) {
+  if (!process.env.ELEVENLABS_API_KEY) throw new Refus('voix_non_configuree', 503);
+  const t = Date.now();
+  const p = passagesVoix.get(ip) || { n: 0, debut: t };
+  if (t - p.debut > 10 * 60 * 1000) { p.n = 0; p.debut = t; }
+  p.n++;
+  passagesVoix.set(ip, p);
+  if (p.n > 400) throw new Refus('ia_trop_de_demandes', 429);
+  const texte = String(corps.texte || '').replace(/\s+/g, ' ').trim().slice(0, 1500);
+  if (!texte) throw new Refus('message_invalide');
+  const voix = /^[A-Za-z0-9]{10,40}$/.test(process.env.ELEVENLABS_VOIX || '') ? process.env.ELEVENLABS_VOIX : VOIX_DEFAUT;
+  let r;
+  try {
+    r = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${voix}?output_format=mp3_44100_64`, {
+      method: 'POST',
+      headers: { 'xi-api-key': process.env.ELEVENLABS_API_KEY, 'Content-Type': 'application/json', Accept: 'audio/mpeg' },
+      body: JSON.stringify({ text: texte, model_id: process.env.ELEVENLABS_MODELE || 'eleven_flash_v2_5', language_code: 'fr' }),
+      signal: AbortSignal.timeout(20000),
+    });
+  } catch {
+    throw new Refus('voix_injoignable', 502);
+  }
+  if (!r.ok) {
+    console.error('crm voix', r.status, (await r.text()).slice(0, 200));
+    throw new Refus(r.status === 401 ? 'voix_cle' : r.status === 429 ? 'ia_trop_de_demandes' : 'voix_erreur', r.status === 429 ? 429 : 502);
+  }
+  res.setHeader('Content-Type', r.headers.get('content-type') || 'audio/mpeg');
+  res.setHeader('Cache-Control', 'no-store');
+  return res.status(200).send(Buffer.from(await r.arrayBuffer()));
+}
+
 /* ---------- Fonction orale ---------- */
 
 const SCHEMA_VOCAL = {
@@ -1966,7 +2004,7 @@ export default async function handler(req, res) {
     if (req.method === 'GET') {
       const params = new URL(req.url, 'http://local').searchParams;
       const logo = params.get('logo');
-      if (logo !== null) return envoyerLogo(res, logo);
+      if (logo !== null) return await envoyerLogo(res, logo);
       if (params.get('fil') !== null) return res.status(200).json(await filDuCrm(params.get('fil')));
       if (params.get('document') !== null) {
         const id = params.get('document');
@@ -2000,6 +2038,7 @@ export default async function handler(req, res) {
     }
     if (corps && corps.op === 'rediger') return res.status(200).json(await rediger(corps, ip));
     if (corps && corps.op === 'vocal') return res.status(200).json(await interpreterVocal(corps, ip));
+    if (corps && corps.op === 'voix') return await envoyerVoix(res, corps, ip);
     if (corps && ['programme_generer', 'programme_recommander'].includes(corps.op)) {
       if (tropDeRedactions(ip)) throw new Refus('ia_trop_de_demandes', 429);
       return res.status(200).json(await operationProgramme(corps));
