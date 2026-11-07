@@ -1178,16 +1178,60 @@ async function synchroGmail() {
 }
 
 // Tes emails envoyés depuis Gmail : dans l'historique, et ils règlent la tâche de leur fil.
+// Un email envoyé règle-t-il la tâche du lead ? Si la tâche vient du fil de cet email, oui. Sinon (tâche écrite à la main,
+// décalée, étape du suivi client…), Claude compare la tâche et l'email. Gabriel, 07/11 : « j'ai répondu à Sarah et
+// Anne-Marie, comment ça se fait que le CRM voit toujours ces relances ? ne serait-il pas possible qu'il le détecte ? »
+const SCHEMA_TACHE_FAITE = {
+  type: 'object',
+  additionalProperties: false,
+  properties: {
+    tache: { type: 'string', enum: ['faite', 'en_partie', 'sans_rapport'] },
+    reste: { type: 'string' },
+    attente: { type: 'string' },
+  },
+  required: ['tache', 'reste', 'attente'],
+};
+const CONSIGNES_TACHE_FAITE = `Tu tiens le CRM de Gabriel Vanderbecken (IA-Entrepreneur, formations à l'IA pour les entreprises). On te donne la tâche prévue sur une fiche, c'est-à-dire ce que Gabriel devait faire, et un email qu'il vient d'envoyer à un contact de cette fiche. Dis si cet email fait la tâche.
+- faite : l'email fait tout ce que la tâche demande. Une pièce jointe annoncée dans l'email (« vous trouverez la facture en pièce jointe ») compte comme envoyée.
+- en_partie : l'email fait une partie de la tâche seulement.
+- sans_rapport : l'email parle d'autre chose, ou il ne fait rien de ce que la tâche demande.
+reste : pour en_partie seulement, ce qui manque, en une phrase qui commence par un verbe à l'infinitif (« Envoyer la facture de la mission de Gilles. »). Vide sinon.
+attente : ce que Gabriel attend maintenant du destinataire, en une phrase courte (« Sarah doit dire où se trouve sa cliente. »). Vide s'il n'attend rien.
+Écris en français. N'invente rien qui ne soit pas dans la tâche ou dans l'email.`;
+async function tacheFaite(lead, { objet, texte, dest, jour }) {
+  if (!process.env.ANTHROPIC_API_KEY || !lead.prochaine_relance || !lead.prochaine_note || !texte) return null;
+  try {
+    const r = await appelClaude({
+      consignes: CONSIGNES_TACHE_FAITE,
+      schema: SCHEMA_TACHE_FAITE,
+      max: 1500,
+      timeout: 30000,
+      contenu: `Fiche : ${lead.entreprise}\nTâche prévue (${lead.prochaine_action || 'autre'}, pour le ${dateCourte(lead.prochaine_relance)}) : ${lead.prochaine_note}\n\nEmail envoyé le ${dateCourte(jour)} à ${dest.join(', ')}, objet « ${objet} » :\n${texte.slice(0, 6000)}`,
+    });
+    return ['faite', 'en_partie', 'sans_rapport'].includes(r?.tache) ? r : null;
+  } catch (e) {
+    console.error('crm tache faite', e.code || e.message);
+    return null;
+  }
+}
+const SUITE_TACHE = { faite: ' · tâche faite', en_partie: ' · tâche faite en partie' };
+
 async function synchroEnvoyes(depuis, ann) {
   const liste = await google(`${GMAIL}/messages?maxResults=30&q=${encodeURIComponent(`in:sent after:${depuis}`)}`);
   const ids = (liste.messages || []).map((m) => m.id).filter((id) => /^[0-9a-f]+$/i.test(id));
   if (!ids.length) return 0;
   const deja = new Set((await sb(`iae_crm_activites?select=meta&meta->>gmail_id=in.(${ids.join(',')})`)).lignes.map((x) => x.meta.gmail_id));
   const parEmail = new Map(ann.contacts.filter((c) => c.email).map((c) => [c.email.toLowerCase(), c]));
-  let n = 0;
+  const messages = [];
   for (const id of ids.filter((x) => !deja.has(x))) {
     const m = await google(`${GMAIL}/messages/${id}?format=full`);
-    if ((m.labelIds || []).includes('DRAFT')) continue;
+    if (!(m.labelIds || []).includes('DRAFT')) messages.push(m);
+  }
+  // Dans l'ordre d'envoi : deux réponses du même jour règlent la tâche l'une après l'autre.
+  messages.sort((a, b) => Number(a.internalDate || 0) - Number(b.internalDate || 0));
+  let n = 0;
+  for (const m of messages) {
+    const id = m.id;
     const h = enTetes(m);
     const dest = [...listeAdresses(h.to), ...listeAdresses(h.cc)];
     const c = dest.map((e) => parEmail.get(e)).find(Boolean);
@@ -1201,15 +1245,28 @@ async function synchroEnvoyes(depuis, ann) {
     const objet = String(h.subject || '(sans objet)').slice(0, 300);
     const quand = new Date(Number(m.internalDate) || Date.now()).toISOString();
     const jour = jourParis(quand);
-    await sb('iae_crm_activites', {
-      methode: 'POST', prefer: 'return=minimal',
-      corps: { lead_id: leadId, contact_id: c?.id || null, date: quand, type: 'email_envoye', resume: `Email envoyé depuis Gmail : « ${objet} »`.slice(0, 2000), contenu: sansCitation(partieTexte(m.payload)).slice(0, 8000) || null, source: 'gmail iae', meta: { gmail_id: id, fil: m.threadId, objet, a: dest.join(', ') } },
-    });
+    const texte = sansCitation(partieTexte(m.payload)).slice(0, 8000);
     const maj = {};
     if (!lead.dernier_contact || lead.dernier_contact < jour) maj.dernier_contact = jour;
+    let verdict = null;
     if (lead.tache_fil && lead.tache_fil === m.threadId) {
+      verdict = 'faite';
       Object.assign(maj, { prochaine_relance: dansJoursOuvres(3), prochaine_action: 'email', prochaine_note: `Tu as répondu le ${dateCourte(jour)} (« ${objet} ») : relancer s'il n'y a pas de réponse.`.slice(0, 2000), tache_fil: null, relances_sans_reponse: 0 });
+    } else {
+      const r = await tacheFaite(lead, { objet, texte, dest, jour });
+      verdict = r?.tache || null;
+      const attente = String(r?.attente || '').trim().replace(/\.$/, '');
+      const reste = String(r?.reste || '').trim();
+      if (verdict === 'faite') {
+        Object.assign(maj, { prochaine_relance: dansJoursOuvres(3), prochaine_action: 'email', prochaine_note: `Tu as écrit le ${dateCourte(jour)} (« ${objet} »)${attente ? ` : ${attente}` : ''}. Relancer s'il n'y a pas de réponse.`.slice(0, 2000), tache_fil: null, relances_sans_reponse: 0 });
+      } else if (verdict === 'en_partie' && reste) {
+        maj.prochaine_note = `Fait le ${dateCourte(jour)} par email (« ${objet} »). Reste : ${reste}`.slice(0, 2000);
+      }
     }
+    await sb('iae_crm_activites', {
+      methode: 'POST', prefer: 'return=minimal',
+      corps: { lead_id: leadId, contact_id: c?.id || null, date: quand, type: 'email_envoye', resume: `Email envoyé depuis Gmail : « ${objet} »${SUITE_TACHE[verdict] || ''}`.slice(0, 2000), contenu: texte || null, source: 'gmail iae', meta: { gmail_id: id, fil: m.threadId, objet, a: dest.join(', '), tache: verdict } },
+    });
     if (Object.keys(maj).length) {
       await sb(`iae_crm_leads?id=eq.${leadId}`, { methode: 'PATCH', prefer: 'return=minimal', corps: maj });
       Object.assign(lead, maj);
