@@ -873,7 +873,8 @@ const listeAdresses = (v) => String(v || '').split(/,(?=(?:[^"]*"[^"]*")*[^"]*$)
 function fichiersJoints(p, out = []) {
   const dispo = String((p?.headers || []).find((x) => x.name.toLowerCase() === 'content-disposition')?.value || '');
   const signature = /^image\//i.test(p?.mimeType || '') && /^inline/i.test(dispo);
-  if (p?.filename && p.body?.attachmentId && !signature && !/^(image\d*|\d+_\d+|outlook-\w+)\.(png|jpe?g|gif)$/i.test(p.filename)) {
+  const invitation = /^(text\/calendar|application\/ics)$/i.test(p?.mimeType || '') || /\.ics$/i.test(p?.filename || '');
+  if (p?.filename && p.body?.attachmentId && !signature && !invitation && !/^(image\d*|\d+_\d+|outlook-\w+)\.(png|jpe?g|gif)$/i.test(p.filename)) {
     out.push({ nom: p.filename.slice(0, 200), type: String(p.mimeType || '').slice(0, 100), taille: Number(p.body.size) || 0, partie: String(p.partId || ''), att: p.body.attachmentId });
   }
   for (const q of p?.parts || []) fichiersJoints(q, out);
@@ -950,9 +951,10 @@ async function boiteDuLead(leadId) {
     if (/^[0-9a-f]{6,32}$/i.test(f || '') && fils.size < 40) fils.set(f, true);
   }
   const lus = await Promise.all([...fils.keys()].map(async (fil) => {
+    // Les fils que Gmail dit « avec pièce jointe » sont lus en entier, pour écarter signatures et invitations d'agenda.
     let t;
     try {
-      t = await google(`${GMAIL}/threads/${fil}?format=metadata&metadataHeaders=Subject&metadataHeaders=From&metadataHeaders=To&metadataHeaders=Cc`);
+      t = await google(`${GMAIL}/threads/${fil}?${avecPj.has(fil) ? 'format=full' : 'format=metadata&metadataHeaders=Subject&metadataHeaders=From&metadataHeaders=To&metadataHeaders=Cc'}`);
     } catch {
       return null;
     }
@@ -969,7 +971,7 @@ async function boiteDuLead(leadId) {
     return {
       fil, objet: String(enTetes(ms[0]).subject || h.subject || '').slice(0, 300), dernier: new Date(Number(dernier.internalDate) || Date.now()).toISOString(), n: ms.length,
       extrait: texteBrut(dernier.snippet).slice(0, 220), dernier_moi: de.email === COMPTE, dernier_de: de.nom || de.email,
-      avec: [...avec].slice(0, 6), pj: avecPj.has(fil) || ms.some((m) => m.payload?.mimeType === 'multipart/mixed'),
+      avec: [...avec].slice(0, 6), pj: avecPj.has(fil) && ms.some((m) => fichiersJoints(m.payload).length > 0),
       non_lu: ms.some((m) => (m.labelIds || []).includes('UNREAD')), tache: fil === lead.tache_fil,
     };
   }));
