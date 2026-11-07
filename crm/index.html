@@ -307,6 +307,17 @@
   .analyse .meta { display: block; margin-top: 2px; }
   .ecartes { margin-top: 28px; border-top: 1px solid var(--line); padding-top: 12px; }
   .tete-vue { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; flex-wrap: wrap; }
+  .programme h4 { color: var(--primary); margin: 14px 0 4px; font-size: 15px; }
+  .programme h5 { margin: 8px 0 2px; font-size: 14px; }
+  .programme ul { margin: 4px 0 4px 18px; }
+  .programme .pratique { font-style: italic; color: var(--muted); font-size: 14px; }
+  .programme .sous-titre-prog { color: var(--muted); }
+  .reco { list-style: none; padding: 0; margin: 8px 0 0; display: flex; flex-direction: column; gap: 10px; counter-reset: reco; }
+  .reco > li { border: 1px solid var(--line); border-radius: 12px; padding: 12px; font-size: 14px; display: flex; flex-direction: column; gap: 6px; }
+  .reco .tete { display: flex; flex-wrap: wrap; gap: 8px; align-items: baseline; }
+  .reco .score { margin-left: auto; font-weight: 800; color: var(--primary); }
+  .reco ul { margin: 0 0 0 18px; }
+  .reco .a-verifier { color: #874A08; }
   .statut.f-valide { background: var(--accent-soft); color: var(--accent-dark); border-color: transparent; }
   .statut.f-verifier { background: #FEF1DC; color: #874A08; border-color: transparent; }
   .statut.f-cours { background: var(--primary-soft); color: var(--primary); border-color: transparent; }
@@ -574,6 +585,12 @@ const ERREURS = {
   reseau: 'Pas de connexion. Ta saisie est gardée, réessaie quand le réseau revient.',
   ia_non_configuree: "La rédaction automatique n'est pas branchée sur le serveur.",
   google_acces: "Gmail refuse l'accès : il faut reconnecter la boîte dans les réglages Google.",
+  formateur_non_valide: "Ce formateur n'est pas encore validé : son dossier doit être complet et vérifié avant de le positionner sur une mission.",
+  programme_invalide: 'Le programme est incomplet : il faut au moins un titre.',
+  dossier_incomplet: "Le dossier n'est pas complet : il manque des pièces, la signature ou un SIRET actif.",
+  fichier_trop_lourd: 'Fichier trop lourd : 3,4 Mo au plus.',
+  format_refuse: 'Format non accepté : PDF, JPEG ou PNG.',
+  stockage_indisponible: "Le stockage des pièces ne répond pas. Réessaie dans un instant.",
   google_erreur: "Gmail n'a pas répondu. Réessaie dans un instant.",
   introuvable: "Introuvable : il a peut-être été supprimé.",
   ia_trop_de_demandes: 'Beaucoup de rédactions en peu de temps : réessaie dans une minute.',
@@ -759,6 +776,8 @@ function indexer() {
   IDX.activites = new Map();
   for (const a of D.activites) { if (!IDX.activites.has(a.lead_id)) IDX.activites.set(a.lead_id, []); IDX.activites.get(a.lead_id).push(a); }
   IDX.formateur = new Map((D.formateurs || []).map((f) => [f.lead_id, f]));
+  IDX.programmes = new Map();
+  for (const pr of (D.programmes || []).slice().sort((a, b) => (a.created_at < b.created_at ? 1 : -1))) { if (!IDX.programmes.has(pr.lead_id)) IDX.programmes.set(pr.lead_id, []); IDX.programmes.get(pr.lead_id).push(pr); }
   IDX.documents = new Map();
   for (const d of D.documents || []) { if (!IDX.documents.has(d.lead_id)) IDX.documents.set(d.lead_id, []); IDX.documents.get(d.lead_id).push(d); }
 }
@@ -1074,7 +1093,7 @@ function rendreFiche() {
       </div>
     </section>
     ${blocRecap(l)}
-    ${l.type === 'formateur' ? blocDossierFormateur(l) : ''}
+    ${l.type === 'formateur' ? blocDossierFormateur(l) : blocProgramme(l)}
     <section class="bloc">
       <h3>Contacts <button type="button" class="btn petit" data-act="contact-nouveau">Ajouter</button></h3>
       ${cs.map((c) => `<div class="contact">
@@ -1866,6 +1885,218 @@ document.addEventListener('click', (ev) => {
   if (c) { navigator.clipboard.writeText(c.dataset.copier).then(() => toast('Copié.'), () => toast('Copie impossible : sélectionne le texte.')); return; }
   const filtre = ev.target.closest('[data-filtre-f]');
   if (filtre) { S.filtreF = filtre.dataset.filtreF; rendre(); }
+});
+
+/* ----- Programme de formation (rédigé par Claude, validé par Gabriel) et formateurs recommandés ----- */
+
+const FORMATS_PROG = { presentiel: 'en présentiel', distanciel: 'à distance', mixte: 'en présentiel et à distance' };
+function blocProgramme(l) {
+  const ps = IDX.programmes.get(l.id) || [];
+  const pr = ps[0];
+  if (!pr) {
+    if (!D.ia) return '';
+    return `<section class="bloc"><h3>Programme de formation <button type="button" class="btn petit" data-act="programme-generer">Rédiger le programme</button></h3>
+      <p class="aide">Claude le rédige d'après le besoin, le récap et vos échanges, au format de tes programmes types (sans prix ni formateur). Tu le relis, tu le modifies, tu le valides : les formateurs adaptés s'affichent alors.</p></section>`;
+  }
+  const choisi = pr.formateur_id && IDX.lead.get(pr.formateur_id);
+  const reco = (pr.recommandations && pr.recommandations.liste) || [];
+  return `<section class="bloc"><h3>Programme de formation <span class="statut ${pr.statut === 'valide' ? 'f-valide' : 'f-verifier'}">${pr.statut === 'valide' ? 'Validé' : 'Brouillon'}</span></h3>
+    <p><b>${esc(pr.titre)}</b><br><span class="meta">${esc([pr.contenu && pr.contenu.duree, pr.parametres && FORMATS_PROG[pr.parametres.format]].filter(Boolean).join(', '))}, ${pr.statut === 'valide' ? `validé le ${esc(dateCourte(String(pr.valide_le).slice(0, 10)))}` : `rédigé le ${esc(dateCourte(String(pr.created_at).slice(0, 10)))}`}${ps.length > 1 ? `, ${ps.length} versions` : ''}</span></p>
+    ${choisi ? `<p>Formateur choisi : <b>${esc(choisi.entreprise)}</b></p>` : reco.length ? `<p class="meta">Recommandés : ${reco.slice(0, 3).map((x) => `${esc(x.nom)} (${x.score})`).join(', ')}</p>` : ''}
+    <div class="actions"><button type="button" class="btn${pr.statut !== 'valide' ? ' primaire' : ''}" data-act="programme-ouvrir" data-programme="${pr.id}">Ouvrir</button>
+      ${pr.statut === 'valide' ? `<button type="button" class="btn${choisi ? '' : ' primaire'}" data-act="programme-ouvrir" data-programme="${pr.id}" data-reco="1">Formateurs recommandés</button>` : ''}
+      ${D.ia ? '<button type="button" class="btn" data-act="programme-generer">Nouvelle version</button>' : ''}</div>
+  </section>`;
+}
+function ouvrirGenererProgramme(l) {
+  const besoin = [l.besoin, l.recap && l.recap.attentes].filter(Boolean).join('\n');
+  const deviner = /niveau\s*3|automatis|n8n|make|agent/i.test(besoin) ? 3 : /niveau\s*2|m[ée]tier|copilot|365|crm/i.test(besoin) ? 2 : 1;
+  ouvrirModale(`<h2>Programme pour ${esc(l.entreprise)}</h2>
+    <p class="aide">Claude part du besoin, du récap et des derniers échanges. Tu relis et tu modifies ensuite.</p>
+    <div class="deux">${champ('Niveau', `<select name="niveau">${[[1, 'Niveau 1, acculturation'], [2, 'Niveau 2, IA métier'], [3, 'Niveau 3, automatisation'], [0, 'Sur mesure']].map(([k, v]) => `<option value="${k}" ${k === deviner ? 'selected' : ''}>${v}</option>`).join('')}</select>`)}${champ('Durée (jours)', `<input type="text" inputmode="decimal" name="jours" value="${deviner}">`, '1 jour = 7 heures.')}</div>
+    <div class="deux">${champ('Format', `<select name="format">${[['presentiel', 'Présentiel'], ['distanciel', 'À distance'], ['mixte', 'Présentiel et distance']].map(([k, v]) => `<option value="${k}">${v}</option>`).join('')}</select>`)}${champ('Participants', '<input type="text" inputmode="numeric" name="participants" placeholder="12 au plus">')}</div>
+    ${champ('Lieu', `<input type="text" name="lieu" value="${esc(l.localisation || '')}">`)}
+    ${champ('Outils du client', '<input type="text" name="outils" placeholder="Microsoft 365, Google Workspace, leur CRM…">')}
+    ${champ('Attentes et objectifs', `<textarea name="attentes">${esc(besoin)}</textarea>`)}
+    ${champ('Consigne (facultatif)', '<input type="text" name="consigne" placeholder="Ex. insister sur la prospection, deux demi-journées à distance">')}
+    ${piedFormulaire('<button type="submit" class="btn primaire">Rédiger</button>')}`, (form) => {
+    brancherAnnuler(form);
+    form.addEventListener('submit', (ev) => {
+      ev.preventDefault();
+      const el = form.elements;
+      const bouton = $('[type="submit"]', form);
+      soumettre(form, async () => {
+        bouton.textContent = 'Claude rédige (30 secondes environ)…';
+        const r = await api('POST', { op: 'programme_generer', lead_id: l.id, niveau: Number(el.niveau.value), jours: el.jours.value, format: el.format.value, participants: el.participants.value, lieu: el.lieu.value, outils: el.outils.value, attentes: el.attentes.value, consigne: el.consigne.value });
+        D.programmes = [r.programme, ...(D.programmes || [])];
+        await actualiser();
+        ouvrirProgramme(r.programme.id);
+      });
+    });
+  });
+}
+const lignesDe = (t) => String(t || '').split('\n').map((x) => x.replace(/^[\s\-•*]+/, '').trim()).filter(Boolean);
+function htmlProgramme(c, { interne = true } = {}) {
+  return `<p class="sous-titre-prog">${esc(c.sous_titre)}</p>
+    <dl class="infos"><dt>Public</dt><dd>${esc(c.public)}</dd><dt>Prérequis</dt><dd>${esc(c.prerequis)}</dd><dt>Durée</dt><dd>${esc(c.duree)}</dd><dt>Modalités</dt><dd>${esc(c.modalites)}</dd></dl>
+    <h4>Objectifs</h4><p>À l'issue de la formation, les participants seront capables de :</p><ul>${(c.objectifs || []).map((x) => `<li>${esc(x)}</li>`).join('')}</ul>
+    <h4>Programme</h4>${(c.seances || []).map((x) => `<div class="seance"><h5>${esc(x.titre)}</h5><ul>${(x.contenus || []).map((y) => `<li>${esc(y)}</li>`).join('')}</ul>${x.pratique ? `<p class="pratique">En pratique : ${esc(x.pratique)}</p>` : ''}</div>`).join('')}
+    <h4>Méthodes</h4><p>${esc(c.methodes)}</p>
+    <h4>Évaluation</h4><p>${esc(c.evaluation)}</p>
+    ${c.livrables ? `<h4>Ce que les participants emportent</h4><p>${esc(c.livrables)}</p>` : ''}
+    <h4>Accessibilité</h4><p>${esc(c.accessibilite)}</p>
+    <h4>Délai d'accès</h4><p>${esc(c.delai_acces)}</p>
+    ${interne && (c.competences_formateur || []).length ? `<h4>Compétences attendues du formateur <span class="meta">(interne)</span></h4><ul class="etiquettes">${c.competences_formateur.map((x) => `<li>${esc(x)}</li>`).join('')}</ul>` : ''}`;
+}
+function htmlReco(pr) {
+  const r = pr.recommandations;
+  if (!r) return '';
+  if (!r.liste.length) return '<h3 class="sous-groupe">Formateurs recommandés</h3><p class="vide">Aucun formateur dans le CRM pour l\'instant : ajoute-les dans l\'onglet Formateurs.</p>';
+  return `<h3 class="sous-groupe">Formateurs recommandés <span class="meta">le ${esc(instantLisible(r.le))}</span></h3>
+    ${r.liste.some((x) => !x.positionnable) ? '<p class="aide">Un formateur dont le dossier n\'est pas validé ne peut pas être choisi : envoie-lui d\'abord son lien d\'envoi depuis sa fiche.</p>' : ''}
+    <ol class="reco">${r.liste.map((x) => {
+      const [lib, cls] = STATUTS_F[x.statut] || [x.statut, ''];
+      const choisi = pr.formateur_id === x.lead_id;
+      return `<li data-formateur="${x.lead_id}">
+        <div class="tete"><b>${esc(x.nom)}</b> <span class="statut ${cls}">${esc(lib)}</span> <span class="score" title="Adéquation au programme">${x.score}/100</span></div>
+        <ul>${x.raisons.map((y) => `<li>${esc(y)}</li>`).join('')}</ul>
+        ${x.a_verifier.length ? `<p class="a-verifier">À vérifier : ${esc(x.a_verifier.join(' ; '))}</p>` : ''}
+        <div class="actions">${choisi ? '<span class="statut f-valide">Choisi</span>' : x.positionnable ? '<button type="button" class="btn petit primaire" data-prog-act="choisir">Choisir</button>' : '<button type="button" class="btn petit" disabled>Dossier à valider d\'abord</button>'}
+          ${x.positionnable ? '<button type="button" class="btn petit" data-prog-act="proposer">Lui proposer la mission</button>' : ''}
+          <button type="button" class="btn petit lien" data-prog-act="fiche">Sa fiche</button></div>
+      </li>`;
+    }).join('')}</ol>`;
+}
+function programmeParId(id) { return (D.programmes || []).find((x) => x.id === id); }
+function remplacerProgramme(pr) { D.programmes = (D.programmes || []).filter((x) => x.id !== pr.id).concat([pr]); indexer(); if (S.fiche) rendreFiche(); }
+function ouvrirProgramme(id, { reco = false } = {}) {
+  const pr = programmeParId(id);
+  if (!pr) return;
+  const l = IDX.lead.get(pr.lead_id);
+  ouvrirModale(`<h2>${esc(pr.titre)}</h2>
+    <p class="meta">${esc(l ? l.entreprise : '')}, ${pr.statut === 'valide' ? `programme validé le ${esc(dateCourte(String(pr.valide_le).slice(0, 10)))}` : 'brouillon à relire'}</p>
+    <div class="programme">${htmlProgramme(pr.contenu)}</div>
+    <div data-reco-zone>${htmlReco(pr)}</div>
+    <div class="pied"><p class="erreur" data-erreur role="alert" hidden></p>
+      ${pr.statut !== 'valide' ? '<button type="button" class="btn primaire" data-prog-act="valider">Valider le programme</button>' : `<button type="button" class="btn primaire" data-prog-act="recommander">${pr.recommandations ? 'Refaire les recommandations' : 'Formateurs recommandés'}</button>`}
+      <button type="button" class="btn" data-prog-act="modifier">Modifier</button>
+      <button type="button" class="btn" data-prog-act="imprimer">Imprimer ou PDF</button>
+      <button type="button" class="btn" data-fermer>Fermer</button></div>`, (form) => {
+    brancherAnnuler(form);
+    form.dataset.programme = pr.id;
+    if (reco && pr.statut === 'valide' && !pr.recommandations) setTimeout(() => { const b = $('[data-prog-act="recommander"]', form); if (b) b.click(); }, 0);
+    if (reco) setTimeout(() => { const z = $('[data-reco-zone]', form); if (z) z.scrollIntoView({ block: 'start' }); }, 50);
+  });
+}
+function ouvrirModifierProgramme(pr) {
+  const c = pr.contenu;
+  const seances = (c.seances || []).map((x) => `## ${x.titre}\n${(x.contenus || []).map((y) => `- ${y}`).join('\n')}\nPratique : ${x.pratique || ''}`).join('\n\n');
+  ouvrirModale(`<h2>Modifier le programme</h2>
+    ${champ('Titre', `<input type="text" name="titre" value="${esc(c.titre)}" required>`)}
+    ${champ('Sous-titre', `<input type="text" name="sous_titre" value="${esc(c.sous_titre)}">`)}
+    <div class="deux">${champ('Public', `<textarea name="public">${esc(c.public)}</textarea>`)}${champ('Prérequis', `<textarea name="prerequis">${esc(c.prerequis)}</textarea>`)}</div>
+    <div class="deux">${champ('Durée', `<input type="text" name="duree" value="${esc(c.duree)}">`)}${champ('Modalités', `<input type="text" name="modalites" value="${esc(c.modalites)}">`)}</div>
+    ${champ('Objectifs', `<textarea name="objectifs" class="grand">${esc((c.objectifs || []).join('\n'))}</textarea>`, 'Un objectif par ligne, avec un verbe d\'action.')}
+    ${champ('Séances', `<textarea name="seances" class="grand" style="min-height:260px">${esc(seances)}</textarea>`, 'Chaque séance commence par « ## » ; un contenu par ligne avec « - » ; une ligne « Pratique : ».')}
+    ${champ('Méthodes', `<textarea name="methodes">${esc(c.methodes)}</textarea>`)}
+    ${champ('Évaluation', `<textarea name="evaluation">${esc(c.evaluation)}</textarea>`)}
+    ${champ('Ce que les participants emportent', `<textarea name="livrables">${esc(c.livrables)}</textarea>`)}
+    <div class="deux">${champ('Accessibilité', `<textarea name="accessibilite">${esc(c.accessibilite)}</textarea>`)}${champ("Délai d'accès", `<textarea name="delai_acces">${esc(c.delai_acces)}</textarea>`)}</div>
+    ${champ('Compétences attendues du formateur', `<textarea name="competences_formateur">${esc((c.competences_formateur || []).join('\n'))}</textarea>`, 'Une par ligne. Interne : elles servent aux recommandations.')}
+    ${piedFormulaire('<button type="submit" class="btn primaire">Enregistrer</button>')}`, (form) => {
+    brancherAnnuler(form);
+    form.addEventListener('submit', (ev) => {
+      ev.preventDefault();
+      soumettre(form, async () => {
+        const el = form.elements;
+        const blocs = el.seances.value.split(/^##\s*/m).map((x) => x.trim()).filter(Boolean);
+        const seancesLues = blocs.map((b) => {
+          const [titre, ...reste] = b.split('\n');
+          const pratique = (reste.find((x) => /^pratique\s*:/i.test(x.trim())) || '').replace(/^\s*pratique\s*:\s*/i, '');
+          return { titre: titre.trim(), contenus: lignesDe(reste.filter((x) => !/^pratique\s*:/i.test(x.trim())).join('\n')), pratique };
+        });
+        const contenu = { ...c, titre: el.titre.value, sous_titre: el.sous_titre.value, public: el.public.value, prerequis: el.prerequis.value, duree: el.duree.value, modalites: el.modalites.value, objectifs: lignesDe(el.objectifs.value), seances: seancesLues, methodes: el.methodes.value, evaluation: el.evaluation.value, livrables: el.livrables.value, accessibilite: el.accessibilite.value, delai_acces: el.delai_acces.value, competences_formateur: lignesDe(el.competences_formateur.value) };
+        const r = await api('POST', { op: 'programme_maj', id: pr.id, contenu });
+        remplacerProgramme(r.programme);
+        ouvrirProgramme(pr.id);
+        toast(pr.statut === 'valide' ? 'Enregistré : le programme repasse en brouillon, à revalider.' : 'Programme enregistré.');
+      });
+    });
+  });
+}
+function imprimerProgramme(pr) {
+  const w = window.open('', '_blank');
+  if (!w) return toast('Autorise les fenêtres pour imprimer.');
+  const c = pr.contenu;
+  w.document.write(`<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8"><title>${esc(c.titre)}</title><style>
+    body { font-family: Arial, sans-serif; color: #0A0F2C; font-size: 11pt; line-height: 1.45; max-width: 760px; margin: 24px auto; padding: 0 20px; }
+    header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #1A3CFF; padding-bottom: 10px; margin-bottom: 14px; }
+    header img { height: 30px; } h1 { font-size: 18pt; margin: 0 0 4px; } h4 { color: #1A3CFF; margin: 14px 0 4px; font-size: 12pt; } h5 { margin: 8px 0 2px; font-size: 11pt; }
+    dl { display: grid; grid-template-columns: 110px 1fr; gap: 3px 10px; margin: 8px 0; } dt { font-weight: bold; } dd { margin: 0; }
+    ul { margin: 4px 0 4px 18px; padding: 0; } p { margin: 4px 0; } .pratique { font-style: italic; } .sous-titre-prog { font-size: 12pt; color: #525880; }
+    footer { margin-top: 18px; border-top: 1px solid #C9D0EA; padding-top: 8px; font-size: 9pt; color: #525880; } .seance { break-inside: avoid; }
+  </style></head><body><header><img src="${location.origin}/images/logo-ia-entrepreneur-compact.png" alt="IA-Entrepreneur"><span>Programme de formation</span></header>
+    <h1>${esc(c.titre)}</h1>${htmlProgramme(c, { interne: false })}
+    <footer>IA-Entrepreneur, organisme de formation certifié Qualiopi au titre des actions de formation. Contact : gabriel@ia-entrepreneur.fr.</footer>
+    <script>window.onload = () => setTimeout(() => window.print(), 300);<\/script></body></html>`);
+  w.document.close();
+}
+function proposerMission(pr, formateurId) {
+  const f = IDX.lead.get(formateurId);
+  const client = IDX.lead.get(pr.lead_id);
+  const ct = contactsDe(formateurId).find((x) => x.email);
+  if (!ct) return toast("Ce formateur n'a pas d'adresse email dans sa fiche.");
+  const c = pr.contenu;
+  fermerModale();
+  ouvrirEmail(formateurId, ct.id);
+  const el = $('#modale form').elements;
+  const signature = (D.reglages.signature || SIGNATURE_DEFAUT).trim();
+  const dates = client && client.formation_debut ? `du ${dateCourte(client.formation_debut)} au ${dateCourte(client.formation_fin || client.formation_debut)}` : 'à caler ensemble';
+  el.objet.value = `Mission de formation : ${c.titre}`;
+  el.corps.value = `${salutation(ct)}\n\nJ'ai une mission qui correspond à ton profil :\n- ${c.titre}, ${c.duree}\n- ${c.modalites}\n- pour une entreprise${client && client.secteur ? ` du secteur ${client.secteur}` : ''}${client && client.localisation ? `, ${client.localisation}` : ''}\n- dates : ${dates}\n\nLes objectifs :\n${(c.objectifs || []).map((x) => `- ${x}`).join('\n')}\n\nEs-tu disponible ? Si c'est bon pour toi, je t'envoie le programme complet et le bon de commande.\n\n${signature}`;
+  el.corps.dispatchEvent(new Event('input'));
+}
+document.addEventListener('click', async (ev) => {
+  const b = ev.target.closest('[data-prog-act]');
+  if (!b) return;
+  const form = b.closest('form');
+  const pr = programmeParId(form && form.dataset.programme);
+  if (!pr) return;
+  const act = b.dataset.progAct;
+  const li = b.closest('[data-formateur]');
+  try {
+    if (act === 'imprimer') return imprimerProgramme(pr);
+    if (act === 'modifier') return ouvrirModifierProgramme(pr);
+    if (act === 'fiche') { fermerModale(); return ouvrirFiche(li.dataset.formateur); }
+    if (act === 'proposer') return proposerMission(pr, li.dataset.formateur);
+    b.disabled = true;
+    if (act === 'valider') {
+      const r = await api('POST', { op: 'programme_valider', id: pr.id });
+      remplacerProgramme(r.programme);
+      const l = IDX.lead.get(pr.lead_id);
+      const ordre = SUIVIS.map(([k]) => k);
+      if (l && l.suivi && ordre.indexOf(l.suivi) < ordre.indexOf('programme_valide')) await changerSuivi(l.id, 'programme_valide', { donnees: {} });
+      ouvrirProgramme(pr.id, { reco: true });
+      return;
+    }
+    if (act === 'recommander') {
+      b.textContent = 'Claude compare les formateurs…';
+      const r = await api('POST', { op: 'programme_recommander', id: pr.id });
+      remplacerProgramme(r.programme);
+      const z = $('[data-reco-zone]', form);
+      if (z) { z.innerHTML = htmlReco(r.programme); z.scrollIntoView({ block: 'start', behavior: 'smooth' }); }
+      b.disabled = false;
+      b.textContent = 'Refaire les recommandations';
+      return;
+    }
+    if (act === 'choisir') {
+      const r = await api('POST', { op: 'programme_choisir', id: pr.id, formateur_id: li.dataset.formateur });
+      remplacerProgramme(r.programme);
+      await actualiser();
+      ouvrirProgramme(pr.id, { reco: true });
+      toast(`${IDX.lead.get(li.dataset.formateur)?.entreprise || 'Le formateur'} est positionné sur la mission.`);
+    }
+  } catch (e) { b.disabled = false; montrerErreur(form, e.message); }
 });
 
 /* ----- Les échanges d'un lead : ses fils Gmail, lus en entier ----- */
@@ -3950,6 +4181,8 @@ document.addEventListener('click', (ev) => {
     case 'ouvrir': S.journalEdition = false; return ouvrirFiche(leadId);
     case 'echanges': return ouvrirEchanges(leadId, cible.dataset.fil || null);
     case 'formateur-nouveau': return ouvrirNouveauFormateur();
+    case 'programme-generer': return ouvrirGenererProgramme(IDX.lead.get(leadId));
+    case 'programme-ouvrir': return ouvrirProgramme(cible.dataset.programme, { reco: cible.dataset.reco === '1' });
     case 'formateur-lien': { const l = IDX.lead.get(leadId); return opFormateur({ op: 'formateur_lien', lead_id: leadId }).then((r) => { if (r && r.jeton) ouvrirLienFormateur(l, r); }); }
     case 'formateur-profil': return ouvrirProfilFormateur(IDX.lead.get(leadId));
     case 'formateur-valider': return ouvrirValiderFormateur(IDX.lead.get(leadId));

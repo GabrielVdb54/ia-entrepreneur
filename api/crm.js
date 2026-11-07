@@ -40,6 +40,11 @@
  *   POST { op: 'formateur_lien' | 'formateur_maj' | 'formateur_siret' | 'piece_deposer'
  *          | 'document_verifier' | 'formateur_valider' | 'formateur_refuser', … }
  *        le dossier des formateurs (voir api/_formateurs.js et api/formateur.js)
+ *   POST { op: 'programme_generer' | 'programme_maj' | 'programme_valider'
+ *          | 'programme_recommander' | 'programme_choisir', … }
+ *        le programme de formation d'un client, rédigé par Claude d'après le
+ *        besoin et les échanges, puis les formateurs recommandés pour ce
+ *        programme (seul un formateur validé peut être choisi)
  *   GET  /api/crm?tache=synchro      la même synchro, lancée par Vercel Cron
  *        toutes les 15 minutes (en-tête Authorization: Bearer CRON_SECRET)
  *
@@ -507,6 +512,7 @@ async function operation(corps) {
   if (op === 'entrant') return traiterEntrant(corps);
   if (op === 'recap') return recapLead(corps);
   if (op && op.startsWith('formateur_') || op === 'piece_deposer' || op === 'document_verifier') return operationFormateur(corps);
+  if (op && op.startsWith('programme_')) return operationProgramme(corps);
   if (op === 'importer') return importer(corps);
   if (op === 'email') return envoyerEmail(corps);
   if (op === 'reglage') {
@@ -1317,6 +1323,205 @@ async function echeancesFormateurs() {
   return n;
 }
 
+/* ---------- Programmes de formation et formateurs recommandés ---------- */
+
+// L'offre telle que la page formation-ia-entreprise.html la présente (novembre 2026).
+const CATALOGUE_NIVEAUX = `Niveau 1, Acculturation IA (1 à 2 jours, sans prérequis, salariés et dirigeants) : ce que l'IA générative sait faire et ne sait pas faire ; quelle IA pour quoi (ChatGPT, Claude, Gemini, Copilot, Perplexity, outils d'image et de transcription) ; prompter sur ses propres documents ; vérifier une réponse, repérer une hallucination ; règle d'or RGPD et shadow AI ; cadre AI Act et règles internes. On repart avec une charte d'usage de l'IA et des prompts testés sur ses documents. 2e jour en option : ateliers par service.
+Niveau 2, IA métier (2 à 3 jours, prérequis niveau 1 ou équivalent) : cartographie des tâches service par service ; l'IA intégrée aux outils (Microsoft 365 Copilot, Google Workspace et Gemini, CRM, logiciels métier) ; ateliers sur les dossiers réels des participants ; bibliothèque de prompts partagée ; règles d'usage propres à l'entreprise. 3e jour en option : approfondissement par métier.
+Niveau 3, Automatisation et intégration (3 à 4 jours, prérequis niveau 2 ou équivalent) : automatisation ou agent IA, choisir la bonne approche ; workflows sans code avec n8n ou Make ; agents IA métier branchés sur les outils ; assistant qui répond à partir des documents de l'entreprise (RAG) ; mise en production, sécurité, coûts réels, maintenance. On repart avec au moins une automatisation en production, documentée. 4e jour en option.`;
+
+const SCHEMA_PROGRAMME = {
+  type: 'object',
+  properties: {
+    titre: { type: 'string' },
+    sous_titre: { type: 'string' },
+    public: { type: 'string' },
+    prerequis: { type: 'string' },
+    objectifs: { type: 'array', items: { type: 'string' } },
+    duree: { type: 'string' },
+    modalites: { type: 'string' },
+    seances: { type: 'array', items: { type: 'object', properties: { titre: { type: 'string' }, contenus: { type: 'array', items: { type: 'string' } }, pratique: { type: 'string' } }, required: ['titre', 'contenus', 'pratique'], additionalProperties: false } },
+    methodes: { type: 'string' },
+    evaluation: { type: 'string' },
+    livrables: { type: 'string' },
+    accessibilite: { type: 'string' },
+    delai_acces: { type: 'string' },
+    competences_formateur: { type: 'array', items: { type: 'string' } },
+  },
+  required: ['titre', 'sous_titre', 'public', 'prerequis', 'objectifs', 'duree', 'modalites', 'seances', 'methodes', 'evaluation', 'livrables', 'accessibilite', 'delai_acces', 'competences_formateur'],
+  additionalProperties: false,
+};
+const CONSIGNES_PROGRAMME = `Tu rédiges, pour IA-Entrepreneur (organisme de formation certifié Qualiopi, marque de Clindit SASU), le programme d'une formation à l'IA pour une entreprise cliente. C'est le programme remis au client et validé avec lui, une à deux pages, clair et sans jargon. Le formateur en reprendra ensuite les objectifs mot pour mot dans son déroulé.
+
+L'offre : trois niveaux, en intra, groupes de 12 personnes au plus, une journée = 7 heures, en présentiel ou à distance.
+${CATALOGUE_NIVEAUX}
+
+Règles :
+- Pars du besoin réel du client (secteur, outils, équipes, ce qui s'est dit dans les échanges) et adapte les modules du niveau. Ne recopie pas le site mot pour mot.
+- objectifs : 3 à 6 objectifs opérationnels, chacun commence par un verbe d'action mesurable (rédiger, utiliser, vérifier, construire, automatiser, choisir, appliquer…). Verbes interdits : apprendre, comprendre, connaître, être, mémoriser, savoir, sensibiliser.
+- seances : une par demi-journée (« Jour 1, matin », « Jour 1, après-midi »…), avec ses contenus et la pratique prévue. Au moins deux tiers du temps en pratique, sur les cas et les documents des participants. Le nombre de demi-journées colle exactement à la durée.
+- evaluation : positionnement au départ, évaluation des acquis par objectif à la fin (quiz ou mise en situation), questionnaire de satisfaction à chaud, attestation individuelle de fin de formation (au titre de l'article 4 de l'AI Act quand c'est pertinent).
+- accessibilite : formation accessible aux personnes en situation de handicap ; le référent handicap, Gabriel Vanderbecken (gabriel@ia-entrepreneur.fr), étudie avec la personne l'adaptation des modalités.
+- delai_acces : la formation a lieu à la date convenue avec le client, en général deux à six semaines après son accord, et après l'accord de prise en charge s'il y a un financement.
+- Jamais de prix, jamais le nom d'un formateur, jamais de gain chiffré (ROI, heures gagnées, pourcentages), jamais « garanti » ni « 100 % », jamais de code de certification. L'article 4 de l'AI Act demande de « prendre des mesures » pour la maîtrise de l'IA du personnel : pas d'amende, pas de « formation obligatoire ».
+- Pas de tiret long, pas de flèche, pas d'emoji.
+- competences_formateur : 3 à 6 compétences précises qu'il faut au formateur pour animer ce programme (sujets, outils, secteur, niveau). Elles servent à choisir le formateur.
+En français, phrases courtes.`;
+
+const SCHEMA_RECOMMANDATION = {
+  type: 'object',
+  properties: {
+    recommandations: {
+      type: 'array',
+      items: {
+        type: 'object',
+        properties: { lead_id: { type: 'string' }, score: { type: 'integer' }, raisons: { type: 'array', items: { type: 'string' } }, a_verifier: { type: 'array', items: { type: 'string' } } },
+        required: ['lead_id', 'score', 'raisons', 'a_verifier'],
+        additionalProperties: false,
+      },
+    },
+  },
+  required: ['recommandations'],
+  additionalProperties: false,
+};
+const CONSIGNES_RECOMMANDATION = `Tu aides Gabriel, dirigeant d'IA-Entrepreneur, à choisir le formateur d'une mission. On te donne le programme validé avec le client et la liste des formateurs du réseau. Classe les 5 formateurs les plus adaptés, du meilleur au moins bon.
+Critères, dans cet ordre : les compétences et les outils au regard des contenus du programme et des « compétences attendues » ; le niveau (1, 2 ou 3) ; la connaissance du secteur du client ; le lieu (présentiel : sa zone doit couvrir le lieu ; à distance : il doit animer à distance) ; les disponibilités si elles sont connues ; le tarif jour, qui ne doit pas dépasser 600 € (au-delà ou inconnu : à vérifier).
+Le statut du dossier ne change pas le classement : un formateur non validé peut être recommandé, Gabriel verra qu'il faut d'abord valider son dossier.
+score : de 0 à 100, l'adéquation au programme. raisons : 2 ou 3 phrases courtes et précises (« Anime Copilot dans Word et Excel, au cœur des jours 1 et 2 »). a_verifier : ce que Gabriel doit confirmer avant de choisir (disponibilité aux dates, déplacement, tarif, compétence non prouvée). lead_id copié de la liste, jamais inventé. N'invente rien sur un formateur : seulement ce qui est dans sa fiche.`;
+
+const textesListe = (v, max = 20, longueur = 300) => (Array.isArray(v) ? v : []).slice(0, max).map((x) => couper(String(x), longueur));
+function nettoyerProgramme(c) {
+  if (!c || typeof c !== 'object') throw new Refus('programme_invalide');
+  const t = (x, n = 1200) => couper(String(x ?? ''), n);
+  const programme = {
+    titre: t(c.titre, 200), sous_titre: t(c.sous_titre, 300), public: t(c.public, 600), prerequis: t(c.prerequis, 400),
+    objectifs: textesListe(c.objectifs, 8), duree: t(c.duree, 200), modalites: t(c.modalites, 600),
+    seances: (Array.isArray(c.seances) ? c.seances : []).slice(0, 16).map((x) => ({ titre: t(x && x.titre, 120), contenus: textesListe(x && x.contenus, 10), pratique: t(x && x.pratique, 600) })),
+    methodes: t(c.methodes), evaluation: t(c.evaluation), livrables: t(c.livrables, 800), accessibilite: t(c.accessibilite, 600), delai_acces: t(c.delai_acces, 400),
+    competences_formateur: textesListe(c.competences_formateur, 8, 200),
+  };
+  if (!programme.titre) throw new Refus('programme_invalide');
+  return programme;
+}
+async function appelClaude({ consignes, schema, contenu, effort = 'low', max = 6000, timeout = 50000 }) {
+  if (!process.env.ANTHROPIC_API_KEY) throw new Refus('ia_non_configuree', 503);
+  const client = new Anthropic({ timeout, maxRetries: 1 });
+  let r;
+  try {
+    r = await client.beta.messages.create({
+      model: MODELE_REDACTION,
+      max_tokens: max,
+      output_config: { effort, format: { type: 'json_schema', schema } },
+      betas: ['server-side-fallback-2026-07-01'],
+      fallbacks: 'default',
+      system: [{ type: 'text', text: consignes, cache_control: { type: 'ephemeral' } }],
+      messages: [{ role: 'user', content: contenu }],
+    });
+  } catch (e) {
+    if (e instanceof Anthropic.RateLimitError) throw new Refus('ia_trop_de_demandes', 429);
+    if (e instanceof Anthropic.APIConnectionError) throw new Refus('ia_injoignable', 502);
+    if (e instanceof Anthropic.APIError) { console.error('crm claude', e.status, e.message); throw new Refus('ia_erreur', 502); }
+    throw e;
+  }
+  if (r.stop_reason === 'refusal') throw new Refus('ia_refus', 422);
+  if (r.stop_reason === 'max_tokens') throw new Refus('ia_coupe', 502);
+  try { return JSON.parse((r.content || []).filter((b) => b.type === 'text').map((b) => b.text).join('')); } catch { throw new Refus('ia_erreur', 502); }
+}
+async function recommander(prog) {
+  const [{ lignes: [client] }, { lignes: leadsF }, { lignes: dossiers }] = await Promise.all([
+    sb(`iae_crm_leads?id=eq.${prog.lead_id}&select=entreprise,secteur,localisation,formation_debut,formation_fin`),
+    sb('iae_crm_leads?type=eq.formateur&archive=is.false&select=id,entreprise'),
+    sb('iae_crm_formateurs?select=lead_id,statut,competences,outils,niveaux,secteurs,zone,distanciel,disponibilites,tarif_jour,bio'),
+  ]);
+  const parId = new Map(dossiers.map((d) => [d.lead_id, d]));
+  const candidats = leadsF.map((l) => ({ l, d: parId.get(l.id) || { statut: 'a_inviter' } }));
+  if (!candidats.length) return { le: new Date().toISOString(), liste: [] };
+  const c = prog.contenu || {};
+  const p = prog.parametres || {};
+  const contenu = [
+    `Programme : ${c.titre} (${prog.niveau ? `niveau ${prog.niveau}` : 'sur mesure'}), ${c.duree}, ${c.modalites}`,
+    `Client : secteur ${client?.secteur || 'non précisé'}, ${client?.localisation || 'lieu non précisé'} ; format ${p.format || 'non précisé'}${p.lieu ? `, lieu ${p.lieu}` : ''}${client?.formation_debut ? ` ; dates ${client.formation_debut} au ${client.formation_fin || client.formation_debut}` : ''}`,
+    `Objectifs : ${(c.objectifs || []).join(' ; ')}`,
+    `Séances : ${(c.seances || []).map((x) => `${x.titre} : ${(x.contenus || []).join(', ')}`).join(' | ')}`,
+    `Compétences attendues du formateur : ${(c.competences_formateur || []).join(' ; ')}`,
+    '',
+    'Formateurs (id | nom | dossier | zone | distanciel | niveaux | compétences | outils | secteurs | disponibilités | tarif jour) :',
+    ...candidats.map(({ l, d }) => [l.id, l.entreprise, d.statut, d.zone || '?', d.distanciel === false ? 'non' : 'oui', (d.niveaux || []).join(',') || '?', couper((d.competences || []).join(' ; '), 700), (d.outils || []).join(', '), (d.secteurs || []).join(', '), d.disponibilites || '?', d.tarif_jour ? `${d.tarif_jour} €` : '?'].join(' | ')),
+  ].join('\n');
+  const r = await appelClaude({ consignes: CONSIGNES_RECOMMANDATION, schema: SCHEMA_RECOMMANDATION, contenu, max: 3000 });
+  const vus = new Set();
+  const liste = (r.recommandations || []).filter((x) => parId.has(x.lead_id) || leadsF.some((l) => l.id === x.lead_id)).filter((x) => !vus.has(x.lead_id) && vus.add(x.lead_id)).slice(0, 6).map((x) => {
+    const cand = candidats.find((k) => k.l.id === x.lead_id);
+    return { lead_id: x.lead_id, nom: cand.l.entreprise, statut: cand.d.statut, positionnable: cand.d.statut === 'valide', score: Math.max(0, Math.min(100, Number(x.score) || 0)), raisons: textesListe(x.raisons, 4), a_verifier: textesListe(x.a_verifier, 4) };
+  });
+  return { le: new Date().toISOString(), liste };
+}
+async function operationProgramme(corps) {
+  const op = corps.op;
+  if (op === 'programme_generer') {
+    if (!UUID_RE.test(corps.lead_id || '')) throw new Refus('id_invalide');
+    const [{ lignes: [lead] }, { lignes: contacts }, { lignes: acts }] = await Promise.all([
+      sb(`iae_crm_leads?id=eq.${corps.lead_id}&select=*`),
+      sb(`iae_crm_contacts?lead_id=eq.${corps.lead_id}&select=prenom,nom,poste&order=principal.desc`),
+      sb(`iae_crm_activites?lead_id=eq.${corps.lead_id}&select=date,type,resume,contenu&order=date.desc&limit=15`),
+    ]);
+    if (!lead) throw new Refus('introuvable', 404);
+    const niveau = [1, 2, 3].includes(Number(corps.niveau)) ? Number(corps.niveau) : null;
+    const jours = Math.max(0.5, Math.min(10, Number(String(corps.jours || '').replace(',', '.')) || (niveau ? niveau + 0 : 1)));
+    const parametres = {
+      niveau, jours, participants: couper(String(corps.participants ?? ''), 20), format: ['presentiel', 'distanciel', 'mixte'].includes(corps.format) ? corps.format : 'presentiel',
+      lieu: couper(String(corps.lieu ?? ''), 200), outils: couper(String(corps.outils ?? ''), 400), attentes: couper(String(corps.attentes ?? ''), 2000), consigne: couper(String(corps.consigne ?? ''), 1000),
+    };
+    const r = lead.recap || null;
+    const contenu = [
+      `Client : ${lead.entreprise}${lead.secteur ? `, secteur ${lead.secteur}` : ''}${lead.localisation ? `, ${lead.localisation}` : ''}`,
+      lead.besoin ? `Besoin noté : ${lead.besoin}` : '',
+      contacts.length ? `Interlocuteurs : ${contacts.map((x) => [x.prenom, x.nom, x.poste].filter(Boolean).join(' ')).join(' ; ')}` : '',
+      r ? `Récap de la relation : ${r.situation} ${r.attentes ? `Attentes : ${r.attentes}` : ''}` : '',
+      `Demande : ${niveau ? `niveau ${niveau}` : 'sur mesure'}, ${jours} jour${jours > 1 ? 's' : ''} (${Math.round(jours * 7)} heures), ${parametres.participants ? `${parametres.participants} participants, ` : ''}${{ presentiel: 'en présentiel', distanciel: 'à distance', mixte: 'en présentiel et à distance' }[parametres.format]}${parametres.lieu ? `, ${parametres.lieu}` : ''}`,
+      parametres.outils ? `Outils du client : ${parametres.outils}` : '',
+      parametres.attentes ? `Attentes et objectifs du client : ${parametres.attentes}` : '',
+      parametres.consigne ? `Consigne de Gabriel : ${parametres.consigne}` : '',
+      `Derniers échanges :\n${acts.filter((a) => a.type !== 'import').map((a) => `- ${String(a.date).slice(0, 10)} ${a.resume}${a.contenu ? ` / ${couper(a.contenu, 400)}` : ''}`).join('\n')}`,
+    ].filter(Boolean).join('\n');
+    const prog = nettoyerProgramme(await appelClaude({ consignes: CONSIGNES_PROGRAMME, schema: SCHEMA_PROGRAMME, contenu, max: 8000, timeout: 55000 }));
+    const { lignes: [ligne] } = await sb('iae_crm_programmes', { methode: 'POST', corps: { lead_id: lead.id, titre: prog.titre, niveau, parametres, contenu: prog, statut: 'brouillon' }, prefer: 'return=representation' });
+    await inserer('activites', { lead_id: lead.id, type: 'note', resume: `Programme rédigé (brouillon) : ${prog.titre}`.slice(0, 2000), source: 'crm' });
+    return { programme: ligne };
+  }
+  if (!UUID_RE.test(corps.id || '')) throw new Refus('id_invalide');
+  const { lignes: [prog] } = await sb(`iae_crm_programmes?id=eq.${corps.id}&select=*`);
+  if (!prog) throw new Refus('introuvable', 404);
+  if (op === 'programme_maj') {
+    const contenu = nettoyerProgramme(corps.contenu);
+    const { lignes: [ligne] } = await sb(`iae_crm_programmes?id=eq.${prog.id}`, { methode: 'PATCH', corps: { contenu, titre: contenu.titre, statut: 'brouillon', valide_le: null }, prefer: 'return=representation' });
+    return { programme: ligne };
+  }
+  if (op === 'programme_valider') {
+    const { lignes: [ligne] } = await sb(`iae_crm_programmes?id=eq.${prog.id}`, { methode: 'PATCH', corps: { statut: 'valide', valide_le: new Date().toISOString() }, prefer: 'return=representation' });
+    await inserer('activites', { lead_id: prog.lead_id, type: 'note', resume: `Programme validé : ${prog.titre}`.slice(0, 2000), source: 'crm' });
+    return { programme: ligne };
+  }
+  if (op === 'programme_recommander') {
+    const recommandations = await recommander(prog);
+    const { lignes: [ligne] } = await sb(`iae_crm_programmes?id=eq.${prog.id}`, { methode: 'PATCH', corps: { recommandations, recommande_le: recommandations.le }, prefer: 'return=representation' });
+    return { programme: ligne };
+  }
+  if (op === 'programme_choisir') {
+    if (!UUID_RE.test(corps.formateur_id || '')) throw new Refus('id_invalide');
+    const { lignes: [f] } = await sb(`iae_crm_formateurs?lead_id=eq.${corps.formateur_id}&select=statut`);
+    if (!f || f.statut !== 'valide') throw new Refus('formateur_non_valide', 409);
+    const [{ lignes: [client] }, { lignes: [formateur] }] = await Promise.all([
+      sb(`iae_crm_leads?id=eq.${prog.lead_id}&select=entreprise`), sb(`iae_crm_leads?id=eq.${corps.formateur_id}&select=entreprise`),
+    ]);
+    const { lignes: [ligne] } = await sb(`iae_crm_programmes?id=eq.${prog.id}`, { methode: 'PATCH', corps: { formateur_id: corps.formateur_id }, prefer: 'return=representation' });
+    await inserer('activites', { lead_id: prog.lead_id, type: 'note', resume: `Formateur choisi : ${formateur.entreprise} (programme « ${prog.titre} »)`.slice(0, 2000), source: 'crm' });
+    await inserer('activites', { lead_id: corps.formateur_id, type: 'note', resume: `Positionné sur la mission ${client.entreprise} (programme « ${prog.titre} »)`.slice(0, 2000), source: 'crm' });
+    return { programme: ligne };
+  }
+  throw new Refus('operation_inconnue');
+}
+
 /* ---------- Le récap d'une relation ---------- */
 
 const SCHEMA_RECAP = {
@@ -1793,6 +1998,10 @@ export default async function handler(req, res) {
     }
     if (corps && corps.op === 'rediger') return res.status(200).json(await rediger(corps, ip));
     if (corps && corps.op === 'vocal') return res.status(200).json(await interpreterVocal(corps, ip));
+    if (corps && ['programme_generer', 'programme_recommander'].includes(corps.op)) {
+      if (tropDeRedactions(ip)) throw new Refus('ia_trop_de_demandes', 429);
+      return res.status(200).json(await operationProgramme(corps));
+    }
     if (corps && corps.op === 'recap') {
       if (tropDeRedactions(ip)) throw new Refus('ia_trop_de_demandes', 429);
       return res.status(200).json(await recapLead(corps));
