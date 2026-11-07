@@ -35,7 +35,9 @@
  *   POST /api/crm { op: 'recap',     lead_id }
  *        Claude fait le récap de la relation (où on en est, ce qu'elle attend,
  *        chaleur, réactivité, ton, points à retenir, prochaine étape)
- *   GET  /api/crm?fil=<id Gmail>     les messages d'un fil lié au CRM, en entier
+ *   GET  /api/crm?fil=<id Gmail>     les messages d'un fil lié au CRM (ou échangé avec un contact du CRM), en entier
+ *   GET  /api/crm?boite=<lead id>    tous les fils Gmail avec les contacts du lead, du plus récent au plus ancien
+ *   GET  /api/crm?piece=<partie>&message=<id>&fil=<id>   une pièce jointe d'un de ces fils
  *   GET  /api/crm?document=<id>      une pièce d'un formateur (bucket privé), pour la regarder
  *   POST { op: 'voix', texte }       le mode oral lu par ElevenLabs (ELEVENLABS_API_KEY,
  *        ELEVENLABS_VOIX, ELEVENLABS_MODELE) ; sans clé, la page garde la voix du navigateur
@@ -393,7 +395,29 @@ function entete(texte) {
   return morceaux.map((m) => `=?UTF-8?B?${Buffer.from(m, 'utf8').toString('base64')}?=`).join('\r\n ');
 }
 
-function messageBrut({ a, objet, corps, enReponseA }) {
+// Les pièces jointes envoyées depuis le CRM : 5 au plus, 3,3 Mo en tout (une requête Vercel plafonne à 4,5 Mo, base64 compris).
+const ENVOI_PIECES_MAX = 3.3 * 1024 * 1024;
+function piecesAEnvoyer(liste) {
+  if (liste == null || (Array.isArray(liste) && !liste.length)) return [];
+  if (!Array.isArray(liste) || liste.length > 5) throw new Refus('trop_de_pieces');
+  let total = 0;
+  return liste.map((p) => {
+    const nom = String(p?.nom || '').replace(/[\u0000-\u001f"\\/]+/g, ' ').trim().slice(0, 150);
+    const type = /^[a-z]+\/[a-z0-9.+-]+$/i.test(p?.type || '') ? String(p.type).toLowerCase() : 'application/octet-stream';
+    const b64 = String(p?.donnees || '');
+    if (!nom || !b64 || !/^[A-Za-z0-9+/]+=*$/.test(b64)) throw new Refus('piece_invalide');
+    const octets = Buffer.from(b64, 'base64');
+    total += octets.length;
+    if (!octets.length) throw new Refus('piece_invalide');
+    if (total > ENVOI_PIECES_MAX) throw new Refus('pieces_trop_lourdes', 413);
+    return { nom, type, octets };
+  });
+}
+const en76 = (b64) => b64.replace(/.{76}/g, '$&\r\n');
+// Nom de fichier dans un en-tête : un seul mot encodé (pas de pliage dans les guillemets), et la forme RFC 5987.
+const motEncode = (t) => (/^[\x20-\x7e]*$/.test(t) ? t.replace(/"/g, '') : `=?UTF-8?B?${Buffer.from(t, 'utf8').toString('base64')}?=`);
+const nomRfc5987 = (t) => encodeURIComponent(t).replace(/['()*]/g, (c) => `%${c.charCodeAt(0).toString(16).toUpperCase()}`);
+function messageBrut({ a, objet, corps, enReponseA, references, pieces = [] }) {
   const idMessage = `<crm-${randomBytes(12).toString('hex')}@ia-entrepreneur.fr>`;
   const lignes = [
     `From: ${EXPEDITEUR}`,
@@ -402,20 +426,24 @@ function messageBrut({ a, objet, corps, enReponseA }) {
     `Message-ID: ${idMessage}`,
     `Date: ${new Date().toUTCString().replace('GMT', '+0000')}`,
   ];
-  if (enReponseA) lignes.push(`In-Reply-To: ${enReponseA}`, `References: ${enReponseA}`);
-  lignes.push(
-    'MIME-Version: 1.0',
-    'Content-Type: text/plain; charset=UTF-8',
-    'Content-Transfer-Encoding: base64',
-    '',
-    Buffer.from(corps.replace(/\r?\n/g, '\r\n'), 'utf8').toString('base64').replace(/.{76}/g, '$&\r\n'),
-  );
+  if (enReponseA) lignes.push(`In-Reply-To: ${enReponseA}`, `References: ${references || enReponseA}`);
+  const texte = en76(Buffer.from(corps.replace(/\r?\n/g, '\r\n'), 'utf8').toString('base64'));
+  if (!pieces.length) {
+    lignes.push('MIME-Version: 1.0', 'Content-Type: text/plain; charset=UTF-8', 'Content-Transfer-Encoding: base64', '', texte);
+  } else {
+    const borne = `crm-${randomBytes(12).toString('hex')}`;
+    lignes.push('MIME-Version: 1.0', `Content-Type: multipart/mixed; boundary="${borne}"`, '', `--${borne}`, 'Content-Type: text/plain; charset=UTF-8', 'Content-Transfer-Encoding: base64', '', texte);
+    for (const p of pieces) {
+      lignes.push(`--${borne}`, `Content-Type: ${p.type}; name="${motEncode(p.nom)}"`, `Content-Disposition: attachment; filename="${motEncode(p.nom)}"; filename*=UTF-8''${nomRfc5987(p.nom)}`, 'Content-Transfer-Encoding: base64', '', en76(p.octets.toString('base64')));
+    }
+    lignes.push(`--${borne}--`, '');
+  }
   return { brut: Buffer.from(lignes.join('\r\n'), 'utf8').toString('base64url'), idMessage };
 }
 
-async function envoyerGmail({ a, objet, corps, mode, fil, enReponseA }) {
+async function envoyerGmail({ a, objet, corps, mode, fil, enReponseA, references, pieces }) {
   const jeton = await accesGmail();
-  const { brut, idMessage } = messageBrut({ a, objet, corps, enReponseA });
+  const { brut, idMessage } = messageBrut({ a, objet, corps, enReponseA, references, pieces });
   const message = { raw: brut };
   if (fil) message.threadId = fil;
   const url = mode === 'brouillon' ? `${GMAIL}/drafts` : `${GMAIL}/messages/send`;
@@ -585,12 +613,14 @@ async function envoyerEmail(corps) {
   if (!texte.trim() || texte.length > 20000) throw new Refus('message_invalide');
   const fil = corps.fil && /^[0-9a-f]{6,32}$/i.test(corps.fil) ? corps.fil : null;
   const enReponseA = corps.en_reponse_a && /^<[^<>\s\r\n]{3,200}>$/.test(corps.en_reponse_a) ? corps.en_reponse_a : null;
+  const references = enReponseA && typeof corps.references === 'string' && /^(<[^<>\s\r\n]{3,200}>\s*){1,20}$/.test(corps.references.trim()) ? corps.references.trim().replace(/\s+/g, ' ') : null;
+  const pieces = piecesAEnvoyer(corps.pieces);
   const contactId = corps.contact_id && UUID_RE.test(corps.contact_id) ? corps.contact_id : null;
   const majLead = corps.lead ? nettoyer(corps.lead, 'leads', false) : null;
 
   if (mode === 'envoyer' && (await emailsEnvoyesAujourdhui()) >= MAX_EMAILS_JOUR) throw new Refus('trop_d_emails_aujourdhui', 429);
 
-  const gmail = await envoyerGmail({ a, objet, corps: texte, mode, fil, enReponseA });
+  const gmail = await envoyerGmail({ a, objet, corps: texte, mode, fil, enReponseA, references, pieces });
 
   // L'email est parti : si le journal échoue, on le dit sans faire croire
   // à un échec d'envoi (sinon Gabriel renverrait le même message).
@@ -604,7 +634,7 @@ async function envoyerEmail(corps) {
       resume: `${mode === 'brouillon' ? 'Brouillon Gmail' : 'Email envoyé'} à ${a} : « ${objet} »`.slice(0, 2000),
       contenu: texte,
       source: 'crm',
-      meta: { ...gmail, a, objet, de: COMPTE },
+      meta: { ...gmail, a, objet, de: COMPTE, ...(pieces.length ? { pieces: pieces.map((p) => p.nom) } : {}) },
     });
     if (majLead && Object.keys(majLead).length) lead = await modifier('leads', corps.lead_id, majLead);
   } catch (e) {
@@ -838,29 +868,136 @@ function sansCitation(t) {
 const enTetes = (m) => Object.fromEntries((m.payload?.headers || []).map((x) => [x.name.toLowerCase(), x.value]));
 const listeAdresses = (v) => String(v || '').split(/,(?=(?:[^"]*"[^"]*")*[^"]*$)/).map((x) => adresse(x).email).filter((x) => x && x.includes('@'));
 
-async function lireFil(fil) {
-  const t = await google(`${GMAIL}/threads/${encodeURIComponent(fil)}?format=full`);
+// Les vraies pièces jointes d'un message (pas les images de signature), avec ce qu'il faut pour les ouvrir.
+// La partie (partId) sert d'identifiant : l'attachmentId de Gmail change d'une lecture à l'autre.
+function fichiersJoints(p, out = []) {
+  const dispo = String((p?.headers || []).find((x) => x.name.toLowerCase() === 'content-disposition')?.value || '');
+  const signature = /^image\//i.test(p?.mimeType || '') && /^inline/i.test(dispo);
+  if (p?.filename && p.body?.attachmentId && !signature && !/^(image\d*|\d+_\d+|outlook-\w+)\.(png|jpe?g|gif)$/i.test(p.filename)) {
+    out.push({ nom: p.filename.slice(0, 200), type: String(p.mimeType || '').slice(0, 100), taille: Number(p.body.size) || 0, partie: String(p.partId || ''), att: p.body.attachmentId });
+  }
+  for (const q of p?.parts || []) fichiersJoints(q, out);
+  return out.slice(0, 20);
+}
+function messagesDuFil(t) {
   return (t.messages || []).filter((m) => !(m.labelIds || []).includes('DRAFT')).map((m) => {
     const h = enTetes(m);
     const de = adresse(h.from);
     const brut = partieTexte(m.payload);
     return {
       id: m.id, date: new Date(Number(m.internalDate) || Date.now()).toISOString(), de: de.nom || de.email, email: de.email,
-      moi: de.email === COMPTE, a: String(h.to || '').slice(0, 300), objet: String(h.subject || '').slice(0, 300),
+      moi: de.email === COMPTE, a: String(h.to || '').slice(0, 300), cc: String(h.cc || '').slice(0, 300), objet: String(h.subject || '').slice(0, 300),
       texte: (sansCitation(brut) || texteBrut(m.snippet)).slice(0, 5000), complet: propre(brut).slice(0, 15000), pieces: piecesJointes(m.payload),
+      fichiers: fichiersJoints(m.payload).map(({ att: _a, ...f }) => f),
+      message_id: /^<[^<>\s]{3,200}>$/.test(String(h['message-id'] || '').trim()) ? String(h['message-id']).trim() : null,
+      references: String(h.references || '').slice(0, 2000),
     };
   });
 }
-// Un fil n'est lisible que s'il est lié au CRM (historique ou « À trier »).
-async function filDuCrm(fil) {
-  if (!/^[0-9a-f]{6,32}$/i.test(fil || '')) throw new Refus('id_invalide');
+async function lireFil(fil) {
+  return messagesDuFil(await google(`${GMAIL}/threads/${encodeURIComponent(fil)}?format=full`));
+}
+// Un fil est lisible s'il est lié au CRM (historique ou « À trier »), ou échangé avec un contact du CRM.
+async function filAutorise(fil, messages) {
   const [{ lignes: a }, { lignes: e }] = await Promise.all([
     sb(`iae_crm_activites?select=id&meta->>fil=eq.${fil}&limit=1`),
     sb(`iae_crm_entrants?select=id&fil=eq.${fil}&limit=1`),
   ]);
-  if (!a.length && !e.length) throw new Refus('introuvable', 404);
+  if (a.length || e.length) return true;
+  const adresses = new Set();
+  for (const m of messages || []) {
+    const h = enTetes(m);
+    for (const x of [...listeAdresses(h.from), ...listeAdresses(h.to), ...listeAdresses(h.cc)]) if (x !== COMPTE) adresses.add(x.toLowerCase());
+  }
+  if (!adresses.size) return false;
+  const { lignes } = await sb('iae_crm_contacts?select=email&email=not.is.null&limit=5000');
+  return lignes.some((c) => adresses.has(String(c.email).toLowerCase()));
+}
+async function filDuCrm(fil) {
+  if (!/^[0-9a-f]{6,32}$/i.test(fil || '')) throw new Refus('id_invalide');
   if (!gmailConfigure()) throw new Refus('gmail_non_configure', 503);
-  return { fil, messages: await lireFil(fil) };
+  const t = await google(`${GMAIL}/threads/${encodeURIComponent(fil)}?format=full`);
+  if (!(await filAutorise(fil, t.messages))) throw new Refus('introuvable', 404);
+  return { fil, messages: messagesDuFil(t) };
+}
+
+/* ---------- La boîte d'un lead : ses fils Gmail, comme dans Gmail ---------- */
+// Gabriel, 07/11 : « que le CRM je puisse l'utiliser comme mes mails : voir l'historique des échanges, les PJ envoyées… »
+// Tous les fils avec les adresses de ses contacts (recherche Gmail, sans limite de date), plus ceux que le CRM a liés.
+async function boiteDuLead(leadId) {
+  if (!UUID_RE.test(leadId || '')) throw new Refus('id_invalide');
+  if (!gmailConfigure()) throw new Refus('gmail_non_configure', 503);
+  const [{ lignes: [lead] }, { lignes: contacts }, { lignes: acts }] = await Promise.all([
+    sb(`iae_crm_leads?id=eq.${leadId}&select=id,tache_fil`),
+    sb(`iae_crm_contacts?lead_id=eq.${leadId}&select=email`),
+    sb(`iae_crm_activites?lead_id=eq.${leadId}&select=meta&order=date.desc&limit=300`),
+  ]);
+  if (!lead) throw new Refus('introuvable', 404);
+  const emails = [...new Set(contacts.map((c) => String(c.email || '').trim().toLowerCase()).filter((e) => EMAIL_RE.test(e)))].slice(0, 12);
+  const fils = new Map();
+  const avecPj = new Set();
+  if (emails.length) {
+    const q = `{${emails.map((e) => `from:${e} to:${e} cc:${e}`).join(' ')}}`;
+    const [tous, pj] = await Promise.all([
+      google(`${GMAIL}/threads?maxResults=30&q=${encodeURIComponent(q)}`),
+      google(`${GMAIL}/threads?maxResults=30&q=${encodeURIComponent(`${q} has:attachment`)}`),
+    ]);
+    for (const t of tous.threads || []) if (/^[0-9a-f]{6,32}$/i.test(t.id)) fils.set(t.id, true);
+    for (const t of pj.threads || []) avecPj.add(t.id);
+  }
+  for (const a of acts) {
+    const f = a.meta?.fil;
+    if (/^[0-9a-f]{6,32}$/i.test(f || '') && fils.size < 40) fils.set(f, true);
+  }
+  const lus = await Promise.all([...fils.keys()].map(async (fil) => {
+    let t;
+    try {
+      t = await google(`${GMAIL}/threads/${fil}?format=metadata&metadataHeaders=Subject&metadataHeaders=From&metadataHeaders=To&metadataHeaders=Cc`);
+    } catch {
+      return null;
+    }
+    const ms = (t.messages || []).filter((m) => !(m.labelIds || []).includes('DRAFT'));
+    if (!ms.length) return null;
+    const dernier = ms[ms.length - 1];
+    const h = enTetes(dernier);
+    const de = adresse(h.from);
+    const avec = new Set();
+    for (const m of ms) {
+      const x = enTetes(m);
+      for (const ad of [...listeAdresses(x.from), ...listeAdresses(x.to), ...listeAdresses(x.cc)]) if (ad !== COMPTE) avec.add(ad);
+    }
+    return {
+      fil, objet: String(enTetes(ms[0]).subject || h.subject || '').slice(0, 300), dernier: new Date(Number(dernier.internalDate) || Date.now()).toISOString(), n: ms.length,
+      extrait: texteBrut(dernier.snippet).slice(0, 220), dernier_moi: de.email === COMPTE, dernier_de: de.nom || de.email,
+      avec: [...avec].slice(0, 6), pj: avecPj.has(fil) || ms.some((m) => m.payload?.mimeType === 'multipart/mixed'),
+      non_lu: ms.some((m) => (m.labelIds || []).includes('UNREAD')), tache: fil === lead.tache_fil,
+    };
+  }));
+  return { fils: lus.filter(Boolean).sort((x, y) => (x.dernier < y.dernier ? 1 : -1)), emails };
+}
+
+// Une pièce jointe d'un fil autorisé. Les PDF et images s'ouvrent ; le reste se télécharge.
+const PIECE_LECTURE_MAX = 4 * 1024 * 1024; // une réponse Vercel plafonne à 4,5 Mo
+const TYPES_OUVRABLES = /^(application\/pdf|image\/(png|jpeg|gif|webp))$/i;
+async function envoyerPieceGmail(res, params) {
+  const fil = params.get('fil');
+  const message = params.get('message');
+  const partie = params.get('piece');
+  if (!/^[0-9a-f]{6,32}$/i.test(fil || '') || !/^[0-9a-f]{6,32}$/i.test(message || '') || !/^[0-9.]{1,20}$/.test(partie || '')) throw new Refus('id_invalide');
+  if (!gmailConfigure()) throw new Refus('gmail_non_configure', 503);
+  const m = await google(`${GMAIL}/messages/${message}?format=full`);
+  if (m.threadId !== fil || !(await filAutorise(fil, [m]))) throw new Refus('introuvable', 404);
+  const p = fichiersJoints(m.payload).find((x) => x.partie === partie);
+  if (!p) throw new Refus('introuvable', 404);
+  if (p.taille > PIECE_LECTURE_MAX) throw new Refus('piece_trop_lourde', 413);
+  const d = await google(`${GMAIL}/messages/${message}/attachments/${encodeURIComponent(p.att)}`);
+  const octets = Buffer.from(String(d.data || ''), 'base64url');
+  const ouvrable = TYPES_OUVRABLES.test(p.type);
+  res.setHeader('Content-Type', ouvrable ? p.type.toLowerCase() : 'application/octet-stream');
+  res.setHeader('Content-Disposition', `${ouvrable ? 'inline' : 'attachment'}; filename*=UTF-8''${nomRfc5987(p.nom)}`);
+  res.setHeader('X-Content-Type-Options', 'nosniff');
+  res.setHeader('Cache-Control', 'private, no-store');
+  return res.status(200).send(octets);
 }
 
 /* ---------- Dates ouvrées (mêmes règles que la page) ---------- */
@@ -2116,7 +2253,9 @@ export default async function handler(req, res) {
       const params = new URL(req.url, 'http://local').searchParams;
       const logo = params.get('logo');
       if (logo !== null) return await envoyerLogo(res, logo);
+      if (params.get('piece') !== null) return await envoyerPieceGmail(res, params);
       if (params.get('fil') !== null) return res.status(200).json(await filDuCrm(params.get('fil')));
+      if (params.get('boite') !== null) return res.status(200).json(await boiteDuLead(params.get('boite')));
       if (params.get('document') !== null) {
         const id = params.get('document');
         if (!UUID_RE.test(id)) throw new Refus('id_invalide');

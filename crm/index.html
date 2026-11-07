@@ -290,6 +290,31 @@
   .vocal .choix-voix { display: flex; align-items: center; gap: 6px; font-size: 14px; color: var(--muted); margin-left: auto; min-width: 0; }
   .vocal .choix-voix select { height: 36px; max-width: 220px; min-width: 0; border: 1px solid var(--line-strong); border-radius: 10px; padding: 0 8px; background: var(--card); font-size: 16px; color: var(--text); }
   .fil-email { border: 1px solid var(--line); border-radius: 12px; padding: 10px 12px; margin-top: 10px; background: #fff; }
+  dialog.modale.large { width: min(1180px, calc(100vw - 24px)); }
+  .boite { display: grid; gap: 18px; }
+  .boite > section { min-width: 0; }
+  @media (min-width: 900px) {
+    .boite { grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); align-items: start; }
+    .boite-echanges { max-height: calc(100dvh - 160px); overflow: auto; padding-right: 6px; position: sticky; top: 0; }
+  }
+  .boite-tete { display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .boite-tete h3 { font-size: 16px; margin: 0; }
+  .boite-echanges .fil-email > summary { display: grid; gap: 3px; }
+  .fil-email .ligne1 { display: flex; justify-content: space-between; gap: 2px 8px; align-items: baseline; flex-wrap: wrap; }
+  .fil-email .ligne1 .meta { white-space: nowrap; }
+  .boite-echanges .fil-email > summary { -webkit-user-select: none; user-select: none; -webkit-tap-highlight-color: transparent; }
+  .fil-email .objet { font-weight: 700; overflow-wrap: anywhere; }
+  .fil-email.non-lu .objet { font-weight: 800; }
+  .fil-email .extrait { color: var(--muted); font-size: 13.5px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; overflow-wrap: anywhere; }
+  .fil-email[open] .extrait { display: none; }
+  .fil-actions { margin-top: 12px; }
+  .pj-liste { display: flex; flex-wrap: wrap; gap: 6px; margin: 2px 0 0; padding: 0; list-style: none; max-width: 100%; }
+  .pj { display: inline-flex; align-items: center; gap: 6px; min-height: 36px; border: 1px solid var(--line-strong); border-radius: 8px; padding: 6px 10px; background: var(--card); color: var(--text); font: inherit; font-size: 13.5px; font-weight: 600; cursor: pointer; max-width: 100%; text-align: left; overflow-wrap: anywhere; }
+  .pj:hover { border-color: var(--primary); }
+  .pj .taille { color: var(--muted); font-weight: 400; white-space: nowrap; }
+  .pj-envoi { display: flex; flex-direction: column; gap: 6px; }
+  .pj-envoi ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 4px; }
+  .pj-envoi li { display: flex; justify-content: space-between; gap: 8px; align-items: center; font-size: 14px; overflow-wrap: anywhere; }
   .fil-email > summary { cursor: pointer; display: flex; flex-wrap: wrap; gap: 4px 10px; align-items: baseline; }
   .fil { list-style: none; margin: 12px 0 0; padding: 0; display: flex; flex-direction: column; gap: 12px; }
   .fil li { max-width: 92%; display: flex; flex-direction: column; gap: 4px; }
@@ -579,6 +604,10 @@ const ERREURS = {
   gmail_connexion: "Connexion à Gmail impossible : rien n'est parti.",
   gmail_mauvaise_boite: "La boîte reliée n'est pas gabriel@ia-entrepreneur.fr : rien n'est parti.",
   gmail_envoi: "Gmail a refusé le message : rien n'est parti.",
+  trop_de_pieces: "5 pièces jointes au plus : rien n'est parti.",
+  pieces_trop_lourdes: "Pièces jointes trop lourdes pour le CRM (3,3 Mo au plus) : rien n'est parti. Envoie ce message depuis Gmail.",
+  piece_invalide: "Une pièce jointe est vide ou illisible : rien n'est parti.",
+  piece_trop_lourde: 'Pièce jointe trop lourde pour le CRM (plus de 4 Mo) : ouvre le fil dans Gmail.',
   trop_d_emails_aujourdhui: "Limite de 60 emails par jour atteinte : rien n'est parti.",
   adresse_invalide: "L'adresse email n'est pas valide.",
   objet_invalide: "Il manque l'objet.",
@@ -1147,8 +1176,9 @@ function libelleSource(s) {
 /* ================= Fenêtres d'action ================= */
 
 const modale = () => $('#modale');
-function ouvrirModale(html, monter) {
+function ouvrirModale(html, monter, { large = false } = {}) {
   const m = modale();
+  m.classList.toggle('large', large);
   m.innerHTML = `<form class="form" novalidate><button type="button" class="fermer fermer-modale" data-fermer aria-label="Fermer">✕</button>${html}</form>`;
   const titre = $('h2', m);
   if (titre) { titre.id = 'titre-modale'; m.setAttribute('aria-labelledby', 'titre-modale'); }
@@ -2223,9 +2253,9 @@ function filsDuLead(leadId) {
 }
 function boutonEchanges(l) {
   const n = filsDuLead(l.id).length;
-  if (!n || !D.gmail) return '';
+  if (!D.gmail || (!n && !contactsDe(l.id).some((c) => c.email))) return '';
   const tache = l.tache_fil && FIL_RE.test(l.tache_fil);
-  return `<div class="actions" style="margin-top:8px"><button type="button" class="btn petit${tache ? ' primaire' : ''}" data-act="echanges"${tache ? ` data-fil="${esc(l.tache_fil)}"` : ''}>${tache ? "Lire l'email à traiter" : `Voir les échanges (${n})`}</button>${tache && n > 1 ? `<button type="button" class="btn petit" data-act="echanges">Tous les échanges (${n})</button>` : ''}</div>`;
+  return `<div class="actions" style="margin-top:8px"><button type="button" class="btn petit${tache ? ' primaire' : ''}" data-act="echanges"${tache ? ` data-fil="${esc(l.tache_fil)}"` : ''}>${tache ? "Lire l'email à traiter" : 'Voir les échanges'}</button>${tache ? '<button type="button" class="btn petit" data-act="echanges">Tous les échanges</button>' : ''}</div>`;
 }
 const FILS_LUS = new Map();
 async function lireFilCrm(fil) {
@@ -2234,12 +2264,111 @@ async function lireFilCrm(fil) {
   FILS_LUS.set(fil, r.messages || []);
   return r.messages || [];
 }
-function messagesHtml(ms) {
+/* ----- Les pièces jointes des emails : ouvrir un PDF ou une image, télécharger le reste ----- */
+const OUVRABLES = /^(application\/pdf|image\/(png|jpeg|gif|webp))$/i;
+const taillePj = (o) => (o >= 1048576 ? `${(o / 1048576).toFixed(1).replace('.', ',')} Mo` : `${Math.max(1, Math.round((o || 0) / 1024))} Ko`);
+const lienGmail = (fil) => `https://mail.google.com/mail/u/?authuser=${encodeURIComponent(COMPTE)}#all/${fil}`;
+function piecesHtml(m, fil) {
+  if (fil && m.fichiers && m.fichiers.length) {
+    return `<ul class="pj-liste" aria-label="Pièces jointes">${m.fichiers.map((f) => `<li><button type="button" class="pj" data-pj="${esc(f.partie)}" data-message="${esc(m.id)}" data-fil="${esc(fil)}" data-nom="${esc(f.nom)}" data-type="${esc(f.type)}" title="${OUVRABLES.test(f.type) ? 'Ouvrir' : 'Télécharger'} ${esc(f.nom)}">${esc(f.nom)} <span class="taille">${esc(taillePj(f.taille))}</span></button></li>`).join('')}</ul>`;
+  }
+  return m.pieces && m.pieces.length ? `<p class="meta">Pièces jointes : ${esc(m.pieces.join(', '))}</p>` : '';
+}
+async function ouvrirPieceGmail(b) {
+  const ouvrable = OUVRABLES.test(b.dataset.type || '');
+  const fenetre = ouvrable ? window.open('', '_blank') : null;
+  try {
+    const r = await fetch(`${API}?piece=${encodeURIComponent(b.dataset.pj)}&message=${encodeURIComponent(b.dataset.message)}&fil=${encodeURIComponent(b.dataset.fil)}`, { headers: { 'X-Cle-Crm': S.cle } });
+    if (r.status === 413) { if (fenetre) fenetre.close(); toast(ERREURS.piece_trop_lourde, 6000); return; }
+    if (!r.ok) throw new Error();
+    const blob = await r.blob();
+    const url = URL.createObjectURL(ouvrable ? blob : new Blob([blob], { type: 'application/octet-stream' }));
+    if (fenetre) fenetre.location.href = url;
+    else {
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = b.dataset.nom || 'piece-jointe';
+      document.body.append(a);
+      a.click();
+      a.remove();
+    }
+    setTimeout(() => URL.revokeObjectURL(url), 120000);
+  } catch {
+    if (fenetre) fenetre.close();
+    toast("La pièce jointe n'a pas pu s'ouvrir. Réessaie.");
+  }
+}
+document.addEventListener('click', (ev) => {
+  const b = ev.target.closest('[data-pj]');
+  if (!b) return;
+  ev.preventDefault();
+  ouvrirPieceGmail(b);
+});
+
+/* ----- La boîte d'un lead : tous ses emails, comme dans Gmail ----- */
+// Gabriel, 07/11 : « que le CRM je puisse l'utiliser comme mes mails : voir l'historique des échanges, les PJ envoyées… »
+const BOITES = new Map();
+async function chargerBoite(leadId, forcer = false) {
+  if (!forcer && BOITES.has(leadId)) return BOITES.get(leadId);
+  const r = await api('GET', null, `?boite=${encodeURIComponent(leadId)}`);
+  BOITES.set(leadId, r);
+  return r;
+}
+function listeFilsHtml(b, ouvert) {
+  if (!b.fils.length) return `<p class="vide">${b.emails.length ? `Aucun email avec ${esc(b.emails.join(', '))} dans ta boîte.` : "Aucune adresse email sur cette fiche : ajoute-la au contact pour retrouver vos échanges."}</p>`;
+  return b.fils.map((f) => `<details class="fil-email${f.non_lu ? ' non-lu' : ''}" data-fil="${esc(f.fil)}"${f.fil === ouvert ? ' open' : ''}>
+      <summary><span class="ligne1"><span class="objet">${esc(f.objet || 'Sans objet')}</span><span class="meta">${esc(instantLisible(f.dernier))}</span></span>
+        <span class="meta">${esc(f.dernier_moi ? 'Toi' : f.dernier_de)}${f.n > 1 ? ` · ${f.n} messages` : ''}${f.pj ? ' · pièces jointes' : ''}${f.non_lu ? ' · non lu' : ''}${f.tache ? ' · lié à la tâche' : ''}</span>
+        <span class="extrait">${esc(f.extrait)}</span></summary>
+      <div data-fil-corps><p class="aide">Je lis le fil dans Gmail…</p></div></details>`).join('');
+}
+function brancherBoite(zone, surRepondre) {
+  $$('details.fil-email', zone).forEach((d) => {
+    const lire = async () => {
+      if (d.dataset.lu) return;
+      d.dataset.lu = '1';
+      const corps = $('[data-fil-corps]', d);
+      try {
+        const ms = await lireFilCrm(d.dataset.fil);
+        corps.innerHTML = `${messagesHtml(ms, d.dataset.fil)}<div class="actions fil-actions">${surRepondre && ms.length ? '<button type="button" class="btn petit primaire" data-repondre>Répondre</button>' : ''}<a class="btn petit lien" href="${esc(lienGmail(d.dataset.fil))}" target="_blank" rel="noopener">Ouvrir dans Gmail</a></div>`;
+        const b = $('[data-repondre]', corps);
+        if (b) b.addEventListener('click', () => surRepondre(d.dataset.fil, ms));
+      } catch (e) {
+        corps.innerHTML = `<p class="erreur" role="alert">${esc(e.message)}</p>`;
+        delete d.dataset.lu;
+      }
+    };
+    d.addEventListener('toggle', () => { if (d.open) lire(); });
+    if (d.open) lire();
+  });
+}
+async function monterBoite(racine, leadId, { ouvert = null, surRepondre = null } = {}) {
+  const zone = $('[data-boite-liste]', racine);
+  if (!zone) return;
+  const afficher = (b) => {
+    zone.innerHTML = listeFilsHtml(b, ouvert || (b.fils[0] && b.fils[0].fil));
+    brancherBoite(zone, surRepondre);
+  };
+  const maj = $('[data-boite-maj]', racine);
+  if (maj) maj.addEventListener('click', async () => {
+    maj.disabled = true;
+    FILS_LUS.clear();
+    try { afficher(await chargerBoite(leadId, true)); } catch (e) { toast(e.message); }
+    maj.disabled = false;
+  });
+  try { afficher(await chargerBoite(leadId)); } catch (e) { zone.innerHTML = `<p class="erreur" role="alert">${esc(e.message)}</p>`; }
+}
+const blocBoite = (l) => `<section class="boite-echanges" aria-label="Emails échangés">
+    <div class="boite-tete"><h3>Vos emails</h3><button type="button" class="btn petit lien" data-boite-maj>Actualiser</button></div>
+    <div data-boite-liste><p class="aide">Je cherche tes emails avec ${esc(l.entreprise)} dans ta boîte…</p></div>
+  </section>`;
+
+function messagesHtml(ms, fil = null) {
   if (!ms.length) return '<p class="vide">Ce fil est vide dans Gmail.</p>';
   return `<ol class="fil">${ms.map((m) => `<li class="${m.moi ? 'moi' : 'eux'}">
       <p class="meta">${esc(m.moi ? 'Toi' : m.de)}, ${esc(instantLisible(m.date))}</p>
       <div class="bulle">${esc(m.texte || '(message vide)')}</div>
-      ${m.pieces && m.pieces.length ? `<p class="meta">Pièces jointes : ${esc(m.pieces.join(', '))}</p>` : ''}
+      ${piecesHtml(m, fil)}
       ${m.complet && m.complet.length > (m.texte || '').length + 80 ? `<details><summary>Afficher le message entier</summary><pre>${esc(m.complet)}</pre></details>` : ''}
     </li>`).join('')}</ol>`;
 }
@@ -2249,7 +2378,7 @@ function brancherFils(racine) {
       if (d.dataset.lu) return;
       d.dataset.lu = '1';
       const zone = $('[data-fil-corps]', d);
-      try { zone.innerHTML = messagesHtml(await lireFilCrm(d.dataset.fil)); } catch (e) { zone.innerHTML = `<p class="erreur" role="alert">${esc(e.message)}</p>`; delete d.dataset.lu; }
+      try { zone.innerHTML = messagesHtml(await lireFilCrm(d.dataset.fil), d.dataset.fil); } catch (e) { zone.innerHTML = `<p class="erreur" role="alert">${esc(e.message)}</p>`; delete d.dataset.lu; }
     };
     d.addEventListener('toggle', () => { if (d.open) lire(); });
     if (d.open) lire();
@@ -2259,18 +2388,15 @@ const AUTRES_ECHANGES = ['appel', 'appel_sans_reponse', 'rdv', 'sms', 'note', 'l
 function ouvrirEchanges(leadId, filOuvert = null) {
   const l = IDX.lead.get(leadId);
   if (!l) return;
-  const fils = filsDuLead(leadId);
-  const ouvert = filOuvert || (FIL_RE.test(l.tache_fil || '') ? l.tache_fil : '') || (fils[0] && fils[0].fil);
+  const ouvert = filOuvert || (FIL_RE.test(l.tache_fil || '') ? l.tache_fil : null);
   const autres = activitesDe(leadId).filter((a) => AUTRES_ECHANGES.includes(a.type)).slice(0, 15);
   ouvrirModale(`<h2>Échanges avec ${esc(l.entreprise)}</h2>
     ${l.prochaine_note ? `<div class="prochaine"><p class="meta">À faire ${esc(l.prochaine_relance ? quand(l.prochaine_relance) : '')}</p><p>${esc(l.prochaine_note)}</p></div>` : ''}
-    ${fils.length ? `<p class="meta">${fils.length} fil${fils.length > 1 ? 's' : ''} d'emails, lus dans ta boîte</p>${fils.map((f) => `<details class="fil-email" data-fil="${esc(f.fil)}"${f.fil === ouvert ? ' open' : ''}>
-        <summary><b>${esc(f.objet || 'Sans objet')}</b> <span class="meta">${esc(instantLisible(f.dernier))}${f.fil === l.tache_fil ? ', lié à la tâche' : ''}</span></summary>
-        <div data-fil-corps><p class="aide">Je lis le fil dans Gmail…</p></div></details>`).join('')}` : '<p class="vide">Aucun email de ce lead dans le CRM pour l\'instant.</p>'}
+    ${D.gmail ? blocBoite(l) : '<p class="vide">La boîte Gmail n\'est pas reliée au CRM.</p>'}
     ${autres.length ? `<h3 class="sous-groupe">Appels, RDV et notes</h3><ol class="journal">${autres.map((a) => `<li class="t-${a.type}"><div class="quand"><span class="quoi">${esc(LIB_ACTIVITE[a.type] || a.type)}</span><span>${esc(instantLisible(a.date))}</span></div><p class="resume">${esc(a.resume)}</p>${a.contenu ? `<details><summary>Voir le texte</summary><pre>${esc(a.contenu)}</pre></details>` : ''}</li>`).join('')}</ol>` : ''}
     <div class="pied"><button type="button" class="btn" data-fermer>Fermer</button></div>`, (form) => {
     brancherAnnuler(form);
-    brancherFils(form);
+    monterBoite(form, leadId, { ouvert, surRepondre: (fil, ms) => ouvrirEmail(leadId, null, { reponse: { fil, ms } }) });
   });
 }
 function ouvrirFilSeul(fil, titre) {
@@ -2683,7 +2809,10 @@ function remplirModele(texte, l, c) {
     .replace(/Bonjour ,/g, 'Bonjour,');
 }
 
-function ouvrirEmail(leadId, contactId) {
+// La fenêtre Email : à gauche (en haut sur téléphone) tous les emails avec ce lead, comme dans Gmail, avec les pièces
+// jointes ; à droite, le message à écrire, en nouveau message ou en réponse dans un fil, avec des pièces jointes.
+const PJ_MAX = 3.3 * 1024 * 1024;
+function ouvrirEmail(leadId, contactId, { reponse: reponseDemandee = null } = {}) {
   const l = IDX.lead.get(leadId);
   const avecEmail = contactsDe(leadId).filter((c) => c.email);
   let c = avecEmail.find((x) => x.id === contactId) || avecEmail.find((x) => x.principal) || avecEmail[0] || null;
@@ -2694,7 +2823,11 @@ function ouvrirEmail(leadId, contactId) {
   const etapeTexte = n <= CADENCE.length ? `relance ${n} sur ${CADENCE.length} du rythme, dans ${delaiApres(n)} jours` : 'prise de nouvelles dans 3 mois, les relances du rythme sont faites';
   const corpsDepart = `${salutation(c)}\n\n\n\n${signature}`;
   ouvrirModale(`
-    <h2>Écrire à ${esc(l.entreprise)}</h2>
+    <h2>Emails avec ${esc(l.entreprise)}</h2>
+    <div class="boite">
+    ${D.gmail ? blocBoite(l) : ''}
+    <section class="boite-ecrire" aria-label="Écrire">
+    <div class="boite-tete"><h3 data-ecrire-titre>Nouveau message</h3><button type="button" class="btn petit lien" data-nouveau hidden>Écrire un nouveau message plutôt</button></div>
     <p class="de">De : <b>${esc(D.expediteur || COMPTE)}</b>.${D.gmail ? ' Le message ira dans tes Envoyés Gmail.' : ''}</p>
     ${champ('À', `<select name="a_contact">${avecEmail.map((x) => `<option value="${x.id}" ${c && x.id === c.id ? 'selected' : ''}>${esc(nomContact(x) || x.email)} (${esc(x.email)})</option>`).join('')}<option value="autre" ${c ? '' : 'selected'}>Autre adresse</option></select>`)}
     <label class="champ" data-autre ${c ? 'hidden' : ''}>Adresse<input type="email" name="a_autre" placeholder="prenom@entreprise.fr" autocomplete="off"></label>
@@ -2705,14 +2838,86 @@ function ouvrirEmail(leadId, contactId) {
     ${precedent ? `<label class="case"><input type="checkbox" name="fil" ${l.relances_sans_reponse > 0 ? 'checked' : ''}> Répondre dans le fil de « ${esc(precedent.meta.objet)} » (${esc(instantLisible(precedent.date))})</label>` : ''}
     ${champ('Objet', '<input type="text" name="objet" maxlength="250" required>')}
     ${champ('Message', `<textarea name="corps" class="grand" required>${esc(corpsDepart)}</textarea>`, 'La signature est déjà dans le texte : tu peux tout modifier.')}
+    ${D.gmail ? `<div class="champ pj-envoi"><span>Pièces jointes</span><ul data-pj-liste></ul><div class="actions"><label class="btn petit">Joindre des fichiers<input type="file" multiple data-pj-fichiers hidden></label></div><span class="aide">5 fichiers et 3,3 Mo en tout au plus. Au-delà, envoie ce message depuis Gmail.</span></div>` : ''}
     ${blocProchaine('apres', date, 'email', n <= CADENCE.length ? `Relance ${n}` : 'Prise de nouvelles', { aide: `${n <= CADENCE.length ? `Relance ${n} sur ${CADENCE.length}` : 'Prise de nouvelles'}, proposée d'après le rythme. Change la date si un appel est prévu.` })}
     <div class="confirmation" data-confirmation hidden></div>
     ${piedFormulaire(`<button type="button" class="btn lien" data-mode="noter">Noter sans envoyer</button>${D.gmail ? '<button type="button" class="btn" data-mode="brouillon">Brouillon</button><button type="submit" class="btn primaire" data-mode="envoyer">Envoyer</button>' : ''}`)}
     ${D.gmail ? '' : '<p class="aide">L\'envoi direct n\'est pas encore branché : copie le texte dans Gmail (vérifie la ligne De), puis note-le ici.</p>'}
+    </section>
+    </div>
   `, (form) => {
     brancherAnnuler(form);
     brancherPuces(form, 'apres');
     const el = form.elements;
+    // Répondre dans un fil de la boîte : destinataire, objet « Re: » et en-têtes de réponse.
+    let reponse = null;
+    const titre = $('[data-ecrire-titre]', form);
+    const nouveau = $('[data-nouveau]', form);
+    const caseFil = el.fil ? el.fil.closest('label') : null;
+    const repondre = (fil, ms) => {
+      const dernier = ms[ms.length - 1];
+      const autre = [...ms].reverse().find((m) => !m.moi);
+      const adr = dernier.moi ? ((dernier.a.match(/[^\s<>,;"]+@[^\s<>,;"]+/) || [])[0] || (autre && autre.email) || '') : dernier.email;
+      const objet = String(ms[0].objet || dernier.objet || '').replace(/^((re|tr|fwd?)\s*:\s*)+/i, '');
+      const ct = avecEmail.find((x) => x.email.toLowerCase() === String(adr).toLowerCase());
+      el.a_contact.value = ct ? ct.id : 'autre';
+      if (!ct) el.a_autre.value = adr;
+      el.a_contact.dispatchEvent(new Event('change'));
+      modeReponse({ fil, message_id: dernier.message_id || null, references: [dernier.references, dernier.message_id].filter(Boolean).join(' ').trim(), objet });
+      $('.boite-ecrire', form).scrollIntoView({ block: 'start', behavior: 'smooth' });
+      el.corps.focus({ preventScroll: true });
+      const debut = el.corps.value.indexOf('\n\n') + 2;
+      if (debut > 1) el.corps.setSelectionRange(debut, debut);
+    };
+    function modeReponse(r) {
+      reponse = r;
+      el.objet.value = `Re: ${r.objet}`;
+      if (caseFil) { el.fil.checked = false; caseFil.hidden = true; }
+      titre.textContent = `Réponse à « ${r.objet} »`;
+      nouveau.hidden = false;
+    }
+    nouveau.addEventListener('click', () => {
+      reponse = null;
+      titre.textContent = 'Nouveau message';
+      nouveau.hidden = true;
+      el.objet.value = '';
+    });
+    if (D.gmail) {
+      const ouvert = reponseDemandee ? reponseDemandee.fil : FIL_RE.test(l.tache_fil || '') ? l.tache_fil : null;
+      monterBoite(form, l.id, { ouvert, surRepondre: repondre });
+    }
+    // Pièces jointes à envoyer.
+    let pj = [];
+    const listePj = $('[data-pj-liste]', form);
+    const entreePj = $('[data-pj-fichiers]', form);
+    const rendrePj = () => {
+      listePj.innerHTML = pj.map((f, i) => `<li><span>${esc(f.name)} <span class="meta">${esc(taillePj(f.size))}</span></span><button type="button" class="btn petit lien" data-retirer="${i}">Retirer</button></li>`).join('');
+    };
+    if (entreePj) {
+      entreePj.addEventListener('change', () => {
+        const tous = [...pj, ...entreePj.files];
+        entreePj.value = '';
+        const total = tous.reduce((x, f) => x + f.size, 0);
+        if (tous.length > 5) { montrerErreur(form, '5 pièces jointes au plus.'); return; }
+        if (tous.some((f) => !f.size)) { montrerErreur(form, 'Un des fichiers est vide.'); return; }
+        if (total > PJ_MAX) { montrerErreur(form, `Trop lourd pour le CRM : ${taillePj(total)} en tout, 3,3 Mo au plus. Retire une pièce ou envoie ce message depuis Gmail.`); return; }
+        $('[data-erreur]', form).hidden = true;
+        pj = tous;
+        rendrePj();
+      });
+      listePj.addEventListener('click', (ev) => {
+        const b = ev.target.closest('[data-retirer]');
+        if (!b) return;
+        pj.splice(Number(b.dataset.retirer), 1);
+        rendrePj();
+      });
+    }
+    const lirePj = () => Promise.all(pj.map((f) => new Promise((ok, ko) => {
+      const r = new FileReader();
+      r.onload = () => ok({ nom: f.name, type: f.type || 'application/octet-stream', donnees: String(r.result).split(',')[1] || '' });
+      r.onerror = () => ko(new Error(`Je n'arrive pas à lire « ${f.name} ».`));
+      r.readAsDataURL(f);
+    })));
     const objetParDefaut = () => (precedent && el.fil && el.fil.checked ? `Re: ${precedent.meta.objet.replace(/^(re|tr|fwd?)\s*:\s*/i, '')}` : '');
     el.objet.value = objetParDefaut();
     const contactChoisi = () => avecEmail.find((x) => x.id === el.a_contact.value) || null;
@@ -2724,7 +2929,7 @@ function ouvrirEmail(leadId, contactId) {
     el.modele.addEventListener('change', () => {
       const m = D.modeles.find((x) => x.id === el.modele.value);
       if (!m) return;
-      if (!(el.fil && el.fil.checked)) el.objet.value = remplirModele(m.objet, l, c);
+      if (!reponse && !(el.fil && el.fil.checked)) el.objet.value = remplirModele(m.objet, l, c);
       el.corps.value = `${remplirModele(m.corps, l, c).trim()}\n\n${signature}`;
     });
     if (el.fil) el.fil.addEventListener('change', () => { el.objet.value = el.fil.checked ? objetParDefaut() : ''; });
@@ -2733,7 +2938,7 @@ function ouvrirEmail(leadId, contactId) {
       el.modele.dispatchEvent(new Event('change'));
     }
     brancherPerso(form, l.id, 'email', () => (el.a_contact.value === 'autre' ? null : el.a_contact.value), (r) => {
-      if (!(el.fil && el.fil.checked) && r.objet) el.objet.value = r.objet;
+      if (!reponse && !(el.fil && el.fil.checked) && r.objet) el.objet.value = r.objet;
       el.corps.value = `${r.corps.trim()}\n\n${signature}`;
     });
     const memoriserSession = () => {
@@ -2769,10 +2974,10 @@ function ouvrirEmail(leadId, contactId) {
     const envoyer = (mode) => soumettre(form, async () => {
       const a = destinataire();
       const ch = contactChoisi();
-      const fil = el.fil && el.fil.checked && precedent ? precedent.meta : null;
+      const fil = reponse ? { fil: reponse.fil, message_id: reponse.message_id, references: reponse.references } : el.fil && el.fil.checked && precedent ? precedent.meta : null;
       memoriserSession();
       if (mode === 'noter') {
-        await journal(l.id, { type: 'email_envoye', resume: `Email envoyé à ${a} : « ${el.objet.value.trim()} »`, contenu: el.corps.value, contact_id: ch ? ch.id : null, source: 'crm' }, majLead());
+        await journal(l.id, { type: 'email_envoye', resume: `Email envoyé à ${a} : « ${el.objet.value.trim()} »${pj.length ? ` (pièces jointes : ${pj.map((f) => f.name).join(', ')})` : ''}`, contenu: el.corps.value, contact_id: ch ? ch.id : null, source: 'crm' }, majLead());
         fermerModale();
         toast("Noté dans l'historique.");
         actionFaite(l.id, 'email');
@@ -2780,8 +2985,11 @@ function ouvrirEmail(leadId, contactId) {
       }
       const r = await api('POST', {
         op: 'email', mode, lead_id: l.id, contact_id: ch ? ch.id : null, a, objet: el.objet.value.trim(), corps: el.corps.value,
-        fil: fil ? fil.fil : null, en_reponse_a: fil ? fil.message_id : null, lead: majLead(mode),
+        fil: fil ? fil.fil : null, en_reponse_a: fil ? fil.message_id : null, references: fil && fil.references ? fil.references : null, lead: majLead(mode),
+        pieces: pj.length ? await lirePj() : undefined,
       });
+      BOITES.delete(l.id);
+      if (fil) FILS_LUS.delete(fil.fil);
       ajouterActivite(r.activite);
       remplacerLead(r.lead);
       indexer();
@@ -2802,14 +3010,21 @@ function ouvrirEmail(leadId, contactId) {
       if (mode !== 'envoyer' || (enSession() && el.direct && el.direct.checked)) { envoyer(mode); return; }
       const conf = $('[data-confirmation]', form);
       conf.hidden = false;
-      conf.innerHTML = `<p>Envoyer maintenant à <b>${esc(destinataire())}</b> depuis <b>${esc(D.expediteur || COMPTE)}</b> ?</p>
+      conf.innerHTML = `<p>Envoyer maintenant à <b>${esc(destinataire())}</b> depuis <b>${esc(D.expediteur || COMPTE)}</b>${pj.length ? `, avec ${pj.length} pièce${pj.length > 1 ? 's' : ''} jointe${pj.length > 1 ? 's' : ''}` : ''}${reponse ? `, en réponse dans le fil « ${esc(reponse.objet)} »` : ''} ?</p>
         <div class="actions"><button type="button" class="btn" data-revenir>Revenir</button><button type="button" class="btn primaire" data-confirmer>Oui, envoyer</button></div>`;
       conf.scrollIntoView({ block: 'nearest' });
       $('[data-revenir]', conf).addEventListener('click', () => { conf.hidden = true; });
       $('[data-confirmer]', conf).addEventListener('click', () => envoyer('envoyer'));
     }));
     form.addEventListener('submit', (ev) => ev.preventDefault());
-  });
+    // Avec la boîte Gmail, la case « Répondre dans le fil » devient le mode réponse (la relance part dans le dernier fil envoyé).
+    if (D.gmail && caseFil) {
+      caseFil.hidden = true;
+      if (el.fil.checked && !reponseDemandee && precedent) modeReponse({ fil: precedent.meta.fil, message_id: precedent.meta.message_id || null, references: '', objet: precedent.meta.objet.replace(/^((re|tr|fwd?)\s*:\s*)+/i, '') });
+      el.fil.checked = false;
+    }
+    if (reponseDemandee && reponseDemandee.ms && reponseDemandee.ms.length) repondre(reponseDemandee.fil, reponseDemandee.ms);
+  }, { large: Boolean(D.gmail) });
 }
 
 /* ----- Appel ----- */
