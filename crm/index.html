@@ -287,6 +287,8 @@
   @keyframes pouls { 50% { box-shadow: 0 0 0 8px color-mix(in srgb, var(--danger) 22%, transparent); } }
   @media (prefers-reduced-motion: reduce) { .vocal .micro.ecoute { animation: none; } }
   .vocal .etat-vocal { font-weight: 700; font-size: 17px; margin: 0; }
+  .vocal .choix-voix { display: flex; align-items: center; gap: 6px; font-size: 14px; color: var(--muted); margin-left: auto; min-width: 0; }
+  .vocal .choix-voix select { height: 36px; max-width: 220px; min-width: 0; border: 1px solid var(--line-strong); border-radius: 10px; padding: 0 8px; background: var(--card); font-size: 16px; color: var(--text); }
   .fil-email { border: 1px solid var(--line); border-radius: 12px; padding: 10px 12px; margin-top: 10px; background: #fff; }
   .fil-email > summary { cursor: pointer; display: flex; flex-wrap: wrap; gap: 4px 10px; align-items: baseline; }
   .fil { list-style: none; margin: 12px 0 0; padding: 0; display: flex; flex-direction: column; gap: 12px; }
@@ -1261,7 +1263,35 @@ const enSession = () => Boolean(S.session && $('#session').open);
 /* ----- À l'oral : je lis la relance, j'écoute ta réponse, j'exécute ----- */
 
 const Reco = window.SpeechRecognition || window.webkitSpeechRecognition || null;
-const voix = () => (window.speechSynthesis ? speechSynthesis.getVoices().find((v) => /^fr(-|_)FR/i.test(v.lang)) || speechSynthesis.getVoices().find((v) => /^fr/i.test(v.lang)) : null);
+// La voix du navigateur : la meilleure voix française disponible, ou celle que Gabriel a choisie.
+// Avant le 07/11, la première de la liste lisait ; sur Mac, c'était une voix gadget (Eddy, Grandma, Rocko…).
+const VOIX_GADGET = /\b(eddy|flo|grandma|grandpa|reed|rocko|sandy|shelley|jacques|albert|bahh|bells|boing|bubbles|cellos|wobble|jester|organ|superstar|trinoids|whisper|zarvox|fred|junior|kathy|ralph|good news|bad news)\b/i;
+function noteVoix(v) {
+  let n = /^fr(-|_)FR/i.test(v.lang) ? 0 : 40;
+  if (/natural|neural/i.test(v.name)) n -= 30; // Edge : « Microsoft … Online (Natural) »
+  else if (/premium/i.test(v.name)) n -= 25;
+  else if (/enhanced|am[ée]lior[ée]e/i.test(v.name)) n -= 20;
+  else if (/^google/i.test(v.name)) n -= 15;
+  if (VOIX_GADGET.test(v.name)) n += 100;
+  return n;
+}
+function voixFrancaises() {
+  if (!window.speechSynthesis) return [];
+  return speechSynthesis.getVoices().filter((v) => /^fr/i.test(v.lang)).sort((a, b) => noteVoix(a) - noteVoix(b));
+}
+function voix() {
+  const liste = voixFrancaises();
+  const choisie = localStorage.getItem('crm_voix');
+  return liste.find((v) => v.voiceURI === choisie) || liste[0] || null;
+}
+const voixNavigateurUtilisee = () => !(D && D.voix && !S.voixNavigateur);
+function choixVoix() {
+  const liste = voixFrancaises();
+  if (liste.length < 2 || !voixNavigateurUtilisee()) return '';
+  const v = voix();
+  const options = liste.map((x) => `<option value="${esc(x.voiceURI)}"${v && x.voiceURI === v.voiceURI ? ' selected' : ''}>${esc(x.name)}${/^fr(-|_)FR/i.test(x.lang) ? '' : ` (${esc(x.lang)})`}</option>`).join('');
+  return `<label class="choix-voix">Voix <select data-vocal-voix>${options}</select></label>`;
+}
 // Chrome coupe une lecture longue (vers 15 s) et oublie parfois de dire qu'elle est finie :
 // on lit phrase par phrase, et un minuteur de secours enchaîne quand même.
 let paroleJeton = 0;
@@ -1405,7 +1435,7 @@ function panneauVocal() {
     ${Reco ? '' : `<p class="alerte-vocal">Ce navigateur ne sait pas t'écouter. Sur iPhone, ouvre le CRM dans Safari ; sur ordinateur ou Android, dans Chrome. Ici, écris ta réponse (ou dicte-la avec le micro du clavier) : elle est exécutée pareil.</p>`}
     <div class="saisie"><input type="text" data-vocal-saisie placeholder="Ou écris : pas de réponse, rappelle lundi" aria-label="Ta réponse"><button type="button" class="btn" data-vocal="ecrit">OK</button></div>
     ${s.dernierTexte ? `<div class="confirmation"><p>${esc(s.dernierTexte)}</p><div class="actions"><button type="button" class="btn petit" data-vocal="annuler">Annuler</button></div></div>` : ''}
-    <div class="actions">${etat !== 'pause' ? '<button type="button" class="btn petit" data-vocal="pause">Pause</button>' : ''}<button type="button" class="btn petit" data-vocal="lire">Relire</button></div>
+    <div class="actions">${etat !== 'pause' ? '<button type="button" class="btn petit" data-vocal="pause">Pause</button>' : ''}<button type="button" class="btn petit" data-vocal="lire">Relire</button>${choixVoix()}</div>
     <p class="aide">Réponds comme à quelqu'un : « pas de réponse, rappelle-le lundi », « joint, il veut le programme, relance vendredi par email », « RDV jeudi à 14 h en visio », « perdu, pas de budget ». Tu peux aussi dire « suivant », « annule », « relis » ou « stop ».</p>
   </div>`;
 }
@@ -1608,6 +1638,23 @@ document.addEventListener('click', (ev) => {
     ecouterVocal(l, nouveauTour());
   }
 });
+// Changer de voix : on se met en pause (sinon le micro entendrait l'essai), puis la nouvelle voix se présente.
+document.addEventListener('change', (ev) => {
+  if (!ev.target.matches('[data-vocal-voix]') || !S.session) return;
+  localStorage.setItem('crm_voix', ev.target.value);
+  const s = S.session;
+  s.pause = true;
+  arreterVocal();
+  etatVocal('pause', 'Voix changée. Touche Reprendre pour continuer.');
+  parler("Bonjour Gabriel, c'est moi qui lirai tes relances. Touche Reprendre pour continuer.");
+});
+// Chrome charge ses voix après la page : on ajoute la liste dès qu'elles arrivent.
+if (window.speechSynthesis && speechSynthesis.addEventListener) {
+  speechSynthesis.addEventListener('voiceschanged', () => {
+    const s = S.session;
+    if (s && s.vocal && $('#session .vocal') && !$('#session [data-vocal-voix]')) etatVocal(s.etat, s.etatTexte);
+  });
+}
 document.addEventListener('keydown', (ev) => {
   if (ev.key !== 'Enter' || !ev.target.matches('[data-vocal-saisie]') || !S.session) return;
   ev.preventDefault();
