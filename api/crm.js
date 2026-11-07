@@ -956,6 +956,9 @@ const SCHEMA_TRI = {
           interet: { type: 'string', enum: ['oui', 'a_voir', 'non'] },
           a_faire: { type: 'string', enum: ['repondre', 'relancer_le', 'rien'] },
           relance_date: { type: 'string', description: 'AAAA-MM-JJ, ou vide' },
+          rdv_date: { type: 'string', description: 'AAAA-MM-JJ du rendez-vous validé, ou vide' },
+          rdv_heure: { type: 'string', description: 'HH:MM, ou vide' },
+          rdv_detail: { type: 'string' },
           tache: { type: 'string' },
           resume: { type: 'string' },
           raison: { type: 'string' },
@@ -964,7 +967,7 @@ const SCHEMA_TRI = {
           prenom: { type: 'string' },
           nom: { type: 'string' },
         },
-        required: ['ref', 'action', 'lead_id', 'interet', 'a_faire', 'relance_date', 'tache', 'resume', 'raison', 'type', 'entreprise', 'prenom', 'nom'],
+        required: ['ref', 'action', 'lead_id', 'interet', 'a_faire', 'relance_date', 'rdv_date', 'rdv_heure', 'rdv_detail', 'tache', 'resume', 'raison', 'type', 'entreprise', 'prenom', 'nom'],
         additionalProperties: false,
       },
     },
@@ -987,6 +990,8 @@ a_faire, pour un email rattaché :
 - relancer_le : l'email annonce un retour à une date (« je reviens vers toi lundi », « Jean te répondra lundi »). relance_date = ce jour-là, en AAAA-MM-JJ.
 - rien : information, remerciement, accusé de réception, ou Gabriel a déjà répondu.
 
+rdv_date, rdv_heure, rdv_detail : seulement quand l'email fixe un rendez-vous accepté des deux côtés : la personne accepte un créneau proposé par Gabriel, ou confirme un rendez-vous (« OK pour jeudi 14 h », « je vous confirme notre rendez-vous du 12 à 10 h »). Pas pour une simple proposition de créneaux qui attend la réponse de Gabriel : là, a_faire = repondre et les trois restent vides. rdv_date en AAAA-MM-JJ, en résolvant « jeudi » ou « demain » d'après la date de réception de l'email ; rdv_heure en HH:MM, vide si l'heure n'est pas dite ; rdv_detail en quelques mots : le format et l'objet (« visio avec son directeur », « au cabinet à Nancy »). Un rendez-vous validé n'appelle pas de réponse (a_faire = rien), sauf si l'email demande aussi quelque chose (un lien, un document) : a_faire = repondre.
+
 tache : si a_faire n'est pas rien, une phrase à l'infinitif, adressée à Gabriel, qui dit exactement quoi faire avec les détails utiles (quoi, pour qui, chiffres, dates). Par exemple « Envoyer à Sarah tes tarifs et un plan de cours niveau 2 pour sa cliente (1 personne, Supply Chain, 1er semestre 2027) ». Jamais seulement « Répondre à l'email ».
 resume : une phrase qui dit ce que contient l'email, avec les faits.
 raison : pourquoi cette décision, en quelques mots (« élève, rendu de TD », « même domaine que Jean Piron, il répondra lundi »).
@@ -995,7 +1000,8 @@ type : la nature de la relation (prospect, client, partenaire, fournisseur, form
 En français. N'invente rien : seulement ce qui est dans l'email et dans la liste.`;
 
 const resumeAnalyse = (d) => ({
-  action: d.action, lead_id: d.lead_id || '', interet: d.interet, a_faire: d.a_faire, relance_date: d.relance_date || '', tache: couper(d.tache, 600),
+  action: d.action, lead_id: d.lead_id || '', interet: d.interet, a_faire: d.a_faire, relance_date: d.relance_date || '',
+  rdv_date: d.rdv_date || '', rdv_heure: d.rdv_heure || '', rdv_detail: couper(d.rdv_detail || '', 200), tache: couper(d.tache, 600),
   resume: couper(d.resume, 600), raison: couper(d.raison, 300), type: d.type || '', entreprise: couper(d.entreprise, 160), prenom: couper(d.prenom, 80), nom: couper(d.nom, 80), le: new Date().toISOString(),
 });
 
@@ -1012,7 +1018,7 @@ async function analyserEmails(items, ann) {
     const emails = paquet.map((r) => [
       `--- ref : ${r.ref}`,
       `De : ${r.de.nom ? `${r.de.nom} ` : ''}<${r.de.email}>`,
-      `Reçu le : ${new Date(r.quand).toLocaleString('fr-FR', { timeZone: 'Europe/Paris' })}`,
+      `Reçu le : ${new Date(r.quand).toLocaleString('fr-FR', { timeZone: 'Europe/Paris', weekday: 'long', day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' })}`,
       `Objet : ${r.objet}`,
       r.agenda ? 'Nature : invitation à un rendez-vous dans son agenda' : '',
       r.pieces?.length ? `Pièces jointes : ${r.pieces.join(', ')}` : '',
@@ -1072,6 +1078,34 @@ async function lireRecu(id) {
 }
 
 // Un email qui concerne un lead : dans son historique, avec la tâche qui dit quoi faire.
+/* ---------- Les rendez-vous validés par email ---------- */
+// Gabriel, 07/11 : « si dans un email on détecte une date de rdv validé, mettre la relance au moment-là ».
+// Le RDV entre dans l'historique (type rdv, meta.date_rdv, comme ceux de l'agenda) et devient la tâche du jour J.
+const HEURE_RE = /^([01]\d|2[0-3]):([0-5]\d)$/;
+function rdvValide(x) {
+  if (!x || !DATE_RE.test(x.rdv_date || '') || x.rdv_date < aujourdHuiParis()) return null;
+  const h = HEURE_RE.exec(x.rdv_heure || '');
+  return { date: x.rdv_date, heure: h ? `${Number(h[1])} h${h[2] === '00' ? '' : ` ${h[2]}`}` : '', detail: couper(String(x.rdv_detail || '').trim(), 200) };
+}
+const texteRdv = (rdv) => `RDV le ${dateCourte(rdv.date)}${rdv.heure ? ` à ${rdv.heure}` : ''}${rdv.detail ? ` (${rdv.detail})` : ''}`;
+const AGENDA_SI_BESOIN = "Ajoute-le à ton agenda s'il n'y est pas encore.";
+async function noterRdv(leadId, contactId, rdv, origine, { fil, objet }) {
+  const { lignes } = await sb(`iae_crm_activites?select=id&lead_id=eq.${leadId}&type=eq.rdv&meta->>date_rdv=eq.${rdv.date}&limit=1`);
+  if (lignes.length) return;
+  await sb('iae_crm_activites', {
+    methode: 'POST', prefer: 'return=minimal',
+    corps: { lead_id: leadId, contact_id: contactId || null, type: 'rdv', resume: `${texteRdv(rdv)}, ${origine}`.slice(0, 2000), source: 'gmail iae', meta: { date_rdv: rdv.date, heure: rdv.heure || null, fil: fil || null, objet: objet || null, origine: 'email' } },
+  });
+}
+// Le prochain RDV connu du lead (email ou agenda), pour la tâche qui suit une réponse.
+async function prochainRdv(leadId) {
+  const { lignes } = await sb(`iae_crm_activites?select=resume,meta&lead_id=eq.${leadId}&type=eq.rdv&order=date.desc&limit=20`);
+  const auj = aujourdHuiParis();
+  const a = lignes.filter((x) => DATE_RE.test(x.meta?.date_rdv || '') && x.meta.date_rdv >= auj).sort((x, y) => x.meta.date_rdv.localeCompare(y.meta.date_rdv))[0];
+  return a ? { date: a.meta.date_rdv, heure: a.meta.heure || '', resume: a.resume } : null;
+}
+const tacheRdv = (rdv, note) => ({ prochaine_relance: rdv.date, prochaine_action: 'rdv', prochaine_note: note.slice(0, 2000), relances_sans_reponse: 0, tache_fil: null });
+
 async function rattacherEmail(r, d, leadId, ann) {
   const lead = ann.lead(leadId);
   const contact = r.contact?.id ? r.contact : await contactPourLead(ann, leadId, r.de, d || {});
@@ -1091,8 +1125,12 @@ async function rattacherEmail(r, d, leadId, ann) {
   const maj = { relances_sans_reponse: 0, archive: false };
   const jour = jourParis(r.quand);
   if (!lead?.dernier_contact || lead.dernier_contact < jour) maj.dernier_contact = jour;
+  const rdv = rdvValide(d);
+  if (rdv) await noterRdv(leadId, contact?.id, rdv, `confirmé par ${qui} (« ${r.objet} »)`, { fil: r.fil, objet: r.objet });
   if (aFaire === 'repondre') {
-    Object.assign(maj, { prochaine_relance: aujourdHuiParis(), prochaine_action: 'email', prochaine_note: (d?.tache || `Répondre à ${qui} : « ${r.objet} »`).slice(0, 2000), tache_fil: r.fil || null });
+    Object.assign(maj, { prochaine_relance: aujourdHuiParis(), prochaine_action: 'email', prochaine_note: `${d?.tache || `Répondre à ${qui} : « ${r.objet} »`}${rdv ? ` Puis ${texteRdv(rdv)}.` : ''}`.slice(0, 2000), tache_fil: r.fil || null });
+  } else if (rdv) {
+    Object.assign(maj, tacheRdv(rdv, `${texteRdv(rdv)}, confirmé par ${qui} (« ${r.objet} »). ${AGENDA_SI_BESOIN}`));
   } else if (aFaire === 'relancer_le' && DATE_RE.test(d?.relance_date || '') && d.relance_date >= aujourdHuiParis()) {
     Object.assign(maj, { prochaine_relance: estOuvreIso(d.relance_date) ? d.relance_date : dansJoursOuvres(0, d.relance_date), prochaine_action: lead?.prochaine_action || 'email', prochaine_note: (d.tache || d.resume || `Retour prévu de ${qui}`).slice(0, 2000), tache_fil: r.fil || null });
   }
@@ -1188,25 +1226,31 @@ const SCHEMA_TACHE_FAITE = {
     tache: { type: 'string', enum: ['faite', 'en_partie', 'sans_rapport'] },
     reste: { type: 'string' },
     attente: { type: 'string' },
+    rdv_date: { type: 'string', description: 'AAAA-MM-JJ du rendez-vous validé, ou vide' },
+    rdv_heure: { type: 'string', description: 'HH:MM, ou vide' },
+    rdv_detail: { type: 'string' },
   },
-  required: ['tache', 'reste', 'attente'],
+  required: ['tache', 'reste', 'attente', 'rdv_date', 'rdv_heure', 'rdv_detail'],
 };
-const CONSIGNES_TACHE_FAITE = `Tu tiens le CRM de Gabriel Vanderbecken (IA-Entrepreneur, formations à l'IA pour les entreprises). On te donne la tâche prévue sur une fiche, c'est-à-dire ce que Gabriel devait faire, et un email qu'il vient d'envoyer à un contact de cette fiche. Dis si cet email fait la tâche.
+const CONSIGNES_TACHE_FAITE = `Tu tiens le CRM de Gabriel Vanderbecken (IA-Entrepreneur, formations à l'IA pour les entreprises). On te donne la tâche prévue sur une fiche, c'est-à-dire ce que Gabriel devait faire, et un email qu'il vient d'envoyer à un contact de cette fiche. Dis si cet email fait la tâche (sans_rapport s'il n'y a pas de tâche prévue), et s'il valide un rendez-vous.
 - faite : l'email fait tout ce que la tâche demande. Une pièce jointe annoncée dans l'email (« vous trouverez la facture en pièce jointe ») compte comme envoyée.
 - en_partie : l'email fait une partie de la tâche seulement.
 - sans_rapport : l'email parle d'autre chose, ou il ne fait rien de ce que la tâche demande.
 reste : pour en_partie seulement, ce qui manque, en une phrase qui commence par un verbe à l'infinitif (« Envoyer la facture de la mission de Gilles. »). Vide sinon.
 attente : ce que Gabriel attend maintenant du destinataire, en une phrase courte (« Sarah doit dire où se trouve sa cliente. »). Vide s'il n'attend rien.
+rdv_date, rdv_heure, rdv_detail : seulement si l'email fixe un rendez-vous accepté des deux côtés : Gabriel accepte un créneau que le contact a proposé, ou confirme un rendez-vous déjà convenu (« OK pour jeudi 14 h », « je vous confirme notre visio du 12 à 10 h »). Pas quand Gabriel propose des créneaux sans réponse encore. rdv_date en AAAA-MM-JJ, en résolvant « jeudi » ou « demain » d'après la date d'envoi de l'email ; rdv_heure en HH:MM, vide si l'heure n'est pas dite ; rdv_detail en quelques mots : le format et l'objet (« visio avec son directeur »). Sinon les trois sont vides.
 Écris en français. N'invente rien qui ne soit pas dans la tâche ou dans l'email.`;
-async function tacheFaite(lead, { objet, texte, dest, jour }) {
-  if (!process.env.ANTHROPIC_API_KEY || !lead.prochaine_relance || !lead.prochaine_note || !texte) return null;
+async function jugerEnvoi(lead, { objet, texte, dest, quand }) {
+  if (!process.env.ANTHROPIC_API_KEY || !texte) return null;
+  const tache = lead.prochaine_note ? `Tâche prévue (${lead.prochaine_action || 'autre'}${lead.prochaine_relance ? `, pour le ${dateCourte(lead.prochaine_relance)}` : ''}) : ${lead.prochaine_note}` : 'Tâche prévue : aucune.';
+  const envoi = new Date(quand).toLocaleString('fr-FR', { timeZone: 'Europe/Paris', weekday: 'long', day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
   try {
     const r = await appelClaude({
       consignes: CONSIGNES_TACHE_FAITE,
       schema: SCHEMA_TACHE_FAITE,
       max: 1500,
       timeout: 30000,
-      contenu: `Fiche : ${lead.entreprise}\nTâche prévue (${lead.prochaine_action || 'autre'}, pour le ${dateCourte(lead.prochaine_relance)}) : ${lead.prochaine_note}\n\nEmail envoyé le ${dateCourte(jour)} à ${dest.join(', ')}, objet « ${objet} » :\n${texte.slice(0, 6000)}`,
+      contenu: `Fiche : ${lead.entreprise}\n${tache}\n\nEmail envoyé le ${envoi} à ${dest.join(', ')}, objet « ${objet} » :\n${texte.slice(0, 6000)}`,
     });
     return ['faite', 'en_partie', 'sans_rapport'].includes(r?.tache) ? r : null;
   } catch (e) {
@@ -1248,24 +1292,31 @@ async function synchroEnvoyes(depuis, ann) {
     const texte = sansCitation(partieTexte(m.payload)).slice(0, 8000);
     const maj = {};
     if (!lead.dernier_contact || lead.dernier_contact < jour) maj.dernier_contact = jour;
-    let verdict = null;
-    if (lead.tache_fil && lead.tache_fil === m.threadId) {
-      verdict = 'faite';
-      Object.assign(maj, { prochaine_relance: dansJoursOuvres(3), prochaine_action: 'email', prochaine_note: `Tu as répondu le ${dateCourte(jour)} (« ${objet} ») : relancer s'il n'y a pas de réponse.`.slice(0, 2000), tache_fil: null, relances_sans_reponse: 0 });
-    } else {
-      const r = await tacheFaite(lead, { objet, texte, dest, jour });
-      verdict = r?.tache || null;
-      const attente = String(r?.attente || '').trim().replace(/\.$/, '');
-      const reste = String(r?.reste || '').trim();
-      if (verdict === 'faite') {
-        Object.assign(maj, { prochaine_relance: dansJoursOuvres(3), prochaine_action: 'email', prochaine_note: `Tu as écrit le ${dateCourte(jour)} (« ${objet} »)${attente ? ` : ${attente}` : ''}. Relancer s'il n'y a pas de réponse.`.slice(0, 2000), tache_fil: null, relances_sans_reponse: 0 });
-      } else if (verdict === 'en_partie' && reste) {
-        maj.prochaine_note = `Fait le ${dateCourte(jour)} par email (« ${objet} »). Reste : ${reste}`.slice(0, 2000);
-      }
+    const r = await jugerEnvoi(lead, { objet, texte, dest, quand });
+    const rdv = rdvValide(r);
+    const confirme = `confirmé dans ton email du ${dateCourte(jour)} (« ${objet} »)`;
+    if (rdv) await noterRdv(leadId, c?.id, rdv, confirme, { fil: m.threadId, objet });
+    const avaitTache = Boolean(lead.prochaine_note || lead.prochaine_relance);
+    let verdict = lead.tache_fil && lead.tache_fil === m.threadId ? 'faite' : avaitTache ? (r?.tache || null) : null;
+    const attente = String(r?.attente || '').trim().replace(/\.$/, '');
+    const reste = String(r?.reste || '').trim();
+    if (verdict === 'faite') {
+      // Tâche faite : le prochain point est le RDV s'il y en a un (celui-ci ou un déjà prévu), sinon une relance dans 3 jours ouvrés.
+      const suivant = rdv ? null : await prochainRdv(leadId);
+      if (rdv) Object.assign(maj, tacheRdv(rdv, `${texteRdv(rdv)}, ${confirme}. ${AGENDA_SI_BESOIN}`));
+      else if (suivant) Object.assign(maj, tacheRdv(suivant, `${suivant.resume}. Tu as écrit le ${dateCourte(jour)} (« ${objet} »)${attente ? ` : ${attente}` : ''}.`));
+      else if (lead.tache_fil && lead.tache_fil === m.threadId) Object.assign(maj, { prochaine_relance: dansJoursOuvres(3), prochaine_action: 'email', prochaine_note: `Tu as répondu le ${dateCourte(jour)} (« ${objet} ») : relancer s'il n'y a pas de réponse.`.slice(0, 2000), tache_fil: null, relances_sans_reponse: 0 });
+      else Object.assign(maj, { prochaine_relance: dansJoursOuvres(3), prochaine_action: 'email', prochaine_note: `Tu as écrit le ${dateCourte(jour)} (« ${objet} »)${attente ? ` : ${attente}` : ''}. Relancer s'il n'y a pas de réponse.`.slice(0, 2000), tache_fil: null, relances_sans_reponse: 0 });
+    } else if (verdict === 'en_partie' && reste) {
+      maj.prochaine_note = `Fait le ${dateCourte(jour)} par email (« ${objet} »). Reste : ${reste}${rdv ? ` Puis ${texteRdv(rdv)}.` : ''}`.slice(0, 2000);
+    } else if (rdv) {
+      // RDV validé sans toucher à la tâche prévue : il devient la tâche, sauf si quelque chose est prévu avant lui.
+      if (!lead.prochaine_relance || lead.prochaine_relance >= rdv.date) Object.assign(maj, tacheRdv(rdv, `${texteRdv(rdv)}, ${confirme}. ${AGENDA_SI_BESOIN}`));
+      else maj.prochaine_note = `${lead.prochaine_note || ''} Puis ${texteRdv(rdv)}.`.trim().slice(0, 2000);
     }
     await sb('iae_crm_activites', {
       methode: 'POST', prefer: 'return=minimal',
-      corps: { lead_id: leadId, contact_id: c?.id || null, date: quand, type: 'email_envoye', resume: `Email envoyé depuis Gmail : « ${objet} »${SUITE_TACHE[verdict] || ''}`.slice(0, 2000), contenu: texte || null, source: 'gmail iae', meta: { gmail_id: id, fil: m.threadId, objet, a: dest.join(', '), tache: verdict } },
+      corps: { lead_id: leadId, contact_id: c?.id || null, date: quand, type: 'email_envoye', resume: `Email envoyé depuis Gmail : « ${objet} »${SUITE_TACHE[verdict] || ''}${rdv ? ` · ${texteRdv(rdv)}` : ''}`.slice(0, 2000), contenu: texte || null, source: 'gmail iae', meta: { gmail_id: id, fil: m.threadId, objet, a: dest.join(', '), tache: verdict } },
     });
     if (Object.keys(maj).length) {
       await sb(`iae_crm_leads?id=eq.${leadId}`, { methode: 'PATCH', prefer: 'return=minimal', corps: maj });
@@ -1810,7 +1861,10 @@ async function traiterEntrant(corps) {
     const dejaRepondu = await dernierMessageDeMoi(e.fil);
     const aFaire = dejaRepondu ? 'rien' : (an?.a_faire || 'repondre');
     const maj = { relances_sans_reponse: 0, dernier_contact: jourParis(e.recu_le) };
-    if (aFaire === 'repondre' || action === 'creer') Object.assign(maj, { prochaine_relance: aujourdHuiParis(), prochaine_action: 'email', prochaine_note: (an?.tache || `Répondre à ${qui} : « ${String(e.objet || '').slice(0, 200)} »`).slice(0, 2000), tache_fil: e.fil || null });
+    const rdv = rdvValide(an);
+    if (rdv) await noterRdv(lead.id, contactId, rdv, `confirmé par ${qui} (« ${String(e.objet || '').slice(0, 200)} »)`, { fil: e.fil, objet: e.objet });
+    if (aFaire === 'repondre' || action === 'creer') Object.assign(maj, { prochaine_relance: aujourdHuiParis(), prochaine_action: 'email', prochaine_note: `${an?.tache || `Répondre à ${qui} : « ${String(e.objet || '').slice(0, 200)} »`}${rdv ? ` Puis ${texteRdv(rdv)}.` : ''}`.slice(0, 2000), tache_fil: e.fil || null });
+    else if (rdv) Object.assign(maj, tacheRdv(rdv, `${texteRdv(rdv)}, confirmé par ${qui} (« ${String(e.objet || '').slice(0, 200)} »). ${AGENDA_SI_BESOIN}`));
     else if (aFaire === 'relancer_le' && DATE_RE.test(an?.relance_date || '') && an.relance_date >= aujourdHuiParis()) Object.assign(maj, { prochaine_relance: an.relance_date, prochaine_note: (an.tache || an.resume || '').slice(0, 2000) || null, tache_fil: e.fil || null });
     await modifier('leads', lead.id, maj);
   }
