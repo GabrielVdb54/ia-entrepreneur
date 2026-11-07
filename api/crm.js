@@ -455,7 +455,7 @@ async function lireTout() {
     sb('iae_crm_entrants?select=*&statut=eq.a_trier&order=recu_le.desc&limit=100'),
     sb('iae_crm_entrants?select=id,recu_le,canal,de_email,de_nom,objet,fil,meta&statut=eq.ignore&order=recu_le.desc&limit=60'),
     toutLire('iae_crm_formateurs', 'created_at.asc'),
-    sb('iae_crm_documents?select=id,created_at,lead_id,type,nom,mime,taille,depose_par,lecture,statut,motif,verifie_le,expire_le,archive&order=created_at.desc&limit=2000').then((x) => x.lignes),
+    sb('iae_crm_documents?select=id,created_at,lead_id,type,nom,chemin,mime,taille,depose_par,lecture,statut,motif,verifie_le,expire_le,archive&order=created_at.desc&limit=2000').then((x) => x.lignes),
     toutLire('iae_crm_programmes', 'created_at.desc'),
   ]);
   return {
@@ -1234,7 +1234,7 @@ const sansSecret = ({ jeton_hash: _h, signature, ...f }) => ({ ...f, signature: 
 async function retourFormateur(leadId) {
   const [[f], { lignes: documents }, { lignes: [lead] }] = await Promise.all([
     sb(`iae_crm_formateurs?lead_id=eq.${leadId}&select=*`).then((x) => x.lignes),
-    sb(`iae_crm_documents?lead_id=eq.${leadId}&select=id,created_at,lead_id,type,nom,mime,taille,depose_par,lecture,statut,motif,verifie_le,expire_le,archive&order=created_at.desc`),
+    sb(`iae_crm_documents?lead_id=eq.${leadId}&select=id,created_at,lead_id,type,nom,chemin,mime,taille,depose_par,lecture,statut,motif,verifie_le,expire_le,archive&order=created_at.desc`),
     sb(`iae_crm_leads?id=eq.${leadId}&select=*`),
   ]);
   return { formateur: f ? sansSecret(f) : null, documents, lead };
@@ -1973,6 +1973,8 @@ export default async function handler(req, res) {
         if (!UUID_RE.test(id)) throw new Refus('id_invalide');
         const [d] = (await sb(`iae_crm_documents?id=eq.${id}&select=chemin,mime,nom`)).lignes;
         if (!d) throw new Refus('introuvable', 404);
+        // Une pièce reprise du Drive y reste : la page l'ouvre directement dans Google Drive.
+        if (String(d.chemin).startsWith('drive:')) throw new Refus('piece_drive', 409);
         const octets = await lireFichier(d.chemin);
         res.setHeader('Content-Type', d.mime || 'application/octet-stream');
         res.setHeader('Content-Disposition', `inline; filename*=UTF-8''${encodeURIComponent(d.nom)}`);

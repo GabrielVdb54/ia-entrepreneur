@@ -591,6 +591,7 @@ const ERREURS = {
   fichier_trop_lourd: 'Fichier trop lourd : 3,4 Mo au plus.',
   format_refuse: 'Format non accepté : PDF, JPEG ou PNG.',
   stockage_indisponible: "Le stockage des pièces ne répond pas. Réessaie dans un instant.",
+  piece_drive: 'Cette pièce est dans ton Drive : ouvre-la depuis la fiche.',
   google_erreur: "Gmail n'a pas répondu. Réessaie dans un instant.",
   introuvable: "Introuvable : il a peut-être été supprimé.",
   ia_trop_de_demandes: 'Beaucoup de rédactions en peu de temps : réessaie dans une minute.',
@@ -1594,7 +1595,7 @@ function brancherDictee(form) {
 
 const PIECES_F = [['kbis', "Justificatif d'immatriculation"], ['identite', "Pièce d'identité"], ['rib', 'RIB'], ['tva', 'Régime de TVA'], ['rc_pro', 'Assurance RC Pro'],
   ['urssaf', 'Attestation de vigilance URSSAF'], ['cv', 'CV à jour'], ['competences', 'Justificatifs de compétences'], ['formation_continue', 'Formation continue'], ['nda', 'Déclaration d\'activité (NDA)']];
-const LIB_PIECE = Object.fromEntries([...PIECES_F, ['contrat', 'Contrat signé (ancien)'], ['autre', 'Autre pièce']]);
+const LIB_PIECE = Object.fromEntries([...PIECES_F, ['contrat', 'Ancien contrat'], ['autre', 'Autre document']]);
 const STATUTS_F = { valide: ['Validé', 'f-valide'], a_verifier: ['À vérifier', 'f-verifier'], en_cours: ['Dossier en cours', 'f-cours'], a_inviter: ['À inviter', 'f-inviter'], a_renouveler: ['À mettre à jour', 'f-renouveler'], refuse: ['Refusé', 'f-refuse'] };
 const ETATS_PIECE = { manquante: ['Manquante', 'e-manque'], facultative: ['Facultative', 'e-facultatif'], a_verifier: ['À vérifier', 'e-verifier'], verifiee: ['Vérifiée', 'e-ok'], refusee: ['À refaire', 'e-refus'], expiree: ['Expirée', 'e-refus'] };
 const URSSAF_VERIF = 'https://www.urssaf.fr/accueil/outils-documentation/outils/verification-attestation.html';
@@ -1696,7 +1697,7 @@ function blocDossierFormateur(l) {
       const lu = d && d.lecture && !d.lecture.erreur ? d.lecture : null;
       return `<li${d ? ` data-doc="${d.id}"` : ''}>
         <div class="tete"><b>${esc(p.titre)}</b><span class="etat ${p.bientot ? 'e-verifier' : ecls}">${p.bientot ? `Expire le ${esc(dateCourte(d.expire_le))}` : esc(elib)}</span></div>
-        ${d ? `<p class="meta">${esc(d.nom)}, ${d.depose_par === 'gabriel' ? 'déposée par toi' : 'envoyée'} le ${esc(instantLisible(d.created_at))}${d.expire_le ? `, valable jusqu'au ${esc(dateCourte(d.expire_le))}` : ''}</p>
+        ${d ? `<p class="meta">${esc(d.nom)}, ${lienDrive(d) ? 'dans ton Drive depuis' : d.depose_par === 'gabriel' ? 'déposée par toi' : 'envoyée'} le ${esc(instantLisible(d.created_at))}${d.expire_le ? `, valable jusqu'au ${esc(dateCourte(d.expire_le))}` : ''}</p>
           ${lu ? `<p class="lecture${lu.conforme ? ' conforme' : ''}">${lu.conforme ? 'Claude : conforme. ' : 'Claude : '}${esc(lu.details)}</p>` : d.lecture && d.lecture.erreur ? '<p class="aide">Claude n\'a pas pu lire cette pièce : regarde-la toi-même.</p>' : ''}
           ${lu && lu.alertes && lu.alertes.length ? `<ul class="alertes-f">${lu.alertes.map((x) => `<li>${esc(x)}</li>`).join('')}</ul>` : ''}
           ${lu && lu.code_verification ? `<p class="code-urssaf">Code de sécurité : <code>${esc(lu.code_verification)}</code> <button type="button" class="btn petit" data-copier="${esc(lu.code_verification)}">Copier</button> <a href="${URSSAF_VERIF}" target="_blank" rel="noopener noreferrer">Vérifier sur urssaf.fr</a></p>` : ''}
@@ -1704,7 +1705,18 @@ function blocDossierFormateur(l) {
           <div class="actions"><button type="button" class="btn petit" data-act="piece-voir">Voir</button>${p.etat === 'a_verifier' ? '<button type="button" class="btn petit primaire" data-act="piece-ok">Vérifiée</button>' : ''}${['a_verifier', 'verifiee'].includes(p.etat) ? '<button type="button" class="btn petit" data-act="piece-refaire">À refaire</button>' : ''}</div>` : ''}
       </li>`;
     }).join('')}</ul>
+    ${autresDocuments(l.id)}
   </section>`;
+}
+// Anciens contrats et documents hors liste : consultables, ils ne comptent pas dans le dossier.
+function autresDocuments(id) {
+  const ds = (IDX.documents.get(id) || []).filter((d) => !d.archive && ['contrat', 'autre'].includes(d.type));
+  if (!ds.length) return '';
+  return `<h4 class="sous-groupe">Autres documents</h4><ul class="pieces-f">${ds.map((d) => `<li data-doc="${d.id}">
+      <div class="tete"><b>${esc(LIB_PIECE[d.type] || d.type)}</b><span class="meta">${lienDrive(d) ? 'Drive' : 'CRM'}, ${esc(dateCourte(String(d.created_at).slice(0, 10)))}</span></div>
+      <p class="meta">${esc(d.nom)}</p>
+      ${d.lecture && d.lecture.details ? `<p>${esc(d.lecture.details)}</p>` : ''}
+      <div class="actions"><button type="button" class="btn petit" data-act="piece-voir">Voir</button></div></li>`).join('')}</ul>`;
 }
 function majFormateur(r) {
   if (!r) return;
@@ -1730,7 +1742,10 @@ async function preparerFichier(fichier) {
   return { donnees: blob, nom: fichier.name.replace(/\.[a-z0-9]+$/i, '') + '.jpg' };
 }
 const enBase64 = (blob) => new Promise((ok, ko) => { const l = new FileReader(); l.onload = () => ok(String(l.result).split(',')[1]); l.onerror = ko; l.readAsDataURL(blob); });
+const lienDrive = (d) => (d && String(d.chemin || '').startsWith('drive:') ? `https://drive.google.com/file/d/${encodeURIComponent(d.chemin.slice(6))}/view` : '');
 async function voirPiece(id) {
+  const doc = (D.documents || []).find((x) => x.id === id);
+  if (lienDrive(doc)) { window.open(lienDrive(doc), '_blank', 'noopener'); return; }
   const fenetre = window.open('', '_blank');
   try {
     const r = await fetch(`${API}?document=${encodeURIComponent(id)}`, { headers: { 'X-Cle-Crm': S.cle } });
