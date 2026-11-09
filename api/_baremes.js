@@ -16,83 +16,17 @@
  * « 10 à 19 salariés » chevauche le seuil de 11 : l'email donne alors les
  * deux paliers, sans choisir à la place de l'entreprise.
  *
- * Pour ajouter une branche : lire le barème 2026 de l'OPCO, recopier les
- * chiffres tels quels (HT), noter la source et la date, vérifier que les IDCC
- * sont bien rattachés à cet OPCO dans data/idcc-opco.json.
+ * Pour ajouter une branche : la relever dans data/baremes-2026/ (chiffres tels
+ * quels, HT seulement si la source l'écrit, citations exactes), puis lancer
+ * generer_baremes.py, qui refuse toute entrée non vérifiée.
  */
 
-export const BAREMES = [
-  {
-    opco: 'CONSTRUCTYS',
-    branche: 'Bâtiment',
-    idcc: ['1596', '1597', '2420', '2609'],
-    lien: 'https://www.constructys.fr/conditions-de-prise-en-charge-2/',
-    version: 'barème Bâtiment 2026 de Constructys (septembre 2026)',
-    lu_le: '2026-11-09',
-    valable_jusquau: '2026-12-31',
-    paliers: [
-      { min: 0, max: 10, montant: '24 € HT par heure et par stagiaire', detail: "dans la limite de 840 € HT par jour pour un groupe en intra-entreprise, plus une participation aux salaires de 15 € HT par heure et par stagiaire" },
-      { min: 11, max: 49, montant: '19 € HT par heure et par stagiaire', detail: 'dans la limite de 665 € HT par jour pour un groupe en intra-entreprise' },
-    ],
-    delai: 'Demande complète à déposer au moins 15 jours avant le début de la formation.',
-  },
-  {
-    opco: 'CONSTRUCTYS',
-    branche: 'Travaux publics',
-    idcc: ['1702', '2614', '3212'],
-    lien: 'https://www.constructys.fr/conditions-de-prise-en-charge-2/',
-    version: 'barème Travaux publics 2026 de Constructys (juillet 2026)',
-    lu_le: '2026-11-09',
-    valable_jusquau: '2026-12-31',
-    paliers: [
-      { min: 0, max: 10, montant: '4 000 € HT par an pour les coûts de formation', detail: 'dans la limite de 32 € HT par heure et par stagiaire, plus une participation aux salaires de 15 € HT par heure et par stagiaire' },
-      { min: 11, max: 49, montant: '4 000 € HT par an pour les coûts de formation', detail: 'dans la limite de 32 € HT par heure et par stagiaire' },
-    ],
-    delai: 'Demande complète à déposer au moins 15 jours avant le début de la formation.',
-  },
-  {
-    opco: 'AKTO',
-    branche: 'Propreté et services associés',
-    idcc: ['3043'],
-    lien: 'https://www.akto.fr/regles-de-prise-en-charge-proprete/',
-    version: "règles de prise en charge 2026 de la branche Propreté d'AKTO (mises à jour le 02/11/2026)",
-    lu_le: '2026-11-09',
-    valable_jusquau: '2026-12-31',
-    paliers: [
-      { min: 0, max: 49, montant: '7 000 € HT par an pour les coûts de formation', detail: "en intra-entreprise, jusqu'à 2 800 € HT par jour pour un groupe de 5 à 12 salariés" },
-    ],
-    delai: 'AKTO demande que les dossiers 2026 soient déposés complets au plus tard le 20 novembre 2026.',
-    delai_jusquau: '2026-11-20',
-  },
-  {
-    opco: 'OPCO EP',
-    branche: 'Immobilier',
-    idcc: ['1527'],
-    lien: 'https://www.opcoep.fr/criteres-de-financement?branche=187',
-    version: "critères 2026 de la branche Immobilier d'OPCO EP (mis à jour le 05/10/2026)",
-    lu_le: '2026-11-09',
-    valable_jusquau: '2026-12-31',
-    paliers: [
-      { min: 0, max: 10, montant: "jusqu'à 2 500 € HT", detail: "les formations cœur de métier, dont « la transformation numérique et digitale des entreprises (y compris IA) », sont prises en charge à 30 € HT de l'heure" },
-      { min: 11, max: 49, montant: "jusqu'à 4 500 € HT", detail: "les formations cœur de métier, dont « la transformation numérique et digitale des entreprises (y compris IA) », sont prises en charge à 30 € HT de l'heure" },
-    ],
-  },
-  {
-    opco: 'OPCO EP',
-    branche: 'Cabinets médicaux',
-    idcc: ['1147'],
-    lien: 'https://www.opcoep.fr/criteres-de-financement?branche=204',
-    version: "critères 2026 de la branche Cabinets médicaux d'OPCO EP (mis à jour le 01/10/2026)",
-    lu_le: '2026-11-09',
-    valable_jusquau: '2026-12-31',
-    paliers: [
-      { min: 0, max: 10, montant: "jusqu'à 15 000 € HT", detail: "les formations « Informatique / Logiciels professionnels » sont prises en charge à 25 € HT de l'heure, 28 heures au plus" },
-      { min: 11, max: 49, montant: "jusqu'à 30 000 € HT", detail: "les formations « Informatique / Logiciels professionnels » sont prises en charge à 25 € HT de l'heure, 28 heures au plus" },
-    ],
-    delai: "Pour une formation en 2026, la demande doit parvenir à OPCO EP avant le 30 novembre 2026.",
-    delai_jusquau: '2026-11-30',
-  },
-];
+import { BAREMES_2026 } from './_baremes-2026.js';
+
+// Les barèmes relevés et vérifiés vivent dans data/baremes-2026/ ;
+// generer_baremes.py les contrôle (verifier_baremes.py) puis écrit
+// _baremes-2026.js. En 2027 : relire les barèmes, data/baremes-2027/, même chaîne.
+export const BAREMES = [...BAREMES_2026];
 
 // Tranche d'effectif Insee → bornes en salariés.
 const BORNES = {
@@ -115,15 +49,15 @@ export function baremePour(opco, idcc, tranche) {
   const b = BAREMES.find((x) => x.opco === opco && x.idcc.includes(idcc) && jour <= x.valable_jusquau);
   if (!b) return null;
   const bornes = BORNES[tranche] || null;
+  const commun = { branche: b.branche, lien: b.lien, version: b.version, lu_le: b.lu_le };
+  // Enveloppe 2026 épuisée (dit par l'OPCO, cité) : on le dit, sans montant.
+  if (b.epuise) return bornes && bornes[0] >= 50 ? null : { ...commun, epuise: b.epuise, paliers: [] };
   const paliers = bornes ? b.paliers.filter((p) => p.min <= bornes[1] && p.max >= bornes[0]) : b.paliers;
-  if (!paliers.length) return null; // 50 salariés et plus : pas de fonds mutualisés
+  if (!paliers.length) return null; // 50 salariés et plus, ou palier non publié : lien seul
   return {
-    branche: b.branche,
-    lien: b.lien,
-    version: b.version,
-    lu_le: b.lu_le,
+    ...commun,
     paliers: paliers.map((p) => ({ ...p, libelle: p.min === 0 ? `moins de ${p.max + 1} salariés` : `de ${p.min} à ${p.max} salariés` })),
     plusieurs: paliers.length > 1,
-    delai: b.delai && (!b.delai_jusquau || jour <= b.delai_jusquau) ? b.delai : null,
+    delai: b.delai || null,
   };
 }

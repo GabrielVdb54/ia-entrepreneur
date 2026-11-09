@@ -113,7 +113,8 @@ function publique(r) {
     methode: r.methode,
     convention: r.convention ? { idcc: r.convention.idcc, titre: r.convention.titre } : null,
     // Le montant lui-même part par email ; la page dit seulement qu'il est prêt.
-    bareme: Boolean(o && !o.ambigu && baremePour((o.gestion || o).code, r.convention?.idcc, r.effectif.tranche)),
+    // Vrai seulement si l'email donnera un montant (pas pour une enveloppe épuisée).
+    bareme: Boolean(o && !o.ambigu && baremePour((o.gestion || o).code, r.convention?.idcc, r.effectif.tranche)?.paliers.length),
     envoi: envoiPossible(),
     liens: envoiPossible() ? null : liens(r),
     fonds_non_salaries: envoiPossible() ? null : Object.values(FONDS_NON_SALARIES),
@@ -172,8 +173,8 @@ function contenu(r) {
     return c;
   }
 
-  c.sujet = bareme
-    ? `Votre budget formation ${ref.nom} : ${bareme.paliers[0].montant}${bareme.plusieurs ? ' ou plus' : ''}`
+  c.sujet = bareme?.paliers.length
+    ? (bareme.plusieurs ? `Votre budget formation 2026 chez ${ref.nom}` : `Votre budget formation ${ref.nom} : ${bareme.paliers[0].montant}`)
     : `Budget formation de ${nom} : votre OPCO est ${o.nom}`;
   c.opco = `Votre OPCO : ${o.nom}${o.gestion ? ` (dossier géré par ${o.gestion.nom})` : ''}`;
   // Gabriel, 09/11 : « ajouter le lien vers là où on a trouvé l'info, pour
@@ -184,13 +185,19 @@ function contenu(r) {
     c.notes.push(`Votre convention est partagée entre ${o.candidats.map((x) => x.nom).join(' et ')} : nous vérifions le vôtre avec vous avant tout dépôt.`);
   }
 
-  if (bareme) {
+  if (bareme?.epuise) {
+    // L'OPCO écrit que l'enveloppe 2026 de la branche est engagée : on le dit tel quel.
+    c.budget.push(`${bareme.epuise}.`);
+    c.notes.push(`Source : ${bareme.version}, lue le ${dateFr(bareme.lu_le)}.`);
+    c.bouton = { texte: `Voir la page de ma branche chez ${ref.nom}`, url: bareme.lien };
+    c.sources.push({ quoi: 'Le budget 2026', texte: `page de votre branche, site ${de(ref.nom)}`, url: bareme.lien });
+  } else if (bareme) {
     const qui = bareme.plusieurs ? '' : ` (${bareme.paliers[0].libelle})`;
     c.budget.push(`D'après vos informations${qui}, voici ce ${/^[aeiouy]/i.test(ref.nom) ? 'qu’' : 'que '}${ref.nom} finance en 2026 pour former vos salariés :`);
     for (const p of bareme.paliers) {
       c.budget.push({ fort: `${bareme.plusieurs ? `${p.libelle[0].toUpperCase()}${p.libelle.slice(1)} : ` : ''}${p.montant}`, suite: p.detail });
     }
-    c.notes.push(`Montant tiré du ${bareme.version}, relu le ${dateFr(bareme.lu_le)}, dans la limite des fonds disponibles.${bareme.delai ? ` ${bareme.delai}` : ''}`);
+    c.notes.push(`Source : ${bareme.version}, lue le ${dateFr(bareme.lu_le)}. Dans la limite des fonds disponibles.${bareme.delai ? ` ${bareme.delai}` : ''}`);
     c.bouton = { texte: `Voir le barème sur le site ${de(ref.nom)}`, url: bareme.lien };
     c.sources.push({ quoi: 'Le montant', texte: `barème 2026 de votre branche, site ${de(ref.nom)}`, url: bareme.lien });
   } else if (eff.moins_de_50 === false) {

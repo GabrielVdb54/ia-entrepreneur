@@ -1,0 +1,613 @@
+[
+ {
+  "opco": "AKTO",
+  "branche": "Hôtels, cafés, restaurants",
+  "idcc": [
+   "1979"
+  ],
+  "lien": "https://www.akto.fr/regles-de-prise-en-charge-hotels-cafes-restaurants/#entreprises-de-moins-de-50-salaries",
+  "version": "règles de prise en charge 2026 de la branche Hôtels, cafés, restaurants d'AKTO (mises à jour le 22/10/2026)",
+  "citations": [
+   {
+    "url": "https://www.akto.fr/regles-de-prise-en-charge-hotels-cafes-restaurants/",
+    "texte": "Date de mise à jour : 22/10/2026"
+   },
+   {
+    "url": "https://www.akto.fr/regles-de-prise-en-charge-hotels-cafes-restaurants/",
+    "texte": "Les montants indiqués s’entendent hors taxe – HT."
+   },
+   {
+    "url": "https://www.akto.fr/regles-de-prise-en-charge-hotels-cafes-restaurants/",
+    "texte": "Seules les formations dont les thématiques ne figurent pas sur Espace Formation peuvent être prises en charge au titre du plan de développement des compétences."
+   },
+   {
+    "url": "https://www.akto.fr/regles-de-prise-en-charge-hotels-cafes-restaurants/",
+    "texte": "Pour les formations relevant des thématiques transverses (ex : Habilitations électriques, RSE, SST, …) il est possible de réaliser une session en intra-entreprise, aux conditions de prise en charge en vigueur (coût horaire et plafond annuel par entreprise selon l’effectif de votre entreprise) :"
+   },
+   {
+    "url": "https://www.akto.fr/regles-de-prise-en-charge-hotels-cafes-restaurants/",
+    "texte": "Entreprises de moins de 11 salariés :"
+   },
+   {
+    "url": "https://www.akto.fr/regles-de-prise-en-charge-hotels-cafes-restaurants/",
+    "texte": "plafond annuel de 2 000 €"
+   },
+   {
+    "url": "https://www.akto.fr/regles-de-prise-en-charge-hotels-cafes-restaurants/",
+    "texte": "prise en charge de 2 formations maximum par an et par entreprise"
+   },
+   {
+    "url": "https://www.akto.fr/regles-de-prise-en-charge-hotels-cafes-restaurants/",
+    "texte": "Entreprises de 11 à 25 salariés :"
+   },
+   {
+    "url": "https://www.akto.fr/regles-de-prise-en-charge-hotels-cafes-restaurants/",
+    "texte": "plafond annuel de 3 000 €"
+   },
+   {
+    "url": "https://www.akto.fr/regles-de-prise-en-charge-hotels-cafes-restaurants/",
+    "texte": "prise en charge de 3 formations maximum par an et par entreprise"
+   },
+   {
+    "url": "https://www.akto.fr/regles-de-prise-en-charge-hotels-cafes-restaurants/",
+    "texte": "Entreprises de 26 à 49 salariés :"
+   },
+   {
+    "url": "https://www.akto.fr/regles-de-prise-en-charge-hotels-cafes-restaurants/",
+    "texte": "plafond annuel de 6 000 €"
+   },
+   {
+    "url": "https://www.akto.fr/regles-de-prise-en-charge-hotels-cafes-restaurants/",
+    "texte": "prise en charge de 6 formations maximum par an et par entreprise"
+   },
+   {
+    "url": "https://www.akto.fr/regles-de-prise-en-charge-hotels-cafes-restaurants/",
+    "texte": "1000€/jour au réel plafonné, pour 2 stagiaires minimum"
+   },
+   {
+    "url": "https://www.akto.fr/regles-de-prise-en-charge-hotels-cafes-restaurants/",
+    "texte": "Présentiel : 25€/heure au réel plafonné"
+   },
+   {
+    "url": "https://www.akto.fr/regles-de-prise-en-charge-hotels-cafes-restaurants/",
+    "texte": "Distanciel : 15€/heure au réel plafonné"
+   },
+   {
+    "url": "https://www.akto.fr/regles-de-prise-en-charge-hotels-cafes-restaurants/",
+    "texte": "La rémunération est prise en charge dans la limite d’un forfait de 14 € par heure par salarié formé."
+   },
+   {
+    "url": "https://www.akto.fr/regles-de-prise-en-charge-hotels-cafes-restaurants/",
+    "texte": "AKTO assure le financement des actions de formation réalisées selon les modalités figurant sur l’accord de prise en charge, sous réserve des fonds disponibles et de réalisation des actions."
+   },
+   {
+    "url": "https://www.akto.fr/regles-de-prise-en-charge-hotels-cafes-restaurants/",
+    "texte": "Les financements sont orientés vers les formations répondant aux enjeux et priorités de la branche Hôtels, Cafés, Restaurants ou liées à ses métiers."
+   },
+   {
+    "url": "https://www.akto.fr/regles-de-prise-en-charge-hotels-cafes-restaurants/",
+    "texte": "Pour pouvoir garantir leur traitement avant le 31 décembre 2026, vos demandes de prise en charge de formation (hors contrats en alternance) doivent être déposées auprès d’AKTO complètes et conformes au plus tard le 20 novembre 2026."
+   },
+   {
+    "url": "https://www.akto.fr/financer-une-formation/process-de-depot-de-contrat-en-alternance-dossier-formation/",
+    "texte": "Vous devez déposer le dossier auprès d’AKTO 30 jours calendaires avant le démarrage de l’action de formation"
+   },
+   {
+    "url": "https://www.akto.fr/breve/date-limite-depot-dossiers-formation-akto-20-novembre-2026/",
+    "texte": "et, à titre exceptionnel, les formations débutant avant le 15 janvier 2027"
+   }
+  ],
+  "retenu": true,
+  "paliers": [
+   {
+    "min": 0,
+    "max": 10,
+    "montant": "jusqu'à 2 000 € par an",
+    "detail": "25 € de l'heure en présentiel, 1 000 € par jour en intra-entreprise ; seules les formations dont le thème ne figure pas au catalogue Espace Formation de la branche sont financées sur ce budget"
+   },
+   {
+    "min": 11,
+    "max": 25,
+    "montant": "jusqu'à 3 000 € par an",
+    "detail": "25 € de l'heure en présentiel, 1 000 € par jour en intra-entreprise ; seules les formations dont le thème ne figure pas au catalogue Espace Formation de la branche sont financées sur ce budget"
+   },
+   {
+    "min": 26,
+    "max": 49,
+    "montant": "jusqu'à 6 000 € par an",
+    "detail": "25 € de l'heure en présentiel, 1 000 € par jour en intra-entreprise ; seules les formations dont le thème ne figure pas au catalogue Espace Formation de la branche sont financées sur ce budget"
+   }
+  ],
+  "delai": "Demande à déposer 30 jours avant le début de la formation, et au plus tard le 20 novembre 2026 pour un traitement garanti en 2026.",
+  "delai_jusquau": "2026-11-20",
+  "remarques": null
+ },
+ {
+  "opco": "AKTO",
+  "branche": "Restauration collective",
+  "idcc": [
+   "1266"
+  ],
+  "lien": "https://www.akto.fr/regles-de-prise-en-charge-restauration-collective/",
+  "version": "règles de prise en charge 2026 de la branche Restauration collective d'AKTO (mises à jour le 16/10/2026)",
+  "citations": [
+   {
+    "url": "https://www.akto.fr/regles-de-prise-en-charge-restauration-collective/",
+    "texte": "Code IDCC de la branche : 1266 – Dispositions en vigueur à compter du 02/01/2026 – Date de mise à jour : 16/10/2026"
+   },
+   {
+    "url": "https://www.akto.fr/regles-de-prise-en-charge-restauration-collective/",
+    "texte": "Les montants indiqués s’entendent hors taxe – HT."
+   },
+   {
+    "url": "https://www.akto.fr/regles-de-prise-en-charge-restauration-collective/",
+    "texte": "Si vous êtes une entreprise de – de 11 salariés, vous disposez d’un budget annuel de 8 000€ réservé à la prise en charge des actions de formation que vous mobilisez, pour l’abondement CPF, le financement de la VAE et pour la prise en charge de la rémunération."
+   },
+   {
+    "url": "https://www.akto.fr/regles-de-prise-en-charge-restauration-collective/",
+    "texte": "Si vous êtes une entreprise de 11 à 49 salariés, vous disposez d’un budget annuel de 13 000€ réservé à la prise en charge des actions de formation que vous mobilisez, pour l’abondement CPF, le financement de la VAE et pour la prise en charge de la rémunération."
+   },
+   {
+    "url": "https://www.akto.fr/regles-de-prise-en-charge-restauration-collective/",
+    "texte": "Montant : coûts réels plafonnés à 22€/heure de formation/salarié formé"
+   },
+   {
+    "url": "https://www.akto.fr/regles-de-prise-en-charge-restauration-collective/",
+    "texte": "Montant : coûts réels plafonnés à 25€/heure de formation/salarié formé et dans la limite de 1000 € /jour"
+   },
+   {
+    "url": "https://www.akto.fr/regles-de-prise-en-charge-restauration-collective/",
+    "texte": "Durée : dans la limite de 35 heures par action de formation"
+   },
+   {
+    "url": "https://www.akto.fr/regles-de-prise-en-charge-restauration-collective/",
+    "texte": "Rémunération : forfait de 14 €/heure de formation/salarié formé"
+   },
+   {
+    "url": "https://www.akto.fr/regles-de-prise-en-charge-restauration-collective/",
+    "texte": "Les financements sont orientés vers les formations répondant aux enjeux et priorités de la branche restauration collective ou liées à ses métiers."
+   },
+   {
+    "url": "https://www.akto.fr/regles-de-prise-en-charge-restauration-collective/",
+    "texte": "Pour pouvoir garantir leur traitement avant le 31 décembre 2026, vos demandes de prise en charge de formation (hors contrats en alternance) doivent être déposées auprès d’AKTO complètes et conformes au plus tard le 20 novembre 2026."
+   },
+   {
+    "url": "https://www.akto.fr/financer-une-formation/process-de-depot-de-contrat-en-alternance-dossier-formation/",
+    "texte": "Vous devez déposer le dossier auprès d’AKTO 30 jours calendaires avant le démarrage de l’action de formation"
+   },
+   {
+    "url": "https://www.akto.fr/breve/date-limite-depot-dossiers-formation-akto-20-novembre-2026/",
+    "texte": "et, à titre exceptionnel, les formations débutant avant le 15 janvier 2027"
+   }
+  ],
+  "retenu": true,
+  "paliers": [
+   {
+    "min": 0,
+    "max": 10,
+    "montant": "jusqu'à 8 000 € par an",
+    "detail": "coûts pédagogiques plafonnés à 22 € de l'heure par salarié formé, 35 heures au plus par action"
+   },
+   {
+    "min": 11,
+    "max": 49,
+    "montant": "jusqu'à 13 000 € par an",
+    "detail": "coûts pédagogiques plafonnés à 22 € de l'heure par salarié formé, 35 heures au plus par action"
+   }
+  ],
+  "delai": "Demande à déposer 30 jours avant le début de la formation, et au plus tard le 20 novembre 2026 pour un traitement garanti en 2026.",
+  "delai_jusquau": "2026-11-20",
+  "remarques": null
+ },
+ {
+  "opco": "AKTO",
+  "branche": "Travail temporaire",
+  "idcc": [
+   "2378",
+   "1413"
+  ],
+  "lien": "https://www.akto.fr/regles-de-prise-en-charge-travail-temporaire/",
+  "version": "règles de prise en charge 2026 de la branche du Travail temporaire d'AKTO (mises à jour le 29/09/2026)",
+  "citations": [
+   {
+    "url": "https://www.akto.fr/regles-de-prise-en-charge-travail-temporaire/",
+    "texte": "Code IDCC de la branche : 1413 – 2378 – Dispositions en vigueur à compter du 02/01/2026 – Date de mise à jour : 29/09/2026"
+   },
+   {
+    "url": "https://www.akto.fr/regles-de-prise-en-charge-travail-temporaire/",
+    "texte": "Les montants indiqués s’entendent hors taxe – HT."
+   },
+   {
+    "url": "https://www.akto.fr/regles-de-prise-en-charge-travail-temporaire/",
+    "texte": "Le montant des actions financées par entreprise ou par groupe d’entreprise est limité à 10% du budget global de la branche."
+   },
+   {
+    "url": "https://www.akto.fr/regles-de-prise-en-charge-travail-temporaire/",
+    "texte": "Coûts pédagogiques : 15€/h/stagiaire, dans la limite de 70h de formation"
+   },
+   {
+    "url": "https://www.akto.fr/regles-de-prise-en-charge-travail-temporaire/",
+    "texte": "Coûts pédagogiques : aux coûts réels plafonnés à 1 400 € / jour pour 4 stagiaires minimum dans la limite de 70 heures de formation"
+   },
+   {
+    "url": "https://www.akto.fr/regles-de-prise-en-charge-travail-temporaire/",
+    "texte": "Rémunérations : au réel, plafonné à 13€/heure et dans la limite de 70h de formation"
+   },
+   {
+    "url": "https://www.akto.fr/regles-de-prise-en-charge-travail-temporaire/",
+    "texte": "Les financements sont orientés vers les formations répondant aux enjeux et priorités de la branche ou liées à ses métiers."
+   },
+   {
+    "url": "https://www.akto.fr/regles-de-prise-en-charge-travail-temporaire/",
+    "texte": "Pour pouvoir garantir leur traitement avant le 31 décembre 2026, vos demandes de prise en charge de formation (hors contrats en alternance) doivent être déposées auprès d’AKTO complètes et conformes au plus tard le 20 novembre 2026."
+   },
+   {
+    "url": "https://www.akto.fr/financer-une-formation/process-de-depot-de-contrat-en-alternance-dossier-formation/",
+    "texte": "Vous devez déposer le dossier auprès d’AKTO 30 jours calendaires avant le démarrage de l’action de formation"
+   },
+   {
+    "url": "https://www.akto.fr/breve/date-limite-depot-dossiers-formation-akto-20-novembre-2026/",
+    "texte": "et, à titre exceptionnel, les formations débutant avant le 15 janvier 2027"
+   },
+   {
+    "url": "https://www.akto.fr/breve/date-limite-depot-dossiers-formation-akto-20-novembre-2026/",
+    "texte": "Plan de développement des compétences – Moins de 50"
+   }
+  ],
+  "retenu": true,
+  "paliers": [
+   {
+    "min": 0,
+    "max": 49,
+    "montant": "15 € de l'heure par stagiaire, 70 heures au plus",
+    "detail": "en intra-entreprise, jusqu'à 1 400 € par jour pour 4 stagiaires minimum"
+   }
+  ],
+  "delai": "Demande à déposer 30 jours avant le début de la formation, et au plus tard le 20 novembre 2026 pour un traitement garanti en 2026.",
+  "delai_jusquau": "2026-11-20",
+  "remarques": null
+ },
+ {
+  "opco": "AKTO",
+  "branche": "Prévention, sécurité",
+  "idcc": [
+   "1351"
+  ],
+  "lien": "https://www.akto.fr/regles-de-prise-en-charge-prevention-securite/",
+  "version": "règles de prise en charge 2026 de la branche Prévention-Sécurité d'AKTO (mises à jour le 10/07/2026)",
+  "citations": [
+   {
+    "url": "https://www.akto.fr/regles-de-prise-en-charge-prevention-securite/",
+    "texte": "Code IDCC de la branche : 1351 – Dispositions en vigueur à compter du 02/01/2026 – Date de mise à jour : 10/07/2026"
+   },
+   {
+    "url": "https://www.akto.fr/regles-de-prise-en-charge-prevention-securite/",
+    "texte": "Les montants indiqués s’entendent hors taxe – HT."
+   },
+   {
+    "url": "https://www.akto.fr/regles-de-prise-en-charge-prevention-securite/",
+    "texte": "Votre entreprise dispose aussi d’un budget annuel de 7 000€ réservé à la prise en charge des coûts pédagogiques, dans la limite des fonds disponibles (cf points 2 et 3)"
+   },
+   {
+    "url": "https://www.akto.fr/regles-de-prise-en-charge-prevention-securite/",
+    "texte": "Coûts pédagogiques : coûts réels, plafonnés à 21€/heure de formation/salarié formé"
+   },
+   {
+    "url": "https://www.akto.fr/regles-de-prise-en-charge-prevention-securite/",
+    "texte": "Coûts pédagogiques : Coûts réels, plafonnés à 21€/heure de formation/salarié formé"
+   },
+   {
+    "url": "https://www.akto.fr/regles-de-prise-en-charge-prevention-securite/",
+    "texte": "dans la limite de 1 700 € /jour/formateur"
+   },
+   {
+    "url": "https://www.akto.fr/regles-de-prise-en-charge-prevention-securite/",
+    "texte": "4 stagiaires. minimum/ 12 stagiaires maximum par session en intra-entreprises"
+   },
+   {
+    "url": "https://www.akto.fr/regles-de-prise-en-charge-prevention-securite/",
+    "texte": "La rémunération et les frais annexes des salariés formés ne sont pas pris en charge."
+   },
+   {
+    "url": "https://www.akto.fr/regles-de-prise-en-charge-prevention-securite/",
+    "texte": "Les partenaires sociaux de votre branche maintiennent la non prise en charge des formations en distanciel sur le budget libre entreprise en 2026"
+   },
+   {
+    "url": "https://www.akto.fr/regles-de-prise-en-charge-prevention-securite/",
+    "texte": "Pour pouvoir garantir leur traitement avant le 31 décembre 2026, vos demandes de prise en charge de formation (hors contrats en alternance) doivent être déposées auprès d’AKTO complètes et conformes au plus tard le 20 novembre 2026."
+   },
+   {
+    "url": "https://www.akto.fr/financer-une-formation/process-de-depot-de-contrat-en-alternance-dossier-formation/",
+    "texte": "Vous devez déposer le dossier auprès d’AKTO 30 jours calendaires avant le démarrage de l’action de formation"
+   },
+   {
+    "url": "https://www.akto.fr/breve/date-limite-depot-dossiers-formation-akto-20-novembre-2026/",
+    "texte": "et, à titre exceptionnel, les formations débutant avant le 15 janvier 2027"
+   }
+  ],
+  "retenu": true,
+  "paliers": [
+   {
+    "min": 0,
+    "max": 49,
+    "montant": "jusqu'à 7 000 € par an pour les coûts pédagogiques",
+    "detail": "21 € de l'heure par salarié formé, et 1 700 € par jour et par formateur en intra-entreprise"
+   }
+  ],
+  "delai": "Demande à déposer 30 jours avant le début de la formation, et au plus tard le 20 novembre 2026 pour un traitement garanti en 2026.",
+  "delai_jusquau": "2026-11-20",
+  "remarques": null
+ },
+ {
+  "opco": "AKTO",
+  "branche": "Enseignement privé indépendant",
+  "idcc": [
+   "2691"
+  ],
+  "lien": "https://www.akto.fr/regles-de-prise-en-charge-enseignement-prive-independant/",
+  "version": "règles de prise en charge 2026 de la branche Enseignement privé indépendant d'AKTO (mises à jour le 14/10/2026)",
+  "citations": [
+   {
+    "url": "https://www.akto.fr/regles-de-prise-en-charge-enseignement-prive-independant/",
+    "texte": "Code IDCC de la branche : 2691 – Dispositions en vigueur à compter du 02/01/2026 – Date de mise à jour : 14/10/2026"
+   },
+   {
+    "url": "https://www.akto.fr/regles-de-prise-en-charge-enseignement-prive-independant/",
+    "texte": "Les montants indiqués s’entendent hors taxe – HT."
+   },
+   {
+    "url": "https://www.akto.fr/regles-de-prise-en-charge-enseignement-prive-independant/",
+    "texte": "Bien que les fonds du plan de développement des compétences pour les entreprises de moins de 50 salariés soient épuisés, votre branche a décidé de mobiliser ses fonds conventionnels pour permettre la poursuite des financements."
+   },
+   {
+    "url": "https://www.akto.fr/regles-de-prise-en-charge-enseignement-prive-independant/",
+    "texte": "Ainsi, les critères ci-dessous continuent de s’appliquer avec un financement sur des fonds conventionnels dédiés."
+   },
+   {
+    "url": "https://www.akto.fr/regles-de-prise-en-charge-enseignement-prive-independant/",
+    "texte": "Si votre entreprise emploie moins de 11 salariés"
+   },
+   {
+    "url": "https://www.akto.fr/regles-de-prise-en-charge-enseignement-prive-independant/",
+    "texte": "elle dispose d’un budget annuel de 6 500€ (par SIREN) réservé à la prise en charge des formations que vous mobilisez (cf. point 1) et des formations réalisées dans le cadre d’une Action de Formation en Situation de Travail (cf. Point 2)"
+   },
+   {
+    "url": "https://www.akto.fr/regles-de-prise-en-charge-enseignement-prive-independant/",
+    "texte": "Si votre entreprise emploie de 11 à 49 salariés salariés"
+   },
+   {
+    "url": "https://www.akto.fr/regles-de-prise-en-charge-enseignement-prive-independant/",
+    "texte": "elle dispose d’un budget annuel de 8 500€ (par SIREN) réservé à la prise en charge des formations que vous mobilisez (cf. point 1) et des formations réalisées dans le cadre d’une Action de Formation en Situation de Travail (cf. Point 2)"
+   },
+   {
+    "url": "https://www.akto.fr/regles-de-prise-en-charge-enseignement-prive-independant/",
+    "texte": "Formations liées à l’intelligence artificielle"
+   },
+   {
+    "url": "https://www.akto.fr/regles-de-prise-en-charge-enseignement-prive-independant/",
+    "texte": "65€/heure de formation/salarié formé"
+   },
+   {
+    "url": "https://www.akto.fr/regles-de-prise-en-charge-enseignement-prive-independant/",
+    "texte": "1 500 €/jour dans la limite de 2 jours"
+   },
+   {
+    "url": "https://www.akto.fr/regles-de-prise-en-charge-enseignement-prive-independant/",
+    "texte": "Rémunérations : pas de prise en charge"
+   },
+   {
+    "url": "https://www.akto.fr/regles-de-prise-en-charge-enseignement-prive-independant/",
+    "texte": "Elle n’est mobilisable que lorsque votre budget PDC-50 est entièrement consommé."
+   },
+   {
+    "url": "https://www.akto.fr/regles-de-prise-en-charge-enseignement-prive-independant/",
+    "texte": "Pour pouvoir garantir leur traitement avant le 31 décembre 2026, vos demandes de prise en charge de formation (hors contrats en alternance) doivent être déposées auprès d’AKTO complètes et conformes au plus tard le 20 novembre 2026."
+   },
+   {
+    "url": "https://www.akto.fr/financer-une-formation/process-de-depot-de-contrat-en-alternance-dossier-formation/",
+    "texte": "Vous devez déposer le dossier auprès d’AKTO 30 jours calendaires avant le démarrage de l’action de formation"
+   },
+   {
+    "url": "https://www.akto.fr/breve/date-limite-depot-dossiers-formation-akto-20-novembre-2026/",
+    "texte": "et, à titre exceptionnel, les formations débutant avant le 15 janvier 2027"
+   },
+   {
+    "url": "https://www.akto.fr/regles-de-prise-en-charge-enseignement-prive-independant/",
+    "texte": "Formations liées à l’intelligence artificielle 21 heures 65€/heure de formation/salarié formé 1 500 €/jour dans la limite de 2 jours"
+   }
+  ],
+  "retenu": true,
+  "paliers": [
+   {
+    "min": 0,
+    "max": 10,
+    "montant": "jusqu'à 6 500 € par an",
+    "detail": "les « formations liées à l'intelligence artificielle » sont prises en charge à 65 € de l'heure par salarié formé, 21 heures au plus, ou 1 500 € par jour dans la limite de 2 jours"
+   },
+   {
+    "min": 11,
+    "max": 49,
+    "montant": "jusqu'à 8 500 € par an",
+    "detail": "les « formations liées à l'intelligence artificielle » sont prises en charge à 65 € de l'heure par salarié formé, 21 heures au plus, ou 1 500 € par jour dans la limite de 2 jours"
+   }
+  ],
+  "delai": "Demande à déposer 30 jours avant le début de la formation, et au plus tard le 20 novembre 2026 pour un traitement garanti en 2026.",
+  "delai_jusquau": "2026-11-20",
+  "remarques": null
+ },
+ {
+  "opco": "AKTO",
+  "branche": "Restauration rapide",
+  "idcc": [
+   "1501"
+  ],
+  "lien": "https://www.akto.fr/regles-de-prise-en-charge-restauration-rapide/",
+  "version": "règles de prise en charge 2026 de la branche Restauration rapide d'AKTO (dispositions en vigueur à compter du 15/01/2026, mises à jour le 20/10/2026)",
+  "citations": [
+   {
+    "url": "https://www.akto.fr/regles-de-prise-en-charge-restauration-rapide/",
+    "texte": "Code IDCC de la branche : 1501 – Dispositions en vigueur à compter du 15/01/2026 – Date de mise à jour : 20/10/2026"
+   },
+   {
+    "url": "https://www.akto.fr/regles-de-prise-en-charge-restauration-rapide/",
+    "texte": "Suspension du financement des formations sur le budget Plan de développement des compétences (PDC)"
+   },
+   {
+    "url": "https://www.akto.fr/regles-de-prise-en-charge-restauration-rapide/",
+    "texte": "A ce jour l’enveloppe budgétaire qui a été attribuée à votre branche a été intégralement engagée."
+   },
+   {
+    "url": "https://www.akto.fr/regles-de-prise-en-charge-restauration-rapide/",
+    "texte": "Nous vous remercions de ne pas déposer de nouveaux dossiers pour 2026."
+   },
+   {
+    "url": "https://www.akto.fr/regles-de-prise-en-charge-restauration-rapide/",
+    "texte": "L’enveloppe budgétaire étant intégralement engagée, les critères ci-dessous ne s’appliquent plus."
+   }
+  ],
+  "retenu": false,
+  "epuise": "AKTO indique que l'enveloppe 2026 de votre branche pour le plan de développement des compétences est intégralement engagée",
+  "paliers": [],
+  "remarques": null
+ },
+ {
+  "opco": "AKTO",
+  "branche": "Commerces de gros",
+  "idcc": [
+   "0573"
+  ],
+  "lien": "https://www.akto.fr/regles-de-prise-en-charge-commerces-de-gros/",
+  "version": "règles de prise en charge 2026 de la branche Commerces de gros d'AKTO (mises à jour le 09/10/2026)",
+  "citations": [
+   {
+    "url": "https://www.akto.fr/regles-de-prise-en-charge-commerces-de-gros/",
+    "texte": "Codes IDCC de la branche : 573 – Dispositions en vigueur à compter du 02/01/2026 – Date de mise à jour : 09/10/2026"
+   },
+   {
+    "url": "https://www.akto.fr/regles-de-prise-en-charge-commerces-de-gros/",
+    "texte": "Suspension du financement des formations, y compris Espace Formation"
+   },
+   {
+    "url": "https://www.akto.fr/regles-de-prise-en-charge-commerces-de-gros/",
+    "texte": "A ce jour, l’enveloppe budgétaire a été intégralement engagée."
+   },
+   {
+    "url": "https://www.akto.fr/regles-de-prise-en-charge-commerces-de-gros/",
+    "texte": "Nous vous remercions de ne pas déposer de nouveaux dossiers pour 2026."
+   },
+   {
+    "url": "https://www.akto.fr/regles-de-prise-en-charge-commerces-de-gros/",
+    "texte": "Les conditions de prise en charge présentées ci-dessous ne s’appliquent plus."
+   }
+  ],
+  "retenu": false,
+  "epuise": "AKTO indique que l'enveloppe 2026 de votre branche pour le plan de développement des compétences est intégralement engagée",
+  "paliers": [],
+  "remarques": null
+ },
+ {
+  "opco": "AKTO",
+  "branche": "Travail mécanique du bois",
+  "idcc": [
+   "0158"
+  ],
+  "lien": "https://www.akto.fr/regles-de-prise-en-charge-travail-mecanique-du-bois/",
+  "version": "règles de prise en charge 2026 de la branche du Travail mécanique du bois d'AKTO (mises à jour le 31/08/2026)",
+  "citations": [
+   {
+    "url": "https://www.akto.fr/regles-de-prise-en-charge-travail-mecanique-du-bois/",
+    "texte": "Code IDCC de la branche : 158 – Dispositions en vigueur à compter du 02/01/2026 – Date de mise à jour : 31/08/2026"
+   },
+   {
+    "url": "https://www.akto.fr/regles-de-prise-en-charge-travail-mecanique-du-bois/",
+    "texte": "Suspension du financement des formations sur le budget Plan de développement des compétences (PDC)"
+   },
+   {
+    "url": "https://www.akto.fr/regles-de-prise-en-charge-travail-mecanique-du-bois/",
+    "texte": "A ce jour l’enveloppe budgétaire qui a été attribuée à votre branche a été intégralement engagée."
+   },
+   {
+    "url": "https://www.akto.fr/regles-de-prise-en-charge-travail-mecanique-du-bois/",
+    "texte": "Nous vous remercions de ne pas déposer de nouveaux dossiers pour 2026."
+   },
+   {
+    "url": "https://www.akto.fr/regles-de-prise-en-charge-travail-mecanique-du-bois/",
+    "texte": "L’enveloppe budgétaire étant épuisée, les critères ci-dessous ne s’appliquent plus."
+   }
+  ],
+  "retenu": false,
+  "epuise": "AKTO indique que l'enveloppe 2026 de votre branche pour le plan de développement des compétences est intégralement engagée",
+  "paliers": [],
+  "remarques": null
+ },
+ {
+  "opco": "AKTO",
+  "branche": "Activités du déchet",
+  "idcc": [
+   "2149"
+  ],
+  "lien": "https://www.akto.fr/regles-de-prise-en-charge-activites-du-dechet/",
+  "version": "règles de prise en charge 2026 de la branche des Activités du déchet d'AKTO (mises à jour le 27/08/2026)",
+  "citations": [
+   {
+    "url": "https://www.akto.fr/regles-de-prise-en-charge-activites-du-dechet/",
+    "texte": "Code IDCC : 2149 – Dispositions en vigueur à compter du 02/01/2026 – Date de mise à jour : 27/08/2026"
+   },
+   {
+    "url": "https://www.akto.fr/regles-de-prise-en-charge-activites-du-dechet/",
+    "texte": "Suspension du financement des formations sur le budget Plan de développement des compétences (PDC)"
+   },
+   {
+    "url": "https://www.akto.fr/regles-de-prise-en-charge-activites-du-dechet/",
+    "texte": "A ce jour l’enveloppe budgétaire qui a été attribuée à votre branche a été intégralement engagée."
+   },
+   {
+    "url": "https://www.akto.fr/regles-de-prise-en-charge-activites-du-dechet/",
+    "texte": "Nous vous remercions de ne pas déposer de nouveaux dossiers pour 2026."
+   },
+   {
+    "url": "https://www.akto.fr/regles-de-prise-en-charge-activites-du-dechet/",
+    "texte": "Pour les demandes hors Espace formation, l’enveloppe budgétaire est intégralement engagée. Les critères ci-dessous ne s’appliquent plus."
+   }
+  ],
+  "retenu": false,
+  "epuise": "AKTO indique que l'enveloppe 2026 de votre branche pour le plan de développement des compétences est intégralement engagée pour les formations hors de son catalogue Espace Formation",
+  "paliers": [],
+  "remarques": null
+ },
+ {
+  "opco": "AKTO",
+  "branche": "Location et entretien textile",
+  "idcc": [
+   "2002"
+  ],
+  "lien": "https://www.akto.fr/regles-de-prise-en-charge-entretien-et-location-textile/",
+  "version": "règles de prise en charge 2026 de la branche Location et entretien textile d'AKTO (mises à jour le 01/10/2026)",
+  "citations": [
+   {
+    "url": "https://www.akto.fr/regles-de-prise-en-charge-entretien-et-location-textile/",
+    "texte": "Code IDCC de la branche : 2002 – Dispositions en vigueur à compter du 02/01/2026 – Date de mise à jour : 01/10/2026"
+   },
+   {
+    "url": "https://www.akto.fr/regles-de-prise-en-charge-entretien-et-location-textile/",
+    "texte": "2. Les formations hors Espace Formation et Formations réalisées dans le cadre d’une Action de Formation en Situation de Travail (AFEST)"
+   },
+   {
+    "url": "https://www.akto.fr/regles-de-prise-en-charge-entretien-et-location-textile/",
+    "texte": "Suspension du financement des formations sur le budget Plan de développement des compétences (PDC)"
+   },
+   {
+    "url": "https://www.akto.fr/regles-de-prise-en-charge-entretien-et-location-textile/",
+    "texte": "A ce jour l’enveloppe budgétaire qui a été attribuée à votre branche a été intégralement engagée."
+   },
+   {
+    "url": "https://www.akto.fr/regles-de-prise-en-charge-entretien-et-location-textile/",
+    "texte": "Nous vous remercions de ne pas déposer de nouveaux dossiers pour 2026."
+   }
+  ],
+  "retenu": false,
+  "epuise": "AKTO indique que l'enveloppe 2026 de votre branche pour le plan de développement des compétences est intégralement engagée pour les formations hors de son catalogue Espace Formation",
+  "paliers": [],
+  "remarques": null
+ }
+]

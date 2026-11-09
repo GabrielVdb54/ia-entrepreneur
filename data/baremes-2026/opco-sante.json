@@ -1,0 +1,191 @@
+[
+ {
+  "opco": "OPCO SANTE",
+  "branche": "Convention collective nationale de travail des établissements et services pour personnes inadaptées et handicapées (convention de 1966)",
+  "idcc": [
+   "0413"
+  ],
+  "retenu": true,
+  "lien": "https://www.opco-sante.fr/employeur/tpme-evolution/",
+  "version": "synthèse des prises en charge du secteur sanitaire, social et médico-social privé à but non lucratif (SSSMS) de l'OPCO Santé, mise à jour en mai 2026, et conditions générales de gestion SSSMS applicables au 1er janvier 2026",
+  "citations": [
+   {
+    "url": "https://www.opco-sante.fr/app/uploads/2025/08/opco0179_codes_idcc_pdf_site.pdf",
+    "texte": "IDCC 0413 - Convention collective nationale de travail des établissements et services pour personnes inadaptées et handicapées (convention de 1966, SNAPEI)"
+   },
+   {
+    "url": "https://www.opco-sante.fr/employeur/tpme-evolution/",
+    "texte": "Afin d’améliorer l’accès à la formation des salariés des entreprises et associations de moins de 50 salariés, nous prenons en compte leurs spécificités et mettons en place une aide spécifique accessible via la contribution légale à la formation professionnelle."
+   },
+   {
+    "url": "https://www.opco-sante.fr/employeur/tpme-evolution/",
+    "texte": "dans la limite de 2 500 € par an et dans la limite des fonds disponibles"
+   },
+   {
+    "url": "https://www.opco-sante.fr/app/uploads/2025/07/opco0289_synthese-des-prise-en-charge-sssms_pdf_site.pdf",
+    "texte": "Sur les fonds légaux (article L. 6332-17 du Code du travail), seules les entreprises de moins de 50 salariés bénéficient d’un financement pour leur plan de développement des compétences."
+   },
+   {
+    "url": "https://www.opco-sante.fr/app/uploads/2025/07/opco0289_synthese-des-prise-en-charge-sssms_pdf_site.pdf",
+    "texte": "Depuis 2026, prise en charge de 100 % des coûts pédagogiques, des rémunérations à hauteur d’un SMIC et des frais annexes dans la limite de 2 500 € par an."
+   },
+   {
+    "url": "https://www.opco-sante.fr/app/uploads/2025/07/opco0289_synthese-des-prise-en-charge-sssms_pdf_site.pdf",
+    "texte": "Toutes les prises en charge ont été validées par la branche sanitaire, social, médico-social privé à but non lucratif, dans le cadre du conseil d’administration de l’OPCO Santé et mises à jour en mai 2026."
+   },
+   {
+    "url": "https://www.opco-sante.fr/app/uploads/2025/07/opco0289_synthese-des-prise-en-charge-sssms_pdf_site.pdf",
+    "texte": "o des coûts pédagogiques dans la limite de 1 200€/jour ;"
+   },
+   {
+    "url": "https://www.opco-sante.fr/app/uploads/2026/01/opco0236_conditions-generales-de-gestion-sssms-2026_pdf_site.pdf",
+    "texte": "Dans tous les cas, cette demande de prise en charge doit être saisie depuis le compte répertorié de l’adhérent sur la plateforme « Webservices » en amont du démarrage de la formation et au moins 2- (deux) mois avant le début de l’action si l’adhérent souhaite une garantie de réponse de la part de l’OPCO Santé avant le départ en formation."
+   },
+   {
+    "url": "https://www.opco-sante.fr/app/uploads/2026/01/opco0236_conditions-generales-de-gestion-sssms-2026_pdf_site.pdf",
+    "texte": "L’OPCO Santé se réserve le droit de refuser toute demande de financement reçue hors délai."
+   },
+   {
+    "url": "https://www.opco-sante.fr/app/uploads/2026/01/opco0236_conditions-generales-de-gestion-sssms-2026_pdf_site.pdf",
+    "texte": "L’examen de la demande de prise en charge est réalisé sur la base de l’ensemble des dispositions en vigueur au moment de la réception de la demande et dans la limite des fonds disponibles."
+   }
+  ],
+  "remarques": null,
+  "delai_jusquau": null,
+  "paliers": [
+   {
+    "min": 0,
+    "max": 49,
+    "montant": "jusqu'à 2 500 € par an",
+    "detail": "ce budget couvre les coûts pédagogiques, les rémunérations jusqu'au SMIC et les frais annexes"
+   }
+  ],
+  "delai": "Demande à saisir sur la plateforme Webservices d'OPCO Santé avant le démarrage de la formation, au moins 2 mois avant pour une réponse garantie."
+ },
+ {
+  "opco": "OPCO SANTE",
+  "branche": "Convention collective nationale des établissements privés d'hospitalisation, de soins, de cure et de garde à but non lucratif (FEHAP, convention de 1951)",
+  "idcc": [
+   "0029"
+  ],
+  "retenu": true,
+  "lien": "https://www.opco-sante.fr/employeur/tpme-evolution/",
+  "version": "synthèse des prises en charge du secteur sanitaire, social et médico-social privé à but non lucratif (SSSMS) de l'OPCO Santé, mise à jour en mai 2026, et conditions générales de gestion SSSMS applicables au 1er janvier 2026",
+  "citations": [
+   {
+    "url": "https://www.opco-sante.fr/app/uploads/2025/08/opco0179_codes_idcc_pdf_site.pdf",
+    "texte": "IDCC 29 - Convention collective nationale des établissements privés d’hospitalisation, de soins, de cure et de garde à but non lucratif (FEHAP, convention de 1951)"
+   },
+   {
+    "url": "https://www.opco-sante.fr/employeur/tpme-evolution/",
+    "texte": "Afin d’améliorer l’accès à la formation des salariés des entreprises et associations de moins de 50 salariés, nous prenons en compte leurs spécificités et mettons en place une aide spécifique accessible via la contribution légale à la formation professionnelle."
+   },
+   {
+    "url": "https://www.opco-sante.fr/employeur/tpme-evolution/",
+    "texte": "dans la limite de 2 500 € par an et dans la limite des fonds disponibles"
+   },
+   {
+    "url": "https://www.opco-sante.fr/app/uploads/2025/07/opco0289_synthese-des-prise-en-charge-sssms_pdf_site.pdf",
+    "texte": "Sur les fonds légaux (article L. 6332-17 du Code du travail), seules les entreprises de moins de 50 salariés bénéficient d’un financement pour leur plan de développement des compétences."
+   },
+   {
+    "url": "https://www.opco-sante.fr/app/uploads/2025/07/opco0289_synthese-des-prise-en-charge-sssms_pdf_site.pdf",
+    "texte": "Depuis 2026, prise en charge de 100 % des coûts pédagogiques, des rémunérations à hauteur d’un SMIC et des frais annexes dans la limite de 2 500 € par an."
+   },
+   {
+    "url": "https://www.opco-sante.fr/app/uploads/2025/07/opco0289_synthese-des-prise-en-charge-sssms_pdf_site.pdf",
+    "texte": "Toutes les prises en charge ont été validées par la branche sanitaire, social, médico-social privé à but non lucratif, dans le cadre du conseil d’administration de l’OPCO Santé et mises à jour en mai 2026."
+   },
+   {
+    "url": "https://www.opco-sante.fr/app/uploads/2025/07/opco0289_synthese-des-prise-en-charge-sssms_pdf_site.pdf",
+    "texte": "o des coûts pédagogiques dans la limite de 1 200€/jour ;"
+   },
+   {
+    "url": "https://www.opco-sante.fr/app/uploads/2026/01/opco0236_conditions-generales-de-gestion-sssms-2026_pdf_site.pdf",
+    "texte": "Dans tous les cas, cette demande de prise en charge doit être saisie depuis le compte répertorié de l’adhérent sur la plateforme « Webservices » en amont du démarrage de la formation et au moins 2- (deux) mois avant le début de l’action si l’adhérent souhaite une garantie de réponse de la part de l’OPCO Santé avant le départ en formation."
+   },
+   {
+    "url": "https://www.opco-sante.fr/app/uploads/2026/01/opco0236_conditions-generales-de-gestion-sssms-2026_pdf_site.pdf",
+    "texte": "L’OPCO Santé se réserve le droit de refuser toute demande de financement reçue hors délai."
+   },
+   {
+    "url": "https://www.opco-sante.fr/app/uploads/2026/01/opco0236_conditions-generales-de-gestion-sssms-2026_pdf_site.pdf",
+    "texte": "L’examen de la demande de prise en charge est réalisé sur la base de l’ensemble des dispositions en vigueur au moment de la réception de la demande et dans la limite des fonds disponibles."
+   }
+  ],
+  "remarques": null,
+  "delai_jusquau": null,
+  "paliers": [
+   {
+    "min": 0,
+    "max": 49,
+    "montant": "jusqu'à 2 500 € par an",
+    "detail": "ce budget couvre les coûts pédagogiques, les rémunérations jusqu'au SMIC et les frais annexes"
+   }
+  ],
+  "delai": "Demande à saisir sur la plateforme Webservices d'OPCO Santé avant le démarrage de la formation, au moins 2 mois avant pour une réponse garantie."
+ },
+ {
+  "opco": "OPCO SANTE",
+  "branche": "Convention collective de l'hospitalisation privée (CCU, FHP)",
+  "idcc": [
+   "2264"
+  ],
+  "retenu": true,
+  "lien": "https://www.opco-sante.fr/employeur/tpme-evolution/",
+  "version": "synthèse des prises en charge du secteur de l'hospitalisation privée et du thermalisme (HP) de l'OPCO Santé, mise à jour en mai 2026, et conditions générales de gestion HP applicables au 1er janvier 2026",
+  "citations": [
+   {
+    "url": "https://www.opco-sante.fr/app/uploads/2025/08/opco0179_codes_idcc_pdf_site.pdf",
+    "texte": "IDCC 2264 - Convention collective de l’hospitalisation privée (CCU, FHP, établissements pour personnes âgées, maison de retraite, établissements de suite et réadaptation, médicaux pour enfants et adolescents, UHP, sanitaires sociaux et médico-sociaux CRRR, hospitalisation privé à but lucratif FIEHP)"
+   },
+   {
+    "url": "https://www.opco-sante.fr/employeur/tpme-evolution/",
+    "texte": "Afin d’améliorer l’accès à la formation des salariés des entreprises et associations de moins de 50 salariés, nous prenons en compte leurs spécificités et mettons en place une aide spécifique accessible via la contribution légale à la formation professionnelle."
+   },
+   {
+    "url": "https://www.opco-sante.fr/employeur/tpme-evolution/",
+    "texte": "dans la limite de 2 500 € par an et dans la limite des fonds disponibles"
+   },
+   {
+    "url": "https://www.opco-sante.fr/app/uploads/2025/08/opco0290_synthese-des-prise-en-charge-hp_pdf_site.pdf",
+    "texte": "Sur les fonds légaux (article L. 6332-17 du Code du travail), seules les entreprises de moins de 50 salariés bénéficient d’un financement pour leur plan de développement des compétences."
+   },
+   {
+    "url": "https://www.opco-sante.fr/app/uploads/2025/08/opco0290_synthese-des-prise-en-charge-hp_pdf_site.pdf",
+    "texte": "Pour 2026, prise en charge de 100 % des coûts pédagogiques, des rémunérations à hauteur d’un SMIC et des frais annexes dans la limite de 2 500 € par an."
+   },
+   {
+    "url": "https://www.opco-sante.fr/app/uploads/2025/08/opco0290_synthese-des-prise-en-charge-hp_pdf_site.pdf",
+    "texte": "Toutes les prises en charge ci-dessous ont été validées par le secteur de l’hospitalisation privée dans le cadre du conseil d’administration de l’OPCO Santé et mises à jour en mai 2026."
+   },
+   {
+    "url": "https://www.opco-sante.fr/app/uploads/2025/08/opco0290_synthese-des-prise-en-charge-hp_pdf_site.pdf",
+    "texte": "• des coûts pédagogiques dans la limite de 1 200 € par jour ;"
+   },
+   {
+    "url": "https://www.opco-sante.fr/app/uploads/2026/01/opco0235_conditions-generales-de-gestion-hp-2026_pdf_site.pdf",
+    "texte": "Dans tous les cas, cette demande de prise en charge doit être saisie depuis le compte répertorié de l’adhérent sur la plateforme « Webservices » en amont du démarrage de la formation et au moins 2- (deux) mois avant le début de l’action si l’adhérent souhaite une garantie de réponse de la part de l’OPCO Santé avant le départ en formation."
+   },
+   {
+    "url": "https://www.opco-sante.fr/app/uploads/2026/01/opco0235_conditions-generales-de-gestion-hp-2026_pdf_site.pdf",
+    "texte": "L’OPCO Santé se réserve le droit de refuser toute demande de financement reçue hors délai."
+   },
+   {
+    "url": "https://www.opco-sante.fr/app/uploads/2026/01/opco0235_conditions-generales-de-gestion-hp-2026_pdf_site.pdf",
+    "texte": "L’examen de la demande de prise en charge est réalisé sur la base de l’ensemble des dispositions en vigueur au moment de la réception de la demande et dans la limite des fonds disponibles."
+   }
+  ],
+  "remarques": null,
+  "delai_jusquau": null,
+  "paliers": [
+   {
+    "min": 0,
+    "max": 49,
+    "montant": "jusqu'à 2 500 € par an",
+    "detail": "ce budget couvre les coûts pédagogiques, les rémunérations jusqu'au SMIC et les frais annexes"
+   }
+  ],
+  "delai": "Demande à saisir sur la plateforme Webservices d'OPCO Santé avant le démarrage de la formation, au moins 2 mois avant pour une réponse garantie."
+ }
+]

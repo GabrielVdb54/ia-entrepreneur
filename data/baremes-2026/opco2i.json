@@ -1,0 +1,516 @@
+[
+ {
+  "opco": "OPCO2I",
+  "branche": "Métallurgie",
+  "idcc": [
+   "3248"
+  ],
+  "retenu": true,
+  "lien": "https://www.opco2i.fr/regles/prise-en-charge-a-compter-du-1er-janvier-2021/",
+  "version": "règles de prise en charge 2026 du plan de développement des compétences des entreprises de moins de 50 salariés d'OPCO 2i (décision du conseil d'administration du 18/12/2025, applicables depuis le 01/01/2026, page modifiée le 24/12/2025)",
+  "citations": [
+   {
+    "url": "https://www.opco2i.fr/regles/prise-en-charge-a-compter-du-1er-janvier-2021/",
+    "texte": "Le Conseil d’administration a décidé en date du 18 décembre 2025, des conditions de financement des projets d’entreprise éligibles au plan de développement des compétences (entreprise de moins de 50 salariés). Ces conditions sont applicables à compter du 1 er janvier 2026 ."
+   },
+   {
+    "url": "https://www.opco2i.fr/regles/prise-en-charge-a-compter-du-1er-janvier-2021/",
+    "texte": "Toute demande de prise en charge doit être effectuée sur Mon Compte 2i avant le démarrage de l’action"
+   },
+   {
+    "url": "https://www.opco2i.fr/regles/prise-en-charge-a-compter-du-1er-janvier-2021/",
+    "texte": "Coûts pédagogiques plafonnés à 4 800 € par an et par entreprise (dans la limite des fonds disponibles) avec des plafonds horaires :"
+   },
+   {
+    "url": "https://www.opco2i.fr/regles/prise-en-charge-a-compter-du-1er-janvier-2021/",
+    "texte": "– 15 €/h maximum pour les langues"
+   },
+   {
+    "url": "https://www.opco2i.fr/regles/prise-en-charge-a-compter-du-1er-janvier-2021/",
+    "texte": "– 20 €/h maximum pour la formation réglementaire (dont formations des membres du CSE)"
+   },
+   {
+    "url": "https://www.opco2i.fr/regles/prise-en-charge-a-compter-du-1er-janvier-2021/",
+    "texte": "– 30 €/h maximum pour les formations métiers"
+   },
+   {
+    "url": "https://www.opco2i.fr/regles/prise-en-charge-a-compter-du-1er-janvier-2021/",
+    "texte": "Contactez votre conseiller formation pour connaître les règles de prise en charge spécifiques à votre région."
+   }
+  ],
+  "remarques": null,
+  "delai_jusquau": null,
+  "paliers": [
+   {
+    "min": 0,
+    "max": 49,
+    "montant": "jusqu'à 4 800 € par an pour les coûts pédagogiques",
+    "detail": "dans la limite de 30 €/h pour les formations métiers (15 €/h pour les langues, 20 €/h pour la formation réglementaire)"
+   }
+  ],
+  "delai": "Demande à déposer avant le démarrage de la formation."
+ },
+ {
+  "opco": "OPCO2I",
+  "branche": "Chimie",
+  "idcc": [
+   "0044"
+  ],
+  "retenu": true,
+  "lien": "https://www.opco2i.fr/regles/prise-en-charge-a-compter-du-1er-janvier-2021/",
+  "version": "règles de prise en charge 2026 du plan de développement des compétences des entreprises de moins de 50 salariés d'OPCO 2i (décision du conseil d'administration du 18/12/2025, applicables depuis le 01/01/2026, page modifiée le 24/12/2025)",
+  "citations": [
+   {
+    "url": "https://www.opco2i.fr/regles/prise-en-charge-a-compter-du-1er-janvier-2021/",
+    "texte": "Le Conseil d’administration a décidé en date du 18 décembre 2025, des conditions de financement des projets d’entreprise éligibles au plan de développement des compétences (entreprise de moins de 50 salariés). Ces conditions sont applicables à compter du 1 er janvier 2026 ."
+   },
+   {
+    "url": "https://www.opco2i.fr/regles/prise-en-charge-a-compter-du-1er-janvier-2021/",
+    "texte": "Toute demande de prise en charge doit être effectuée sur Mon Compte 2i avant le démarrage de l’action"
+   },
+   {
+    "url": "https://www.opco2i.fr/regles/prise-en-charge-a-compter-du-1er-janvier-2021/",
+    "texte": "Coûts pédagogiques plafonnés à 4 800 € par an et par entreprise (dans la limite des fonds disponibles) avec des plafonds horaires :"
+   },
+   {
+    "url": "https://www.opco2i.fr/regles/prise-en-charge-a-compter-du-1er-janvier-2021/",
+    "texte": "– 15 €/h maximum pour les langues"
+   },
+   {
+    "url": "https://www.opco2i.fr/regles/prise-en-charge-a-compter-du-1er-janvier-2021/",
+    "texte": "– 20 €/h maximum pour la formation réglementaire (dont formations des membres du CSE)"
+   },
+   {
+    "url": "https://www.opco2i.fr/regles/prise-en-charge-a-compter-du-1er-janvier-2021/",
+    "texte": "– 30 €/h maximum pour les formations métiers"
+   },
+   {
+    "url": "https://www.opco2i.fr/regles/prise-en-charge-a-compter-du-1er-janvier-2021/",
+    "texte": "Contactez votre conseiller formation pour connaître les règles de prise en charge spécifiques à votre région."
+   }
+  ],
+  "remarques": null,
+  "delai_jusquau": null,
+  "paliers": [
+   {
+    "min": 0,
+    "max": 49,
+    "montant": "jusqu'à 4 800 € par an pour les coûts pédagogiques",
+    "detail": "dans la limite de 30 €/h pour les formations métiers (15 €/h pour les langues, 20 €/h pour la formation réglementaire)"
+   }
+  ],
+  "delai": "Demande à déposer avant le démarrage de la formation."
+ },
+ {
+  "opco": "OPCO2I",
+  "branche": "Fabrication de l'ameublement",
+  "idcc": [
+   "1411"
+  ],
+  "retenu": true,
+  "lien": "https://www.opco2i.fr/regles/prise-en-charge-a-compter-du-1er-janvier-2021/",
+  "version": "règles de prise en charge 2026 du plan de développement des compétences des entreprises de moins de 50 salariés d'OPCO 2i (décision du conseil d'administration du 18/12/2025, applicables depuis le 01/01/2026, page modifiée le 24/12/2025)",
+  "citations": [
+   {
+    "url": "https://www.opco2i.fr/regles/prise-en-charge-a-compter-du-1er-janvier-2021/",
+    "texte": "Le Conseil d’administration a décidé en date du 18 décembre 2025, des conditions de financement des projets d’entreprise éligibles au plan de développement des compétences (entreprise de moins de 50 salariés). Ces conditions sont applicables à compter du 1 er janvier 2026 ."
+   },
+   {
+    "url": "https://www.opco2i.fr/regles/prise-en-charge-a-compter-du-1er-janvier-2021/",
+    "texte": "Toute demande de prise en charge doit être effectuée sur Mon Compte 2i avant le démarrage de l’action"
+   },
+   {
+    "url": "https://www.opco2i.fr/regles/prise-en-charge-a-compter-du-1er-janvier-2021/",
+    "texte": "Coûts pédagogiques plafonnés à 4 800 € par an et par entreprise (dans la limite des fonds disponibles) avec des plafonds horaires :"
+   },
+   {
+    "url": "https://www.opco2i.fr/regles/prise-en-charge-a-compter-du-1er-janvier-2021/",
+    "texte": "– 15 €/h maximum pour les langues"
+   },
+   {
+    "url": "https://www.opco2i.fr/regles/prise-en-charge-a-compter-du-1er-janvier-2021/",
+    "texte": "– 20 €/h maximum pour la formation réglementaire (dont formations des membres du CSE)"
+   },
+   {
+    "url": "https://www.opco2i.fr/regles/prise-en-charge-a-compter-du-1er-janvier-2021/",
+    "texte": "– 30 €/h maximum pour les formations métiers"
+   },
+   {
+    "url": "https://www.opco2i.fr/regles/prise-en-charge-a-compter-du-1er-janvier-2021/",
+    "texte": "Contactez votre conseiller formation pour connaître les règles de prise en charge spécifiques à votre région."
+   }
+  ],
+  "remarques": null,
+  "delai_jusquau": null,
+  "paliers": [
+   {
+    "min": 0,
+    "max": 49,
+    "montant": "jusqu'à 4 800 € par an pour les coûts pédagogiques",
+    "detail": "dans la limite de 30 €/h pour les formations métiers (15 €/h pour les langues, 20 €/h pour la formation réglementaire)"
+   }
+  ],
+  "delai": "Demande à déposer avant le démarrage de la formation."
+ },
+ {
+  "opco": "OPCO2I",
+  "branche": "Plasturgie et composites",
+  "idcc": [
+   "0292"
+  ],
+  "retenu": true,
+  "lien": "https://www.opco2i.fr/regles/prise-en-charge-a-compter-du-1er-janvier-2021/",
+  "version": "règles de prise en charge 2026 du plan de développement des compétences des entreprises de moins de 50 salariés d'OPCO 2i (décision du conseil d'administration du 18/12/2025, applicables depuis le 01/01/2026, page modifiée le 24/12/2025)",
+  "citations": [
+   {
+    "url": "https://www.opco2i.fr/regles/prise-en-charge-a-compter-du-1er-janvier-2021/",
+    "texte": "Le Conseil d’administration a décidé en date du 18 décembre 2025, des conditions de financement des projets d’entreprise éligibles au plan de développement des compétences (entreprise de moins de 50 salariés). Ces conditions sont applicables à compter du 1 er janvier 2026 ."
+   },
+   {
+    "url": "https://www.opco2i.fr/regles/prise-en-charge-a-compter-du-1er-janvier-2021/",
+    "texte": "Toute demande de prise en charge doit être effectuée sur Mon Compte 2i avant le démarrage de l’action"
+   },
+   {
+    "url": "https://www.opco2i.fr/regles/prise-en-charge-a-compter-du-1er-janvier-2021/",
+    "texte": "Coûts pédagogiques plafonnés à 4 800 € par an et par entreprise (dans la limite des fonds disponibles) avec des plafonds horaires :"
+   },
+   {
+    "url": "https://www.opco2i.fr/regles/prise-en-charge-a-compter-du-1er-janvier-2021/",
+    "texte": "– 15 €/h maximum pour les langues"
+   },
+   {
+    "url": "https://www.opco2i.fr/regles/prise-en-charge-a-compter-du-1er-janvier-2021/",
+    "texte": "– 20 €/h maximum pour la formation réglementaire (dont formations des membres du CSE)"
+   },
+   {
+    "url": "https://www.opco2i.fr/regles/prise-en-charge-a-compter-du-1er-janvier-2021/",
+    "texte": "– 30 €/h maximum pour les formations métiers"
+   },
+   {
+    "url": "https://www.opco2i.fr/regles/prise-en-charge-a-compter-du-1er-janvier-2021/",
+    "texte": "Contactez votre conseiller formation pour connaître les règles de prise en charge spécifiques à votre région."
+   }
+  ],
+  "remarques": null,
+  "delai_jusquau": null,
+  "paliers": [
+   {
+    "min": 0,
+    "max": 49,
+    "montant": "jusqu'à 4 800 € par an pour les coûts pédagogiques",
+    "detail": "dans la limite de 30 €/h pour les formations métiers (15 €/h pour les langues, 20 €/h pour la formation réglementaire)"
+   }
+  ],
+  "delai": "Demande à déposer avant le démarrage de la formation."
+ },
+ {
+  "opco": "OPCO2I",
+  "branche": "Industries de carrières et matériaux de construction (branche « Carrières et matériaux + Chaux » d'OPCO 2i)",
+  "idcc": [
+   "3249"
+  ],
+  "retenu": true,
+  "lien": "https://www.opco2i.fr/regles/prise-en-charge-a-compter-du-1er-janvier-2021/",
+  "version": "règles de prise en charge 2026 du plan de développement des compétences des entreprises de moins de 50 salariés d'OPCO 2i (décision du conseil d'administration du 18/12/2025, applicables depuis le 01/01/2026, page modifiée le 24/12/2025)",
+  "citations": [
+   {
+    "url": "https://www.opco2i.fr/regles/prise-en-charge-a-compter-du-1er-janvier-2021/",
+    "texte": "Le Conseil d’administration a décidé en date du 18 décembre 2025, des conditions de financement des projets d’entreprise éligibles au plan de développement des compétences (entreprise de moins de 50 salariés). Ces conditions sont applicables à compter du 1 er janvier 2026 ."
+   },
+   {
+    "url": "https://www.opco2i.fr/regles/prise-en-charge-a-compter-du-1er-janvier-2021/",
+    "texte": "Toute demande de prise en charge doit être effectuée sur Mon Compte 2i avant le démarrage de l’action"
+   },
+   {
+    "url": "https://www.opco2i.fr/regles/prise-en-charge-a-compter-du-1er-janvier-2021/",
+    "texte": "Coûts pédagogiques plafonnés à 4 800 € par an et par entreprise (dans la limite des fonds disponibles) avec des plafonds horaires :"
+   },
+   {
+    "url": "https://www.opco2i.fr/regles/prise-en-charge-a-compter-du-1er-janvier-2021/",
+    "texte": "– 15 €/h maximum pour les langues"
+   },
+   {
+    "url": "https://www.opco2i.fr/regles/prise-en-charge-a-compter-du-1er-janvier-2021/",
+    "texte": "– 20 €/h maximum pour la formation réglementaire (dont formations des membres du CSE)"
+   },
+   {
+    "url": "https://www.opco2i.fr/regles/prise-en-charge-a-compter-du-1er-janvier-2021/",
+    "texte": "– 30 €/h maximum pour les formations métiers"
+   },
+   {
+    "url": "https://www.opco2i.fr/regles/prise-en-charge-a-compter-du-1er-janvier-2021/",
+    "texte": "Contactez votre conseiller formation pour connaître les règles de prise en charge spécifiques à votre région."
+   },
+   {
+    "url": "https://www.opco2i.fr/regles/mesures-durgence-10/",
+    "texte": "relevant de la convention collective des Industries de carrières et matériaux de construction du 6 juillet 2022 (Code IDCC 3249)."
+   }
+  ],
+  "remarques": null,
+  "delai_jusquau": null,
+  "paliers": [
+   {
+    "min": 0,
+    "max": 49,
+    "montant": "jusqu'à 4 800 € par an pour les coûts pédagogiques",
+    "detail": "dans la limite de 30 €/h pour les formations métiers (15 €/h pour les langues, 20 €/h pour la formation réglementaire)"
+   }
+  ],
+  "delai": "Demande à déposer avant le démarrage de la formation."
+ },
+ {
+  "opco": "OPCO2I",
+  "branche": "Métallurgie, ingénieurs et cadres (IDCC 0650, nom non trouvé chez OPCO 2i)",
+  "idcc": [
+   "0650"
+  ],
+  "retenu": true,
+  "lien": "https://www.opco2i.fr/regles/prise-en-charge-a-compter-du-1er-janvier-2021/",
+  "version": "règles de prise en charge 2026 du plan de développement des compétences des entreprises de moins de 50 salariés d'OPCO 2i (décision du conseil d'administration du 18/12/2025, applicables depuis le 01/01/2026, page modifiée le 24/12/2025)",
+  "citations": [
+   {
+    "url": "https://www.opco2i.fr/regles/prise-en-charge-a-compter-du-1er-janvier-2021/",
+    "texte": "Le Conseil d’administration a décidé en date du 18 décembre 2025, des conditions de financement des projets d’entreprise éligibles au plan de développement des compétences (entreprise de moins de 50 salariés). Ces conditions sont applicables à compter du 1 er janvier 2026 ."
+   },
+   {
+    "url": "https://www.opco2i.fr/regles/prise-en-charge-a-compter-du-1er-janvier-2021/",
+    "texte": "Toute demande de prise en charge doit être effectuée sur Mon Compte 2i avant le démarrage de l’action"
+   },
+   {
+    "url": "https://www.opco2i.fr/regles/prise-en-charge-a-compter-du-1er-janvier-2021/",
+    "texte": "Coûts pédagogiques plafonnés à 4 800 € par an et par entreprise (dans la limite des fonds disponibles) avec des plafonds horaires :"
+   },
+   {
+    "url": "https://www.opco2i.fr/regles/prise-en-charge-a-compter-du-1er-janvier-2021/",
+    "texte": "– 15 €/h maximum pour les langues"
+   },
+   {
+    "url": "https://www.opco2i.fr/regles/prise-en-charge-a-compter-du-1er-janvier-2021/",
+    "texte": "– 20 €/h maximum pour la formation réglementaire (dont formations des membres du CSE)"
+   },
+   {
+    "url": "https://www.opco2i.fr/regles/prise-en-charge-a-compter-du-1er-janvier-2021/",
+    "texte": "– 30 €/h maximum pour les formations métiers"
+   },
+   {
+    "url": "https://www.opco2i.fr/regles/prise-en-charge-a-compter-du-1er-janvier-2021/",
+    "texte": "Contactez votre conseiller formation pour connaître les règles de prise en charge spécifiques à votre région."
+   }
+  ],
+  "remarques": null,
+  "delai_jusquau": null,
+  "paliers": [
+   {
+    "min": 0,
+    "max": 49,
+    "montant": "jusqu'à 4 800 € par an pour les coûts pédagogiques",
+    "detail": "dans la limite de 30 €/h pour les formations métiers (15 €/h pour les langues, 20 €/h pour la formation réglementaire)"
+   }
+  ],
+  "delai": "Demande à déposer avant le démarrage de la formation."
+ },
+ {
+  "opco": "OPCO2I",
+  "branche": "Recyclage et Réemploi",
+  "idcc": [
+   "0637"
+  ],
+  "retenu": true,
+  "lien": "https://www.opco2i.fr/regles/prise-en-charge-a-compter-du-1er-janvier-2021/",
+  "version": "règles de prise en charge 2026 du plan de développement des compétences des entreprises de moins de 50 salariés d'OPCO 2i (décision du conseil d'administration du 18/12/2025, applicables depuis le 01/01/2026, page modifiée le 24/12/2025)",
+  "citations": [
+   {
+    "url": "https://www.opco2i.fr/regles/prise-en-charge-a-compter-du-1er-janvier-2021/",
+    "texte": "Le Conseil d’administration a décidé en date du 18 décembre 2025, des conditions de financement des projets d’entreprise éligibles au plan de développement des compétences (entreprise de moins de 50 salariés). Ces conditions sont applicables à compter du 1 er janvier 2026 ."
+   },
+   {
+    "url": "https://www.opco2i.fr/regles/prise-en-charge-a-compter-du-1er-janvier-2021/",
+    "texte": "Toute demande de prise en charge doit être effectuée sur Mon Compte 2i avant le démarrage de l’action"
+   },
+   {
+    "url": "https://www.opco2i.fr/regles/prise-en-charge-a-compter-du-1er-janvier-2021/",
+    "texte": "Coûts pédagogiques plafonnés à 4 800 € par an et par entreprise (dans la limite des fonds disponibles) avec des plafonds horaires :"
+   },
+   {
+    "url": "https://www.opco2i.fr/regles/prise-en-charge-a-compter-du-1er-janvier-2021/",
+    "texte": "– 15 €/h maximum pour les langues"
+   },
+   {
+    "url": "https://www.opco2i.fr/regles/prise-en-charge-a-compter-du-1er-janvier-2021/",
+    "texte": "– 20 €/h maximum pour la formation réglementaire (dont formations des membres du CSE)"
+   },
+   {
+    "url": "https://www.opco2i.fr/regles/prise-en-charge-a-compter-du-1er-janvier-2021/",
+    "texte": "– 30 €/h maximum pour les formations métiers"
+   },
+   {
+    "url": "https://www.opco2i.fr/regles/prise-en-charge-a-compter-du-1er-janvier-2021/",
+    "texte": "Contactez votre conseiller formation pour connaître les règles de prise en charge spécifiques à votre région."
+   }
+  ],
+  "remarques": null,
+  "delai_jusquau": null,
+  "paliers": [
+   {
+    "min": 0,
+    "max": 49,
+    "montant": "jusqu'à 4 800 € par an pour les coûts pédagogiques",
+    "detail": "dans la limite de 30 €/h pour les formations métiers (15 €/h pour les langues, 20 €/h pour la formation réglementaire)"
+   }
+  ],
+  "delai": "Demande à déposer avant le démarrage de la formation."
+ },
+ {
+  "opco": "OPCO2I",
+  "branche": "Habillement",
+  "idcc": [
+   "0247"
+  ],
+  "retenu": true,
+  "lien": "https://www.opco2i.fr/regles/prise-en-charge-a-compter-du-1er-janvier-2021/",
+  "version": "règles de prise en charge 2026 du plan de développement des compétences des entreprises de moins de 50 salariés d'OPCO 2i (décision du conseil d'administration du 18/12/2025, applicables depuis le 01/01/2026, page modifiée le 24/12/2025)",
+  "citations": [
+   {
+    "url": "https://www.opco2i.fr/regles/prise-en-charge-a-compter-du-1er-janvier-2021/",
+    "texte": "Le Conseil d’administration a décidé en date du 18 décembre 2025, des conditions de financement des projets d’entreprise éligibles au plan de développement des compétences (entreprise de moins de 50 salariés). Ces conditions sont applicables à compter du 1 er janvier 2026 ."
+   },
+   {
+    "url": "https://www.opco2i.fr/regles/prise-en-charge-a-compter-du-1er-janvier-2021/",
+    "texte": "Toute demande de prise en charge doit être effectuée sur Mon Compte 2i avant le démarrage de l’action"
+   },
+   {
+    "url": "https://www.opco2i.fr/regles/prise-en-charge-a-compter-du-1er-janvier-2021/",
+    "texte": "Coûts pédagogiques plafonnés à 4 800 € par an et par entreprise (dans la limite des fonds disponibles) avec des plafonds horaires :"
+   },
+   {
+    "url": "https://www.opco2i.fr/regles/prise-en-charge-a-compter-du-1er-janvier-2021/",
+    "texte": "– 15 €/h maximum pour les langues"
+   },
+   {
+    "url": "https://www.opco2i.fr/regles/prise-en-charge-a-compter-du-1er-janvier-2021/",
+    "texte": "– 20 €/h maximum pour la formation réglementaire (dont formations des membres du CSE)"
+   },
+   {
+    "url": "https://www.opco2i.fr/regles/prise-en-charge-a-compter-du-1er-janvier-2021/",
+    "texte": "– 30 €/h maximum pour les formations métiers"
+   },
+   {
+    "url": "https://www.opco2i.fr/regles/prise-en-charge-a-compter-du-1er-janvier-2021/",
+    "texte": "Contactez votre conseiller formation pour connaître les règles de prise en charge spécifiques à votre région."
+   }
+  ],
+  "remarques": null,
+  "delai_jusquau": null,
+  "paliers": [
+   {
+    "min": 0,
+    "max": 49,
+    "montant": "jusqu'à 4 800 € par an pour les coûts pédagogiques",
+    "detail": "dans la limite de 30 €/h pour les formations métiers (15 €/h pour les langues, 20 €/h pour la formation réglementaire)"
+   }
+  ],
+  "delai": "Demande à déposer avant le démarrage de la formation."
+ },
+ {
+  "opco": "OPCO2I",
+  "branche": "Industries électriques et gazières",
+  "idcc": [
+   "5001"
+  ],
+  "retenu": true,
+  "lien": "https://www.opco2i.fr/regles/prise-en-charge-a-compter-du-1er-janvier-2021/",
+  "version": "règles de prise en charge 2026 du plan de développement des compétences des entreprises de moins de 50 salariés d'OPCO 2i (décision du conseil d'administration du 18/12/2025, applicables depuis le 01/01/2026, page modifiée le 24/12/2025)",
+  "citations": [
+   {
+    "url": "https://www.opco2i.fr/regles/prise-en-charge-a-compter-du-1er-janvier-2021/",
+    "texte": "Le Conseil d’administration a décidé en date du 18 décembre 2025, des conditions de financement des projets d’entreprise éligibles au plan de développement des compétences (entreprise de moins de 50 salariés). Ces conditions sont applicables à compter du 1 er janvier 2026 ."
+   },
+   {
+    "url": "https://www.opco2i.fr/regles/prise-en-charge-a-compter-du-1er-janvier-2021/",
+    "texte": "Toute demande de prise en charge doit être effectuée sur Mon Compte 2i avant le démarrage de l’action"
+   },
+   {
+    "url": "https://www.opco2i.fr/regles/prise-en-charge-a-compter-du-1er-janvier-2021/",
+    "texte": "Coûts pédagogiques plafonnés à 4 800 € par an et par entreprise (dans la limite des fonds disponibles) avec des plafonds horaires :"
+   },
+   {
+    "url": "https://www.opco2i.fr/regles/prise-en-charge-a-compter-du-1er-janvier-2021/",
+    "texte": "– 15 €/h maximum pour les langues"
+   },
+   {
+    "url": "https://www.opco2i.fr/regles/prise-en-charge-a-compter-du-1er-janvier-2021/",
+    "texte": "– 20 €/h maximum pour la formation réglementaire (dont formations des membres du CSE)"
+   },
+   {
+    "url": "https://www.opco2i.fr/regles/prise-en-charge-a-compter-du-1er-janvier-2021/",
+    "texte": "– 30 €/h maximum pour les formations métiers"
+   },
+   {
+    "url": "https://www.opco2i.fr/regles/prise-en-charge-a-compter-du-1er-janvier-2021/",
+    "texte": "Contactez votre conseiller formation pour connaître les règles de prise en charge spécifiques à votre région."
+   }
+  ],
+  "remarques": null,
+  "delai_jusquau": null,
+  "paliers": [
+   {
+    "min": 0,
+    "max": 49,
+    "montant": "jusqu'à 4 800 € par an pour les coûts pédagogiques",
+    "detail": "dans la limite de 30 €/h pour les formations métiers (15 €/h pour les langues, 20 €/h pour la formation réglementaire)"
+   }
+  ],
+  "delai": "Demande à déposer avant le démarrage de la formation."
+ },
+ {
+  "opco": "OPCO2I",
+  "branche": "Textile",
+  "idcc": [
+   "0018"
+  ],
+  "retenu": true,
+  "lien": "https://www.opco2i.fr/regles/prise-en-charge-a-compter-du-1er-janvier-2021/",
+  "version": "règles de prise en charge 2026 du plan de développement des compétences des entreprises de moins de 50 salariés d'OPCO 2i (décision du conseil d'administration du 18/12/2025, applicables depuis le 01/01/2026, page modifiée le 24/12/2025)",
+  "citations": [
+   {
+    "url": "https://www.opco2i.fr/regles/prise-en-charge-a-compter-du-1er-janvier-2021/",
+    "texte": "Le Conseil d’administration a décidé en date du 18 décembre 2025, des conditions de financement des projets d’entreprise éligibles au plan de développement des compétences (entreprise de moins de 50 salariés). Ces conditions sont applicables à compter du 1 er janvier 2026 ."
+   },
+   {
+    "url": "https://www.opco2i.fr/regles/prise-en-charge-a-compter-du-1er-janvier-2021/",
+    "texte": "Toute demande de prise en charge doit être effectuée sur Mon Compte 2i avant le démarrage de l’action"
+   },
+   {
+    "url": "https://www.opco2i.fr/regles/prise-en-charge-a-compter-du-1er-janvier-2021/",
+    "texte": "Coûts pédagogiques plafonnés à 4 800 € par an et par entreprise (dans la limite des fonds disponibles) avec des plafonds horaires :"
+   },
+   {
+    "url": "https://www.opco2i.fr/regles/prise-en-charge-a-compter-du-1er-janvier-2021/",
+    "texte": "– 15 €/h maximum pour les langues"
+   },
+   {
+    "url": "https://www.opco2i.fr/regles/prise-en-charge-a-compter-du-1er-janvier-2021/",
+    "texte": "– 20 €/h maximum pour la formation réglementaire (dont formations des membres du CSE)"
+   },
+   {
+    "url": "https://www.opco2i.fr/regles/prise-en-charge-a-compter-du-1er-janvier-2021/",
+    "texte": "– 30 €/h maximum pour les formations métiers"
+   },
+   {
+    "url": "https://www.opco2i.fr/regles/prise-en-charge-a-compter-du-1er-janvier-2021/",
+    "texte": "Contactez votre conseiller formation pour connaître les règles de prise en charge spécifiques à votre région."
+   }
+  ],
+  "remarques": null,
+  "delai_jusquau": null,
+  "paliers": [
+   {
+    "min": 0,
+    "max": 49,
+    "montant": "jusqu'à 4 800 € par an pour les coûts pédagogiques",
+    "detail": "dans la limite de 30 €/h pour les formations métiers (15 €/h pour les langues, 20 €/h pour la formation réglementaire)"
+   }
+  ],
+  "delai": "Demande à déposer avant le démarrage de la formation."
+ }
+]

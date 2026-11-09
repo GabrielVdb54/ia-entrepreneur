@@ -1,0 +1,1268 @@
+[
+ {
+  "opco": "OPCO EP",
+  "branche": "Immobilier",
+  "idcc": [
+   "1527"
+  ],
+  "retenu": true,
+  "lien": "https://www.opcoep.fr/criteres-de-financement?branche=187",
+  "page": "187",
+  "version": "critères 2026 de la branche Immobilier d'OPCO EP (mis à jour le 05/10/2026)",
+  "paliers": [
+   {
+    "min": 0,
+    "max": 10,
+    "montant": "jusqu'à 2 500 € HT",
+    "detail": "les formations cœur de métier, dont « la transformation numérique et digitale des entreprises (y compris IA) », sont prises en charge à 30 € HT de l'heure"
+   },
+   {
+    "min": 11,
+    "max": 49,
+    "montant": "jusqu'à 4 500 € HT",
+    "detail": "les formations cœur de métier, dont « la transformation numérique et digitale des entreprises (y compris IA) », sont prises en charge à 30 € HT de l'heure"
+   }
+  ],
+  "citations": [
+   {
+    "url": "https://www.opcoep.fr/criteres-de-financement?branche=187",
+    "texte": "Moins de 11 salariés : 2 500 € HT"
+   },
+   {
+    "url": "https://www.opcoep.fr/criteres-de-financement?branche=187",
+    "texte": "11 à 50 salariés : 4 500 € HT"
+   },
+   {
+    "url": "https://www.opcoep.fr/criteres-de-financement?branche=187",
+    "texte": "La transformation numérique et digitale des entreprises (y compris IA)"
+   },
+   {
+    "url": "https://www.opcoep.fr/criteres-de-financement?branche=187",
+    "texte": "Droit Coût pédagogique : 30 € HT/h"
+   },
+   {
+    "url": "https://www.opcoep.fr/criteres-de-financement?branche=187",
+    "texte": "Mise à jour : 05/10/2026"
+   }
+  ],
+  "delai": null,
+  "delai_jusquau": null,
+  "remarques": null
+ },
+ {
+  "opco": "OPCO EP",
+  "branche": "Cabinets médicaux",
+  "idcc": [
+   "1147"
+  ],
+  "retenu": true,
+  "lien": "https://www.opcoep.fr/criteres-de-financement?branche=204",
+  "page": "204",
+  "version": "critères 2026 de la branche Cabinets médicaux d'OPCO EP (mis à jour le 01/10/2026)",
+  "paliers": [
+   {
+    "min": 0,
+    "max": 10,
+    "montant": "jusqu'à 15 000 € HT",
+    "detail": "les formations « Informatique / Logiciels professionnels » sont prises en charge à 25 € HT de l'heure, 28 heures au plus"
+   },
+   {
+    "min": 11,
+    "max": 49,
+    "montant": "jusqu'à 30 000 € HT",
+    "detail": "les formations « Informatique / Logiciels professionnels » sont prises en charge à 25 € HT de l'heure, 28 heures au plus"
+   }
+  ],
+  "citations": [
+   {
+    "url": "https://www.opcoep.fr/criteres-de-financement?branche=204",
+    "texte": "Moins de 11 salariés : 15 000 € HT"
+   },
+   {
+    "url": "https://www.opcoep.fr/criteres-de-financement?branche=204",
+    "texte": "De 11 à 49 salariés : 30 000 € HT"
+   },
+   {
+    "url": "https://www.opcoep.fr/criteres-de-financement?branche=204",
+    "texte": "Informatique / Logiciels professionnels Durée maximale de prise en charge : 28 h Coût pédagogique : 25 € HT/h"
+   },
+   {
+    "url": "https://www.opcoep.fr/criteres-de-financement?branche=204",
+    "texte": "Mise à jour : 01/10/2026"
+   },
+   {
+    "url": "https://www.opcoep.fr/criteres-de-financement?branche=204",
+    "texte": "avant le 30 novembre de l’année durant laquelle se déroule l’action de formation"
+   }
+  ],
+  "delai": "Pour une formation en 2026, la demande doit parvenir à OPCO EP avant le 30 novembre 2026.",
+  "delai_jusquau": "2026-11-30",
+  "remarques": null
+ },
+ {
+  "opco": "OPCO EP",
+  "branche": "Gardiens, concierges et employés d’immeubles",
+  "idcc": [
+   "1043"
+  ],
+  "retenu": true,
+  "lien": "https://www.opcoep.fr/criteres-de-financement?branche=189",
+  "page": "189",
+  "version": "critères 2026 de la branche Gardiens, concierges et employés d’immeubles d'OPCO EP (mis à jour le 01/10/2026)",
+  "paliers": [
+   {
+    "min": 0,
+    "max": 10,
+    "montant": "500 € HT par salarié pour une formation individuelle, sans plafond pour une formation collective",
+    "detail": null
+   }
+  ],
+  "citations": [
+   {
+    "url": "https://www.opcoep.fr/criteres-de-financement?branche=189",
+    "texte": "Plan de développement des compétences entreprises de moins de 11 salariés"
+   },
+   {
+    "url": "https://www.opcoep.fr/criteres-de-financement?branche=189",
+    "texte": "Actions individuelles : 500 € HT par salarié Actions collectives : aucun"
+   },
+   {
+    "url": "https://www.opcoep.fr/criteres-de-financement?branche=189",
+    "texte": "Mise à jour : 01/10/2026"
+   }
+  ],
+  "delai": null,
+  "delai_jusquau": null,
+  "remarques": null
+ },
+ {
+  "opco": "OPCO EP",
+  "branche": "Coiffure",
+  "idcc": [
+   "2596"
+  ],
+  "retenu": true,
+  "lien": "https://www.opcoep.fr/criteres-de-financement?branche=201",
+  "page": "201",
+  "version": "critères 2026 de la branche Coiffure d'OPCO EP (mis à jour le 07/10/2026)",
+  "paliers": [
+   {
+    "min": 1,
+    "max": 2,
+    "montant": "jusqu'à 2 100 € HT par an",
+    "detail": "les formations « Informatique » et « Connaissance des outils numériques » sont prises en charge à 25 € HT de l'heure"
+   },
+   {
+    "min": 3,
+    "max": 6,
+    "montant": "jusqu'à 6 300 € HT par an",
+    "detail": "les formations « Informatique » et « Connaissance des outils numériques » sont prises en charge à 25 € HT de l'heure"
+   },
+   {
+    "min": 7,
+    "max": 10,
+    "montant": "jusqu'à 10 500 € HT par an",
+    "detail": "les formations « Informatique » et « Connaissance des outils numériques » sont prises en charge à 25 € HT de l'heure"
+   },
+   {
+    "min": 11,
+    "max": 49,
+    "montant": "35 heures de formation par an et par salarié, à 30 € HT de l'heure",
+    "detail": "les formations « Informatique » et « Connaissance des outils numériques » sont prises en charge à 25 € HT de l'heure"
+   }
+  ],
+  "citations": [
+   {
+    "url": "https://www.opcoep.fr/criteres-de-financement?branche=201",
+    "texte": "de 1 à 2 salariés : 2 100 € HT/an"
+   },
+   {
+    "url": "https://www.opcoep.fr/criteres-de-financement?branche=201",
+    "texte": "de 3 à 6 salariés : 6 300 € HT/an"
+   },
+   {
+    "url": "https://www.opcoep.fr/criteres-de-financement?branche=201",
+    "texte": "de 7 à 10 salariés : 10 500 € HT/an"
+   },
+   {
+    "url": "https://www.opcoep.fr/criteres-de-financement?branche=201",
+    "texte": "11 à 49 salariés : 35 heures de formation par an/salarié à un coût horaire de 30 € HT/h"
+   },
+   {
+    "url": "https://www.opcoep.fr/criteres-de-financement?branche=201",
+    "texte": "Informatique Connaissance des outils numériques (création web, gestion internet,…) Ergonomie, hygiène et sécurité au travail Qualité Coût pédagogique : 25 € HT/h"
+   },
+   {
+    "url": "https://www.opcoep.fr/criteres-de-financement?branche=201",
+    "texte": "Mise à jour : 07/10/2026"
+   }
+  ],
+  "delai": null,
+  "delai_jusquau": null,
+  "remarques": null
+ },
+ {
+  "opco": "OPCO EP",
+  "branche": "Prestataires de services du secteur tertiaire",
+  "idcc": [
+   "2098"
+  ],
+  "retenu": true,
+  "lien": "https://www.opcoep.fr/criteres-de-financement?branche=173",
+  "page": "173",
+  "version": "critères 2026 de la branche Prestataires de services du secteur tertiaire d'OPCO EP (mis à jour le 15/10/2026)",
+  "paliers": [
+   {
+    "min": 0,
+    "max": 10,
+    "montant": "jusqu'à 5 000 € HT",
+    "detail": null
+   },
+   {
+    "min": 11,
+    "max": 49,
+    "montant": "jusqu'à 8 000 € HT",
+    "detail": null
+   }
+  ],
+  "citations": [
+   {
+    "url": "https://www.opcoep.fr/criteres-de-financement?branche=173",
+    "texte": "5 000 € HT pour les entreprises de moins de 11 salariés"
+   },
+   {
+    "url": "https://www.opcoep.fr/criteres-de-financement?branche=173",
+    "texte": "8 000 € HT pour les entreprises de 11 à 49 salariés"
+   },
+   {
+    "url": "https://www.opcoep.fr/criteres-de-financement?branche=173",
+    "texte": "Mise à jour : 15/10/2026"
+   }
+  ],
+  "delai": null,
+  "delai_jusquau": null,
+  "remarques": null
+ },
+ {
+  "opco": "OPCO EP",
+  "branche": "Boulangerie",
+  "idcc": [
+   "0843"
+  ],
+  "retenu": true,
+  "lien": "https://www.opcoep.fr/criteres-de-financement?branche=208",
+  "page": "208",
+  "version": "critères 2026 de la branche Boulangerie d'OPCO EP (mis à jour le 01/10/2026)",
+  "paliers": [
+   {
+    "min": 0,
+    "max": 49,
+    "montant": "jusqu'à 3 500 € HT",
+    "detail": "les formations à distance et les intitulés absents de la liste de la branche ne sont pas financés"
+   }
+  ],
+  "citations": [
+   {
+    "url": "https://www.opcoep.fr/criteres-de-financement?branche=208",
+    "texte": "Moins de 50 salariés : 3 500 € HT"
+   },
+   {
+    "url": "https://www.opcoep.fr/criteres-de-financement?branche=208",
+    "texte": "Pas de financement : Formation en distanciel"
+   },
+   {
+    "url": "https://www.opcoep.fr/criteres-de-financement?branche=208",
+    "texte": "Intitulés de formation non mentionnés dans la plaquette"
+   },
+   {
+    "url": "https://www.opcoep.fr/criteres-de-financement?branche=208",
+    "texte": "Mise à jour : 01/10/2026"
+   }
+  ],
+  "delai": null,
+  "delai_jusquau": null,
+  "remarques": null
+ },
+ {
+  "opco": "OPCO EP",
+  "branche": "Commerce de détail de l’habillement et des articles textiles",
+  "idcc": [
+   "1483"
+  ],
+  "retenu": true,
+  "lien": "https://www.opcoep.fr/criteres-de-financement?branche=200",
+  "page": "200",
+  "version": "critères 2026 de la branche Commerce de détail de l’habillement et des articles textiles d'OPCO EP (mis à jour le 01/10/2026)",
+  "paliers": [
+   {
+    "min": 0,
+    "max": 49,
+    "montant": "jusqu'à 8 000 € HT",
+    "detail": "« Mise en place d'un service digital (incluant le numérique) » fait partie des formations métier prises en charge à 40 € HT de l'heure"
+   }
+  ],
+  "citations": [
+   {
+    "url": "https://www.opcoep.fr/criteres-de-financement?branche=200",
+    "texte": "8 000 € HT pour les entreprises de moins de 50 salariés"
+   },
+   {
+    "url": "https://www.opcoep.fr/criteres-de-financement?branche=200",
+    "texte": "Mise en place d'un service digital (incluant le numérique)"
+   },
+   {
+    "url": "https://www.opcoep.fr/criteres-de-financement?branche=200",
+    "texte": "Développement, réorganisation ou restructuration de nouvelles activités Coût pédagogique : 40 € HT/h"
+   },
+   {
+    "url": "https://www.opcoep.fr/criteres-de-financement?branche=200",
+    "texte": "Mise à jour : 01/10/2026"
+   }
+  ],
+  "delai": null,
+  "delai_jusquau": null,
+  "remarques": null
+ },
+ {
+  "opco": "OPCO EP",
+  "branche": "Cabinets dentaires",
+  "idcc": [
+   "1619"
+  ],
+  "retenu": true,
+  "lien": "https://www.opcoep.fr/criteres-de-financement?branche=205",
+  "page": "205",
+  "version": "critères 2026 de la branche Cabinets dentaires d'OPCO EP (mis à jour le 05/10/2026)",
+  "paliers": [
+   {
+    "min": 0,
+    "max": 10,
+    "montant": "jusqu'à 7 500 € HT",
+    "detail": "les formations « Informatique/logiciels professionnels » sont prises en charge à 25 € HT de l'heure, 28 heures au plus"
+   },
+   {
+    "min": 11,
+    "max": 49,
+    "montant": "jusqu'à 15 000 € HT",
+    "detail": "les formations « Informatique/logiciels professionnels » sont prises en charge à 25 € HT de l'heure, 28 heures au plus"
+   }
+  ],
+  "citations": [
+   {
+    "url": "https://www.opcoep.fr/criteres-de-financement?branche=205",
+    "texte": "Moins de 11 salariés : 7 500 € HT"
+   },
+   {
+    "url": "https://www.opcoep.fr/criteres-de-financement?branche=205",
+    "texte": "Plus de 11 salariés : 15 000 € HT"
+   },
+   {
+    "url": "https://www.opcoep.fr/criteres-de-financement?branche=205",
+    "texte": "Informatique/logiciels professionnels"
+   },
+   {
+    "url": "https://www.opcoep.fr/criteres-de-financement?branche=205",
+    "texte": "Durée ou plafond de prise en charge : 28 h Coût pédagogique : 25 € HT/h"
+   },
+   {
+    "url": "https://www.opcoep.fr/criteres-de-financement?branche=205",
+    "texte": "Mise à jour : 05/10/2026"
+   },
+   {
+    "url": "https://www.opcoep.fr/criteres-de-financement?branche=205",
+    "texte": "avant le 30 novembre de l’année durant laquelle se déroule l’action de formation"
+   }
+  ],
+  "delai": "Pour une formation en 2026, la demande doit parvenir à OPCO EP avant le 30 novembre 2026.",
+  "delai_jusquau": "2026-11-30",
+  "remarques": null
+ },
+ {
+  "opco": "OPCO EP",
+  "branche": "Esthétique, cosmétique et parfumerie",
+  "idcc": [
+   "3032"
+  ],
+  "retenu": true,
+  "lien": "https://www.opcoep.fr/criteres-de-financement?branche=192",
+  "page": "192",
+  "version": "critères 2026 de la branche Esthétique, cosmétique et parfumerie d'OPCO EP (mis à jour le 01/10/2026)",
+  "paliers": [
+   {
+    "min": 1,
+    "max": 2,
+    "montant": "jusqu'à 1 500 € HT par an",
+    "detail": "« Transition numérique dont l’intelligence artificielle » est prise en charge à 25 € HT de l'heure"
+   },
+   {
+    "min": 3,
+    "max": 6,
+    "montant": "jusqu'à 4 000 € HT par an",
+    "detail": "« Transition numérique dont l’intelligence artificielle » est prise en charge à 25 € HT de l'heure"
+   },
+   {
+    "min": 7,
+    "max": 10,
+    "montant": "jusqu'à 6 500 € HT par an",
+    "detail": "« Transition numérique dont l’intelligence artificielle » est prise en charge à 25 € HT de l'heure"
+   }
+  ],
+  "citations": [
+   {
+    "url": "https://www.opcoep.fr/criteres-de-financement?branche=192",
+    "texte": "1 500€ HT/an pour les entreprises de moins de 1 à 2 salariés"
+   },
+   {
+    "url": "https://www.opcoep.fr/criteres-de-financement?branche=192",
+    "texte": "4 000€ HT/an pour les entreprises de moins de 3 à 6 salariés"
+   },
+   {
+    "url": "https://www.opcoep.fr/criteres-de-financement?branche=192",
+    "texte": "6 500€ HT/an pour les entreprises de moins de 7 à 10 salariés"
+   },
+   {
+    "url": "https://www.opcoep.fr/criteres-de-financement?branche=192",
+    "texte": "Transition numérique dont l’intelligence artificielle Secourisme, Sauveteur Secouriste Travail (SST), Service de sécurité incendie et d'assistance à personnes (SSIAP), Formation premiers secours citoyen (PSC) Coût pédagogique : 25 € HT/h"
+   },
+   {
+    "url": "https://www.opcoep.fr/criteres-de-financement?branche=192",
+    "texte": "Mise à jour : 01/10/2026"
+   }
+  ],
+  "delai": null,
+  "delai_jusquau": null,
+  "remarques": null
+ },
+ {
+  "opco": "OPCO EP",
+  "branche": "Pharmacie d’officine",
+  "idcc": [
+   "1996"
+  ],
+  "retenu": true,
+  "lien": "https://www.opcoep.fr/criteres-de-financement?branche=175",
+  "page": "175",
+  "version": "critères 2026 de la branche Pharmacie d’officine d'OPCO EP (mis à jour le 01/10/2026)",
+  "paliers": [
+   {
+    "min": 0,
+    "max": 10,
+    "montant": "jusqu'à 7 500 € HT",
+    "detail": "les formations « Informatique/logiciels professionnels » sont prises en charge à 25 € HT de l'heure, 28 heures au plus ; les formations dans les locaux de la pharmacie ne sont pas prises en charge, sauf à distance ou en classe virtuelle"
+   },
+   {
+    "min": 11,
+    "max": 49,
+    "montant": "jusqu'à 15 000 € HT",
+    "detail": "les formations « Informatique/logiciels professionnels » sont prises en charge à 25 € HT de l'heure, 28 heures au plus ; les formations dans les locaux de la pharmacie ne sont pas prises en charge, sauf à distance ou en classe virtuelle"
+   }
+  ],
+  "citations": [
+   {
+    "url": "https://www.opcoep.fr/criteres-de-financement?branche=175",
+    "texte": "7 500 € HT pour les entreprises de moins de 11 salariés"
+   },
+   {
+    "url": "https://www.opcoep.fr/criteres-de-financement?branche=175",
+    "texte": "15 000 € HT pour les entreprises de plus de 11 salariés"
+   },
+   {
+    "url": "https://www.opcoep.fr/criteres-de-financement?branche=175",
+    "texte": "Pas de prise en charge des formations sur site (dans les locaux de l’entreprise) à l'exception de la FOAD et des classes virtuelles."
+   },
+   {
+    "url": "https://www.opcoep.fr/criteres-de-financement?branche=175",
+    "texte": "Informatique/logiciels professionnels Hygiène et sécurité QVT Transition écologique et énergétique Durée maximale de prise en charge : 28 h Coût pédagogique : 25 € HT/h"
+   },
+   {
+    "url": "https://www.opcoep.fr/criteres-de-financement?branche=175",
+    "texte": "Mise à jour : 01/10/2026"
+   },
+   {
+    "url": "https://www.opcoep.fr/criteres-de-financement?branche=175",
+    "texte": "avant le 30 novembre de l’année durant laquelle se déroule l’action de formation"
+   }
+  ],
+  "delai": "Pour une formation en 2026, la demande doit parvenir à OPCO EP avant le 30 novembre 2026.",
+  "delai_jusquau": "2026-11-30",
+  "remarques": null
+ },
+ {
+  "opco": "OPCO EP",
+  "branche": "Entreprises de services à la personne",
+  "idcc": [
+   "3127"
+  ],
+  "retenu": true,
+  "lien": "https://www.opcoep.fr/criteres-de-financement?branche=193",
+  "page": "193",
+  "version": "critères 2026 de la branche Entreprises de services à la personne d'OPCO EP (mis à jour le 25/09/2026)",
+  "paliers": [
+   {
+    "min": 0,
+    "max": 10,
+    "montant": "jusqu'à 3 000 € HT",
+    "detail": "« L'intelligence artificielle » fait partie des formations prises en charge à 20 € HT de l'heure (effectif compté en équivalents temps plein)"
+   },
+   {
+    "min": 11,
+    "max": 19,
+    "montant": "jusqu'à 5 000 € HT",
+    "detail": "« L'intelligence artificielle » fait partie des formations prises en charge à 20 € HT de l'heure (effectif compté en équivalents temps plein)"
+   },
+   {
+    "min": 20,
+    "max": 49,
+    "montant": "jusqu'à 10 000 € HT",
+    "detail": "« L'intelligence artificielle » fait partie des formations prises en charge à 20 € HT de l'heure (effectif compté en équivalents temps plein)"
+   }
+  ],
+  "citations": [
+   {
+    "url": "https://www.opcoep.fr/criteres-de-financement?branche=193",
+    "texte": "Moins de 11 salariés (ETP) : 3 000 € HT"
+   },
+   {
+    "url": "https://www.opcoep.fr/criteres-de-financement?branche=193",
+    "texte": "De 11 à 19 salariés (ETP) : 5 000 € HT"
+   },
+   {
+    "url": "https://www.opcoep.fr/criteres-de-financement?branche=193",
+    "texte": "De 20 à 49 salariés (ETP) : 10 000 € HT"
+   },
+   {
+    "url": "https://www.opcoep.fr/criteres-de-financement?branche=193",
+    "texte": "Autres actions transverses L'intelligence artificielle"
+   },
+   {
+    "url": "https://www.opcoep.fr/criteres-de-financement?branche=193",
+    "texte": "Audit et qualité Coût pédagogique 20 € HT/h"
+   },
+   {
+    "url": "https://www.opcoep.fr/criteres-de-financement?branche=193",
+    "texte": "Mise à jour : 25/09/2026"
+   }
+  ],
+  "delai": null,
+  "delai_jusquau": null,
+  "remarques": null
+ },
+ {
+  "opco": "OPCO EP",
+  "branche": "Entreprises d’architecture",
+  "idcc": [
+   "2332"
+  ],
+  "retenu": true,
+  "lien": "https://www.opcoep.fr/criteres-de-financement?branche=196",
+  "page": "196",
+  "version": "critères 2026 de la branche Entreprises d’architecture d'OPCO EP (mis à jour le 01/10/2026)",
+  "paliers": [
+   {
+    "min": 0,
+    "max": 10,
+    "montant": "jusqu'à 7 500 € HT",
+    "detail": "les formations transverses sont prises en charge à 25 € HT de l'heure, 14 heures au plus"
+   },
+   {
+    "min": 11,
+    "max": 49,
+    "montant": "jusqu'à 15 000 € HT",
+    "detail": "les formations transverses sont prises en charge à 25 € HT de l'heure, 14 heures au plus"
+   }
+  ],
+  "citations": [
+   {
+    "url": "https://www.opcoep.fr/criteres-de-financement?branche=196",
+    "texte": "7 500 € HT pour les entreprises de moins de 11 salariés"
+   },
+   {
+    "url": "https://www.opcoep.fr/criteres-de-financement?branche=196",
+    "texte": "15 000 € HT pour les entreprises de 11 à 49 salariés"
+   },
+   {
+    "url": "https://www.opcoep.fr/criteres-de-financement?branche=196",
+    "texte": "Formations transverses Durée maximale de prise en charge : 14 h Coût pédagogique : 25 € HT/h"
+   },
+   {
+    "url": "https://www.opcoep.fr/criteres-de-financement?branche=196",
+    "texte": "Mise à jour : 01/10/2026"
+   }
+  ],
+  "delai": null,
+  "delai_jusquau": null,
+  "remarques": null
+ },
+ {
+  "opco": "OPCO EP",
+  "branche": "Maintenance, distribution et location de matériels agricoles, de TP et de manutention (SDLM)",
+  "idcc": [
+   "1404"
+  ],
+  "retenu": true,
+  "lien": "https://www.opcoep.fr/criteres-de-financement?branche=183",
+  "page": "183",
+  "version": "critères 2026 de la branche Maintenance, distribution et location de matériels agricoles, de TP et de manutention (SDLM) d'OPCO EP (mis à jour le 01/10/2026)",
+  "paliers": [
+   {
+    "min": 0,
+    "max": 10,
+    "montant": "2 000 € HT sur le plan de développement des compétences",
+    "detail": "plus une enveloppe annuelle de 2 000 € HT pour 7 thèmes dont l'intelligence artificielle, et 1 000 € HT toutes thématiques confondues"
+   },
+   {
+    "min": 11,
+    "max": 49,
+    "montant": "3 000 € HT sur le plan de développement des compétences",
+    "detail": "plus une enveloppe annuelle de 2 000 € HT pour 7 thèmes dont l'intelligence artificielle"
+   }
+  ],
+  "citations": [
+   {
+    "url": "https://www.opcoep.fr/criteres-de-financement?branche=183",
+    "texte": "PDC : 2 000€ HT / Conventionnel : 180 % du versement conventionnel pour les entreprises de moins de 11 salariés"
+   },
+   {
+    "url": "https://www.opcoep.fr/criteres-de-financement?branche=183",
+    "texte": "PDC : 3 000€ HT / Conventionnel : 180 % du versement conventionnel pour les entreprises de 11 à 49 salariés"
+   },
+   {
+    "url": "https://www.opcoep.fr/criteres-de-financement?branche=183",
+    "texte": "2 000 € HT au titre de 7 thématiques spécifiques (intelligence artificielle"
+   },
+   {
+    "url": "https://www.opcoep.fr/criteres-de-financement?branche=183",
+    "texte": "Enveloppe conventionnelle supplémentaire annuelle par entreprise (moins de 11 salariés) : 1 000 € HT pour toutes thématiques confondues"
+   },
+   {
+    "url": "https://www.opcoep.fr/criteres-de-financement?branche=183",
+    "texte": "Mise à jour : 01/10/2026"
+   }
+  ],
+  "delai": null,
+  "delai_jusquau": null,
+  "remarques": "part conventionnelle (180 % du versement conventionnel) non annoncée : elle dépend de la contribution de l’entreprise"
+ },
+ {
+  "opco": "OPCO EP",
+  "branche": "Fleuristes, vente et services des animaux familiers",
+  "idcc": [
+   "1978"
+  ],
+  "retenu": true,
+  "lien": "https://www.opcoep.fr/criteres-de-financement?branche=190",
+  "page": "190",
+  "version": "critères 2026 de la branche Fleuristes, vente et services des animaux familiers d'OPCO EP (mis à jour le 01/10/2026)",
+  "paliers": [
+   {
+    "min": 0,
+    "max": 49,
+    "montant": "jusqu'à 6 000 € HT",
+    "detail": null
+   }
+  ],
+  "citations": [
+   {
+    "url": "https://www.opcoep.fr/criteres-de-financement?branche=190",
+    "texte": "Plafonds de financement pour l'ensemble des entreprises : 6 000 € HT"
+   },
+   {
+    "url": "https://www.opcoep.fr/criteres-de-financement?branche=190",
+    "texte": "Mise à jour : 01/10/2026"
+   }
+  ],
+  "delai": null,
+  "delai_jusquau": null,
+  "remarques": null
+ },
+ {
+  "opco": "OPCO EP",
+  "branche": "Personnel salarié des cabinets d’avocats",
+  "idcc": [
+   "1000"
+  ],
+  "retenu": true,
+  "lien": "https://www.opcoep.fr/criteres-de-financement?branche=206",
+  "page": "206",
+  "version": "critères 2026 de la branche Personnel salarié des cabinets d’avocats d'OPCO EP (mis à jour le 05/10/2026)",
+  "paliers": [
+   {
+    "min": 0,
+    "max": 49,
+    "montant": "jusqu'à 15 000 € HT",
+    "detail": "« IA appliquée aux cabinets » fait partie des formations prises en charge à 60 € HT de l'heure, 35 heures au plus"
+   }
+  ],
+  "citations": [
+   {
+    "url": "https://www.opcoep.fr/criteres-de-financement?branche=206",
+    "texte": "Moins de 50 salariés : 15 000 € HT"
+   },
+   {
+    "url": "https://www.opcoep.fr/criteres-de-financement?branche=206",
+    "texte": "IA appliquée aux cabinets"
+   },
+   {
+    "url": "https://www.opcoep.fr/criteres-de-financement?branche=206",
+    "texte": "Durée maximale de prise en charge : 35 h Coût pédagogique : 60 € HT/h"
+   },
+   {
+    "url": "https://www.opcoep.fr/criteres-de-financement?branche=206",
+    "texte": "Mise à jour : 05/10/2026"
+   }
+  ],
+  "delai": null,
+  "delai_jusquau": null,
+  "remarques": null
+ },
+ {
+  "opco": "OPCO EP",
+  "branche": "Taxis",
+  "idcc": [
+   "2219"
+  ],
+  "retenu": true,
+  "lien": "https://www.opcoep.fr/criteres-de-financement?branche=337",
+  "page": "337",
+  "version": "critères 2026 de la branche Taxis d'OPCO EP (mis à jour le 01/10/2026)",
+  "paliers": [
+   {
+    "min": 0,
+    "max": 49,
+    "montant": "pas de plafond annuel par entreprise",
+    "detail": "la « Formation Intelligence artificielle » est prise en charge à 25 € HT de l'heure, 21 heures au plus ; les formations à distance ne sont pas financées"
+   }
+  ],
+  "citations": [
+   {
+    "url": "https://www.opcoep.fr/criteres-de-financement?branche=337",
+    "texte": "pas de limite de financement annuel par entreprise"
+   },
+   {
+    "url": "https://www.opcoep.fr/criteres-de-financement?branche=337",
+    "texte": "Formations en distanciel."
+   },
+   {
+    "url": "https://www.opcoep.fr/criteres-de-financement?branche=337",
+    "texte": "Formation Intelligence artificielle Liste des formations Gestion RH Développement commercial Gestion entreprise Durée maximale de prise en charge : 21 h Coût pédagogique : 25 € HT/h"
+   },
+   {
+    "url": "https://www.opcoep.fr/criteres-de-financement?branche=337",
+    "texte": "Mise à jour : 01/10/2026"
+   }
+  ],
+  "delai": null,
+  "delai_jusquau": null,
+  "remarques": null
+ },
+ {
+  "opco": "OPCO EP",
+  "branche": "Négoce et prestations de services médico-techniques",
+  "idcc": [
+   "1982"
+  ],
+  "retenu": true,
+  "lien": "https://www.opcoep.fr/criteres-de-financement?branche=179",
+  "page": "179",
+  "version": "critères 2026 de la branche Négoce et prestations de services médico-techniques d'OPCO EP (mis à jour le 01/10/2026)",
+  "paliers": [
+   {
+    "min": 0,
+    "max": 10,
+    "montant": "jusqu'à 5 000 € HT",
+    "detail": "les formations « Informatique, digital » sont prises en charge à 30 € HT de l'heure"
+   },
+   {
+    "min": 11,
+    "max": 49,
+    "montant": "jusqu'à 7 000 € HT",
+    "detail": "les formations « Informatique, digital » sont prises en charge à 30 € HT de l'heure"
+   }
+  ],
+  "citations": [
+   {
+    "url": "https://www.opcoep.fr/criteres-de-financement?branche=179",
+    "texte": "5 000 € HT pour les entreprises de moins de 11 salariés"
+   },
+   {
+    "url": "https://www.opcoep.fr/criteres-de-financement?branche=179",
+    "texte": "7 000 € HT pour les entreprises de 11 à 49 salariés"
+   },
+   {
+    "url": "https://www.opcoep.fr/criteres-de-financement?branche=179",
+    "texte": "Informatique, digital"
+   },
+   {
+    "url": "https://www.opcoep.fr/criteres-de-financement?branche=179",
+    "texte": "Coût pédagogique : 30 € HT/h Frais annexes : oui Frais de salaire : 8 € HT/h"
+   },
+   {
+    "url": "https://www.opcoep.fr/criteres-de-financement?branche=179",
+    "texte": "Mise à jour : 01/10/2026"
+   }
+  ],
+  "delai": null,
+  "delai_jusquau": null,
+  "remarques": null
+ },
+ {
+  "opco": "OPCO EP",
+  "branche": "Boucherie",
+  "idcc": [
+   "0992"
+  ],
+  "retenu": true,
+  "lien": "https://www.opcoep.fr/criteres-de-financement?branche=209",
+  "page": "209",
+  "version": "critères 2026 de la branche Boucherie d'OPCO EP (mis à jour le 01/10/2026)",
+  "paliers": [
+   {
+    "min": 0,
+    "max": 49,
+    "montant": "jusqu'à 5 000 € HT",
+    "detail": "les formations à distance, celles en intra-entreprise (hors stages techniques métiers) et les intitulés absents de la liste de la branche ne sont pas financés"
+   }
+  ],
+  "citations": [
+   {
+    "url": "https://www.opcoep.fr/criteres-de-financement?branche=209",
+    "texte": "Moins de 50 salariés : 5 000 € HT"
+   },
+   {
+    "url": "https://www.opcoep.fr/criteres-de-financement?branche=209",
+    "texte": "Pas de financement : Formation en distanciel"
+   },
+   {
+    "url": "https://www.opcoep.fr/criteres-de-financement?branche=209",
+    "texte": "Formations en intra-entreprise, en dehors des"
+   },
+   {
+    "url": "https://www.opcoep.fr/criteres-de-financement?branche=209",
+    "texte": "Intitulés de formation non mentionnés dans la plaquette"
+   },
+   {
+    "url": "https://www.opcoep.fr/criteres-de-financement?branche=209",
+    "texte": "Mise à jour : 01/10/2026"
+   }
+  ],
+  "delai": null,
+  "delai_jusquau": null,
+  "remarques": null
+ },
+ {
+  "opco": "OPCO EP",
+  "branche": "Offices notariaux",
+  "idcc": [
+   "2205"
+  ],
+  "retenu": true,
+  "lien": "https://www.opcoep.fr/criteres-de-financement?branche=178",
+  "page": "178",
+  "version": "critères 2026 de la branche Offices notariaux d'OPCO EP (mis à jour le 05/10/2026)",
+  "paliers": [
+   {
+    "min": 0,
+    "max": 10,
+    "montant": "jusqu'à 15 000 € HT",
+    "detail": "« Stratégie numérique des offices » est prise en charge à 15 € HT de l'heure, 21 heures au plus"
+   },
+   {
+    "min": 11,
+    "max": 49,
+    "montant": "jusqu'à 30 000 € HT",
+    "detail": "« Stratégie numérique des offices » est prise en charge à 15 € HT de l'heure, 21 heures au plus"
+   }
+  ],
+  "citations": [
+   {
+    "url": "https://www.opcoep.fr/criteres-de-financement?branche=178",
+    "texte": "moins de 11 salariés : 15 000 € HT"
+   },
+   {
+    "url": "https://www.opcoep.fr/criteres-de-financement?branche=178",
+    "texte": "11 à 49 salariés : 30 000 € HT"
+   },
+   {
+    "url": "https://www.opcoep.fr/criteres-de-financement?branche=178",
+    "texte": "Stratégie numérique des offices (connaissance et utilisation des systèmes d'information) Accompagner le changement (médiation, freins et ressources personnelles et management) Durée maximale de prise en charge : 21 h Coût pédagogique : 15 € HT/h"
+   },
+   {
+    "url": "https://www.opcoep.fr/criteres-de-financement?branche=178",
+    "texte": "Mise à jour : 05/10/2026"
+   }
+  ],
+  "delai": null,
+  "delai_jusquau": null,
+  "remarques": null
+ },
+ {
+  "opco": "OPCO EP",
+  "branche": "Services funéraires",
+  "idcc": [
+   "0759"
+  ],
+  "retenu": true,
+  "lien": "https://www.opcoep.fr/criteres-de-financement?branche=166",
+  "page": "166",
+  "version": "critères 2026 de la branche Services funéraires d'OPCO EP (mis à jour le 01/10/2026)",
+  "paliers": [
+   {
+    "min": 0,
+    "max": 10,
+    "montant": "jusqu'à 3 000 € HT",
+    "detail": null
+   },
+   {
+    "min": 11,
+    "max": 49,
+    "montant": "jusqu'à 6 000 € HT",
+    "detail": null
+   }
+  ],
+  "citations": [
+   {
+    "url": "https://www.opcoep.fr/criteres-de-financement?branche=166",
+    "texte": "3 000 € HT pour les entreprises de moins de 11 salariés"
+   },
+   {
+    "url": "https://www.opcoep.fr/criteres-de-financement?branche=166",
+    "texte": "6 000€ HT pour les entreprises de 11 à 49 salariés"
+   },
+   {
+    "url": "https://www.opcoep.fr/criteres-de-financement?branche=166",
+    "texte": "Mise à jour : 01/10/2026"
+   }
+  ],
+  "delai": null,
+  "delai_jusquau": null,
+  "remarques": null
+ },
+ {
+  "opco": "OPCO EP",
+  "branche": "Promotion immobilière",
+  "idcc": [
+   "1512"
+  ],
+  "retenu": true,
+  "lien": "https://www.opcoep.fr/criteres-de-financement?branche=172",
+  "page": "172",
+  "version": "critères 2026 de la branche Promotion immobilière d'OPCO EP (mis à jour le 05/10/2026)",
+  "paliers": [
+   {
+    "min": 0,
+    "max": 10,
+    "montant": "jusqu'à 8 000 € HT",
+    "detail": null
+   },
+   {
+    "min": 11,
+    "max": 49,
+    "montant": "jusqu'à 12 000 € HT",
+    "detail": null
+   }
+  ],
+  "citations": [
+   {
+    "url": "https://www.opcoep.fr/criteres-de-financement?branche=172",
+    "texte": "Moins de 11 salariés : 8 000 € HT"
+   },
+   {
+    "url": "https://www.opcoep.fr/criteres-de-financement?branche=172",
+    "texte": "11 à 50 salariés : 12 000 € HT"
+   },
+   {
+    "url": "https://www.opcoep.fr/criteres-de-financement?branche=172",
+    "texte": "Mise à jour : 05/10/2026"
+   }
+  ],
+  "delai": null,
+  "delai_jusquau": null,
+  "remarques": null
+ },
+ {
+  "opco": "OPCO EP",
+  "branche": "Personnel salarié des cabinets et cliniques vétérinaires",
+  "idcc": [
+   "1875"
+  ],
+  "retenu": true,
+  "lien": "https://www.opcoep.fr/criteres-de-financement?branche=207",
+  "page": "207",
+  "version": "critères 2026 de la branche Personnel salarié des cabinets et cliniques vétérinaires d'OPCO EP (mis à jour le 16/10/2026)",
+  "paliers": [
+   {
+    "min": 0,
+    "max": 10,
+    "montant": "jusqu'à 7 500 € HT",
+    "detail": "les formations « Informatique / logiciels professionnels » sont prises en charge à 25 € HT de l'heure, 14 heures au plus"
+   },
+   {
+    "min": 11,
+    "max": 49,
+    "montant": "jusqu'à 15 000 € HT",
+    "detail": "les formations « Informatique / logiciels professionnels » sont prises en charge à 25 € HT de l'heure, 14 heures au plus"
+   }
+  ],
+  "citations": [
+   {
+    "url": "https://www.opcoep.fr/criteres-de-financement?branche=207",
+    "texte": "Moins de 11 salariés : 7 500 € HT"
+   },
+   {
+    "url": "https://www.opcoep.fr/criteres-de-financement?branche=207",
+    "texte": "Plus de 11 salariés : 15 000 € HT"
+   },
+   {
+    "url": "https://www.opcoep.fr/criteres-de-financement?branche=207",
+    "texte": "Informatique / logiciels professionnels Hygiène Qualité Environnement Durée maximale de prise en charge : 14 h Coût pédagogique : 25 € HT/h"
+   },
+   {
+    "url": "https://www.opcoep.fr/criteres-de-financement?branche=207",
+    "texte": "Mise à jour : 16/10/2026"
+   },
+   {
+    "url": "https://www.opcoep.fr/criteres-de-financement?branche=207",
+    "texte": "avant le 30 novembre de l’année durant laquelle se déroule l’action de formation"
+   }
+  ],
+  "delai": "Pour une formation en 2026, la demande doit parvenir à OPCO EP avant le 30 novembre 2026.",
+  "delai_jusquau": "2026-11-30",
+  "remarques": null
+ },
+ {
+  "opco": "OPCO EP",
+  "branche": "Pâtisserie",
+  "idcc": [
+   "1267"
+  ],
+  "retenu": true,
+  "lien": "https://www.opcoep.fr/criteres-de-financement?branche=177",
+  "page": "177",
+  "version": "critères 2026 de la branche Pâtisserie d'OPCO EP (mis à jour le 01/10/2026)",
+  "paliers": [
+   {
+    "min": 0,
+    "max": 10,
+    "montant": "jusqu'à 2 000 € HT",
+    "detail": "les formations « Informatique » sont prises en charge à 30 € HT de l'heure, 7 heures au plus ; seuls les intitulés de la liste de la branche sont financés"
+   },
+   {
+    "min": 11,
+    "max": 49,
+    "montant": "jusqu'à 3 000 € HT",
+    "detail": "les formations « Informatique » sont prises en charge à 30 € HT de l'heure, 7 heures au plus ; seuls les intitulés de la liste de la branche sont financés"
+   }
+  ],
+  "citations": [
+   {
+    "url": "https://www.opcoep.fr/criteres-de-financement?branche=177",
+    "texte": "2 000 € HT pour les entreprises de moins de 11 salariés"
+   },
+   {
+    "url": "https://www.opcoep.fr/criteres-de-financement?branche=177",
+    "texte": "3 000 € HT pour les entreprises de 11 à 49 salariés"
+   },
+   {
+    "url": "https://www.opcoep.fr/criteres-de-financement?branche=177",
+    "texte": "Informatique Durée maximale de prise en charge : 7 h Coût pédagogique : 30 € HT/h"
+   },
+   {
+    "url": "https://www.opcoep.fr/criteres-de-financement?branche=177",
+    "texte": "Intitulés de formation non mentionnés dans la plaquette"
+   },
+   {
+    "url": "https://www.opcoep.fr/criteres-de-financement?branche=177",
+    "texte": "Mise à jour : 01/10/2026"
+   }
+  ],
+  "delai": null,
+  "delai_jusquau": null,
+  "remarques": null
+ },
+ {
+  "opco": "OPCO EP",
+  "branche": "Imprimerie",
+  "idcc": [
+   "0184"
+  ],
+  "retenu": true,
+  "lien": "https://www.opcoep.fr/criteres-de-financement?branche=186",
+  "page": "186",
+  "version": "critères 2026 de la branche Imprimerie d'OPCO EP (mis à jour le 01/10/2026)",
+  "paliers": [
+   {
+    "min": 0,
+    "max": 49,
+    "montant": "jusqu'à 1 500 € HT",
+    "detail": null
+   }
+  ],
+  "citations": [
+   {
+    "url": "https://www.opcoep.fr/criteres-de-financement?branche=186",
+    "texte": "Moins de 50 salariés : 1 500 € HT"
+   },
+   {
+    "url": "https://www.opcoep.fr/criteres-de-financement?branche=186",
+    "texte": "Mise à jour : 01/10/2026"
+   }
+  ],
+  "delai": null,
+  "delai_jusquau": null,
+  "remarques": null
+ },
+ {
+  "opco": "OPCO EP",
+  "branche": "Confiserie, chocolaterie, biscuiterie",
+  "idcc": [
+   "1286"
+  ],
+  "retenu": true,
+  "lien": "https://www.opcoep.fr/criteres-de-financement?branche=198",
+  "page": "198",
+  "version": "critères 2026 de la branche Confiserie, chocolaterie, biscuiterie d'OPCO EP (mis à jour le 01/10/2026)",
+  "paliers": [
+   {
+    "min": 0,
+    "max": 10,
+    "montant": "jusqu'à 2 500 € HT",
+    "detail": "les formations « Informatique » sont prises en charge à 30 € HT de l'heure, 7 heures au plus ; seuls les intitulés de la liste de la branche sont financés"
+   },
+   {
+    "min": 11,
+    "max": 49,
+    "montant": "jusqu'à 7 500 € HT",
+    "detail": "les formations « Informatique » sont prises en charge à 30 € HT de l'heure, 7 heures au plus ; seuls les intitulés de la liste de la branche sont financés"
+   }
+  ],
+  "citations": [
+   {
+    "url": "https://www.opcoep.fr/criteres-de-financement?branche=198",
+    "texte": "2 500 € HT pour les entreprises de moins de 11 salariés"
+   },
+   {
+    "url": "https://www.opcoep.fr/criteres-de-financement?branche=198",
+    "texte": "7 500 € HT pour les entreprises de 11 à 49 salariés"
+   },
+   {
+    "url": "https://www.opcoep.fr/criteres-de-financement?branche=198",
+    "texte": "Informatique Durée maximale de prise en charge : 7h Coût pédagogique : 30 € HT/h"
+   },
+   {
+    "url": "https://www.opcoep.fr/criteres-de-financement?branche=198",
+    "texte": "Intitulés de formation non mentionnés dans la plaquette"
+   },
+   {
+    "url": "https://www.opcoep.fr/criteres-de-financement?branche=198",
+    "texte": "Mise à jour : 01/10/2026"
+   }
+  ],
+  "delai": null,
+  "delai_jusquau": null,
+  "remarques": null
+ },
+ {
+  "opco": "OPCO EP",
+  "branche": "Charcuterie de détail",
+  "idcc": [
+   "0953"
+  ],
+  "retenu": true,
+  "lien": "https://www.opcoep.fr/criteres-de-financement?branche=202",
+  "page": "202",
+  "version": "critères 2026 de la branche Charcuterie de détail d'OPCO EP (mis à jour le 01/10/2026)",
+  "paliers": [
+   {
+    "min": 0,
+    "max": 10,
+    "montant": "jusqu'à 3 500 € HT",
+    "detail": "les formations « Informatique » sont prises en charge à 25 € HT de l'heure, 14 heures au plus ; les formations à distance et les intitulés absents de la liste de la branche ne sont pas financés"
+   },
+   {
+    "min": 11,
+    "max": 49,
+    "montant": "jusqu'à 7 000 € HT",
+    "detail": "les formations « Informatique » sont prises en charge à 25 € HT de l'heure, 14 heures au plus ; les formations à distance et les intitulés absents de la liste de la branche ne sont pas financés"
+   }
+  ],
+  "citations": [
+   {
+    "url": "https://www.opcoep.fr/criteres-de-financement?branche=202",
+    "texte": "3 500 € HT pour les entreprises de moins de 11 salariés"
+   },
+   {
+    "url": "https://www.opcoep.fr/criteres-de-financement?branche=202",
+    "texte": "7 000 € HT pour les entreprises de 11 à 49 salariés"
+   },
+   {
+    "url": "https://www.opcoep.fr/criteres-de-financement?branche=202",
+    "texte": "Informatique Durée maximale de prise en charge : 14 h Coût pédagogique : 25 € HT/h"
+   },
+   {
+    "url": "https://www.opcoep.fr/criteres-de-financement?branche=202",
+    "texte": "Pas de financement : Formations en distanciel"
+   },
+   {
+    "url": "https://www.opcoep.fr/criteres-de-financement?branche=202",
+    "texte": "Intitulés de formation non mentionnés dans la plaquette"
+   },
+   {
+    "url": "https://www.opcoep.fr/criteres-de-financement?branche=202",
+    "texte": "Mise à jour : 01/10/2026"
+   }
+  ],
+  "delai": null,
+  "delai_jusquau": null,
+  "remarques": null
+ },
+ {
+  "opco": "OPCO EP",
+  "branche": "Laboratoires de biologie médicale extrahospitaliers",
+  "idcc": [
+   "0959"
+  ],
+  "retenu": true,
+  "lien": "https://www.opcoep.fr/criteres-de-financement?branche=185",
+  "page": "185",
+  "version": "critères 2026 de la branche Laboratoires de biologie médicale extrahospitaliers d'OPCO EP (mis à jour le 01/10/2026)",
+  "paliers": [
+   {
+    "min": 0,
+    "max": 10,
+    "montant": "jusqu'à 7 500 € HT",
+    "detail": "les formations « Informatique/Logiciels professionnels » sont prises en charge à 25 € HT de l'heure, 28 heures au plus"
+   },
+   {
+    "min": 11,
+    "max": 49,
+    "montant": "jusqu'à 15 000 € HT",
+    "detail": "les formations « Informatique/Logiciels professionnels » sont prises en charge à 25 € HT de l'heure, 28 heures au plus"
+   }
+  ],
+  "citations": [
+   {
+    "url": "https://www.opcoep.fr/criteres-de-financement?branche=185",
+    "texte": "7 500 € HT pour les entreprises de moins de 11 salariés"
+   },
+   {
+    "url": "https://www.opcoep.fr/criteres-de-financement?branche=185",
+    "texte": "15 000 € HT pour les entreprises de 11 à 49 salariés"
+   },
+   {
+    "url": "https://www.opcoep.fr/criteres-de-financement?branche=185",
+    "texte": "Informatique/Logiciels professionnels Hygiène et sécurité QVT Transition écologique et énergétique Durée maximale de prise en charge : 28 h Coût pédagogique : 25 € HT/h"
+   },
+   {
+    "url": "https://www.opcoep.fr/criteres-de-financement?branche=185",
+    "texte": "Mise à jour : 01/10/2026"
+   },
+   {
+    "url": "https://www.opcoep.fr/criteres-de-financement?branche=185",
+    "texte": "avant le 30 novembre de l’année durant laquelle se déroule l’action de formation"
+   }
+  ],
+  "delai": "Pour une formation en 2026, la demande doit parvenir à OPCO EP avant le 30 novembre 2026.",
+  "delai_jusquau": "2026-11-30",
+  "remarques": null
+ }
+]

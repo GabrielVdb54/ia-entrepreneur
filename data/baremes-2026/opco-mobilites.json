@@ -1,0 +1,616 @@
+[
+ {
+  "opco": "OPCO MOBILITES",
+  "branche": "Services de l'automobile",
+  "idcc": [
+   "1090"
+  ],
+  "retenu": true,
+  "lien": "https://www.opcomobilites.fr/media/2026/02/Services-de-lautomobile_01102026.pdf",
+  "version": "guide pratique 2026 Services de l'automobile, France hexagonale, d'OPCO Mobilités (mis à jour le 01/10/2026)",
+  "citations": [
+   {
+    "url": "https://www.opcomobilites.fr/media/2026/02/Services-de-lautomobile_01102026.pdf",
+    "texte": "Actions de formation au réel dans la limite des fonds OPCO disponibles au moment de l’instruction et d’un plafond HT de :"
+   },
+   {
+    "url": "https://www.opcomobilites.fr/media/2026/02/Services-de-lautomobile_01102026.pdf",
+    "texte": "1 500 € 1 800 € 2 100 € 2 400 € 2 700 € Moins de 11 salariés De 11 à moins de 20 salariés De 20 à moins de 30 salariés De 30 à moins de 40 salariés De 40 à moins de 50 salariés"
+   },
+   {
+    "url": "https://www.opcomobilites.fr/media/2026/02/Services-de-lautomobile_01102026.pdf",
+    "texte": "conformément aux décisions des instances de l’OPCO et applicables aux formations débutant en 2026 dont l’accord de prise en charge est notifié à compter du 01 janvier 2026."
+   },
+   {
+    "url": "https://www.opcomobilites.fr/media/2026/02/Services-de-lautomobile_01102026.pdf",
+    "texte": "Effectif annuel moyen 2025 déclaré sur la DSN *"
+   },
+   {
+    "url": "https://www.opcomobilites.fr/media/2026/02/Services-de-lautomobile_01102026.pdf",
+    "texte": "Les demandes de prise en charge doivent parvenir le plus tôt possible au fur et à mesure de la réalisation des actions et au plus tard le 31 décembre 2026."
+   },
+   {
+    "url": "https://www.opcomobilites.fr/media/2026/02/Services-de-lautomobile_01102026.pdf",
+    "texte": "Mise à jour 01/10/2026"
+   },
+   {
+    "url": "https://www.opcomobilites.fr/branches-et-secteurs-professionnels/",
+    "texte": "Services de l'automobile"
+   },
+   {
+    "url": "https://www.opcomobilites.fr/dispositifs-formation/le-plan-de-developpement-des-competences/",
+    "texte": "Version janvier 2026 applicable aux demandes de prise en charge reçues à compter du 01/01/2026 et dont l’action débute en 2026."
+   },
+   {
+    "url": "https://www.opcomobilites.fr/dispositifs-formation/le-plan-de-developpement-des-competences/",
+    "texte": "L’ entreprise bénéficie d’un plafond exprimé en euros HT qui lui permet de financer les coûts pédagogiques (hors frais annexes et hors coûts salariaux) des formations suivies par ses salariés dans la limite d’un montant déterminé en fonction de l’effectif de l’entreprise."
+   },
+   {
+    "url": "https://www.opcomobilites.fr/dispositifs-formation/le-plan-de-developpement-des-competences/",
+    "texte": "Budget alloué dans la limite des fonds OPCO disponibles au moment de l’instruction"
+   },
+   {
+    "url": "https://www.opcomobilites.fr/dispositifs-formation/le-plan-de-developpement-des-competences/",
+    "texte": "Moins de 11 salariés 1 500 € De 11 à moins de 20 salariés 1 800 € De 20 à moins de 30 salariés 2 100 € De 30 à moins de 40 salariés 2 400 € De 40 à moins de 50 salariés 2 700 €"
+   },
+   {
+    "url": "https://www.opcomobilites.fr/dispositifs-formation/le-plan-de-developpement-des-competences/",
+    "texte": "Les demandes de prise en charge doivent parvenir le plus tôt possible au fur et à mesure de la réalisation des actions et au plus tard le 31 décembre 2026. Si la formation débute entre le 15 et le 31 décembre 2026 : délai d’envoi au plus tard le 15/01/2027."
+   },
+   {
+    "url": "https://www.opcomobilites.fr/dispositifs-formation/le-plan-de-developpement-des-competences/",
+    "texte": "Pour être financées, les formations doivent être délivrées par un organisme : Certifié Qualiopi"
+   }
+  ],
+  "paliers": [
+   {
+    "min": 0,
+    "max": 10,
+    "montant": "jusqu'à 1 500 € HT",
+    "detail": "coûts pédagogiques au réel, hors frais annexes et hors coûts salariaux, pour les formations qui débutent en 2026"
+   },
+   {
+    "min": 11,
+    "max": 19,
+    "montant": "jusqu'à 1 800 € HT",
+    "detail": "coûts pédagogiques au réel, hors frais annexes et hors coûts salariaux, pour les formations qui débutent en 2026"
+   },
+   {
+    "min": 20,
+    "max": 29,
+    "montant": "jusqu'à 2 100 € HT",
+    "detail": "coûts pédagogiques au réel, hors frais annexes et hors coûts salariaux, pour les formations qui débutent en 2026"
+   },
+   {
+    "min": 30,
+    "max": 39,
+    "montant": "jusqu'à 2 400 € HT",
+    "detail": "coûts pédagogiques au réel, hors frais annexes et hors coûts salariaux, pour les formations qui débutent en 2026"
+   },
+   {
+    "min": 40,
+    "max": 49,
+    "montant": "jusqu'à 2 700 € HT",
+    "detail": "coûts pédagogiques au réel, hors frais annexes et hors coûts salariaux, pour les formations qui débutent en 2026"
+   }
+  ],
+  "delai": "Demande à envoyer au plus tard le 31 décembre 2026.",
+  "delai_jusquau": "2026-12-31",
+  "remarques": null
+ },
+ {
+  "opco": "OPCO MOBILITES",
+  "branche": "Transports routiers et activités auxiliaires du transport",
+  "idcc": [
+   "0016"
+  ],
+  "retenu": true,
+  "lien": "https://www.opcomobilites.fr/media/2026/02/Transports-routiers-de-marchandises_01102026.pdf",
+  "version": "guides pratiques 2026 Transports routiers de marchandises, Transports routiers de voyageurs et Transports sanitaires, France hexagonale, d'OPCO Mobilités (mis à jour le 01/10/2026)",
+  "citations": [
+   {
+    "url": "https://www.opcomobilites.fr/media/2026/02/Transports-routiers-de-marchandises_01102026.pdf",
+    "texte": "Actions de formation au réel dans la limite des fonds OPCO disponibles au moment de l’instruction et d’un plafond HT de :"
+   },
+   {
+    "url": "https://www.opcomobilites.fr/media/2026/02/Transports-routiers-de-marchandises_01102026.pdf",
+    "texte": "1 500 € 1 800 € 2 100 € 2 400 € 2 700 € Moins de 11 salariés De 11 à moins de 20 salariés De 20 à moins de 30 salariés De 30 à moins de 40 salariés De 40 à moins de 50 salariés"
+   },
+   {
+    "url": "https://www.opcomobilites.fr/media/2026/02/Transports-routiers-de-marchandises_01102026.pdf",
+    "texte": "conformément aux décisions des instances de l’OPCO et applicables aux formations débutant en 2026 dont l’accord de prise en charge est notifié à compter du 01 janvier 2026."
+   },
+   {
+    "url": "https://www.opcomobilites.fr/media/2026/02/Transports-routiers-de-marchandises_01102026.pdf",
+    "texte": "Effectif annuel moyen 2025 déclaré sur la DSN *"
+   },
+   {
+    "url": "https://www.opcomobilites.fr/media/2026/02/Transports-routiers-de-marchandises_01102026.pdf",
+    "texte": "Les demandes de prise en charge doivent parvenir le plus tôt possible au fur et à mesure de la réalisation des actions et au plus tard le 31 décembre 2026."
+   },
+   {
+    "url": "https://www.opcomobilites.fr/media/2026/02/Transports-routiers-de-marchandises_01102026.pdf",
+    "texte": "Mise à jour 01/10/2026"
+   },
+   {
+    "url": "https://www.opcomobilites.fr/media/2026/02/Transports-routiers-de-voyageurs_01102026.pdf",
+    "texte": "Actions de formation au réel dans la limite des fonds OPCO disponibles au moment de l’instruction et d’un plafond HT de :"
+   },
+   {
+    "url": "https://www.opcomobilites.fr/media/2026/02/Transports-routiers-de-voyageurs_01102026.pdf",
+    "texte": "1 500 € 1 800 € 2 100 € 2 400 € 2 700 € Moins de 11 salariés De 11 à moins de 20 salariés De 20 à moins de 30 salariés De 30 à moins de 40 salariés De 40 à moins de 50 salariés"
+   },
+   {
+    "url": "https://www.opcomobilites.fr/media/2026/02/Transports-sanitaires_01102026.pdf",
+    "texte": "Actions de formation au réel dans la limite des fonds OPCO disponibles au moment de l’instruction et et d’un plafond HT de :"
+   },
+   {
+    "url": "https://www.opcomobilites.fr/media/2026/02/Transports-sanitaires_01102026.pdf",
+    "texte": "1 500 € 1 800 € 2 100 € 2 400 € 2 700 € Moins de 11 salariés De 11 à moins de 20 salariés De 20 à moins de 30 salariés De 30 à moins de 40 salariés De 40 à moins de 50 salariés"
+   },
+   {
+    "url": "https://www.opcomobilites.fr/branches-et-secteurs-professionnels/",
+    "texte": "Transports routiers et activités auxiliaires du transport"
+   },
+   {
+    "url": "https://www.opcomobilites.fr/dispositifs-formation/le-plan-de-developpement-des-competences/",
+    "texte": "Version janvier 2026 applicable aux demandes de prise en charge reçues à compter du 01/01/2026 et dont l’action débute en 2026."
+   },
+   {
+    "url": "https://www.opcomobilites.fr/dispositifs-formation/le-plan-de-developpement-des-competences/",
+    "texte": "L’ entreprise bénéficie d’un plafond exprimé en euros HT qui lui permet de financer les coûts pédagogiques (hors frais annexes et hors coûts salariaux) des formations suivies par ses salariés dans la limite d’un montant déterminé en fonction de l’effectif de l’entreprise."
+   },
+   {
+    "url": "https://www.opcomobilites.fr/dispositifs-formation/le-plan-de-developpement-des-competences/",
+    "texte": "Budget alloué dans la limite des fonds OPCO disponibles au moment de l’instruction"
+   },
+   {
+    "url": "https://www.opcomobilites.fr/dispositifs-formation/le-plan-de-developpement-des-competences/",
+    "texte": "Moins de 11 salariés 1 500 € De 11 à moins de 20 salariés 1 800 € De 20 à moins de 30 salariés 2 100 € De 30 à moins de 40 salariés 2 400 € De 40 à moins de 50 salariés 2 700 €"
+   },
+   {
+    "url": "https://www.opcomobilites.fr/dispositifs-formation/le-plan-de-developpement-des-competences/",
+    "texte": "Les demandes de prise en charge doivent parvenir le plus tôt possible au fur et à mesure de la réalisation des actions et au plus tard le 31 décembre 2026. Si la formation débute entre le 15 et le 31 décembre 2026 : délai d’envoi au plus tard le 15/01/2027."
+   },
+   {
+    "url": "https://www.opcomobilites.fr/dispositifs-formation/le-plan-de-developpement-des-competences/",
+    "texte": "Pour être financées, les formations doivent être délivrées par un organisme : Certifié Qualiopi"
+   }
+  ],
+  "paliers": [
+   {
+    "min": 0,
+    "max": 10,
+    "montant": "jusqu'à 1 500 € HT",
+    "detail": "coûts pédagogiques au réel, hors frais annexes et hors coûts salariaux, pour les formations qui débutent en 2026"
+   },
+   {
+    "min": 11,
+    "max": 19,
+    "montant": "jusqu'à 1 800 € HT",
+    "detail": "coûts pédagogiques au réel, hors frais annexes et hors coûts salariaux, pour les formations qui débutent en 2026"
+   },
+   {
+    "min": 20,
+    "max": 29,
+    "montant": "jusqu'à 2 100 € HT",
+    "detail": "coûts pédagogiques au réel, hors frais annexes et hors coûts salariaux, pour les formations qui débutent en 2026"
+   },
+   {
+    "min": 30,
+    "max": 39,
+    "montant": "jusqu'à 2 400 € HT",
+    "detail": "coûts pédagogiques au réel, hors frais annexes et hors coûts salariaux, pour les formations qui débutent en 2026"
+   },
+   {
+    "min": 40,
+    "max": 49,
+    "montant": "jusqu'à 2 700 € HT",
+    "detail": "coûts pédagogiques au réel, hors frais annexes et hors coûts salariaux, pour les formations qui débutent en 2026"
+   }
+  ],
+  "delai": "Demande à envoyer au plus tard le 31 décembre 2026.",
+  "delai_jusquau": "2026-12-31",
+  "remarques": null
+ },
+ {
+  "opco": "OPCO MOBILITES",
+  "branche": "Ferroviaire",
+  "idcc": [
+   "3217"
+  ],
+  "retenu": true,
+  "lien": "https://www.opcomobilites.fr/media/2026/02/Ferroviaire_01102026.pdf",
+  "version": "guide pratique 2026 Ferroviaire, France hexagonale, d'OPCO Mobilités (mis à jour le 01/10/2026)",
+  "citations": [
+   {
+    "url": "https://www.opcomobilites.fr/media/2026/02/Ferroviaire_01102026.pdf",
+    "texte": "Actions de formation au réel dans la limite des fonds OPCO disponibles au moment de l’instruction et d’un plafond HT de :"
+   },
+   {
+    "url": "https://www.opcomobilites.fr/media/2026/02/Ferroviaire_01102026.pdf",
+    "texte": "1 500 € 1 800 € 2 100 € 2 400 € 2 700 € Moins de 11 salariés De 11 à moins de 20 salariés De 20 à moins de 30 salariés De 30 à moins de 40 salariés De 40 à moins de 50 salariés"
+   },
+   {
+    "url": "https://www.opcomobilites.fr/media/2026/02/Ferroviaire_01102026.pdf",
+    "texte": "conformément aux décisions des instances de l’OPCO et applicables aux formations débutant en 2026 dont l’accord de prise en charge est notifié à compter du 01 janvier 2026."
+   },
+   {
+    "url": "https://www.opcomobilites.fr/media/2026/02/Ferroviaire_01102026.pdf",
+    "texte": "Effectif annuel moyen 2025 déclaré sur la DSN *"
+   },
+   {
+    "url": "https://www.opcomobilites.fr/media/2026/02/Ferroviaire_01102026.pdf",
+    "texte": "Les demandes de prise en charge doivent parvenir le plus tôt possible au fur et à mesure de la réalisation des actions et au plus tard le 31 décembre 2026."
+   },
+   {
+    "url": "https://www.opcomobilites.fr/media/2026/02/Ferroviaire_01102026.pdf",
+    "texte": "Mise à jour 01/10/2026"
+   },
+   {
+    "url": "https://www.opcomobilites.fr/branches-et-secteurs-professionnels/",
+    "texte": "Ferroviaire"
+   },
+   {
+    "url": "https://www.opcomobilites.fr/dispositifs-formation/le-plan-de-developpement-des-competences/",
+    "texte": "Version janvier 2026 applicable aux demandes de prise en charge reçues à compter du 01/01/2026 et dont l’action débute en 2026."
+   },
+   {
+    "url": "https://www.opcomobilites.fr/dispositifs-formation/le-plan-de-developpement-des-competences/",
+    "texte": "L’ entreprise bénéficie d’un plafond exprimé en euros HT qui lui permet de financer les coûts pédagogiques (hors frais annexes et hors coûts salariaux) des formations suivies par ses salariés dans la limite d’un montant déterminé en fonction de l’effectif de l’entreprise."
+   },
+   {
+    "url": "https://www.opcomobilites.fr/dispositifs-formation/le-plan-de-developpement-des-competences/",
+    "texte": "Budget alloué dans la limite des fonds OPCO disponibles au moment de l’instruction"
+   },
+   {
+    "url": "https://www.opcomobilites.fr/dispositifs-formation/le-plan-de-developpement-des-competences/",
+    "texte": "Moins de 11 salariés 1 500 € De 11 à moins de 20 salariés 1 800 € De 20 à moins de 30 salariés 2 100 € De 30 à moins de 40 salariés 2 400 € De 40 à moins de 50 salariés 2 700 €"
+   },
+   {
+    "url": "https://www.opcomobilites.fr/dispositifs-formation/le-plan-de-developpement-des-competences/",
+    "texte": "Les demandes de prise en charge doivent parvenir le plus tôt possible au fur et à mesure de la réalisation des actions et au plus tard le 31 décembre 2026. Si la formation débute entre le 15 et le 31 décembre 2026 : délai d’envoi au plus tard le 15/01/2027."
+   },
+   {
+    "url": "https://www.opcomobilites.fr/dispositifs-formation/le-plan-de-developpement-des-competences/",
+    "texte": "Pour être financées, les formations doivent être délivrées par un organisme : Certifié Qualiopi"
+   }
+  ],
+  "paliers": [
+   {
+    "min": 0,
+    "max": 10,
+    "montant": "jusqu'à 1 500 € HT",
+    "detail": "coûts pédagogiques au réel, hors frais annexes et hors coûts salariaux, pour les formations qui débutent en 2026"
+   },
+   {
+    "min": 11,
+    "max": 19,
+    "montant": "jusqu'à 1 800 € HT",
+    "detail": "coûts pédagogiques au réel, hors frais annexes et hors coûts salariaux, pour les formations qui débutent en 2026"
+   },
+   {
+    "min": 20,
+    "max": 29,
+    "montant": "jusqu'à 2 100 € HT",
+    "detail": "coûts pédagogiques au réel, hors frais annexes et hors coûts salariaux, pour les formations qui débutent en 2026"
+   },
+   {
+    "min": 30,
+    "max": 39,
+    "montant": "jusqu'à 2 400 € HT",
+    "detail": "coûts pédagogiques au réel, hors frais annexes et hors coûts salariaux, pour les formations qui débutent en 2026"
+   },
+   {
+    "min": 40,
+    "max": 49,
+    "montant": "jusqu'à 2 700 € HT",
+    "detail": "coûts pédagogiques au réel, hors frais annexes et hors coûts salariaux, pour les formations qui débutent en 2026"
+   }
+  ],
+  "delai": "Demande à envoyer au plus tard le 31 décembre 2026.",
+  "delai_jusquau": "2026-12-31",
+  "remarques": null
+ },
+ {
+  "opco": "OPCO MOBILITES",
+  "branche": "Opérateurs de voyages et des guides",
+  "idcc": [
+   "3245"
+  ],
+  "retenu": true,
+  "lien": "https://www.opcomobilites.fr/media/2026/02/Operateurs-de-voyage-et-des-guides_01102026.pdf",
+  "version": "guide pratique 2026 Opérateurs de voyages et des guides, France hexagonale, d'OPCO Mobilités (mis à jour le 01/10/2026)",
+  "citations": [
+   {
+    "url": "https://www.opcomobilites.fr/media/2026/02/Operateurs-de-voyage-et-des-guides_01102026.pdf",
+    "texte": "Actions de formation au réel dans la limite des fonds OPCO disponibles au moment de l’instruction et d’un plafond HT de :"
+   },
+   {
+    "url": "https://www.opcomobilites.fr/media/2026/02/Operateurs-de-voyage-et-des-guides_01102026.pdf",
+    "texte": "1 500 € 1 800 € 2 100 € 2 400 € 2 700 € Moins de 11 salariés De 11 à moins de 20 salariés De 20 à moins de 30 salariés De 30 à moins de 40 salariés De 40 à moins de 50 salariés"
+   },
+   {
+    "url": "https://www.opcomobilites.fr/media/2026/02/Operateurs-de-voyage-et-des-guides_01102026.pdf",
+    "texte": "conformément aux décisions des instances de l’OPCO et applicables aux formations débutant en 2026 dont l’accord de prise en charge est notifié à compter du 01 janvier 2026."
+   },
+   {
+    "url": "https://www.opcomobilites.fr/media/2026/02/Operateurs-de-voyage-et-des-guides_01102026.pdf",
+    "texte": "Effectif annuel moyen 2025 déclaré sur la DSN *"
+   },
+   {
+    "url": "https://www.opcomobilites.fr/media/2026/02/Operateurs-de-voyage-et-des-guides_01102026.pdf",
+    "texte": "Les demandes de prise en charge doivent parvenir le plus tôt possible au fur et à mesure de la réalisation des actions et au plus tard le 31 décembre 2026."
+   },
+   {
+    "url": "https://www.opcomobilites.fr/media/2026/02/Operateurs-de-voyage-et-des-guides_01102026.pdf",
+    "texte": "Mise à jour 01/10/2026"
+   },
+   {
+    "url": "https://www.opcomobilites.fr/branches-et-secteurs-professionnels/",
+    "texte": "Opérateurs de voyages et des guides"
+   },
+   {
+    "url": "https://www.opcomobilites.fr/dispositifs-formation/le-plan-de-developpement-des-competences/",
+    "texte": "Version janvier 2026 applicable aux demandes de prise en charge reçues à compter du 01/01/2026 et dont l’action débute en 2026."
+   },
+   {
+    "url": "https://www.opcomobilites.fr/dispositifs-formation/le-plan-de-developpement-des-competences/",
+    "texte": "L’ entreprise bénéficie d’un plafond exprimé en euros HT qui lui permet de financer les coûts pédagogiques (hors frais annexes et hors coûts salariaux) des formations suivies par ses salariés dans la limite d’un montant déterminé en fonction de l’effectif de l’entreprise."
+   },
+   {
+    "url": "https://www.opcomobilites.fr/dispositifs-formation/le-plan-de-developpement-des-competences/",
+    "texte": "Budget alloué dans la limite des fonds OPCO disponibles au moment de l’instruction"
+   },
+   {
+    "url": "https://www.opcomobilites.fr/dispositifs-formation/le-plan-de-developpement-des-competences/",
+    "texte": "Moins de 11 salariés 1 500 € De 11 à moins de 20 salariés 1 800 € De 20 à moins de 30 salariés 2 100 € De 30 à moins de 40 salariés 2 400 € De 40 à moins de 50 salariés 2 700 €"
+   },
+   {
+    "url": "https://www.opcomobilites.fr/dispositifs-formation/le-plan-de-developpement-des-competences/",
+    "texte": "Les demandes de prise en charge doivent parvenir le plus tôt possible au fur et à mesure de la réalisation des actions et au plus tard le 31 décembre 2026. Si la formation débute entre le 15 et le 31 décembre 2026 : délai d’envoi au plus tard le 15/01/2027."
+   },
+   {
+    "url": "https://www.opcomobilites.fr/dispositifs-formation/le-plan-de-developpement-des-competences/",
+    "texte": "Pour être financées, les formations doivent être délivrées par un organisme : Certifié Qualiopi"
+   }
+  ],
+  "paliers": [
+   {
+    "min": 0,
+    "max": 10,
+    "montant": "jusqu'à 1 500 € HT",
+    "detail": "coûts pédagogiques au réel, hors frais annexes et hors coûts salariaux, pour les formations qui débutent en 2026"
+   },
+   {
+    "min": 11,
+    "max": 19,
+    "montant": "jusqu'à 1 800 € HT",
+    "detail": "coûts pédagogiques au réel, hors frais annexes et hors coûts salariaux, pour les formations qui débutent en 2026"
+   },
+   {
+    "min": 20,
+    "max": 29,
+    "montant": "jusqu'à 2 100 € HT",
+    "detail": "coûts pédagogiques au réel, hors frais annexes et hors coûts salariaux, pour les formations qui débutent en 2026"
+   },
+   {
+    "min": 30,
+    "max": 39,
+    "montant": "jusqu'à 2 400 € HT",
+    "detail": "coûts pédagogiques au réel, hors frais annexes et hors coûts salariaux, pour les formations qui débutent en 2026"
+   },
+   {
+    "min": 40,
+    "max": 49,
+    "montant": "jusqu'à 2 700 € HT",
+    "detail": "coûts pédagogiques au réel, hors frais annexes et hors coûts salariaux, pour les formations qui débutent en 2026"
+   }
+  ],
+  "delai": "Demande à envoyer au plus tard le 31 décembre 2026.",
+  "delai_jusquau": "2026-12-31",
+  "remarques": null
+ },
+ {
+  "opco": "OPCO MOBILITES",
+  "branche": "Opérateurs de voyages et des guides (ex-agences de voyages et de tourisme)",
+  "idcc": [
+   "1710"
+  ],
+  "retenu": true,
+  "lien": "https://www.opcomobilites.fr/media/2026/02/Operateurs-de-voyage-et-des-guides_01102026.pdf",
+  "version": "guide pratique 2026 Opérateurs de voyages et des guides, France hexagonale, d'OPCO Mobilités (mis à jour le 01/10/2026)",
+  "citations": [
+   {
+    "url": "https://www.opcomobilites.fr/media/2026/02/Operateurs-de-voyage-et-des-guides_01102026.pdf",
+    "texte": "Actions de formation au réel dans la limite des fonds OPCO disponibles au moment de l’instruction et d’un plafond HT de :"
+   },
+   {
+    "url": "https://www.opcomobilites.fr/media/2026/02/Operateurs-de-voyage-et-des-guides_01102026.pdf",
+    "texte": "1 500 € 1 800 € 2 100 € 2 400 € 2 700 € Moins de 11 salariés De 11 à moins de 20 salariés De 20 à moins de 30 salariés De 30 à moins de 40 salariés De 40 à moins de 50 salariés"
+   },
+   {
+    "url": "https://www.opcomobilites.fr/media/2026/02/Operateurs-de-voyage-et-des-guides_01102026.pdf",
+    "texte": "conformément aux décisions des instances de l’OPCO et applicables aux formations débutant en 2026 dont l’accord de prise en charge est notifié à compter du 01 janvier 2026."
+   },
+   {
+    "url": "https://www.opcomobilites.fr/media/2026/02/Operateurs-de-voyage-et-des-guides_01102026.pdf",
+    "texte": "Effectif annuel moyen 2025 déclaré sur la DSN *"
+   },
+   {
+    "url": "https://www.opcomobilites.fr/media/2026/02/Operateurs-de-voyage-et-des-guides_01102026.pdf",
+    "texte": "Les demandes de prise en charge doivent parvenir le plus tôt possible au fur et à mesure de la réalisation des actions et au plus tard le 31 décembre 2026."
+   },
+   {
+    "url": "https://www.opcomobilites.fr/media/2026/02/Operateurs-de-voyage-et-des-guides_01102026.pdf",
+    "texte": "Mise à jour 01/10/2026"
+   },
+   {
+    "url": "https://www.opcomobilites.fr/branches-et-secteurs-professionnels/",
+    "texte": "Opérateurs de voyages et des guides"
+   },
+   {
+    "url": "https://www.opcomobilites.fr/dispositifs-formation/le-plan-de-developpement-des-competences/",
+    "texte": "Version janvier 2026 applicable aux demandes de prise en charge reçues à compter du 01/01/2026 et dont l’action débute en 2026."
+   },
+   {
+    "url": "https://www.opcomobilites.fr/dispositifs-formation/le-plan-de-developpement-des-competences/",
+    "texte": "L’ entreprise bénéficie d’un plafond exprimé en euros HT qui lui permet de financer les coûts pédagogiques (hors frais annexes et hors coûts salariaux) des formations suivies par ses salariés dans la limite d’un montant déterminé en fonction de l’effectif de l’entreprise."
+   },
+   {
+    "url": "https://www.opcomobilites.fr/dispositifs-formation/le-plan-de-developpement-des-competences/",
+    "texte": "Budget alloué dans la limite des fonds OPCO disponibles au moment de l’instruction"
+   },
+   {
+    "url": "https://www.opcomobilites.fr/dispositifs-formation/le-plan-de-developpement-des-competences/",
+    "texte": "Moins de 11 salariés 1 500 € De 11 à moins de 20 salariés 1 800 € De 20 à moins de 30 salariés 2 100 € De 30 à moins de 40 salariés 2 400 € De 40 à moins de 50 salariés 2 700 €"
+   },
+   {
+    "url": "https://www.opcomobilites.fr/dispositifs-formation/le-plan-de-developpement-des-competences/",
+    "texte": "Les demandes de prise en charge doivent parvenir le plus tôt possible au fur et à mesure de la réalisation des actions et au plus tard le 31 décembre 2026. Si la formation débute entre le 15 et le 31 décembre 2026 : délai d’envoi au plus tard le 15/01/2027."
+   },
+   {
+    "url": "https://www.opcomobilites.fr/dispositifs-formation/le-plan-de-developpement-des-competences/",
+    "texte": "Pour être financées, les formations doivent être délivrées par un organisme : Certifié Qualiopi"
+   }
+  ],
+  "paliers": [
+   {
+    "min": 0,
+    "max": 10,
+    "montant": "jusqu'à 1 500 € HT",
+    "detail": "coûts pédagogiques au réel, hors frais annexes et hors coûts salariaux, pour les formations qui débutent en 2026"
+   },
+   {
+    "min": 11,
+    "max": 19,
+    "montant": "jusqu'à 1 800 € HT",
+    "detail": "coûts pédagogiques au réel, hors frais annexes et hors coûts salariaux, pour les formations qui débutent en 2026"
+   },
+   {
+    "min": 20,
+    "max": 29,
+    "montant": "jusqu'à 2 100 € HT",
+    "detail": "coûts pédagogiques au réel, hors frais annexes et hors coûts salariaux, pour les formations qui débutent en 2026"
+   },
+   {
+    "min": 30,
+    "max": 39,
+    "montant": "jusqu'à 2 400 € HT",
+    "detail": "coûts pédagogiques au réel, hors frais annexes et hors coûts salariaux, pour les formations qui débutent en 2026"
+   },
+   {
+    "min": 40,
+    "max": 49,
+    "montant": "jusqu'à 2 700 € HT",
+    "detail": "coûts pédagogiques au réel, hors frais annexes et hors coûts salariaux, pour les formations qui débutent en 2026"
+   }
+  ],
+  "delai": "Demande à envoyer au plus tard le 31 décembre 2026.",
+  "delai_jusquau": "2026-12-31",
+  "remarques": null
+ },
+ {
+  "opco": "OPCO MOBILITES",
+  "branche": "Distributeurs conseils hors domicile - grossistes en boissons",
+  "idcc": [
+   "1536"
+  ],
+  "retenu": true,
+  "lien": "https://www.opcomobilites.fr/media/2026/02/DCHD-GROSSISTES-EN-BOISSONS_01102026.pdf",
+  "version": "guide pratique 2026 Distributeurs Conseil Hors Domicile, Grossistes en boissons, France hexagonale, d'OPCO Mobilités (mis à jour le 01/10/2026)",
+  "citations": [
+   {
+    "url": "https://www.opcomobilites.fr/media/2026/02/DCHD-GROSSISTES-EN-BOISSONS_01102026.pdf",
+    "texte": "Actions de formation au réel dans la limite des fonds OPCO disponibles au moment de l’instruction et d’un plafond HT de :"
+   },
+   {
+    "url": "https://www.opcomobilites.fr/media/2026/02/DCHD-GROSSISTES-EN-BOISSONS_01102026.pdf",
+    "texte": "1 500 € 1 800 € 2 100 € 2 400 € 2 700 € Moins de 11 salariés De 11 à moins de 20 salariés De 20 à moins de 30 salariés De 30 à moins de 40 salariés De 40 à moins de 50 salariés"
+   },
+   {
+    "url": "https://www.opcomobilites.fr/media/2026/02/DCHD-GROSSISTES-EN-BOISSONS_01102026.pdf",
+    "texte": "conformément aux décisions des instances de l’OPCO et applicables aux formations débutant en 2026 dont l’accord de prise en charge est notifié à compter du 01 janvier 2026."
+   },
+   {
+    "url": "https://www.opcomobilites.fr/media/2026/02/DCHD-GROSSISTES-EN-BOISSONS_01102026.pdf",
+    "texte": "Effectif annuel moyen 2025 déclaré sur la DSN *"
+   },
+   {
+    "url": "https://www.opcomobilites.fr/media/2026/02/DCHD-GROSSISTES-EN-BOISSONS_01102026.pdf",
+    "texte": "Les demandes de prise en charge doivent parvenir le plus tôt possible au fur et à mesure de la réalisation des actions et au plus tard le 31 décembre 2026."
+   },
+   {
+    "url": "https://www.opcomobilites.fr/media/2026/02/DCHD-GROSSISTES-EN-BOISSONS_01102026.pdf",
+    "texte": "Mise à jour 01/10/2026"
+   },
+   {
+    "url": "https://www.opcomobilites.fr/media/2026/02/DCHD-GROSSISTES-EN-BOISSONS_01102026.pdf",
+    "texte": "Employabilité & numérique : Gestion, Management, Commerce, Marketing, Transition numérique, intelligence artificielle et sécurité informatique"
+   },
+   {
+    "url": "https://www.opcomobilites.fr/branches-et-secteurs-professionnels/",
+    "texte": "Distributeurs conseils hors domicile - grossistes en boissons"
+   },
+   {
+    "url": "https://www.opcomobilites.fr/dispositifs-formation/le-plan-de-developpement-des-competences/",
+    "texte": "Version janvier 2026 applicable aux demandes de prise en charge reçues à compter du 01/01/2026 et dont l’action débute en 2026."
+   },
+   {
+    "url": "https://www.opcomobilites.fr/dispositifs-formation/le-plan-de-developpement-des-competences/",
+    "texte": "L’ entreprise bénéficie d’un plafond exprimé en euros HT qui lui permet de financer les coûts pédagogiques (hors frais annexes et hors coûts salariaux) des formations suivies par ses salariés dans la limite d’un montant déterminé en fonction de l’effectif de l’entreprise."
+   },
+   {
+    "url": "https://www.opcomobilites.fr/dispositifs-formation/le-plan-de-developpement-des-competences/",
+    "texte": "Budget alloué dans la limite des fonds OPCO disponibles au moment de l’instruction"
+   },
+   {
+    "url": "https://www.opcomobilites.fr/dispositifs-formation/le-plan-de-developpement-des-competences/",
+    "texte": "Moins de 11 salariés 1 500 € De 11 à moins de 20 salariés 1 800 € De 20 à moins de 30 salariés 2 100 € De 30 à moins de 40 salariés 2 400 € De 40 à moins de 50 salariés 2 700 €"
+   },
+   {
+    "url": "https://www.opcomobilites.fr/dispositifs-formation/le-plan-de-developpement-des-competences/",
+    "texte": "Les demandes de prise en charge doivent parvenir le plus tôt possible au fur et à mesure de la réalisation des actions et au plus tard le 31 décembre 2026. Si la formation débute entre le 15 et le 31 décembre 2026 : délai d’envoi au plus tard le 15/01/2027."
+   },
+   {
+    "url": "https://www.opcomobilites.fr/dispositifs-formation/le-plan-de-developpement-des-competences/",
+    "texte": "Pour être financées, les formations doivent être délivrées par un organisme : Certifié Qualiopi"
+   }
+  ],
+  "paliers": [
+   {
+    "min": 0,
+    "max": 10,
+    "montant": "jusqu'à 1 500 € HT",
+    "detail": "coûts pédagogiques au réel, hors frais annexes et hors coûts salariaux, pour les formations qui débutent en 2026"
+   },
+   {
+    "min": 11,
+    "max": 19,
+    "montant": "jusqu'à 1 800 € HT",
+    "detail": "coûts pédagogiques au réel, hors frais annexes et hors coûts salariaux, pour les formations qui débutent en 2026"
+   },
+   {
+    "min": 20,
+    "max": 29,
+    "montant": "jusqu'à 2 100 € HT",
+    "detail": "coûts pédagogiques au réel, hors frais annexes et hors coûts salariaux, pour les formations qui débutent en 2026"
+   },
+   {
+    "min": 30,
+    "max": 39,
+    "montant": "jusqu'à 2 400 € HT",
+    "detail": "coûts pédagogiques au réel, hors frais annexes et hors coûts salariaux, pour les formations qui débutent en 2026"
+   },
+   {
+    "min": 40,
+    "max": 49,
+    "montant": "jusqu'à 2 700 € HT",
+    "detail": "coûts pédagogiques au réel, hors frais annexes et hors coûts salariaux, pour les formations qui débutent en 2026"
+   }
+  ],
+  "delai": "Demande à envoyer au plus tard le 31 décembre 2026.",
+  "delai_jusquau": "2026-12-31",
+  "remarques": null
+ }
+]

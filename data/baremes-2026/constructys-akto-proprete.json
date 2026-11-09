@@ -1,0 +1,135 @@
+[
+ {
+  "opco": "CONSTRUCTYS",
+  "branche": "Bâtiment",
+  "idcc": [
+   "1596",
+   "1597",
+   "2420",
+   "2609"
+  ],
+  "retenu": true,
+  "lien": "https://www.constructys.fr/conditions-de-prise-en-charge-2/",
+  "version": "barème Bâtiment 2026 de Constructys (septembre 2026)",
+  "paliers": [
+   {
+    "min": 0,
+    "max": 10,
+    "montant": "24 € HT par heure et par stagiaire",
+    "detail": "dans la limite de 840 € HT par jour pour un groupe en intra-entreprise, plus une participation aux salaires de 15 € HT par heure et par stagiaire"
+   },
+   {
+    "min": 11,
+    "max": 49,
+    "montant": "19 € HT par heure et par stagiaire",
+    "detail": "dans la limite de 665 € HT par jour pour un groupe en intra-entreprise"
+   }
+  ],
+  "delai": "Demande complète à déposer au moins 15 jours avant le début de la formation.",
+  "delai_jusquau": null,
+  "citations": [
+   {
+    "url": "https://www.constructys.fr/wp-content/uploads/BATIMENT-Modalites-2026.zip",
+    "texte": "Constructys - Septembre 2026"
+   },
+   {
+    "url": "https://www.constructys.fr/wp-content/uploads/BATIMENT-Modalites-2026.zip",
+    "texte": "Entreprises de moins de 11 salariés ▪ Plafond de 24 € HT / heure / stagiaire. Dans la limite de 840 € HT / jour / groupe dans le cas d’une session intra-entreprise."
+   },
+   {
+    "url": "https://www.constructys.fr/wp-content/uploads/BATIMENT-Modalites-2026.zip",
+    "texte": "Entreprises de 11 à moins de 50 salariés ▪ Plafond de 19 € HT / heure / stagiaire. Dans la limite de 665 € HT / jour / groupe dans le cas d’une session intra-entreprise."
+   },
+   {
+    "url": "https://www.constructys.fr/wp-content/uploads/BATIMENT-Modalites-2026.zip",
+    "texte": "Frais de salaires : Entreprises de moins de 11 salariés Plafond : 15 € HT / heure / stagiaire."
+   },
+   {
+    "url": "https://www.constructys.fr/wp-content/uploads/BATIMENT-Modalites-2026.zip",
+    "texte": "La formation doit démarrer en 2026 et les demandes de financement doivent parvenir à Constructys au moins 15 jours avant le d ébut de la formation."
+   }
+  ]
+ },
+ {
+  "opco": "CONSTRUCTYS",
+  "branche": "Travaux publics",
+  "idcc": [
+   "1702",
+   "2614",
+   "3212"
+  ],
+  "retenu": true,
+  "lien": "https://www.constructys.fr/conditions-de-prise-en-charge-2/",
+  "version": "barème Travaux publics 2026 de Constructys (juillet 2026)",
+  "paliers": [
+   {
+    "min": 0,
+    "max": 49,
+    "montant": "4 000 € HT par an pour les coûts de formation",
+    "detail": "dans la limite de 32 € HT par heure et par stagiaire"
+   }
+  ],
+  "delai": "Demande complète à déposer au moins 15 jours avant le début de la formation.",
+  "delai_jusquau": null,
+  "citations": [
+   {
+    "url": "https://www.constructys.fr/wp-content/uploads/TP-Modalites-2026.zip",
+    "texte": "Constructys – Juillet 2026"
+   },
+   {
+    "url": "https://www.constructys.fr/wp-content/uploads/TP-Modalites-2026.zip",
+    "texte": "Plafond de 32 € HT / heure / stagiaire."
+   },
+   {
+    "url": "https://www.constructys.fr/wp-content/uploads/TP-Modalites-2026.zip",
+    "texte": "BUDGET ANNUEL ENTREPRISE Coût pédagogique : Entreprises de moins de 50 salariés 4 000 € HT."
+   },
+   {
+    "url": "https://www.constructys.fr/wp-content/uploads/TP-Modalites-2026.zip",
+    "texte": "La formation doit démarrer en 2026 et les demandes de financement doivent parvenir à Constructys au moins 15 jours avant le d ébut de la formation."
+   }
+  ]
+ },
+ {
+  "opco": "AKTO",
+  "branche": "Propreté et services associés",
+  "idcc": [
+   "3043"
+  ],
+  "retenu": true,
+  "lien": "https://www.akto.fr/regles-de-prise-en-charge-proprete/",
+  "version": "règles de prise en charge 2026 de la branche Propreté d'AKTO (mises à jour le 02/11/2026)",
+  "paliers": [
+   {
+    "min": 0,
+    "max": 49,
+    "montant": "7 000 € par an pour les coûts pédagogiques",
+    "detail": "en intra-entreprise, jusqu'à 2 800 € par jour pour un groupe de 5 à 12 stagiaires"
+   }
+  ],
+  "delai": "Date limite de dépôt des dossiers de formation chez AKTO : 20 novembre 2026.",
+  "delai_jusquau": "2026-11-20",
+  "citations": [
+   {
+    "url": "https://www.akto.fr/regles-de-prise-en-charge-proprete/",
+    "texte": "Date de mise à jour : 02/11/2026"
+   },
+   {
+    "url": "https://www.akto.fr/regles-de-prise-en-charge-proprete/",
+    "texte": "Si votre entreprise emploie moins de 50 salariés , vous bénéficiez"
+   },
+   {
+    "url": "https://www.akto.fr/regles-de-prise-en-charge-proprete/",
+    "texte": "budget annuel de 7 000€ réservé à la prise en charge des coûts pédagogiques"
+   },
+   {
+    "url": "https://www.akto.fr/regles-de-prise-en-charge-proprete/",
+    "texte": "Plafond de 2 800 € / jour, pour un groupe de 5 stagiaires minimum à 12 stagiaires maximum"
+   },
+   {
+    "url": "https://www.akto.fr/regles-de-prise-en-charge-proprete/",
+    "texte": "Date limite de dépôt des dossiers formation : 20 novembre 2026"
+   }
+  ]
+ }
+]

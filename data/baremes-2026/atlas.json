@@ -1,0 +1,830 @@
+[
+ {
+  "opco": "ATLAS",
+  "branche": "Bureaux d'études techniques, cabinets d'ingénieurs-conseils et sociétés de conseils (Syntec)",
+  "idcc": [
+   "1486"
+  ],
+  "retenu": true,
+  "lien": "https://www.opco-atlas.fr/criteres-financement/bureaux-detudes-techniques-ingenieurs-et-conseils",
+  "version": "critères de financement 2026 de la branche Bureaux d'études techniques ingénieurs et conseils sur opco-atlas.fr (bloc PDC mis à jour le 05/01/2026)",
+  "citations": [
+   {
+    "url": "https://www.opco-atlas.fr/criteres-financement/bureaux-detudes-techniques-ingenieurs-et-conseils",
+    "texte": "applicables depuis le 01 janvier 2026 sous réserve de fonds disponibles."
+   },
+   {
+    "url": "https://www.opco-atlas.fr/criteres-financement/bureaux-detudes-techniques-ingenieurs-et-conseils",
+    "texte": "Les dossiers doivent être déposés avant le début de la formation."
+   },
+   {
+    "url": "https://www.opco-atlas.fr/criteres-financement/bureaux-detudes-techniques-ingenieurs-et-conseils",
+    "texte": "Toute formation éligible au Plan de Développement des Compétences (obligatoire ou non), à l’exception de tous les permis de conduire, des formations à l’anglais et du reste à charge CPF."
+   },
+   {
+    "url": "https://www.opco-atlas.fr/criteres-financement/bureaux-detudes-techniques-ingenieurs-et-conseils",
+    "texte": "Entreprises de moins de 11 salariés"
+   },
+   {
+    "url": "https://www.opco-atlas.fr/criteres-financement/bureaux-detudes-techniques-ingenieurs-et-conseils",
+    "texte": "Plafond par entreprise : 2 500€ HT/an"
+   },
+   {
+    "url": "https://www.opco-atlas.fr/criteres-financement/bureaux-detudes-techniques-ingenieurs-et-conseils",
+    "texte": "Entreprises de 11 à 49 salariés"
+   },
+   {
+    "url": "https://www.opco-atlas.fr/criteres-financement/bureaux-detudes-techniques-ingenieurs-et-conseils",
+    "texte": "Plafond par entreprise : 3 000€ HT/an"
+   },
+   {
+    "url": "https://www.opco-atlas.fr/criteres-financement/bureaux-detudes-techniques-ingenieurs-et-conseils",
+    "texte": "Mise à jour 05/01/26"
+   },
+   {
+    "url": "https://www.opco-atlas.fr/criteres-financement/bureaux-detudes-techniques-ingenieurs-et-conseils",
+    "texte": "Pour pouvoir les mobiliser, vous devez être à jour du versement de votre contribution conventionnelle."
+   },
+   {
+    "url": "https://www.opco-atlas.fr/criteres-financement/bureaux-detudes-techniques-ingenieurs-et-conseils",
+    "texte": "Formation INTRA : 1 500€ HT / jour (minimum 3 personnes)"
+   },
+   {
+    "url": "https://www.opco-atlas.fr/criteres-financement/bureaux-detudes-techniques-ingenieurs-et-conseils",
+    "texte": "Une prise en charge par entreprise tous les deux ans"
+   },
+   {
+    "url": "https://www.opco-atlas.fr/sites/default/files/medias/files/2026/03/atlas_note-politique_formation_2026_160326.pdf",
+    "texte": "a décidé qu’elle ne réviserait plus à l’avenir les critères de prise en charge avant la fin du premier semestre de chaque année."
+   },
+   {
+    "url": "https://www.opco-atlas.fr/sites/default/files/medias/files/2026/03/ATLAS_CVG10MARS2026%5B89%5D.pdf",
+    "texte": "Transmettre le dossier de demande de prise en charge à Atlas avant le début de la formation en passant par les services en ligne myAtlas."
+   },
+   {
+    "url": "https://www.opco-atlas.fr/sites/default/files/medias/files/2026/03/ATLAS_CVG10MARS2026%5B89%5D.pdf",
+    "texte": "Afin de bénéficier des fonds de l’année N, toute demande de prise en charge de formations qui se déroulent sur l’année N, doit parvenir à Atlas avant le 31/12 de l’année N."
+   },
+   {
+    "url": "https://www.opco-atlas.fr/criteres-financement",
+    "texte": "Pas besoin de compte, c'est instantané !"
+   },
+   {
+    "url": "https://www.opco-atlas.fr/actualites/reforme-de-la-tva-ce-qui-change-pour-le-financement-de-vos-formations.html",
+    "texte": "Les formations prises en charge par l’enveloppe Plan de développement des compétences"
+   }
+  ],
+  "paliers": [
+   {
+    "min": 0,
+    "max": 10,
+    "montant": "jusqu'à 2 500 € HT par an",
+    "detail": "plafond par entreprise, pour toute formation éligible au plan de développement des compétences"
+   },
+   {
+    "min": 11,
+    "max": 49,
+    "montant": "jusqu'à 3 000 € HT par an",
+    "detail": "plafond par entreprise, pour toute formation éligible au plan de développement des compétences"
+   }
+  ],
+  "delai": "Demande à déposer sur myAtlas avant le début de la formation.",
+  "delai_jusquau": "2026-12-30",
+  "remarques": null
+ },
+ {
+  "opco": "ATLAS",
+  "branche": "Experts-comptables et commissaires aux comptes",
+  "idcc": [
+   "0787"
+  ],
+  "retenu": true,
+  "lien": "https://www.opco-atlas.fr/criteres-financement/experts-comptables-et-commissaires-aux-comptes",
+  "version": "critères de financement 2026 de la branche Experts-comptables et commissaires aux comptes sur opco-atlas.fr (bloc PDC mis à jour le 05/01/2026)",
+  "citations": [
+   {
+    "url": "https://www.opco-atlas.fr/criteres-financement/experts-comptables-et-commissaires-aux-comptes",
+    "texte": "Les critères de financement définis par les partenaires sociaux peuvent évoluer en cours d’année en fonction de la consommation des fonds attribués par France Compétences."
+   },
+   {
+    "url": "https://www.opco-atlas.fr/criteres-financement/experts-comptables-et-commissaires-aux-comptes",
+    "texte": "applicables au 1er janvier 2026 sous réserve de fonds disponibles."
+   },
+   {
+    "url": "https://www.opco-atlas.fr/criteres-financement/experts-comptables-et-commissaires-aux-comptes",
+    "texte": "les salariés des entreprises de moins de 50 salariés"
+   },
+   {
+    "url": "https://www.opco-atlas.fr/criteres-financement/experts-comptables-et-commissaires-aux-comptes",
+    "texte": "Toutes les thématiques éligibles au Plan de Développement des Compétences"
+   },
+   {
+    "url": "https://www.opco-atlas.fr/criteres-financement/experts-comptables-et-commissaires-aux-comptes",
+    "texte": "Entreprises de moins de 11 salariés"
+   },
+   {
+    "url": "https://www.opco-atlas.fr/criteres-financement/experts-comptables-et-commissaires-aux-comptes",
+    "texte": "Plafond par entreprise : 2 800€ HT/an"
+   },
+   {
+    "url": "https://www.opco-atlas.fr/criteres-financement/experts-comptables-et-commissaires-aux-comptes",
+    "texte": "Entreprises de 11 à 49 salariés"
+   },
+   {
+    "url": "https://www.opco-atlas.fr/criteres-financement/experts-comptables-et-commissaires-aux-comptes",
+    "texte": "Plafond par entreprise : 9 000€ HT/an"
+   },
+   {
+    "url": "https://www.opco-atlas.fr/criteres-financement/experts-comptables-et-commissaires-aux-comptes",
+    "texte": "Mise à jour 05/01/2026"
+   },
+   {
+    "url": "https://www.opco-atlas.fr/sites/default/files/medias/files/2026/03/ATLAS_CVG10MARS2026%5B89%5D.pdf",
+    "texte": "Transmettre le dossier de demande de prise en charge à Atlas avant le début de la formation en passant par les services en ligne myAtlas."
+   },
+   {
+    "url": "https://www.opco-atlas.fr/sites/default/files/medias/files/2026/03/ATLAS_CVG10MARS2026%5B89%5D.pdf",
+    "texte": "Afin de bénéficier des fonds de l’année N, toute demande de prise en charge de formations qui se déroulent sur l’année N, doit parvenir à Atlas avant le 31/12 de l’année N."
+   },
+   {
+    "url": "https://www.opco-atlas.fr/criteres-financement",
+    "texte": "Pas besoin de compte, c'est instantané !"
+   }
+  ],
+  "paliers": [
+   {
+    "min": 0,
+    "max": 10,
+    "montant": "jusqu'à 2 800 € HT par an",
+    "detail": "plafond par entreprise, toutes thématiques éligibles"
+   },
+   {
+    "min": 11,
+    "max": 49,
+    "montant": "jusqu'à 9 000 € HT par an",
+    "detail": "plafond par entreprise, toutes thématiques éligibles"
+   }
+  ],
+  "delai": "Demande à déposer sur myAtlas avant le début de la formation.",
+  "delai_jusquau": "2026-12-30",
+  "remarques": null
+ },
+ {
+  "opco": "ATLAS",
+  "branche": "Courtage d'assurances et de réassurances",
+  "idcc": [
+   "2247"
+  ],
+  "retenu": true,
+  "lien": "https://www.opco-atlas.fr/criteres-financement/courtage-dassurances-et-de-reassurances",
+  "version": "critères de financement 2026 de la branche Courtage d'assurances et de réassurances sur opco-atlas.fr (bloc PDC mis à jour le 05/01/2026)",
+  "citations": [
+   {
+    "url": "https://www.opco-atlas.fr/criteres-financement/courtage-dassurances-et-de-reassurances",
+    "texte": "Les critères de financement définis par les partenaires sociaux peuvent évoluer en cours d’année en fonction de la consommation des fonds attribués par France Compétences."
+   },
+   {
+    "url": "https://www.opco-atlas.fr/criteres-financement/courtage-dassurances-et-de-reassurances",
+    "texte": "applicables depuis le 01 janvier 2026 sous réserve de fonds disponibles."
+   },
+   {
+    "url": "https://www.opco-atlas.fr/criteres-financement/courtage-dassurances-et-de-reassurances",
+    "texte": "Toute formation éligible au Plan de Développement des Compétences"
+   },
+   {
+    "url": "https://www.opco-atlas.fr/criteres-financement/courtage-dassurances-et-de-reassurances",
+    "texte": "Entreprises de moins de 11 salariés"
+   },
+   {
+    "url": "https://www.opco-atlas.fr/criteres-financement/courtage-dassurances-et-de-reassurances",
+    "texte": "Plafond par entreprise : 6 000€ HT/an"
+   },
+   {
+    "url": "https://www.opco-atlas.fr/criteres-financement/courtage-dassurances-et-de-reassurances",
+    "texte": "Entreprises de 11 à 49 salariés"
+   },
+   {
+    "url": "https://www.opco-atlas.fr/criteres-financement/courtage-dassurances-et-de-reassurances",
+    "texte": "Plafond par entreprise : 9 000€ HT/an"
+   },
+   {
+    "url": "https://www.opco-atlas.fr/criteres-financement/courtage-dassurances-et-de-reassurances",
+    "texte": "Plafond formation : au coût réel plafonné à 55€ HT"
+   },
+   {
+    "url": "https://www.opco-atlas.fr/criteres-financement/courtage-dassurances-et-de-reassurances",
+    "texte": "Mise à jour 05/01/2026"
+   },
+   {
+    "url": "https://www.opco-atlas.fr/criteres-financement/courtage-dassurances-et-de-reassurances",
+    "texte": "Toute formation liées à la transition numérique et/ou à la transition écologique"
+   },
+   {
+    "url": "https://www.opco-atlas.fr/criteres-financement/courtage-dassurances-et-de-reassurances",
+    "texte": "Formation INTER : coût réel plafonné à 90€ HT / heure et dans la limite de 14h de formation"
+   },
+   {
+    "url": "https://www.opco-atlas.fr/criteres-financement/courtage-dassurances-et-de-reassurances",
+    "texte": "Formation INTRA : coût réel plafonné à 2500 HT / jour et dans la limite de 14h de formation (minimum 4 personnes)"
+   },
+   {
+    "url": "https://www.opco-atlas.fr/sites/default/files/medias/files/2026/03/ATLAS_CVG10MARS2026%5B89%5D.pdf",
+    "texte": "Transmettre le dossier de demande de prise en charge à Atlas avant le début de la formation en passant par les services en ligne myAtlas."
+   },
+   {
+    "url": "https://www.opco-atlas.fr/sites/default/files/medias/files/2026/03/ATLAS_CVG10MARS2026%5B89%5D.pdf",
+    "texte": "Afin de bénéficier des fonds de l’année N, toute demande de prise en charge de formations qui se déroulent sur l’année N, doit parvenir à Atlas avant le 31/12 de l’année N."
+   },
+   {
+    "url": "https://www.opco-atlas.fr/criteres-financement",
+    "texte": "Pas besoin de compte, c'est instantané !"
+   }
+  ],
+  "paliers": [
+   {
+    "min": 0,
+    "max": 10,
+    "montant": "jusqu'à 6 000 € HT par an",
+    "detail": "plafond par entreprise, au coût réel plafonné à 55 € HT de l'heure"
+   },
+   {
+    "min": 11,
+    "max": 49,
+    "montant": "jusqu'à 9 000 € HT par an",
+    "detail": "plafond par entreprise, au coût réel plafonné à 55 € HT de l'heure"
+   }
+  ],
+  "delai": "Demande à déposer sur myAtlas avant le début de la formation.",
+  "delai_jusquau": "2026-12-30",
+  "remarques": null
+ },
+ {
+  "opco": "ATLAS",
+  "branche": "Banque",
+  "idcc": [
+   "2120"
+  ],
+  "retenu": true,
+  "lien": "https://www.opco-atlas.fr/criteres-financement/banque",
+  "version": "critères de financement 2026 de la branche Banque sur opco-atlas.fr (bloc PDC mis à jour le 05/01/2026)",
+  "citations": [
+   {
+    "url": "https://www.opco-atlas.fr/criteres-financement/banque",
+    "texte": "Les critères de financement définis par les partenaires sociaux peuvent évoluer en cours d’année en fonction de la consommation des fonds attribués par France Compétences."
+   },
+   {
+    "url": "https://www.opco-atlas.fr/criteres-financement/banque",
+    "texte": "applicables depuis le 01 janvier 2026 sous réserve de fonds disponibles."
+   },
+   {
+    "url": "https://www.opco-atlas.fr/criteres-financement/banque",
+    "texte": "les salariés des entreprises de moins de 50 salariés"
+   },
+   {
+    "url": "https://www.opco-atlas.fr/criteres-financement/banque",
+    "texte": "toute formation éligible au Plan de Développement des Compétences"
+   },
+   {
+    "url": "https://www.opco-atlas.fr/criteres-financement/banque",
+    "texte": "Entreprises de moins de 11 salariés"
+   },
+   {
+    "url": "https://www.opco-atlas.fr/criteres-financement/banque",
+    "texte": "Plafond par entreprise : 3 200€ HT/an"
+   },
+   {
+    "url": "https://www.opco-atlas.fr/criteres-financement/banque",
+    "texte": "Entreprises de 11 à 49 salariés"
+   },
+   {
+    "url": "https://www.opco-atlas.fr/criteres-financement/banque",
+    "texte": "Plafond par entreprise : 5 600€ HT/an"
+   },
+   {
+    "url": "https://www.opco-atlas.fr/criteres-financement/banque",
+    "texte": "Mise à jour 05/01/2026"
+   },
+   {
+    "url": "https://www.opco-atlas.fr/sites/default/files/medias/files/2026/03/ATLAS_CVG10MARS2026%5B89%5D.pdf",
+    "texte": "Transmettre le dossier de demande de prise en charge à Atlas avant le début de la formation en passant par les services en ligne myAtlas."
+   },
+   {
+    "url": "https://www.opco-atlas.fr/sites/default/files/medias/files/2026/03/ATLAS_CVG10MARS2026%5B89%5D.pdf",
+    "texte": "Afin de bénéficier des fonds de l’année N, toute demande de prise en charge de formations qui se déroulent sur l’année N, doit parvenir à Atlas avant le 31/12 de l’année N."
+   },
+   {
+    "url": "https://www.opco-atlas.fr/criteres-financement",
+    "texte": "Pas besoin de compte, c'est instantané !"
+   }
+  ],
+  "paliers": [
+   {
+    "min": 0,
+    "max": 10,
+    "montant": "jusqu'à 3 200 € HT par an",
+    "detail": "plafond par entreprise, pour toute formation éligible au plan de développement des compétences"
+   },
+   {
+    "min": 11,
+    "max": 49,
+    "montant": "jusqu'à 5 600 € HT par an",
+    "detail": "plafond par entreprise, pour toute formation éligible au plan de développement des compétences"
+   }
+  ],
+  "delai": "Demande à déposer sur myAtlas avant le début de la formation.",
+  "delai_jusquau": "2026-12-30",
+  "remarques": null
+ },
+ {
+  "opco": "ATLAS",
+  "branche": "Sociétés d'assurances",
+  "idcc": [
+   "1672"
+  ],
+  "retenu": true,
+  "lien": "https://www.opco-atlas.fr/criteres-financement/societes-dassurances",
+  "version": "critères de financement 2026 de la branche Sociétés d'assurances sur opco-atlas.fr (bloc PDC mis à jour le 17/07/2026)",
+  "citations": [
+   {
+    "url": "https://www.opco-atlas.fr/criteres-financement/societes-dassurances",
+    "texte": "Les critères de financement définis par les partenaires sociaux peuvent évoluer en cours d’année en fonction de la consommation des fonds attribués par France Compétences."
+   },
+   {
+    "url": "https://www.opco-atlas.fr/criteres-financement/societes-dassurances",
+    "texte": "applicables depuis le 01 janvier 2026 sous réserve de fonds disponibles."
+   },
+   {
+    "url": "https://www.opco-atlas.fr/criteres-financement/societes-dassurances",
+    "texte": "les salariés des entreprises de moins de 50 salariés"
+   },
+   {
+    "url": "https://www.opco-atlas.fr/criteres-financement/societes-dassurances",
+    "texte": "Toutes les thématiques éligibles au Plan de Développement des Compétences"
+   },
+   {
+    "url": "https://www.opco-atlas.fr/criteres-financement/societes-dassurances",
+    "texte": "Entreprises de moins de 11 salariés"
+   },
+   {
+    "url": "https://www.opco-atlas.fr/criteres-financement/societes-dassurances",
+    "texte": "Plafond par entreprise : 9 000€ HT/an"
+   },
+   {
+    "url": "https://www.opco-atlas.fr/criteres-financement/societes-dassurances",
+    "texte": "Entreprises 11 à 49 salariés"
+   },
+   {
+    "url": "https://www.opco-atlas.fr/criteres-financement/societes-dassurances",
+    "texte": "Plafond par entreprise : 12 000€ HT/an"
+   },
+   {
+    "url": "https://www.opco-atlas.fr/criteres-financement/societes-dassurances",
+    "texte": "Mise à jour 17/07/2026"
+   },
+   {
+    "url": "https://www.opco-atlas.fr/sites/default/files/medias/files/2026/03/ATLAS_CVG10MARS2026%5B89%5D.pdf",
+    "texte": "Transmettre le dossier de demande de prise en charge à Atlas avant le début de la formation en passant par les services en ligne myAtlas."
+   },
+   {
+    "url": "https://www.opco-atlas.fr/sites/default/files/medias/files/2026/03/ATLAS_CVG10MARS2026%5B89%5D.pdf",
+    "texte": "Afin de bénéficier des fonds de l’année N, toute demande de prise en charge de formations qui se déroulent sur l’année N, doit parvenir à Atlas avant le 31/12 de l’année N."
+   },
+   {
+    "url": "https://www.opco-atlas.fr/criteres-financement",
+    "texte": "Pas besoin de compte, c'est instantané !"
+   }
+  ],
+  "paliers": [
+   {
+    "min": 0,
+    "max": 10,
+    "montant": "jusqu'à 9 000 € HT par an",
+    "detail": "plafond par entreprise, toutes thématiques éligibles"
+   },
+   {
+    "min": 11,
+    "max": 49,
+    "montant": "jusqu'à 12 000 € HT par an",
+    "detail": "plafond par entreprise, toutes thématiques éligibles"
+   }
+  ],
+  "delai": "Demande à déposer sur myAtlas avant le début de la formation.",
+  "delai_jusquau": "2026-12-30",
+  "remarques": null
+ },
+ {
+  "opco": "ATLAS",
+  "branche": "Caisse d'épargne",
+  "idcc": [
+   "5005"
+  ],
+  "retenu": true,
+  "lien": "https://www.opco-atlas.fr/criteres-financement/caisse-depargne",
+  "version": "critères de financement 2026 de la branche Caisse d'épargne sur opco-atlas.fr (bloc PDC mis à jour le 05/01/2026)",
+  "citations": [
+   {
+    "url": "https://www.opco-atlas.fr/criteres-financement/caisse-depargne",
+    "texte": "Les critères de financement définis par les partenaires sociaux peuvent évoluer en cours d’année en fonction de la consommation des fonds attribués par France Compétences."
+   },
+   {
+    "url": "https://www.opco-atlas.fr/criteres-financement/caisse-depargne",
+    "texte": "applicables depuis le 01 janvier 2026 sous réserve de fonds disponibles."
+   },
+   {
+    "url": "https://www.opco-atlas.fr/criteres-financement/caisse-depargne",
+    "texte": "les salariés des entreprises de moins de 50 salariés"
+   },
+   {
+    "url": "https://www.opco-atlas.fr/criteres-financement/caisse-depargne",
+    "texte": "toute formation éligible au Plan de Développement des Compétences"
+   },
+   {
+    "url": "https://www.opco-atlas.fr/criteres-financement/caisse-depargne",
+    "texte": "Entreprises de 1 à 49 salariés"
+   },
+   {
+    "url": "https://www.opco-atlas.fr/criteres-financement/caisse-depargne",
+    "texte": "Plafond par entreprise : 2 800€ HT/an"
+   },
+   {
+    "url": "https://www.opco-atlas.fr/criteres-financement/caisse-depargne",
+    "texte": "Mise à jour 05/01/2026"
+   },
+   {
+    "url": "https://www.opco-atlas.fr/sites/default/files/medias/files/2026/03/ATLAS_CVG10MARS2026%5B89%5D.pdf",
+    "texte": "Transmettre le dossier de demande de prise en charge à Atlas avant le début de la formation en passant par les services en ligne myAtlas."
+   },
+   {
+    "url": "https://www.opco-atlas.fr/sites/default/files/medias/files/2026/03/ATLAS_CVG10MARS2026%5B89%5D.pdf",
+    "texte": "Afin de bénéficier des fonds de l’année N, toute demande de prise en charge de formations qui se déroulent sur l’année N, doit parvenir à Atlas avant le 31/12 de l’année N."
+   },
+   {
+    "url": "https://www.opco-atlas.fr/criteres-financement",
+    "texte": "Pas besoin de compte, c'est instantané !"
+   }
+  ],
+  "paliers": [
+   {
+    "min": 1,
+    "max": 49,
+    "montant": "jusqu'à 2 800 € HT par an",
+    "detail": "plafond par entreprise, pour toute formation éligible au plan de développement des compétences"
+   }
+  ],
+  "delai": "Demande à déposer sur myAtlas avant le début de la formation.",
+  "delai_jusquau": "2026-12-30",
+  "remarques": null
+ },
+ {
+  "opco": "ATLAS",
+  "branche": "Crédit mutuel",
+  "idcc": [
+   "1468"
+  ],
+  "retenu": true,
+  "lien": "https://www.opco-atlas.fr/criteres-financement/credit-mutuel",
+  "version": "critères de financement 2026 de la branche Crédit mutuel sur opco-atlas.fr (bloc PDC mis à jour le 07/07/2026)",
+  "citations": [
+   {
+    "url": "https://www.opco-atlas.fr/criteres-financement/credit-mutuel",
+    "texte": "Les critères de financement définis par les partenaires sociaux peuvent évoluer en cours d’année en fonction de la consommation des fonds attribués par France Compétences."
+   },
+   {
+    "url": "https://www.opco-atlas.fr/criteres-financement/credit-mutuel",
+    "texte": "applicables depuis le 01 janvier 2026 sous réserve de fonds disponibles."
+   },
+   {
+    "url": "https://www.opco-atlas.fr/criteres-financement/credit-mutuel",
+    "texte": "les salariés des entreprises de moins de 50 salariés"
+   },
+   {
+    "url": "https://www.opco-atlas.fr/criteres-financement/credit-mutuel",
+    "texte": "toute formation éligible au Plan de Développement des Compétences"
+   },
+   {
+    "url": "https://www.opco-atlas.fr/criteres-financement/credit-mutuel",
+    "texte": "Entreprises de 1 à 49 salariés"
+   },
+   {
+    "url": "https://www.opco-atlas.fr/criteres-financement/credit-mutuel",
+    "texte": "Prise en charge : 1 500€ HT/an"
+   },
+   {
+    "url": "https://www.opco-atlas.fr/criteres-financement/credit-mutuel",
+    "texte": "Mise à jour 07/07/2026"
+   },
+   {
+    "url": "https://www.opco-atlas.fr/sites/default/files/medias/files/2026/03/ATLAS_CVG10MARS2026%5B89%5D.pdf",
+    "texte": "Transmettre le dossier de demande de prise en charge à Atlas avant le début de la formation en passant par les services en ligne myAtlas."
+   },
+   {
+    "url": "https://www.opco-atlas.fr/sites/default/files/medias/files/2026/03/ATLAS_CVG10MARS2026%5B89%5D.pdf",
+    "texte": "Afin de bénéficier des fonds de l’année N, toute demande de prise en charge de formations qui se déroulent sur l’année N, doit parvenir à Atlas avant le 31/12 de l’année N."
+   },
+   {
+    "url": "https://www.opco-atlas.fr/criteres-financement",
+    "texte": "Pas besoin de compte, c'est instantané !"
+   }
+  ],
+  "paliers": [
+   {
+    "min": 1,
+    "max": 49,
+    "montant": "jusqu'à 1 500 € HT par an",
+    "detail": "pour toute formation éligible au plan de développement des compétences"
+   }
+  ],
+  "delai": "Demande à déposer sur myAtlas avant le début de la formation.",
+  "delai_jusquau": "2026-12-30",
+  "remarques": null
+ },
+ {
+  "opco": "ATLAS",
+  "branche": "Géomètres (géomètres-experts, géomètres-topographes, photogrammètres et experts fonciers)",
+  "idcc": [
+   "2543"
+  ],
+  "retenu": true,
+  "lien": "https://www.opco-atlas.fr/criteres-financement/geometres",
+  "version": "critères de financement 2026 de la branche Géomètres sur opco-atlas.fr (bloc PDC mis à jour le 07/07/2026, soutien aux priorités de branche mis à jour le 19/10/2026)",
+  "citations": [
+   {
+    "url": "https://www.opco-atlas.fr/criteres-financement/geometres",
+    "texte": "Les critères de financement définis par les partenaires sociaux peuvent évoluer en cours d’année en fonction de la consommation des fonds attribués par France Compétences."
+   },
+   {
+    "url": "https://www.opco-atlas.fr/criteres-financement/geometres",
+    "texte": "Les dossiers doivent être déposés avant le début de la formation"
+   },
+   {
+    "url": "https://www.opco-atlas.fr/criteres-financement/geometres",
+    "texte": "Les demandes de prise en charge peuvent être déposées avant ou après le démarrage de la formation."
+   },
+   {
+    "url": "https://www.opco-atlas.fr/criteres-financement/geometres",
+    "texte": "toutes les thématiques éligibles au Plan de Développement des Compétences"
+   },
+   {
+    "url": "https://www.opco-atlas.fr/criteres-financement/geometres",
+    "texte": "Entreprises de moins de 11 salariés"
+   },
+   {
+    "url": "https://www.opco-atlas.fr/criteres-financement/geometres",
+    "texte": "Plafond par entreprise : 5 000€ HT/an"
+   },
+   {
+    "url": "https://www.opco-atlas.fr/criteres-financement/geometres",
+    "texte": "Entreprises de 11 à 49 salariés"
+   },
+   {
+    "url": "https://www.opco-atlas.fr/criteres-financement/geometres",
+    "texte": "Plafond par entreprise : 10 000€ HT/an"
+   },
+   {
+    "url": "https://www.opco-atlas.fr/criteres-financement/geometres",
+    "texte": "Mise à jour 07/07/2026"
+   },
+   {
+    "url": "https://www.opco-atlas.fr/criteres-financement/geometres",
+    "texte": "Formation sur l’IA"
+   },
+   {
+    "url": "https://www.opco-atlas.fr/criteres-financement/geometres",
+    "texte": "La financement peut s'articuler avec vos dossiers PDC ou être activé individuellement."
+   },
+   {
+    "url": "https://www.opco-atlas.fr/criteres-financement/geometres",
+    "texte": "Plafond par entreprise : 7 500€ HT/an"
+   },
+   {
+    "url": "https://www.opco-atlas.fr/criteres-financement/geometres",
+    "texte": "Plafond par entreprise : 15 000€ HT/an"
+   },
+   {
+    "url": "https://www.opco-atlas.fr/criteres-financement/geometres",
+    "texte": "Mise à jour 19/10/2026"
+   },
+   {
+    "url": "https://www.opco-atlas.fr/sites/default/files/medias/files/2026/03/ATLAS_CVG10MARS2026%5B89%5D.pdf",
+    "texte": "Transmettre le dossier de demande de prise en charge à Atlas avant le début de la formation en passant par les services en ligne myAtlas."
+   },
+   {
+    "url": "https://www.opco-atlas.fr/sites/default/files/medias/files/2026/03/ATLAS_CVG10MARS2026%5B89%5D.pdf",
+    "texte": "Afin de bénéficier des fonds de l’année N, toute demande de prise en charge de formations qui se déroulent sur l’année N, doit parvenir à Atlas avant le 31/12 de l’année N."
+   },
+   {
+    "url": "https://www.opco-atlas.fr/criteres-financement",
+    "texte": "Pas besoin de compte, c'est instantané !"
+   }
+  ],
+  "paliers": [
+   {
+    "min": 0,
+    "max": 10,
+    "montant": "jusqu'à 5 000 € HT par an",
+    "detail": "plus, pour une formation sur l'IA, un soutien aux priorités de la branche jusqu'à 7 500 € HT par an"
+   },
+   {
+    "min": 11,
+    "max": 49,
+    "montant": "jusqu'à 10 000 € HT par an",
+    "detail": "plus, pour une formation sur l'IA, un soutien aux priorités de la branche jusqu'à 15 000 € HT par an"
+   }
+  ],
+  "delai": "Demande à déposer sur myAtlas avant le début de la formation.",
+  "delai_jusquau": "2026-12-30",
+  "remarques": null
+ },
+ {
+  "opco": "ATLAS",
+  "branche": "Économistes de la construction et métreurs-vérificateurs",
+  "idcc": [
+   "3213"
+  ],
+  "retenu": true,
+  "lien": "https://www.opco-atlas.fr/criteres-financement/economistes-de-la-construction",
+  "version": "critères de financement 2026 de la branche Économistes de la construction sur opco-atlas.fr (bloc PDC mis à jour le 05/01/2026) et liste « Critères de prise en charge 2026 » (CPNEFP du 25/12/2025)",
+  "citations": [
+   {
+    "url": "https://www.opco-atlas.fr/criteres-financement/economistes-de-la-construction",
+    "texte": "Les critères de financement définis par les partenaires sociaux peuvent évoluer en cours d’année en fonction de la consommation des fonds attribués par France Compétences."
+   },
+   {
+    "url": "https://www.opco-atlas.fr/criteres-financement/economistes-de-la-construction",
+    "texte": "applicables depuis le 01 janvier 2026 sous réserve de fonds disponibles."
+   },
+   {
+    "url": "https://www.opco-atlas.fr/criteres-financement/economistes-de-la-construction",
+    "texte": "Les dossiers doivent être déposés 1 semaine avant le début de la formation"
+   },
+   {
+    "url": "https://www.opco-atlas.fr/criteres-financement/economistes-de-la-construction",
+    "texte": "Uniquement les thématiques définies par la branche"
+   },
+   {
+    "url": "https://www.opco-atlas.fr/criteres-financement/economistes-de-la-construction",
+    "texte": "Entreprises de moins de 5 salariés"
+   },
+   {
+    "url": "https://www.opco-atlas.fr/criteres-financement/economistes-de-la-construction",
+    "texte": "Plafond par entreprise : 4 500€ HT/an"
+   },
+   {
+    "url": "https://www.opco-atlas.fr/criteres-financement/economistes-de-la-construction",
+    "texte": "Entreprises de 5 à 24 salariés"
+   },
+   {
+    "url": "https://www.opco-atlas.fr/criteres-financement/economistes-de-la-construction",
+    "texte": "Plafond par entreprise : 6 500€ HT/an"
+   },
+   {
+    "url": "https://www.opco-atlas.fr/criteres-financement/economistes-de-la-construction",
+    "texte": "Entreprises de 25 à 49 salariés"
+   },
+   {
+    "url": "https://www.opco-atlas.fr/criteres-financement/economistes-de-la-construction",
+    "texte": "Plafond par entreprise : 9 000€ HT/an"
+   },
+   {
+    "url": "https://www.opco-atlas.fr/criteres-financement/economistes-de-la-construction",
+    "texte": "Mise à jour 05/01/2026"
+   },
+   {
+    "url": "https://www.opco-atlas.fr/sites/default/files/medias/files/2026/03/01-01-26%20-Crit%C3%A8res%202026%20-%20ATLAS%20-%20CRITERES%20FORMATION%20ECONOMISTES%20DE%20LA%20CONSTRUCTION%20v2.pdf",
+    "texte": "Thèmes prioritaires 01 (innovateurs) - BASE JOURNÉE 8 HEURES"
+   },
+   {
+    "url": "https://www.opco-atlas.fr/sites/default/files/medias/files/2026/03/01-01-26%20-Crit%C3%A8res%202026%20-%20ATLAS%20-%20CRITERES%20FORMATION%20ECONOMISTES%20DE%20LA%20CONSTRUCTION%20v2.pdf",
+    "texte": "Plafonds de prise en charge : 70 €/h   dans la limite de 4 jours par personne"
+   },
+   {
+    "url": "https://www.opco-atlas.fr/sites/default/files/medias/files/2026/03/01-01-26%20-Crit%C3%A8res%202026%20-%20ATLAS%20-%20CRITERES%20FORMATION%20ECONOMISTES%20DE%20LA%20CONSTRUCTION%20v2.pdf",
+    "texte": "- Découvrir l'IA générative et ses applications en entreprises"
+   },
+   {
+    "url": "https://www.opco-atlas.fr/sites/default/files/medias/files/2026/03/01-01-26%20-Crit%C3%A8res%202026%20-%20ATLAS%20-%20CRITERES%20FORMATION%20ECONOMISTES%20DE%20LA%20CONSTRUCTION%20v2.pdf",
+    "texte": "- Optimisez vos opérations avec l'IA - Niveau 2"
+   },
+   {
+    "url": "https://www.opco-atlas.fr/sites/default/files/medias/files/2026/03/01-01-26%20-Crit%C3%A8res%202026%20-%20ATLAS%20-%20CRITERES%20FORMATION%20ECONOMISTES%20DE%20LA%20CONSTRUCTION%20v2.pdf",
+    "texte": "- Placez l'IA au cœur de vos processus métiers - Niveau 3"
+   },
+   {
+    "url": "https://www.opco-atlas.fr/sites/default/files/medias/files/2026/03/01-01-26%20-Crit%C3%A8res%202026%20-%20ATLAS%20-%20CRITERES%20FORMATION%20ECONOMISTES%20DE%20LA%20CONSTRUCTION%20v2.pdf",
+    "texte": "Les formations en informatique bureautique (Word, Excel, POWER POINT,… )"
+   },
+   {
+    "url": "https://www.opco-atlas.fr/sites/default/files/medias/files/2026/03/ATLAS_CVG10MARS2026%5B89%5D.pdf",
+    "texte": "Transmettre le dossier de demande de prise en charge à Atlas avant le début de la formation en passant par les services en ligne myAtlas."
+   },
+   {
+    "url": "https://www.opco-atlas.fr/sites/default/files/medias/files/2026/03/ATLAS_CVG10MARS2026%5B89%5D.pdf",
+    "texte": "Afin de bénéficier des fonds de l’année N, toute demande de prise en charge de formations qui se déroulent sur l’année N, doit parvenir à Atlas avant le 31/12 de l’année N."
+   },
+   {
+    "url": "https://www.opco-atlas.fr/criteres-financement",
+    "texte": "Pas besoin de compte, c'est instantané !"
+   }
+  ],
+  "paliers": [
+   {
+    "min": 0,
+    "max": 4,
+    "montant": "jusqu'à 4 500 € HT par an",
+    "detail": "pour les thèmes listés par la branche, dont des formations IA plafonnées à 70 € de l'heure et 4 jours par personne"
+   },
+   {
+    "min": 5,
+    "max": 24,
+    "montant": "jusqu'à 6 500 € HT par an",
+    "detail": "pour les thèmes listés par la branche, dont des formations IA plafonnées à 70 € de l'heure et 4 jours par personne"
+   },
+   {
+    "min": 25,
+    "max": 49,
+    "montant": "jusqu'à 9 000 € HT par an",
+    "detail": "pour les thèmes listés par la branche, dont des formations IA plafonnées à 70 € de l'heure et 4 jours par personne"
+   }
+  ],
+  "delai": "Demande à déposer sur myAtlas au moins 1 semaine avant le début de la formation.",
+  "delai_jusquau": "2026-12-30",
+  "remarques": null
+ },
+ {
+  "opco": "ATLAS",
+  "branche": "Marchés financiers",
+  "idcc": [
+   "2931"
+  ],
+  "retenu": true,
+  "lien": "https://www.opco-atlas.fr/criteres-financement/marches-financiers",
+  "version": "critères de financement 2026 de la branche Marchés financiers sur opco-atlas.fr (bloc PDC mis à jour le 30/04/2026)",
+  "citations": [
+   {
+    "url": "https://www.opco-atlas.fr/criteres-financement/marches-financiers",
+    "texte": "Les critères de financement définis par les partenaires sociaux peuvent évoluer en cours d’année en fonction de la consommation des fonds attribués par France Compétences."
+   },
+   {
+    "url": "https://www.opco-atlas.fr/criteres-financement/marches-financiers",
+    "texte": "applicables depuis le 01 janvier 2026 sous réserve de fonds disponibles."
+   },
+   {
+    "url": "https://www.opco-atlas.fr/criteres-financement/marches-financiers",
+    "texte": "les salariés des entreprises de moins de 50 salariés"
+   },
+   {
+    "url": "https://www.opco-atlas.fr/criteres-financement/marches-financiers",
+    "texte": "Toutes les thématiques éligibles au Plan de Développement des Compétences"
+   },
+   {
+    "url": "https://www.opco-atlas.fr/criteres-financement/marches-financiers",
+    "texte": "Entreprises de moins de 11 salariés"
+   },
+   {
+    "url": "https://www.opco-atlas.fr/criteres-financement/marches-financiers",
+    "texte": "Prise en charge : 2 500€ HT/an"
+   },
+   {
+    "url": "https://www.opco-atlas.fr/criteres-financement/marches-financiers",
+    "texte": "Entreprises de 11 à 49 salariés"
+   },
+   {
+    "url": "https://www.opco-atlas.fr/criteres-financement/marches-financiers",
+    "texte": "Prise en charge : 4 000€ HT/an"
+   },
+   {
+    "url": "https://www.opco-atlas.fr/criteres-financement/marches-financiers",
+    "texte": "Mise à jour 30/04/2026"
+   },
+   {
+    "url": "https://www.opco-atlas.fr/sites/default/files/medias/files/2026/03/ATLAS_CVG10MARS2026%5B89%5D.pdf",
+    "texte": "Transmettre le dossier de demande de prise en charge à Atlas avant le début de la formation en passant par les services en ligne myAtlas."
+   },
+   {
+    "url": "https://www.opco-atlas.fr/sites/default/files/medias/files/2026/03/ATLAS_CVG10MARS2026%5B89%5D.pdf",
+    "texte": "Afin de bénéficier des fonds de l’année N, toute demande de prise en charge de formations qui se déroulent sur l’année N, doit parvenir à Atlas avant le 31/12 de l’année N."
+   },
+   {
+    "url": "https://www.opco-atlas.fr/criteres-financement",
+    "texte": "Pas besoin de compte, c'est instantané !"
+   }
+  ],
+  "paliers": [
+   {
+    "min": 0,
+    "max": 10,
+    "montant": "jusqu'à 2 500 € HT par an",
+    "detail": "toutes thématiques éligibles"
+   },
+   {
+    "min": 11,
+    "max": 49,
+    "montant": "jusqu'à 4 000 € HT par an",
+    "detail": "toutes thématiques éligibles"
+   }
+  ],
+  "delai": "Demande à déposer sur myAtlas avant le début de la formation.",
+  "delai_jusquau": "2026-12-30",
+  "remarques": null
+ }
+]

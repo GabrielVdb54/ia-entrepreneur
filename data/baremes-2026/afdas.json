@@ -1,0 +1,856 @@
+[
+ {
+  "opco": "AFDAS",
+  "branche": "CCN du sport",
+  "idcc": [
+   "2511"
+  ],
+  "retenu": true,
+  "lien": "https://www.afdas.com/entreprise/financer-vos-actions-de-formation/choisir-le-bon-financement/financement-de-la-formation-pour-les-structures-de-moins-de-50-salaries.html",
+  "version": "critères de prise en charge 2026 du plan de développement des compétences des structures de moins de 50 salariés, communs à toutes les branches de l'Afdas (annoncés le 13/01/2026, page consultée le 09/11/2026)",
+  "citations": [
+   {
+    "url": "https://www.afdas.com/entreprise/financer-vos-actions-de-formation/choisir-le-bon-financement/financement-de-la-formation-pour-les-structures-de-moins-de-50-salaries.html",
+    "texte": "Critères de prise en charge 2026"
+   },
+   {
+    "url": "https://www.afdas.com/entreprise/financer-vos-actions-de-formation/choisir-le-bon-financement/financement-de-la-formation-pour-les-structures-de-moins-de-50-salaries.html",
+    "texte": "Au titre du plan de développement des compétences des structures de moins de 50 salariés, la prise en charge des coûts pédagogiques s’effectue dans la limite d’un plafond annuel de :"
+   },
+   {
+    "url": "https://www.afdas.com/entreprise/financer-vos-actions-de-formation/choisir-le-bon-financement/financement-de-la-formation-pour-les-structures-de-moins-de-50-salaries.html",
+    "texte": "➜ 1 100€ HT pour les entreprises de moins de 11 salariés"
+   },
+   {
+    "url": "https://www.afdas.com/entreprise/financer-vos-actions-de-formation/choisir-le-bon-financement/financement-de-la-formation-pour-les-structures-de-moins-de-50-salaries.html",
+    "texte": "➜ 1 800€ HT pour les entreprises de 11 à 49 salariés"
+   },
+   {
+    "url": "https://www.afdas.com/entreprise/financer-vos-actions-de-formation/choisir-le-bon-financement/financement-de-la-formation-pour-les-structures-de-moins-de-50-salaries.html",
+    "texte": "40€ par heure de formation et par stagiaire"
+   },
+   {
+    "url": "https://www.afdas.com/entreprise/financer-vos-actions-de-formation/choisir-le-bon-financement/financement-de-la-formation-pour-les-structures-de-moins-de-50-salaries.html",
+    "texte": "La prise en charge s’effectue dans la limite des fonds disponibles au titre du plan de développement des compétences des structures de moins de 50 salariés."
+   },
+   {
+    "url": "https://www.afdas.com/actualites/entreprise/criteres-de-financements-2026-ce-qui-change-pour-les-entreprises.html",
+    "texte": "Afin de permettre un accès aux fonds mutualisés dans la durée et au plus grand nombre d’entreprises, les règles de financement évoluent à compter du 1er janvier 2026 pour s'adapter aux priorités définies par les branches professionnelles ainsi qu'aux contraintes réglementaires et financières."
+   },
+   {
+    "url": "https://www.afdas.com/actualites/entreprise/criteres-de-financements-2026-ce-qui-change-pour-les-entreprises.html",
+    "texte": "Cette prise en charge des coûts pédagogiques s’effectue à l’intérieur du plafond quel que soit le type de formation (y compris VAE, bilan de compétences, formation relative à la santé sécurité au travail des membres du CSE, formation du référent harcèlement sexuel)."
+   },
+   {
+    "url": "https://www.afdas.com/faq/entreprise/financement-pour-les-entreprises-de-moins-de-50-salaries.html",
+    "texte": "Tout parcours pédagogique visant à acquérir, développer ou renforcer des compétences professionnelles en lien avec un objectif professionnel peut faire l’objet d’un financement. Cela inclut, par exemple : apprendre un nouveau logiciel, se perfectionner sur un métier, ou préparer une certification."
+   },
+   {
+    "url": "https://www.afdas.com/faq/entreprise/financement-pour-les-entreprises-de-moins-de-50-salaries.html",
+    "texte": "Les formations métiers ou transversales,"
+   },
+   {
+    "url": "https://www.afdas.com/fileadmin/user_upload/Conditions_generales/conditions_generales_160426.pdf",
+    "texte": "Toute demande de prise en charge et les documents associés nécessaires à l’instruction doivent parvenir à l’Afdas avant le début de la prestation."
+   },
+   {
+    "url": "https://www.afdas.com/fileadmin/user_upload/Conditions_generales/conditions_generales_160426.pdf",
+    "texte": "L’Afdas se réserve le droit de refuser toute demande de financement reçue hors délai."
+   },
+   {
+    "url": "https://web.archive.org/web/20251118201349/https://www.afdas.com/entreprise/financer-vos-actions-de-formation/choisir-le-bon-financement/financement-de-la-formation-pour-les-structures-de-moins-de-50-salaries.html",
+    "texte": "Suite à un volume important de demandes, la totalité des fonds formation alloués sur le dispositif plan de développement pour les entreprises de moins de 50 salariés a été consommée. Il n’est donc plus possible d’engager des financements jusqu’à la fin de l’année 2025 sur ce dispositif."
+   },
+   {
+    "url": "https://www.afdas.com/fileadmin/user_upload/Gouvernance/Afdas_CCC_0926.pdf",
+    "texte": "2511 CCN du sport"
+   }
+  ],
+  "remarques": null,
+  "delai_jusquau": null,
+  "paliers": [
+   {
+    "min": 0,
+    "max": 10,
+    "montant": "jusqu'à 1 100 € HT par an pour les coûts pédagogiques",
+    "detail": "dans la limite de 40 € par heure de formation et par stagiaire"
+   },
+   {
+    "min": 11,
+    "max": 49,
+    "montant": "jusqu'à 1 800 € HT par an pour les coûts pédagogiques",
+    "detail": "dans la limite de 40 € par heure de formation et par stagiaire"
+   }
+  ],
+  "delai": "Demande à déposer sur l'espace MyA avant le début de la formation."
+ },
+ {
+  "opco": "AFDAS",
+  "branche": "CCN des entreprises du secteur privé du spectacle vivant",
+  "idcc": [
+   "3090"
+  ],
+  "retenu": true,
+  "lien": "https://www.afdas.com/entreprise/financer-vos-actions-de-formation/choisir-le-bon-financement/financement-de-la-formation-pour-les-structures-de-moins-de-50-salaries.html",
+  "version": "critères de prise en charge 2026 du plan de développement des compétences des structures de moins de 50 salariés, communs à toutes les branches de l'Afdas (annoncés le 13/01/2026, page consultée le 09/11/2026)",
+  "citations": [
+   {
+    "url": "https://www.afdas.com/entreprise/financer-vos-actions-de-formation/choisir-le-bon-financement/financement-de-la-formation-pour-les-structures-de-moins-de-50-salaries.html",
+    "texte": "Critères de prise en charge 2026"
+   },
+   {
+    "url": "https://www.afdas.com/entreprise/financer-vos-actions-de-formation/choisir-le-bon-financement/financement-de-la-formation-pour-les-structures-de-moins-de-50-salaries.html",
+    "texte": "Au titre du plan de développement des compétences des structures de moins de 50 salariés, la prise en charge des coûts pédagogiques s’effectue dans la limite d’un plafond annuel de :"
+   },
+   {
+    "url": "https://www.afdas.com/entreprise/financer-vos-actions-de-formation/choisir-le-bon-financement/financement-de-la-formation-pour-les-structures-de-moins-de-50-salaries.html",
+    "texte": "➜ 1 100€ HT pour les entreprises de moins de 11 salariés"
+   },
+   {
+    "url": "https://www.afdas.com/entreprise/financer-vos-actions-de-formation/choisir-le-bon-financement/financement-de-la-formation-pour-les-structures-de-moins-de-50-salaries.html",
+    "texte": "➜ 1 800€ HT pour les entreprises de 11 à 49 salariés"
+   },
+   {
+    "url": "https://www.afdas.com/entreprise/financer-vos-actions-de-formation/choisir-le-bon-financement/financement-de-la-formation-pour-les-structures-de-moins-de-50-salaries.html",
+    "texte": "40€ par heure de formation et par stagiaire"
+   },
+   {
+    "url": "https://www.afdas.com/entreprise/financer-vos-actions-de-formation/choisir-le-bon-financement/financement-de-la-formation-pour-les-structures-de-moins-de-50-salaries.html",
+    "texte": "La prise en charge s’effectue dans la limite des fonds disponibles au titre du plan de développement des compétences des structures de moins de 50 salariés."
+   },
+   {
+    "url": "https://www.afdas.com/actualites/entreprise/criteres-de-financements-2026-ce-qui-change-pour-les-entreprises.html",
+    "texte": "Afin de permettre un accès aux fonds mutualisés dans la durée et au plus grand nombre d’entreprises, les règles de financement évoluent à compter du 1er janvier 2026 pour s'adapter aux priorités définies par les branches professionnelles ainsi qu'aux contraintes réglementaires et financières."
+   },
+   {
+    "url": "https://www.afdas.com/actualites/entreprise/criteres-de-financements-2026-ce-qui-change-pour-les-entreprises.html",
+    "texte": "Cette prise en charge des coûts pédagogiques s’effectue à l’intérieur du plafond quel que soit le type de formation (y compris VAE, bilan de compétences, formation relative à la santé sécurité au travail des membres du CSE, formation du référent harcèlement sexuel)."
+   },
+   {
+    "url": "https://www.afdas.com/faq/entreprise/financement-pour-les-entreprises-de-moins-de-50-salaries.html",
+    "texte": "Tout parcours pédagogique visant à acquérir, développer ou renforcer des compétences professionnelles en lien avec un objectif professionnel peut faire l’objet d’un financement. Cela inclut, par exemple : apprendre un nouveau logiciel, se perfectionner sur un métier, ou préparer une certification."
+   },
+   {
+    "url": "https://www.afdas.com/faq/entreprise/financement-pour-les-entreprises-de-moins-de-50-salaries.html",
+    "texte": "Les formations métiers ou transversales,"
+   },
+   {
+    "url": "https://www.afdas.com/fileadmin/user_upload/Conditions_generales/conditions_generales_160426.pdf",
+    "texte": "Toute demande de prise en charge et les documents associés nécessaires à l’instruction doivent parvenir à l’Afdas avant le début de la prestation."
+   },
+   {
+    "url": "https://www.afdas.com/fileadmin/user_upload/Conditions_generales/conditions_generales_160426.pdf",
+    "texte": "L’Afdas se réserve le droit de refuser toute demande de financement reçue hors délai."
+   },
+   {
+    "url": "https://web.archive.org/web/20251118201349/https://www.afdas.com/entreprise/financer-vos-actions-de-formation/choisir-le-bon-financement/financement-de-la-formation-pour-les-structures-de-moins-de-50-salaries.html",
+    "texte": "Suite à un volume important de demandes, la totalité des fonds formation alloués sur le dispositif plan de développement pour les entreprises de moins de 50 salariés a été consommée. Il n’est donc plus possible d’engager des financements jusqu’à la fin de l’année 2025 sur ce dispositif."
+   },
+   {
+    "url": "https://www.afdas.com/fileadmin/user_upload/Gouvernance/Afdas_CCC_0926.pdf",
+    "texte": "3090 CCN des entreprises du secteur privé du spectacle vivant"
+   }
+  ],
+  "remarques": null,
+  "delai_jusquau": null,
+  "paliers": [
+   {
+    "min": 0,
+    "max": 10,
+    "montant": "jusqu'à 1 100 € HT par an pour les coûts pédagogiques",
+    "detail": "dans la limite de 40 € par heure de formation et par stagiaire"
+   },
+   {
+    "min": 11,
+    "max": 49,
+    "montant": "jusqu'à 1 800 € HT par an pour les coûts pédagogiques",
+    "detail": "dans la limite de 40 € par heure de formation et par stagiaire"
+   }
+  ],
+  "delai": "Demande à déposer sur l'espace MyA avant le début de la formation."
+ },
+ {
+  "opco": "AFDAS",
+  "branche": "CCN pour les entreprises artistiques et culturelles (CCNEAC)",
+  "idcc": [
+   "1285"
+  ],
+  "retenu": true,
+  "lien": "https://www.afdas.com/entreprise/financer-vos-actions-de-formation/choisir-le-bon-financement/financement-de-la-formation-pour-les-structures-de-moins-de-50-salaries.html",
+  "version": "critères de prise en charge 2026 du plan de développement des compétences des structures de moins de 50 salariés, communs à toutes les branches de l'Afdas (annoncés le 13/01/2026, page consultée le 09/11/2026)",
+  "citations": [
+   {
+    "url": "https://www.afdas.com/entreprise/financer-vos-actions-de-formation/choisir-le-bon-financement/financement-de-la-formation-pour-les-structures-de-moins-de-50-salaries.html",
+    "texte": "Critères de prise en charge 2026"
+   },
+   {
+    "url": "https://www.afdas.com/entreprise/financer-vos-actions-de-formation/choisir-le-bon-financement/financement-de-la-formation-pour-les-structures-de-moins-de-50-salaries.html",
+    "texte": "Au titre du plan de développement des compétences des structures de moins de 50 salariés, la prise en charge des coûts pédagogiques s’effectue dans la limite d’un plafond annuel de :"
+   },
+   {
+    "url": "https://www.afdas.com/entreprise/financer-vos-actions-de-formation/choisir-le-bon-financement/financement-de-la-formation-pour-les-structures-de-moins-de-50-salaries.html",
+    "texte": "➜ 1 100€ HT pour les entreprises de moins de 11 salariés"
+   },
+   {
+    "url": "https://www.afdas.com/entreprise/financer-vos-actions-de-formation/choisir-le-bon-financement/financement-de-la-formation-pour-les-structures-de-moins-de-50-salaries.html",
+    "texte": "➜ 1 800€ HT pour les entreprises de 11 à 49 salariés"
+   },
+   {
+    "url": "https://www.afdas.com/entreprise/financer-vos-actions-de-formation/choisir-le-bon-financement/financement-de-la-formation-pour-les-structures-de-moins-de-50-salaries.html",
+    "texte": "40€ par heure de formation et par stagiaire"
+   },
+   {
+    "url": "https://www.afdas.com/entreprise/financer-vos-actions-de-formation/choisir-le-bon-financement/financement-de-la-formation-pour-les-structures-de-moins-de-50-salaries.html",
+    "texte": "La prise en charge s’effectue dans la limite des fonds disponibles au titre du plan de développement des compétences des structures de moins de 50 salariés."
+   },
+   {
+    "url": "https://www.afdas.com/actualites/entreprise/criteres-de-financements-2026-ce-qui-change-pour-les-entreprises.html",
+    "texte": "Afin de permettre un accès aux fonds mutualisés dans la durée et au plus grand nombre d’entreprises, les règles de financement évoluent à compter du 1er janvier 2026 pour s'adapter aux priorités définies par les branches professionnelles ainsi qu'aux contraintes réglementaires et financières."
+   },
+   {
+    "url": "https://www.afdas.com/actualites/entreprise/criteres-de-financements-2026-ce-qui-change-pour-les-entreprises.html",
+    "texte": "Cette prise en charge des coûts pédagogiques s’effectue à l’intérieur du plafond quel que soit le type de formation (y compris VAE, bilan de compétences, formation relative à la santé sécurité au travail des membres du CSE, formation du référent harcèlement sexuel)."
+   },
+   {
+    "url": "https://www.afdas.com/faq/entreprise/financement-pour-les-entreprises-de-moins-de-50-salaries.html",
+    "texte": "Tout parcours pédagogique visant à acquérir, développer ou renforcer des compétences professionnelles en lien avec un objectif professionnel peut faire l’objet d’un financement. Cela inclut, par exemple : apprendre un nouveau logiciel, se perfectionner sur un métier, ou préparer une certification."
+   },
+   {
+    "url": "https://www.afdas.com/faq/entreprise/financement-pour-les-entreprises-de-moins-de-50-salaries.html",
+    "texte": "Les formations métiers ou transversales,"
+   },
+   {
+    "url": "https://www.afdas.com/fileadmin/user_upload/Conditions_generales/conditions_generales_160426.pdf",
+    "texte": "Toute demande de prise en charge et les documents associés nécessaires à l’instruction doivent parvenir à l’Afdas avant le début de la prestation."
+   },
+   {
+    "url": "https://www.afdas.com/fileadmin/user_upload/Conditions_generales/conditions_generales_160426.pdf",
+    "texte": "L’Afdas se réserve le droit de refuser toute demande de financement reçue hors délai."
+   },
+   {
+    "url": "https://web.archive.org/web/20251118201349/https://www.afdas.com/entreprise/financer-vos-actions-de-formation/choisir-le-bon-financement/financement-de-la-formation-pour-les-structures-de-moins-de-50-salaries.html",
+    "texte": "Suite à un volume important de demandes, la totalité des fonds formation alloués sur le dispositif plan de développement pour les entreprises de moins de 50 salariés a été consommée. Il n’est donc plus possible d’engager des financements jusqu’à la fin de l’année 2025 sur ce dispositif."
+   },
+   {
+    "url": "https://www.afdas.com/fileadmin/user_upload/Gouvernance/Afdas_CCC_0926.pdf",
+    "texte": "1285 CCN pour les entreprises artistiques et culturelles (CCNEAC)"
+   }
+  ],
+  "remarques": null,
+  "delai_jusquau": null,
+  "paliers": [
+   {
+    "min": 0,
+    "max": 10,
+    "montant": "jusqu'à 1 100 € HT par an pour les coûts pédagogiques",
+    "detail": "dans la limite de 40 € par heure de formation et par stagiaire"
+   },
+   {
+    "min": 11,
+    "max": 49,
+    "montant": "jusqu'à 1 800 € HT par an pour les coûts pédagogiques",
+    "detail": "dans la limite de 40 € par heure de formation et par stagiaire"
+   }
+  ],
+  "delai": "Demande à déposer sur l'espace MyA avant le début de la formation."
+ },
+ {
+  "opco": "AFDAS",
+  "branche": "CCN des entreprises de publicité et assimilées",
+  "idcc": [
+   "0086"
+  ],
+  "retenu": true,
+  "lien": "https://www.afdas.com/entreprise/financer-vos-actions-de-formation/choisir-le-bon-financement/financement-de-la-formation-pour-les-structures-de-moins-de-50-salaries.html",
+  "version": "critères de prise en charge 2026 du plan de développement des compétences des structures de moins de 50 salariés, communs à toutes les branches de l'Afdas (annoncés le 13/01/2026, page consultée le 09/11/2026)",
+  "citations": [
+   {
+    "url": "https://www.afdas.com/entreprise/financer-vos-actions-de-formation/choisir-le-bon-financement/financement-de-la-formation-pour-les-structures-de-moins-de-50-salaries.html",
+    "texte": "Critères de prise en charge 2026"
+   },
+   {
+    "url": "https://www.afdas.com/entreprise/financer-vos-actions-de-formation/choisir-le-bon-financement/financement-de-la-formation-pour-les-structures-de-moins-de-50-salaries.html",
+    "texte": "Au titre du plan de développement des compétences des structures de moins de 50 salariés, la prise en charge des coûts pédagogiques s’effectue dans la limite d’un plafond annuel de :"
+   },
+   {
+    "url": "https://www.afdas.com/entreprise/financer-vos-actions-de-formation/choisir-le-bon-financement/financement-de-la-formation-pour-les-structures-de-moins-de-50-salaries.html",
+    "texte": "➜ 1 100€ HT pour les entreprises de moins de 11 salariés"
+   },
+   {
+    "url": "https://www.afdas.com/entreprise/financer-vos-actions-de-formation/choisir-le-bon-financement/financement-de-la-formation-pour-les-structures-de-moins-de-50-salaries.html",
+    "texte": "➜ 1 800€ HT pour les entreprises de 11 à 49 salariés"
+   },
+   {
+    "url": "https://www.afdas.com/entreprise/financer-vos-actions-de-formation/choisir-le-bon-financement/financement-de-la-formation-pour-les-structures-de-moins-de-50-salaries.html",
+    "texte": "40€ par heure de formation et par stagiaire"
+   },
+   {
+    "url": "https://www.afdas.com/entreprise/financer-vos-actions-de-formation/choisir-le-bon-financement/financement-de-la-formation-pour-les-structures-de-moins-de-50-salaries.html",
+    "texte": "La prise en charge s’effectue dans la limite des fonds disponibles au titre du plan de développement des compétences des structures de moins de 50 salariés."
+   },
+   {
+    "url": "https://www.afdas.com/actualites/entreprise/criteres-de-financements-2026-ce-qui-change-pour-les-entreprises.html",
+    "texte": "Afin de permettre un accès aux fonds mutualisés dans la durée et au plus grand nombre d’entreprises, les règles de financement évoluent à compter du 1er janvier 2026 pour s'adapter aux priorités définies par les branches professionnelles ainsi qu'aux contraintes réglementaires et financières."
+   },
+   {
+    "url": "https://www.afdas.com/actualites/entreprise/criteres-de-financements-2026-ce-qui-change-pour-les-entreprises.html",
+    "texte": "Cette prise en charge des coûts pédagogiques s’effectue à l’intérieur du plafond quel que soit le type de formation (y compris VAE, bilan de compétences, formation relative à la santé sécurité au travail des membres du CSE, formation du référent harcèlement sexuel)."
+   },
+   {
+    "url": "https://www.afdas.com/faq/entreprise/financement-pour-les-entreprises-de-moins-de-50-salaries.html",
+    "texte": "Tout parcours pédagogique visant à acquérir, développer ou renforcer des compétences professionnelles en lien avec un objectif professionnel peut faire l’objet d’un financement. Cela inclut, par exemple : apprendre un nouveau logiciel, se perfectionner sur un métier, ou préparer une certification."
+   },
+   {
+    "url": "https://www.afdas.com/faq/entreprise/financement-pour-les-entreprises-de-moins-de-50-salaries.html",
+    "texte": "Les formations métiers ou transversales,"
+   },
+   {
+    "url": "https://www.afdas.com/fileadmin/user_upload/Conditions_generales/conditions_generales_160426.pdf",
+    "texte": "Toute demande de prise en charge et les documents associés nécessaires à l’instruction doivent parvenir à l’Afdas avant le début de la prestation."
+   },
+   {
+    "url": "https://www.afdas.com/fileadmin/user_upload/Conditions_generales/conditions_generales_160426.pdf",
+    "texte": "L’Afdas se réserve le droit de refuser toute demande de financement reçue hors délai."
+   },
+   {
+    "url": "https://web.archive.org/web/20251118201349/https://www.afdas.com/entreprise/financer-vos-actions-de-formation/choisir-le-bon-financement/financement-de-la-formation-pour-les-structures-de-moins-de-50-salaries.html",
+    "texte": "Suite à un volume important de demandes, la totalité des fonds formation alloués sur le dispositif plan de développement pour les entreprises de moins de 50 salariés a été consommée. Il n’est donc plus possible d’engager des financements jusqu’à la fin de l’année 2025 sur ce dispositif."
+   },
+   {
+    "url": "https://www.afdas.com/fileadmin/user_upload/Gouvernance/Afdas_CCC_0926.pdf",
+    "texte": "0086 CCN des entreprises de publicité et assimilées"
+   }
+  ],
+  "remarques": null,
+  "delai_jusquau": null,
+  "paliers": [
+   {
+    "min": 0,
+    "max": 10,
+    "montant": "jusqu'à 1 100 € HT par an pour les coûts pédagogiques",
+    "detail": "dans la limite de 40 € par heure de formation et par stagiaire"
+   },
+   {
+    "min": 11,
+    "max": 49,
+    "montant": "jusqu'à 1 800 € HT par an pour les coûts pédagogiques",
+    "detail": "dans la limite de 40 € par heure de formation et par stagiaire"
+   }
+  ],
+  "delai": "Demande à déposer sur l'espace MyA avant le début de la formation."
+ },
+ {
+  "opco": "AFDAS",
+  "branche": "CC de la production audiovisuelle",
+  "idcc": [
+   "2642"
+  ],
+  "retenu": true,
+  "lien": "https://www.afdas.com/entreprise/financer-vos-actions-de-formation/choisir-le-bon-financement/financement-de-la-formation-pour-les-structures-de-moins-de-50-salaries.html",
+  "version": "critères de prise en charge 2026 du plan de développement des compétences des structures de moins de 50 salariés, communs à toutes les branches de l'Afdas (annoncés le 13/01/2026, page consultée le 09/11/2026)",
+  "citations": [
+   {
+    "url": "https://www.afdas.com/entreprise/financer-vos-actions-de-formation/choisir-le-bon-financement/financement-de-la-formation-pour-les-structures-de-moins-de-50-salaries.html",
+    "texte": "Critères de prise en charge 2026"
+   },
+   {
+    "url": "https://www.afdas.com/entreprise/financer-vos-actions-de-formation/choisir-le-bon-financement/financement-de-la-formation-pour-les-structures-de-moins-de-50-salaries.html",
+    "texte": "Au titre du plan de développement des compétences des structures de moins de 50 salariés, la prise en charge des coûts pédagogiques s’effectue dans la limite d’un plafond annuel de :"
+   },
+   {
+    "url": "https://www.afdas.com/entreprise/financer-vos-actions-de-formation/choisir-le-bon-financement/financement-de-la-formation-pour-les-structures-de-moins-de-50-salaries.html",
+    "texte": "➜ 1 100€ HT pour les entreprises de moins de 11 salariés"
+   },
+   {
+    "url": "https://www.afdas.com/entreprise/financer-vos-actions-de-formation/choisir-le-bon-financement/financement-de-la-formation-pour-les-structures-de-moins-de-50-salaries.html",
+    "texte": "➜ 1 800€ HT pour les entreprises de 11 à 49 salariés"
+   },
+   {
+    "url": "https://www.afdas.com/entreprise/financer-vos-actions-de-formation/choisir-le-bon-financement/financement-de-la-formation-pour-les-structures-de-moins-de-50-salaries.html",
+    "texte": "40€ par heure de formation et par stagiaire"
+   },
+   {
+    "url": "https://www.afdas.com/entreprise/financer-vos-actions-de-formation/choisir-le-bon-financement/financement-de-la-formation-pour-les-structures-de-moins-de-50-salaries.html",
+    "texte": "La prise en charge s’effectue dans la limite des fonds disponibles au titre du plan de développement des compétences des structures de moins de 50 salariés."
+   },
+   {
+    "url": "https://www.afdas.com/actualites/entreprise/criteres-de-financements-2026-ce-qui-change-pour-les-entreprises.html",
+    "texte": "Afin de permettre un accès aux fonds mutualisés dans la durée et au plus grand nombre d’entreprises, les règles de financement évoluent à compter du 1er janvier 2026 pour s'adapter aux priorités définies par les branches professionnelles ainsi qu'aux contraintes réglementaires et financières."
+   },
+   {
+    "url": "https://www.afdas.com/actualites/entreprise/criteres-de-financements-2026-ce-qui-change-pour-les-entreprises.html",
+    "texte": "Cette prise en charge des coûts pédagogiques s’effectue à l’intérieur du plafond quel que soit le type de formation (y compris VAE, bilan de compétences, formation relative à la santé sécurité au travail des membres du CSE, formation du référent harcèlement sexuel)."
+   },
+   {
+    "url": "https://www.afdas.com/faq/entreprise/financement-pour-les-entreprises-de-moins-de-50-salaries.html",
+    "texte": "Tout parcours pédagogique visant à acquérir, développer ou renforcer des compétences professionnelles en lien avec un objectif professionnel peut faire l’objet d’un financement. Cela inclut, par exemple : apprendre un nouveau logiciel, se perfectionner sur un métier, ou préparer une certification."
+   },
+   {
+    "url": "https://www.afdas.com/faq/entreprise/financement-pour-les-entreprises-de-moins-de-50-salaries.html",
+    "texte": "Les formations métiers ou transversales,"
+   },
+   {
+    "url": "https://www.afdas.com/fileadmin/user_upload/Conditions_generales/conditions_generales_160426.pdf",
+    "texte": "Toute demande de prise en charge et les documents associés nécessaires à l’instruction doivent parvenir à l’Afdas avant le début de la prestation."
+   },
+   {
+    "url": "https://www.afdas.com/fileadmin/user_upload/Conditions_generales/conditions_generales_160426.pdf",
+    "texte": "L’Afdas se réserve le droit de refuser toute demande de financement reçue hors délai."
+   },
+   {
+    "url": "https://web.archive.org/web/20251118201349/https://www.afdas.com/entreprise/financer-vos-actions-de-formation/choisir-le-bon-financement/financement-de-la-formation-pour-les-structures-de-moins-de-50-salaries.html",
+    "texte": "Suite à un volume important de demandes, la totalité des fonds formation alloués sur le dispositif plan de développement pour les entreprises de moins de 50 salariés a été consommée. Il n’est donc plus possible d’engager des financements jusqu’à la fin de l’année 2025 sur ce dispositif."
+   },
+   {
+    "url": "https://www.afdas.com/fileadmin/user_upload/Gouvernance/Afdas_CCC_0926.pdf",
+    "texte": "2642 CC de la production audiovisuelle (intègre les artistes-interprètes engagés pour des émissions de télévision)"
+   }
+  ],
+  "remarques": null,
+  "delai_jusquau": null,
+  "paliers": [
+   {
+    "min": 0,
+    "max": 10,
+    "montant": "jusqu'à 1 100 € HT par an pour les coûts pédagogiques",
+    "detail": "dans la limite de 40 € par heure de formation et par stagiaire"
+   },
+   {
+    "min": 11,
+    "max": 49,
+    "montant": "jusqu'à 1 800 € HT par an pour les coûts pédagogiques",
+    "detail": "dans la limite de 40 € par heure de formation et par stagiaire"
+   }
+  ],
+  "delai": "Demande à déposer sur l'espace MyA avant le début de la formation."
+ },
+ {
+  "opco": "AFDAS",
+  "branche": "CCN des espaces de loisirs, d'attractions et culturels",
+  "idcc": [
+   "1790"
+  ],
+  "retenu": true,
+  "lien": "https://www.afdas.com/entreprise/financer-vos-actions-de-formation/choisir-le-bon-financement/financement-de-la-formation-pour-les-structures-de-moins-de-50-salaries.html",
+  "version": "critères de prise en charge 2026 du plan de développement des compétences des structures de moins de 50 salariés, communs à toutes les branches de l'Afdas (annoncés le 13/01/2026, page consultée le 09/11/2026)",
+  "citations": [
+   {
+    "url": "https://www.afdas.com/entreprise/financer-vos-actions-de-formation/choisir-le-bon-financement/financement-de-la-formation-pour-les-structures-de-moins-de-50-salaries.html",
+    "texte": "Critères de prise en charge 2026"
+   },
+   {
+    "url": "https://www.afdas.com/entreprise/financer-vos-actions-de-formation/choisir-le-bon-financement/financement-de-la-formation-pour-les-structures-de-moins-de-50-salaries.html",
+    "texte": "Au titre du plan de développement des compétences des structures de moins de 50 salariés, la prise en charge des coûts pédagogiques s’effectue dans la limite d’un plafond annuel de :"
+   },
+   {
+    "url": "https://www.afdas.com/entreprise/financer-vos-actions-de-formation/choisir-le-bon-financement/financement-de-la-formation-pour-les-structures-de-moins-de-50-salaries.html",
+    "texte": "➜ 1 100€ HT pour les entreprises de moins de 11 salariés"
+   },
+   {
+    "url": "https://www.afdas.com/entreprise/financer-vos-actions-de-formation/choisir-le-bon-financement/financement-de-la-formation-pour-les-structures-de-moins-de-50-salaries.html",
+    "texte": "➜ 1 800€ HT pour les entreprises de 11 à 49 salariés"
+   },
+   {
+    "url": "https://www.afdas.com/entreprise/financer-vos-actions-de-formation/choisir-le-bon-financement/financement-de-la-formation-pour-les-structures-de-moins-de-50-salaries.html",
+    "texte": "40€ par heure de formation et par stagiaire"
+   },
+   {
+    "url": "https://www.afdas.com/entreprise/financer-vos-actions-de-formation/choisir-le-bon-financement/financement-de-la-formation-pour-les-structures-de-moins-de-50-salaries.html",
+    "texte": "La prise en charge s’effectue dans la limite des fonds disponibles au titre du plan de développement des compétences des structures de moins de 50 salariés."
+   },
+   {
+    "url": "https://www.afdas.com/actualites/entreprise/criteres-de-financements-2026-ce-qui-change-pour-les-entreprises.html",
+    "texte": "Afin de permettre un accès aux fonds mutualisés dans la durée et au plus grand nombre d’entreprises, les règles de financement évoluent à compter du 1er janvier 2026 pour s'adapter aux priorités définies par les branches professionnelles ainsi qu'aux contraintes réglementaires et financières."
+   },
+   {
+    "url": "https://www.afdas.com/actualites/entreprise/criteres-de-financements-2026-ce-qui-change-pour-les-entreprises.html",
+    "texte": "Cette prise en charge des coûts pédagogiques s’effectue à l’intérieur du plafond quel que soit le type de formation (y compris VAE, bilan de compétences, formation relative à la santé sécurité au travail des membres du CSE, formation du référent harcèlement sexuel)."
+   },
+   {
+    "url": "https://www.afdas.com/faq/entreprise/financement-pour-les-entreprises-de-moins-de-50-salaries.html",
+    "texte": "Tout parcours pédagogique visant à acquérir, développer ou renforcer des compétences professionnelles en lien avec un objectif professionnel peut faire l’objet d’un financement. Cela inclut, par exemple : apprendre un nouveau logiciel, se perfectionner sur un métier, ou préparer une certification."
+   },
+   {
+    "url": "https://www.afdas.com/faq/entreprise/financement-pour-les-entreprises-de-moins-de-50-salaries.html",
+    "texte": "Les formations métiers ou transversales,"
+   },
+   {
+    "url": "https://www.afdas.com/fileadmin/user_upload/Conditions_generales/conditions_generales_160426.pdf",
+    "texte": "Toute demande de prise en charge et les documents associés nécessaires à l’instruction doivent parvenir à l’Afdas avant le début de la prestation."
+   },
+   {
+    "url": "https://www.afdas.com/fileadmin/user_upload/Conditions_generales/conditions_generales_160426.pdf",
+    "texte": "L’Afdas se réserve le droit de refuser toute demande de financement reçue hors délai."
+   },
+   {
+    "url": "https://web.archive.org/web/20251118201349/https://www.afdas.com/entreprise/financer-vos-actions-de-formation/choisir-le-bon-financement/financement-de-la-formation-pour-les-structures-de-moins-de-50-salaries.html",
+    "texte": "Suite à un volume important de demandes, la totalité des fonds formation alloués sur le dispositif plan de développement pour les entreprises de moins de 50 salariés a été consommée. Il n’est donc plus possible d’engager des financements jusqu’à la fin de l’année 2025 sur ce dispositif."
+   },
+   {
+    "url": "https://www.afdas.com/fileadmin/user_upload/Gouvernance/Afdas_CCC_0926.pdf",
+    "texte": "1790 CCN des espaces de loisirs, d'attractions et culturels"
+   }
+  ],
+  "remarques": null,
+  "delai_jusquau": null,
+  "paliers": [
+   {
+    "min": 0,
+    "max": 10,
+    "montant": "jusqu'à 1 100 € HT par an pour les coûts pédagogiques",
+    "detail": "dans la limite de 40 € par heure de formation et par stagiaire"
+   },
+   {
+    "min": 11,
+    "max": 49,
+    "montant": "jusqu'à 1 800 € HT par an pour les coûts pédagogiques",
+    "detail": "dans la limite de 40 € par heure de formation et par stagiaire"
+   }
+  ],
+  "delai": "Demande à déposer sur l'espace MyA avant le début de la formation."
+ },
+ {
+  "opco": "AFDAS",
+  "branche": "CCN des télécommunications",
+  "idcc": [
+   "2148"
+  ],
+  "retenu": true,
+  "lien": "https://www.afdas.com/entreprise/financer-vos-actions-de-formation/choisir-le-bon-financement/financement-de-la-formation-pour-les-structures-de-moins-de-50-salaries.html",
+  "version": "critères de prise en charge 2026 du plan de développement des compétences des structures de moins de 50 salariés, communs à toutes les branches de l'Afdas (annoncés le 13/01/2026, page consultée le 09/11/2026)",
+  "citations": [
+   {
+    "url": "https://www.afdas.com/entreprise/financer-vos-actions-de-formation/choisir-le-bon-financement/financement-de-la-formation-pour-les-structures-de-moins-de-50-salaries.html",
+    "texte": "Critères de prise en charge 2026"
+   },
+   {
+    "url": "https://www.afdas.com/entreprise/financer-vos-actions-de-formation/choisir-le-bon-financement/financement-de-la-formation-pour-les-structures-de-moins-de-50-salaries.html",
+    "texte": "Au titre du plan de développement des compétences des structures de moins de 50 salariés, la prise en charge des coûts pédagogiques s’effectue dans la limite d’un plafond annuel de :"
+   },
+   {
+    "url": "https://www.afdas.com/entreprise/financer-vos-actions-de-formation/choisir-le-bon-financement/financement-de-la-formation-pour-les-structures-de-moins-de-50-salaries.html",
+    "texte": "➜ 1 100€ HT pour les entreprises de moins de 11 salariés"
+   },
+   {
+    "url": "https://www.afdas.com/entreprise/financer-vos-actions-de-formation/choisir-le-bon-financement/financement-de-la-formation-pour-les-structures-de-moins-de-50-salaries.html",
+    "texte": "➜ 1 800€ HT pour les entreprises de 11 à 49 salariés"
+   },
+   {
+    "url": "https://www.afdas.com/entreprise/financer-vos-actions-de-formation/choisir-le-bon-financement/financement-de-la-formation-pour-les-structures-de-moins-de-50-salaries.html",
+    "texte": "40€ par heure de formation et par stagiaire"
+   },
+   {
+    "url": "https://www.afdas.com/entreprise/financer-vos-actions-de-formation/choisir-le-bon-financement/financement-de-la-formation-pour-les-structures-de-moins-de-50-salaries.html",
+    "texte": "La prise en charge s’effectue dans la limite des fonds disponibles au titre du plan de développement des compétences des structures de moins de 50 salariés."
+   },
+   {
+    "url": "https://www.afdas.com/actualites/entreprise/criteres-de-financements-2026-ce-qui-change-pour-les-entreprises.html",
+    "texte": "Afin de permettre un accès aux fonds mutualisés dans la durée et au plus grand nombre d’entreprises, les règles de financement évoluent à compter du 1er janvier 2026 pour s'adapter aux priorités définies par les branches professionnelles ainsi qu'aux contraintes réglementaires et financières."
+   },
+   {
+    "url": "https://www.afdas.com/actualites/entreprise/criteres-de-financements-2026-ce-qui-change-pour-les-entreprises.html",
+    "texte": "Cette prise en charge des coûts pédagogiques s’effectue à l’intérieur du plafond quel que soit le type de formation (y compris VAE, bilan de compétences, formation relative à la santé sécurité au travail des membres du CSE, formation du référent harcèlement sexuel)."
+   },
+   {
+    "url": "https://www.afdas.com/faq/entreprise/financement-pour-les-entreprises-de-moins-de-50-salaries.html",
+    "texte": "Tout parcours pédagogique visant à acquérir, développer ou renforcer des compétences professionnelles en lien avec un objectif professionnel peut faire l’objet d’un financement. Cela inclut, par exemple : apprendre un nouveau logiciel, se perfectionner sur un métier, ou préparer une certification."
+   },
+   {
+    "url": "https://www.afdas.com/faq/entreprise/financement-pour-les-entreprises-de-moins-de-50-salaries.html",
+    "texte": "Les formations métiers ou transversales,"
+   },
+   {
+    "url": "https://www.afdas.com/fileadmin/user_upload/Conditions_generales/conditions_generales_160426.pdf",
+    "texte": "Toute demande de prise en charge et les documents associés nécessaires à l’instruction doivent parvenir à l’Afdas avant le début de la prestation."
+   },
+   {
+    "url": "https://www.afdas.com/fileadmin/user_upload/Conditions_generales/conditions_generales_160426.pdf",
+    "texte": "L’Afdas se réserve le droit de refuser toute demande de financement reçue hors délai."
+   },
+   {
+    "url": "https://web.archive.org/web/20251118201349/https://www.afdas.com/entreprise/financer-vos-actions-de-formation/choisir-le-bon-financement/financement-de-la-formation-pour-les-structures-de-moins-de-50-salaries.html",
+    "texte": "Suite à un volume important de demandes, la totalité des fonds formation alloués sur le dispositif plan de développement pour les entreprises de moins de 50 salariés a été consommée. Il n’est donc plus possible d’engager des financements jusqu’à la fin de l’année 2025 sur ce dispositif."
+   },
+   {
+    "url": "https://www.afdas.com/fileadmin/user_upload/Gouvernance/Afdas_CCC_0926.pdf",
+    "texte": "2148 CCN des télécommunications"
+   }
+  ],
+  "remarques": null,
+  "delai_jusquau": null,
+  "paliers": [
+   {
+    "min": 0,
+    "max": 10,
+    "montant": "jusqu'à 1 100 € HT par an pour les coûts pédagogiques",
+    "detail": "dans la limite de 40 € par heure de formation et par stagiaire"
+   },
+   {
+    "min": 11,
+    "max": 49,
+    "montant": "jusqu'à 1 800 € HT par an pour les coûts pédagogiques",
+    "detail": "dans la limite de 40 € par heure de formation et par stagiaire"
+   }
+  ],
+  "delai": "Demande à déposer sur l'espace MyA avant le début de la formation."
+ },
+ {
+  "opco": "AFDAS",
+  "branche": "CCN de l'hôtellerie de plein air",
+  "idcc": [
+   "1631"
+  ],
+  "retenu": true,
+  "lien": "https://www.afdas.com/entreprise/financer-vos-actions-de-formation/choisir-le-bon-financement/financement-de-la-formation-pour-les-structures-de-moins-de-50-salaries.html",
+  "version": "critères de prise en charge 2026 du plan de développement des compétences des structures de moins de 50 salariés, communs à toutes les branches de l'Afdas (annoncés le 13/01/2026, page consultée le 09/11/2026)",
+  "citations": [
+   {
+    "url": "https://www.afdas.com/entreprise/financer-vos-actions-de-formation/choisir-le-bon-financement/financement-de-la-formation-pour-les-structures-de-moins-de-50-salaries.html",
+    "texte": "Critères de prise en charge 2026"
+   },
+   {
+    "url": "https://www.afdas.com/entreprise/financer-vos-actions-de-formation/choisir-le-bon-financement/financement-de-la-formation-pour-les-structures-de-moins-de-50-salaries.html",
+    "texte": "Au titre du plan de développement des compétences des structures de moins de 50 salariés, la prise en charge des coûts pédagogiques s’effectue dans la limite d’un plafond annuel de :"
+   },
+   {
+    "url": "https://www.afdas.com/entreprise/financer-vos-actions-de-formation/choisir-le-bon-financement/financement-de-la-formation-pour-les-structures-de-moins-de-50-salaries.html",
+    "texte": "➜ 1 100€ HT pour les entreprises de moins de 11 salariés"
+   },
+   {
+    "url": "https://www.afdas.com/entreprise/financer-vos-actions-de-formation/choisir-le-bon-financement/financement-de-la-formation-pour-les-structures-de-moins-de-50-salaries.html",
+    "texte": "➜ 1 800€ HT pour les entreprises de 11 à 49 salariés"
+   },
+   {
+    "url": "https://www.afdas.com/entreprise/financer-vos-actions-de-formation/choisir-le-bon-financement/financement-de-la-formation-pour-les-structures-de-moins-de-50-salaries.html",
+    "texte": "40€ par heure de formation et par stagiaire"
+   },
+   {
+    "url": "https://www.afdas.com/entreprise/financer-vos-actions-de-formation/choisir-le-bon-financement/financement-de-la-formation-pour-les-structures-de-moins-de-50-salaries.html",
+    "texte": "La prise en charge s’effectue dans la limite des fonds disponibles au titre du plan de développement des compétences des structures de moins de 50 salariés."
+   },
+   {
+    "url": "https://www.afdas.com/actualites/entreprise/criteres-de-financements-2026-ce-qui-change-pour-les-entreprises.html",
+    "texte": "Afin de permettre un accès aux fonds mutualisés dans la durée et au plus grand nombre d’entreprises, les règles de financement évoluent à compter du 1er janvier 2026 pour s'adapter aux priorités définies par les branches professionnelles ainsi qu'aux contraintes réglementaires et financières."
+   },
+   {
+    "url": "https://www.afdas.com/actualites/entreprise/criteres-de-financements-2026-ce-qui-change-pour-les-entreprises.html",
+    "texte": "Cette prise en charge des coûts pédagogiques s’effectue à l’intérieur du plafond quel que soit le type de formation (y compris VAE, bilan de compétences, formation relative à la santé sécurité au travail des membres du CSE, formation du référent harcèlement sexuel)."
+   },
+   {
+    "url": "https://www.afdas.com/faq/entreprise/financement-pour-les-entreprises-de-moins-de-50-salaries.html",
+    "texte": "Tout parcours pédagogique visant à acquérir, développer ou renforcer des compétences professionnelles en lien avec un objectif professionnel peut faire l’objet d’un financement. Cela inclut, par exemple : apprendre un nouveau logiciel, se perfectionner sur un métier, ou préparer une certification."
+   },
+   {
+    "url": "https://www.afdas.com/faq/entreprise/financement-pour-les-entreprises-de-moins-de-50-salaries.html",
+    "texte": "Les formations métiers ou transversales,"
+   },
+   {
+    "url": "https://www.afdas.com/fileadmin/user_upload/Conditions_generales/conditions_generales_160426.pdf",
+    "texte": "Toute demande de prise en charge et les documents associés nécessaires à l’instruction doivent parvenir à l’Afdas avant le début de la prestation."
+   },
+   {
+    "url": "https://www.afdas.com/fileadmin/user_upload/Conditions_generales/conditions_generales_160426.pdf",
+    "texte": "L’Afdas se réserve le droit de refuser toute demande de financement reçue hors délai."
+   },
+   {
+    "url": "https://web.archive.org/web/20251118201349/https://www.afdas.com/entreprise/financer-vos-actions-de-formation/choisir-le-bon-financement/financement-de-la-formation-pour-les-structures-de-moins-de-50-salaries.html",
+    "texte": "Suite à un volume important de demandes, la totalité des fonds formation alloués sur le dispositif plan de développement pour les entreprises de moins de 50 salariés a été consommée. Il n’est donc plus possible d’engager des financements jusqu’à la fin de l’année 2025 sur ce dispositif."
+   },
+   {
+    "url": "https://www.afdas.com/fileadmin/user_upload/Gouvernance/Afdas_CCC_0926.pdf",
+    "texte": "1631 CCN de l'hôtellerie de plein air"
+   }
+  ],
+  "remarques": null,
+  "delai_jusquau": null,
+  "paliers": [
+   {
+    "min": 0,
+    "max": 10,
+    "montant": "jusqu'à 1 100 € HT par an pour les coûts pédagogiques",
+    "detail": "dans la limite de 40 € par heure de formation et par stagiaire"
+   },
+   {
+    "min": 11,
+    "max": 49,
+    "montant": "jusqu'à 1 800 € HT par an pour les coûts pédagogiques",
+    "detail": "dans la limite de 40 € par heure de formation et par stagiaire"
+   }
+  ],
+  "delai": "Demande à déposer sur l'espace MyA avant le début de la formation."
+ },
+ {
+  "opco": "AFDAS",
+  "branche": "CCN de l'édition (avec l'édition de musique et l'édition phonographique)",
+  "idcc": [
+   "2121"
+  ],
+  "retenu": true,
+  "lien": "https://www.afdas.com/entreprise/financer-vos-actions-de-formation/choisir-le-bon-financement/financement-de-la-formation-pour-les-structures-de-moins-de-50-salaries.html",
+  "version": "critères de prise en charge 2026 du plan de développement des compétences des structures de moins de 50 salariés, communs à toutes les branches de l'Afdas (annoncés le 13/01/2026, page consultée le 09/11/2026)",
+  "citations": [
+   {
+    "url": "https://www.afdas.com/entreprise/financer-vos-actions-de-formation/choisir-le-bon-financement/financement-de-la-formation-pour-les-structures-de-moins-de-50-salaries.html",
+    "texte": "Critères de prise en charge 2026"
+   },
+   {
+    "url": "https://www.afdas.com/entreprise/financer-vos-actions-de-formation/choisir-le-bon-financement/financement-de-la-formation-pour-les-structures-de-moins-de-50-salaries.html",
+    "texte": "Au titre du plan de développement des compétences des structures de moins de 50 salariés, la prise en charge des coûts pédagogiques s’effectue dans la limite d’un plafond annuel de :"
+   },
+   {
+    "url": "https://www.afdas.com/entreprise/financer-vos-actions-de-formation/choisir-le-bon-financement/financement-de-la-formation-pour-les-structures-de-moins-de-50-salaries.html",
+    "texte": "➜ 1 100€ HT pour les entreprises de moins de 11 salariés"
+   },
+   {
+    "url": "https://www.afdas.com/entreprise/financer-vos-actions-de-formation/choisir-le-bon-financement/financement-de-la-formation-pour-les-structures-de-moins-de-50-salaries.html",
+    "texte": "➜ 1 800€ HT pour les entreprises de 11 à 49 salariés"
+   },
+   {
+    "url": "https://www.afdas.com/entreprise/financer-vos-actions-de-formation/choisir-le-bon-financement/financement-de-la-formation-pour-les-structures-de-moins-de-50-salaries.html",
+    "texte": "40€ par heure de formation et par stagiaire"
+   },
+   {
+    "url": "https://www.afdas.com/entreprise/financer-vos-actions-de-formation/choisir-le-bon-financement/financement-de-la-formation-pour-les-structures-de-moins-de-50-salaries.html",
+    "texte": "La prise en charge s’effectue dans la limite des fonds disponibles au titre du plan de développement des compétences des structures de moins de 50 salariés."
+   },
+   {
+    "url": "https://www.afdas.com/actualites/entreprise/criteres-de-financements-2026-ce-qui-change-pour-les-entreprises.html",
+    "texte": "Afin de permettre un accès aux fonds mutualisés dans la durée et au plus grand nombre d’entreprises, les règles de financement évoluent à compter du 1er janvier 2026 pour s'adapter aux priorités définies par les branches professionnelles ainsi qu'aux contraintes réglementaires et financières."
+   },
+   {
+    "url": "https://www.afdas.com/actualites/entreprise/criteres-de-financements-2026-ce-qui-change-pour-les-entreprises.html",
+    "texte": "Cette prise en charge des coûts pédagogiques s’effectue à l’intérieur du plafond quel que soit le type de formation (y compris VAE, bilan de compétences, formation relative à la santé sécurité au travail des membres du CSE, formation du référent harcèlement sexuel)."
+   },
+   {
+    "url": "https://www.afdas.com/faq/entreprise/financement-pour-les-entreprises-de-moins-de-50-salaries.html",
+    "texte": "Tout parcours pédagogique visant à acquérir, développer ou renforcer des compétences professionnelles en lien avec un objectif professionnel peut faire l’objet d’un financement. Cela inclut, par exemple : apprendre un nouveau logiciel, se perfectionner sur un métier, ou préparer une certification."
+   },
+   {
+    "url": "https://www.afdas.com/faq/entreprise/financement-pour-les-entreprises-de-moins-de-50-salaries.html",
+    "texte": "Les formations métiers ou transversales,"
+   },
+   {
+    "url": "https://www.afdas.com/fileadmin/user_upload/Conditions_generales/conditions_generales_160426.pdf",
+    "texte": "Toute demande de prise en charge et les documents associés nécessaires à l’instruction doivent parvenir à l’Afdas avant le début de la prestation."
+   },
+   {
+    "url": "https://www.afdas.com/fileadmin/user_upload/Conditions_generales/conditions_generales_160426.pdf",
+    "texte": "L’Afdas se réserve le droit de refuser toute demande de financement reçue hors délai."
+   },
+   {
+    "url": "https://web.archive.org/web/20251118201349/https://www.afdas.com/entreprise/financer-vos-actions-de-formation/choisir-le-bon-financement/financement-de-la-formation-pour-les-structures-de-moins-de-50-salaries.html",
+    "texte": "Suite à un volume important de demandes, la totalité des fonds formation alloués sur le dispositif plan de développement pour les entreprises de moins de 50 salariés a été consommée. Il n’est donc plus possible d’engager des financements jusqu’à la fin de l’année 2025 sur ce dispositif."
+   },
+   {
+    "url": "https://www.afdas.com/fileadmin/user_upload/Gouvernance/Afdas_CCC_0926.pdf",
+    "texte": "CCN de l'édition phonographique"
+   },
+   {
+    "url": "https://www.afdas.com/fileadmin/user_upload/Gouvernance/Afdas_CCC_0926.pdf",
+    "texte": "2121"
+   }
+  ],
+  "remarques": null,
+  "delai_jusquau": null,
+  "paliers": [
+   {
+    "min": 0,
+    "max": 10,
+    "montant": "jusqu'à 1 100 € HT par an pour les coûts pédagogiques",
+    "detail": "dans la limite de 40 € par heure de formation et par stagiaire"
+   },
+   {
+    "min": 11,
+    "max": 49,
+    "montant": "jusqu'à 1 800 € HT par an pour les coûts pédagogiques",
+    "detail": "dans la limite de 40 € par heure de formation et par stagiaire"
+   }
+  ],
+  "delai": "Demande à déposer sur l'espace MyA avant le début de la formation."
+ },
+ {
+  "opco": "AFDAS",
+  "branche": "CCN de la production cinématographique (titres I et II, techniciens de la production cinématographique)",
+  "idcc": [
+   "3097"
+  ],
+  "retenu": true,
+  "lien": "https://www.afdas.com/entreprise/financer-vos-actions-de-formation/choisir-le-bon-financement/financement-de-la-formation-pour-les-structures-de-moins-de-50-salaries.html",
+  "version": "critères de prise en charge 2026 du plan de développement des compétences des structures de moins de 50 salariés, communs à toutes les branches de l'Afdas (annoncés le 13/01/2026, page consultée le 09/11/2026)",
+  "citations": [
+   {
+    "url": "https://www.afdas.com/entreprise/financer-vos-actions-de-formation/choisir-le-bon-financement/financement-de-la-formation-pour-les-structures-de-moins-de-50-salaries.html",
+    "texte": "Critères de prise en charge 2026"
+   },
+   {
+    "url": "https://www.afdas.com/entreprise/financer-vos-actions-de-formation/choisir-le-bon-financement/financement-de-la-formation-pour-les-structures-de-moins-de-50-salaries.html",
+    "texte": "Au titre du plan de développement des compétences des structures de moins de 50 salariés, la prise en charge des coûts pédagogiques s’effectue dans la limite d’un plafond annuel de :"
+   },
+   {
+    "url": "https://www.afdas.com/entreprise/financer-vos-actions-de-formation/choisir-le-bon-financement/financement-de-la-formation-pour-les-structures-de-moins-de-50-salaries.html",
+    "texte": "➜ 1 100€ HT pour les entreprises de moins de 11 salariés"
+   },
+   {
+    "url": "https://www.afdas.com/entreprise/financer-vos-actions-de-formation/choisir-le-bon-financement/financement-de-la-formation-pour-les-structures-de-moins-de-50-salaries.html",
+    "texte": "➜ 1 800€ HT pour les entreprises de 11 à 49 salariés"
+   },
+   {
+    "url": "https://www.afdas.com/entreprise/financer-vos-actions-de-formation/choisir-le-bon-financement/financement-de-la-formation-pour-les-structures-de-moins-de-50-salaries.html",
+    "texte": "40€ par heure de formation et par stagiaire"
+   },
+   {
+    "url": "https://www.afdas.com/entreprise/financer-vos-actions-de-formation/choisir-le-bon-financement/financement-de-la-formation-pour-les-structures-de-moins-de-50-salaries.html",
+    "texte": "La prise en charge s’effectue dans la limite des fonds disponibles au titre du plan de développement des compétences des structures de moins de 50 salariés."
+   },
+   {
+    "url": "https://www.afdas.com/actualites/entreprise/criteres-de-financements-2026-ce-qui-change-pour-les-entreprises.html",
+    "texte": "Afin de permettre un accès aux fonds mutualisés dans la durée et au plus grand nombre d’entreprises, les règles de financement évoluent à compter du 1er janvier 2026 pour s'adapter aux priorités définies par les branches professionnelles ainsi qu'aux contraintes réglementaires et financières."
+   },
+   {
+    "url": "https://www.afdas.com/actualites/entreprise/criteres-de-financements-2026-ce-qui-change-pour-les-entreprises.html",
+    "texte": "Cette prise en charge des coûts pédagogiques s’effectue à l’intérieur du plafond quel que soit le type de formation (y compris VAE, bilan de compétences, formation relative à la santé sécurité au travail des membres du CSE, formation du référent harcèlement sexuel)."
+   },
+   {
+    "url": "https://www.afdas.com/faq/entreprise/financement-pour-les-entreprises-de-moins-de-50-salaries.html",
+    "texte": "Tout parcours pédagogique visant à acquérir, développer ou renforcer des compétences professionnelles en lien avec un objectif professionnel peut faire l’objet d’un financement. Cela inclut, par exemple : apprendre un nouveau logiciel, se perfectionner sur un métier, ou préparer une certification."
+   },
+   {
+    "url": "https://www.afdas.com/faq/entreprise/financement-pour-les-entreprises-de-moins-de-50-salaries.html",
+    "texte": "Les formations métiers ou transversales,"
+   },
+   {
+    "url": "https://www.afdas.com/fileadmin/user_upload/Conditions_generales/conditions_generales_160426.pdf",
+    "texte": "Toute demande de prise en charge et les documents associés nécessaires à l’instruction doivent parvenir à l’Afdas avant le début de la prestation."
+   },
+   {
+    "url": "https://www.afdas.com/fileadmin/user_upload/Conditions_generales/conditions_generales_160426.pdf",
+    "texte": "L’Afdas se réserve le droit de refuser toute demande de financement reçue hors délai."
+   },
+   {
+    "url": "https://web.archive.org/web/20251118201349/https://www.afdas.com/entreprise/financer-vos-actions-de-formation/choisir-le-bon-financement/financement-de-la-formation-pour-les-structures-de-moins-de-50-salaries.html",
+    "texte": "Suite à un volume important de demandes, la totalité des fonds formation alloués sur le dispositif plan de développement pour les entreprises de moins de 50 salariés a été consommée. Il n’est donc plus possible d’engager des financements jusqu’à la fin de l’année 2025 sur ce dispositif."
+   },
+   {
+    "url": "https://www.afdas.com/fileadmin/user_upload/Gouvernance/Afdas_CCC_0926.pdf",
+    "texte": "3097 CCN de la production cinématographique : titre I et titre II (techniciens de la production cinématographique)"
+   }
+  ],
+  "remarques": null,
+  "delai_jusquau": null,
+  "paliers": [
+   {
+    "min": 0,
+    "max": 10,
+    "montant": "jusqu'à 1 100 € HT par an pour les coûts pédagogiques",
+    "detail": "dans la limite de 40 € par heure de formation et par stagiaire"
+   },
+   {
+    "min": 11,
+    "max": 49,
+    "montant": "jusqu'à 1 800 € HT par an pour les coûts pédagogiques",
+    "detail": "dans la limite de 40 € par heure de formation et par stagiaire"
+   }
+  ],
+  "delai": "Demande à déposer sur l'espace MyA avant le début de la formation."
+ }
+]

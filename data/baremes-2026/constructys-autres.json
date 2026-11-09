@@ -1,0 +1,124 @@
+[
+ {
+  "opco": "CONSTRUCTYS",
+  "branche": "Négoce des matériaux de construction (Convention collective nationale des salariés du négoce des matériaux de construction)",
+  "idcc": [
+   "3216"
+  ],
+  "retenu": true,
+  "lien": "https://www.constructys.fr/conditions-de-prise-en-charge-2/",
+  "version": "modalités de participation financière 2026 du Négoce des matériaux de construction, plan de développement des compétences (PDF « Constructys - Juillet 2026 », applicables à partir du 1er janvier 2026)",
+  "citations": [
+   {
+    "url": "https://www.constructys.fr/conditions-de-prise-en-charge-2/",
+    "texte": "Les dossiers doivent parvenir complets à Constructys, 15 jours calendaires avant le début de la formation."
+   },
+   {
+    "url": "https://www.constructys.fr/conditions-de-prise-en-charge-2/",
+    "texte": "Les actions de formation envoyées après la date limite ne seront pas financées."
+   },
+   {
+    "url": "https://www.constructys.fr/wp-content/uploads/NEGOCE-Modalites-2026.zip",
+    "texte": "PLAN DE DÉVELOPPEMENT DES COMPÉTENCES Modalités de participation financière Constructys - Juillet 2026"
+   },
+   {
+    "url": "https://www.constructys.fr/wp-content/uploads/NEGOCE-Modalites-2026.zip",
+    "texte": "PLAFOND COÛT PÉDAGOGIQUE HORAIRE ▪ Plafond de 30 € HT / heure / stagiaire."
+   },
+   {
+    "url": "https://www.constructys.fr/wp-content/uploads/NEGOCE-Modalites-2026.zip",
+    "texte": "BUDGET ANNUEL ENTREPRISE ▪ Coûts pédagogiques : Entreprises de moins de 11 salariés 2 000 € HT. Entreprises de 11 à moins de 50 salariés 6 000 € HT."
+   },
+   {
+    "url": "https://www.constructys.fr/wp-content/uploads/NEGOCE-Modalites-2026.zip",
+    "texte": "Applicables à partir du 1er janvier 2026"
+   },
+   {
+    "url": "https://www.constructys.fr/wp-content/uploads/NEGOCE-Modalites-2026.zip",
+    "texte": "La formation ne doit pas avoir déjà démarré avant la réception de la demande de financement par Constructys."
+   }
+  ],
+  "remarques": null,
+  "delai_jusquau": null,
+  "paliers": [
+   {
+    "min": 0,
+    "max": 10,
+    "montant": "jusqu'à 2 000 € HT par an",
+    "detail": "dans la limite de 30 € HT par heure et par stagiaire"
+   },
+   {
+    "min": 11,
+    "max": 49,
+    "montant": "jusqu'à 6 000 € HT par an",
+    "detail": "dans la limite de 30 € HT par heure et par stagiaire"
+   }
+  ],
+  "delai": "Demande complète à déposer au moins 15 jours avant le début de la formation."
+ },
+ {
+  "opco": "CONSTRUCTYS",
+  "branche": "Convention collective régionale des ingénieurs, assimilés et cadres du bâtiment de la région parisienne (branche Bâtiment)",
+  "idcc": [
+   "1843"
+  ],
+  "retenu": true,
+  "lien": "https://www.constructys.fr/conditions-de-prise-en-charge-2/",
+  "version": "modalités de participation financière 2026 du Bâtiment, plan de développement des compétences (PDF « Constructys - Septembre 2026 », applicables à partir du 1er juin 2026)",
+  "citations": [
+   {
+    "url": "https://www.constructys.fr/conditions-de-prise-en-charge-2/",
+    "texte": "Les dossiers doivent parvenir complets à Constructys, 15 jours calendaires avant le début de la formation."
+   },
+   {
+    "url": "https://www.constructys.fr/conditions-de-prise-en-charge-2/",
+    "texte": "Les actions de formation envoyées après la date limite ne seront pas financées."
+   },
+   {
+    "url": "https://www.constructys.fr/conditions-de-prise-en-charge-2/",
+    "texte": "Plan de développement des compétences (PDC) du Bâtiment : en raison des nombreux engagements pris depuis le début d’année 2026, le Conseil d’administration a décidé de réduire le plafond horaire de financement de 24 € à 19 € pour toutes les demandes de financement reçues à partir du 1 er juin 2026. Cette décision s’applique aux entreprises du Bâtiment de 11 à moins de 300 salariés."
+   },
+   {
+    "url": "https://www.constructys.fr/wp-content/uploads/BATIMENT-Modalites-2026.zip",
+    "texte": "PLAN DE DÉVELOPPEMENT DES COMPÉTENCES Modalités de participation financière Constructys - Septembre 2026"
+   },
+   {
+    "url": "https://www.constructys.fr/wp-content/uploads/BATIMENT-Modalites-2026.zip",
+    "texte": "▪ Par action non qualifiante : maximum 300 heures / stagiaire."
+   },
+   {
+    "url": "https://www.constructys.fr/wp-content/uploads/BATIMENT-Modalites-2026.zip",
+    "texte": "Entreprises de moins de 11 salariés ▪ Plafond de 24 € HT / heure / stagiaire. Dans la limite de 840 € HT / jour / groupe dans le cas d’une session intra-entreprise."
+   },
+   {
+    "url": "https://www.constructys.fr/wp-content/uploads/BATIMENT-Modalites-2026.zip",
+    "texte": "Entreprises de 11 à moins de 50 salariés ▪ Plafond de 19 € HT / heure / stagiaire. Dans la limite de 665 € HT / jour / groupe dans le cas d’une session intra-entreprise."
+   },
+   {
+    "url": "https://www.constructys.fr/wp-content/uploads/BATIMENT-Modalites-2026.zip",
+    "texte": "Applicables à partir du 1 er juin 2026"
+   },
+   {
+    "url": "https://www.constructys.fr/wp-content/uploads/BATIMENT-Modalites-2026.zip",
+    "texte": "La formation ne doit pas avoir déjà démarré avant la réception de la demande de financement par Constructys."
+   }
+  ],
+  "remarques": null,
+  "delai_jusquau": null,
+  "paliers": [
+   {
+    "min": 0,
+    "max": 10,
+    "montant": "24 € HT par heure et par stagiaire",
+    "detail": "dans la limite de 840 € HT par jour pour un groupe en intra-entreprise"
+   },
+   {
+    "min": 11,
+    "max": 49,
+    "montant": "19 € HT par heure et par stagiaire",
+    "detail": "dans la limite de 665 € HT par jour pour un groupe en intra-entreprise"
+   }
+  ],
+  "delai": "Demande complète à déposer au moins 15 jours avant le début de la formation."
+ }
+]

@@ -1,0 +1,737 @@
+[
+ {
+  "opco": "L'OPCOMMERCE",
+  "branche": "Commerces de détail non alimentaires",
+  "idcc": [
+   "1517"
+  ],
+  "retenu": true,
+  "lien": "https://www.lopcommerce.com/media/0fddqg4x/cpc_cdna.pdf",
+  "version": "critères de prise en charge de la branche des Commerces de détail non alimentaires de l'Opcommerce, en vigueur à compter du 21/09/2026 (dernière mise à jour le 17/09/2026)",
+  "citations": [
+   {
+    "url": "https://www.lopcommerce.com/media/0fddqg4x/cpc_cdna.pdf",
+    "texte": "Budget annuel : 2 500 €, comprenant uniquement la prise en charge des coûts pédagogiques au réel."
+   },
+   {
+    "url": "https://www.lopcommerce.com/media/0fddqg4x/cpc_cdna.pdf",
+    "texte": "Budget annuel : 3 300 €, comprenant uniquement la prise en charge des coûts pédagogiques au réel."
+   },
+   {
+    "url": "https://www.lopcommerce.com/media/0fddqg4x/cpc_cdna.pdf",
+    "texte": "Compétences + 2 500 €/an/entreprise 3 300 €/an/entreprise"
+   },
+   {
+    "url": "https://www.lopcommerce.com/media/0fddqg4x/cpc_cdna.pdf",
+    "texte": "Dernière mise à jour le 17/09/2026"
+   },
+   {
+    "url": "https://www.lopcommerce.com/media/0fddqg4x/cpc_cdna.pdf",
+    "texte": "Ces critères sont susceptibles d’être modifiés en cours d’année."
+   },
+   {
+    "url": "https://www.lopcommerce.com/lopcommerce/les-20-branches-professionnelles/commerces-de-detail-non-alimentaires/presentation/",
+    "texte": "La branche des Commerces de Détail Non Alimentaires rassemble les entreprises relevant de la Convention collective nationale des commerces de détail non alimentaires : antiquités, brocante, galeries d'art, arts de la table, coutellerie, droguerie, équipement du foyer, bazars, commerces ménagers, modélisme, jeux, jouets, périnatalité, maroquinerie (œuvres d'art) commerçants de presse et de jeux de hasard ou pronostics (IDCC 1517)."
+   },
+   {
+    "url": "https://www.lopcommerce.com/media/bsbnjydz/conditions-generales-gestion.pdf",
+    "texte": "Les demandes de prise en charge au titre de l’année 2026 doivent être transmises à l’Opcommerce au plus tard :"
+   },
+   {
+    "url": "https://www.lopcommerce.com/media/bsbnjydz/conditions-generales-gestion.pdf",
+    "texte": "Elles s’appliquent aux demandes déposées auprès de l’Opcommerce au plus tard le 30 novembre 2026 et dont la date de démarrage se situe en 2026."
+   },
+   {
+    "url": "https://www.lopcommerce.com/media/bsbnjydz/conditions-generales-gestion.pdf",
+    "texte": "Les demandes de prise en charge déposées au-delà du 30 novembre 2026 seront traitées en fonction des dispo-"
+   },
+   {
+    "url": "https://www.lopcommerce.com/media/bsbnjydz/conditions-generales-gestion.pdf",
+    "texte": "Compétences+ : un accompagnement adapté aux besoins de chaque entreprise de moins de 50 salariés n’appartenant pas à un groupe ou à un réseau d’entreprises"
+   }
+  ],
+  "paliers": [
+   {
+    "min": 0,
+    "max": 10,
+    "montant": "jusqu'à 2 500 € par an",
+    "detail": "dispositif « Compétences + » : coûts pédagogiques au réel uniquement, sans salaires ni frais annexes"
+   },
+   {
+    "min": 11,
+    "max": 49,
+    "montant": "jusqu'à 3 300 € par an",
+    "detail": "dispositif « Compétences + » : coûts pédagogiques au réel uniquement, sans salaires ni frais annexes"
+   }
+  ],
+  "delai": "Pour une formation qui démarre en 2026, la demande doit être déposée au plus tard le 30 novembre 2026.",
+  "delai_jusquau": "2026-11-30",
+  "remarques": null
+ },
+ {
+  "opco": "L'OPCOMMERCE",
+  "branche": "Commerce de détail alimentaire non spécialisé",
+  "idcc": [
+   "1505"
+  ],
+  "retenu": true,
+  "lien": "https://www.lopcommerce.com/media/ze0haai0/cpc_commerce_detail_alimentaire_non_specialise.pdf",
+  "version": "critères de prise en charge 2026 de la branche du Commerce de détail alimentaire non spécialisé de l'Opcommerce, en vigueur à compter du 01/10/2026 (dernière mise à jour le 05/10/2026)",
+  "citations": [
+   {
+    "url": "https://www.lopcommerce.com/media/ze0haai0/cpc_commerce_detail_alimentaire_non_specialise.pdf",
+    "texte": "Budget annuel : 3 000 €, comprenant → Les coûts pédagogiques → Les Salaires à 13 €/h → Frais annexes : pas de prise en charge."
+   },
+   {
+    "url": "https://www.lopcommerce.com/media/ze0haai0/cpc_commerce_detail_alimentaire_non_specialise.pdf",
+    "texte": "Budget annuel : 3 500 €, comprenant → Les coûts pédagogiques → Les Salaires à 13 €/h → Frais annexes : pas de prise en charge."
+   },
+   {
+    "url": "https://www.lopcommerce.com/media/ze0haai0/cpc_commerce_detail_alimentaire_non_specialise.pdf",
+    "texte": "Dernière mise à jour le 05 octobre 2026"
+   },
+   {
+    "url": "https://www.lopcommerce.com/media/ze0haai0/cpc_commerce_detail_alimentaire_non_specialise.pdf",
+    "texte": "→ Prise en charge de 100% des coûts pédagogiques par l’Opcommerce dans la limite de 5 inscriptions par entreprise et par an, dans la limite des fonds disponibles."
+   },
+   {
+    "url": "https://www.lopcommerce.com/lopcommerce/les-20-branches-professionnelles/commerce-de-detail-alimentaire-non-specialise/presentation/",
+    "texte": "La branche du Commerce de détail alimentaire non spécialisé rassemble les entreprises relevant de la CCN Convention collective nationale du commerce de détail alimentaire non spécialisé (IDCC 1505)."
+   },
+   {
+    "url": "https://www.lopcommerce.com/media/bsbnjydz/conditions-generales-gestion.pdf",
+    "texte": "Les demandes de prise en charge au titre de l’année 2026 doivent être transmises à l’Opcommerce au plus tard :"
+   },
+   {
+    "url": "https://www.lopcommerce.com/media/bsbnjydz/conditions-generales-gestion.pdf",
+    "texte": "Elles s’appliquent aux demandes déposées auprès de l’Opcommerce au plus tard le 30 novembre 2026 et dont la date de démarrage se situe en 2026."
+   },
+   {
+    "url": "https://www.lopcommerce.com/media/bsbnjydz/conditions-generales-gestion.pdf",
+    "texte": "Les demandes de prise en charge déposées au-delà du 30 novembre 2026 seront traitées en fonction des dispo-"
+   },
+   {
+    "url": "https://www.lopcommerce.com/media/bsbnjydz/conditions-generales-gestion.pdf",
+    "texte": "Compétences+ : un accompagnement adapté aux besoins de chaque entreprise de moins de 50 salariés n’appartenant pas à un groupe ou à un réseau d’entreprises"
+   }
+  ],
+  "paliers": [
+   {
+    "min": 0,
+    "max": 10,
+    "montant": "jusqu'à 3 000 € par an",
+    "detail": "dispositif « Compétences + » : coûts pédagogiques et salaires à 13 €/h, sans frais annexes"
+   },
+   {
+    "min": 11,
+    "max": 49,
+    "montant": "jusqu'à 3 500 € par an",
+    "detail": "dispositif « Compétences + » : coûts pédagogiques et salaires à 13 €/h, sans frais annexes"
+   }
+  ],
+  "delai": "Pour une formation qui démarre en 2026, la demande doit être déposée au plus tard le 30 novembre 2026.",
+  "delai_jusquau": "2026-11-30",
+  "remarques": null
+ },
+ {
+  "opco": "L'OPCOMMERCE",
+  "branche": "Commerce à prédominance alimentaire (détail et gros)",
+  "idcc": [
+   "2216"
+  ],
+  "retenu": true,
+  "lien": "https://www.lopcommerce.com/media/shbkyxa1/cpc_predom.pdf",
+  "version": "critères de prise en charge 2026 de la branche du Commerce à prédominance alimentaire (détail et gros) de l'Opcommerce, en vigueur à compter du 28/09/2026 (dernière mise à jour le 28/09/2026)",
+  "citations": [
+   {
+    "url": "https://www.lopcommerce.com/media/shbkyxa1/cpc_predom.pdf",
+    "texte": "Budget annuel : 2 500 € comprenant : → L’action de formation → Salaires : 13 €/h → Frais annexes : pas de prise en charge."
+   },
+   {
+    "url": "https://www.lopcommerce.com/media/shbkyxa1/cpc_predom.pdf",
+    "texte": "Budget annuel : 5 000€ comprenant : → L’action de formation, → Salaires : 13 €/h → Frais annexes : pas de prise en charge."
+   },
+   {
+    "url": "https://www.lopcommerce.com/media/shbkyxa1/cpc_predom.pdf",
+    "texte": "Elles s’appliquent aux demandes déposées auprès de l’Opcommerce avant le 30 novembre 2026 inclus et dont la date de démarrage se situe en 2026."
+   },
+   {
+    "url": "https://www.lopcommerce.com/media/shbkyxa1/cpc_predom.pdf",
+    "texte": "(1) Les demandes de prise en charge reçues plus d’un mois avant le début de la formation donnent lieu à un accusé de réception."
+   },
+   {
+    "url": "https://www.lopcommerce.com/media/shbkyxa1/cpc_predom.pdf",
+    "texte": "Dernière mise à jour le 28/09/2026"
+   },
+   {
+    "url": "https://www.lopcommerce.com/lopcommerce/les-20-branches-professionnelles/commerce-a-predominance-alimentaire-detail-et-gros/presentation/",
+    "texte": "La branche du Commerce à prédominance alimentaire* (détail et gros) rassemble les activités relevant de la Convention collective nationale du commerce de détail et de gros à prédominance alimentaire (entrepôts d'alimentation, supérettes, supermarchés, hypermarchés, grande distribution) - (IDCC 2216)."
+   },
+   {
+    "url": "https://www.lopcommerce.com/media/bsbnjydz/conditions-generales-gestion.pdf",
+    "texte": "Les demandes de prise en charge au titre de l’année 2026 doivent être transmises à l’Opcommerce au plus tard :"
+   },
+   {
+    "url": "https://www.lopcommerce.com/media/bsbnjydz/conditions-generales-gestion.pdf",
+    "texte": "Elles s’appliquent aux demandes déposées auprès de l’Opcommerce au plus tard le 30 novembre 2026 et dont la date de démarrage se situe en 2026."
+   },
+   {
+    "url": "https://www.lopcommerce.com/media/bsbnjydz/conditions-generales-gestion.pdf",
+    "texte": "Les demandes de prise en charge déposées au-delà du 30 novembre 2026 seront traitées en fonction des dispo-"
+   },
+   {
+    "url": "https://www.lopcommerce.com/media/bsbnjydz/conditions-generales-gestion.pdf",
+    "texte": "Compétences+ : un accompagnement adapté aux besoins de chaque entreprise de moins de 50 salariés n’appartenant pas à un groupe ou à un réseau d’entreprises"
+   }
+  ],
+  "paliers": [
+   {
+    "min": 0,
+    "max": 10,
+    "montant": "jusqu'à 2 500 € par an",
+    "detail": "dispositif « Compétences + » : action de formation et salaires à 13 €/h, sans frais annexes"
+   },
+   {
+    "min": 11,
+    "max": 49,
+    "montant": "jusqu'à 5 000 € par an",
+    "detail": "dispositif « Compétences + » : action de formation et salaires à 13 €/h, sans frais annexes"
+   }
+  ],
+  "delai": "Pour une formation qui démarre en 2026, la demande doit être déposée au plus tard le 30 novembre 2026.",
+  "delai_jusquau": "2026-11-30",
+  "remarques": null
+ },
+ {
+  "opco": "L'OPCOMMERCE",
+  "branche": "Commerce succursaliste de l'habillement",
+  "idcc": [
+   "0675"
+  ],
+  "retenu": true,
+  "lien": "https://www.lopcommerce.com/media/ocgd1tho/cpc-habillement.pdf",
+  "version": "critères de prise en charge de la branche du Commerce succursaliste de l'habillement de l'Opcommerce, en vigueur à compter du 17/10/2026 (dernière mise à jour le 23/10/2026)",
+  "citations": [
+   {
+    "url": "https://www.lopcommerce.com/media/ocgd1tho/cpc-habillement.pdf",
+    "texte": "Budget annuel : 1 000 €, comprenant → L’action de formation"
+   },
+   {
+    "url": "https://www.lopcommerce.com/media/ocgd1tho/cpc-habillement.pdf",
+    "texte": "Budget annuel : 2 200 €, comprenant → L’action de formation"
+   },
+   {
+    "url": "https://www.lopcommerce.com/media/ocgd1tho/cpc-habillement.pdf",
+    "texte": "Compétences + 1 000 € par an 2 200 € par an"
+   },
+   {
+    "url": "https://www.lopcommerce.com/media/ocgd1tho/cpc-habillement.pdf",
+    "texte": "Etant entendu que L’Opcommerce se réserve la possibilité de refuser une demande de prise en charge émise au-delà de 3 mois après le début de la formation."
+   },
+   {
+    "url": "https://www.lopcommerce.com/media/ocgd1tho/cpc-habillement.pdf",
+    "texte": "→ Il n’y a pas de fonds alloué à ce dispositif dans la branche les entreprises de moins de 50 salariés."
+   },
+   {
+    "url": "https://www.lopcommerce.com/media/ocgd1tho/cpc-habillement.pdf",
+    "texte": "Dernière mise à jour le 23/10/2026"
+   },
+   {
+    "url": "https://www.lopcommerce.com/lopcommerce/les-20-branches-professionnelles/commerce-succursaliste-de-lhabillement/presentation/",
+    "texte": "La branche du Commerce succursaliste de l’habillement rassemble les entreprises à succursales dont l’activité principale est le commerce de détail de l’habillement et d’articles textiles relevant de la Convention collective nationale des maisons à succursales de vente au détail d'habillement (IDCC 0675)."
+   },
+   {
+    "url": "https://www.lopcommerce.com/media/bsbnjydz/conditions-generales-gestion.pdf",
+    "texte": "Les demandes de prise en charge au titre de l’année 2026 doivent être transmises à l’Opcommerce au plus tard :"
+   },
+   {
+    "url": "https://www.lopcommerce.com/media/bsbnjydz/conditions-generales-gestion.pdf",
+    "texte": "Elles s’appliquent aux demandes déposées auprès de l’Opcommerce au plus tard le 30 novembre 2026 et dont la date de démarrage se situe en 2026."
+   },
+   {
+    "url": "https://www.lopcommerce.com/media/bsbnjydz/conditions-generales-gestion.pdf",
+    "texte": "Les demandes de prise en charge déposées au-delà du 30 novembre 2026 seront traitées en fonction des dispo-"
+   },
+   {
+    "url": "https://www.lopcommerce.com/media/bsbnjydz/conditions-generales-gestion.pdf",
+    "texte": "Compétences+ : un accompagnement adapté aux besoins de chaque entreprise de moins de 50 salariés n’appartenant pas à un groupe ou à un réseau d’entreprises"
+   }
+  ],
+  "paliers": [
+   {
+    "min": 0,
+    "max": 10,
+    "montant": "jusqu'à 1 000 € par an",
+    "detail": "dispositif « Compétences + » : action de formation, salaires et frais annexes plafonnés"
+   },
+   {
+    "min": 11,
+    "max": 49,
+    "montant": "jusqu'à 2 200 € par an",
+    "detail": "dispositif « Compétences + » : action de formation, salaires et frais annexes plafonnés"
+   }
+  ],
+  "delai": "Pour une formation qui démarre en 2026, la demande doit être déposée au plus tard le 30 novembre 2026.",
+  "delai_jusquau": "2026-11-30",
+  "remarques": null
+ },
+ {
+  "opco": "L'OPCOMMERCE",
+  "branche": "Négoce de l'ameublement",
+  "idcc": [
+   "1880"
+  ],
+  "retenu": true,
+  "lien": "https://www.lopcommerce.com/media/5athimrt/cpc_negoce_ameublement.pdf",
+  "version": "critères de prise en charge 2026 de la branche du Négoce de l'ameublement de l'Opcommerce, en vigueur à compter du 22/10/2026 (dernière mise à jour le 21/10/2026)",
+  "citations": [
+   {
+    "url": "https://www.lopcommerce.com/media/5athimrt/cpc_negoce_ameublement.pdf",
+    "texte": "Prise en charge des coûts pédagogiques au réel et des frais de salaires plafonnés à 14,50€/h, dans la limite de 1 300 € HT par entreprise et par an."
+   },
+   {
+    "url": "https://www.lopcommerce.com/media/5athimrt/cpc_negoce_ameublement.pdf",
+    "texte": "Plafond annuel : 1 300 €, comprenant → Action de formation → Salaires : 14,50 €/h → Frais annexes : pas de prise en charge."
+   },
+   {
+    "url": "https://www.lopcommerce.com/media/5athimrt/cpc_negoce_ameublement.pdf",
+    "texte": "Les demandes de prise en charge déposées au-delà du 30 novembre 2026, seront traitées en fonction des disponibilités générées par d’éventuels réabondements des enveloppes grâce à la démarche de mutualisation opérée par l’Opcommerce en application des décisions prises par son Conseil d’Administration qui se réunira courant décembre 2026."
+   },
+   {
+    "url": "https://www.lopcommerce.com/media/5athimrt/cpc_negoce_ameublement.pdf",
+    "texte": "Etant entendu que L’Opcommerce se réserve la possibilité de refuser une demande de prise en charge émise au-delà de 3 mois après le début de la formation."
+   },
+   {
+    "url": "https://www.lopcommerce.com/media/5athimrt/cpc_negoce_ameublement.pdf",
+    "texte": "Dernière mise à jour le 21/10/2026"
+   },
+   {
+    "url": "https://www.lopcommerce.com/lopcommerce/les-20-branches-professionnelles/negoce-de-lameublement/presentation/",
+    "texte": "La branche du Négoce de l’ameublement rassemble les entreprises relevant de la Convention collective nationale du négoce de l'ameublement (IDCC 1880)."
+   },
+   {
+    "url": "https://www.lopcommerce.com/media/bsbnjydz/conditions-generales-gestion.pdf",
+    "texte": "Les demandes de prise en charge au titre de l’année 2026 doivent être transmises à l’Opcommerce au plus tard :"
+   },
+   {
+    "url": "https://www.lopcommerce.com/media/bsbnjydz/conditions-generales-gestion.pdf",
+    "texte": "Elles s’appliquent aux demandes déposées auprès de l’Opcommerce au plus tard le 30 novembre 2026 et dont la date de démarrage se situe en 2026."
+   },
+   {
+    "url": "https://www.lopcommerce.com/media/bsbnjydz/conditions-generales-gestion.pdf",
+    "texte": "Les demandes de prise en charge déposées au-delà du 30 novembre 2026 seront traitées en fonction des dispo-"
+   },
+   {
+    "url": "https://www.lopcommerce.com/media/bsbnjydz/conditions-generales-gestion.pdf",
+    "texte": "Compétences+ : un accompagnement adapté aux besoins de chaque entreprise de moins de 50 salariés n’appartenant pas à un groupe ou à un réseau d’entreprises"
+   }
+  ],
+  "paliers": [
+   {
+    "min": 0,
+    "max": 10,
+    "montant": "jusqu'à 1 300 € HT par an",
+    "detail": "dispositif « Compétences + » : coûts pédagogiques au réel et salaires plafonnés, sans frais annexes"
+   },
+   {
+    "min": 11,
+    "max": 49,
+    "montant": "jusqu'à 1 300 € HT par an",
+    "detail": "dispositif « Compétences + » : coûts pédagogiques au réel et salaires plafonnés, sans frais annexes"
+   }
+  ],
+  "delai": "Pour une formation qui démarre en 2026, la demande doit être déposée au plus tard le 30 novembre 2026.",
+  "delai_jusquau": "2026-11-30",
+  "remarques": null
+ },
+ {
+  "opco": "L'OPCOMMERCE",
+  "branche": "Entreprises du bureau et du numérique (commerces et services)",
+  "idcc": [
+   "1539"
+  ],
+  "retenu": true,
+  "lien": "https://www.lopcommerce.com/media/3pyfo421/cpc_entreprises-bureau_et_numerique.pdf",
+  "version": "critères de prise en charge 2026 de la branche des Entreprises du bureau et du numérique (commerces et services) de l'Opcommerce, en vigueur à compter du 01/10/2026 (mise à jour suite à la SPP du 15/10/2026)",
+  "citations": [
+   {
+    "url": "https://www.lopcommerce.com/media/3pyfo421/cpc_entreprises-bureau_et_numerique.pdf",
+    "texte": "Prise en charge des coûts pédagogiques et des salaires plafonnés à 14.5€/h dans la limite de 3 000 €HT par entreprise et par an."
+   },
+   {
+    "url": "https://www.lopcommerce.com/media/3pyfo421/cpc_entreprises-bureau_et_numerique.pdf",
+    "texte": "Budget annuel : 3 000 €, comprenant → L’action de formation → Salaires plafonnés à 14.5€/ h → Frais annexes : pas de financement."
+   },
+   {
+    "url": "https://www.lopcommerce.com/media/3pyfo421/cpc_entreprises-bureau_et_numerique.pdf",
+    "texte": "Elles s’appliquent aux demandes déposées auprès de l’Opcommerce avant le 30 novembre 2026 inclus et dont la date de démarrage se situe en 2026."
+   },
+   {
+    "url": "https://www.lopcommerce.com/media/3pyfo421/cpc_entreprises-bureau_et_numerique.pdf",
+    "texte": "Dernière mise à jour 1er octobre suite SPP du 15/10/2026"
+   },
+   {
+    "url": "https://www.lopcommerce.com/lopcommerce/les-20-branches-professionnelles/entreprises-du-bureau-et-du-numerique-commerces-et-services/presentation/",
+    "texte": "La branche des Entreprises du bureau et du numérique (commerces et services) rassemble les entreprises relevant de la Convention collective nationale des entreprises du bureau et du numérique – (Commerces et services) - (IDCC 1539)."
+   },
+   {
+    "url": "https://www.lopcommerce.com/media/bsbnjydz/conditions-generales-gestion.pdf",
+    "texte": "Les demandes de prise en charge au titre de l’année 2026 doivent être transmises à l’Opcommerce au plus tard :"
+   },
+   {
+    "url": "https://www.lopcommerce.com/media/bsbnjydz/conditions-generales-gestion.pdf",
+    "texte": "Elles s’appliquent aux demandes déposées auprès de l’Opcommerce au plus tard le 30 novembre 2026 et dont la date de démarrage se situe en 2026."
+   },
+   {
+    "url": "https://www.lopcommerce.com/media/bsbnjydz/conditions-generales-gestion.pdf",
+    "texte": "Les demandes de prise en charge déposées au-delà du 30 novembre 2026 seront traitées en fonction des dispo-"
+   },
+   {
+    "url": "https://www.lopcommerce.com/media/bsbnjydz/conditions-generales-gestion.pdf",
+    "texte": "Compétences+ : un accompagnement adapté aux besoins de chaque entreprise de moins de 50 salariés n’appartenant pas à un groupe ou à un réseau d’entreprises"
+   }
+  ],
+  "paliers": [
+   {
+    "min": 0,
+    "max": 10,
+    "montant": "jusqu'à 3 000 € HT par an",
+    "detail": "dispositif « Compétences + » : coûts pédagogiques et salaires plafonnés, sans frais annexes"
+   },
+   {
+    "min": 11,
+    "max": 49,
+    "montant": "jusqu'à 3 000 € HT par an",
+    "detail": "dispositif « Compétences + » : coûts pédagogiques et salaires plafonnés, sans frais annexes"
+   }
+  ],
+  "delai": "Pour une formation qui démarre en 2026, la demande doit être déposée au plus tard le 30 novembre 2026.",
+  "delai_jusquau": "2026-11-30",
+  "remarques": null
+ },
+ {
+  "opco": "L'OPCOMMERCE",
+  "branche": "Entreprises de la filière Sport-Loisirs",
+  "idcc": [
+   "1557"
+  ],
+  "retenu": true,
+  "lien": "https://www.lopcommerce.com/media/jbfkyvbt/cpc_sports_loisirs.pdf",
+  "version": "critères de prise en charge 2026 de la branche des Entreprises de la filière Sports-Loisirs de l'Opcommerce, en vigueur à compter du 01/05/2026 (dernière mise à jour le 12/05/2026)",
+  "citations": [
+   {
+    "url": "https://www.lopcommerce.com/media/jbfkyvbt/cpc_sports_loisirs.pdf",
+    "texte": "Budget annuel : 3 000 €, comprenant → Les coûts pédagogiques de l’action de formation, → Salaires : frais de salaires plafonnés à 14,50 €/h, → Frais annexes : au réel."
+   },
+   {
+    "url": "https://www.lopcommerce.com/media/jbfkyvbt/cpc_sports_loisirs.pdf",
+    "texte": "Budget annuel : 3 500 €, comprenant → Les coûts pédagogiques de l’action de formation, → Salaires : frais de salaires plafonnés à 14,50 €/h, → Frais annexes : au réel."
+   },
+   {
+    "url": "https://www.lopcommerce.com/media/jbfkyvbt/cpc_sports_loisirs.pdf",
+    "texte": "Dernière mise à jour le 12/05/2026"
+   },
+   {
+    "url": "https://www.lopcommerce.com/media/jbfkyvbt/cpc_sports_loisirs.pdf",
+    "texte": "Les coûts pédagogiques sont intégralement pris en charge par l’Opcommerce dans la limite de 3 inscriptions par entreprise et par an, dans la limite des fonds alloués par la branche des Entreprises de la filière Sport&Loisirs."
+   },
+   {
+    "url": "https://www.lopcommerce.com/lopcommerce/les-20-branches-professionnelles/entreprises-de-la-filiere-sports-loisirs/presentation/",
+    "texte": "La branche des entreprises de la filière Sports-Loisirs rassemble les entreprises relevant de la Convention collective nationale des entreprises de la filière sports-loisirs (conception, fabrication, services et commerce des articles de sport et équipements de loisirs) - (IDCC 1557)."
+   },
+   {
+    "url": "https://www.lopcommerce.com/media/bsbnjydz/conditions-generales-gestion.pdf",
+    "texte": "Les demandes de prise en charge au titre de l’année 2026 doivent être transmises à l’Opcommerce au plus tard :"
+   },
+   {
+    "url": "https://www.lopcommerce.com/media/bsbnjydz/conditions-generales-gestion.pdf",
+    "texte": "Elles s’appliquent aux demandes déposées auprès de l’Opcommerce au plus tard le 30 novembre 2026 et dont la date de démarrage se situe en 2026."
+   },
+   {
+    "url": "https://www.lopcommerce.com/media/bsbnjydz/conditions-generales-gestion.pdf",
+    "texte": "Les demandes de prise en charge déposées au-delà du 30 novembre 2026 seront traitées en fonction des dispo-"
+   },
+   {
+    "url": "https://www.lopcommerce.com/media/bsbnjydz/conditions-generales-gestion.pdf",
+    "texte": "Compétences+ : un accompagnement adapté aux besoins de chaque entreprise de moins de 50 salariés n’appartenant pas à un groupe ou à un réseau d’entreprises"
+   }
+  ],
+  "paliers": [
+   {
+    "min": 0,
+    "max": 10,
+    "montant": "jusqu'à 3 000 € par an",
+    "detail": "dispositif « Compétences + » : coûts pédagogiques, salaires plafonnés et frais annexes au réel"
+   },
+   {
+    "min": 11,
+    "max": 49,
+    "montant": "jusqu'à 3 500 € par an",
+    "detail": "dispositif « Compétences + » : coûts pédagogiques, salaires plafonnés et frais annexes au réel"
+   }
+  ],
+  "delai": "Pour une formation qui démarre en 2026, la demande doit être déposée au plus tard le 30 novembre 2026.",
+  "delai_jusquau": "2026-11-30",
+  "remarques": null
+ },
+ {
+  "opco": "L'OPCOMMERCE",
+  "branche": "Commerce à distance et e-commerce",
+  "idcc": [
+   "2198"
+  ],
+  "retenu": true,
+  "lien": "https://www.lopcommerce.com/media/a5qe0xz2/cpc_cad.pdf",
+  "version": "critères de prise en charge 2026 de la branche du Commerce à distance et e-commerce de l'Opcommerce (dernière mise à jour le 07/10/2026)",
+  "citations": [
+   {
+    "url": "https://www.lopcommerce.com/media/a5qe0xz2/cpc_cad.pdf",
+    "texte": "Prise en charge des coûts pédagogiques plafonnés à 100€/h et des frais de salaires plafonnés à 14,50€/h, dans la limite de 2 000 € HT par entreprise et par an."
+   },
+   {
+    "url": "https://www.lopcommerce.com/media/a5qe0xz2/cpc_cad.pdf",
+    "texte": "Prise en charge des coûts pédagogiques plafonnés à 100€/h et des frais de salaires plafonnés à 14,50€/h dans la limite de 3 000 € HT par entreprise et par an."
+   },
+   {
+    "url": "https://www.lopcommerce.com/media/a5qe0xz2/cpc_cad.pdf",
+    "texte": "Plafond annuel 2 000 €, comprenant → L’action de formation (coût pédagogique plafonné à 100€/h – par formation),"
+   },
+   {
+    "url": "https://www.lopcommerce.com/media/a5qe0xz2/cpc_cad.pdf",
+    "texte": "Elles s’appliquent aux demandes déposées auprès de l’Opcommerce avant le 30 novembre 2026 inclus et dont la date de démarrage se situe en 2026."
+   },
+   {
+    "url": "https://www.lopcommerce.com/media/a5qe0xz2/cpc_cad.pdf",
+    "texte": "Dernière mise à jour le 07/10/2026"
+   },
+   {
+    "url": "https://www.lopcommerce.com/lopcommerce/les-20-branches-professionnelles/commerce-a-distance-et-e-commerce/presentation/",
+    "texte": "La branche des entreprises du Commerce à distance et E-commerce rassemble les entreprises relevant de la Convention collective nationale des entreprises de commerce à distance (IDCC 2198)."
+   },
+   {
+    "url": "https://www.lopcommerce.com/media/bsbnjydz/conditions-generales-gestion.pdf",
+    "texte": "Les demandes de prise en charge au titre de l’année 2026 doivent être transmises à l’Opcommerce au plus tard :"
+   },
+   {
+    "url": "https://www.lopcommerce.com/media/bsbnjydz/conditions-generales-gestion.pdf",
+    "texte": "Elles s’appliquent aux demandes déposées auprès de l’Opcommerce au plus tard le 30 novembre 2026 et dont la date de démarrage se situe en 2026."
+   },
+   {
+    "url": "https://www.lopcommerce.com/media/bsbnjydz/conditions-generales-gestion.pdf",
+    "texte": "Les demandes de prise en charge déposées au-delà du 30 novembre 2026 seront traitées en fonction des dispo-"
+   },
+   {
+    "url": "https://www.lopcommerce.com/media/bsbnjydz/conditions-generales-gestion.pdf",
+    "texte": "Compétences+ : un accompagnement adapté aux besoins de chaque entreprise de moins de 50 salariés n’appartenant pas à un groupe ou à un réseau d’entreprises"
+   }
+  ],
+  "paliers": [
+   {
+    "min": 0,
+    "max": 10,
+    "montant": "jusqu'à 2 000 € HT par an",
+    "detail": "dispositif « Compétences + » : coûts pédagogiques plafonnés à 100 €/h, salaires plafonnés, sans frais annexes"
+   },
+   {
+    "min": 11,
+    "max": 49,
+    "montant": "jusqu'à 3 000 € HT par an",
+    "detail": "dispositif « Compétences + » : coûts pédagogiques plafonnés à 100 €/h, salaires plafonnés, sans frais annexes"
+   }
+  ],
+  "delai": "Pour une formation qui démarre en 2026, la demande doit être déposée au plus tard le 30 novembre 2026.",
+  "delai_jusquau": "2026-11-30",
+  "remarques": null
+ },
+ {
+  "opco": "L'OPCOMMERCE",
+  "branche": "Commerces et services de l'audiovisuel, de l'électronique et de l'équipement ménager",
+  "idcc": [
+   "1686"
+  ],
+  "retenu": true,
+  "lien": "https://www.lopcommerce.com/media/ns3hi5ur/cpc_audiovisuel_electronique_equipement_menager.pdf",
+  "version": "critères de prise en charge 2026 de la branche des Commerces et services de l'audiovisuel, de l'électronique et de l'équipement ménager de l'Opcommerce, en vigueur à compter du 14/10/2026 (dernière mise à jour le 14/10/2026)",
+  "citations": [
+   {
+    "url": "https://www.lopcommerce.com/media/ns3hi5ur/cpc_audiovisuel_electronique_equipement_menager.pdf",
+    "texte": "Budget annuel : 1 700 €, comprenant → L’action de formation au coût réel"
+   },
+   {
+    "url": "https://www.lopcommerce.com/media/ns3hi5ur/cpc_audiovisuel_electronique_equipement_menager.pdf",
+    "texte": "Plafond de 1 700€, prise en charge des coûts pédagogiques au réel."
+   },
+   {
+    "url": "https://www.lopcommerce.com/media/ns3hi5ur/cpc_audiovisuel_electronique_equipement_menager.pdf",
+    "texte": "Elles s’appliquent aux demandes déposées auprès de l’Opcommerce avant le 30 novembre 2026 inclus et dont la date de démarrage se situe en 2026."
+   },
+   {
+    "url": "https://www.lopcommerce.com/media/ns3hi5ur/cpc_audiovisuel_electronique_equipement_menager.pdf",
+    "texte": "Dernière mise à jour le 14/10/2026"
+   },
+   {
+    "url": "https://www.lopcommerce.com/lopcommerce/les-20-branches-professionnelles/commerces-et-services-de-laudiovisuel-de-lelectronique-et-de-lequipement-menager/presentation/",
+    "texte": "La branche des Commerces et services de l’audiovisuel, de l’électronique et de l’équipement ménager rassemble les entreprises relevant de la Convention collective nationale des commerces et services de l'audiovisuel, de l'électronique et de l'équipement ménager (IDCC 1686)."
+   },
+   {
+    "url": "https://www.lopcommerce.com/media/bsbnjydz/conditions-generales-gestion.pdf",
+    "texte": "Les demandes de prise en charge au titre de l’année 2026 doivent être transmises à l’Opcommerce au plus tard :"
+   },
+   {
+    "url": "https://www.lopcommerce.com/media/bsbnjydz/conditions-generales-gestion.pdf",
+    "texte": "Elles s’appliquent aux demandes déposées auprès de l’Opcommerce au plus tard le 30 novembre 2026 et dont la date de démarrage se situe en 2026."
+   },
+   {
+    "url": "https://www.lopcommerce.com/media/bsbnjydz/conditions-generales-gestion.pdf",
+    "texte": "Les demandes de prise en charge déposées au-delà du 30 novembre 2026 seront traitées en fonction des dispo-"
+   },
+   {
+    "url": "https://www.lopcommerce.com/media/bsbnjydz/conditions-generales-gestion.pdf",
+    "texte": "Compétences+ : un accompagnement adapté aux besoins de chaque entreprise de moins de 50 salariés n’appartenant pas à un groupe ou à un réseau d’entreprises"
+   }
+  ],
+  "paliers": [
+   {
+    "min": 0,
+    "max": 10,
+    "montant": "jusqu'à 1 700 € par an",
+    "detail": "dispositif « Compétences + » : action de formation au coût réel, sans salaires ni frais annexes"
+   },
+   {
+    "min": 11,
+    "max": 49,
+    "montant": "jusqu'à 1 700 € par an",
+    "detail": "dispositif « Compétences + » : action de formation au coût réel, sans salaires ni frais annexes"
+   }
+  ],
+  "delai": "Pour une formation qui démarre en 2026, la demande doit être déposée au plus tard le 30 novembre 2026.",
+  "delai_jusquau": "2026-11-30",
+  "remarques": null
+ },
+ {
+  "opco": "L'OPCOMMERCE",
+  "branche": "Import-Export et Commerce international",
+  "idcc": [
+   "0043"
+  ],
+  "retenu": true,
+  "lien": "https://www.lopcommerce.com/media/exyb0gml/cpc_import_export_commerce_international.pdf",
+  "version": "critères de prise en charge 2026 de la branche de l'Import-Export et Commerce international de l'Opcommerce, en vigueur à compter du 12/10/2026 (dernière mise à jour le 06/10/2026)",
+  "citations": [
+   {
+    "url": "https://www.lopcommerce.com/media/exyb0gml/cpc_import_export_commerce_international.pdf",
+    "texte": "Budget annuel : 1 800 €, comprenant → L’action de formation, → Salaires : Pas de prise en charge → Frais annexes : Pas de prise en charge"
+   },
+   {
+    "url": "https://www.lopcommerce.com/media/exyb0gml/cpc_import_export_commerce_international.pdf",
+    "texte": "Budget annuel : 2 200 €, comprenant → L’action de formation, → Salaires : Pas de prise en charge → Frais annexes : Pas de prise en charge"
+   },
+   {
+    "url": "https://www.lopcommerce.com/media/exyb0gml/cpc_import_export_commerce_international.pdf",
+    "texte": "Dernière mise à jour le 06/10/2026"
+   },
+   {
+    "url": "https://www.lopcommerce.com/lopcommerce/les-20-branches-professionnelles/import-export-et-commerce-international/presentation/",
+    "texte": "La branche de l'Import-Export et Commerce international rassemble les entreprises relevant de la Convention collective nationale de l’import-export et du commerce international (IDCC 0043)."
+   },
+   {
+    "url": "https://www.lopcommerce.com/media/bsbnjydz/conditions-generales-gestion.pdf",
+    "texte": "Les demandes de prise en charge au titre de l’année 2026 doivent être transmises à l’Opcommerce au plus tard :"
+   },
+   {
+    "url": "https://www.lopcommerce.com/media/bsbnjydz/conditions-generales-gestion.pdf",
+    "texte": "Elles s’appliquent aux demandes déposées auprès de l’Opcommerce au plus tard le 30 novembre 2026 et dont la date de démarrage se situe en 2026."
+   },
+   {
+    "url": "https://www.lopcommerce.com/media/bsbnjydz/conditions-generales-gestion.pdf",
+    "texte": "Les demandes de prise en charge déposées au-delà du 30 novembre 2026 seront traitées en fonction des dispo-"
+   },
+   {
+    "url": "https://www.lopcommerce.com/media/bsbnjydz/conditions-generales-gestion.pdf",
+    "texte": "Compétences+ : un accompagnement adapté aux besoins de chaque entreprise de moins de 50 salariés n’appartenant pas à un groupe ou à un réseau d’entreprises"
+   }
+  ],
+  "paliers": [
+   {
+    "min": 0,
+    "max": 10,
+    "montant": "jusqu'à 1 800 € par an",
+    "detail": "dispositif « Compétences + » : coûts pédagogiques seulement, sans salaires ni frais annexes"
+   },
+   {
+    "min": 11,
+    "max": 49,
+    "montant": "jusqu'à 2 200 € par an",
+    "detail": "dispositif « Compétences + » : coûts pédagogiques seulement, sans salaires ni frais annexes"
+   }
+  ],
+  "delai": "Pour une formation qui démarre en 2026, la demande doit être déposée au plus tard le 30 novembre 2026.",
+  "delai_jusquau": "2026-11-30",
+  "remarques": null
+ },
+ {
+  "opco": "L'OPCOMMERCE",
+  "branche": "Commerces de gros de l'habillement, de la mercerie, de la chaussure et du jouet",
+  "idcc": [
+   "0500"
+  ],
+  "retenu": true,
+  "lien": "https://www.lopcommerce.com/media/1hyfi34k/cpc_dcjtm.pdf",
+  "version": "critères de prise en charge de la branche des Commerces de gros de l'habillement, de la mercerie, de la chaussure et du jouet de l'Opcommerce (dernière mise à jour le 06/10/2026)",
+  "citations": [
+   {
+    "url": "https://www.lopcommerce.com/media/1hyfi34k/cpc_dcjtm.pdf",
+    "texte": "Budget annuel : 3.500 €, comprenant → L’action de formation"
+   },
+   {
+    "url": "https://www.lopcommerce.com/media/1hyfi34k/cpc_dcjtm.pdf",
+    "texte": "Budget annuel : 4.500 €, comprenant → L’action de formation"
+   },
+   {
+    "url": "https://www.lopcommerce.com/media/1hyfi34k/cpc_dcjtm.pdf",
+    "texte": "Compétences + 3.500 € 4.500 €"
+   },
+   {
+    "url": "https://www.lopcommerce.com/media/1hyfi34k/cpc_dcjtm.pdf",
+    "texte": "Dernière mise à jour le 06/10/2026"
+   },
+   {
+    "url": "https://www.lopcommerce.com/lopcommerce/les-20-branches-professionnelles/commerces-de-gros-de-lhabillement-de-la-mercerie-de-la-chaussure-et-du-jouet/presentation/",
+    "texte": "La branche des Commerces de gros de l'habillement, de la mercerie, de la chaussure et du jouet, rassemble les entreprises relevant de la Convention collective nationale des entreprises de distribution importation, exportation, en chaussures, jouets, textiles, et mercerie (IDCC 0500)."
+   },
+   {
+    "url": "https://www.lopcommerce.com/media/bsbnjydz/conditions-generales-gestion.pdf",
+    "texte": "Les demandes de prise en charge au titre de l’année 2026 doivent être transmises à l’Opcommerce au plus tard :"
+   },
+   {
+    "url": "https://www.lopcommerce.com/media/bsbnjydz/conditions-generales-gestion.pdf",
+    "texte": "Elles s’appliquent aux demandes déposées auprès de l’Opcommerce au plus tard le 30 novembre 2026 et dont la date de démarrage se situe en 2026."
+   },
+   {
+    "url": "https://www.lopcommerce.com/media/bsbnjydz/conditions-generales-gestion.pdf",
+    "texte": "Les demandes de prise en charge déposées au-delà du 30 novembre 2026 seront traitées en fonction des dispo-"
+   },
+   {
+    "url": "https://www.lopcommerce.com/media/bsbnjydz/conditions-generales-gestion.pdf",
+    "texte": "Compétences+ : un accompagnement adapté aux besoins de chaque entreprise de moins de 50 salariés n’appartenant pas à un groupe ou à un réseau d’entreprises"
+   }
+  ],
+  "paliers": [
+   {
+    "min": 0,
+    "max": 10,
+    "montant": "jusqu'à 3 500 € par an",
+    "detail": "dispositif « Compétences + » : action de formation, salaires et frais annexes plafonnés"
+   },
+   {
+    "min": 11,
+    "max": 49,
+    "montant": "jusqu'à 4 500 € par an",
+    "detail": "dispositif « Compétences + » : action de formation, salaires et frais annexes plafonnés"
+   }
+  ],
+  "delai": "Pour une formation qui démarre en 2026, la demande doit être déposée au plus tard le 30 novembre 2026.",
+  "delai_jusquau": "2026-11-30",
+  "remarques": null
+ }
+]

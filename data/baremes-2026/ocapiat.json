@@ -1,0 +1,812 @@
+[
+ {
+  "opco": "OCAPIAT",
+  "branche": "Production agricole et CUMA",
+  "idcc": [
+   "7024"
+  ],
+  "retenu": true,
+  "lien": "https://www.ocapiat.fr/wp-content/uploads/Regles-de-prise-en-charge-2026.pdf",
+  "version": "règles de fonctionnement des dispositifs 2026 d'OCAPIAT, version 7 (conseil d'administration du 20/10/2026), offre Boost compétences pages 28 et 34",
+  "citations": [
+   {
+    "url": "https://www.ocapiat.fr/wp-content/uploads/Regles-de-prise-en-charge-2026.pdf",
+    "texte": "Règles de fonctionnement des dispositifs Année 2026 Conseil d’administration - 20/10/2026"
+   },
+   {
+    "url": "https://www.ocapiat.fr/wp-content/uploads/Regles-de-prise-en-charge-2026.pdf",
+    "texte": "Plan de développement des compétences des entreprises de moins de 11 salariés - Tous secteurs OCAPIAT sauf pêche, cultures marines et coopération maritime (1)"
+   },
+   {
+    "url": "https://www.ocapiat.fr/wp-content/uploads/Regles-de-prise-en-charge-2026.pdf",
+    "texte": "Plan de développement des compétences des entreprises de 11 à 49 salariés - Tous secteurs OCAPIAT sauf pêche, cultures marines et coopération maritime (1)"
+   },
+   {
+    "url": "https://www.ocapiat.fr/wp-content/uploads/Regles-de-prise-en-charge-2026.pdf",
+    "texte": "(2)Autres actions externes (plan libre de l’entreprise) Boost compétences"
+   },
+   {
+    "url": "https://www.ocapiat.fr/wp-content/uploads/Regles-de-prise-en-charge-2026.pdf",
+    "texte": "> Formation externe dispensée par un organisme de formation externe certifié Qualiopi ou équivalent"
+   },
+   {
+    "url": "https://www.ocapiat.fr/wp-content/uploads/Regles-de-prise-en-charge-2026.pdf",
+    "texte": "- 50 % des coûts pédagogiques demandés, plafonnés à 750 € HT par stagiaire par dossier"
+   },
+   {
+    "url": "https://www.ocapiat.fr/wp-content/uploads/Regles-de-prise-en-charge-2026.pdf",
+    "texte": "- Coût horaire de formation plafonné  à 40 €/h stagiaire HT **"
+   },
+   {
+    "url": "https://www.ocapiat.fr/wp-content/uploads/Regles-de-prise-en-charge-2026.pdf",
+    "texte": "** A compter du 01.05.26 (date de réception de la demande de prise en charge)"
+   },
+   {
+    "url": "https://www.ocapiat.fr/wp-content/uploads/Regles-de-prise-en-charge-2026.pdf",
+    "texte": "> Demande de prise en charge à adresser obligatoirement avant le début de  l’action de formation soit au plus tôt dans les 2 mois précédant l’action et au plus tard le 1er jour de la formation, en joignant la convention de formation correspondante"
+   },
+   {
+    "url": "https://www.ocapiat.fr/wp-content/uploads/Regles-de-prise-en-charge-2026.pdf",
+    "texte": "- 70 % des coûts pédagogiques  demandés, plafonnés à 1 050 € HT par stagiaire par dossier"
+   },
+   {
+    "url": "https://www.ocapiat.fr/wp-content/uploads/Regles-de-prise-en-charge-2026.pdf",
+    "texte": "- Sécurité des données ; - Gestion de l’eau et stress hydrique ; - Acculturation aux changements climatiques ; - Gestion de crise ; - Management du changement."
+   },
+   {
+    "url": "https://www.ocapiat.fr/financement-sur-mesure-par-lopco-simulateur-boost-competences/",
+    "texte": "Boost Compétences est réservé aux entreprises de moins de 50 salariés (sauf le secteur Pêche-PCMCM)"
+   },
+   {
+    "url": "https://www.ocapiat.fr/financement-sur-mesure-par-lopco-simulateur-boost-competences/",
+    "texte": "Plusieurs demandes préalables de prise en charge sont possibles dans l’année dans la limite des fonds disponibles."
+   }
+  ],
+  "remarques": null,
+  "delai_jusquau": null,
+  "paliers": [
+   {
+    "min": 0,
+    "max": 10,
+    "montant": "50 % des coûts pédagogiques, jusqu'à 750 € HT par stagiaire et par dossier",
+    "detail": "dans la limite de 40 € HT de l'heure par stagiaire"
+   },
+   {
+    "min": 11,
+    "max": 49,
+    "montant": "50 % des coûts pédagogiques, jusqu'à 750 € HT par stagiaire et par dossier",
+    "detail": "dans la limite de 40 € HT de l'heure par stagiaire"
+   }
+  ],
+  "delai": "Demande à déposer avant le début de la formation, au plus tôt 2 mois avant."
+ },
+ {
+  "opco": "OCAPIAT",
+  "branche": "Paysage : entreprises d’espaces verts, jardiniers",
+  "idcc": [
+   "7018"
+  ],
+  "retenu": true,
+  "lien": "https://www.ocapiat.fr/wp-content/uploads/Regles-de-prise-en-charge-2026.pdf",
+  "version": "règles de fonctionnement des dispositifs 2026 d'OCAPIAT, version 7 (conseil d'administration du 20/10/2026), offre Boost compétences pages 28 et 34",
+  "citations": [
+   {
+    "url": "https://www.ocapiat.fr/wp-content/uploads/Regles-de-prise-en-charge-2026.pdf",
+    "texte": "Règles de fonctionnement des dispositifs Année 2026 Conseil d’administration - 20/10/2026"
+   },
+   {
+    "url": "https://www.ocapiat.fr/wp-content/uploads/Regles-de-prise-en-charge-2026.pdf",
+    "texte": "Plan de développement des compétences des entreprises de moins de 11 salariés - Tous secteurs OCAPIAT sauf pêche, cultures marines et coopération maritime (1)"
+   },
+   {
+    "url": "https://www.ocapiat.fr/wp-content/uploads/Regles-de-prise-en-charge-2026.pdf",
+    "texte": "Plan de développement des compétences des entreprises de 11 à 49 salariés - Tous secteurs OCAPIAT sauf pêche, cultures marines et coopération maritime (1)"
+   },
+   {
+    "url": "https://www.ocapiat.fr/wp-content/uploads/Regles-de-prise-en-charge-2026.pdf",
+    "texte": "(2)Autres actions externes (plan libre de l’entreprise) Boost compétences"
+   },
+   {
+    "url": "https://www.ocapiat.fr/wp-content/uploads/Regles-de-prise-en-charge-2026.pdf",
+    "texte": "> Formation externe dispensée par un organisme de formation externe certifié Qualiopi ou équivalent"
+   },
+   {
+    "url": "https://www.ocapiat.fr/wp-content/uploads/Regles-de-prise-en-charge-2026.pdf",
+    "texte": "- 50 % des coûts pédagogiques demandés, plafonnés à 750 € HT par stagiaire par dossier"
+   },
+   {
+    "url": "https://www.ocapiat.fr/wp-content/uploads/Regles-de-prise-en-charge-2026.pdf",
+    "texte": "- Coût horaire de formation plafonné  à 40 €/h stagiaire HT **"
+   },
+   {
+    "url": "https://www.ocapiat.fr/wp-content/uploads/Regles-de-prise-en-charge-2026.pdf",
+    "texte": "** A compter du 01.05.26 (date de réception de la demande de prise en charge)"
+   },
+   {
+    "url": "https://www.ocapiat.fr/wp-content/uploads/Regles-de-prise-en-charge-2026.pdf",
+    "texte": "> Demande de prise en charge à adresser obligatoirement avant le début de  l’action de formation soit au plus tôt dans les 2 mois précédant l’action et au plus tard le 1er jour de la formation, en joignant la convention de formation correspondante"
+   },
+   {
+    "url": "https://www.ocapiat.fr/wp-content/uploads/Regles-de-prise-en-charge-2026.pdf",
+    "texte": "- 70 % des coûts pédagogiques  demandés, plafonnés à 1 050 € HT par stagiaire par dossier"
+   },
+   {
+    "url": "https://www.ocapiat.fr/wp-content/uploads/Regles-de-prise-en-charge-2026.pdf",
+    "texte": "- Sécurité des données ; - Gestion de l’eau et stress hydrique ; - Acculturation aux changements climatiques ; - Gestion de crise ; - Management du changement."
+   },
+   {
+    "url": "https://www.ocapiat.fr/financement-sur-mesure-par-lopco-simulateur-boost-competences/",
+    "texte": "Boost Compétences est réservé aux entreprises de moins de 50 salariés (sauf le secteur Pêche-PCMCM)"
+   },
+   {
+    "url": "https://www.ocapiat.fr/financement-sur-mesure-par-lopco-simulateur-boost-competences/",
+    "texte": "Plusieurs demandes préalables de prise en charge sont possibles dans l’année dans la limite des fonds disponibles."
+   }
+  ],
+  "remarques": null,
+  "delai_jusquau": null,
+  "paliers": [
+   {
+    "min": 0,
+    "max": 10,
+    "montant": "50 % des coûts pédagogiques, jusqu'à 750 € HT par stagiaire et par dossier",
+    "detail": "dans la limite de 40 € HT de l'heure par stagiaire"
+   },
+   {
+    "min": 11,
+    "max": 49,
+    "montant": "50 % des coûts pédagogiques, jusqu'à 750 € HT par stagiaire et par dossier",
+    "detail": "dans la limite de 40 € HT de l'heure par stagiaire"
+   }
+  ],
+  "delai": "Demande à déposer avant le début de la formation, au plus tôt 2 mois avant."
+ },
+ {
+  "opco": "OCAPIAT",
+  "branche": "Convention collective nationale des vins, cidres, jus de fruits, sirop, spiritueux et liqueurs",
+  "idcc": [
+   "0493"
+  ],
+  "retenu": true,
+  "lien": "https://www.ocapiat.fr/wp-content/uploads/Regles-de-prise-en-charge-2026.pdf",
+  "version": "règles de fonctionnement des dispositifs 2026 d'OCAPIAT, version 7 (conseil d'administration du 20/10/2026), offre Boost compétences pages 28 et 34",
+  "citations": [
+   {
+    "url": "https://www.ocapiat.fr/wp-content/uploads/Regles-de-prise-en-charge-2026.pdf",
+    "texte": "Règles de fonctionnement des dispositifs Année 2026 Conseil d’administration - 20/10/2026"
+   },
+   {
+    "url": "https://www.ocapiat.fr/wp-content/uploads/Regles-de-prise-en-charge-2026.pdf",
+    "texte": "Plan de développement des compétences des entreprises de moins de 11 salariés - Tous secteurs OCAPIAT sauf pêche, cultures marines et coopération maritime (1)"
+   },
+   {
+    "url": "https://www.ocapiat.fr/wp-content/uploads/Regles-de-prise-en-charge-2026.pdf",
+    "texte": "Plan de développement des compétences des entreprises de 11 à 49 salariés - Tous secteurs OCAPIAT sauf pêche, cultures marines et coopération maritime (1)"
+   },
+   {
+    "url": "https://www.ocapiat.fr/wp-content/uploads/Regles-de-prise-en-charge-2026.pdf",
+    "texte": "(2)Autres actions externes (plan libre de l’entreprise) Boost compétences"
+   },
+   {
+    "url": "https://www.ocapiat.fr/wp-content/uploads/Regles-de-prise-en-charge-2026.pdf",
+    "texte": "> Formation externe dispensée par un organisme de formation externe certifié Qualiopi ou équivalent"
+   },
+   {
+    "url": "https://www.ocapiat.fr/wp-content/uploads/Regles-de-prise-en-charge-2026.pdf",
+    "texte": "- 50 % des coûts pédagogiques demandés, plafonnés à 750 € HT par stagiaire par dossier"
+   },
+   {
+    "url": "https://www.ocapiat.fr/wp-content/uploads/Regles-de-prise-en-charge-2026.pdf",
+    "texte": "- Coût horaire de formation plafonné  à 40 €/h stagiaire HT **"
+   },
+   {
+    "url": "https://www.ocapiat.fr/wp-content/uploads/Regles-de-prise-en-charge-2026.pdf",
+    "texte": "** A compter du 01.05.26 (date de réception de la demande de prise en charge)"
+   },
+   {
+    "url": "https://www.ocapiat.fr/wp-content/uploads/Regles-de-prise-en-charge-2026.pdf",
+    "texte": "> Demande de prise en charge à adresser obligatoirement avant le début de  l’action de formation soit au plus tôt dans les 2 mois précédant l’action et au plus tard le 1er jour de la formation, en joignant la convention de formation correspondante"
+   },
+   {
+    "url": "https://www.ocapiat.fr/wp-content/uploads/Regles-de-prise-en-charge-2026.pdf",
+    "texte": "- 70 % des coûts pédagogiques  demandés, plafonnés à 1 050 € HT par stagiaire par dossier"
+   },
+   {
+    "url": "https://www.ocapiat.fr/wp-content/uploads/Regles-de-prise-en-charge-2026.pdf",
+    "texte": "- Sécurité des données ; - Gestion de l’eau et stress hydrique ; - Acculturation aux changements climatiques ; - Gestion de crise ; - Management du changement."
+   },
+   {
+    "url": "https://www.ocapiat.fr/financement-sur-mesure-par-lopco-simulateur-boost-competences/",
+    "texte": "Boost Compétences est réservé aux entreprises de moins de 50 salariés (sauf le secteur Pêche-PCMCM)"
+   },
+   {
+    "url": "https://www.ocapiat.fr/financement-sur-mesure-par-lopco-simulateur-boost-competences/",
+    "texte": "Plusieurs demandes préalables de prise en charge sont possibles dans l’année dans la limite des fonds disponibles."
+   }
+  ],
+  "remarques": null,
+  "delai_jusquau": null,
+  "paliers": [
+   {
+    "min": 0,
+    "max": 10,
+    "montant": "50 % des coûts pédagogiques, jusqu'à 750 € HT par stagiaire et par dossier",
+    "detail": "dans la limite de 40 € HT de l'heure par stagiaire"
+   },
+   {
+    "min": 11,
+    "max": 49,
+    "montant": "50 % des coûts pédagogiques, jusqu'à 750 € HT par stagiaire et par dossier",
+    "detail": "dans la limite de 40 € HT de l'heure par stagiaire"
+   }
+  ],
+  "delai": "Demande à déposer avant le début de la formation, au plus tôt 2 mois avant."
+ },
+ {
+  "opco": "OCAPIAT",
+  "branche": "Entreprises de travaux et services agricoles, ruraux et forestiers (ETARF)",
+  "idcc": [
+   "7025"
+  ],
+  "retenu": true,
+  "lien": "https://www.ocapiat.fr/wp-content/uploads/Regles-de-prise-en-charge-2026.pdf",
+  "version": "règles de fonctionnement des dispositifs 2026 d'OCAPIAT, version 7 (conseil d'administration du 20/10/2026), offre Boost compétences pages 28 et 34",
+  "citations": [
+   {
+    "url": "https://www.ocapiat.fr/wp-content/uploads/Regles-de-prise-en-charge-2026.pdf",
+    "texte": "Règles de fonctionnement des dispositifs Année 2026 Conseil d’administration - 20/10/2026"
+   },
+   {
+    "url": "https://www.ocapiat.fr/wp-content/uploads/Regles-de-prise-en-charge-2026.pdf",
+    "texte": "Plan de développement des compétences des entreprises de moins de 11 salariés - Tous secteurs OCAPIAT sauf pêche, cultures marines et coopération maritime (1)"
+   },
+   {
+    "url": "https://www.ocapiat.fr/wp-content/uploads/Regles-de-prise-en-charge-2026.pdf",
+    "texte": "Plan de développement des compétences des entreprises de 11 à 49 salariés - Tous secteurs OCAPIAT sauf pêche, cultures marines et coopération maritime (1)"
+   },
+   {
+    "url": "https://www.ocapiat.fr/wp-content/uploads/Regles-de-prise-en-charge-2026.pdf",
+    "texte": "(2)Autres actions externes (plan libre de l’entreprise) Boost compétences"
+   },
+   {
+    "url": "https://www.ocapiat.fr/wp-content/uploads/Regles-de-prise-en-charge-2026.pdf",
+    "texte": "> Formation externe dispensée par un organisme de formation externe certifié Qualiopi ou équivalent"
+   },
+   {
+    "url": "https://www.ocapiat.fr/wp-content/uploads/Regles-de-prise-en-charge-2026.pdf",
+    "texte": "- 50 % des coûts pédagogiques demandés, plafonnés à 750 € HT par stagiaire par dossier"
+   },
+   {
+    "url": "https://www.ocapiat.fr/wp-content/uploads/Regles-de-prise-en-charge-2026.pdf",
+    "texte": "- Coût horaire de formation plafonné  à 40 €/h stagiaire HT **"
+   },
+   {
+    "url": "https://www.ocapiat.fr/wp-content/uploads/Regles-de-prise-en-charge-2026.pdf",
+    "texte": "** A compter du 01.05.26 (date de réception de la demande de prise en charge)"
+   },
+   {
+    "url": "https://www.ocapiat.fr/wp-content/uploads/Regles-de-prise-en-charge-2026.pdf",
+    "texte": "> Demande de prise en charge à adresser obligatoirement avant le début de  l’action de formation soit au plus tôt dans les 2 mois précédant l’action et au plus tard le 1er jour de la formation, en joignant la convention de formation correspondante"
+   },
+   {
+    "url": "https://www.ocapiat.fr/wp-content/uploads/Regles-de-prise-en-charge-2026.pdf",
+    "texte": "- 70 % des coûts pédagogiques  demandés, plafonnés à 1 050 € HT par stagiaire par dossier"
+   },
+   {
+    "url": "https://www.ocapiat.fr/wp-content/uploads/Regles-de-prise-en-charge-2026.pdf",
+    "texte": "- Sécurité des données ; - Gestion de l’eau et stress hydrique ; - Acculturation aux changements climatiques ; - Gestion de crise ; - Management du changement."
+   },
+   {
+    "url": "https://www.ocapiat.fr/financement-sur-mesure-par-lopco-simulateur-boost-competences/",
+    "texte": "Boost Compétences est réservé aux entreprises de moins de 50 salariés (sauf le secteur Pêche-PCMCM)"
+   },
+   {
+    "url": "https://www.ocapiat.fr/financement-sur-mesure-par-lopco-simulateur-boost-competences/",
+    "texte": "Plusieurs demandes préalables de prise en charge sont possibles dans l’année dans la limite des fonds disponibles."
+   }
+  ],
+  "remarques": null,
+  "delai_jusquau": null,
+  "paliers": [
+   {
+    "min": 0,
+    "max": 10,
+    "montant": "50 % des coûts pédagogiques, jusqu'à 750 € HT par stagiaire et par dossier",
+    "detail": "dans la limite de 40 € HT de l'heure par stagiaire"
+   },
+   {
+    "min": 11,
+    "max": 49,
+    "montant": "50 % des coûts pédagogiques, jusqu'à 750 € HT par stagiaire et par dossier",
+    "detail": "dans la limite de 40 € HT de l'heure par stagiaire"
+   }
+  ],
+  "delai": "Demande à déposer avant le début de la formation, au plus tôt 2 mois avant."
+ },
+ {
+  "opco": "OCAPIAT",
+  "branche": "CCN des personnels des activités hippiques",
+  "idcc": [
+   "7026"
+  ],
+  "retenu": true,
+  "lien": "https://www.ocapiat.fr/wp-content/uploads/Regles-de-prise-en-charge-2026.pdf",
+  "version": "règles de fonctionnement des dispositifs 2026 d'OCAPIAT, version 7 (conseil d'administration du 20/10/2026), offre Boost compétences pages 28 et 34",
+  "citations": [
+   {
+    "url": "https://www.ocapiat.fr/wp-content/uploads/Regles-de-prise-en-charge-2026.pdf",
+    "texte": "Règles de fonctionnement des dispositifs Année 2026 Conseil d’administration - 20/10/2026"
+   },
+   {
+    "url": "https://www.ocapiat.fr/wp-content/uploads/Regles-de-prise-en-charge-2026.pdf",
+    "texte": "Plan de développement des compétences des entreprises de moins de 11 salariés - Tous secteurs OCAPIAT sauf pêche, cultures marines et coopération maritime (1)"
+   },
+   {
+    "url": "https://www.ocapiat.fr/wp-content/uploads/Regles-de-prise-en-charge-2026.pdf",
+    "texte": "Plan de développement des compétences des entreprises de 11 à 49 salariés - Tous secteurs OCAPIAT sauf pêche, cultures marines et coopération maritime (1)"
+   },
+   {
+    "url": "https://www.ocapiat.fr/wp-content/uploads/Regles-de-prise-en-charge-2026.pdf",
+    "texte": "(2)Autres actions externes (plan libre de l’entreprise) Boost compétences"
+   },
+   {
+    "url": "https://www.ocapiat.fr/wp-content/uploads/Regles-de-prise-en-charge-2026.pdf",
+    "texte": "> Formation externe dispensée par un organisme de formation externe certifié Qualiopi ou équivalent"
+   },
+   {
+    "url": "https://www.ocapiat.fr/wp-content/uploads/Regles-de-prise-en-charge-2026.pdf",
+    "texte": "- 50 % des coûts pédagogiques demandés, plafonnés à 750 € HT par stagiaire par dossier"
+   },
+   {
+    "url": "https://www.ocapiat.fr/wp-content/uploads/Regles-de-prise-en-charge-2026.pdf",
+    "texte": "- Coût horaire de formation plafonné  à 40 €/h stagiaire HT **"
+   },
+   {
+    "url": "https://www.ocapiat.fr/wp-content/uploads/Regles-de-prise-en-charge-2026.pdf",
+    "texte": "** A compter du 01.05.26 (date de réception de la demande de prise en charge)"
+   },
+   {
+    "url": "https://www.ocapiat.fr/wp-content/uploads/Regles-de-prise-en-charge-2026.pdf",
+    "texte": "> Demande de prise en charge à adresser obligatoirement avant le début de  l’action de formation soit au plus tôt dans les 2 mois précédant l’action et au plus tard le 1er jour de la formation, en joignant la convention de formation correspondante"
+   },
+   {
+    "url": "https://www.ocapiat.fr/wp-content/uploads/Regles-de-prise-en-charge-2026.pdf",
+    "texte": "- 70 % des coûts pédagogiques  demandés, plafonnés à 1 050 € HT par stagiaire par dossier"
+   },
+   {
+    "url": "https://www.ocapiat.fr/wp-content/uploads/Regles-de-prise-en-charge-2026.pdf",
+    "texte": "- Sécurité des données ; - Gestion de l’eau et stress hydrique ; - Acculturation aux changements climatiques ; - Gestion de crise ; - Management du changement."
+   },
+   {
+    "url": "https://www.ocapiat.fr/financement-sur-mesure-par-lopco-simulateur-boost-competences/",
+    "texte": "Boost Compétences est réservé aux entreprises de moins de 50 salariés (sauf le secteur Pêche-PCMCM)"
+   },
+   {
+    "url": "https://www.ocapiat.fr/financement-sur-mesure-par-lopco-simulateur-boost-competences/",
+    "texte": "Plusieurs demandes préalables de prise en charge sont possibles dans l’année dans la limite des fonds disponibles."
+   }
+  ],
+  "remarques": null,
+  "delai_jusquau": null,
+  "paliers": [
+   {
+    "min": 0,
+    "max": 10,
+    "montant": "50 % des coûts pédagogiques, jusqu'à 750 € HT par stagiaire et par dossier",
+    "detail": "dans la limite de 40 € HT de l'heure par stagiaire"
+   },
+   {
+    "min": 11,
+    "max": 49,
+    "montant": "50 % des coûts pédagogiques, jusqu'à 750 € HT par stagiaire et par dossier",
+    "detail": "dans la limite de 40 € HT de l'heure par stagiaire"
+   }
+  ],
+  "delai": "Demande à déposer avant le début de la formation, au plus tôt 2 mois avant."
+ },
+ {
+  "opco": "OCAPIAT",
+  "branche": "Viticulture Champagne",
+  "idcc": [
+   "8216"
+  ],
+  "retenu": true,
+  "lien": "https://www.ocapiat.fr/wp-content/uploads/Regles-de-prise-en-charge-2026.pdf",
+  "version": "règles de fonctionnement des dispositifs 2026 d'OCAPIAT, version 7 (conseil d'administration du 20/10/2026), offre Boost compétences pages 28 et 34",
+  "citations": [
+   {
+    "url": "https://www.ocapiat.fr/wp-content/uploads/Regles-de-prise-en-charge-2026.pdf",
+    "texte": "Règles de fonctionnement des dispositifs Année 2026 Conseil d’administration - 20/10/2026"
+   },
+   {
+    "url": "https://www.ocapiat.fr/wp-content/uploads/Regles-de-prise-en-charge-2026.pdf",
+    "texte": "Plan de développement des compétences des entreprises de moins de 11 salariés - Tous secteurs OCAPIAT sauf pêche, cultures marines et coopération maritime (1)"
+   },
+   {
+    "url": "https://www.ocapiat.fr/wp-content/uploads/Regles-de-prise-en-charge-2026.pdf",
+    "texte": "Plan de développement des compétences des entreprises de 11 à 49 salariés - Tous secteurs OCAPIAT sauf pêche, cultures marines et coopération maritime (1)"
+   },
+   {
+    "url": "https://www.ocapiat.fr/wp-content/uploads/Regles-de-prise-en-charge-2026.pdf",
+    "texte": "(2)Autres actions externes (plan libre de l’entreprise) Boost compétences"
+   },
+   {
+    "url": "https://www.ocapiat.fr/wp-content/uploads/Regles-de-prise-en-charge-2026.pdf",
+    "texte": "> Formation externe dispensée par un organisme de formation externe certifié Qualiopi ou équivalent"
+   },
+   {
+    "url": "https://www.ocapiat.fr/wp-content/uploads/Regles-de-prise-en-charge-2026.pdf",
+    "texte": "- 50 % des coûts pédagogiques demandés, plafonnés à 750 € HT par stagiaire par dossier"
+   },
+   {
+    "url": "https://www.ocapiat.fr/wp-content/uploads/Regles-de-prise-en-charge-2026.pdf",
+    "texte": "- Coût horaire de formation plafonné  à 40 €/h stagiaire HT **"
+   },
+   {
+    "url": "https://www.ocapiat.fr/wp-content/uploads/Regles-de-prise-en-charge-2026.pdf",
+    "texte": "** A compter du 01.05.26 (date de réception de la demande de prise en charge)"
+   },
+   {
+    "url": "https://www.ocapiat.fr/wp-content/uploads/Regles-de-prise-en-charge-2026.pdf",
+    "texte": "> Demande de prise en charge à adresser obligatoirement avant le début de  l’action de formation soit au plus tôt dans les 2 mois précédant l’action et au plus tard le 1er jour de la formation, en joignant la convention de formation correspondante"
+   },
+   {
+    "url": "https://www.ocapiat.fr/wp-content/uploads/Regles-de-prise-en-charge-2026.pdf",
+    "texte": "- 70 % des coûts pédagogiques  demandés, plafonnés à 1 050 € HT par stagiaire par dossier"
+   },
+   {
+    "url": "https://www.ocapiat.fr/wp-content/uploads/Regles-de-prise-en-charge-2026.pdf",
+    "texte": "- Sécurité des données ; - Gestion de l’eau et stress hydrique ; - Acculturation aux changements climatiques ; - Gestion de crise ; - Management du changement."
+   },
+   {
+    "url": "https://www.ocapiat.fr/financement-sur-mesure-par-lopco-simulateur-boost-competences/",
+    "texte": "Boost Compétences est réservé aux entreprises de moins de 50 salariés (sauf le secteur Pêche-PCMCM)"
+   },
+   {
+    "url": "https://www.ocapiat.fr/financement-sur-mesure-par-lopco-simulateur-boost-competences/",
+    "texte": "Plusieurs demandes préalables de prise en charge sont possibles dans l’année dans la limite des fonds disponibles."
+   }
+  ],
+  "remarques": null,
+  "delai_jusquau": null,
+  "paliers": [
+   {
+    "min": 0,
+    "max": 10,
+    "montant": "50 % des coûts pédagogiques, jusqu'à 750 € HT par stagiaire et par dossier",
+    "detail": "dans la limite de 40 € HT de l'heure par stagiaire"
+   },
+   {
+    "min": 11,
+    "max": 49,
+    "montant": "50 % des coûts pédagogiques, jusqu'à 750 € HT par stagiaire et par dossier",
+    "detail": "dans la limite de 40 € HT de l'heure par stagiaire"
+   }
+  ],
+  "delai": "Demande à déposer avant le début de la formation, au plus tôt 2 mois avant."
+ },
+ {
+  "opco": "OCAPIAT",
+  "branche": "Coopératives agricoles de céréales, de meunerie, d'approvisionnement, d'alimentation de bétail et d'oléagineux",
+  "idcc": [
+   "7002"
+  ],
+  "retenu": true,
+  "lien": "https://www.ocapiat.fr/wp-content/uploads/Regles-de-prise-en-charge-2026.pdf",
+  "version": "règles de fonctionnement des dispositifs 2026 d'OCAPIAT, version 7 (conseil d'administration du 20/10/2026), offre Boost compétences pages 28 et 34",
+  "citations": [
+   {
+    "url": "https://www.ocapiat.fr/wp-content/uploads/Regles-de-prise-en-charge-2026.pdf",
+    "texte": "Règles de fonctionnement des dispositifs Année 2026 Conseil d’administration - 20/10/2026"
+   },
+   {
+    "url": "https://www.ocapiat.fr/wp-content/uploads/Regles-de-prise-en-charge-2026.pdf",
+    "texte": "Plan de développement des compétences des entreprises de moins de 11 salariés - Tous secteurs OCAPIAT sauf pêche, cultures marines et coopération maritime (1)"
+   },
+   {
+    "url": "https://www.ocapiat.fr/wp-content/uploads/Regles-de-prise-en-charge-2026.pdf",
+    "texte": "Plan de développement des compétences des entreprises de 11 à 49 salariés - Tous secteurs OCAPIAT sauf pêche, cultures marines et coopération maritime (1)"
+   },
+   {
+    "url": "https://www.ocapiat.fr/wp-content/uploads/Regles-de-prise-en-charge-2026.pdf",
+    "texte": "(2)Autres actions externes (plan libre de l’entreprise) Boost compétences"
+   },
+   {
+    "url": "https://www.ocapiat.fr/wp-content/uploads/Regles-de-prise-en-charge-2026.pdf",
+    "texte": "> Formation externe dispensée par un organisme de formation externe certifié Qualiopi ou équivalent"
+   },
+   {
+    "url": "https://www.ocapiat.fr/wp-content/uploads/Regles-de-prise-en-charge-2026.pdf",
+    "texte": "- 50 % des coûts pédagogiques demandés, plafonnés à 750 € HT par stagiaire par dossier"
+   },
+   {
+    "url": "https://www.ocapiat.fr/wp-content/uploads/Regles-de-prise-en-charge-2026.pdf",
+    "texte": "- Coût horaire de formation plafonné  à 40 €/h stagiaire HT **"
+   },
+   {
+    "url": "https://www.ocapiat.fr/wp-content/uploads/Regles-de-prise-en-charge-2026.pdf",
+    "texte": "** A compter du 01.05.26 (date de réception de la demande de prise en charge)"
+   },
+   {
+    "url": "https://www.ocapiat.fr/wp-content/uploads/Regles-de-prise-en-charge-2026.pdf",
+    "texte": "> Demande de prise en charge à adresser obligatoirement avant le début de  l’action de formation soit au plus tôt dans les 2 mois précédant l’action et au plus tard le 1er jour de la formation, en joignant la convention de formation correspondante"
+   },
+   {
+    "url": "https://www.ocapiat.fr/wp-content/uploads/Regles-de-prise-en-charge-2026.pdf",
+    "texte": "- 70 % des coûts pédagogiques  demandés, plafonnés à 1 050 € HT par stagiaire par dossier"
+   },
+   {
+    "url": "https://www.ocapiat.fr/wp-content/uploads/Regles-de-prise-en-charge-2026.pdf",
+    "texte": "- Sécurité des données ; - Gestion de l’eau et stress hydrique ; - Acculturation aux changements climatiques ; - Gestion de crise ; - Management du changement."
+   },
+   {
+    "url": "https://www.ocapiat.fr/financement-sur-mesure-par-lopco-simulateur-boost-competences/",
+    "texte": "Boost Compétences est réservé aux entreprises de moins de 50 salariés (sauf le secteur Pêche-PCMCM)"
+   },
+   {
+    "url": "https://www.ocapiat.fr/financement-sur-mesure-par-lopco-simulateur-boost-competences/",
+    "texte": "Plusieurs demandes préalables de prise en charge sont possibles dans l’année dans la limite des fonds disponibles."
+   }
+  ],
+  "remarques": null,
+  "delai_jusquau": null,
+  "paliers": [
+   {
+    "min": 0,
+    "max": 10,
+    "montant": "50 % des coûts pédagogiques, jusqu'à 750 € HT par stagiaire et par dossier",
+    "detail": "dans la limite de 40 € HT de l'heure par stagiaire"
+   },
+   {
+    "min": 11,
+    "max": 49,
+    "montant": "50 % des coûts pédagogiques, jusqu'à 750 € HT par stagiaire et par dossier",
+    "detail": "dans la limite de 40 € HT de l'heure par stagiaire"
+   }
+  ],
+  "delai": "Demande à déposer avant le début de la formation, au plus tôt 2 mois avant."
+ },
+ {
+  "opco": "OCAPIAT",
+  "branche": "Cinq branches des industries alimentaires diverses",
+  "idcc": [
+   "3109"
+  ],
+  "retenu": true,
+  "lien": "https://www.ocapiat.fr/wp-content/uploads/Regles-de-prise-en-charge-2026.pdf",
+  "version": "règles de fonctionnement des dispositifs 2026 d'OCAPIAT, version 7 (conseil d'administration du 20/10/2026), offre Boost compétences pages 28 et 34",
+  "citations": [
+   {
+    "url": "https://www.ocapiat.fr/wp-content/uploads/Regles-de-prise-en-charge-2026.pdf",
+    "texte": "Règles de fonctionnement des dispositifs Année 2026 Conseil d’administration - 20/10/2026"
+   },
+   {
+    "url": "https://www.ocapiat.fr/wp-content/uploads/Regles-de-prise-en-charge-2026.pdf",
+    "texte": "Plan de développement des compétences des entreprises de moins de 11 salariés - Tous secteurs OCAPIAT sauf pêche, cultures marines et coopération maritime (1)"
+   },
+   {
+    "url": "https://www.ocapiat.fr/wp-content/uploads/Regles-de-prise-en-charge-2026.pdf",
+    "texte": "Plan de développement des compétences des entreprises de 11 à 49 salariés - Tous secteurs OCAPIAT sauf pêche, cultures marines et coopération maritime (1)"
+   },
+   {
+    "url": "https://www.ocapiat.fr/wp-content/uploads/Regles-de-prise-en-charge-2026.pdf",
+    "texte": "(2)Autres actions externes (plan libre de l’entreprise) Boost compétences"
+   },
+   {
+    "url": "https://www.ocapiat.fr/wp-content/uploads/Regles-de-prise-en-charge-2026.pdf",
+    "texte": "> Formation externe dispensée par un organisme de formation externe certifié Qualiopi ou équivalent"
+   },
+   {
+    "url": "https://www.ocapiat.fr/wp-content/uploads/Regles-de-prise-en-charge-2026.pdf",
+    "texte": "- 50 % des coûts pédagogiques demandés, plafonnés à 750 € HT par stagiaire par dossier"
+   },
+   {
+    "url": "https://www.ocapiat.fr/wp-content/uploads/Regles-de-prise-en-charge-2026.pdf",
+    "texte": "- Coût horaire de formation plafonné  à 40 €/h stagiaire HT **"
+   },
+   {
+    "url": "https://www.ocapiat.fr/wp-content/uploads/Regles-de-prise-en-charge-2026.pdf",
+    "texte": "** A compter du 01.05.26 (date de réception de la demande de prise en charge)"
+   },
+   {
+    "url": "https://www.ocapiat.fr/wp-content/uploads/Regles-de-prise-en-charge-2026.pdf",
+    "texte": "> Demande de prise en charge à adresser obligatoirement avant le début de  l’action de formation soit au plus tôt dans les 2 mois précédant l’action et au plus tard le 1er jour de la formation, en joignant la convention de formation correspondante"
+   },
+   {
+    "url": "https://www.ocapiat.fr/wp-content/uploads/Regles-de-prise-en-charge-2026.pdf",
+    "texte": "- 70 % des coûts pédagogiques  demandés, plafonnés à 1 050 € HT par stagiaire par dossier"
+   },
+   {
+    "url": "https://www.ocapiat.fr/wp-content/uploads/Regles-de-prise-en-charge-2026.pdf",
+    "texte": "- Sécurité des données ; - Gestion de l’eau et stress hydrique ; - Acculturation aux changements climatiques ; - Gestion de crise ; - Management du changement."
+   },
+   {
+    "url": "https://www.ocapiat.fr/financement-sur-mesure-par-lopco-simulateur-boost-competences/",
+    "texte": "Boost Compétences est réservé aux entreprises de moins de 50 salariés (sauf le secteur Pêche-PCMCM)"
+   },
+   {
+    "url": "https://www.ocapiat.fr/financement-sur-mesure-par-lopco-simulateur-boost-competences/",
+    "texte": "Plusieurs demandes préalables de prise en charge sont possibles dans l’année dans la limite des fonds disponibles."
+   }
+  ],
+  "remarques": null,
+  "delai_jusquau": null,
+  "paliers": [
+   {
+    "min": 0,
+    "max": 10,
+    "montant": "50 % des coûts pédagogiques, jusqu'à 750 € HT par stagiaire et par dossier",
+    "detail": "dans la limite de 40 € HT de l'heure par stagiaire"
+   },
+   {
+    "min": 11,
+    "max": 49,
+    "montant": "50 % des coûts pédagogiques, jusqu'à 750 € HT par stagiaire et par dossier",
+    "detail": "dans la limite de 40 € HT de l'heure par stagiaire"
+   }
+  ],
+  "delai": "Demande à déposer avant le début de la formation, au plus tôt 2 mois avant."
+ },
+ {
+  "opco": "OCAPIAT",
+  "branche": "Entreprises du négoce et de l'industrie des produits du sol, engrais et produits connexes",
+  "idcc": [
+   "1077"
+  ],
+  "retenu": true,
+  "lien": "https://www.ocapiat.fr/wp-content/uploads/Regles-de-prise-en-charge-2026.pdf",
+  "version": "règles de fonctionnement des dispositifs 2026 d'OCAPIAT, version 7 (conseil d'administration du 20/10/2026), offre Boost compétences pages 28 et 34",
+  "citations": [
+   {
+    "url": "https://www.ocapiat.fr/wp-content/uploads/Regles-de-prise-en-charge-2026.pdf",
+    "texte": "Règles de fonctionnement des dispositifs Année 2026 Conseil d’administration - 20/10/2026"
+   },
+   {
+    "url": "https://www.ocapiat.fr/wp-content/uploads/Regles-de-prise-en-charge-2026.pdf",
+    "texte": "Plan de développement des compétences des entreprises de moins de 11 salariés - Tous secteurs OCAPIAT sauf pêche, cultures marines et coopération maritime (1)"
+   },
+   {
+    "url": "https://www.ocapiat.fr/wp-content/uploads/Regles-de-prise-en-charge-2026.pdf",
+    "texte": "Plan de développement des compétences des entreprises de 11 à 49 salariés - Tous secteurs OCAPIAT sauf pêche, cultures marines et coopération maritime (1)"
+   },
+   {
+    "url": "https://www.ocapiat.fr/wp-content/uploads/Regles-de-prise-en-charge-2026.pdf",
+    "texte": "(2)Autres actions externes (plan libre de l’entreprise) Boost compétences"
+   },
+   {
+    "url": "https://www.ocapiat.fr/wp-content/uploads/Regles-de-prise-en-charge-2026.pdf",
+    "texte": "> Formation externe dispensée par un organisme de formation externe certifié Qualiopi ou équivalent"
+   },
+   {
+    "url": "https://www.ocapiat.fr/wp-content/uploads/Regles-de-prise-en-charge-2026.pdf",
+    "texte": "- 50 % des coûts pédagogiques demandés, plafonnés à 750 € HT par stagiaire par dossier"
+   },
+   {
+    "url": "https://www.ocapiat.fr/wp-content/uploads/Regles-de-prise-en-charge-2026.pdf",
+    "texte": "- Coût horaire de formation plafonné  à 40 €/h stagiaire HT **"
+   },
+   {
+    "url": "https://www.ocapiat.fr/wp-content/uploads/Regles-de-prise-en-charge-2026.pdf",
+    "texte": "** A compter du 01.05.26 (date de réception de la demande de prise en charge)"
+   },
+   {
+    "url": "https://www.ocapiat.fr/wp-content/uploads/Regles-de-prise-en-charge-2026.pdf",
+    "texte": "> Demande de prise en charge à adresser obligatoirement avant le début de  l’action de formation soit au plus tôt dans les 2 mois précédant l’action et au plus tard le 1er jour de la formation, en joignant la convention de formation correspondante"
+   },
+   {
+    "url": "https://www.ocapiat.fr/wp-content/uploads/Regles-de-prise-en-charge-2026.pdf",
+    "texte": "- 70 % des coûts pédagogiques  demandés, plafonnés à 1 050 € HT par stagiaire par dossier"
+   },
+   {
+    "url": "https://www.ocapiat.fr/wp-content/uploads/Regles-de-prise-en-charge-2026.pdf",
+    "texte": "- Sécurité des données ; - Gestion de l’eau et stress hydrique ; - Acculturation aux changements climatiques ; - Gestion de crise ; - Management du changement."
+   },
+   {
+    "url": "https://www.ocapiat.fr/financement-sur-mesure-par-lopco-simulateur-boost-competences/",
+    "texte": "Boost Compétences est réservé aux entreprises de moins de 50 salariés (sauf le secteur Pêche-PCMCM)"
+   },
+   {
+    "url": "https://www.ocapiat.fr/financement-sur-mesure-par-lopco-simulateur-boost-competences/",
+    "texte": "Plusieurs demandes préalables de prise en charge sont possibles dans l’année dans la limite des fonds disponibles."
+   }
+  ],
+  "remarques": null,
+  "delai_jusquau": null,
+  "paliers": [
+   {
+    "min": 0,
+    "max": 10,
+    "montant": "50 % des coûts pédagogiques, jusqu'à 750 € HT par stagiaire et par dossier",
+    "detail": "dans la limite de 40 € HT de l'heure par stagiaire"
+   },
+   {
+    "min": 11,
+    "max": 49,
+    "montant": "50 % des coûts pédagogiques, jusqu'à 750 € HT par stagiaire et par dossier",
+    "detail": "dans la limite de 40 € HT de l'heure par stagiaire"
+   }
+  ],
+  "delai": "Demande à déposer avant le début de la formation, au plus tôt 2 mois avant."
+ },
+ {
+  "opco": "OCAPIAT",
+  "branche": "Convention collective du personnel des centres équestres",
+  "idcc": [
+   "7012"
+  ],
+  "retenu": true,
+  "lien": "https://www.ocapiat.fr/wp-content/uploads/Regles-de-prise-en-charge-2026.pdf",
+  "version": "règles de fonctionnement des dispositifs 2026 d'OCAPIAT, version 7 (conseil d'administration du 20/10/2026), offre Boost compétences pages 28 et 34",
+  "citations": [
+   {
+    "url": "https://www.ocapiat.fr/wp-content/uploads/Regles-de-prise-en-charge-2026.pdf",
+    "texte": "Règles de fonctionnement des dispositifs Année 2026 Conseil d’administration - 20/10/2026"
+   },
+   {
+    "url": "https://www.ocapiat.fr/wp-content/uploads/Regles-de-prise-en-charge-2026.pdf",
+    "texte": "Plan de développement des compétences des entreprises de moins de 11 salariés - Tous secteurs OCAPIAT sauf pêche, cultures marines et coopération maritime (1)"
+   },
+   {
+    "url": "https://www.ocapiat.fr/wp-content/uploads/Regles-de-prise-en-charge-2026.pdf",
+    "texte": "Plan de développement des compétences des entreprises de 11 à 49 salariés - Tous secteurs OCAPIAT sauf pêche, cultures marines et coopération maritime (1)"
+   },
+   {
+    "url": "https://www.ocapiat.fr/wp-content/uploads/Regles-de-prise-en-charge-2026.pdf",
+    "texte": "(2)Autres actions externes (plan libre de l’entreprise) Boost compétences"
+   },
+   {
+    "url": "https://www.ocapiat.fr/wp-content/uploads/Regles-de-prise-en-charge-2026.pdf",
+    "texte": "> Formation externe dispensée par un organisme de formation externe certifié Qualiopi ou équivalent"
+   },
+   {
+    "url": "https://www.ocapiat.fr/wp-content/uploads/Regles-de-prise-en-charge-2026.pdf",
+    "texte": "- 50 % des coûts pédagogiques demandés, plafonnés à 750 € HT par stagiaire par dossier"
+   },
+   {
+    "url": "https://www.ocapiat.fr/wp-content/uploads/Regles-de-prise-en-charge-2026.pdf",
+    "texte": "- Coût horaire de formation plafonné  à 40 €/h stagiaire HT **"
+   },
+   {
+    "url": "https://www.ocapiat.fr/wp-content/uploads/Regles-de-prise-en-charge-2026.pdf",
+    "texte": "** A compter du 01.05.26 (date de réception de la demande de prise en charge)"
+   },
+   {
+    "url": "https://www.ocapiat.fr/wp-content/uploads/Regles-de-prise-en-charge-2026.pdf",
+    "texte": "> Demande de prise en charge à adresser obligatoirement avant le début de  l’action de formation soit au plus tôt dans les 2 mois précédant l’action et au plus tard le 1er jour de la formation, en joignant la convention de formation correspondante"
+   },
+   {
+    "url": "https://www.ocapiat.fr/wp-content/uploads/Regles-de-prise-en-charge-2026.pdf",
+    "texte": "- 70 % des coûts pédagogiques  demandés, plafonnés à 1 050 € HT par stagiaire par dossier"
+   },
+   {
+    "url": "https://www.ocapiat.fr/wp-content/uploads/Regles-de-prise-en-charge-2026.pdf",
+    "texte": "- Sécurité des données ; - Gestion de l’eau et stress hydrique ; - Acculturation aux changements climatiques ; - Gestion de crise ; - Management du changement."
+   },
+   {
+    "url": "https://www.ocapiat.fr/financement-sur-mesure-par-lopco-simulateur-boost-competences/",
+    "texte": "Boost Compétences est réservé aux entreprises de moins de 50 salariés (sauf le secteur Pêche-PCMCM)"
+   },
+   {
+    "url": "https://www.ocapiat.fr/financement-sur-mesure-par-lopco-simulateur-boost-competences/",
+    "texte": "Plusieurs demandes préalables de prise en charge sont possibles dans l’année dans la limite des fonds disponibles."
+   }
+  ],
+  "remarques": null,
+  "delai_jusquau": null,
+  "paliers": [
+   {
+    "min": 0,
+    "max": 10,
+    "montant": "50 % des coûts pédagogiques, jusqu'à 750 € HT par stagiaire et par dossier",
+    "detail": "dans la limite de 40 € HT de l'heure par stagiaire"
+   },
+   {
+    "min": 11,
+    "max": 49,
+    "montant": "50 % des coûts pédagogiques, jusqu'à 750 € HT par stagiaire et par dossier",
+    "detail": "dans la limite de 40 € HT de l'heure par stagiaire"
+   }
+  ],
+  "delai": "Demande à déposer avant le début de la formation, au plus tôt 2 mois avant."
+ }
+]
