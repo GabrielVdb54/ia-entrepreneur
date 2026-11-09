@@ -161,7 +161,7 @@ function contenu(r) {
     eff.libelle && !['NN', '00'].includes(eff.tranche) && `${eff.libelle.toLowerCase()}${eff.annee ? ` (Insee, ${eff.annee})` : ''}`,
   ].filter(Boolean).join(', ');
 
-  const c = { nom, sujet: '', opco: null, infos, budget: [], bouton: null, notes: [], fonds: null };
+  const c = { nom, sujet: '', opco: null, infos, budget: [], bouton: null, notes: [], fonds: null, sources: [] };
 
   if (!o) {
     c.sujet = `Budget formation de ${nom} : votre OPCO à vérifier`;
@@ -176,6 +176,10 @@ function contenu(r) {
     ? `Votre budget formation ${ref.nom} : ${bareme.paliers[0].montant}${bareme.plusieurs ? ' ou plus' : ''}`
     : `Budget formation de ${nom} : votre OPCO est ${o.nom}`;
   c.opco = `Votre OPCO : ${o.nom}${o.gestion ? ` (dossier géré par ${o.gestion.nom})` : ''}`;
+  // Gabriel, 09/11 : « ajouter le lien vers là où on a trouvé l'info, pour
+  // qu'il vérifie lui-même ». Chaque information de l'email renvoie à sa source.
+  c.sources.push({ quoi: 'Votre OPCO', texte: 'outil officiel de France compétences (entrez votre SIRET)', url: FRANCE_COMPETENCES });
+  if (conv?.lien) c.sources.push({ quoi: 'Votre convention collective', texte: 'Code du travail numérique', url: conv.lien });
   if (o.ambigu) {
     c.notes.push(`Votre convention est partagée entre ${o.candidats.map((x) => x.nom).join(' et ')} : nous vérifions le vôtre avec vous avant tout dépôt.`);
   }
@@ -186,8 +190,9 @@ function contenu(r) {
     for (const p of bareme.paliers) {
       c.budget.push({ fort: `${bareme.plusieurs ? `${p.libelle[0].toUpperCase()}${p.libelle.slice(1)} : ` : ''}${p.montant}`, suite: p.detail });
     }
-    c.notes.push(`Source : ${bareme.version}, dans la limite des fonds disponibles.${bareme.delai ? ` ${bareme.delai}` : ''}`);
-    c.bouton = { texte: 'Voir le barème de ma branche', url: bareme.lien };
+    c.notes.push(`Montant tiré du ${bareme.version}, relu le ${dateFr(bareme.lu_le)}, dans la limite des fonds disponibles.${bareme.delai ? ` ${bareme.delai}` : ''}`);
+    c.bouton = { texte: `Voir le barème sur le site ${de(ref.nom)}`, url: bareme.lien };
+    c.sources.push({ quoi: 'Le montant', texte: `barème 2026 de votre branche, site ${de(ref.nom)}`, url: bareme.lien });
   } else if (eff.moins_de_50 === false) {
     c.budget.push(`À partir de 50 salariés, les fonds mutualisés de l'OPCO ne s'appliquent plus : la formation se finance sur votre budget ou par un versement volontaire à ${ref.nom}. Le détail est ici :`);
     c.bouton = { texte: `Voir les critères ${de(ref.nom)}`, url: ref.criteres };
@@ -215,6 +220,7 @@ ${P('Bonjour,')}
 ${budget}${fonds}
 ${c.bouton ? `<p style="margin:4px 0 16px;">${BOUTON(c.bouton, '#1A3CFF')}</p>` : ''}
 ${c.notes.map((n) => `<p style="margin:0 0 10px;font:400 12px/1.55 Helvetica,Arial,sans-serif;color:#8A90AB;">${echapper(n)}</p>`).join('')}
+${c.sources.length ? `<p style="margin:0 0 10px;font:400 12px/1.7 Helvetica,Arial,sans-serif;color:#8A90AB;">Pour vérifier vous-même :${c.sources.map((x) => `<br>${echapper(x.quoi)} : <a href="${echapper(x.url)}" style="color:#525880;">${echapper(x.texte)}</a>`).join('')}</p>` : ''}
 <div style="height:10px;border-bottom:1px solid #E7E9F2;margin-bottom:18px;"></div>
 ${P('Nous montons votre dossier de financement avec vous, et vous connaissez votre reste à charge avant de signer.')}
 <p style="margin:0 0 20px;">${BOUTON({ texte: 'Prendre rendez-vous (30 min)', url: RDV }, '#10B981')}</p>
@@ -229,7 +235,9 @@ function versTexte(c) {
   for (const b of c.budget) l.push(typeof b === 'string' ? b : `${b.fort}${b.suite ? `, ${b.suite}` : ''}`);
   if (c.fonds) l.push(...c.fonds.map((f) => `${f.nom} (${f.pour}) : ${f.criteres}`));
   if (c.bouton) l.push(`${c.bouton.texte} : ${c.bouton.url}`);
-  l.push(...c.notes, '', 'Nous montons votre dossier de financement avec vous, et vous connaissez votre reste à charge avant de signer.', `Prendre rendez-vous (30 min) : ${RDV}`, '', 'Gabriel Vanderbecken', 'IA-Entrepreneur, organisme de formation certifié Qualiopi');
+  l.push(...c.notes);
+  if (c.sources.length) l.push('Pour vérifier vous-même :', ...c.sources.map((x) => `${x.quoi} : ${x.texte}, ${x.url}`));
+  l.push('', 'Nous montons votre dossier de financement avec vous, et vous connaissez votre reste à charge avant de signer.', `Prendre rendez-vous (30 min) : ${RDV}`, '', 'Gabriel Vanderbecken', 'IA-Entrepreneur, organisme de formation certifié Qualiopi');
   return l.join('\n');
 }
 

@@ -73,9 +73,24 @@ export const BAREMES = [
     lu_le: '2026-11-09',
     valable_jusquau: '2026-12-31',
     paliers: [
-      { min: 0, max: 10, montant: '2 500 € HT de financement en 2026', detail: "les formations à la transformation numérique, IA comprise, sont prises en charge jusqu'à 30 € HT par heure et par stagiaire" },
-      { min: 11, max: 49, montant: '4 500 € HT de financement en 2026', detail: "les formations à la transformation numérique, IA comprise, sont prises en charge jusqu'à 30 € HT par heure et par stagiaire" },
+      { min: 0, max: 10, montant: "jusqu'à 2 500 € HT", detail: "les formations cœur de métier, dont « la transformation numérique et digitale des entreprises (y compris IA) », sont prises en charge à 30 € HT de l'heure" },
+      { min: 11, max: 49, montant: "jusqu'à 4 500 € HT", detail: "les formations cœur de métier, dont « la transformation numérique et digitale des entreprises (y compris IA) », sont prises en charge à 30 € HT de l'heure" },
     ],
+  },
+  {
+    opco: 'OPCO EP',
+    branche: 'Cabinets médicaux',
+    idcc: ['1147'],
+    lien: 'https://www.opcoep.fr/criteres-de-financement?branche=204',
+    version: "critères 2026 de la branche Cabinets médicaux d'OPCO EP (mis à jour le 01/10/2026)",
+    lu_le: '2026-11-09',
+    valable_jusquau: '2026-12-31',
+    paliers: [
+      { min: 0, max: 10, montant: "jusqu'à 15 000 € HT", detail: "les formations « Informatique / Logiciels professionnels » sont prises en charge à 25 € HT de l'heure, 28 heures au plus" },
+      { min: 11, max: 49, montant: "jusqu'à 30 000 € HT", detail: "les formations « Informatique / Logiciels professionnels » sont prises en charge à 25 € HT de l'heure, 28 heures au plus" },
+    ],
+    delai: "Pour une formation en 2026, la demande doit parvenir à OPCO EP avant le 30 novembre 2026.",
+    delai_jusquau: '2026-11-30',
   },
 ];
 
@@ -106,6 +121,7 @@ export function baremePour(opco, idcc, tranche) {
     branche: b.branche,
     lien: b.lien,
     version: b.version,
+    lu_le: b.lu_le,
     paliers: paliers.map((p) => ({ ...p, libelle: p.min === 0 ? `moins de ${p.max + 1} salariés` : `de ${p.min} à ${p.max} salariés` })),
     plusieurs: paliers.length > 1,
     delai: b.delai && (!b.delai_jusquau || jour <= b.delai_jusquau) ? b.delai : null,
