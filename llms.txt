@@ -16,6 +16,14 @@ IA-Entrepreneur est installé à Nancy (5 rue Jacques Villermaux, 54000 Nancy). 
 - Formation IA à Metz : https://ia-entrepreneur.fr/formation-ia-metz.html
 - Formation IA à Strasbourg : https://ia-entrepreneur.fr/formation-ia-strasbourg.html
 
+### Formations par métier
+Pour chaque métier : les tâches où l'IA fait gagner du temps, les règles du secteur à respecter et l'OPCO qui finance.
+- Formation IA pour agences immobilières (OPCO EP) : https://ia-entrepreneur.fr/formation-ia-agence-immobiliere.html
+- Formation IA pour syndics et gestion locative (OPCO EP) : https://ia-entrepreneur.fr/formation-ia-syndic-gestion-locative.html
+- Formation IA pour le BTP (Constructys) : https://ia-entrepreneur.fr/formation-ia-btp.html
+- Formation IA pour les entreprises de propreté (AKTO) : https://ia-entrepreneur.fr/formation-ia-proprete.html
+- Formation IA pour agents et courtiers d'assurance (OPCO Atlas) : https://ia-entrepreneur.fr/formation-ia-assurance.html
+
 ### Formations thématiques (sur mesure, sur devis)
 - Formation IA et AI Act : l'article 4, applicable depuis le 2 février 2025, demande aux entreprises qui utilisent l'IA de prendre des mesures pour développer la maîtrise de l'IA de leur personnel ; depuis le règlement Digital Omnibus, c'est une obligation de moyens : https://ia-entrepreneur.fr/formation-ia-obligatoire-ai-act.html
 - Formation Claude en entreprise : documents longs, projets partagés, connecteurs (Google Drive, Microsoft 365, HubSpot), fichiers Excel, Word et PowerPoint : https://ia-entrepreneur.fr/formation-claude-entreprise.html
