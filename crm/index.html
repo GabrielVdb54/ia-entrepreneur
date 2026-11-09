@@ -648,7 +648,7 @@ const ERREURS = {
   message_trop_long: 'Message trop long pour une prospection (1 900 caractères au plus).',
   caractere_refuse: 'Le texte contient un caractère que LinkedIn refuse (tabulation ou caractère invisible).',
   texte_interdit: 'Ce texte contient un mot interdit en prospection LinkedIn (prix, ROI, CPF, « reste à charge », « 100 % », « certifiante », « gratuit ») : corrige-le.',
-  lien_interdit: 'Ce lien n\'a pas sa place à cette étape : aucun lien dans le message 1, FindIA seulement dans le dernier message.',
+  lien_interdit: 'Ce lien n\'a pas sa place à cette étape : aucun lien dans le message 1, FindIA ou le skill du métier seulement dans le dernier message.',
   pieces_trop_lourdes: "Pièces jointes trop lourdes pour le CRM (3,3 Mo au plus) : rien n'est parti. Envoie ce message depuis Gmail.",
   piece_invalide: "Une pièce jointe est vide ou illisible : rien n'est parti.",
   piece_trop_lourde: 'Pièce jointe trop lourde pour le CRM (plus de 4 Mo) : ouvre le fil dans Gmail.',
@@ -2856,7 +2856,7 @@ const ETAPES_LINKEDIN = [
   ['invitation', 'Invitation envoyée', 3, "LinkedIn : voir si l'invitation est acceptée"],
   ['acceptee', 'Invitation acceptée', 1, 'LinkedIn : envoyer le message 1'],
   ['message', 'Message envoyé', 4, 'LinkedIn : relance si pas de réponse'],
-  ['relance', 'Relance envoyée', 4, 'LinkedIn : dernier message (FindIA), puis on arrête'],
+  ['relance', 'Relance envoyée', 4, 'LinkedIn : dernier message (skill du métier ou FindIA), puis on arrête'],
   ['reponse', 'Réponse reçue', 1, 'LinkedIn : répondre'],
   ['autre', 'Autre', null, ''],
 ];
@@ -2919,7 +2919,7 @@ function ouvrirLinkedin(leadId) {
 // détecte et dans les tâches du jour j'envoie le message ». Gabriel valide ici ; son Mac envoie (MCP LinkedIn) et,
 // chaque matin, relève les acceptations et les réponses.
 const LI_OUVERTS = ['brouillon', 'a_envoyer', 'en_cours', 'echec', 'a_verifier'];
-const LIB_LI = { invitation: 'Invitation', message: 'Message 1', relance: 'Relance', findia: 'Dernier message (FindIA)', reponse: 'Réponse' };
+const LIB_LI = { invitation: 'Invitation', message: 'Message 1', relance: 'Relance', findia: 'Dernier message (skill ou FindIA)', reponse: 'Réponse' };
 const ETAT_LI = { brouillon: 'À valider', a_envoyer: 'En file : ton Mac l\'envoie bientôt', en_cours: 'Ton Mac l\'envoie…', envoye: 'Envoyé', echec: 'Pas parti', a_verifier: 'À vérifier sur LinkedIn', annule: 'Annulé' };
 const actionsLi = () => D.linkedin || [];
 const contactParId = (id) => (D.contacts || []).find((x) => x.id === id) || null;
