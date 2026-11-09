@@ -2105,6 +2105,23 @@ const INTERDITS_LI = [
   [/(sans|z[ée]ro)\s+reste\s+[àa]\s+charge/i, '« reste à charge »'], [/pris en charge [àa] 100|100\s?%/i, '« 100 % »'], [/\bCPF\b/, 'CPF'],
   [/certifiante/i, '« certifiante »'], [/\bRS\s?\d{4}\b/i, 'un code de certification'], [/\bROI\b|retour sur investissement/i, 'le ROI'], [/€|\d\s?euros?\b/i, 'un prix'],
 ];
+// Pages métier du site : la section #fiche donne les tâches où l'IA fait gagner du temps dans le métier, puis l'appel
+// de 30 minutes. Le lien va dans la relance, jamais dans le message 1 (Gabriel, 09/11/2026). Le métier se lit d'abord
+// dans le secteur et les tags (saisis à la main ou par la liste), sinon dans le nom et le besoin ; syndic avant immobilier, propreté avant BTP (« nettoyage des bâtiments »).
+const PAGES_METIER_LI = [
+  { metier: 'entreprise de propreté', page: 'formation-ia-proprete.html', re: /propret[ée]|nettoyage|entretien des locaux/i },
+  { metier: 'entreprise du BTP', page: 'formation-ia-btp.html', re: /\bBTP\b|b[âa]timent|travaux publics|ma[çc]onnerie|gros[- ][oœ]e?uvre|second[- ][oœ]e?uvre|charpente|couverture|plomberie|terrassement/i },
+  { metier: 'agence ou cabinet de courtage en assurance', page: 'formation-ia-assurance.html', re: /assuran|agent g[ée]n[ée]ral/i },
+  { metier: 'agence immobilière', page: 'formation-ia-agence-immobiliere.html', re: /immobili|agence immo/i },
+];
+const SYNDIC_LI = { metier: 'syndic de copropriété ou gestion locative', page: 'formation-ia-syndic-gestion-locative.html', re: /syndic|copropri|administrat\w* de biens/i };
+function pageMetierLi(l) {
+  const curate = [l?.secteur, ...(l?.tags || [])].filter(Boolean).join(' ');
+  const libre = [l?.entreprise, l?.besoin].filter(Boolean).join(' ');
+  const p = SYNDIC_LI.re.test(`${curate} ${libre}`) ? SYNDIC_LI
+    : PAGES_METIER_LI.find((x) => x.re.test(curate)) || PAGES_METIER_LI.find((x) => x.re.test(libre));
+  return p ? { metier: p.metier, url: `https://ia-entrepreneur.fr/${p.page}#fiche` } : null;
+}
 const QUOTA_MESSAGES_LI = 20;
 const quotaInvitationsLi = (jour) => (jour <= '2026-11-20' ? 10 : 15); // 2 premières semaines au rythme doux, puis 15 au plus
 
@@ -2117,6 +2134,9 @@ function verifierTexteLi(etape, texte) {
   if (/[\t\u0000-\u0008\u000b-\u001f\u007f\u0085\u2028\u2029]/.test(t)) throw new Refus('caractere_refuse');
   for (const [re, quoi] of INTERDITS_LI) if (re.test(t)) throw new Refus(`texte_interdit:${quoi}`);
   if (etape !== 'findia' && /gratuit/i.test(t)) throw new Refus('texte_interdit:« gratuit »');
+  // Filet des envois automatiques : aucun lien dans le message 1, FindIA seulement dans le dernier message.
+  if (etape === 'message' && /https?:\/\/|www\.|\.html\b|ia-entrepreneur\.fr/i.test(t)) throw new Refus('lien_interdit:message 1');
+  if (etape !== 'findia' && /meilleures-ia|findia/i.test(t)) throw new Refus('lien_interdit:FindIA');
   return t || null;
 }
 const nomContactLi = (c) => [c?.prenom, c?.nom].filter(Boolean).join(' ').trim() || 'ce contact';
@@ -2198,7 +2218,7 @@ Selon l'étape :
   3) Une ligne sur ce que fait Gabriel, rattachée à cette déduction, qui dit que les formations sont éligibles à leur budget formation (« Je forme des équipes de PME du Grand Est à l'alléger grâce à l'IA, avec des formations éligibles à votre budget formation »). Dans le message 1, ni OPCO ni « nous montons le dossier ».
   4) Une question simple sur leur façon de faire aujourd'hui, à deux options dont une qui ne met pas la personne en défaut (Gabriel : « ou avez-vous une autre solution ? »). Modèle : « Chez X, c'est encore surtout fait à la main, ou vous avez déjà trouvé une solution ? ». Une question qui oppose déjà deux façons de faire reste telle quelle (« c'est une personne dédiée qui s'en charge, ou chacun gère ses dossiers ? »).
   Pas de demande de rendez-vous, pas de lien. Exemple validé par Gabriel : « Bonjour Quentin, dans votre post sur les 10 ans de FVP Courtage, vous parliez de « tout le plaisir de l'administratif » à vos débuts. Avec les recrutements et le développement du cabinet depuis, l'administratif a sûrement grandi lui aussi. Je forme des équipes de PME du Grand Est à l'alléger grâce à l'IA, avec des formations éligibles à votre budget formation. Aujourd'hui, c'est une personne dédiée qui s'en charge chez vous, ou chacun gère ses dossiers ? » Ne recopie pas cet exemple : le sujet de la déduction (l'administratif, les devis, les comptes rendus, le recrutement…) découle du fait que tu as trouvé.
-- relance (après 4 jours sans réponse) : 200 à 400 caractères. Reprend la question autrement. Redit en une phrase que les formations sont éligibles à leur budget formation (peut ajouter « nous montons le dossier avec votre OPCO »). Une seule demande : un échange de 30 minutes, avec deux créneaux précis dans les trois jours ouvrés qui suivent la date du jour.
+- relance (après 4 jours sans réponse) : 200 à 400 caractères (jusqu'à 500 avec le lien de la page métier). Reprend la question autrement. Redit en une phrase que les formations sont éligibles à leur budget formation (peut ajouter « nous montons le dossier avec votre OPCO »). Si la fiche donne une « Page métier » et que l'activité de l'entreprise est bien ce métier, donne ce lien en une phrase, recopié tel quel (« Je vous mets ici les tâches où l'IA fait gagner le plus de temps dans une agence comme la vôtre : <lien> », en nommant son métier), juste avant la proposition des 30 minutes ; sinon, pas de lien. Une seule demande : un échange de 30 minutes, avec deux créneaux précis dans les trois jours ouvrés qui suivent la date du jour.
 - findia (dernier message, 8 jours après la relance, seulement si la personne n'a répondu à rien) : 200 à 400 caractères. Apporte quelque chose sans rien demander : FindIA, l'outil gratuit du site qui dit quelle IA choisir pour quel usage (https://ia-entrepreneur.fr/meilleures-ia.html). Laisse partir poliment (« si ce n'est pas le moment, aucun souci »).
 - reponse : répond à son dernier message, fourni dans la fiche, simplement, en reprenant ce qu'il dit. S'il pose une question, réponds-y. S'il est intéressé, propose 30 minutes avec deux créneaux précis dans les trois jours ouvrés. S'il dit qu'il a déjà un prestataire, demande « vous en êtes satisfait à combien sur 10 ? ». S'il dit non, remercie et laisse la porte ouverte.
 - invitation : une note de 200 caractères au plus, une phrase sur eux et une question, sans présentation ni offre.
@@ -2207,20 +2227,22 @@ Règles :
 - Vouvoiement, sauf si la consigne demande le tutoiement. Commence par « Bonjour {prénom}, » si le prénom est connu. Finis par « Gabriel » sur sa propre ligne (pas pour une invitation).
 - Court, direct, centré sur la personne et son entreprise, pas sur IA-Entrepreneur : au plus une ligne sur Gabriel (temps 3 du message 1). Jamais « nous sommes… » ni « je suis… » en ouverture.
 - Jamais le prénom d'un salarié ou d'un tiers, même s'il apparaît dans un post ou dans la fiche.
-- FindIA et son lien seulement à l'étape findia : jamais dans le message 1, la relance ou une réponse (Gabriel, 09/11/2026).
+- FindIA et son lien seulement à l'étape findia : jamais dans le message 1, la relance ou une réponse (Gabriel, 09/11/2026). Le lien de la page métier seulement à l'étape relance. Aucun autre lien.
 - Interdits : tout prix ou montant, chiffre de gain ou de ROI, « sans reste à charge », « zéro reste à charge », « pris en charge à 100 % », « gratuit » (sauf pour FindIA), CPF, « certifiante », code de certification, mots techniques (LLM, prompt, agent, automatisation n8n).
 - N'invente rien : seulement les faits de la fiche et de l'historique. Sans fait assez fort pour un message vraiment personnalisé, écris un message général assumé, construit sur son métier (Gabriel l'accepte) : ne force jamais un fait faible (la ville seule, un vieux post) pour avoir l'air de connaître la personne.
 - Pas de tiret long, pas d'emoji, pas de point d'exclamation.
-appuis : les faits de la fiche que tu as utilisés, en quelques mots chacun, avec leur source et leur date si elle est connue (« post sur les 10 ans du cabinet, il y a 5 semaines »).`;
+appuis : les faits de la fiche que tu as utilisés, en quelques mots chacun, avec leur source et leur date si elle est connue (« post sur les 10 ans du cabinet, il y a 5 semaines »). Si tu as donné la page métier, ajoute « page métier : <métier> » ; si tu l'as écartée, dis pourquoi en quelques mots.`;
 async function redigerLi(c, l, etape, { consigne = '', message = '' } = {}) {
   const { lignes: acts } = await sb(`iae_crm_activites?lead_id=eq.${l.id}&order=date.desc&limit=12&select=date,type,resume,contenu`);
   const jour = new Intl.DateTimeFormat('fr-FR', { timeZone: 'Europe/Paris', weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }).format(new Date());
+  const page = etape === 'relance' ? pageMetierLi(l) : null;
   const fiche = [
     `Date du jour : ${jour}`,
     `Étape : ${etape}`,
     `Personne : ${nomContactLi(c)}${c.poste ? `, ${c.poste}` : ''}`,
     `Entreprise : ${l.entreprise}${l.secteur ? ` (${l.secteur})` : ''}${l.localisation ? `, ${l.localisation}` : ''}`,
     l.besoin ? `Ce que Gabriel sait de leur besoin : ${couper(l.besoin, 600)}` : '',
+    page ? `Page métier (métier : ${page.metier}) : ${page.url}` : '',
     c.notes ? `Notes sur la personne : ${couper(c.notes, 600)}` : '',
     message ? `Son dernier message : ${couper(message, 2000)}` : '',
     consigne ? `Consigne de Gabriel : ${couper(consigne, 300)}` : '',

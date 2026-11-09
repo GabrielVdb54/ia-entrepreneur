@@ -647,6 +647,7 @@ const ERREURS = {
   message_trop_long: 'Message trop long pour une prospection (1 900 caractères au plus).',
   caractere_refuse: 'Le texte contient un caractère que LinkedIn refuse (tabulation ou caractère invisible).',
   texte_interdit: 'Ce texte contient un mot interdit en prospection LinkedIn (prix, ROI, CPF, « reste à charge », « 100 % », « certifiante », « gratuit ») : corrige-le.',
+  lien_interdit: 'Ce lien n\'a pas sa place à cette étape : aucun lien dans le message 1, FindIA seulement dans le dernier message.',
   pieces_trop_lourdes: "Pièces jointes trop lourdes pour le CRM (3,3 Mo au plus) : rien n'est parti. Envoie ce message depuis Gmail.",
   piece_invalide: "Une pièce jointe est vide ou illisible : rien n'est parti.",
   piece_trop_lourde: 'Pièce jointe trop lourde pour le CRM (plus de 4 Mo) : ouvre le fil dans Gmail.',
@@ -1122,6 +1123,7 @@ function rendreFiche() {
   const l = IDX.lead.get(S.fiche);
   if (!l) { if (f.open) f.close(); return; }
   const defile = f.scrollTop;
+  const toastIci = TOAST.parentElement === f; // le message « … Annuler » vit dans la fiche ouverte : il doit survivre au redessin
   const cs = contactsDe(l.id);
   const acts = activitesDe(l.id);
   const sous = [l.secteur, l.localisation].filter(Boolean).join(', ');
@@ -1211,6 +1213,7 @@ function rendreFiche() {
       <button type="button" class="btn" data-act="archiver">${l.archive ? 'Désarchiver' : 'Archiver'}</button>
       <button type="button" class="btn danger" data-act="supprimer-lead">Supprimer le lead</button>
     </footer>`;
+  if (toastIci) { f.append(TOAST); if (TOAST.classList.contains('visible')) { try { TOAST.showPopover(); } catch { /* rien */ } } }
   f.scrollTop = defile;
   chargerLogos();
 }
