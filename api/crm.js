@@ -2192,7 +2192,12 @@ const SCHEMA_LI = { type: 'object', additionalProperties: false, properties: { t
 const CONSIGNES_LI = `Tu écris, pour Gabriel Vanderbecken (IA-Entrepreneur, organisme de formation à l'IA pour les entreprises, en Lorraine et dans le Grand Est), un message LinkedIn à une personne de petite entreprise (1 à 99 salariés), souvent dirigeante, qu'il ne connaît pas ou peu. Le message part sous son nom, il le relit avant l'envoi.
 
 Selon l'étape :
-- message (message 1, juste après l'acceptation de l'invitation) : 300 à 500 caractères. Un fait réel sur la personne ou son entreprise, tiré de la fiche (activité, ville, poste), puis une question facile sur leur façon de faire aujourd'hui (l'administratif, les mails, les devis, les comptes rendus). Pas de demande de rendez-vous, pas de présentation de Gabriel ni de l'offre, pas de lien.
+- message (message 1, juste après l'acceptation de l'invitation) : 300 à 500 caractères, en quatre temps qui justifient la prise de contact (Gabriel, 09/11/2026 : une phrase générale « on dirait juste une phrase bateau »).
+  1) Un fait réel sur la personne ou son entreprise, tiré de la fiche ou de l'historique, en disant d'où il vient (« dans votre post sur… », « avec vos quatre agences… »).
+  2) La déduction qui justifie le message, marquée par « sûrement », qui nomme le sujet en toutes lettres (« l'administratif a sûrement grandi avec vos recrutements », jamais « il a dû grossir »). Elle n'affirme rien d'inventé.
+  3) Une ligne sur ce que fait Gabriel, rattachée à cette déduction (« Je forme des équipes de PME du Grand Est à l'alléger grâce à l'IA »).
+  4) Une question simple sur leur façon de faire aujourd'hui (« c'est une personne dédiée qui s'en charge, ou chacun gère ses dossiers ? »).
+  Pas de demande de rendez-vous, pas de lien. Exemple validé par Gabriel : « Bonjour Quentin, dans votre post sur les 10 ans de FVP Courtage, vous parliez de « tout le plaisir de l'administratif » à vos débuts. Avec les recrutements et le développement du cabinet depuis, l'administratif a sûrement grandi lui aussi. Je forme des équipes de PME du Grand Est à l'alléger grâce à l'IA. Aujourd'hui, c'est une personne dédiée qui s'en charge chez vous, ou chacun gère ses dossiers ? » Ne recopie pas cet exemple : le sujet de la déduction (l'administratif, les devis, les comptes rendus, le recrutement…) découle du fait que tu as trouvé.
 - relance (après 4 jours sans réponse) : 200 à 400 caractères. Reprend la question autrement. Peut dire en une phrase que la formation est finançable sur leur budget formation (« nous montons le dossier avec votre OPCO »). Une seule demande : un échange de 30 minutes, avec deux créneaux précis dans les trois jours ouvrés qui suivent la date du jour.
 - findia (dernier message) : 200 à 400 caractères. Apporte quelque chose sans rien demander : FindIA, l'outil gratuit du site qui dit quelle IA choisir pour quel usage (https://ia-entrepreneur.fr/meilleures-ia.html). Laisse partir poliment (« si ce n'est pas le moment, aucun souci »).
 - reponse : répond à son dernier message, fourni dans la fiche, simplement, en reprenant ce qu'il dit. S'il pose une question, réponds-y. S'il est intéressé, propose 30 minutes avec deux créneaux précis dans les trois jours ouvrés. S'il dit qu'il a déjà un prestataire, demande « vous en êtes satisfait à combien sur 10 ? ». S'il dit non, remercie et laisse la porte ouverte.
@@ -2200,11 +2205,12 @@ Selon l'étape :
 
 Règles :
 - Vouvoiement, sauf si la consigne demande le tutoiement. Commence par « Bonjour {prénom}, » si le prénom est connu. Finis par « Gabriel » sur sa propre ligne (pas pour une invitation).
-- Court, direct, centré sur la personne et son entreprise, pas sur IA-Entrepreneur. Jamais « nous sommes… » ni « je suis… » en ouverture.
+- Court, direct, centré sur la personne et son entreprise, pas sur IA-Entrepreneur : au plus une ligne sur Gabriel (temps 3 du message 1). Jamais « nous sommes… » ni « je suis… » en ouverture.
+- Jamais le prénom d'un salarié ou d'un tiers, même s'il apparaît dans un post ou dans la fiche.
 - Interdits : tout prix ou montant, chiffre de gain ou de ROI, « sans reste à charge », « zéro reste à charge », « pris en charge à 100 % », « gratuit » (sauf pour FindIA), CPF, « certifiante », code de certification, mots techniques (LLM, prompt, agent, automatisation n8n).
-- N'invente rien : seulement les faits de la fiche et de l'historique. Si la fiche ne dit rien d'utile, reste général sans faire semblant de connaître.
+- N'invente rien : seulement les faits de la fiche et de l'historique. Si la fiche ne dit rien d'utile, pars du fait le plus concret qu'elle donne (activité, ville, poste) sans faire semblant de connaître.
 - Pas de tiret long, pas d'emoji, pas de point d'exclamation.
-appuis : les faits de la fiche que tu as utilisés, en quelques mots chacun.`;
+appuis : les faits de la fiche que tu as utilisés, en quelques mots chacun, avec leur source et leur date si elle est connue (« post sur les 10 ans du cabinet, il y a 5 semaines »).`;
 async function redigerLi(c, l, etape, { consigne = '', message = '' } = {}) {
   const { lignes: acts } = await sb(`iae_crm_activites?lead_id=eq.${l.id}&order=date.desc&limit=12&select=date,type,resume,contenu`);
   const jour = new Intl.DateTimeFormat('fr-FR', { timeZone: 'Europe/Paris', weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }).format(new Date());
