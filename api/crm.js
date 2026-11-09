@@ -83,7 +83,7 @@
  *       /api/conseil). Sans elle, la page n'affiche pas le bouton.
  */
 
-import { timingSafeEqual, randomBytes } from 'node:crypto';
+import { timingSafeEqual, randomBytes, createHash } from 'node:crypto';
 import Anthropic from '@anthropic-ai/sdk';
 import {
   deposerPiece, empreinte as empreinteTexte, etatDossier, lireFichier, majStatut, nouveauJeton, verifierSiret, aujourdHui as aujourdHuiF,
@@ -475,7 +475,8 @@ async function emailsEnvoyesAujourdhui() {
 /* ---------- Opérations ---------- */
 
 async function lireTout() {
-  const [leads, contacts, activites, memos, modeles, reglages, { lignes: entrants }, { lignes: ecartes }, formateurs, documents, programmes] = await Promise.all([
+  const depuisLi = new Date(Date.now() - 45 * 86400000).toISOString();
+  const [leads, contacts, activites, memos, modeles, reglages, { lignes: entrants }, { lignes: ecartes }, formateurs, documents, programmes, { lignes: linkedin }] = await Promise.all([
     toutLire('iae_crm_leads', 'entreprise.asc'),
     toutLire('iae_crm_contacts', 'principal.desc,created_at.asc'),
     toutLire('iae_crm_activites', 'date.desc'),
@@ -487,11 +488,12 @@ async function lireTout() {
     toutLire('iae_crm_formateurs', 'created_at.asc'),
     sb('iae_crm_documents?select=id,created_at,lead_id,type,nom,chemin,mime,taille,depose_par,lecture,statut,motif,verifie_le,expire_le,archive&order=created_at.desc&limit=2000').then((x) => x.lignes),
     toutLire('iae_crm_programmes', 'created_at.desc'),
+    sb(`iae_crm_linkedin?or=(statut.in.(brouillon,a_envoyer,en_cours,echec,a_verifier),created_at.gte.${encodeURIComponent(depuisLi)})&order=created_at.desc&limit=500&select=id,created_at,lead_id,contact_id,type,etape,texte,statut,valide_le,envoye_le,detail`),
   ]);
   return {
-    leads, contacts, activites, memos, modeles, entrants, ecartes, documents, programmes,
+    leads, contacts, activites, memos, modeles, entrants, ecartes, documents, programmes, linkedin: linkedin || [],
     formateurs: formateurs.map(({ jeton_hash: _h, signature, ...f }) => ({ ...f, signature: signature ? { nom: signature.nom, lieu: signature.lieu, date: signature.date, version: signature.version, empreinte: signature.empreinte, ip: signature.ip } : null })),
-    reglages: Object.fromEntries(reglages.map((r) => [r.cle, r.valeur])),
+    reglages: Object.fromEntries(reglages.filter((r) => !r.cle.endsWith('_cle')).map((r) => [r.cle, r.valeur])),
     gmail: gmailConfigure(),
     agenda: gmailConfigure(),
     ia: Boolean(process.env.ANTHROPIC_API_KEY),
@@ -2011,6 +2013,317 @@ async function traiterEntrant(corps) {
   return { lead_id: lead.id };
 }
 
+/* ---------- LinkedIn : la file d'envoi, le Mac de Gabriel et le contrôle du matin ---------- */
+// Gabriel, 09/11 : « lancer les conversations, messages, ajouts directement sur le CRM ; quand ils ajoutent, on le
+// détecte et dans les tâches du jour j'envoie le message ». Ses choix : son Mac envoie après son clic dans le CRM,
+// et vérifie chaque matin qui a accepté ou répondu. Le serveur ne parle jamais à LinkedIn : il tient la file, le
+// Mac (robot local, MCP LinkedIn, clé X-Cle-Robot) l'exécute et rend compte.
+const PROFIL_LI_RE = /^https:\/\/([a-z]{2,3}\.)?linkedin\.com\/in\/[^\s"'<>]+$/;
+const ETAPES_LI = ['invitation', 'message', 'relance', 'findia', 'reponse'];
+const LIB_ETAPE_LI = { invitation: 'Invitation', message: 'Message 1', relance: 'Relance', findia: 'Dernier message (FindIA)', reponse: 'Réponse' };
+const OUVERTS_LI = ['brouillon', 'a_envoyer', 'en_cours', 'echec', 'a_verifier'];
+// Les règles d'écriture de la prospection (mémoire du 06/11) : un filet, en plus des consignes de rédaction.
+const INTERDITS_LI = [
+  [/(sans|z[ée]ro)\s+reste\s+[àa]\s+charge/i, '« reste à charge »'], [/pris en charge [àa] 100|100\s?%/i, '« 100 % »'], [/\bCPF\b/, 'CPF'],
+  [/certifiante/i, '« certifiante »'], [/\bRS\s?\d{4}\b/i, 'un code de certification'], [/\bROI\b|retour sur investissement/i, 'le ROI'], [/€|\d\s?euros?\b/i, 'un prix'],
+];
+const QUOTA_MESSAGES_LI = 20;
+const quotaInvitationsLi = (jour) => (jour <= '2026-11-20' ? 10 : 15); // 2 premières semaines au rythme doux, puis 15 au plus
+
+function verifierTexteLi(etape, texte) {
+  const t = String(texte ?? '').replace(/\r\n?/g, '\n').trim();
+  if (etape === 'invitation') {
+    if (t.length > 200) throw new Refus('note_trop_longue');
+  } else if (!t) throw new Refus('message_vide');
+  else if (t.length > 1900) throw new Refus('message_trop_long');
+  if (/[\t\u0000-\u0008\u000b-\u001f\u007f\u0085\u2028\u2029]/.test(t)) throw new Refus('caractere_refuse');
+  for (const [re, quoi] of INTERDITS_LI) if (re.test(t)) throw new Refus(`texte_interdit:${quoi}`);
+  if (etape !== 'findia' && /gratuit/i.test(t)) throw new Refus('texte_interdit:« gratuit »');
+  return t || null;
+}
+const nomContactLi = (c) => [c?.prenom, c?.nom].filter(Boolean).join(' ').trim() || 'ce contact';
+
+async function contactEtLeadLi(contactId) {
+  if (!UUID_RE.test(contactId || '')) throw new Refus('id_invalide');
+  const [c] = (await sb(`iae_crm_contacts?id=eq.${contactId}&select=*`)).lignes;
+  if (!c) throw new Refus('introuvable', 404);
+  const [l] = (await sb(`iae_crm_leads?id=eq.${c.lead_id}&select=*`)).lignes;
+  if (!l) throw new Refus('introuvable', 404);
+  return { c, l };
+}
+async function actionLi(id) {
+  if (!UUID_RE.test(id || '')) throw new Refus('id_invalide');
+  const [a] = (await sb(`iae_crm_linkedin?id=eq.${id}&select=*`)).lignes;
+  if (!a) throw new Refus('introuvable', 404);
+  return a;
+}
+async function majActionLi(id, valeurs) {
+  const { lignes } = await sb(`iae_crm_linkedin?id=eq.${id}`, { methode: 'PATCH', corps: valeurs, prefer: 'return=representation' });
+  return lignes[0];
+}
+async function majLeadLi(id, valeurs) {
+  if (!Object.keys(valeurs).length) return null;
+  const { lignes } = await sb(`iae_crm_leads?id=eq.${id}`, { methode: 'PATCH', corps: valeurs, prefer: 'return=representation' });
+  return lignes[0];
+}
+async function majContactLi(id, valeurs) {
+  const { lignes } = await sb(`iae_crm_contacts?id=eq.${id}`, { methode: 'PATCH', corps: valeurs, prefer: 'return=representation' });
+  return lignes[0];
+}
+async function journalLi(l, c, etape, resume, contenu = null, extra = {}) {
+  await sb('iae_crm_activites', {
+    methode: 'POST', prefer: 'return=minimal',
+    corps: { lead_id: l.id, contact_id: c?.id || null, type: 'linkedin', resume: resume.slice(0, 2000), contenu: contenu ? String(contenu).slice(0, 8000) : null, source: 'crm, linkedin (Mac)', meta: { canal: 'linkedin', etape, ...extra } },
+  });
+}
+
+// Un seul brouillon ouvert par personne : préparer le remplace ou le crée.
+async function preparerLi(c, l, etape, texte) {
+  if (!PROFIL_LI_RE.test(c.linkedin || '')) throw new Refus('profil_linkedin_absent');
+  if (!ETAPES_LI.includes(etape)) throw new Refus('valeur_invalide:etape');
+  const type = etape === 'invitation' ? 'invitation' : 'message';
+  const t = texte == null ? null : String(texte).replace(/\r\n?/g, '\n').trim().slice(0, 8000) || null;
+  const { lignes: ouverts } = await sb(`iae_crm_linkedin?contact_id=eq.${c.id}&statut=in.(${OUVERTS_LI.join(',')})&select=*`);
+  const modifiable = ouverts.find((a) => ['brouillon', 'echec', 'a_verifier'].includes(a.statut));
+  if (ouverts.some((a) => ['a_envoyer', 'en_cours'].includes(a.statut))) throw new Refus('deja_en_file', 409);
+  if (modifiable) return majActionLi(modifiable.id, { type, etape, texte: t, statut: 'brouillon', detail: null });
+  const { lignes } = await sb('iae_crm_linkedin', { methode: 'POST', corps: { lead_id: l.id, contact_id: c.id, type, etape, texte: t }, prefer: 'return=representation' });
+  return lignes[0];
+}
+
+// Claude rédige le texte de l'étape, d'après la fiche (Gabriel relit toujours avant l'envoi).
+const SCHEMA_LI = { type: 'object', additionalProperties: false, properties: { texte: { type: 'string' }, appuis: { type: 'array', items: { type: 'string' } } }, required: ['texte', 'appuis'] };
+const CONSIGNES_LI = `Tu écris, pour Gabriel Vanderbecken (IA-Entrepreneur, organisme de formation à l'IA pour les entreprises, en Lorraine et dans le Grand Est), un message LinkedIn à une personne de petite entreprise (1 à 99 salariés), souvent dirigeante, qu'il ne connaît pas ou peu. Le message part sous son nom, il le relit avant l'envoi.
+
+Selon l'étape :
+- message (message 1, juste après l'acceptation de l'invitation) : 300 à 500 caractères. Un fait réel sur la personne ou son entreprise, tiré de la fiche (activité, ville, poste), puis une question facile sur leur façon de faire aujourd'hui (l'administratif, les mails, les devis, les comptes rendus). Pas de demande de rendez-vous, pas de présentation de Gabriel ni de l'offre, pas de lien.
+- relance (après 4 jours sans réponse) : 200 à 400 caractères. Reprend la question autrement. Peut dire en une phrase que la formation est finançable sur leur budget formation (« nous montons le dossier avec votre OPCO »). Une seule demande : un échange de 30 minutes, avec deux créneaux précis dans les trois jours ouvrés qui suivent la date du jour.
+- findia (dernier message) : 200 à 400 caractères. Apporte quelque chose sans rien demander : FindIA, l'outil gratuit du site qui dit quelle IA choisir pour quel usage (https://ia-entrepreneur.fr/meilleures-ia.html). Laisse partir poliment (« si ce n'est pas le moment, aucun souci »).
+- reponse : répond à son dernier message, fourni dans la fiche, simplement, en reprenant ce qu'il dit. S'il pose une question, réponds-y. S'il est intéressé, propose 30 minutes avec deux créneaux précis dans les trois jours ouvrés. S'il dit qu'il a déjà un prestataire, demande « vous en êtes satisfait à combien sur 10 ? ». S'il dit non, remercie et laisse la porte ouverte.
+- invitation : une note de 200 caractères au plus, une phrase sur eux et une question, sans présentation ni offre.
+
+Règles :
+- Vouvoiement, sauf si la consigne demande le tutoiement. Commence par « Bonjour {prénom}, » si le prénom est connu. Finis par « Gabriel » sur sa propre ligne (pas pour une invitation).
+- Court, direct, centré sur la personne et son entreprise, pas sur IA-Entrepreneur. Jamais « nous sommes… » ni « je suis… » en ouverture.
+- Interdits : tout prix ou montant, chiffre de gain ou de ROI, « sans reste à charge », « zéro reste à charge », « pris en charge à 100 % », « gratuit » (sauf pour FindIA), CPF, « certifiante », code de certification, mots techniques (LLM, prompt, agent, automatisation n8n).
+- N'invente rien : seulement les faits de la fiche et de l'historique. Si la fiche ne dit rien d'utile, reste général sans faire semblant de connaître.
+- Pas de tiret long, pas d'emoji, pas de point d'exclamation.
+appuis : les faits de la fiche que tu as utilisés, en quelques mots chacun.`;
+async function redigerLi(c, l, etape, { consigne = '', message = '' } = {}) {
+  const { lignes: acts } = await sb(`iae_crm_activites?lead_id=eq.${l.id}&order=date.desc&limit=12&select=date,type,resume,contenu`);
+  const jour = new Intl.DateTimeFormat('fr-FR', { timeZone: 'Europe/Paris', weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }).format(new Date());
+  const fiche = [
+    `Date du jour : ${jour}`,
+    `Étape : ${etape}`,
+    `Personne : ${nomContactLi(c)}${c.poste ? `, ${c.poste}` : ''}`,
+    `Entreprise : ${l.entreprise}${l.secteur ? ` (${l.secteur})` : ''}${l.localisation ? `, ${l.localisation}` : ''}`,
+    l.besoin ? `Ce que Gabriel sait de leur besoin : ${couper(l.besoin, 600)}` : '',
+    c.notes ? `Notes sur la personne : ${couper(c.notes, 600)}` : '',
+    message ? `Son dernier message : ${couper(message, 2000)}` : '',
+    consigne ? `Consigne de Gabriel : ${couper(consigne, 300)}` : '',
+    acts.length ? `Historique (du plus récent au plus ancien) :\n${acts.map((a) => `- ${String(a.date).slice(0, 10)} ${a.type} : ${couper(a.resume, 200)}${a.contenu && a.type === 'linkedin' ? ` | texte : ${couper(a.contenu, 500)}` : ''}`).join('\n')}` : '',
+  ].filter(Boolean).join('\n');
+  const r = await appelClaude({ consignes: CONSIGNES_LI, schema: SCHEMA_LI, contenu: fiche, max: 2000, timeout: 40000 });
+  return { texte: String(r.texte || '').trim(), appuis: (r.appuis || []).slice(0, 6) };
+}
+async function preparerAvecClaude(c, l, etape, opts) {
+  let texte = null;
+  try { texte = (await redigerLi(c, l, etape, opts)).texte || null; } catch (e) { console.error('crm linkedin rédaction', e.code || e.message); }
+  try { if (texte) verifierTexteLi(etape, texte); } catch { /* Gabriel corrige : le texte reste en brouillon */ }
+  return preparerLi(c, l, etape, texte);
+}
+
+async function operationLinkedin(corps, ip) {
+  const op = corps.op;
+  if (op === 'linkedin_preparer') {
+    const { c, l } = await contactEtLeadLi(corps.contact_id);
+    return { action: await preparerLi(c, l, String(corps.etape || 'invitation'), corps.texte ?? null) };
+  }
+  if (op === 'linkedin_rediger') {
+    if (tropDeRedactions(ip)) throw new Refus('ia_trop_de_demandes', 429);
+    const { c, l } = await contactEtLeadLi(corps.contact_id);
+    const etape = ETAPES_LI.includes(corps.etape) ? corps.etape : 'message';
+    let message = '';
+    if (etape === 'reponse') {
+      const { lignes } = await sb(`iae_crm_activites?lead_id=eq.${l.id}&type=eq.linkedin&meta->>etape=eq.reponse_recue&order=date.desc&limit=1&select=contenu`);
+      message = lignes[0]?.contenu || c.linkedin_vu || '';
+    }
+    return redigerLi(c, l, etape, { consigne: String(corps.consigne || ''), message });
+  }
+  const a = await actionLi(corps.id);
+  if (op === 'linkedin_valider') {
+    if (!['brouillon', 'echec', 'a_verifier'].includes(a.statut)) throw new Refus('deja_en_file', 409);
+    const texte = verifierTexteLi(a.etape, corps.texte ?? a.texte);
+    return { action: await majActionLi(a.id, { texte, statut: 'a_envoyer', valide_le: new Date().toISOString(), detail: null }) };
+  }
+  if (op === 'linkedin_annuler') {
+    if (['en_cours', 'envoye'].includes(a.statut)) throw new Refus('deja_parti', 409);
+    return { action: await majActionLi(a.id, { statut: 'annule', detail: 'Annulé par Gabriel' }) };
+  }
+  if (op === 'linkedin_parti') {
+    // « Ton Mac ne sait pas si c'est parti » : Gabriel a regardé sur LinkedIn, c'est parti.
+    if (a.statut !== 'a_verifier') throw new Refus('valeur_invalide:statut');
+    return appliquerEnvoiLi(a, { detail: 'Confirmé par Gabriel sur LinkedIn' });
+  }
+  throw new Refus('op_inconnue');
+}
+
+// Les suites d'un envoi : historique, compteurs et tâche suivante, comme la séquence LinkedIn du skill crm-gabriel.
+async function appliquerEnvoiLi(a, { detail = '', statutMcp = '', resultat = null } = {}) {
+  const { c, l } = await contactEtLeadLi(a.contact_id);
+  const jour = aujourdHuiParis();
+  const action = await majActionLi(a.id, { statut: 'envoye', envoye_le: new Date().toISOString(), detail: detail || null, resultat });
+  const prenom = c.prenom || nomContactLi(c);
+  if (a.type === 'invitation') {
+    if (statutMcp === 'already_connected') {
+      await majContactLi(c.id, { linkedin_etat: 'relation', linkedin_le: new Date().toISOString() });
+      await journalLi(l, c, 'acceptee', `${nomContactLi(c)} est déjà dans tes relations LinkedIn : pas d'invitation, le message 1 est prêt`);
+      await preparerAvecClaude(c, l, 'message');
+      await majLeadLi(l.id, { prochaine_relance: jour, prochaine_action: 'autre', prochaine_note: `LinkedIn : ${prenom} est déjà dans tes relations. Message 1 prêt à valider.` });
+      return { action };
+    }
+    await majContactLi(c.id, { linkedin_etat: 'invitation_envoyee', linkedin_le: new Date().toISOString() });
+    await journalLi(l, c, 'invitation', `Invitation LinkedIn envoyée à ${nomContactLi(c)}${a.texte ? ', avec une note' : ', sans note'} (par ton Mac)`, a.texte);
+    await majLeadLi(l.id, { prochaine_relance: dansJoursOuvres(21), prochaine_action: 'autre', prochaine_note: `LinkedIn : invitation envoyée à ${prenom} le ${dateCourte(jour)}. Ton Mac regarde chaque matin si elle est acceptée.` });
+    return { action };
+  }
+  await majContactLi(c.id, { linkedin_etat: 'relation' });
+  await journalLi(l, c, a.etape, `${LIB_ETAPE_LI[a.etape]} envoyé${a.etape === 'relance' || a.etape === 'reponse' ? 'e' : ''} à ${nomContactLi(c)} sur LinkedIn (par ton Mac)`, a.texte);
+  const maj = { dernier_contact: jour };
+  if (a.etape === 'message') { maj.relances_sans_reponse = 0; if (l.statut === 'nouveau') maj.statut = 'contacte'; }
+  if (a.etape === 'relance' || a.etape === 'findia') maj.relances_sans_reponse = (l.relances_sans_reponse || 0) + 1;
+  if (a.etape === 'reponse') maj.relances_sans_reponse = 0;
+  const suite = {
+    message: [dansJoursOuvres(4), 'autre', `LinkedIn : relancer ${prenom} s'il ne répond pas (message envoyé le ${dateCourte(jour)}).`],
+    reponse: [dansJoursOuvres(4), 'autre', `LinkedIn : relancer ${prenom} s'il ne répond pas (réponse envoyée le ${dateCourte(jour)}).`],
+    relance: [dansJoursOuvres(8), 'autre', `LinkedIn : dernier message à ${prenom} (FindIA), puis on arrête.`],
+    findia: [dansJoursOuvres(90), 'autre', `Séquence LinkedIn terminée avec ${prenom} : prendre des nouvelles.`],
+  }[a.etape];
+  if (suite) Object.assign(maj, { prochaine_relance: suite[0], prochaine_action: suite[1], prochaine_note: suite[2] });
+  await majLeadLi(l.id, maj);
+  return { action };
+}
+
+// Ce que le Mac voit : quoi envoyer, qui surveiller. Une action restée « en cours » 30 minutes passe à vérifier.
+async function etatRobotLi() { return (await lireReglage('linkedin_robot')) || {}; }
+async function fileRobotLi() {
+  const jour = aujourdHuiParis();
+  const coince = new Date(Date.now() - 30 * 60000).toISOString();
+  await sb(`iae_crm_linkedin?statut=eq.en_cours&pris_le=lt.${encodeURIComponent(coince)}`, { methode: 'PATCH', corps: { statut: 'a_verifier', detail: "Ton Mac s'est arrêté pendant l'envoi : regarde sur LinkedIn si c'est parti." }, prefer: 'return=minimal' });
+  const debut = new Date(`${jour}T00:00:00+01:00`).toISOString();
+  const [{ lignes: file }, { lignes: suivis }, { lignes: faits }, etat] = await Promise.all([
+    sb('iae_crm_linkedin?statut=eq.a_envoyer&order=valide_le.asc&limit=40&select=id,type,etape,texte,contact_id,lead_id'),
+    sb('iae_crm_contacts?linkedin_etat=not.is.null&select=id,lead_id,prenom,nom,linkedin,linkedin_etat,linkedin_le,linkedin_vu&limit=1000'),
+    sb(`iae_crm_linkedin?statut=in.(envoye,en_cours,a_verifier)&pris_le=gte.${encodeURIComponent(debut)}&select=type`),
+    etatRobotLi(),
+  ]);
+  const ids = [...new Set([...file.map((a) => a.contact_id), ...suivis.map((x) => x.id)])];
+  const contacts = new Map(suivis.map((x) => [x.id, x]));
+  const manquants = file.map((a) => a.contact_id).filter((id) => !contacts.has(id));
+  if (manquants.length) for (const x of (await sb(`iae_crm_contacts?id=in.(${manquants.join(',')})&select=id,lead_id,prenom,nom,linkedin`)).lignes) contacts.set(x.id, x);
+  const leadsIds = [...new Set([...contacts.values()].map((x) => x.lead_id))];
+  const leads = new Map(leadsIds.length ? (await sb(`iae_crm_leads?id=in.(${leadsIds.join(',')})&select=id,entreprise,statut,archive`)).lignes.map((x) => [x.id, x]) : []);
+  const vivant = (x) => { const l = leads.get(x.lead_id); return l && !l.archive && l.statut !== 'perdu'; };
+  const qui = (x) => ({ contact_id: x.id, prenom: x.prenom || '', nom: x.nom || '', linkedin: x.linkedin, entreprise: leads.get(x.lead_id)?.entreprise || '' });
+  return {
+    jour,
+    etat: { pause_jusqua: etat.pause_jusqua || null, raison: etat.raison || null, dernier_controle: etat.dernier_controle || null },
+    quotas: { invitations: { max: quotaInvitationsLi(jour), faits: faits.filter((x) => x.type === 'invitation').length }, messages: { max: QUOTA_MESSAGES_LI, faits: faits.filter((x) => x.type === 'message').length } },
+    a_envoyer: file.filter((a) => contacts.get(a.contact_id) && PROFIL_LI_RE.test(contacts.get(a.contact_id).linkedin || '')).map((a) => ({ id: a.id, type: a.type, etape: a.etape, texte: a.texte || '', ...qui(contacts.get(a.contact_id)) })),
+    en_attente: suivis.filter((x) => x.linkedin_etat === 'invitation_envoyee' && vivant(x)).map((x) => ({ ...qui(x), depuis: x.linkedin_le })),
+    a_ecouter: suivis.filter((x) => x.linkedin_etat === 'relation' && vivant(x)).map((x) => ({ ...qui(x), vu: x.linkedin_vu || '' })),
+  };
+}
+
+async function operationRobotLi(corps) {
+  const etape = corps.etape;
+  const etat = await etatRobotLi();
+  const maintenant = new Date().toISOString();
+  if (etape === 'etat') {
+    const nouvel = { ...etat, dernier_passage: maintenant };
+    if (corps.pause) { nouvel.pause_jusqua = String(corps.pause.jusqua || '').slice(0, 40) || null; nouvel.raison = couper(corps.pause.raison || '', 300); }
+    if (corps.reprise) { nouvel.pause_jusqua = null; nouvel.raison = null; }
+    nouvel.erreur = corps.erreur ? couper(corps.erreur, 300) : null;
+    await ecrireReglage('linkedin_robot', nouvel);
+    return { ok: true };
+  }
+  if (etat.pause_jusqua && etat.pause_jusqua > maintenant) return { ok: false, raison: 'pause' };
+  if (etape === 'prendre') {
+    const a = await actionLi(corps.id);
+    const file = await fileRobotLi();
+    const q = a.type === 'invitation' ? file.quotas.invitations : file.quotas.messages;
+    if (q.faits >= q.max) return { ok: false, raison: 'quota' };
+    const { lignes } = await sb(`iae_crm_linkedin?id=eq.${a.id}&statut=eq.a_envoyer`, { methode: 'PATCH', corps: { statut: 'en_cours', pris_le: maintenant }, prefer: 'return=representation' });
+    return { ok: Boolean(lignes && lignes.length) };
+  }
+  if (etape === 'rendre') {
+    // Le navigateur était occupé avant tout envoi : l'action retourne dans la file.
+    const a = await actionLi(corps.id);
+    if (a.statut === 'en_cours') await majActionLi(a.id, { statut: 'a_envoyer', pris_le: null });
+    return { ok: true };
+  }
+  if (etape === 'resultat') {
+    const a = await actionLi(corps.id);
+    if (a.statut !== 'en_cours') throw new Refus('valeur_invalide:statut');
+    const detail = couper(corps.detail || '', 400);
+    const resultat = corps.resultat && typeof corps.resultat === 'object' ? JSON.parse(JSON.stringify(corps.resultat).slice(0, 4000)) : null;
+    if (corps.issue === 'envoye') return appliquerEnvoiLi(a, { detail, statutMcp: String(corps.statut_mcp || ''), resultat });
+    const statut = corps.issue === 'a_verifier' ? 'a_verifier' : 'echec';
+    return { action: await majActionLi(a.id, { statut, detail: detail || 'Échec sans détail', resultat }) };
+  }
+  if (etape === 'controle') {
+    const bilan = { acceptes: 0, reponses: 0, a_retirer: 0 };
+    for (const id of (corps.acceptes || []).slice(0, 50)) {
+      const { c, l } = await contactEtLeadLi(id);
+      if (c.linkedin_etat !== 'invitation_envoyee') continue;
+      await majContactLi(c.id, { linkedin_etat: 'relation', linkedin_le: maintenant });
+      await journalLi(l, c, 'acceptee', `${nomContactLi(c)} a accepté ton invitation LinkedIn (vu par ton Mac)`);
+      await preparerAvecClaude(c, l, 'message');
+      await majLeadLi(l.id, { prochaine_relance: aujourdHuiParis(), prochaine_action: 'autre', prochaine_note: `LinkedIn : ${c.prenom || nomContactLi(c)} a accepté ton invitation. Message 1 prêt à valider.`, relances_sans_reponse: 0 });
+      bilan.acceptes++;
+    }
+    for (const r of (corps.reponses || []).slice(0, 50)) {
+      const { c, l } = await contactEtLeadLi(r.contact_id);
+      const texte = couper(String(r.texte || '').trim(), 4000);
+      if (!texte || texte === c.linkedin_vu) continue;
+      // Une réponse suppose que Gabriel a écrit : sinon c'est un vieux message d'une relation, gardé comme « vu ».
+      const { lignes: ecrit } = await sb(`iae_crm_linkedin?contact_id=eq.${c.id}&type=eq.message&statut=eq.envoye&limit=1&select=id`);
+      if (!ecrit.length) { await majContactLi(c.id, { linkedin_vu: texte }); continue; }
+      await majContactLi(c.id, { linkedin_etat: 'relation', linkedin_vu: texte });
+      const fil = /^\/messaging\/thread\/[A-Za-z0-9=_-]+\/?$/.test(r.fil || '') ? `https://www.linkedin.com${r.fil}` : null;
+      await journalLi(l, c, 'reponse_recue', `${nomContactLi(c)} t'a répondu sur LinkedIn`, texte, fil ? { fil_linkedin: fil } : {});
+      await sb(`iae_crm_linkedin?contact_id=eq.${c.id}&statut=in.(brouillon,a_envoyer)&etape=in.(message,relance,findia)`, { methode: 'PATCH', corps: { statut: 'annule', detail: 'Il a répondu : la séquence s\'arrête.' }, prefer: 'return=minimal' });
+      await preparerAvecClaude(c, l, 'reponse', { message: texte });
+      const anna = /anna/i.test(l.source || '');
+      await majLeadLi(l.id, { prochaine_relance: aujourdHuiParis(), prochaine_action: 'autre', prochaine_note: `LinkedIn : ${c.prenom || nomContactLi(c)} t'a répondu. Réponse proposée à relire.${anna ? ' Préviens Anna : elle a aussi cette entreprise dans ses listes.' : ''}`, relances_sans_reponse: 0, dernier_contact: aujourdHuiParis() });
+      bilan.reponses++;
+    }
+    // Invitation sans réponse depuis 3 semaines : on la retire (à la main, aucun outil ne le fait) et on arrête.
+    const limite = new Date(Date.now() - 21 * 86400000).toISOString();
+    const { lignes: vieilles } = await sb(`iae_crm_contacts?linkedin_etat=eq.invitation_envoyee&linkedin_le=lt.${encodeURIComponent(limite)}&select=id`);
+    for (const v of vieilles) {
+      const { c, l } = await contactEtLeadLi(v.id);
+      await majContactLi(c.id, { linkedin_etat: 'a_retirer' });
+      await journalLi(l, c, 'autre', `Invitation LinkedIn à ${nomContactLi(c)} sans réponse depuis 3 semaines`);
+      await majLeadLi(l.id, { prochaine_relance: aujourdHuiParis(), prochaine_action: 'autre', prochaine_note: `LinkedIn : retire l'invitation à ${c.prenom || nomContactLi(c)} (en attente depuis 3 semaines), puis on arrête.` });
+      bilan.a_retirer++;
+    }
+    await ecrireReglage('linkedin_robot', { ...etat, dernier_passage: maintenant, dernier_controle: aujourdHuiParis(), dernier_bilan: bilan });
+    return { ok: true, bilan };
+  }
+  throw new Refus('op_inconnue');
+}
+
+// La clé du Mac : son empreinte SHA-256 est dans iae_crm_reglages (linkedin_robot_cle), jamais la clé elle-même.
+async function cleRobotValide(req) {
+  const donnee = String(req.headers['x-cle-robot'] || '');
+  const attendue = await lireReglage('linkedin_robot_cle');
+  if (!donnee || typeof attendue !== 'string' || !/^[0-9a-f]{64}$/.test(attendue)) return false;
+  const a = Buffer.from(createHash('sha256').update(donnee).digest('hex'));
+  const b = Buffer.from(attendue);
+  return a.length === b.length && timingSafeEqual(a, b);
+}
+
 /* ---------- La voix du mode oral (ElevenLabs) ---------- */
 
 const VOIX_DEFAUT = 'JBFqnCBsd6RMkjVDRZzb'; // voix multilingue d'ElevenLabs, à remplacer par une voix française (ELEVENLABS_VOIX)
@@ -2243,6 +2556,25 @@ export default async function handler(req, res) {
   }
   if (origineEtrangere(req)) return res.status(403).json({ erreur: 'origine' });
 
+  // Le Mac de Gabriel (robot LinkedIn) : sa propre clé, et seulement la file LinkedIn.
+  if (req.headers['x-cle-robot']) {
+    const ipRobot = empreinte(req);
+    if (tropDEchecs(ipRobot)) return res.status(429).json({ erreur: 'trop_de_tentatives' });
+    try {
+      if (!(await cleRobotValide(req))) {
+        noterEchec(ipRobot);
+        return res.status(401).json({ erreur: 'cle_invalide' });
+      }
+      if (req.method === 'GET') return res.status(200).json(await fileRobotLi());
+      const corpsRobot = typeof req.body === 'string' ? JSON.parse(req.body || '{}') : req.body || {};
+      return res.status(200).json(await operationRobotLi(corpsRobot));
+    } catch (e) {
+      if (e instanceof Refus || (e && e.refus)) return res.status(e.statut || 400).json({ erreur: e.code });
+      console.error('crm robot', e);
+      return res.status(500).json({ erreur: 'erreur_interne' });
+    }
+  }
+
   const ip = empreinte(req);
   if (tropDEchecs(ip)) return res.status(429).json({ erreur: 'trop_de_tentatives' });
   if (!cleValide(req)) {
@@ -2295,6 +2627,7 @@ export default async function handler(req, res) {
       if (tropDeRedactions(ip)) throw new Refus('ia_trop_de_demandes', 429);
       return res.status(200).json(await operationProgramme(corps));
     }
+    if (corps && /^linkedin_[a-z]+$/.test(String(corps.op || ''))) return res.status(200).json(await operationLinkedin(corps, ip));
     if (corps && corps.op === 'recap') {
       if (tropDeRedactions(ip)) throw new Refus('ia_trop_de_demandes', 429);
       return res.status(200).json(await recapLead(corps));
