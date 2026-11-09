@@ -832,7 +832,18 @@ function texteBrut(t) {
     .replace(/&quot;/g, '"').replace(/&#39;/g, "'").replace(/&#(\d+);/g, (x, n) => String.fromCodePoint(Number(n))).replace(/\s+/g, ' ').trim();
 }
 async function contactParEmail(email) {
-  const { lignes } = await sb(`iae_crm_contacts?select=id,lead_id,prenom,nom&email=ilike.${encodeURIComponent(email)}&limit=1`);
+  const { lignes } = await sb(`iae_crm_contacts?select=id,lead_id,prenom,nom&email=ilike.${encodeURIComponent(email)}&order=principal.desc&limit=1`);
+  return lignes[0] || null;
+}
+// Une même adresse peut appartenir à plusieurs fiches (Gabriel, 09/11 : Ludovic écrit de la même adresse pour
+// l'appel d'offres de Confluence et pour leur travail commun chez LM Conseil). Le fil décide d'abord, puis le sujet.
+async function contactsParEmail(email) {
+  const { lignes } = await sb(`iae_crm_contacts?select=id,lead_id,prenom,nom&email=ilike.${encodeURIComponent(email)}&order=principal.desc&limit=10`);
+  return lignes;
+}
+async function leadDuFil(fil) {
+  if (!/^[0-9a-f]{6,32}$/i.test(fil || '')) return null;
+  const { lignes } = await sb(`iae_crm_activites?select=lead_id,contact_id&meta->>fil=eq.${encodeURIComponent(fil)}&order=date.desc&limit=1`);
   return lignes[0] || null;
 }
 
@@ -951,6 +962,12 @@ async function boiteDuLead(leadId) {
   for (const a of acts) {
     const f = a.meta?.fil;
     if (/^[0-9a-f]{6,32}$/i.test(f || '') && fils.size < 40) fils.set(f, true);
+  }
+  // Un fil rangé sur une autre fiche (même personne, autre dossier) n'apparaît pas ici.
+  if (fils.size) {
+    const { lignes: ranges } = await sb(`iae_crm_activites?select=lead_id,meta&meta->>fil=in.(${[...fils.keys()].join(',')})&limit=2000`);
+    const ici = new Set(ranges.filter((x) => x.lead_id === leadId).map((x) => x.meta.fil));
+    for (const x of ranges) if (x.lead_id !== leadId && !ici.has(x.meta.fil)) fils.delete(x.meta.fil);
   }
   const lus = await Promise.all([...fils.keys()].map(async (fil) => {
     // Les fils que Gmail dit « avec pièce jointe » sont lus en entier, pour écarter signatures et invitations d'agenda.
@@ -1152,7 +1169,7 @@ async function analyserEmails(items, ann) {
   const jourSemaine = new Intl.DateTimeFormat('fr-FR', { timeZone: 'Europe/Paris', weekday: 'long' }).format(new Date());
   const lignesLeads = ann.leads.map((l) => [l.id, l.entreprise, `${l.type}, ${l.statut}${l.archive ? ', archivé' : ''}`,
     (ann.parLead.get(l.id) || []).map((c) => `${nomDe(c) || '?'}${c.email ? ` <${c.email}>` : ''}`).join(' ; '),
-    l.prochaine_note ? couper(l.prochaine_note, 140) : ''].join(' | ')).join('\n');
+    [l.besoin ? `sujet : ${couper(l.besoin, 120)}` : '', l.prochaine_note ? couper(l.prochaine_note, 140) : ''].filter(Boolean).join(' ; ')].join(' | ')).join('\n');
   const client = new Anthropic({ timeout: 40000, maxRetries: 1 });
   for (let i = 0; i < items.length; i += 10) {
     const paquet = items.slice(i, i + 10);
@@ -1298,12 +1315,15 @@ async function synchroGmail() {
       // Newsletters, robots, équipe : jamais dans le CRM.
       if (!r.de.email || interne(r.de.email) || EXPEDITEURS_AUTOMATIQUES.test(r.de.email) || r.h['list-unsubscribe']) continue;
       if (ignores.has(r.de.email) || ignores.has(r.de.email.split('@')[1])) continue;
-      let contact = await contactParEmail(r.de.email);
-      if (!contact && r.fil) {
-        const { lignes } = await sb(`iae_crm_activites?select=lead_id,contact_id&meta->>fil=eq.${encodeURIComponent(r.fil)}&limit=1`);
-        if (lignes[0]) contact = { lead_id: lignes[0].lead_id, id: lignes[0].contact_id };
-      }
-      items.push({ ...r, ref: id, gmailId: id, contact, dernierDeMoi: await dernierMessageDeMoi(r.fil), candidats: contact ? [] : candidatsPour(ann, r.de) });
+      let contact = null;
+      let candidats = null;
+      const duFil = await leadDuFil(r.fil);
+      const parAdresse = await contactsParEmail(r.de.email);
+      // L'expéditeur n'est pas encore un contact de cette fiche : id vide, il y sera ajouté (et non confondu avec un autre).
+      if (duFil) contact = { lead_id: duFil.lead_id, id: parAdresse.find((x) => x.lead_id === duFil.lead_id)?.id || null };
+      else if (new Set(parAdresse.map((x) => x.lead_id)).size === 1) contact = parAdresse[0];
+      else if (parAdresse.length) candidats = [...new Map(parAdresse.map((x) => [x.lead_id, { lead_id: x.lead_id, raison: `même adresse, ${nomDe(x) || 'ce contact'} a plusieurs dossiers : choisis celui dont parle l'email` }])).values()];
+      items.push({ ...r, ref: id, gmailId: id, contact, dernierDeMoi: await dernierMessageDeMoi(r.fil), candidats: contact ? [] : candidats || candidatsPour(ann, r.de) });
     }
   }
   // Du plus ancien au plus récent : la tâche qui reste est celle du dernier message.
@@ -1406,7 +1426,12 @@ async function synchroEnvoyes(depuis, ann) {
   const ids = (liste.messages || []).map((m) => m.id).filter((id) => /^[0-9a-f]+$/i.test(id));
   if (!ids.length) return 0;
   const deja = new Set((await sb(`iae_crm_activites?select=meta&meta->>gmail_id=in.(${ids.join(',')})`)).lignes.map((x) => x.meta.gmail_id));
-  const parEmail = new Map(ann.contacts.filter((c) => c.email).map((c) => [c.email.toLowerCase(), c]));
+  const parEmail = new Map();
+  for (const c of ann.contacts.filter((x) => x.email)) {
+    const e = c.email.toLowerCase();
+    if (!parEmail.has(e)) parEmail.set(e, []);
+    parEmail.get(e).push(c);
+  }
   const messages = [];
   for (const id of ids.filter((x) => !deja.has(x))) {
     const m = await google(`${GMAIL}/messages/${id}?format=full`);
@@ -1419,21 +1444,31 @@ async function synchroEnvoyes(depuis, ann) {
     const id = m.id;
     const h = enTetes(m);
     const dest = [...listeAdresses(h.to), ...listeAdresses(h.cc)];
-    const c = dest.map((e) => parEmail.get(e)).find(Boolean);
-    let leadId = c?.lead_id;
-    if (!leadId && m.threadId) {
-      const { lignes } = await sb(`iae_crm_activites?select=lead_id&meta->>fil=eq.${encodeURIComponent(m.threadId)}&limit=1`);
-      leadId = lignes[0]?.lead_id;
-    }
-    if (!leadId || !ann.ids.has(leadId)) continue;
-    const lead = ann.lead(leadId);
+    const connus = dest.flatMap((e) => parEmail.get(e) || []);
     const objet = String(h.subject || '(sans objet)').slice(0, 300);
     const quand = new Date(Number(m.internalDate) || Date.now()).toISOString();
     const jour = jourParis(quand);
     const texte = sansCitation(partieTexte(m.payload)).slice(0, 8000);
+    let leadId = (await leadDuFil(m.threadId))?.lead_id || null;
+    let jugement;
+    if (!leadId) {
+      const fiches = [...new Set(connus.map((x) => x.lead_id))].filter((x) => ann.ids.has(x));
+      if (fiches.length === 1) leadId = fiches[0];
+      else if (fiches.length > 1) {
+        // Nouveau fil vers une adresse qui a plusieurs dossiers : la fiche dont l'email fait la tâche, sinon la plus active.
+        for (const x of fiches.slice(0, 3)) {
+          const j = await jugerEnvoi(ann.lead(x), { objet, texte, dest, quand });
+          if (j && (j.tache === 'faite' || j.tache === 'en_partie')) { leadId = x; jugement = j; break; }
+        }
+        if (!leadId) leadId = fiches.slice().sort((a, b) => String(ann.lead(b).dernier_contact || '').localeCompare(String(ann.lead(a).dernier_contact || '')))[0];
+      }
+    }
+    if (!leadId || !ann.ids.has(leadId)) continue;
+    const c = connus.find((x) => x.lead_id === leadId) || null;
+    const lead = ann.lead(leadId);
     const maj = {};
     if (!lead.dernier_contact || lead.dernier_contact < jour) maj.dernier_contact = jour;
-    const r = await jugerEnvoi(lead, { objet, texte, dest, quand });
+    const r = jugement || (await jugerEnvoi(lead, { objet, texte, dest, quand }));
     const rdv = rdvValide(r);
     const confirme = `confirmé dans ton email du ${dateCourte(jour)} (« ${objet} »)`;
     if (rdv) await noterRdv(leadId, c?.id, rdv, confirme, { fil: m.threadId, objet });
