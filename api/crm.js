@@ -2179,6 +2179,26 @@ async function journalLi(l, c, etape, resume, contenu = null, extra = {}) {
 // rédiger le message automatiquement et que je valide ; une fois validé plus de 10 messages sans modif, on enverra
 // automatiquement ». Les réponses à un prospect qui a écrit restent toujours à valider.
 const SEUIL_CONFIANCE_LI = 10;
+// Invitation impossible : profil introuvable, ou sans « Se connecter » (Gabriel, 09/11 : « il faut aussi que le crm me
+// prévienne au cas où il ne trouve plus de profil linkedin »). Une tâche sur le lead, le jour même.
+const PROFIL_IMPOSSIBLE_LI = {
+  unavailable: (nom) => `LinkedIn : profil introuvable pour ${nom}. Vérifie l'adresse, ou demande à Claude de le rechercher ; sinon Anna peut appeler.`,
+  follow_only: (nom) => `LinkedIn : pas d'invitation possible pour ${nom} (son profil ne propose que « Suivre »). Passe par l'email ou le téléphone ; sinon Anna peut appeler.`,
+  connect_unavailable: (nom) => `LinkedIn : pas d'invitation possible pour ${nom} (LinkedIn ne propose pas « Se connecter »). Passe par l'email ou le téléphone ; sinon Anna peut appeler.`,
+};
+// La file d'invitations se vide : une ligne dans la barre LinkedIn et dans le récap de 7 h (une par jour, pas une tâche
+// par lead). À 0, seulement si une invitation est partie dans les 7 derniers jours : sinon la prospection est en pause.
+const SEUIL_FILE_LI = 10;
+function alerteFileLi(enFile, derniereEnvoyee, jour) {
+  const ajout = 'Pour en ajouter, demande « LinkedIn du jour » à Claude.';
+  if (enFile > SEUIL_FILE_LI) return null;
+  if (enFile > 0) {
+    const j = Math.ceil(enFile / quotaInvitationsLi(jour));
+    return `Plus que ${enFile} invitation${enFile > 1 ? 's' : ''} en file (environ ${j} jour${j > 1 ? 's' : ''} ouvré${j > 1 ? 's' : ''}). ${ajout}`;
+  }
+  if (!derniereEnvoyee || Date.now() - Date.parse(derniereEnvoyee) > 7 * 86400000) return null;
+  return `Plus aucune invitation à envoyer : ton Mac n'a plus de profil à inviter. ${ajout}`;
+}
 const ETAPES_AUTO_LI = ['message', 'relance', 'findia'];
 const normeLi = (t) => String(t || '').replace(/\s+/g, ' ').trim();
 async function confianceLi() { return (await lireReglage('linkedin_confiance')) || { serie: 0, auto: false }; }
@@ -2407,7 +2427,14 @@ async function operationRobotLi(corps) {
     const resultat = corps.resultat && typeof corps.resultat === 'object' ? JSON.parse(JSON.stringify(corps.resultat).slice(0, 4000)) : null;
     if (corps.issue === 'envoye') return appliquerEnvoiLi(a, { detail, statutMcp: String(corps.statut_mcp || ''), resultat });
     const statut = corps.issue === 'a_verifier' ? 'a_verifier' : 'echec';
-    return { action: await majActionLi(a.id, { statut, detail: detail || 'Échec sans détail', resultat }) };
+    const action = await majActionLi(a.id, { statut, detail: detail || 'Échec sans détail', resultat });
+    const mcp = String(corps.statut_mcp || '');
+    if (a.type === 'invitation' && statut === 'echec' && Object.hasOwn(PROFIL_IMPOSSIBLE_LI, mcp)) {
+      const { c, l } = await contactEtLeadLi(a.contact_id);
+      await journalLi(l, c, 'invitation_impossible', `Invitation LinkedIn impossible pour ${nomContactLi(c)} : ${detail || 'profil introuvable'}`);
+      await majLeadLi(l.id, { prochaine_relance: aujourdHuiParis(), prochaine_action: 'autre', prochaine_note: PROFIL_IMPOSSIBLE_LI[mcp](nomContactLi(c)) });
+    }
+    return { action };
   }
   if (etape === 'controle') {
     const bilan = { acceptes: 0, reponses: 0, a_retirer: 0 };
@@ -2700,12 +2727,32 @@ async function rappelDuMatin(force = false) {
   // Un premier tour de boîte et d'agenda, pour que le récapitulatif soit à jour, et les échéances des formateurs.
   await synchroniser().catch(() => null);
   await echeancesFormateurs().catch((e) => console.error('crm échéances formateurs', e?.message || e));
-  const [{ lignes: leads }, { lignes: contacts }, { lignes: entrants }] = await Promise.all([
+  const [{ lignes: leads }, { lignes: contacts }, { lignes: entrants }, { lignes: fileLi }, { lignes: derniereLi }, { lignes: pasPartisLi }, robotLi] = await Promise.all([
     sb(`iae_crm_leads?select=id,entreprise,prochaine_relance,prochaine_action,prochaine_note,relances_sans_reponse&archive=is.false&prochaine_relance=lte.${jour}&order=prochaine_relance.asc,entreprise.asc`),
-    sb('iae_crm_contacts?select=lead_id,prenom,nom,principal&order=principal.desc'),
+    sb('iae_crm_contacts?select=id,lead_id,prenom,nom,principal&order=principal.desc'),
     sb('iae_crm_entrants?select=de_nom,de_email,objet,canal&statut=eq.a_trier&order=recu_le.desc&limit=10'),
+    sb('iae_crm_linkedin?type=eq.invitation&statut=in.(a_envoyer,en_cours)&select=id'),
+    sb('iae_crm_linkedin?type=eq.invitation&statut=eq.envoye&order=envoye_le.desc&limit=1&select=envoye_le'),
+    sb('iae_crm_linkedin?statut=in.(echec,a_verifier)&order=created_at.asc&limit=30&select=lead_id,contact_id,etape,statut,detail'),
+    etatRobotLi(),
   ]);
-  if (!leads.length && !entrants.length) return { envoye: false, raison: 'rien_a_faire' };
+  // LinkedIn : la file qui se vide, puis ce qui n'est pas parti (sauf les leads déjà dans la liste du jour, qui ont leur tâche).
+  const lignesLi = [];
+  if (robotLi.dernier_passage) {
+    const alerte = alerteFileLi(fileLi.length, derniereLi[0]?.envoye_le, jour);
+    if (alerte) lignesLi.push(`- ${alerte}`);
+  }
+  const listes = new Set(leads.map((l) => l.id));
+  const autresLi = pasPartisLi.filter((a) => !listes.has(a.lead_id));
+  if (autresLi.length) {
+    const { lignes: ents } = await sb(`iae_crm_leads?id=in.(${[...new Set(autresLi.map((a) => a.lead_id))].join(',')})&select=id,entreprise`);
+    for (const a of autresLi) {
+      const c = contacts.find((x) => x.id === a.contact_id);
+      const nom = c ? [c.prenom, c.nom].filter(Boolean).join(' ') : '';
+      lignesLi.push(`- ${ents.find((x) => x.id === a.lead_id)?.entreprise || 'Lead'}${nom ? ` (${nom})` : ''} : ${LIB_ETAPE_LI[a.etape] || 'Envoi'} pas parti${['invitation', 'relance', 'reponse'].includes(a.etape) ? 'e' : ''}${a.statut === 'a_verifier' ? ' ou à vérifier' : ''}. ${String(a.detail || '').slice(0, 200)}`.trim());
+    }
+  }
+  if (!leads.length && !entrants.length && !lignesLi.length) return { envoye: false, raison: 'rien_a_faire' };
   const qui = (id) => { const c = contacts.find((x) => x.lead_id === id); return c ? [c.prenom, c.nom].filter(Boolean).join(' ') : ''; };
   const ACTION = { email: 'email', appel: 'appel', rdv: 'rendez-vous', autre: 'à faire' };
   const ecart = (d) => Math.round((Date.parse(jour) - Date.parse(d)) / 86400000);
@@ -2718,18 +2765,20 @@ async function rappelDuMatin(force = false) {
   const dujour = leads.filter((l) => l.prochaine_relance === jour);
   const dateLongue = new Intl.DateTimeFormat('fr-FR', { timeZone: 'Europe/Paris', weekday: 'long', day: 'numeric', month: 'long' }).format(new Date());
   const resume = [dujour.length && `${dujour.length} relance${dujour.length > 1 ? 's' : ''} pour aujourd'hui`, retards.length && `${retards.length} en retard`,
-    entrants.length && `${entrants.length} message${entrants.length > 1 ? 's' : ''} à trier`].filter(Boolean).join(', ');
+    entrants.length && `${entrants.length} message${entrants.length > 1 ? 's' : ''} à trier`, lignesLi.length && `${lignesLi.length} point${lignesLi.length > 1 ? 's' : ''} LinkedIn`].filter(Boolean).join(', ');
   const corps = [
     'Bonjour Gabriel,', '',
     `Aujourd'hui, ${dateLongue} : ${resume}.`, '',
     retards.length ? `En retard\n${retards.map(ligne).join('\n')}\n` : null,
     dujour.length ? `Aujourd'hui\n${dujour.map(ligne).join('\n')}\n` : null,
     entrants.length ? `À trier\n${entrants.map((e) => `- ${e.de_nom || e.de_email} : ${e.objet || ''}`).join('\n')}\n` : null,
+    lignesLi.length ? `LinkedIn\n${lignesLi.join('\n')}\n` : null,
     "Pour tout enchaîner : https://ia-entrepreneur.fr/crm/ (bouton « Enchaîner les relances »).", '',
     'Bonne journée,', 'Ton CRM',
   ].filter((x) => x !== null).join('\n');
   const total = leads.length;
-  const objet = total ? `Tes ${total} relance${total > 1 ? 's' : ''} du jour${retards.length ? ` (${retards.length} en retard)` : ''}` : `${entrants.length} message${entrants.length > 1 ? 's' : ''} à trier dans ton CRM`;
+  const objet = total ? `Tes ${total} relance${total > 1 ? 's' : ''} du jour${retards.length ? ` (${retards.length} en retard)` : ''}`
+    : entrants.length ? `${entrants.length} message${entrants.length > 1 ? 's' : ''} à trier dans ton CRM` : 'LinkedIn : à regarder dans ton CRM';
   const envoi = await envoyerGmail({ a: COMPTE, objet, corps, mode: 'envoyer' });
   await ecrireReglage('rappel_matin_envoye', { le: jour, relances: total, a_trier: entrants.length });
   return { envoye: true, objet, gmail_id: envoi.gmail_id };

@@ -321,6 +321,7 @@
   .li-barre p { margin: 0; color: var(--muted); }
   .li-barre b { color: var(--text); }
   .li-barre .li-confiance { font-size: 13.5px; }
+  .li-barre .li-file { display: inline-block; margin-top: 4px; font-size: 13.5px; font-weight: 700; color: var(--text); }
   .li-barre.alerte-li p { color: var(--danger); }
   .boite { display: grid; gap: 18px; }
   .boite > section { min-width: 0; }
@@ -3113,13 +3114,27 @@ function ouvrirLinkedinDuJour() {
     });
   }, { large: true });
 }
+// La file d'invitations se vide (Gabriel, 09/11) : même règle que le récap de 7 h. À 0, seulement si une invitation
+// est partie dans les 7 derniers jours (sinon la prospection est en pause, pas d'alerte).
+function alerteFileLi() {
+  if (!((D.reglages && D.reglages.linkedin_robot) || {}).dernier_passage) return '';
+  const inv = actionsLi().filter((a) => a.type === 'invitation');
+  const n = inv.filter((a) => a.statut === 'a_envoyer' || a.statut === 'en_cours').length;
+  const ajout = 'Pour en ajouter, demande « LinkedIn du jour » à Claude.';
+  if (n > 10) return '';
+  if (n) { const j = Math.ceil(n / quotaInvitations()); return `Plus que ${n} invitation${n > 1 ? 's' : ''} en file (environ ${j} jour${j > 1 ? 's' : ''} ouvré${j > 1 ? 's' : ''}). ${ajout}`; }
+  const derniere = inv.filter((a) => a.statut === 'envoye' && a.envoye_le).map((a) => a.envoye_le).sort().pop();
+  if (!derniere || Date.now() - Date.parse(derniere) > 7 * 86400000) return '';
+  return `Plus aucune invitation à envoyer : ton Mac n'a plus de profil à inviter. ${ajout}`;
+}
 function barreLinkedin() {
   const aValider = D.leads.filter(liAFaire).length;
   const enFile = actionsLi().filter((a) => a.statut === 'a_envoyer' || a.statut === 'en_cours').length;
   if (!aValider && !enFile && !(D.reglages && D.reglages.linkedin_robot)) return '';
   const etat = etatMac();
   const k = texteConfiance();
-  return `<div class="li-barre${etat.alerte ? ' alerte-li' : ''}"><p><b>LinkedIn</b> · ${esc(etat.texte)}${enFile ? ` ${enFile} en file.` : ''}<br><span class="li-confiance">${esc(k.texte)}</span></p><div class="actions">${aValider ? `<button type="button" class="btn petit primaire" data-li-jour>Messages LinkedIn à valider (${aValider})</button>` : ''}${k.auto ? '<button type="button" class="btn petit lien" data-li-couper>Couper l\'envoi automatique</button>' : ''}</div></div>`;
+  const fileLi = alerteFileLi();
+  return `<div class="li-barre${etat.alerte ? ' alerte-li' : ''}"><p><b>LinkedIn</b> · ${esc(etat.texte)}${enFile ? ` ${enFile} en file.` : ''}<br><span class="li-confiance">${esc(k.texte)}</span>${fileLi ? `<br><span class="li-file" role="status">${esc(fileLi)}</span>` : ''}</p><div class="actions">${aValider ? `<button type="button" class="btn petit primaire" data-li-jour>Messages LinkedIn à valider (${aValider})</button>` : ''}${k.auto ? '<button type="button" class="btn petit lien" data-li-couper>Couper l\'envoi automatique</button>' : ''}</div></div>`;
 }
 document.addEventListener('click', (ev) => { if (ev.target.closest('[data-li-jour]')) { ev.preventDefault(); ouvrirLinkedinDuJour(); } });
 document.addEventListener('click', async (ev) => {
