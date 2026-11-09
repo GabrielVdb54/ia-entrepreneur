@@ -16,6 +16,10 @@ CHEVRON = '<svg width="16" height="16" fill="none" stroke="currentColor" stroke-
 ADRESSE = {"@type": "PostalAddress", "streetAddress": "5 Rue Jacques Villermaux", "addressLocality": "Nancy",
            "postalCode": "54000", "addressRegion": "Grand Est", "addressCountry": "FR"}
 TEL = '<a class="tel-reveal" role="button" tabindex="0" data-tel="MzUgODIgMzEgNzUgNzA=" aria-label="Afficher le numéro de téléphone"><span class="tel-value">Afficher le numéro</span></a>'
+# Numéro en clair pour Google (fiche d'identité LocalBusiness), recalculé depuis la version codée
+# de TEL : le script est public, il ne doit pas contenir le numéro lisible (Gabriel, 09/11/2026).
+import base64 as _b64
+TEL_SCHEMA = '+33 ' + _b64.b64decode(re.search(r'data-tel="([^"]+)"', TEL).group(1)).decode()[::-1][1:]
 
 CSS = """
   /* Pages villes (formation-ia-nancy, -metz, -strasbourg), 09/11/2026 */
@@ -379,7 +383,7 @@ def jsonld(p):
     service = {"@context": "https://schema.org", "@type": "Service", "name": f"Formation IA à {p['nom']}",
                "serviceType": "Formation à l'intelligence artificielle pour les entreprises", "url": url,
                "description": p['desc'],
-               "provider": {"@type": "LocalBusiness", "@id": f"{SITE}/#local", "name": "IA-Entrepreneur", "url": SITE, "address": ADRESSE},
+               "provider": {"@type": "LocalBusiness", "@id": f"{SITE}/#local", "name": "IA-Entrepreneur", "url": SITE, "telephone": TEL_SCHEMA, "address": ADRESSE},
                "areaServed": p['zone']}
     faq = {"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [
         {"@type": "Question", "name": texte(q), "acceptedAnswer": {"@type": "Answer", "text": texte(r)}} for q, r in p['faq']]}
