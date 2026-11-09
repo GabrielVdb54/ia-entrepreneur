@@ -109,7 +109,16 @@ def fiche(titre, sous, taches):
 
 
 def faq_section(faq, titre):
+    # L'outil « Quel est mon OPCO ? » (outil-opco.js, chargé par le gabarit)
+    # juste avant la FAQ, comme sur les pages villes et de formation.
     return f'''
+  <!-- outil-opco -->
+  <section style="padding:56px 0 8px;" id="budget-formation">
+    <div class="container">
+      <div data-outil-opco></div>
+    </div>
+  </section>
+
   <section class="faq-section" id="faq">
     <div class="container">
       <h2 class="section-title">{titre}</h2>
@@ -691,7 +700,7 @@ PAGES['assurance'] = dict(
     public='Agents généraux et courtiers d\'assurance',
     faq=[
         ("La formation est-elle finançable par l'OPCO Atlas ?",
-         f"Les agences générales appliquent la convention collective du personnel des agences générales d'assurances (IDCC 2335), les cabinets de courtage celle des entreprises de courtage d'assurances et/ou de réassurances (IDCC 2247). Les deux branches relèvent de l'OPCO Atlas, qui publie ses critères de prise en charge pour {ATLAS_AGENTS} et pour {ATLAS_COURTAGE}, dans la limite des fonds disponibles. Un cabinet de courtage en crédit dépend de la convention qu'il applique : <a class=\"metier-lien\" href=\"/simulateur-financement-formation-ia.html\">notre simulateur</a> retrouve votre OPCO à partir de votre SIRET. La formation de l'agent général lui-même, s'il n'est pas salarié, relève d'un autre financement, que nous regardons avec vous. IA-Entrepreneur est un organisme certifié Qualiopi (certificat n° 883211-2) : nous montons le dossier avec vous, et vous connaissez votre reste à charge avant de signer. Les fonds mutualisés sont réservés aux entreprises de moins de 50 salariés."),
+         f"Les agences générales appliquent la convention collective du personnel des agences générales d'assurances (IDCC 2335), les cabinets de courtage celle des entreprises de courtage d'assurances et/ou de réassurances (IDCC 2247). Les deux branches relèvent de l'OPCO Atlas, qui publie ses critères de prise en charge pour {ATLAS_AGENTS} et pour {ATLAS_COURTAGE}, dans la limite des fonds disponibles. Un cabinet de courtage en crédit dépend de la convention qu'il applique : <a class=\"metier-lien\" href=\"/quel-est-mon-opco.html\">notre outil « Quel est mon OPCO ? »</a> le retrouve à partir de votre SIRET. La formation de l'agent général lui-même, s'il n'est pas salarié, relève d'un autre financement, que nous regardons avec vous. IA-Entrepreneur est un organisme certifié Qualiopi (certificat n° 883211-2) : nous montons le dossier avec vous, et vous connaissez votre reste à charge avant de signer. Les fonds mutualisés sont réservés aux entreprises de moins de 50 salariés."),
         ("Une formation IA compte-t-elle dans mes 15 heures de formation continue DDA ?",
          f"Elle peut compter, si son contenu correspond à la liste de compétences de l'{COMPETENCES_A512_8}. Cette liste cite notamment les évolutions technologiques et leurs effets sur la distribution d'assurances, les outils du parcours client « y compris les outils digitaux », la formalisation du conseil et sa traçabilité, et la protection des données personnelles. Une formation bâtie sur votre recueil des besoins, votre devoir de conseil et la confidentialité des données de vos clients est conçue pour s'y rattacher ; une découverte générale de ChatGPT, beaucoup moins. Les 15 heures concernent chaque personne qui conseille, présente ou aide à conclure des contrats. Le code ne prévoit aucune validation à l'avance : c'est à vous de pouvoir justifier vos heures, l'ACPR contrôle, et pour un courtier son association professionnelle le vérifie aussi. Notre attestation reprend {JUSTIFICATIFS_R512} : l'organisme, la date, la durée, les modalités et les thèmes traités. Un courtier en crédit a sa propre obligation, centrée sur l'évolution de la réglementation : nous ne promettons pas qu'une formation IA y réponde."),
         ("Peut-on mettre le questionnaire de santé d'un client dans ChatGPT ?",
