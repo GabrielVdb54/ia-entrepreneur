@@ -2131,8 +2131,16 @@ async function journalLi(l, c, etape, resume, contenu = null, extra = {}) {
   });
 }
 
-// Un seul brouillon ouvert par personne : préparer le remplace ou le crée.
-async function preparerLi(c, l, etape, texte) {
+// Gabriel, 09/11 : « envoyer l'invitation automatiquement, et une fois seulement que la personne m'a ajouté en retour,
+// rédiger le message automatiquement et que je valide ; une fois validé plus de 10 messages sans modif, on enverra
+// automatiquement ». Les réponses à un prospect qui a écrit restent toujours à valider.
+const SEUIL_CONFIANCE_LI = 10;
+const ETAPES_AUTO_LI = ['message', 'relance', 'findia'];
+const normeLi = (t) => String(t || '').replace(/\s+/g, ' ').trim();
+async function confianceLi() { return (await lireReglage('linkedin_confiance')) || { serie: 0, auto: false }; }
+
+// Un seul brouillon ouvert par personne : préparer le remplace ou le crée. Une invitation part seule.
+async function preparerLi(c, l, etape, texte, { claude = false } = {}) {
   if (!PROFIL_LI_RE.test(c.linkedin || '')) throw new Refus('profil_linkedin_absent');
   if (!ETAPES_LI.includes(etape)) throw new Refus('valeur_invalide:etape');
   const type = etape === 'invitation' ? 'invitation' : 'message';
@@ -2140,8 +2148,18 @@ async function preparerLi(c, l, etape, texte) {
   const { lignes: ouverts } = await sb(`iae_crm_linkedin?contact_id=eq.${c.id}&statut=in.(${OUVERTS_LI.join(',')})&select=*`);
   const modifiable = ouverts.find((a) => ['brouillon', 'echec', 'a_verifier'].includes(a.statut));
   if (ouverts.some((a) => ['a_envoyer', 'en_cours'].includes(a.statut))) throw new Refus('deja_en_file', 409);
-  if (modifiable) return majActionLi(modifiable.id, { type, etape, texte: t, statut: 'brouillon', detail: null });
-  const { lignes } = await sb('iae_crm_linkedin', { methode: 'POST', corps: { lead_id: l.id, contact_id: c.id, type, etape, texte: t }, prefer: 'return=representation' });
+  const maintenant = new Date().toISOString();
+  let valeurs = { type, etape, texte: t, statut: 'brouillon', detail: null };
+  if (claude) valeurs.texte_claude = t;
+  if (etape === 'invitation') valeurs = { ...valeurs, texte: null, statut: 'a_envoyer', valide_le: maintenant, detail: 'Invitation automatique, sans note.' };
+  else if (claude && t && ETAPES_AUTO_LI.includes(etape) && (await confianceLi()).auto) {
+    try {
+      verifierTexteLi(etape, t);
+      valeurs = { ...valeurs, statut: 'a_envoyer', valide_le: maintenant, detail: 'Envoi automatique : 10 messages validés tels quels d\'affilée.' };
+    } catch { /* un mot interdit : le texte reste à relire */ }
+  }
+  if (modifiable) return majActionLi(modifiable.id, valeurs);
+  const { lignes } = await sb('iae_crm_linkedin', { methode: 'POST', corps: { lead_id: l.id, contact_id: c.id, ...valeurs }, prefer: 'return=representation' });
   return lignes[0];
 }
 
@@ -2184,14 +2202,18 @@ async function preparerAvecClaude(c, l, etape, opts) {
   let texte = null;
   try { texte = (await redigerLi(c, l, etape, opts)).texte || null; } catch (e) { console.error('crm linkedin rédaction', e.code || e.message); }
   try { if (texte) verifierTexteLi(etape, texte); } catch { /* Gabriel corrige : le texte reste en brouillon */ }
-  return preparerLi(c, l, etape, texte);
+  return preparerLi(c, l, etape, texte, { claude: Boolean(texte) });
 }
 
 async function operationLinkedin(corps, ip) {
   const op = corps.op;
   if (op === 'linkedin_preparer') {
     const { c, l } = await contactEtLeadLi(corps.contact_id);
-    return { action: await preparerLi(c, l, String(corps.etape || 'invitation'), corps.texte ?? null) };
+    return { action: await preparerLi(c, l, String(corps.etape || 'invitation'), corps.texte ?? null, { claude: corps.claude === true }) };
+  }
+  if (op === 'linkedin_auto_couper') {
+    await ecrireReglage('linkedin_confiance', { serie: 0, auto: false, coupe_le: new Date().toISOString() });
+    return { confiance: await confianceLi() };
   }
   if (op === 'linkedin_rediger') {
     if (tropDeRedactions(ip)) throw new Refus('ia_trop_de_demandes', 429);
@@ -2208,7 +2230,16 @@ async function operationLinkedin(corps, ip) {
   if (op === 'linkedin_valider') {
     if (!['brouillon', 'echec', 'a_verifier'].includes(a.statut)) throw new Refus('deja_en_file', 409);
     const texte = verifierTexteLi(a.etape, corps.texte ?? a.texte);
-    return { action: await majActionLi(a.id, { texte, statut: 'a_envoyer', valide_le: new Date().toISOString(), detail: null }) };
+    // La confiance : des messages de Claude validés tels quels, d'affilée. Un texte modifié remet le compteur à zéro.
+    let confiance = null;
+    if (a.type === 'message' && ETAPES_AUTO_LI.includes(a.etape)) {
+      const avant = await confianceLi();
+      const telQuel = Boolean(a.texte_claude) && normeLi(texte) === normeLi(a.texte_claude);
+      const serie = telQuel ? (avant.serie || 0) + 1 : 0;
+      confiance = { ...avant, serie, auto: avant.auto || serie >= SEUIL_CONFIANCE_LI, ...(serie >= SEUIL_CONFIANCE_LI && !avant.auto ? { depuis: new Date().toISOString() } : {}) };
+      await ecrireReglage('linkedin_confiance', confiance);
+    }
+    return { action: await majActionLi(a.id, { texte, statut: 'a_envoyer', valide_le: new Date().toISOString(), detail: null }), confiance };
   }
   if (op === 'linkedin_annuler') {
     if (['en_cours', 'envoye'].includes(a.statut)) throw new Refus('deja_parti', 409);
@@ -2361,6 +2392,21 @@ async function operationRobotLi(corps) {
       await journalLi(l, c, 'autre', `Invitation LinkedIn à ${nomContactLi(c)} sans réponse depuis 3 semaines`);
       await majLeadLi(l.id, { prochaine_relance: aujourdHuiParis(), prochaine_action: 'autre', prochaine_note: `LinkedIn : retire l'invitation à ${c.prenom || nomContactLi(c)} (en attente depuis 3 semaines), puis on arrête.` });
       bilan.a_retirer++;
+    }
+    // Les suites du jour (relance, dernier message) sont rédigées par Claude, comme le message 1.
+    bilan.suites = 0;
+    const { lignes: relations } = await sb('iae_crm_contacts?linkedin_etat=eq.relation&select=id,lead_id&limit=1000');
+    for (const r of relations) {
+      if (bilan.suites >= 10) break;
+      const [l] = (await sb(`iae_crm_leads?id=eq.${r.lead_id}&select=*`)).lignes;
+      if (!l || l.archive || l.statut === 'perdu' || !l.prochaine_relance || l.prochaine_relance > aujourdHuiParis()) continue;
+      const etapeSuite = /^LinkedIn : relancer /.test(l.prochaine_note || '') ? 'relance' : /^LinkedIn : dernier message/.test(l.prochaine_note || '') ? 'findia' : null;
+      if (!etapeSuite) continue;
+      const { lignes: ouverts } = await sb(`iae_crm_linkedin?contact_id=eq.${r.id}&statut=in.(${OUVERTS_LI.join(',')})&select=id&limit=1`);
+      if (ouverts.length) continue;
+      const [c] = (await sb(`iae_crm_contacts?id=eq.${r.id}&select=*`)).lignes;
+      await preparerAvecClaude(c, l, etapeSuite);
+      bilan.suites++;
     }
     await ecrireReglage('linkedin_robot', { ...etat, dernier_passage: maintenant, dernier_controle: aujourdHuiParis(), dernier_bilan: bilan });
     return { ok: true, bilan };
@@ -2681,7 +2727,7 @@ export default async function handler(req, res) {
       if (tropDeRedactions(ip)) throw new Refus('ia_trop_de_demandes', 429);
       return res.status(200).json(await operationProgramme(corps));
     }
-    if (corps && /^linkedin_[a-z]+$/.test(String(corps.op || ''))) return res.status(200).json(await operationLinkedin(corps, ip));
+    if (corps && /^linkedin_[a-z_]+$/.test(String(corps.op || ''))) return res.status(200).json(await operationLinkedin(corps, ip));
     if (corps && corps.op === 'recap') {
       if (tropDeRedactions(ip)) throw new Refus('ia_trop_de_demandes', 429);
       return res.status(200).json(await recapLead(corps));

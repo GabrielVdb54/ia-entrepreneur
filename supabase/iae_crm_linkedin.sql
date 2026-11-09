@@ -27,3 +27,7 @@ alter table public.iae_crm_contacts
   add column if not exists linkedin_etat text check (linkedin_etat is null or linkedin_etat in ('invitation_envoyee', 'relation', 'a_retirer')),
   add column if not exists linkedin_le timestamptz,
   add column if not exists linkedin_vu text;
+
+-- 09/11 : le texte tel que Claude l'a rédigé, pour savoir si Gabriel valide un message sans le modifier
+-- (après plus de 10 messages validés tels quels d'affilée, les messages partent seuls).
+alter table public.iae_crm_linkedin add column if not exists texte_claude text check (texte_claude is null or char_length(texte_claude) <= 8000);

@@ -313,6 +313,7 @@
   .li-barre { display: flex; flex-wrap: wrap; gap: 8px 14px; align-items: center; justify-content: space-between; border: 1px solid var(--line); border-radius: 12px; padding: 10px 14px; margin-top: 14px; background: var(--card); font-size: 14px; }
   .li-barre p { margin: 0; color: var(--muted); }
   .li-barre b { color: var(--text); }
+  .li-barre .li-confiance { font-size: 13.5px; }
   .li-barre.alerte-li p { color: var(--danger); }
   .boite { display: grid; gap: 18px; }
   .boite > section { min-width: 0; }
@@ -2814,6 +2815,13 @@ function etatMac() {
   return { texte: `${morceaux.join(' · ')}.${ouvre && min > 90 ? " Il n'est pas passé depuis longtemps : il doit être allumé et réveillé." : ''}`, alerte: Boolean(r.erreur) || (ouvre && min > 90) };
 }
 
+// Où en est l'envoi automatique des messages (validés tels quels d'affilée, sur 10).
+function texteConfiance() {
+  const k = (D.reglages && D.reglages.linkedin_confiance) || {};
+  if (k.auto) return { texte: 'Les invitations et les messages partent tout seuls (les réponses aux prospects restent pour toi).', auto: true };
+  const n = Math.min(k.serie || 0, 10);
+  return { texte: `Les invitations partent toutes seules. Messages : ${n} validé${n > 1 ? 's' : ''} tel${n > 1 ? 's' : ''} quel${n > 1 ? 's' : ''} d'affilée sur 10 ; après 10, ils partiront tout seuls.`, auto: false };
+}
 function blocLi(c) {
   const a = liOuverte(c.id);
   const nom = nomContact(c) || 'Sans nom';
@@ -2821,7 +2829,7 @@ function blocLi(c) {
   if (!a) {
     const etape = etapeLiSuivante(c);
     if (!etape) return `<section class="li-bloc" data-li-contact="${c.id}">${tete}<p class="meta">Invitation envoyée${c.linkedin_le ? ` le ${esc(dateCourte(c.linkedin_le.slice(0, 10)))}` : ''}. Ton Mac regarde chaque matin si elle est acceptée.</p></section>`;
-    return `<section class="li-bloc" data-li-contact="${c.id}">${tete}<div class="actions"><button type="button" class="btn petit primaire" data-li-preparer="${etape}">Préparer : ${esc(LIB_LI[etape])}</button></div></section>`;
+    return `<section class="li-bloc" data-li-contact="${c.id}">${tete}<div class="actions"><button type="button" class="btn petit primaire" data-li-preparer="${etape}">${etape === 'invitation' ? 'Inviter sur LinkedIn (part tout seul)' : `Préparer : ${esc(LIB_LI[etape])}`}</button></div></section>`;
   }
   const texte = a.texte || '';
   if (a.statut === 'a_envoyer' || a.statut === 'en_cours') {
@@ -2876,7 +2884,7 @@ function brancherLi(form) {
           if (z) { z.value = 'Claude rédige…'; z.disabled = true; }
           try {
             const d = await api('POST', { op: 'linkedin_rediger', contact_id: contactId, etape: b.dataset.liPreparer });
-            r = await api('POST', { op: 'linkedin_preparer', contact_id: contactId, etape: b.dataset.liPreparer, texte: d.texte });
+            r = await api('POST', { op: 'linkedin_preparer', contact_id: contactId, etape: b.dataset.liPreparer, texte: d.texte, claude: true });
             majLi(r.action);
           } catch (e) { toast(e.message); }
         }
@@ -2884,13 +2892,14 @@ function brancherLi(form) {
         b.textContent = 'Claude rédige…';
         const a = actionsLi().find((x) => x.id === id);
         const d = await api('POST', { op: 'linkedin_rediger', contact_id: contactId, etape: a.etape });
-        const r = await api('POST', { op: 'linkedin_preparer', contact_id: contactId, etape: a.etape, texte: d.texte });
+        const r = await api('POST', { op: 'linkedin_preparer', contact_id: contactId, etape: a.etape, texte: d.texte, claude: true });
         majLi(r.action);
       } else if (b.hasAttribute('data-li-valider')) {
         b.textContent = 'Envoi…';
         const r = await api('POST', { op: 'linkedin_valider', id, texte: zone ? zone.value : null });
         majLi(r.action);
-        toast('En file : ton Mac l\'envoie dans le quart d\'heure, s\'il est allumé.');
+        if (r.confiance) D.reglages.linkedin_confiance = r.confiance;
+        toast(r.confiance && r.confiance.auto && r.confiance.depuis && Date.now() - Date.parse(r.confiance.depuis) < 60000 ? 'En file. Tu as validé 10 messages tels quels : les suivants partiront tout seuls.' : 'En file : ton Mac l\'envoie dans le quart d\'heure, s\'il est allumé.', 6000);
       } else if (b.hasAttribute('data-li-annuler')) {
         const r = await api('POST', { op: 'linkedin_annuler', id });
         majLi(r.action);
@@ -2921,7 +2930,7 @@ function ouvrirLinkedinDuJour() {
   const e = envoisLiDuJour();
   ouvrirModale(`<h2>LinkedIn du jour</h2>
     <p class="li-mac${etat.alerte ? ' alerte-li' : ''}">${esc(etat.texte)}</p>
-    <p class="aide">Relis chaque texte, puis « Envoyer par mon Mac ». Ton Mac envoie au plus ${quotaInvitations()} invitations par jour (${e.invitations} déjà parties), espacées de quelques minutes ; le reste part le jour ouvré suivant.${enFile ? ` ${enFile} déjà en file.` : ''}</p>
+    <p class="aide">${esc(texteConfiance().texte)} Relis chaque message, puis « Envoyer par mon Mac ». Ton Mac envoie au plus ${quotaInvitations()} invitations par jour (${e.invitations} déjà parties), espacées de quelques minutes.${enFile ? ` ${enFile} déjà en file.` : ''}</p>
     ${blocs.length ? blocs.map(({ l, c }) => `<div class="li-ligne"><p class="meta">${esc(l.entreprise)}${l.prochaine_note && /^LinkedIn :/.test(l.prochaine_note) ? ` · ${esc(l.prochaine_note.replace(/^LinkedIn : /, ''))}` : ''}</p>${blocLi(c)}</div>`).join('') : '<p class="vide">Rien à valider pour LinkedIn aujourd\'hui.</p>'}
     ${blocs.some(({ a }) => a && a.statut === 'brouillon') ? '<div class="actions"><button type="button" class="btn primaire" data-li-tout>Envoyer tout ce qui est à valider</button></div>' : ''}
     ${piedFormulaire('')}`, (form) => {
@@ -2938,6 +2947,7 @@ function ouvrirLinkedinDuJour() {
         try {
           const r = await api('POST', { op: 'linkedin_valider', id: a.id, texte: ($('[data-li-texte]', bloc) || {}).value ?? a.texte });
           majLi(r.action);
+          if (r.confiance) D.reglages.linkedin_confiance = r.confiance;
           n++;
         } catch (err) {
           montrerErreur(form, `${nomContact(contactParId(a.contact_id)) || 'Une personne'} : ${err.message}`);
@@ -2956,9 +2966,20 @@ function barreLinkedin() {
   const enFile = actionsLi().filter((a) => a.statut === 'a_envoyer' || a.statut === 'en_cours').length;
   if (!aValider && !enFile && !(D.reglages && D.reglages.linkedin_robot)) return '';
   const etat = etatMac();
-  return `<div class="li-barre${etat.alerte ? ' alerte-li' : ''}"><p><b>LinkedIn</b> · ${esc(etat.texte)}${enFile ? ` ${enFile} en file.` : ''}</p>${aValider ? `<button type="button" class="btn petit primaire" data-li-jour>Valider la liste LinkedIn (${aValider})</button>` : ''}</div>`;
+  const k = texteConfiance();
+  return `<div class="li-barre${etat.alerte ? ' alerte-li' : ''}"><p><b>LinkedIn</b> · ${esc(etat.texte)}${enFile ? ` ${enFile} en file.` : ''}<br><span class="li-confiance">${esc(k.texte)}</span></p><div class="actions">${aValider ? `<button type="button" class="btn petit primaire" data-li-jour>Messages LinkedIn à valider (${aValider})</button>` : ''}${k.auto ? '<button type="button" class="btn petit lien" data-li-couper>Couper l\'envoi automatique</button>' : ''}</div></div>`;
 }
 document.addEventListener('click', (ev) => { if (ev.target.closest('[data-li-jour]')) { ev.preventDefault(); ouvrirLinkedinDuJour(); } });
+document.addEventListener('click', async (ev) => {
+  if (!ev.target.closest('[data-li-couper]')) return;
+  ev.preventDefault();
+  try {
+    const r = await api('POST', { op: 'linkedin_auto_couper' });
+    D.reglages.linkedin_confiance = r.confiance;
+    rendre();
+    toast('Envoi automatique coupé : chaque message attend de nouveau ton clic.');
+  } catch (e) { toast(e.message); }
+});
 
 // La salutation suit toujours la personne à qui le message part : on remplace
 // « Bonjour X, » au début du texte quand le destinataire change.
