@@ -549,6 +549,7 @@ MENU_MOBILE = [
     ('/formation-ia-independant.html', 'Formation indépendants'),
     ('/integrations-ia.html', 'Intégrations IA'),
     ('/meilleures-ia.html', 'Meilleures IA'),
+    ('/skills-ia-gratuits.html', 'Skills IA gratuits'),
     ('/nos-formateurs.html', 'Nos formateurs'),
     ('/quel-est-mon-opco.html', 'Financer ma formation'),
     ('/blog.html', 'Blog'),
@@ -603,6 +604,7 @@ MENUS_NAV = [
     ], ('Voir toutes les intégrations', '/integrations-ia.html')),
     ('/meilleures-ia.html', 'Meilleures IA', [
         ("Goodweek : toutes les IA réunies",      '/partenaire-goodweek.html'),
+        ("Skills IA gratuits pour mon métier",    '/skills-ia-gratuits.html'),
         ("Quel assistant IA choisir",             '/ia/meilleures-ia-assistants-ia.html'),
         ("Automatisation et agents IA",           '/ia/meilleures-ia-automatisation.html'),
         ("Prospection, vente et CRM",             '/ia/meilleures-ia-prospection-vente.html'),

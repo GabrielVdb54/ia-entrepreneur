@@ -68,6 +68,7 @@ MENUS = [
     ], ('Voir toutes les intégrations', '/integrations-ia.html')),
     ('/meilleures-ia.html', 'Meilleures IA', [
         ("Goodweek : toutes les IA réunies",     '/partenaire-goodweek.html'),
+        ("Skills IA gratuits pour mon métier",   '/skills-ia-gratuits.html'),
         ("Quel assistant IA choisir",            '/ia/meilleures-ia-assistants-ia.html'),
         ("Automatisation et agents IA",          '/ia/meilleures-ia-automatisation.html'),
         ("Prospection, vente et CRM",            '/ia/meilleures-ia-prospection-vente.html'),
@@ -103,6 +104,7 @@ MENU = f"""<div class="mobile-menu" id="mobile-menu">
     <a href="/formation-ia-independant.html">Formation indépendants</a>
     <a href="/integrations-ia.html">Intégrations IA</a>
     <a href="/meilleures-ia.html">Meilleures IA</a>
+    <a href="/skills-ia-gratuits.html">Skills IA gratuits</a>
     <a href="/nos-formateurs.html">Nos formateurs</a>
     <a href="/quel-est-mon-opco.html">Mon budget formation</a>
     <a href="/blog.html">Blog</a>
@@ -128,7 +130,8 @@ def main():
         # 316 pages : il vit dans nav-dropdown.css, posé ici en même temps que
         # le <nav> qu'il habille. Après mobile.css, qui garde la main sur le
         # responsive.
-        if CSS_MENUS not in out:
+        # quelle que soit l'écriture du lien (« > » ou « /> », comme sur meilleures-ia.html)
+        if '/nav-dropdown.css"' not in out:
             if '<link rel="stylesheet" href="/mobile.css">' in out:
                 out = out.replace('<link rel="stylesheet" href="/mobile.css">',
                                   '<link rel="stylesheet" href="/mobile.css">' + CSS_MENUS, 1)

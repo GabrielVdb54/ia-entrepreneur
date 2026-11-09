@@ -24,6 +24,9 @@ Pour chaque métier : les tâches où l'IA fait gagner du temps, les règles du 
 - Formation IA pour les entreprises de propreté (AKTO) : https://ia-entrepreneur.fr/formation-ia-proprete.html
 - Formation IA pour agents et courtiers d'assurance (OPCO Atlas) : https://ia-entrepreneur.fr/formation-ia-assurance.html
 
+### Skills IA gratuits
+Des skills (« compétences » dans les interfaces en français) gratuits, sans inscription et sans script : un fichier SKILL.md au format ouvert Agent Skills, à installer dans Claude ou Gemini, ou sa version texte à coller dans ChatGPT, Mistral ou Copilot. Chacun dit à l'IA ce qu'elle ne doit jamais inventer (prix, dates, quantités, noms) et finit par la liste de ce qu'il reste à vérifier. BTP : compte rendu de chantier, devis après visite. Propreté : devis et plan de nettoyage, consignes de site traduites. Communs : lecture d'un dossier d'appel d'offres, réponse à une réclamation client : https://ia-entrepreneur.fr/skills-ia-gratuits.html
+
 ### Formations thématiques (sur mesure, sur devis)
 - Formation IA et AI Act : l'article 4, applicable depuis le 2 février 2025, demande aux entreprises qui utilisent l'IA de prendre des mesures pour développer la maîtrise de l'IA de leur personnel ; depuis le règlement Digital Omnibus, c'est une obligation de moyens : https://ia-entrepreneur.fr/formation-ia-obligatoire-ai-act.html
 - Formation Claude en entreprise : documents longs, projets partagés, connecteurs (Google Drive, Microsoft 365, HubSpot), fichiers Excel, Word et PowerPoint : https://ia-entrepreneur.fr/formation-claude-entreprise.html

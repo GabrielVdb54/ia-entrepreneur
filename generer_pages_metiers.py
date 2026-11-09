@@ -21,6 +21,8 @@ sys.dont_write_bytecode = True  # pas de __pycache__ : Vercel servirait tout le 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from generer_pages_villes import (GABARIT, SITE, FLECHE, CHEVRON, ADRESSE, TEL_SCHEMA, texte, faq_html,
                                   formateur, hero, zones, equipe, marches, AVIS, GABRIEL, RYAD, CELINE, GILLES)
+# Boîte à skills (09/11/2026) : les pages métier qui ont des skills les montrent juste après la fiche.
+from generer_boite_skills import bloc_metier, METIERS as METIERS_SKILLS
 
 # Photos des métiers : Unsplash, licence Unsplash (usage commercial libre, sans attribution obligatoire), choisies le 09/11/2026.
 #   agence-immobiliere-cles.jpg     https://unsplash.com/fr/photos/tenant-les-cles-de-la-maison-devant-lentree-bqUZEAeWuok
@@ -868,6 +870,10 @@ def page(p):
     debut = t.index('  <section class="imm-outil-hero">')
     fin = t.index('<footer>')
     corps = p['corps']
+    for cle_sk, (_, url_sk) in METIERS_SKILLS.items():
+        if url_sk == '/' + p['slug']:
+            k = corps.index('</section>', corps.index('<section class="fiche-section" id="fiche">')) + len('</section>\n')
+            corps = corps[:k] + bloc_metier(cle_sk) + corps[k:]
     i = corps.rindex('\n  <section class="cta-final">')
     corps = corps[:i] + autres_metiers(p['slug']) + corps[i:]
     # immersion.js fait entrer en cascade, au défilement, tout élément .reveal (et rien si l'appareil demande moins d'animations)

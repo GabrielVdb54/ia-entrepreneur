@@ -1,0 +1,24 @@
+On a reçu ce dossier de consultation, je n'ai que le règlement et le CCTP. Tu peux me dire ce qu'il y a dedans avant que je décide si on y va ?
+
+=== RÈGLEMENT DE LA CONSULTATION (RC) ===
+Commune de Saint-Aubin-sur-Meurthe (exemple fictif)
+Marché de services de nettoyage des bâtiments communaux. Procédure adaptée (article R2123-1 du Code de la commande publique).
+Article 1 - Objet. Nettoyage courant des locaux communaux. Le marché est alloti : lot 1 Mairie et médiathèque ; lot 2 Groupe scolaire Jules Ferry. Les candidats peuvent répondre à un ou aux deux lots.
+Article 2 - Durée. Le marché est conclu pour une durée d'un an à compter du 1er février 2027, reconductible tacitement trois fois par période d'un an.
+Article 3 - Variantes. Les variantes ne sont pas autorisées.
+Article 4 - Visite. Une visite des sites est obligatoire, sous peine d'irrecevabilité de l'offre. Elle a lieu sur rendez-vous jusqu'au 2 décembre 2026. Une attestation de visite est remise et doit être jointe à l'offre.
+Article 5 - Contenu du dossier de réponse.
+5.1 Candidature : DC1 et DC2 ou DUME ; attestation d'assurance responsabilité civile professionnelle en cours de validité ; références de prestations similaires sur les trois dernières années.
+5.2 Offre : acte d'engagement signé ; bordereau des prix unitaires (BPU) et détail quantitatif estimatif (DQE) complétés sur les modèles fournis ; mémoire technique ; attestation de visite.
+Article 6 - Critères de jugement des offres. Valeur technique : 60 % (moyens humains affectés au marché : 25 % ; méthodologie et plan de contrôle qualité : 20 % ; démarche environnementale et produits utilisés : 15 %). Prix : 40 %.
+Article 7 - Remise des offres. Les offres sont remises sur la plateforme de dématérialisation de l'acheteur avant le 11 décembre 2026 à 12 h 00. Les questions peuvent être posées sur la plateforme jusqu'au 3 décembre 2026.
+Article 8 - Validité des offres. 120 jours à compter de la date limite de remise.
+Article 9 - Pénalités et conditions d'exécution. Les pénalités sont définies au CCAP.
+
+=== CAHIER DES CLAUSES TECHNIQUES PARTICULIÈRES (CCTP) ===
+Article 1 - Sites. Lot 1 : mairie (620 m², bureaux et salle du conseil), médiathèque (410 m², dont 120 m² de moquette). Lot 2 : groupe scolaire (1 850 m², 9 classes, restauration scolaire de 140 m², sanitaires enfants).
+Article 2 - Horaires. Les prestations sont réalisées en dehors des heures d'ouverture au public : avant 8 h 00 ou après 18 h 00. Pendant les vacances scolaires, le lot 2 fait l'objet d'un nettoyage approfondi (une fois par période de vacances).
+Article 3 - Fréquences. Lot 1 : bureaux 3 fois par semaine ; sanitaires et salle du conseil après chaque utilisation déclarée par la mairie, au moins 2 fois par semaine. Lot 2 : classes et sanitaires tous les jours d'école ; restauration scolaire après chaque service.
+Article 4 - Produits. Les produits utilisés porteront un écolabel (Écolabel européen ou équivalent). Les fiches de données de sécurité sont remises à la commune avant le démarrage.
+Article 5 - Personnel. Le titulaire respecte les dispositions conventionnelles relatives à la reprise du personnel (accord annexe 7 de la convention collective des entreprises de propreté). La liste du personnel affecté est communiquée à la demande des candidats.
+Article 6 - Contrôle. Un contrôle contradictoire est réalisé une fois par mois avec le référent de la commune ; il donne lieu à une fiche signée par les deux parties.
