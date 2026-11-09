@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """Génère les pages métier : formation-ia-agence-immobiliere.html, formation-ia-syndic-gestion-locative.html,
-formation-ia-btp.html et formation-ia-proprete.html.
+formation-ia-btp.html, formation-ia-proprete.html et formation-ia-assurance.html (qui remplace l'ancienne page écrite à la main).
 
 Demande de Gabriel (09/11/2026) : une « fiche » par métier, proposée en prospection LinkedIn,
 qui soit aussi une page SEO (« ça fera d'une pierre 2 coups »). La fiche est la section #fiche :
@@ -22,10 +22,18 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 from generer_pages_villes import (GABARIT, SITE, FLECHE, CHEVRON, ADRESSE, TEL_SCHEMA, texte, faq_html,
                                   formateur, hero, zones, equipe, marches, AVIS, GABRIEL, RYAD, CELINE, GILLES)
 
+# Photos des métiers : Unsplash, licence Unsplash (usage commercial libre, sans attribution obligatoire), choisies le 09/11/2026.
+#   agence-immobiliere-cles.jpg     https://unsplash.com/fr/photos/tenant-les-cles-de-la-maison-devant-lentree-bqUZEAeWuok
+#   syndic-copropriete-immeuble.jpg https://unsplash.com/fr/photos/un-batiment-avec-de-nombreuses-fenetres-BJfKknOkuW8
+#   btp-chantier-conducteur.jpg     https://unsplash.com/fr/photos/homme-en-veste-noire-et-jaune-portant-un-casque-rouge-tenant-un-baton-noir-et-blanc-PDjpA1yeonw
+#   proprete-agent-bureaux.jpg      https://unsplash.com/fr/photos/un-homme-aux-gants-jaunes-passe-laspirateur-sur-un-sol-de-bureau-moquette-CVcIMnH_7so
+#   assurance-conseil-client.jpg    https://unsplash.com/fr/photos/un-homme-et-une-femme-assis-a-une-table-avec-un-ordinateur-portable-M5k978V3qBc
 CSS = """
   /* Pages métier (formation-ia-agence-immobiliere, -syndic-gestion-locative, -btp, -proprete), 09/11/2026 */
-  /* Les liens envoyés en prospection pointent sur #fiche : l'en-tête fixe ne doit pas couvrir le titre */
-  html{scroll-padding-top:96px}
+  /* Les liens envoyés en prospection pointent sur #fiche : l'en-tête fixe ne doit pas couvrir le titre.
+     scroll-behavior:auto, car le défilement doux du gabarit était coupé par le démarrage des animations GSAP
+     et l'arrivée tombait dans le haut de page (relecture design du 09/11/2026). */
+  html{scroll-padding-top:72px;scroll-behavior:auto}
   .imm-limite a,.metier-lien{color:var(--primary);font-weight:700;text-decoration:underline;text-underline-offset:2px}
   .metier-source{margin-top:18px;font-size:.88rem;color:var(--muted);line-height:1.6}
   .metier-source a{color:var(--muted);text-decoration:underline;text-underline-offset:2px}
@@ -36,7 +44,11 @@ CSS = """
   .fiche-tache p{margin:0 0 8px;font-size:.95rem;line-height:1.6;color:var(--text)}
   .fiche-tache p b{font-weight:700}
   .fiche-tache .fiche-reste{color:var(--muted)}
-  .fiche-niveau{align-self:flex-start;margin-top:auto;font-size:.78rem;font-weight:700;color:var(--primary);background:rgba(26,60,255,.08);border-radius:999px;padding:4px 11px}
+  .fiche-tache h3{order:-2}
+  .fiche-niveau{order:-1;align-self:flex-start;margin:0 0 10px;font-size:.78rem;font-weight:700;color:var(--primary);background:rgba(26,60,255,.08);border-radius:999px;padding:4px 11px}
+  .fiche-suite{margin-top:32px;padding:24px;border-radius:16px;background:#fff;border:1px solid var(--border);display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:16px 28px}
+  .fiche-suite p{margin:0;max-width:560px;font-size:1rem;line-height:1.6;color:var(--text)}
+  .imm-outil-equipe .imm-lien,.imm-niveaux-outil .imm-lien{display:inline-block;padding:6px 0}
   .ville-avis{margin:26px 0 0;padding:20px 22px;border-radius:16px;background:#fff;border:1px solid rgba(10,15,44,.09)}
   .ville-avis p{margin:0;font-size:1rem;line-height:1.7;color:var(--text)}
   .ville-avis .ville-etoiles{color:#F5A623;letter-spacing:2px;margin-bottom:8px}
@@ -44,7 +56,7 @@ CSS = """
   .ville-lien{color:var(--primary);font-weight:700;text-decoration:underline;text-underline-offset:2px}
   .metier-voisins{padding:34px 0;border-top:1px solid var(--border)}
   .metier-voisins p{margin:0;font-size:.95rem;line-height:1.7;color:var(--muted);max-width:820px}
-  @media (max-width:600px){.fiche-section{padding:50px 0}.fiche-grille{grid-template-columns:1fr}}
+  @media (max-width:600px){.fiche-section{padding:50px 0}.fiche-grille{grid-template-columns:1fr;gap:12px;margin-top:22px}.fiche-tache{padding:18px 18px 14px}.fiche-suite{padding:20px}}
 """
 
 
@@ -65,8 +77,19 @@ def reperes(titre, sous, cartes, source, ident='constats'):
 '''
 
 
+FICHE_INTRO = "Pour chaque tâche : ce que l'IA prépare, ce qui reste à vous, et le niveau de formation qui la travaille. En formation, on part de vos propres dossiers."
+
+
+def niveau_court(n):
+    """« Niveau 2, puis 3 pour l'automatiser » devient « Niveaux 2 et 3 » : une pastille, un format."""
+    ch = sorted(set(re.findall(r'[123]', n)))
+    return f'Niveau {ch[0]}' if len(ch) == 1 else 'Niveaux ' + ', '.join(ch[:-1]) + ' et ' + ch[-1]
+
+
 def fiche(titre, sous, taches):
-    """La fiche métier : (tâche, ce que l'IA change, ce qui reste à vous, niveau)."""
+    """La fiche métier : (tâche, ce que l'IA change, ce qui reste à vous, niveau). « sous » est ignoré :
+    l'introduction est la même sur toutes les pages (relecture design du 09/11/2026)."""
+    taches = [(t, avec, reste, niveau_court(niveau)) for t, avec, reste, niveau in taches]
     c = '\n'.join(
         f'          <div class="fiche-tache"><h3>{t}</h3><p><b>Avec l\'IA :</b> {avec}</p>'
         f'<p class="fiche-reste"><b>Reste à vous :</b> {reste}</p><span class="fiche-niveau">{niveau}</span></div>'
@@ -75,10 +98,11 @@ def fiche(titre, sous, taches):
   <section class="fiche-section" id="fiche">
     <div class="container">
       <h2 class="section-title">{titre}</h2>
-      <p class="section-sub">{sous}</p>
+      <p class="section-sub">{FICHE_INTRO}</p>
       <div class="fiche-grille">
 {c}
       </div>
+      <div class="fiche-suite"><p><b>Laquelle de ces tâches vous prend le plus de temps ?</b> En 30 minutes, on regarde avec vous par où commencer et quel niveau convient à votre équipe.</p><a href="/rendez-vous.html" class="btn-primary">Réserver un appel de 30 min {FLECHE}</a></div>
     </div>
   </section>
 '''
@@ -131,7 +155,7 @@ PAGES['agence'] = dict(
     nom='Formation IA pour agences immobilières',
     titre='Formation IA pour agences immobilières | IA-Entrepreneur',
     desc="Formation IA pour agences immobilières : annonces, comptes rendus de visite, relances, dossiers locataires, sur vos dossiers. Dossier OPCO EP monté.",
-    image='formation-2.jpg',
+    image='metiers/agence-immobiliere-cles.jpg',
     public='Agences immobilières (transaction et location)',
     faq=[
         ("La formation est-elle finançable par l'OPCO EP ?",
@@ -153,7 +177,7 @@ PAGES['agence']['corps'] = (
          'négociateurs|assistantes|gestionnaires locatifs|directeurs d\'agence',
          "Annonces, comptes rendus de visite, relances vendeurs, dossiers locataires : vos agents immobiliers et vos assistantes apprennent à confier à l'IA ce qui leur prend du temps, sur vos propres dossiers et dans vos logiciels, et à vérifier ce qu'elle produit avant que ça parte.",
          ['Organisme certifié Qualiopi', 'À Nancy, Metz et Strasbourg', 'Dossier OPCO EP monté'],
-         'formation-2.jpg', 'Gabriel Vanderbecken en formation')
+         'metiers/agence-immobiliere-cles.jpg', 'Une remise de clés')
     + reperes("Ce que l'OPCO EP a constaté dans les agences",
               "En mars 2026, l'OPCO EP, qui finance la formation de la branche immobilier, a publié un diagnostic sur le numérique et l'IA dans les agences, à partir de 255 entreprises interrogées. Trois constats guident notre façon de former.",
               [("Des formations IA jugées trop théoriques",
@@ -166,11 +190,11 @@ PAGES['agence']['corps'] = (
     + fiche("Les 12 tâches où l'IA fait gagner du temps à une agence",
             "Pour chacune : ce que l'IA change, ce qui reste à faire par vous, et le niveau de formation qui la travaille. En formation, on part de vos propres dossiers.",
             [("Rédiger une annonce de vente ou de location",
-              "un premier jet à partir de la fiche du bien et des photos, une version par portail, une version en anglais, un ton adapté à l'acheteur visé.",
+              "un premier jet à partir de la fiche du bien et des photos, une version par portail et une en anglais.",
               "relire contre les mentions obligatoires (honoraires, DPE) et retirer tout critère qui pourrait être discriminant en location.",
               "Niveau 2"),
              ("Le compte rendu de visite et le point au vendeur",
-              "vous dictez vos impressions en sortant de la visite, l'IA met en forme le compte rendu et le mail au propriétaire. Hektor et Modelo proposent déjà la saisie à la voix.",
+              "vous dictez vos impressions en sortant de la visite, l'IA met en forme le compte rendu et le mail au propriétaire.",
               "vérifier les faits avant l'envoi.",
               "Niveau 2"),
              ("Relancer vendeurs et acquéreurs",
@@ -190,7 +214,7 @@ PAGES['agence']['corps'] = (
               "ne promettre aucun prix.",
               "Niveaux 1 et 2"),
              ("Lire un document long",
-              "un DPE, des diagnostics, un PV d'assemblée générale ou un règlement de copropriété résumés, avec les points à signaler à l'acquéreur et les questions à poser au syndic.",
+              "un DPE, des diagnostics ou un règlement de copropriété résumés, avec les points à signaler à l'acquéreur.",
               "revenir au document pour chaque point, avec un outil qui cite ses passages.",
               "Niveau 2"),
              ("Contrôler un dossier locataire",
@@ -210,7 +234,7 @@ PAGES['agence']['corps'] = (
               "garder le ton de l'agence et relire.",
               "Niveaux 1 et 2"),
              ("Un nouveau mandat, de bout en bout",
-              "enchaîner l'annonce, la diffusion, le tri des contacts et la proposition de créneaux de visite. Un dirigeant interrogé par l'OPCO EP dit vouloir « tout connecter ensemble » de cette façon.",
+              "enchaîner l'annonce, la diffusion, le tri des contacts et la proposition de créneaux de visite.",
               "valider à chaque étape, avec une charte d'usage.",
               "Niveau 3")])
     + zones("Ce qu'il faut savoir avant de s'y mettre",
@@ -230,7 +254,7 @@ PAGES['agence']['corps'] = (
             ident='cadre')
     + equipe('Qui vous forme',
              "Gabriel Vanderbecken a fondé IA-Entrepreneur à Nancy et forme des équipes en entreprise dans tout le Grand Est. Benjamin Niel a dirigé une conciergerie jusqu'à 80 logements, avec des salariés, et conçoit des logiciels de gestion, notamment pour l'immobilier. Il forme à distance, partout en France.",
-             [GABRIEL, BENJAMIN], 'formation-1.jpg', 'Gabriel Vanderbecken en session', AVIS)
+             [GABRIEL, BENJAMIN], 'formation-2.jpg', 'Gabriel Vanderbecken en formation', AVIS)
     + marches('<h2 class="section-title">Trois niveaux, du premier pas à l\'automatisation</h2>')
     + faq_section(PAGES['agence']['faq'], "Vos questions sur la formation IA en agence immobilière")
     + cta('Parlons de votre agence',
@@ -269,7 +293,7 @@ PAGES['syndic'] = dict(
     nom='Formation IA pour syndics et gestion locative',
     titre='Formation IA syndic de copropriété et gestion locative',
     desc="Formation IA pour syndics de copropriété et gestion locative : mails des copropriétaires, AG, PV, devis, charges, sur vos dossiers. Dossier OPCO EP monté.",
-    image='formation-2.jpg',
+    image='metiers/syndic-copropriete-immeuble.jpg',
     public='Syndics de copropriété et administrateurs de biens',
     faq=[
         ("Un cabinet de syndic peut-il faire financer la formation par l'OPCO EP ?",
@@ -291,11 +315,11 @@ PAGES['syndic']['corps'] = (
          'gestionnaires de copropriété|assistants|comptables|gestionnaires locatifs|dirigeants de cabinet',
          "Mails des copropriétaires, convocations et PV d'AG, devis, sinistres, régularisation des charges : vos gestionnaires, assistants et comptables apprennent à faire préparer le premier jet par l'IA, sur les dossiers de vos immeubles, et à le vérifier avant qu'il parte. Ce qui sort au nom du cabinet reste sous votre contrôle.",
          ['Organisme certifié Qualiopi', 'Sur place à Nancy, Metz et Strasbourg', 'Dossier OPCO EP monté'],
-         'formation-2.jpg', 'Gabriel Vanderbecken en formation')
+         'metiers/syndic-copropriete-immeuble.jpg', 'Une copropriété en ville')
     + reperes("Ce que vivent les cabinets de syndic",
               "En mai 2026, l'Association nationale des gestionnaires de copropriété (ANGC) a publié son baromètre des métiers, à partir de 1 584 réponses de gestionnaires, d'assistants, de comptables, de directeurs et de dirigeants. Deux de ses constats, et la carte des copropriétés du Grand Est, guident notre façon de former.",
               [("Les mails, première charge du métier",
-                "88 % des professionnels interrogés vivent la gestion des mails comme une charge psychologique permanente, contre 80,6 % en 2020. Le baromètre relève qu'« aucune formation à la gestion du flux de mails n'est proposée de manière structurée ». C'est la première tâche de la fiche ci-dessous."),
+                "88 % des professionnels interrogés vivent la gestion des mails comme une charge psychologique permanente, contre 80,6 % en 2020. Le baromètre relève qu'« aucune formation à la gestion du flux de mails n'est proposée de manière structurée ». C'est la première tâche de la fiche ci-dessus."),
                ("Peu d'IA livrée dans les logiciels",
                 "Les répondants donnent en moyenne 6,3 sur 10 à leur logiciel métier, et pour filtrer, prioriser ou répondre aux mails, « aucune solution technologique » ne s'est imposée. Les éditeurs annoncent : Vilogi dit rédiger les résolutions d'AG, Septeo a présenté en octobre 2026 une IA qu'il déploiera progressivement. En attendant, l'IA s'apprend à côté du logiciel."),
                ("Un parc de petites copropriétés",
@@ -304,19 +328,19 @@ PAGES['syndic']['corps'] = (
     + fiche("Les 12 tâches où l'IA fait gagner du temps à un syndic ou un administrateur de biens",
             "Pour chacune : ce que l'IA prépare, ce qui reste à faire par vous, et le niveau de formation qui la travaille. En formation, on part des dossiers de vos immeubles et de vos lots en gestion.",
             [("Répondre aux mails des copropriétaires et des locataires",
-              "un projet de réponse à partir du message, du règlement de copropriété, du dernier appel de fonds ou du bail, sur un ton posé, même face à un mail agressif.",
+              "un projet de réponse à partir du message, du règlement, du dernier appel de fonds ou du bail, sur un ton posé.",
               "vérifier chaque fait et chaque montant dans votre logiciel avant d'envoyer, et ne confier un mail nominatif qu'à un outil validé par le cabinet.",
               "Niveau 2"),
              ("Les questions qui reviennent chaque semaine",
-              "solde, tantièmes, date de la prochaine AG, où trouver le PV : des réponses types écrites une fois, et une page de questions fréquentes par immeuble à déposer sur l'extranet. Au niveau 3, la boîte est triée, les urgences sortent en tête et chaque demande arrive avec un projet de réponse.",
+              "solde, tantièmes, date de la prochaine AG : des réponses types écrites une fois, et une page de questions fréquentes par immeuble pour l'extranet.",
               "tenir ces réponses à jour après chaque AG et chaque appel de fonds.",
               "Niveau 2, puis 3"),
              ("Préparer l'assemblée générale",
-              "l'ordre du jour, les projets de résolutions rédigés à partir des devis et des décisions passées, et une note en langage clair qui explique les travaux aux copropriétaires.",
+              "l'ordre du jour, les projets de résolutions à partir des devis et des décisions passées, et une note claire pour les copropriétaires.",
               "la majorité applicable à chaque résolution et les pièces à joindre à la convocation.",
               "Niveau 2"),
              ("Mettre le PV d'AG au propre",
-              "à partir de vos notes de séance et de la feuille de présence, les décisions, le résultat de chaque vote et la liste des opposants et des défaillants, mis en forme.",
+              "à partir de vos notes et de la feuille de présence, les décisions, les votes, les opposants et les défaillants mis en forme.",
               "relire chaque vote. Le PV reste signé par le président, le secrétaire et les scrutateurs, puis notifié dans le mois.",
               "Niveau 2"),
              ("Comparer des devis avant le conseil syndical",
@@ -328,7 +352,7 @@ PAGES['syndic']['corps'] = (
               "les responsabilités et chaque montant, qui ne se décident pas avec une IA.",
               "Niveau 2, puis 3 pour les relances"),
              ("Lire un règlement de copropriété ou un plan de travaux",
-              "un règlement, un diagnostic technique global, un plan pluriannuel de travaux ou un rapport d'expertise résumés, avec les points qui demandent une décision du conseil syndical ou de l'AG.",
+              "un règlement, un diagnostic technique ou un plan pluriannuel de travaux résumés, avec les points qui demandent une décision.",
               "vérifier chaque point dans le document d'origine avant de l'avancer devant un copropriétaire.",
               "Niveau 2"),
              ("Notes d'information et affichages",
@@ -340,7 +364,7 @@ PAGES['syndic']['corps'] = (
               "le passage à la mise en demeure, puis la transmission à l'avocat ou au commissaire de justice.",
               "Niveau 2, puis 3 pour l'automatiser"),
              ("Expliquer une régularisation des charges",
-              "une lettre qui détaille le décompte poste par poste, au copropriétaire ou au locataire, et répond d'avance aux questions habituelles. Même chose pour la révision annuelle du loyer.",
+              "une lettre qui détaille le décompte poste par poste et répond d'avance aux questions habituelles. Même chose pour la révision du loyer.",
               "les montants, tirés de votre logiciel, jamais recalculés par l'IA.",
               "Niveau 2"),
              ("Rédiger un état des lieux",
@@ -393,7 +417,7 @@ PAGES['btp'] = dict(
     nom='Formation IA pour le BTP',
     titre='Formation IA pour les entreprises du BTP | IA-Entrepreneur',
     desc="Formation IA pour les entreprises du BTP : compte rendu de chantier, mémoire technique, DCE, PPSPS, travaillés sur vos dossiers. Dossier Constructys monté.",
-    image='formation-1.jpg',
+    image='metiers/btp-chantier-conducteur.jpg',
     public='Entreprises du bâtiment et des travaux publics',
     faq=[
         ("La formation est-elle finançable par Constructys ?",
@@ -415,7 +439,7 @@ PAGES['btp']['corps'] = (
          'conducteurs de travaux|assistantes de gestion|chargés d\'affaires|chefs de chantier|équipes de bureau',
          "Compte rendu de chantier, mémoire technique, lecture d'un DCE, PPSPS, relance d'une situation de travaux : vos conducteurs de travaux, votre assistante et vous-même apprenez à confier à l'IA une partie de l'administratif qui se fait le soir, sur vos propres dossiers, et à relire ce qu'elle écrit avant que ça parte.",
          ['Organisme certifié Qualiopi', 'Dans vos locaux à Nancy, Metz et Strasbourg', 'Dossier Constructys monté avec vous'],
-         'formation-1.jpg', 'Gabriel Vanderbecken en session')
+         'metiers/btp-chantier-conducteur.jpg', 'Sur le chantier')
     + reperes("Ce que l'Observatoire des métiers du BTP a constaté",
               "En janvier 2026, l'Observatoire des métiers du BTP a publié une étude sur l'IA dans les entreprises du bâtiment et des travaux publics. 621 professionnels ont répondu au questionnaire, dont 28 % dans des entreprises de 10 à 49 salariés, et 16 entreprises ont été interrogées en entretien. Trois de ses constats ont décidé de notre façon de travailler avec les entreprises du BTP.",
               [("Moins d'une entreprise sur dix s'en sert",
@@ -425,14 +449,14 @@ PAGES['btp']['corps'] = (
                ("Des formations loin du chantier",
                 "En 2024, Constructys a financé 1 762 actions de formation à l'IA, surtout de la découverte, et la majorité des intitulés « ne fait aucune référence au BTP ». L'étude recommande d'apprendre sur des situations réelles : « préparation de chantier, devis, réponse à appel d'offres ». C'est ce que nous faisons, sur vos dossiers.")],
               f"Sources : {BTP_ETUDE} (cabinet Plein Sens, questionnaire de 2025 et entretiens), et {BTP_COMMUNIQUE} pour la répartition des usages. Page mise à jour le 9 novembre 2026.")
-    + fiche("Les 12 tâches où l'IA allège l'administratif d'une entreprise du BTP",
+    + fiche("Les 12 tâches où l'IA fait gagner du temps à une entreprise du BTP",
             "Pour chacune : ce que l'IA change, ce qui reste à vous, et le niveau de formation qui la travaille. Les quantités, les prix et la marge ne sont jamais confiés à l'IA. En formation, chacune se travaille sur un dossier réel de votre entreprise.",
             [("Le compte rendu de chantier, dicté sur place",
-              "vous dictez vos notes en sortant de la réunion de chantier ou de la visite, l'IA en fait un compte rendu en ordre : présents, avancement par lot, réserves, actions et qui les porte, puis le mail de diffusion. Un dirigeant interrogé par l'Observatoire des métiers du BTP décrit cet usage chez ses conducteurs de travaux.",
+              "vous dictez vos notes en sortant de la réunion de chantier, l'IA en fait un compte rendu en ordre (avancement, réserves, actions) et le mail de diffusion.",
               "relire les noms, les dates et les réserves avant l'envoi : une fois diffusé, c'est votre compte rendu.",
               "Niveaux 1 et 2"),
              ("Le mémoire technique",
-              "un premier jet construit sur les critères du RC et sur vos vraies références, vos moyens et vos méthodes, qui suit le plan demandé par l'acheteur. Vos anciens mémoires servent de base.",
+              "un premier jet construit sur les critères du RC et sur vos vraies références, moyens et méthodes, à partir de vos anciens mémoires.",
               "relire chaque engagement. Si les pièces du marché rendent le mémoire contractuel, ce que vous y écrivez sur les moyens, le planning ou les méthodes vous engage.",
               "Niveau 2"),
              ("Lire un DCE avant de décider d'y aller",
@@ -440,15 +464,15 @@ PAGES['btp']['corps'] = (
               "revenir au texte d'origine pour chaque point qui compte, et décider de répondre ou non.",
               "Niveau 2"),
              ("Le dossier de candidature",
-              "la liste des pièces demandées par le RC, le DC1 et le DC2 ou le DUME préparés à partir d'une fiche entreprise tenue à jour, les attestations à joindre repérées.",
+              "la liste des pièces demandées par le RC, et le DC1, le DC2 ou le DUME préparés à partir d'une fiche entreprise à jour.",
               "vérifier que chaque attestation est à jour, puis signer.",
               "Niveau 2, puis 3"),
              ("Le devis après la visite",
-              "vos notes ou votre dictée de visite remises en ordre : description des travaux, désignations, questions à poser au client. Obat et Batappli proposent déjà le devis à la voix.",
+              "vos notes ou votre dictée de visite remises en ordre : description des travaux, désignations, questions à poser au client.",
               "les quantités, les prix et la marge. L'IA ne chiffre pas à votre place.",
               "Niveau 2"),
              ("Le PPSPS",
-              "votre modèle adapté au chantier à partir du PGC : phases, risques, moyens de prévention, intervenants. Depuis un arrêt de la Cour de cassation de janvier 2025, plus d'entreprises doivent en rédiger un.",
+              "votre modèle adapté au chantier à partir du PGC : phases, risques, moyens de prévention, intervenants.",
               "valider chaque mesure de prévention avec ceux qui seront sur le chantier.",
               "Niveau 2"),
              ("Les situations de travaux et leurs relances",
@@ -456,7 +480,7 @@ PAGES['btp']['corps'] = (
               "les montants et l'avancement, repris de votre logiciel, jamais de l'IA.",
               "Niveau 1, puis 3 pour l'automatiser"),
              ("Les factures fournisseurs à classer",
-              "la facture reçue est lue, rattachée au chantier et au fournisseur, renommée et rangée au bon endroit. Un dirigeant interrogé par l'Observatoire raconte qu'avant, ses équipes le faisaient « tout ça manuellement ».",
+              "la facture reçue est lue, rattachée au chantier et au fournisseur, renommée et rangée au bon endroit.",
               "contrôler les rattachements les premières semaines, et garder la main sur le paiement.",
               "Niveau 3"),
              ("Le suivi des sous-traitants",
@@ -472,7 +496,7 @@ PAGES['btp']['corps'] = (
               "relire avant l'envoi, surtout quand le ton monte.",
               "Niveau 1"),
              ("Comprendre un texte ou une règle",
-              "un texte réglementaire, une norme ou un changement d'aide comme MaPrimeRénov' résumé, puis traduit en consignes simples pour vos équipes. Un dirigeant interrogé par l'Observatoire s'en sert pour défricher des textes et en tirer des règles de chantier.",
+              "un texte réglementaire, une norme ou un changement d'aide comme MaPrimeRénov' résumé, puis traduit en consignes simples pour vos équipes.",
               "revenir au texte officiel avant d'appliquer, avec un outil qui cite ses passages.",
               "Niveaux 1 et 2")])
     + zones("Ce que l'IA ne change pas à vos responsabilités",
@@ -492,7 +516,7 @@ PAGES['btp']['corps'] = (
             ident='cadre')
     + equipe('Qui vous forme',
              "Nous ne vous apprendrons pas votre métier : vous le connaissez mieux que nous. Gabriel Vanderbecken a fondé IA-Entrepreneur à Nancy ; Gilles Idoux forme à l'IA générative, à la vente et au management dans le Grand Est. Nous venons avec la méthode et les outils d'IA, vous venez avec vos dossiers : un DCE en cours, un compte rendu à faire, un mémoire à reprendre. C'est sur eux que l'on travaille, et c'est vous qui jugez si le résultat tient la route sur le chantier.",
-             [GABRIEL, GILLES], 'accompagnement-gabriel.jpg', 'Gabriel Vanderbecken avec un participant', AVIS)
+             [GABRIEL, GILLES], 'formation-1.jpg', 'Gabriel Vanderbecken en session', AVIS)
     + marches('<h2 class="section-title">Trois niveaux, comme les trois paliers de l\'Observatoire</h2>\n'
               '        <p class="section-sub">L\'étude de l\'Observatoire décrit trois paliers : une culture commune du numérique et des données, puis des usages installés dans l\'entreprise, puis des outils reliés entre eux et automatisés. Nos trois niveaux suivent le même chemin.</p>')
     + faq_section(PAGES['btp']['faq'], "Vos questions sur la formation IA dans le BTP")
@@ -517,7 +541,7 @@ PAGES['proprete'] = dict(
     nom='Formation IA pour entreprises de propreté',
     titre='Formation IA pour entreprises de propreté | IA-Entrepreneur',
     desc="Formation IA pour entreprises de propreté : mémoire technique, consignes traduites, remplacements, contrôle qualité, sur vos documents. Dossier AKTO monté.",
-    image='formation-1.jpg',
+    image='metiers/proprete-agent-bureaux.jpg',
     public='Entreprises de propreté et de nettoyage',
     faq=[
         ("La formation est-elle finançable par AKTO ?",
@@ -539,7 +563,7 @@ PAGES['proprete']['corps'] = (
          'responsables d\'exploitation|services RH|chargés d\'affaires|inspecteurs|chefs d\'équipe',
          "Appels d'offres, remplacements, rapports de contrôle, reprises de personnel : dans une entreprise de propreté, l'écrit repose sur le dirigeant, l'exploitation et le service RH. La formation leur apprend à confier à l'IA la part rédactionnelle de ces tâches, sur vos propres documents, et à contrôler ce qu'elle produit.",
          ['Organisme certifié Qualiopi', 'À Nancy, Metz et Strasbourg', 'Dossier AKTO monté avec vous'],
-         'formation-1.jpg', 'Gabriel Vanderbecken en session')
+         'metiers/proprete-agent-bureaux.jpg', 'Entretien de bureaux')
     + reperes("Où en est l'IA dans les entreprises de propreté",
               "Deux études de la branche donnent la mesure : l'enquête d'Accenture pour le Monde de la Propreté, publiée en 2025, et l'étude prospective d'AKTO, publiée en 2026. Voici ce qu'elles disent, et ce que nous en tirons pour la formation.",
               [("Déjà utilisée, surtout à titre individuel",
@@ -549,34 +573,34 @@ PAGES['proprete']['corps'] = (
                ("Le Grand Est, première région pour les offres d'emploi",
                 "Entre octobre 2023 et octobre 2025, 15 % des offres d'emploi du secteur ont été publiées dans le Grand Est, devant la Nouvelle-Aquitaine (13 %). L'étude d'AKTO relève aussi « une rotation importante des équipes, marquée par des abandons de poste récurrents ». Annonces, accueil des nouveaux agents et remplacements reviennent toute l'année.")],
               f"Sources : {SOURCE_MDP}, enquête Accenture pour le Monde de la Propreté, 2025 ; {SOURCE_AKTO_PROSP}, offres d'emploi relevées par Jobfeed du 1er octobre 2023 au 1er octobre 2025. Page mise à jour le 9 novembre 2026.")
-    + fiche("12 tâches d'une entreprise de propreté où l'IA fait gagner du temps",
+    + fiche("Les 12 tâches où l'IA fait gagner du temps à une entreprise de propreté",
             "Bureaux, parties communes de copropriété, sites industriels ou vitrerie : pour chaque tâche, ce que l'IA change, ce qui reste à faire par vous, et le niveau de formation qui la travaille. En formation, on part de vos documents : un dossier d'appel d'offres, une fiche de site, un rapport de contrôle.",
             [("Le mémoire technique d'un appel d'offres",
-              "à partir de vos propres éléments (méthode par zone et par fréquence, moyens humains, gestion des remplacements, plan de contrôle qualité, reprise du personnel, produits), un mémoire construit selon les critères du règlement de consultation et adapté au CCTP de ce marché, pas un mémoire type.",
+              "un mémoire construit sur les critères du règlement et le CCTP de ce marché, à partir de vos méthodes, de vos moyens et de votre plan de contrôle qualité.",
               "les prix et les effectifs, que l'IA ne calcule pas, et la relecture ligne à ligne : aucune référence, aucun effectif, aucune certification inventés.",
               "Niveau 2"),
              ("Des consignes de site que chaque agent comprend",
-              "la fiche de poste et les consignes d'un site réécrites en français simple, puis traduites dans la langue de chaque agent, avec une version courte à afficher dans le local technique ou à lire sur le téléphone.",
+              "la fiche de poste et les consignes d'un site en français simple, puis traduites dans la langue de chaque agent, en version courte.",
               "faire relire la traduction par quelqu'un qui parle la langue, et faire valider par l'encadrant tout ce qui touche aux produits et à la sécurité.",
               "Niveau 2"),
              ("Lire un dossier de consultation",
-              "le règlement de consultation et le CCTP résumés : surfaces, fréquences de passage, horaires, contraintes du site, critères et pondérations, pièces à fournir, et la liste des questions à poser à l'acheteur avant la visite.",
+              "le règlement et le CCTP résumés : surfaces, fréquences, horaires, critères, pièces à fournir, et les questions à poser à l'acheteur.",
               "relire vous-même le règlement pour tout ce qui peut écarter votre offre : délais, pièces, signature.",
               "Niveau 2"),
              ("Les questionnaires RSE, RGPD et sécurité des acheteurs",
-              "retrouver les réponses déjà données dans vos dossiers précédents et les adapter à la question posée. L'étude Accenture pour le Monde de la Propreté cite ce cas comme déjà en place dans le secteur.",
+              "retrouver les réponses déjà données dans vos dossiers précédents et les adapter à la question posée.",
               "vérifier que chaque réponse est encore vraie aujourd'hui dans votre entreprise.",
               "Niveau 2, puis 3 pour une base de réponses"),
              ("Le devis et le plan de nettoyage après une visite",
-              "vous dictez vos notes en sortant du site, l'IA en tire un descriptif par zone, un plan de nettoyage avec les fréquences de passage et le courrier qui accompagne le devis.",
+              "vous dictez vos notes en sortant du site, l'IA en tire un descriptif par zone, le plan de nettoyage et le courrier du devis.",
               "le chiffrage et les cadences, qui restent dans votre outil de devis.",
               "Niveau 2"),
              ("Remplacements et compléments d'heures",
-              "le message qui propose des heures à un agent à temps partiel, l'avenant temporaire préparé à partir de votre modèle, le planning multi-sites mis à jour et le mot au client si l'équipe change.",
+              "le message qui propose des heures à un agent, l'avenant temporaire à partir de votre modèle et le planning mis à jour.",
               "vérifier les règles de la convention collective et faire signer l'avenant avant le premier jour travaillé.",
               "Niveau 2"),
              ("Rapports d'intervention et contrôle qualité",
-              "le chef d'équipe ou l'inspecteur dicte ce qu'il a vu sur le site, l'IA remplit la fiche de contrôle et rédige le rapport. Chaque mois, une synthèse pour le client à partir de vos relevés : écarts, actions correctives, points à suivre.",
+              "le chef d'équipe dicte ce qu'il a vu, l'IA remplit la fiche de contrôle et prépare la synthèse mensuelle pour le client.",
               "relire avant de signer, et ne rien affirmer au client que vos relevés ne montrent pas.",
               "Niveau 2, puis 3 pour brancher votre logiciel"),
              ("Répondre à une réclamation client",
@@ -584,7 +608,7 @@ PAGES['proprete']['corps'] = (
               "vérifier les faits sur le site et décider d'un éventuel geste commercial.",
               "Niveau 2"),
              ("La reprise du personnel (annexe 7)",
-              "à partir de la liste de transfert de l'entreprise sortante, les noms remplacés par des numéros, un tableau de contrôle des conditions de reprise, les questions à poser au sortant, les courriers et les avenants types.",
+              "à partir de la liste de transfert, noms remplacés par des numéros, un tableau de contrôle des conditions de reprise et les courriers types.",
               "la vérification salarié par salarié et la décision, avec votre service RH ou votre conseil. Les données des salariés n'entrent jamais dans un outil d'IA grand public.",
               "Niveau 2"),
              ("Offres d'emploi et accueil des nouveaux agents",
@@ -614,15 +638,160 @@ PAGES['proprete']['corps'] = (
              ("L'AI Act et l'encadrement",
               'Depuis sa révision de juillet 2026, l\'article 4 demande aux entreprises qui utilisent l\'IA de prendre des mesures pour développer la maîtrise de l\'IA de leur personnel : c\'est une obligation de moyens. Chaque participant reçoit une attestation individuelle de formation, et l\'entreprise un registre de conformité AI Act. <a href="/formation-ia-obligatoire-ai-act.html">Ce que demande l\'AI Act</a>')],
             ident='cadre')
-    + equipe('Vos formateurs',
+    + equipe('Qui vous forme',
              "Gabriel Vanderbecken a fondé IA-Entrepreneur à Nancy. Il enseigne à l'ECM Nancy Business School depuis 2023 et forme des équipes en entreprise dans tout le Grand Est. Gilles Idoux forme à l'IA générative, à la vente et au management, notamment à l'IUT de Thionville-Yutz et à l'ECM Nancy. Votre métier, c'est vous qui le connaissez : le programme se construit avec vous, sur vos documents et avec vos mots, et se valide avant la signature.",
-             [GABRIEL, GILLES], 'accompagnement-gabriel.jpg', 'Gabriel Vanderbecken avec un participant', AVIS)
+             [GABRIEL, GILLES], 'salon-demain-avec-ia.jpg', "Atelier animé par IA-Entrepreneur au salon Demain avec l'IA", AVIS)
     + marches('<h2 class="section-title">Trois niveaux, de la prise en main à l\'automatisation</h2>')
     + faq_section(PAGES['proprete']['faq'], "Vos questions sur la formation IA en entreprise de propreté")
     + cta('Parlons de votre entreprise',
           "Un appel de 30 minutes pour voir quelles tâches pèsent le plus sur votre encadrement : appels d'offres, remplacements, rapports, reprises de personnel. Nous montons ensuite le programme et le dossier de financement AKTO.")
 )
 
+
+
+# ───────────────────────────── AGENTS GÉNÉRAUX ET COURTIERS D'ASSURANCE ─────────────────────────────
+# Faits : /Users/GabrielV/Desktop/pages-metiers/recherche/assurance.md, relus à la source le 09/11/2026 :
+# Observatoire économique Agéa 2026 (PDF, étude Eurogroup Consulting d'octobre 2025 : entrée en relation 24 à 76 données,
+# 44 en moyenne, 31 obligatoires ; vie 109 en moyenne ; sinistres 65 % au contact de l'assuré, dégât des eaux 4,02 contre 2,7),
+# enquête Emploi-formation Agéa 2026 (80 % des salariés d'agence utilisent l'IA), communiqué Planète CSCA du 21/05/2026,
+# Argus du 15/07/2026 (Allianz, Ask.me), code des assurances L511-2, R512-13-1, A512-8, L521-4, CNIL (questions-réponses
+# sur l'IA générative), AI Act annexe III point 5 c) et règlement 2026/1744 (haut risque au 2 décembre 2027, page ACPR),
+# Atlas (branches IDCC 2335 et 2247). Retiré de l'ancienne page : « Imputable sur vos 15h DDA » (aucun texte ne le permet
+# d'avance), « zéro reste à charge », promesse de gain de temps, « 11 882 agents généraux + 26 953 courtiers » (non retrouvé),
+# « 24 à 109 informations » (chiffres mal assemblés). Aucun chiffre de vendeur repris.
+AGEA_OBS = ('<a href="https://agea.fr/actualites/observatoire-economique-des-agents-2026" '
+            'target="_blank" rel="noopener">Agéa, Observatoire économique des agents généraux 2026</a>')
+AGEA_EMPLOI = ('<a href="https://agea.fr/actualites/etude-emploi-formation-2026" '
+               'target="_blank" rel="noopener">enquête Emploi-formation 2026</a>')
+CSCA_VISION = ('<a href="https://www.planetecsca.fr/actualites/communiques-de-presse/planete-csca-lance-vision-ia-un-dispositif-exclusif-pour-accompagner-les-courtiers-dassurances-dans-ladoption-maitrisee-de-lintelligence-artificielle/" '
+               'target="_blank" rel="noopener">communiqué du 21 mai 2026</a>')
+ALLIANZ_ARGUS = ('<a href="https://www.argusdelassurance.com/compagnies/allianz/intelligence-artificielle-allianz-fait-de-lia-le-nouveau-copilote-de-ses-reseaux-de-distribution.JMRHWTWYFNGHLKALMXK6XNNXLI.html" '
+                 'target="_blank" rel="noopener">juillet 2026</a>')
+CONSEIL_L521_4 = ('<a href="https://www.legifrance.gouv.fr/codes/article_lc/LEGIARTI000036920558" '
+                  'target="_blank" rel="noopener">l\'article L521-4 du code des assurances</a>')
+COMPETENCES_A512_8 = ('<a href="https://www.legifrance.gouv.fr/codes/article_lc/LEGIARTI000037447099" '
+                      'target="_blank" rel="noopener">article A512-8 du code des assurances</a>')
+JUSTIFICATIFS_R512 = ('<a class="metier-lien" href="https://www.legifrance.gouv.fr/codes/article_lc/LEGIARTI000036979532" '
+                      'target="_blank" rel="noopener">ce que le code demande de conserver</a>')
+CNIL_IA_GEN = ('<a href="https://www.cnil.fr/fr/les-questions-reponses-de-la-cnil-sur-lutilisation-dun-systeme-dia-generative" '
+               'target="_blank" rel="noopener">CNIL</a>')
+ACPR_AI_ACT = ('<a href="https://acpr.banque-france.fr/fr/reglementation/focus-sur-la-reglementation/transverse/reglement-europeen-sur-lia-ai-act" '
+               'target="_blank" rel="noopener">l\'ACPR</a>')
+ATLAS_AGENTS = ('<a class="metier-lien" href="https://www.opco-atlas.fr/atlas/agents-generaux-assurance.html" '
+                'target="_blank" rel="noopener">les agents généraux</a>')
+ATLAS_COURTAGE = ('<a class="metier-lien" href="https://www.opco-atlas.fr/atlas/courtage-assurances-et-reassurances.html" '
+                  'target="_blank" rel="noopener">le courtage</a>')
+
+PAGES['assurance'] = dict(
+    slug='formation-ia-assurance.html',
+    nom='Formation IA pour agents généraux et courtiers d\'assurance',
+    titre='Formation IA pour agents généraux et courtiers d\'assurance',
+    desc="Formation IA pour agents généraux et courtiers d'assurance : recueil des besoins, devoir de conseil, sinistres, sur vos dossiers. Dossier OPCO Atlas monté.",
+    image='metiers/assurance-conseil-client.jpg',
+    public='Agents généraux et courtiers d\'assurance',
+    faq=[
+        ("La formation est-elle finançable par l'OPCO Atlas ?",
+         f"Les agences générales appliquent la convention collective du personnel des agences générales d'assurances (IDCC 2335), les cabinets de courtage celle des entreprises de courtage d'assurances et/ou de réassurances (IDCC 2247). Les deux branches relèvent de l'OPCO Atlas, qui publie ses critères de prise en charge pour {ATLAS_AGENTS} et pour {ATLAS_COURTAGE}, dans la limite des fonds disponibles. Un cabinet de courtage en crédit dépend de la convention qu'il applique : <a class=\"metier-lien\" href=\"/simulateur-financement-formation-ia.html\">notre simulateur</a> retrouve votre OPCO à partir de votre SIRET. La formation de l'agent général lui-même, s'il n'est pas salarié, relève d'un autre financement, que nous regardons avec vous. IA-Entrepreneur est un organisme certifié Qualiopi (certificat n° 883211-2) : nous montons le dossier avec vous, et vous connaissez votre reste à charge avant de signer. Les fonds mutualisés sont réservés aux entreprises de moins de 50 salariés."),
+        ("Une formation IA compte-t-elle dans mes 15 heures de formation continue DDA ?",
+         f"Elle peut compter, si son contenu correspond à la liste de compétences de l'{COMPETENCES_A512_8}. Cette liste cite notamment les évolutions technologiques et leurs effets sur la distribution d'assurances, les outils du parcours client « y compris les outils digitaux », la formalisation du conseil et sa traçabilité, et la protection des données personnelles. Une formation bâtie sur votre recueil des besoins, votre devoir de conseil et la confidentialité des données de vos clients est conçue pour s'y rattacher ; une découverte générale de ChatGPT, beaucoup moins. Les 15 heures concernent chaque personne qui conseille, présente ou aide à conclure des contrats. Le code ne prévoit aucune validation à l'avance : c'est à vous de pouvoir justifier vos heures, l'ACPR contrôle, et pour un courtier son association professionnelle le vérifie aussi. Notre attestation reprend {JUSTIFICATIFS_R512} : l'organisme, la date, la durée, les modalités et les thèmes traités. Un courtier en crédit a sa propre obligation, centrée sur l'évolution de la réglementation : nous ne promettons pas qu'une formation IA y réponde."),
+        ("Peut-on mettre le questionnaire de santé d'un client dans ChatGPT ?",
+         f"Pas dans une version grand public, qui peut réutiliser ce qu'on lui confie. Un questionnaire médical, un arrêt de travail ou les garanties santé d'un salarié sont des données de santé, que le RGPD range parmi les données sensibles, et la {CNIL_IA_GEN} recommande de ne jamais partager de données personnelles ni d'informations confidentielles sur un service grand public. En formation, on voit quels outils et quels réglages conviennent à un cabinet, comment retirer un nom ou un numéro de contrat avant de demander quoi que ce soit, et ce qui ne sort jamais de votre logiciel ni de l'extranet de la compagnie."),
+        ("L'IA peut-elle conseiller mes clients à ma place ?",
+         f"Non. Selon {CONSEIL_L521_4}, le distributeur conseille un contrat cohérent avec les exigences et les besoins du client et « précise les raisons qui motivent ce conseil » : c'est votre conseil et votre responsabilité. L'IA prépare la trame de questions, la mise au propre de vos notes, le comparatif et le premier jet de la fiche de conseil. Vous décidez de ce qui est proposé, et la fiche que vous signez reprend ce que le client vous a dit, pas ce que l'outil a supposé. Le syndicat des courtiers Planète CSCA le dit ainsi : « la validation humaine reste le garant ultime de la qualité du conseil »."),
+        ("Notre logiciel ou l'outil de notre compagnie a déjà de l'IA : à quoi sert une formation ?",
+         "Les compagnies équipent leurs agents : Allianz a présenté en juillet 2026 un assistant qui répond à leurs questions sur les produits et la souscription. Côté courtage, Modulr indique proposer une connexion à ChatGPT pour rédiger des emails, et Planète CSCA s'est associé à Little John pour proposer aux cabinets un outil d'IA labellisé. Ces outils ne rendent service que si l'équipe sait leur poser la bonne question et vérifier ce qu'ils produisent. On part de votre logiciel et de ce que votre compagnie autorise, puis on ajoute ChatGPT, Claude, Copilot ou Mistral là où il en manque, sans y faire entrer ce qui doit rester dans vos outils."),
+        FAQ_AI_ACT,
+        FAQ_LIEU,
+    ],
+)
+PAGES['assurance']['corps'] = (
+    hero('Formation IA pour les agents généraux et les courtiers d\'assurance',
+         'conseillers clientèle|gestionnaires en assurance|gestionnaires sinistres|chargés de développement commercial|collaborateurs d\'agence',
+         "Recueil des besoins, devoir de conseil, comparatifs, sinistres, échéances : vos collaborateurs et vous-même apprenez à faire préparer le premier jet par l'IA, sur vos propres dossiers, dans vos outils et ceux de votre compagnie, et à le vérifier avant qu'il parte. Le conseil, lui, reste le vôtre.",
+         ['Organisme certifié Qualiopi', 'À Nancy, Metz et Strasbourg', 'Dossier OPCO Atlas monté'],
+         'metiers/assurance-conseil-client.jpg', 'Un rendez-vous de conseil')
+    + reperes("Ce que vivent les agences et les cabinets",
+              "En juillet 2026, Agéa, la fédération des syndicats d'agents généraux, a publié son Observatoire économique, avec pour la première fois une étude de terrain sur le travail en agence menée par Eurogroup Consulting, et son enquête Emploi-formation. Trois constats, dont un que partagent les courtiers, guident notre façon de former.",
+              [("La collecte de données passe avant le conseil",
+                "Selon les compagnies, une agence générale recueille de 24 à 76 informations à l'entrée en relation d'un client, 44 en moyenne, dont un tiers facultatives. Pour souscrire une assurance vie, la moyenne monte à 109. Le président d'Agéa parle d'un transfert de charges qui « grignote notre temps de conseil ». Le recueil des besoins ouvre donc la fiche ci-dessus."),
+               ("Le sinistre, « moment de vérité »",
+                "En gestion de sinistres, 65 % de l'activité d'une agence est consacrée au contact direct avec l'assuré : explications, relances, pièces à transmettre. Pour un dégât des eaux, l'agence intervient en moyenne 4 fois par dossier, contre 2,7 quand la compagnie le gère seule. L'IA peut préparer ces relances et ces points d'étape ; la relation reste la vôtre."),
+               ("L'IA déjà dans les équipes",
+                "80 % des salariés d'agence générale utilisent l'IA, au moins de temps en temps, selon l'enquête d'Agéa. Côté courtage, Planète CSCA a publié en mai 2026 une charte type et dix cas d'usage, dont la formalisation du devoir de conseil, en rappelant que « la validation humaine reste le garant ultime de la qualité du conseil ».")],
+              f"Sources : {AGEA_OBS} (étude d'Eurogroup Consulting sur les charges de gestion, octobre 2025) et {AGEA_EMPLOI}, juillet 2026 ; Planète CSCA, {CSCA_VISION}. Page mise à jour le 10 novembre 2026.")
+    + fiche("Les 12 tâches où l'IA fait gagner du temps à une agence générale ou un cabinet de courtage",
+            "Pour chacune : ce que l'IA prépare, ce qui reste à faire par vous, et le niveau de formation qui la travaille. En formation, on part de vos propres dossiers, sans donnée nominative dans un outil grand public.",
+            [("Le recueil des besoins",
+              "une trame de questions adaptée au contrat, puis vos notes de fin de rendez-vous remises en ordre : situation du client, exigences et besoins, points ouverts.",
+              "poser les questions, faire confirmer chaque réponse par le client et la saisir dans votre logiciel ou l'outil de la compagnie. Aucune donnée de santé dans un outil grand public.",
+              "Niveau 2"),
+             ("Le devoir de conseil écrit",
+              "un premier jet de la fiche de conseil qui reprend les besoins exprimés, le contrat proposé et les raisons du choix, dans une langue que le client comprend.",
+              "le conseil lui-même. La loi demande au distributeur de préciser « les raisons qui motivent ce conseil » : vous relisez, corrigez et signez.",
+              "Niveau 2"),
+             ("Comparer des propositions de compagnies",
+              "un tableau des écarts entre deux ou trois offres : garanties, exclusions, franchises, plafonds, options, tiré des conditions générales et particulières.",
+              "vérifier chaque ligne dans les documents d'origine, puis recommander. Le comparatif prépare votre conseil, il ne le remplace pas.",
+              "Niveau 2"),
+             ("Lire un contrat ou des conditions générales",
+              "le contrat qu'un prospect vous apporte, des conditions générales ou un bail commercial résumés, avec les garanties manquantes repérées et les questions à poser.",
+              "revenir au texte pour chaque point qui compte, avec un outil qui cite ses passages.",
+              "Niveau 2"),
+             ("Préparer un rendez-vous client",
+              "une synthèse de l'historique du client et de ses contrats, les couvertures à revoir depuis le dernier entretien, les questions à poser.",
+              "l'entretien, et ce que vous proposez au client.",
+              "Niveau 2"),
+             ("Suivre un sinistre",
+              "la chronologie du dossier, la liste des pièces à réclamer, les relances de l'expert ou de la compagnie, et un point d'étape à l'assuré en termes simples.",
+              "la position sur la garantie et les montants, qui reviennent à la compagnie et à l'expert, et ce que vous dites à l'assuré.",
+              "Niveau 2, puis 3 pour les relances"),
+             ("Les échéances et la revue du portefeuille",
+              "la liste des contrats qui arrivent à échéance, un message de revue de contrat par client, la proposition de rendez-vous.",
+              "vérifier les dates dans votre logiciel et valider chaque envoi.",
+              "Niveau 2, puis 3 pour l'automatiser"),
+             ("Les mails qui reviennent tous les jours",
+              "attestation, changement de véhicule, question sur une franchise, demande de résiliation : des réponses types qui s'adaptent à la question posée.",
+              "vérifier le contrat concerné et la pièce jointe avant d'envoyer.",
+              "Niveau 2, puis 3"),
+             ("Répondre à une réclamation",
+              "un projet de réponse clair et posé, appuyé sur le contrat et l'historique, qui suit les étapes recommandées par l'ACPR.",
+              "le fond de la réponse, et l'enregistrement de la réclamation.",
+              "Niveau 2"),
+             ("Connaissance client et lutte contre le blanchiment",
+              "la liste des pièces à demander selon le profil du client et le contrat, le mail qui réclame ce qui manque, une synthèse du dossier pour le contrôle interne.",
+              "l'analyse du risque, la décision et toute déclaration. Une pièce d'identité n'entre jamais dans un outil grand public.",
+              "Niveau 2"),
+             ("La veille réglementaire et produits",
+              "une nouvelle règle, une note de compagnie ou un changement de garantie résumés, puis traduits en consignes simples pour l'équipe.",
+              "revenir au texte officiel avant d'appliquer.",
+              "Niveaux 1 et 2"),
+             ("Prospection et relation client",
+              "des publications LinkedIn, une lettre régulière aux clients, des réponses aux avis Google, un message de prise de rendez-vous pour un bilan.",
+              "garder le ton du cabinet, relire, et respecter les règles du démarchage.",
+              "Niveaux 1 et 2")])
+    + zones("Ce que l'IA ne change pas à vos obligations",
+            "Devoir de conseil, données de santé, procédures de la compagnie : vos règles restent les mêmes avec l'IA, et chaque exercice de la formation en tient compte.",
+            [("Le conseil reste le vôtre",
+              f"Selon {CONSEIL_L521_4}, le distributeur conseille un contrat cohérent avec les exigences et les besoins du client et « précise les raisons qui motivent ce conseil ». L'IA met en forme ce que vous avez recueilli ; elle ne connaît ni votre client ni votre responsabilité."),
+             ("Les données de santé",
+              f"Questionnaire médical, arrêt de travail, garanties santé d'un salarié : ce sont des données de santé, que le RGPD range parmi les données sensibles. La {CNIL_IA_GEN} recommande de ne jamais partager de données personnelles ni d'informations confidentielles « lors de l'utilisation d'un service grand public ». On voit en formation quels outils et quels réglages conviennent à un cabinet."),
+             ("Les outils de votre compagnie",
+              f"Une agence générale travaille dans les outils de sa compagnie, et certaines y ajoutent de l'IA : Allianz a présenté en {ALLIANZ_ARGUS} un assistant qui répond aux questions de ses agents sur les produits et la souscription. On part de ce que votre compagnie fournit et autorise, avant d'ajouter un autre outil."),
+             ("Connaissance client et blanchiment",
+              "Un courtier est lui-même soumis aux obligations de lutte contre le blanchiment ; une agence générale applique les procédures de sa compagnie. Dans les deux cas, l'IA aide à lister les pièces et à relancer, jamais à juger un risque ni à décider d'une déclaration."),
+             ("L'AI Act et le haut risque",
+              f"Écrire un mail ou résumer des conditions générales avec ChatGPT ne relève pas du haut risque. L'AI Act classe à haut risque les systèmes d'IA destinés à évaluer le risque et à fixer le tarif des personnes en assurance vie et en assurance maladie : ces règles s'appliquent à partir du 2 décembre 2027, et {ACPR_AI_ACT} en surveillera l'application dans le secteur financier. Pour vos équipes, l'article 4 demande des mesures de maîtrise de l'IA : une obligation de moyens. <a href=\"/formation-ia-obligatoire-ai-act.html\">Ce que demande l'AI Act</a>"),
+             ("Vos 15 heures de formation continue",
+              f"Une formation IA peut être présentée au titre de la formation continue DDA si son contenu correspond aux compétences de l'{COMPETENCES_A512_8} et à vos fonctions. Le code ne prévoit pas de validation à l'avance : c'est à vous d'en justifier. Notre attestation indique l'organisme, la date, la durée, les modalités et les thèmes traités.")],
+            ident='cadre')
+    + equipe('Qui vous forme',
+             "Gabriel Vanderbecken a fondé IA-Entrepreneur à Nancy et forme des équipes en entreprise dans tout le Grand Est. Gilles Idoux a passé huit ans dans l'assurance, en B2B et en B2C, après vingt ans en agence bancaire, de l'accueil au guichet à la direction d'agence ; il forme aujourd'hui à l'IA générative, à la vente et au management. Votre métier, c'est vous qui le connaissez : le programme se construit sur vos dossiers et avec vos mots, et se valide avant la signature.",
+             [GABRIEL, GILLES], 'accompagnement-gabriel.jpg', 'Gabriel Vanderbecken avec un participant', AVIS)
+    + marches('<h2 class="section-title">Trois niveaux, de la prise en main à l\'automatisation</h2>')
+    + faq_section(PAGES['assurance']['faq'], "Vos questions sur la formation IA en agence générale et en cabinet de courtage")
+    + cta('Parlons de votre agence ou de votre cabinet',
+          "Un appel de 30 minutes pour voir ce que votre équipe fait déjà avec l'IA, ce que vos outils et votre compagnie permettent, et par quelles tâches commencer. Nous montons ensuite le programme et le dossier de financement Atlas.")
+)
 
 
 METIERS = [('formation-ia-agence-immobiliere.html', 'agences immobilières'),
@@ -692,6 +861,19 @@ def page(p):
     corps = p['corps']
     i = corps.rindex('\n  <section class="cta-final">')
     corps = corps[:i] + autres_metiers(p['slug']) + corps[i:]
+    # immersion.js fait entrer en cascade, au défilement, tout élément .reveal (et rien si l'appareil demande moins d'animations)
+    corps = corps.replace('class="imm-limite"', 'class="imm-limite reveal"')
+    # Le but de la page est l'appel de 30 minutes : c'est le bouton principal du hero, et le second mène à la fiche
+    nb = corps.count('class="fiche-tache"')
+    ancien = (f'<a href="/formation-ia-entreprise.html#devis" class="btn-primary">Construire mon programme {FLECHE}</a>\n'
+              '          <a href="/rendez-vous.html" class="imm-lien">Réserver un appel de 30 min</a>')
+    assert corps.count(ancien) == 1, p['slug']
+    corps = corps.replace(ancien, f'<a href="/rendez-vous.html" class="btn-primary">Réserver un appel de 30 min {FLECHE}</a>\n'
+                                  f'          <a href="#fiche" class="imm-lien">Voir les {nb} tâches</a>')
+    # La fiche passe avant les constats : c'est elle que le visiteur vient chercher
+    f = re.search(r'\n  <section class="fiche-section" id="fiche">.*?\n  </section>\n', corps, re.S).group(0)
+    k = re.search(r'\n  <section class="imm-limites-section" id="constats">.*?\n  </section>\n', corps, re.S).group(0)
+    corps = corps.replace(f, '').replace(k, f + k)
     t = t[:debut] + corps.lstrip('\n') + '\n' + t[fin:]
     return t
 
