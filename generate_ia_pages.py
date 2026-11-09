@@ -550,7 +550,7 @@ MENU_MOBILE = [
     ('/integrations-ia.html', 'Intégrations IA'),
     ('/meilleures-ia.html', 'Meilleures IA'),
     ('/nos-formateurs.html', 'Nos formateurs'),
-    ('/simulateur-financement-formation-ia.html', 'Financer ma formation'),
+    ('/quel-est-mon-opco.html', 'Financer ma formation'),
     ('/blog.html', 'Blog'),
     ('/apropos.html', 'À propos'),
     ('mailto:contact@ia-entrepreneur.fr', 'Écrire un email'),
@@ -667,7 +667,7 @@ FOOTER_HTML = f"""  <footer>
             <a href="/integrations-ia.html">Intégrations IA</a>
             <a href="/meilleures-ia.html">Les meilleures IA</a>
             <a href="/blog.html">Blog</a>
-            <a href="/simulateur-financement-formation-ia.html">Simulateur de financement</a>
+            <a href="/quel-est-mon-opco.html">Quel est mon OPCO ?</a>
             <a href="/mentions-legales.html">Mentions légales</a>
             <a href="/cgv.html">CGV</a>
             <a href="/politique-confidentialite.html">Politique de confidentialité</a>

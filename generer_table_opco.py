@@ -38,6 +38,13 @@ PAGE      = f'https://www.data.gouv.fr/datasets/{SLUG}'
 RACINE    = os.path.dirname(os.path.abspath(__file__))
 SORTIE    = os.path.join(RACINE, 'data', 'idcc-opco.json')
 SORTIE_JS = os.path.join(RACINE, 'api', '_opco.js')   # consomme par api/opco.js
+# Les etablissements dont l'OPCO ne se deduit PAS de la convention collective,
+# repartis en 1 000 fichiers par les 3 premiers chiffres du SIRET. Embarques
+# dans la fonction /api/opco (vercel.json, includeFiles) : la reponse tombe en
+# une milliseconde, au lieu des 6 a 14 secondes de l'API tabulaire de
+# data.gouv.fr mesurees le 09/11/2026. Meme principe que la table `siret_opco`
+# d'Ella (Cathy), qui ne garde que ces etablissements-la.
+DOSSIER_SIRET = os.path.join(RACINE, 'data', 'siret-opco')
 
 # Pseudo-IDCC : ils ne designent aucune convention collective et se retrouvent
 # donc chez les 11 OPCO a la fois. Les traduire en OPCO produirait une reponse
@@ -51,11 +58,14 @@ SEUIL_CONFIANCE = 0.90          # en dessous, l'IDCC est marque comme ambigu
 # ils dependent de la branche et de l'effectif, changent au moins chaque annee,
 # et une valeur perimee affichee comme certaine ferait perdre un dossier.
 # `regle` decrit la FORME de la prise en charge, qui est stable ; le montant se
-# lit sur la page officielle. URLs verifiees le 21/09/2026.
+# lit sur la page officielle. Depuis le 09/11/2026, `criteres` reprend les
+# liens fournis par Cathy (gestionnaire administrative des dossiers) pour Ella,
+# les memes qu'elle utilise ; tous ouverts le 09/11/2026. Celui d'OCAPIAT porte
+# l'annee (« 2026 ») : a remplacer en janvier 2027.
 OPCO_OFFICIELS = {
     'AFDAS': {
         'nom': 'Afdas', 'site': 'https://www.afdas.com',
-        'criteres': 'https://www.afdas.com/entreprise/financer-vos-actions-de-formation.html',
+        'criteres': 'https://www.afdas.com/entreprise/financer-vos-actions-de-formation/choisir-le-bon-financement/financement-de-la-formation-pour-les-structures-de-moins-de-50-salaries.html',
         'espace': 'https://www.afdas.com/',
         'regle': "Conditions générales votées par le conseil d'administration, puis barèmes par branche. L'entreprise doit être à jour de ses contributions.",
     },
@@ -67,13 +77,13 @@ OPCO_OFFICIELS = {
     },
     'ATLAS': {
         'nom': 'Atlas', 'site': 'https://www.opco-atlas.fr',
-        'criteres': 'https://www.opco-atlas.fr/criteres-financement/criteres-legaux',
+        'criteres': 'https://www.opco-atlas.fr/criteres-financement',
         'espace': 'https://www.opco-atlas.fr/entreprise/espace-entreprise.html',
         'regle': "Une page de critères par branche, avec un plafond annuel par entreprise qui varie selon l'effectif.",
     },
     'CONSTRUCTYS': {
         'nom': 'Constructys', 'site': 'https://www.constructys.fr',
-        'criteres': 'https://www.constructys.fr/financer-vos-projets-de-formation/modalites-demandes-de-prise-charge/conditions-de-prise-en-charge-2/',
+        'criteres': 'https://www.constructys.fr/conditions-de-prise-en-charge-2/',
         'espace': 'https://www.constructys.fr/entreprise/',
         'regle': "Modalités de participation financière révisées chaque année. Dossier à déposer 15 jours avant le début, via eGestion.",
     },
@@ -85,7 +95,7 @@ OPCO_OFFICIELS = {
     },
     'OCAPIAT': {
         'nom': 'OCAPIAT', 'site': 'https://www.ocapiat.fr',
-        'criteres': 'https://www.ocapiat.fr/informations-legales-et-reglementaires/',
+        'criteres': 'https://www.ocapiat.fr/wp-content/uploads/Regles-de-prise-en-charge-2026.pdf',
         'espace': 'https://www.ocapiat.fr/',
         'regle': "Règles de prise en charge publiées en PDF chaque année, avec conditions générales de gestion.",
     },
@@ -103,21 +113,56 @@ OPCO_OFFICIELS = {
     },
     'OPCO MOBILITES': {
         'nom': 'OPCO Mobilités', 'site': 'https://www.opcomobilites.fr',
-        'criteres': 'https://www.opcomobilites.fr/dispositifs-formation/le-plan-de-developpement-des-competences/',
+        'criteres': 'https://www.opcomobilites.fr/ressources/?categories%5B%5D=guides-pratiques#results',
         'espace': 'https://www.opcomobilites.fr/entreprise/',
         'regle': "Conditions financières par branche, avec une enveloppe distincte pour les frais annexes. Demande un mois avant le démarrage.",
     },
     'OPCO SANTE': {
         'nom': 'OPCO Santé', 'site': 'https://www.opco-sante.fr',
-        'criteres': 'https://www.opco-sante.fr/employeur/financer-vos-formations/',
+        'criteres': 'https://www.opco-sante.fr/representant-du-personnel/financement-de-la-formation/regles-de-prise-en-charge/',
         'espace': 'https://www.opco-sante.fr/',
         'regle': "Fonds conventionnels et compte d'investissement formation adhérent (CIFA), selon la branche et le niveau de contribution.",
     },
     'UNIFORMATION COHESION SOCIALE': {
         'nom': 'Uniformation', 'site': 'https://www.uniformation.fr',
-        'criteres': 'https://www.uniformation.fr/entreprise/financements/frais-annexes-et-couts-pedagogiques',
+        'criteres': 'https://www.uniformation.fr/particulier/salaries/formation-et-financements/autres-dispositifs-de-formation/le-plan-de-developpement-des-competences/financement',
         'espace': 'https://www.uniformation.fr/',
         'regle': "Barème de coûts pédagogiques et de frais annexes, avec un plafond annuel par adhérent qui dépend de l'effectif.",
+    },
+}
+
+# Les dirigeants non salaries ne relevent pas de l'OPCO mais d'un fonds
+# d'assurance formation (FAF), celui qui figure sur leur attestation de
+# contribution a la formation professionnelle (CFP, espace Urssaf). Aucune
+# donnee publique ne relie un SIRET a son FAF, et le code APE ne suffit pas a
+# le deduire (un meme code couvre commercants et liberaux) : on liste les cinq,
+# on ne devine pas. Liens fournis par Cathy, ouverts le 09/11/2026 ; ceux de
+# l'AGEFICE et du FAF-PM portent une annee, a remplacer en janvier 2027.
+FONDS_NON_SALARIES = {
+    'AGEFICE': {
+        'nom': 'AGEFICE',
+        'pour': "dirigeants non salariés du commerce, de l'industrie et des services",
+        'criteres': 'https://communication-agefice.fr/wp-content/uploads/2025/12/Criteres-financiers-2026-Tableau-26-12-2025.pdf',
+    },
+    'FIF-PL': {
+        'nom': 'FIF-PL',
+        'pour': 'professions libérales',
+        'criteres': 'https://fifpl.fr/criteres-de-prise-en-charge/',
+    },
+    'FAFCEA': {
+        'nom': 'FAFCEA',
+        'pour': 'artisans',
+        'criteres': 'https://www.fafcea.com/consulter-les-criteres-de-prise-en-charge/',
+    },
+    'VIVEA': {
+        'nom': 'VIVEA',
+        'pour': "chefs d'entreprise agricole",
+        'criteres': 'https://vivea.fr/chef-dentreprise-agricole/nos-criteres-de-prise-en-charge/',
+    },
+    'FAF-PM': {
+        'nom': 'FAF-PM',
+        'pour': 'médecins libéraux',
+        'criteres': 'https://www.fafpm.org/nouvelles-regles-de-prise-en-charge-2025/',
     },
 }
 
@@ -171,6 +216,65 @@ def agreger(chemin):
     return par_idcc, etablissements
 
 
+# Une lettre par OPCO dans les fichiers SIRET : 330 000 lignes, chaque octet
+# compte. La correspondance est ecrite dans _opco.js (CODES_COURTS).
+LETTRES = {
+    'AFDAS': 'A', 'AKTO': 'K', 'ATLAS': 'T', 'CONSTRUCTYS': 'C', "L'OPCOMMERCE": 'M',
+    'OCAPIAT': 'O', 'OPCO2I': 'I', 'OPCO EP': 'E', 'OPCO MOBILITES': 'B', 'OPCO SANTE': 'S',
+    'UNIFORMATION COHESION SOCIALE': 'U',
+}
+
+
+def ecrire_exceptions(chemin, table):
+    """Garde les etablissements que la convention ne suffit pas a situer :
+    sans convention (IDCC vide, 9998, 9999 ou inconnu), convention partagee
+    entre plusieurs OPCO, OPCO different de celui de leur convention, ou
+    dossier gere par un autre OPCO que celui de declaration."""
+    lettres = dict(LETTRES)
+    libres = iter('DFGHJLNPQRVWXYZ')
+    par_prefixe = collections.defaultdict(list)
+    motifs = collections.Counter()
+    with open(chemin, encoding='utf-8', newline='') as f:
+        for row in csv.DictReader(f, delimiter='|'):
+            siret = (row.get('SIRET') or '').strip()
+            opco = (row.get('OPCO_PROPRIETAIRE') or '').strip()
+            if len(siret) != 14 or not siret.isdigit() or not opco:
+                continue
+            gestion = (row.get('OPCO_GESTION') or '').strip()
+            if gestion == opco:
+                gestion = ''
+            idcc = (row.get('IDCC') or '').strip().zfill(4)
+            entree = table.get(idcc) if idcc not in PSEUDO_IDCC else None
+            if entree is None:
+                motif = 'sans convention'
+            elif entree.get('ambigu'):
+                motif = 'convention partagée'
+            elif entree['opco'] != opco:
+                motif = 'OPCO différent de la convention'
+            elif gestion:
+                motif = 'géré par un autre OPCO'
+            else:
+                continue
+            motifs[motif] += 1
+            for o in (opco, gestion):
+                if o and o not in lettres:
+                    lettres[o] = next(libres)
+            par_prefixe[siret[:3]].append(siret + lettres[opco] + (lettres[gestion] if gestion else ''))
+
+    if os.path.isdir(DOSSIER_SIRET):
+        for nom in os.listdir(DOSSIER_SIRET):
+            if nom.endswith('.txt'):
+                os.remove(os.path.join(DOSSIER_SIRET, nom))
+    os.makedirs(DOSSIER_SIRET, exist_ok=True)
+    total = 0
+    for prefixe, lignes in par_prefixe.items():
+        lignes.sort()
+        total += len(lignes)
+        with open(os.path.join(DOSSIER_SIRET, prefixe + '.txt'), 'w', encoding='ascii', newline='\n') as f:
+            f.write('\n'.join(lignes) + '\n')
+    return {v: k for k, v in lettres.items()}, total, motifs
+
+
 def main():
     garder = '--garder-csv' in sys.argv
     res = ressource()
@@ -201,6 +305,8 @@ def main():
             douteux.append((idcc, dict(compte)))
         table[idcc.zfill(4)] = entree
 
+    codes_courts, nb_exceptions, motifs = ecrire_exceptions(tmp, table)
+
     sortie = {
         '_lisez_moi': ("Correspondance IDCC -> OPCO derivee de la table SIRET-OPCO de France "
                        "competences. Genere par generer_table_opco.py, ne pas editer a la main. "
@@ -215,6 +321,7 @@ def main():
         'idcc_couverts': len(table),
         'regle_commune': REGLE_COMMUNE,
         'opco': OPCO_OFFICIELS,
+        'fonds_non_salaries': FONDS_NON_SALARIES,
         'idcc': dict(sorted(table.items())),
     }
     os.makedirs(os.path.dirname(SORTIE), exist_ok=True)
@@ -241,6 +348,9 @@ def main():
         }, ensure_ascii=False) + ';\n\n')
         f.write('export const REGLE_COMMUNE = ' + json.dumps(REGLE_COMMUNE, ensure_ascii=False) + ';\n\n')
         f.write('export const OPCO = ' + json.dumps(OPCO_OFFICIELS, ensure_ascii=False, indent=1) + ';\n\n')
+        f.write('export const FONDS_NON_SALARIES = ' + json.dumps(FONDS_NON_SALARIES, ensure_ascii=False, indent=1) + ';\n\n')
+        # Lettre -> code OPCO, pour lire les fichiers data/siret-opco/*.txt.
+        f.write('export const CODES_COURTS = ' + json.dumps(codes_courts, ensure_ascii=False) + ';\n\n')
         f.write('export const IDCC = ' + json.dumps(dict(sorted(table.items())),
                                                     ensure_ascii=False) + ';\n')
 
@@ -248,6 +358,8 @@ def main():
           f'({os.path.getsize(SORTIE)/1024:.0f} Ko) et api/_opco.js '
           f'({os.path.getsize(SORTIE_JS)/1024:.0f} Ko)')
     print(f'  donnée du {res["maj"] or "?"} · {etablissements:,} établissements source'.replace(',', ' '))
+    print(f'  {nb_exceptions:,} établissements hors convention écrits dans data/siret-opco/ '.replace(',', ' ')
+          + '(' + ', '.join(f'{m} : {n:,}'.replace(',', ' ') for m, n in motifs.most_common()) + ')')
     if inconnus:
         print(f'  ! OPCO absents de OPCO_OFFICIELS, à ajouter : {sorted(inconnus)}')
     if douteux:

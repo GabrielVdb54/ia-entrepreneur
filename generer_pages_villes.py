@@ -49,7 +49,7 @@ def marches(sous_titre):
       <div>
         {sous_titre}
         <p class="section-sub">On choisit avec vous le niveau de départ de chaque groupe. Les prix sont indicatifs, par jour et pour un groupe de 12 personnes au plus ; le prix ferme figure dans la proposition. Nous montons le dossier OPCO : la prise en charge dépend de votre branche et de votre effectif, les fonds mutualisés étant réservés aux entreprises de moins de 50 salariés. Vous connaissez votre reste à charge avant de signer.</p>
-        <a href="/simulateur-financement-formation-ia.html" class="imm-lien">Estimer mon financement</a>
+        <a href="/quel-est-mon-opco.html" class="imm-lien">Trouver mon OPCO et mon budget</a>
       </div>
       <ol class="imm-marches">
             <li><a href="/formation-ia-entreprise.html#niveau-1"><span class="n">1</span><span class="t"><b>Acculturation IA</b>Comprendre les IA, savoir laquelle utiliser pour quoi, éviter les erreurs</span><span class="d">1 à 2 jours<em>1 200 € HT / jour</em></span></a></li>
@@ -138,7 +138,16 @@ def equipe(titre, sous, formateurs, photo, legende, apres=''):
 '''
 
 def faq_section(faq, ville):
+    # L'outil « Quel est mon OPCO ? » (outil-opco.js, chargé par le gabarit)
+    # juste avant la FAQ, comme sur les pages de formation.
     return f'''
+  <!-- outil-opco -->
+  <section style="padding:56px 0 8px;" id="budget-formation">
+    <div class="container">
+      <div data-outil-opco></div>
+    </div>
+  </section>
+
   <section class="faq-section" id="faq">
     <div class="container">
       <h2 class="section-title">Vos questions sur la formation IA à {ville}</h2>
@@ -265,7 +274,7 @@ PAGES['metz'] = dict(
          "Oui, dans vos locaux, par groupes de 12 personnes au plus. Nous sommes installés à Nancy, à moins d'une heure de Metz par l'A31."),
         prix_faq('Metz'),
         ("Quel OPCO finance la formation de nos salariés ?",
-         'Votre OPCO dépend de la convention collective de votre entreprise, pas de votre ville. Notre <a class="ville-lien" href="/simulateur-financement-formation-ia.html">simulateur de financement</a> le retrouve à partir de votre SIRET. Les fonds mutualisés sont réservés aux entreprises de moins de 50 salariés, et nous montons le dossier avec vous.'),
+         'Votre OPCO dépend de la convention collective de votre entreprise, pas de votre ville. Notre <a class="ville-lien" href="/quel-est-mon-opco.html">outil « Quel est mon OPCO ? »</a> le retrouve à partir de votre SIRET. Les fonds mutualisés sont réservés aux entreprises de moins de 50 salariés, et nous montons le dossier avec vous.'),
         ("Peut-on réunir des salariés de Metz et de Nancy ?",
          "Oui : soit une session dans chaque site, soit une classe virtuelle qui réunit tout le monde. On en décide ensemble lors du premier appel, selon le nombre de participants."),
         ("Et pour Thionville, Forbach ou Sarreguemines ?",

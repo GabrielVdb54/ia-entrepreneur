@@ -40,7 +40,7 @@ jobs:
           python3 generer_table_opco.py | tee sortie.txt
           # Le script signale les OPCO inconnus : c'est le seul cas qui demande
           # une intervention humaine, parce qu'un OPCO absent de la table de
-          # correspondance ne s'affichera pas dans le simulateur.
+          # correspondance ne s'affichera pas dans l'outil « Quel est mon OPCO ».
           if grep -q "OPCO absents de OPCO_OFFICIELS" sortie.txt; then
             echo "alerte=oui" >> "$GITHUB_OUTPUT"
           fi
@@ -57,11 +57,11 @@ jobs:
       - name: Commiter si la donnée a changé
         run: |
           rm -f sortie.txt
-          if [ -n "$(git status --porcelain data/idcc-opco.json api/_opco.js)" ]; then
+          if [ -n "$(git status --porcelain data/idcc-opco.json api/_opco.js data/siret-opco)" ]; then
             maj=$(python3 -c "import json;print(json.load(open('data/idcc-opco.json'))['donnee_maj'])")
             git config user.name  "github-actions[bot]"
             git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-            git add data/idcc-opco.json api/_opco.js
+            git add -A data/idcc-opco.json api/_opco.js data/siret-opco
             git commit -m "table OPCO : donnée France compétences du $maj"
             git push
           else

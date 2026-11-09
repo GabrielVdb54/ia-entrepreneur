@@ -213,7 +213,7 @@ html += '</div>';
 html += '</div>';
 html += '<div class="mobile-menu" id="mobile-menu">';
 html += '<a href="/formation-ia-entreprise.html">Formations IA</a><a href="/formation-claude-entreprise.html">Formation Claude</a><a href="/formation-chatgpt-entreprise.html">Formation ChatGPT</a><a href="/formation-ia-independant.html">Formation indépendants</a><a href="/integrations-ia.html">Intégrations IA</a><a href="/meilleures-ia.html">Meilleures IA</a><a href="/nos-formateurs.html">Nos formateurs</a>';
-html += '<a href="/simulateur-financement-formation-ia.html">Financer ma formation</a>';
+html += '<a href="/quel-est-mon-opco.html">Mon budget formation</a>';
 html += '<a href="/blog.html">Blog</a><a href="/apropos.html">À propos</a>';
 html += '<a href="mailto:contact@ia-entrepreneur.fr">Écrire un email</a>';
 html += '<a class="tel-reveal" role="button" tabindex="0" data-tel="MzUgODIgMzEgNzUgNzA=" aria-label="Afficher le numéro de téléphone"><span class="tel-value">Afficher le numéro</span></a>';
