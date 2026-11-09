@@ -43,3 +43,7 @@ create table if not exists public.iae_crm_avis (
 create index if not exists iae_crm_avis_lead on public.iae_crm_avis (lead_id);
 create index if not exists iae_crm_avis_statut on public.iae_crm_avis (statut);
 alter table public.iae_crm_avis enable row level security;
+
+-- Les deux nouveaux types d'historique : un avis reçu ou publié, une étape de facture ou de paiement.
+alter table public.iae_crm_activites drop constraint if exists iae_crm_activites_type_check;
+alter table public.iae_crm_activites add constraint iae_crm_activites_type_check check (type = any (array['note','appel','appel_sans_reponse','email_envoye','email_recu','brouillon','rdv','sms','relance_decalee','statut','import','linkedin','avis','paiement']));

@@ -75,7 +75,7 @@ create table if not exists public.iae_crm_activites (
   date       timestamptz not null default now(),
   type       text not null
              check (type in ('note', 'appel', 'appel_sans_reponse', 'email_envoye', 'email_recu',
-                             'brouillon', 'rdv', 'sms', 'relance_decalee', 'statut', 'import', 'linkedin')),
+                                 'brouillon', 'rdv', 'sms', 'relance_decalee', 'statut', 'import', 'linkedin', 'avis', 'paiement')),
   resume     text not null,
   contenu    text,
   source     text not null default 'crm',
