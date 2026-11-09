@@ -1786,8 +1786,18 @@ const SCHEMA_RECAP = {
     ton: { type: 'string' },
     points: { type: 'array', items: { type: 'string' } },
     prochaine_etape: { type: 'string' },
+    recommandation: {
+      type: 'object',
+      properties: {
+        canal: { type: 'string', enum: ['appel', 'email', 'sms', 'linkedin', 'rdv', 'attendre', 'autre'] },
+        quoi: { type: 'string' },
+        pourquoi: { type: 'string' },
+      },
+      required: ['canal', 'quoi', 'pourquoi'],
+      additionalProperties: false,
+    },
   },
-  required: ['situation', 'attentes', 'chaleur', 'reactivite', 'ton', 'points', 'prochaine_etape'],
+  required: ['situation', 'attentes', 'chaleur', 'reactivite', 'ton', 'points', 'prochaine_etape', 'recommandation'],
   additionalProperties: false,
 };
 const CONSIGNES_RECAP = `Tu fais, pour Gabriel Vanderbecken (fondateur d'IA-Entrepreneur, organisme de formation à l'IA pour les entreprises), le récap d'une relation de son CRM : prospect, client, partenaire ou fournisseur. Il le lit avant d'appeler ou d'écrire, pour savoir en dix secondes où il en est et comment parler à la personne.
@@ -1798,6 +1808,11 @@ const CONSIGNES_RECAP = `Tu fais, pour Gabriel Vanderbecken (fondateur d'IA-Entr
 - ton : comment vous vous parlez (tutoiement ou vouvoiement, formel, amical), pour qu'il écrive juste.
 - points : deux à quatre choses à ne pas oublier : engagements pris, chiffres, dates, sujets sensibles, personnes impliquées.
 - prochaine_etape : ce qu'il faut faire ensuite, une phrase à l'infinitif.
+- recommandation : la tâche que tu recommandes à Gabriel pour sa prochaine relance, d'après la façon dont les échanges se passent (Gabriel, 09/11 : « sur la tâche de relance, mets à chaque fois la tâche recommandée, avec le pourquoi »).
+  - canal : appel, email, sms, linkedin, rdv (préparer ou tenir un rendez-vous prévu), attendre (la personne a annoncé un retour à une date qui n'est pas passée), autre.
+  - quoi : une phrase à l'infinitif, concrète et prête à faire : à qui, quoi, avec les détails utiles (le document à joindre, la question à poser, la date à proposer).
+  - pourquoi : une phrase qui s'appuie sur un fait précis des échanges, avec sa date si possible (ce qu'elle a demandé, son silence, sa façon de répondre, un engagement, le canal où elle répond).
+  - Repères : une demande sans réponse de Gabriel passe avant tout ; deux relances écrites sans réponse, et un téléphone connu : un appel ; quelqu'un qui répond vite par email : un email ; un retour annoncé à une date à venir : attendre cette date ; une séquence LinkedIn en cours : LinkedIn ; un rendez-vous fixé : le préparer. Ne recommande un appel ou un SMS que si un numéro est connu, LinkedIn que si un profil est connu.
 N'invente rien : seulement ce qui est dans l'historique et les emails. Phrases courtes, en français, en tutoyant Gabriel (« tu lui as envoyé… »). Pas de formule.`;
 
 async function recapLead(corps) {
@@ -1828,8 +1843,8 @@ async function recapLead(corps) {
     `Lead : ${lead.entreprise} (${lead.type}, étape ${lead.statut}${lead.suivi ? `, suivi ${lead.suivi}` : ''})`,
     lead.besoin ? `Besoin : ${lead.besoin}` : '',
     lead.source ? `Source : ${lead.source}` : '',
-    `Contacts : ${cs.map((c) => [nomDe(c), c.poste, c.email].filter(Boolean).join(', ')).join(' ; ') || 'aucun'}`,
-    `Prévu : ${lead.prochaine_action} le ${lead.prochaine_relance || 'rien'}${lead.prochaine_note ? `, ${lead.prochaine_note}` : ''}`,
+    `Contacts : ${cs.map((c) => [nomDe(c), c.poste, c.email, c.telephone ? 'téléphone connu' : '', c.linkedin ? 'profil LinkedIn connu' : ''].filter(Boolean).join(', ')).join(' ; ') || 'aucun'}${lead.telephone ? ` ; standard : téléphone connu` : ''}`,
+    `Prévu : ${lead.prochaine_action} le ${lead.prochaine_relance || 'rien'}${lead.prochaine_note ? `, ${lead.prochaine_note}` : ''}${lead.relances_sans_reponse ? ` (${lead.relances_sans_reponse} relance${lead.relances_sans_reponse > 1 ? 's' : ''} sans réponse)` : ''}`,
     `Historique, du plus ancien au plus récent :\n${historique || 'vide'}`,
     textesFils.length ? `Derniers emails :\n${textesFils.join('\n\n')}` : '',
   ].filter(Boolean).join('\n\n');
@@ -1859,6 +1874,10 @@ async function recapLead(corps) {
     chaleur: SCHEMA_RECAP.properties.chaleur.enum.includes(r.chaleur) ? r.chaleur : 'inconnue',
     reactivite: couper(r.reactivite, 200), ton: couper(r.ton, 200),
     points: (Array.isArray(r.points) ? r.points : []).slice(0, 5).map((x) => couper(x, 300)), prochaine_etape: couper(r.prochaine_etape, 400),
+    recommandation: r.recommandation && r.recommandation.quoi ? {
+      canal: SCHEMA_RECAP.properties.recommandation.properties.canal.enum.includes(r.recommandation.canal) ? r.recommandation.canal : 'autre',
+      quoi: couper(r.recommandation.quoi, 400), pourquoi: couper(r.recommandation.pourquoi, 400),
+    } : null,
   };
   return { lead: await modifier('leads', lead.id, { recap, recap_le: new Date().toISOString() }) };
 }

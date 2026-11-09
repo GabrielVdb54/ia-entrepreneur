@@ -291,6 +291,10 @@
   .vocal .choix-voix select { height: 36px; max-width: 220px; min-width: 0; border: 1px solid var(--line-strong); border-radius: 10px; padding: 0 8px; background: var(--card); font-size: 16px; color: var(--text); }
   .fil-email { border: 1px solid var(--line); border-radius: 12px; padding: 10px 12px; margin-top: 10px; background: #fff; }
   dialog.modale.large { width: min(1180px, calc(100vw - 24px)); }
+  .reco { border-left: 0; background: #F2F7F4; border-radius: 10px; padding: 8px 10px; margin: 6px 0 2px; font-size: 14px; }
+  .reco p { margin: 0; }
+  .reco .pourquoi { color: var(--muted); margin-top: 3px; font-size: 13.5px; }
+  .reco-attente { color: var(--muted); font-size: 13.5px; }
   .li-bloc { border: 1px solid var(--line); border-radius: 12px; padding: 12px; margin-top: 10px; background: #fff; display: flex; flex-direction: column; gap: 8px; }
   .li-tete { display: flex; flex-wrap: wrap; gap: 4px 10px; align-items: baseline; }
   .li-etat { font-size: 12.5px; font-weight: 700; padding: 2px 9px; border-radius: 999px; background: #F4F5FA; color: var(--muted); }
@@ -909,6 +913,7 @@ function rendre() {
   else if (S.vue === 'formateurs') vue.innerHTML = vueFormateurs();
   else vue.innerHTML = vueJour();
   chargerLogos();
+  if (S.vue === 'jour' && !S.q) setTimeout(recosEnFond, 300);
 }
 
 function carte(l, { compacte = false } = {}) {
@@ -930,6 +935,7 @@ function carte(l, { compacte = false } = {}) {
     ${l.formation_debut ? `<p class="meta">Formation : ${esc(periodeFormation(l))}</p>` : ''}
     ${relance}
     ${texte ? `<p class="extrait">${esc(texte)}</p>` : ''}
+    ${compacte ? '' : blocReco(l)}
     ${compacte ? '' : `<div class="carte-actions">
       ${tel ? `<a class="btn petit${prim('appel')}" href="${esc(telLien(tel))}" data-act="tel">Appeler</a>` : ''}
       ${email ? `<button type="button" class="btn petit${prim('email')}" data-act="email">Email</button>` : ''}
@@ -1475,7 +1481,18 @@ function texteFiche(l) {
   const d = derniereNote(l.id);
   return [`${l.entreprise}.`, c && nomContact(c) ? `${nomContact(c)}${c.poste ? `, ${c.poste}` : ''}.` : '', l.suivi ? `Suivi client : ${LIB_SUIVI[l.suivi]}.` : '', `Prévu : ${prevu}.`,
     l.prochaine_note ? `${l.prochaine_note}.` : '', l.relances_sans_reponse ? `${l.relances_sans_reponse} relance${l.relances_sans_reponse > 1 ? 's' : ''} sans réponse.` : '',
-    l.recap && l.recap.situation ? `Où vous en êtes : ${l.recap.situation}` : d ? `Dernier échange : ${d}` : ''].filter(Boolean).join(' ');
+    l.recap && l.recap.situation ? `Où vous en êtes : ${l.recap.situation}` : d ? `Dernier échange : ${d}` : '',
+    texteReco(l)].filter(Boolean).join(' ');
+}
+// À l'oral : « Je te conseille d'appeler Paul…, parce qu'il… » (élisions comprises).
+function texteReco(l) {
+  const r = l.recap && l.recap.recommandation;
+  if (!r || !r.quoi) return '';
+  const min = (t) => String(t || '').trim().replace(/\.$/, '').replace(/^./, (x) => x.toLowerCase());
+  const quoi = min(r.quoi);
+  const pourquoi = min(r.pourquoi);
+  const voyelle = (t) => /^[aeiouyéèêëàâîïôöûùh]/i.test(t);
+  return `Je te conseille ${voyelle(quoi) ? "d'" : 'de '}${quoi}${pourquoi ? `, parce ${voyelle(pourquoi) ? "qu'" : 'que '}${pourquoi}` : ''}.`;
 }
 const LIB_VOCAL = { etape: 'Étape de suivi', appel: 'Appel', reponse: 'Réponse reçue', note: 'Note', decaler: 'Relance déplacée', rdv: 'Rendez-vous', perdu: 'Perdu', passer: 'Suivant', incompris: 'Pas compris' };
 const ETATS_VOCAL = { lecture: 'Je te lis la relance…', ecoute: "Je t'écoute…", reflexion: 'Je note…', pause: 'En pause.' };
@@ -2456,8 +2473,43 @@ function blocRecap(l, { compact = false } = {}) {
     ${r.attentes ? `<p><b>Attendu :</b> ${esc(r.attentes)}</p>` : ''}
     <ul class="pastilles"><li class="chaleur c-${esc(r.chaleur)}">${esc(CHALEUR[r.chaleur] || r.chaleur)}</li>${r.reactivite ? `<li>${esc(r.reactivite)}</li>` : ''}${r.ton ? `<li>${esc(r.ton)}</li>` : ''}</ul>
     ${!compact && r.points && r.points.length ? `<ul class="points">${r.points.map((x) => `<li>${esc(x)}</li>`).join('')}</ul>` : ''}
-    ${r.prochaine_etape ? `<p><b>Ensuite :</b> ${esc(r.prochaine_etape)}</p>` : ''}
+    ${r.recommandation && r.recommandation.quoi ? `<div class="reco reco-recap"><p><b>Recommandé${r.recommandation.canal ? ` (${esc(LIB_CANAL_RECO[r.recommandation.canal] || r.recommandation.canal)})` : ''} :</b> ${esc(r.recommandation.quoi)}</p>${r.recommandation.pourquoi ? `<p class="pourquoi">Pourquoi : ${esc(r.recommandation.pourquoi)}</p>` : ''}</div>` : r.prochaine_etape ? `<p><b>Ensuite :</b> ${esc(r.prochaine_etape)}</p>` : ''}
   </section>`;
+}
+// La tâche recommandée, avec le pourquoi, sur chaque relance (Gabriel, 09/11). Elle vient du récap de Claude,
+// refait en fond quand il y a du nouveau dans les échanges.
+const LIB_CANAL_RECO = { appel: 'appel', email: 'email', sms: 'SMS', linkedin: 'LinkedIn', rdv: 'rendez-vous', attendre: 'attendre', autre: 'autre' };
+function blocReco(l) {
+  if (!l.prochaine_relance || l.archive) return '';
+  const r = l.recap && l.recap.recommandation;
+  if (!r || !r.quoi) return S.recapEnCours.has(l.id) ? '<p class="reco reco-attente">Claude relit les échanges pour te recommander la suite…</p>' : '';
+  const maj = S.recapEnCours.has(l.id) ? ' <span class="meta">(mise à jour…)</span>' : '';
+  return `<div class="reco"><p><b>Recommandé${r.canal ? ` (${esc(LIB_CANAL_RECO[r.canal] || r.canal)})` : ''} :</b> ${esc(r.quoi)}${maj}</p>${r.pourquoi ? `<p class="pourquoi">Pourquoi : ${esc(r.pourquoi)}</p>` : ''}</div>`;
+}
+// En fond, à l'affichage du jour : les relances dues puis celles de la semaine dont le récap manque ou date.
+S.recosEnFond = false;
+S.recosFaits = 0; // 25 récaps en fond au plus par visite (la limite de Claude est partagée avec les rédactions)
+async function recosEnFond() {
+  if (!D.ia || S.recosEnFond || S.recosFaits >= 25) return;
+  S.recosEnFond = true;
+  try {
+    const t = aujourdhui();
+    const fin = ajouterJours(t, 7);
+    const cibles = D.leads
+      .filter((l) => !l.archive && l.prochaine_relance && l.prochaine_relance <= fin && activitesDe(l.id).length && recapPerime(l) && !S.recapTente.has(l.id))
+      .sort((a, b) => (a.prochaine_relance < b.prochaine_relance ? -1 : 1))
+      .slice(0, 25 - S.recosFaits);
+    for (const l of cibles) {
+      if (S.recapEnCours.size) await new Promise((ok) => setTimeout(ok, 500));
+      S.recosFaits++;
+      await faireRecap(l.id, { auto: true });
+      const carteEl = $(`#vue .carte[data-id="${l.id}"]`);
+      const maj = IDX.lead.get(l.id);
+      if (carteEl && maj && S.vue === 'jour' && !S.q) carteEl.outerHTML = carte(maj);
+    }
+  } finally {
+    S.recosEnFond = false;
+  }
 }
 function majRecaps(leadId) {
   if (S.fiche === leadId) rendreFiche();
