@@ -12,7 +12,7 @@
  *   GET  /api/opco?siret=<SIRET ou SIREN>
  *        → l'entreprise, son effectif, son OPCO, sa convention. Sans le lien
  *          du barème : c'est ce que le visiteur reçoit par email.
- *   POST /api/opco { siret, email, page?, piege? }
+ *   POST /api/opco { siret, email, page?, piege?, salaries?, newsletter? }
  *        → le serveur refait la recherche, envoie le résultat par email
  *          (Brevo) et pose le lead dans le CRM, à traiter aujourd'hui.
  *
@@ -155,11 +155,13 @@ function contenu(r) {
   const conv = r.convention;
   const eff = r.effectif;
   const nom = nomEntreprise(r);
-  const bareme = o && !o.ambigu ? baremePour(ref.code, conv?.idcc, eff.tranche) : null;
+  const bareme = o && !o.ambigu ? baremePour(ref.code, conv?.idcc, eff.tranche, eff.bornes) : null;
 
   const infos = [
     conv && (conv.titre ? `${conv.titre} (IDCC ${conv.idcc})` : `IDCC ${conv.idcc}`),
-    eff.libelle && !['NN', '00'].includes(eff.tranche) && `${eff.libelle.toLowerCase()}${eff.annee ? ` (Insee, ${eff.annee})` : ''}`,
+    eff.declare !== undefined
+      ? `${eff.libelle} (selon vous)`
+      : eff.libelle && !['NN', '00'].includes(eff.tranche) && `${eff.libelle.toLowerCase()}${eff.annee ? ` (Insee, ${eff.annee})` : ''}`,
   ].filter(Boolean).join(', ');
 
   const c = { nom, sujet: '', opco: null, infos, budget: [], bouton: null, notes: [], fonds: null, sources: [] };
@@ -264,9 +266,83 @@ async function brevo(message) {
   }
 }
 
+// --- Effectif déclaré ---------------------------------------------------------
+
+// Le visiteur peut donner son nombre de salariés (facultatif) : il le connaît
+// mieux que l'Insee, dont la dernière tranche publiée date de 2024. Il
+// remplace alors la tranche pour choisir le palier du barème.
+function effectifDeclare(eff, valeur) {
+  if (valeur === undefined || valeur === null || valeur === '') return eff;
+  const n = Number(String(valeur).trim());
+  if (!Number.isInteger(n) || n < 0 || n > 100000) return eff;
+  return {
+    ...eff,
+    declare: n,
+    bornes: [n, n],
+    libelle: n === 0 ? 'aucun salarié' : `${n.toLocaleString('fr-FR')} salarié${n > 1 ? 's' : ''}`,
+    insee: eff.libelle && !['NN', '00'].includes(eff.tranche) ? `${eff.libelle}${eff.annee ? ` en ${eff.annee}` : ''}` : null,
+    annee: null,
+    moins_de_50: n < 50,
+  };
+}
+
+// --- La newsletter -------------------------------------------------------------
+
+// Gabriel, 09/11/2026 : « ajoute les personnes qui ont fait des simulations
+// dans la newsletter ». Base : prospection B2B (intérêt légitime, art. 6.1.f) ;
+// le formulaire l'annonce et propose une case pour refuser, chaque newsletter
+// porte un lien de désinscription (Brevo). Liste retrouvée par son nom, créée
+// au premier usage, comme celle de FindIA (api/recap.js).
+const NOM_LISTE = 'Newsletter IA-Entrepreneur';
+let listeConnue = null;
+
+async function listeNewsletter() {
+  if (process.env.BREVO_LISTE_NEWSLETTER) return Number(process.env.BREVO_LISTE_NEWSLETTER);
+  if (listeConnue) return listeConnue;
+  const entetes = { 'api-key': process.env.BREVO_API_KEY, 'Content-Type': 'application/json', accept: 'application/json' };
+  const lire = async (url, options) => {
+    try {
+      const r = await fetch(url, options);
+      return r.ok ? await r.json() : null;
+    } catch {
+      return null;
+    }
+  };
+  const existantes = await lire('https://api.brevo.com/v3/contacts/lists?limit=50', { headers: entetes });
+  const deja = (existantes?.lists || []).find((l) => l.name === NOM_LISTE);
+  if (deja) return (listeConnue = deja.id);
+  const dossiers = await lire('https://api.brevo.com/v3/contacts/folders?limit=10&offset=0', { headers: entetes });
+  const dossier = dossiers?.folders?.[0]?.id;
+  if (!dossier) return null;
+  const creee = await lire('https://api.brevo.com/v3/contacts/lists', {
+    method: 'POST', headers: entetes, body: JSON.stringify({ name: NOM_LISTE, folderId: dossier }),
+  });
+  return (listeConnue = creee?.id || null);
+}
+
+async function inscrireNewsletter(email, r) {
+  const liste = await listeNewsletter();
+  if (!liste) throw new Error('liste newsletter introuvable');
+  const ref = r.opco ? r.opco.gestion || r.opco : null;
+  const envoyer = (attributs) => fetch('https://api.brevo.com/v3/contacts', {
+    method: 'POST',
+    headers: { 'api-key': process.env.BREVO_API_KEY, 'Content-Type': 'application/json', accept: 'application/json' },
+    body: JSON.stringify({ email, updateEnabled: true, listIds: [liste], ...(attributs ? { attributes: attributs } : {}) }),
+  });
+  // De quoi parler à chacun de son secteur : entreprise, OPCO, convention.
+  let rep = await envoyer({
+    ENTREPRISE: r.entreprise?.nom || '',
+    OPCO: ref ? ref.nom : '',
+    CONVENTION: r.convention ? `${r.convention.titre || ''} (IDCC ${r.convention.idcc})`.trim() : '',
+  });
+  // Un attribut supprimé côté Brevo ne doit pas empêcher l'inscription.
+  if (rep.status === 400) rep = await envoyer(null);
+  if (!rep.ok && rep.status !== 204) throw new Error(`brevo contacts ${rep.status}`);
+}
+
 // --- Le CRM ------------------------------------------------------------------
 
-function versCrm(r, email, page) {
+function versCrm(r, email, page, newsletter) {
   const o = r.opco;
   const ref = o ? o.gestion || o : null;
   const conv = r.convention;
@@ -274,7 +350,9 @@ function versCrm(r, email, page) {
   const constat = [
     o ? `OPCO ${o.nom}${o.gestion ? ` (géré par ${o.gestion.nom})` : ''}${o.ambigu ? ' à confirmer' : ''}` : 'OPCO non trouvé (pas dans la table de France compétences)',
     conv && `convention ${conv.titre || ''} (IDCC ${conv.idcc})`.replace('  ', ' '),
-    r.effectif.libelle && `effectif ${r.effectif.libelle}${r.effectif.annee ? ` en ${r.effectif.annee}` : ''}`,
+    r.effectif.declare !== undefined
+      ? `effectif déclaré ${r.effectif.libelle}${r.effectif.insee ? ` (Insee : ${r.effectif.insee})` : ''}`
+      : r.effectif.libelle && `effectif ${r.effectif.libelle}${r.effectif.annee ? ` en ${r.effectif.annee}` : ''}`,
   ].filter(Boolean).join(', ');
   return enregistrerDemande({
     email,
@@ -288,9 +366,11 @@ function versCrm(r, email, page) {
       `SIRET : ${r.siret || r.numero}`,
       `Trouvé : ${constat}`,
       ref && (() => {
-        const b = !o.ambigu && baremePour(ref.code, conv?.idcc, r.effectif.tranche);
+        const b = !o.ambigu && baremePour(ref.code, conv?.idcc, r.effectif.tranche, r.effectif.bornes);
+        if (b?.epuise) return `Annoncé : ${b.epuise} (${b.version}), lien ${b.lien}`;
         return b ? `Montant annoncé : ${b.paliers.map((p) => `${p.libelle} ${p.montant}`).join(' ; ')} (${b.version}), lien ${b.lien}` : `Lien envoyé : ${ref.criteres}`;
       })(),
+      `Newsletter : ${newsletter ? 'inscrit' : 'refusée (case cochée)'}`,
     ].filter(Boolean).join('\n'),
     source: 'Site : Quel est mon OPCO',
     tags: ['site', 'outil-opco'],
@@ -345,12 +425,14 @@ export default async function handler(req, res) {
     return res.status(r.etat === 'indisponible' ? 503 : 400).json({ erreur: r.etat });
   }
   const page = /^\/[a-z0-9\-/.]{0,120}$/i.test(String(corps.page || '')) ? corps.page : '/quel-est-mon-opco.html';
+  r.effectif = effectifDeclare(r.effectif, corps.salaries);
+  const newsletter = corps.newsletter !== false; // seule la case « je ne souhaite pas » l'enlève
   const message = contenu(r);
 
   // Le lead d'abord : si l'email échoue, la demande n'est pas perdue pour
   // autant, et l'équipe peut répondre à la main.
   if (crmDisponible()) {
-    try { await versCrm(r, email, page); } catch (e) { console.error('opco crm', e?.message || e); }
+    try { await versCrm(r, email, page, newsletter); } catch (e) { console.error('opco crm', e?.message || e); }
   }
 
   if (!envoiPossible()) {
@@ -372,6 +454,10 @@ export default async function handler(req, res) {
     return res.status(502).json({ erreur: 'envoi_impossible', liens: liens(r) });
   }
 
+  if (newsletter) {
+    try { await inscrireNewsletter(email, r); } catch (e) { console.error('opco newsletter', e?.message || e); }
+  }
+
   // Prévenir tout de suite : un lead qui vient de demander son budget se
   // rappelle le jour même. Un échec ici ne concerne pas le visiteur.
   if (NOTIFICATION) {
@@ -388,7 +474,8 @@ export default async function handler(req, res) {
           `SIRET : ${r.siret || r.numero}`,
           `OPCO : ${r.opco ? r.opco.nom : 'non trouvé'}`,
           r.convention && `Convention : ${r.convention.titre || ''} (IDCC ${r.convention.idcc})`,
-          r.effectif.libelle && `Effectif : ${r.effectif.libelle}${r.effectif.annee ? ` (${r.effectif.annee})` : ''}`,
+          r.effectif.libelle && `Effectif : ${r.effectif.libelle}${r.effectif.declare !== undefined ? ' (déclaré par le visiteur)' : r.effectif.annee ? ` (Insee ${r.effectif.annee})` : ''}`,
+          `Newsletter : ${newsletter ? 'inscrit' : 'refusée'}`,
           '',
           `Le lead est dans le CRM, à traiter aujourd'hui : ${SITE}/crm/`,
         ].filter((l) => l !== null && l !== undefined && l !== false).join('\n'),

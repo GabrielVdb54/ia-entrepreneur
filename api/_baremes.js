@@ -42,13 +42,15 @@ function aujourdhui() {
 /**
  * Le barème à annoncer pour cet OPCO, cette convention et cette tranche,
  * ou null. `paliers` ne garde que ceux qui recouvrent la tranche.
+ * `bornesDeclarees` ([n, n]) remplace la tranche Insee quand le visiteur a
+ * donné son nombre de salariés.
  */
-export function baremePour(opco, idcc, tranche) {
+export function baremePour(opco, idcc, tranche, bornesDeclarees = null) {
   if (!opco || !idcc) return null;
   const jour = aujourdhui();
   const b = BAREMES.find((x) => x.opco === opco && x.idcc.includes(idcc) && jour <= x.valable_jusquau);
   if (!b) return null;
-  const bornes = BORNES[tranche] || null;
+  const bornes = bornesDeclarees || BORNES[tranche] || null;
   const commun = { branche: b.branche, lien: b.lien, version: b.version, lu_le: b.lu_le };
   // Enveloppe 2026 épuisée (dit par l'OPCO, cité) : on le dit, sans montant.
   if (b.epuise) return bornes && bornes[0] >= 50 ? null : { ...commun, epuise: b.epuise, paliers: [] };

@@ -55,6 +55,10 @@
     '.oo .oo-gate p{margin:0 0 14px;font-size:.92rem;line-height:1.6;color:var(--oo-m)}',
     '.oo .oo-rgpd{font-size:.76rem!important;margin:10px 0 0!important;line-height:1.5!important}',
     '.oo .oo-piege{position:absolute!important;left:-9999px!important;width:1px;height:1px;opacity:0}',
+    '.oo .oo-sal{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px;margin:0!important;font-size:.88rem!important;color:var(--oo-m)}',
+    '.oo .oo-sal input{flex:0 0 110px;width:110px;padding:10px 12px;font-size:1rem}',
+    '.oo .oo-case{display:flex;align-items:flex-start;gap:8px;margin:10px 0 0!important;font-size:.82rem!important;line-height:1.5!important;color:var(--oo-m);cursor:pointer}',
+    '.oo .oo-case input{margin:3px 0 0;flex:0 0 auto;width:16px;height:16px;accent-color:var(--oo-p)}',
     '.oo .oo-liens{margin:10px 0 0;padding:0 0 0 18px;font-size:.9rem;line-height:1.7}',
     '.oo .oo-ok h3{color:#0B7A55}',
     '@media (max-width:560px){.oo{padding:20px 16px;border-radius:16px}.oo .oo-btn{width:100%}.oo .oo-faits{grid-template-columns:1fr}.oo .oo-opco strong{font-size:1.35rem}.oo .oo-titre{font-size:1.15rem}}',
@@ -228,9 +232,18 @@
       var email = el('input', { classe: 'oo-champ', type: 'email', autocomplete: 'email', placeholder: 'vous@entreprise.fr', 'aria-label': 'Votre adresse email', required: '' });
       var piege = el('input', { classe: 'oo-piege', type: 'text', name: 'site_web', tabindex: '-1', autocomplete: 'off', 'aria-hidden': 'true' });
       var envoyer = el('button', { classe: 'oo-btn vert', type: 'submit', texte: 'Recevoir mon budget' });
-      var f = el('form', { novalidate: '' }, [el('div', { classe: 'oo-ligne' }, [email, envoyer]), piege]);
+      // Facultatif : le nombre de salariés du jour affine le palier du barème
+      // (l'Insee publie au mieux la tranche de l'année n-2).
+      var eff = d.effectif || {};
+      var idSal = 'oo-sal-' + Math.random().toString(36).slice(2, 8);
+      var salaries = el('input', { classe: 'oo-champ', id: idSal, type: 'number', inputmode: 'numeric', min: '0', max: '100000', step: '1', placeholder: 'ex. 12' });
+      var ligneSal = el('label', { classe: 'oo-sal', for: idSal }, ['Nombre de salariés aujourd’hui (facultatif, pour affiner le montant)', salaries]);
+      if (eff.libelle && eff.tranche !== 'NN' && eff.tranche !== '00') ligneSal.appendChild(el('span', { texte: 'Insee' + (eff.annee ? ' ' + eff.annee : '') + ' : ' + eff.libelle.toLowerCase() }));
+      var refus = el('input', { type: 'checkbox' });
+      var f = el('form', { novalidate: '' }, [ligneSal, el('div', { classe: 'oo-ligne', style: 'margin-top:12px' }, [email, envoyer]), piege,
+        el('label', { classe: 'oo-case' }, [refus, 'Je ne souhaite pas recevoir la newsletter d’IA-Entrepreneur.'])]);
       gate.appendChild(f);
-      gate.appendChild(el('p', { classe: 'oo-rgpd' }, ['Votre adresse sert à vous envoyer ce résultat et à vous recontacter au sujet de votre projet de formation. Vous pouvez vous y opposer à tout moment. ', el('a', { href: '/politique-confidentialite.html', classe: 'oo-lien', texte: 'Politique de confidentialité' }), '.']));
+      gate.appendChild(el('p', { classe: 'oo-rgpd' }, ['Votre adresse sert à vous envoyer ce résultat, à vous recontacter au sujet de votre projet de formation et à vous adresser notre newsletter (IA et financement de la formation), dont vous pouvez vous désinscrire en un clic. ', el('a', { href: '/politique-confidentialite.html', classe: 'oo-lien', texte: 'Politique de confidentialité' }), '.']));
       var retour = el('div', { 'aria-live': 'polite' });
       gate.appendChild(retour);
 
@@ -248,7 +261,7 @@
         fetch(API, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json', accept: 'application/json' },
-          body: JSON.stringify({ siret: d.siret || d.numero, email: adresse, page: page, piege: piege.value }),
+          body: JSON.stringify({ siret: d.siret || d.numero, email: adresse, page: page, piege: piege.value, salaries: salaries.value.trim(), newsletter: !refus.checked }),
         })
           .then(function (r) { return r.json().catch(function () { return {}; }).then(function (j) { return { statut: r.status, j: j }; }); })
           .then(function (x) {
