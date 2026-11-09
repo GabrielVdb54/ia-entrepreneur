@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Votre avis sur la formation · IA-Entrepreneur</title>
+<!-- Page ouverte avec un lien personnel envoyé après une formation : jamais dans Google, liée nulle part. -->
+<meta name="robots" content="noindex, nofollow">
+<meta name="referrer" content="no-referrer">
+<meta name="theme-color" content="#FFFFFF">
+<link rel="icon" type="image/png" href="/favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #F7F8FD; --card: #FFFFFF; --text: #0A0F2C; --muted: #525880; --line: #E3E7F5; --line-strong: #C9D0EA;
+    --primary: #1A3CFF; --primary-dark: #1532D6; --primary-soft: #EEF1FF; --accent: #10B981; --accent-soft: #E7F8F1;
+    --danger: #B42318; --danger-soft: #FDECEA; --etoile: #F5A524; --radius: 14px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { -webkit-text-size-adjust: 100%; }
+  body { background: var(--bg); color: var(--text); font-family: 'Plus Jakarta Sans', Arial, sans-serif; font-size: 16px; line-height: 1.55; padding-bottom: 48px; }
+  a { color: var(--primary); }
+  .haut { background: #fff; border-bottom: 1px solid var(--line); padding: 14px 20px; }
+  .haut img { height: 26px; width: auto; display: block; }
+  main { max-width: 640px; margin: 0 auto; padding: 24px 18px; }
+  h1 { font-size: 24px; line-height: 1.25; letter-spacing: -0.01em; }
+  .sous { color: var(--muted); margin-top: 6px; }
+  form, .merci, .erreur-page { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); padding: 20px; margin-top: 20px; display: flex; flex-direction: column; gap: 18px; }
+  fieldset { border: 0; display: flex; flex-direction: column; gap: 8px; }
+  legend, .libelle { font-weight: 700; font-size: 15px; margin-bottom: 4px; }
+  .etoiles { display: flex; gap: 6px; flex-direction: row-reverse; justify-content: flex-end; }
+  .etoiles input { position: absolute; opacity: 0; width: 1px; height: 1px; }
+  .etoiles label { font-size: 38px; line-height: 1; color: var(--line-strong); cursor: pointer; padding: 2px; border-radius: 8px; }
+  .etoiles input:checked ~ label, .etoiles label:hover, .etoiles label:hover ~ label { color: var(--etoile); }
+  .etoiles input:focus-visible + label { outline: 2px solid var(--primary); outline-offset: 2px; }
+  .aide { font-size: 13.5px; color: var(--muted); }
+  label.champ { display: flex; flex-direction: column; gap: 6px; font-weight: 600; font-size: 15px; }
+  textarea, input[type="text"] { font: inherit; font-size: 16px; border: 1px solid var(--line-strong); border-radius: 10px; padding: 10px 12px; background: #fff; color: var(--text); width: 100%; }
+  textarea { min-height: 96px; resize: vertical; }
+  .case { display: flex; gap: 10px; align-items: flex-start; font-size: 15px; font-weight: 400; }
+  .case input { width: 20px; height: 20px; margin-top: 2px; flex: none; }
+  .cite { display: flex; flex-direction: column; gap: 12px; border-top: 1px solid var(--line); padding-top: 14px; }
+  .cite[hidden] { display: none; }
+  .btn { font: inherit; font-weight: 700; font-size: 16px; border-radius: 12px; padding: 13px 18px; border: 1px solid var(--line-strong); background: #fff; color: var(--text); cursor: pointer; text-decoration: none; display: inline-flex; justify-content: center; align-items: center; min-height: 48px; }
+  .btn.primaire { background: var(--primary); border-color: var(--primary); color: #fff; }
+  .btn.primaire:hover { background: var(--primary-dark); }
+  .btn:disabled { opacity: .6; cursor: default; }
+  .erreur { color: var(--danger); font-weight: 600; font-size: 15px; }
+  .merci h2 { font-size: 20px; }
+  .rgpd { font-size: 12.5px; color: var(--muted); }
+  [hidden] { display: none !important; }
+</style>
+</head>
+<body>
+<div class="haut"><img src="/images/logo-ia-entrepreneur-compact.png" alt="IA-Entrepreneur" width="120" height="26"></div>
+<main>
+  <h1>Votre avis sur la formation</h1>
+  <p class="sous" id="pour">Deux minutes pour nous dire ce qui vous a servi et ce qu'on peut améliorer.</p>
+
+  <form id="avis" novalidate hidden>
+    <fieldset>
+      <legend>Votre note</legend>
+      <div class="etoiles" role="radiogroup" aria-label="Note sur 5">
+        <input type="radio" name="note" id="n5" value="5"><label for="n5" title="5 sur 5">★</label>
+        <input type="radio" name="note" id="n4" value="4"><label for="n4" title="4 sur 5">★</label>
+        <input type="radio" name="note" id="n3" value="3"><label for="n3" title="3 sur 5">★</label>
+        <input type="radio" name="note" id="n2" value="2"><label for="n2" title="2 sur 5">★</label>
+        <input type="radio" name="note" id="n1" value="1"><label for="n1" title="1 sur 5">★</label>
+      </div>
+    </fieldset>
+    <label class="champ">Ce qui vous a été le plus utile<textarea name="utile" maxlength="2000" placeholder="Un exemple, un outil, une façon de faire que vous utilisez depuis…"></textarea></label>
+    <label class="champ">Ce qu'on pourrait améliorer<textarea name="ameliorer" maxlength="2000" placeholder="Facultatif"></textarea></label>
+    <label class="case"><input type="checkbox" name="accord"> J'accepte que mon avis soit publié sur ia-entrepreneur.fr avec mon nom, ma fonction et mon entreprise.</label>
+    <div class="cite" id="cite" hidden>
+      <label class="champ">Votre prénom et votre nom<input type="text" name="nom" maxlength="120" autocomplete="name"></label>
+      <label class="champ">Votre fonction<input type="text" name="fonction" maxlength="120" autocomplete="organization-title" placeholder="Facultatif"></label>
+      <label class="champ">Votre entreprise<input type="text" name="entreprise" maxlength="160" autocomplete="organization"></label>
+    </div>
+    <p class="erreur" id="erreur" role="alert" hidden></p>
+    <button type="submit" class="btn primaire">Envoyer mon avis</button>
+    <p class="rgpd">Votre avis est lu par Gabriel Vanderbecken (IA-Entrepreneur, marque de Clindit SASU) pour améliorer ses formations. Il n'est publié que si vous cochez la case, et vous pouvez demander à tout moment qu'il soit retiré ou supprimé en écrivant à gabriel@ia-entrepreneur.fr. <a href="/politique-confidentialite.html">Politique de confidentialité</a>.</p>
+  </form>
+
+  <section class="merci" id="merci" hidden aria-live="polite">
+    <h2>Merci pour votre avis</h2>
+    <p>Il nous aide à améliorer chaque formation.</p>
+    <div id="google" hidden>
+      <p>Si vous le souhaitez, vous pouvez aussi le partager sur notre fiche Google : il aide d'autres entreprises à nous trouver.</p>
+      <p style="margin-top:12px"><a class="btn" id="lien-google" href="#" target="_blank" rel="noopener noreferrer">Publier aussi sur Google</a></p>
+    </div>
+  </section>
+
+  <section class="erreur-page" id="perdu" hidden>
+    <p id="perdu-texte">Ce lien n'est pas valide. Écrivez à gabriel@ia-entrepreneur.fr pour en recevoir un nouveau.</p>
+  </section>
+</main>
+<script>
+(() => {
+  // Le jeton est dans l'ancre de l'adresse (#…) : il ne part jamais dans une requête ni dans l'historique du serveur.
+  const cle = 'avis_jeton';
+  if (location.hash.length > 30) { sessionStorage.setItem(cle, location.hash.slice(1)); history.replaceState(null, '', location.pathname); }
+  const jeton = sessionStorage.getItem(cle) || '';
+  const $ = (s) => document.querySelector(s);
+  const form = $('#avis');
+  const perdu = (texte) => { if (texte) $('#perdu-texte').textContent = texte; $('#perdu').hidden = false; form.hidden = true; };
+  if (!jeton) { perdu(); return; }
+  const appel = (methode, corps) => fetch('/api/avis', { method: methode, headers: { 'X-Jeton': jeton, ...(corps ? { 'Content-Type': 'application/json' } : {}) }, body: corps ? JSON.stringify(corps) : undefined });
+  appel('GET').then(async (r) => {
+    if (r.status === 410) return perdu('Ce lien a expiré. Écrivez à gabriel@ia-entrepreneur.fr pour en recevoir un nouveau.');
+    if (!r.ok) return perdu();
+    const d = await r.json();
+    if (d.entreprise) { $('#pour').textContent = `Formation IA chez ${d.entreprise} : deux minutes pour nous dire ce qui vous a servi et ce qu'on peut améliorer.`; form.elements.entreprise.value = d.entreprise; }
+    form.hidden = false;
+  }).catch(() => perdu('La page ne se charge pas. Vérifiez votre connexion et réessayez.'));
+  form.elements.accord.addEventListener('change', () => { $('#cite').hidden = !form.elements.accord.checked; if (form.elements.accord.checked) form.elements.nom.focus(); });
+  const erreur = (t) => { const e = $('#erreur'); e.textContent = t; e.hidden = false; e.scrollIntoView({ block: 'nearest' }); };
+  const MESSAGES = { note_invalide: 'Choisissez une note de 1 à 5 étoiles.', nom_requis: 'Indiquez votre nom pour que votre avis puisse être cité, ou décochez la case.', texte_requis: 'Dites-nous en une phrase ce qui vous a été utile, ou décochez la case.', trop_de_demandes: 'Trop d\'envois depuis ce lien. Réessayez dans quelques minutes.', lien_expire: 'Ce lien a expiré.' };
+  form.addEventListener('submit', async (ev) => {
+    ev.preventDefault();
+    $('#erreur').hidden = true;
+    const el = form.elements;
+    const note = Number((form.querySelector('input[name="note"]:checked') || {}).value || 0);
+    if (!note) return erreur(MESSAGES.note_invalide);
+    if (el.accord.checked && !el.nom.value.trim()) { el.nom.focus(); return erreur(MESSAGES.nom_requis); }
+    const bouton = form.querySelector('button[type="submit"]');
+    bouton.disabled = true; bouton.textContent = 'Envoi…';
+    try {
+      const r = await appel('POST', { note, utile: el.utile.value, ameliorer: el.ameliorer.value, accord: el.accord.checked, nom: el.accord.checked ? el.nom.value : '', fonction: el.accord.checked ? el.fonction.value : '', entreprise: el.accord.checked ? el.entreprise.value : '' });
+      const d = await r.json().catch(() => ({}));
+      if (!r.ok) throw new Error(MESSAGES[d.erreur] || 'L\'envoi n\'a pas marché. Votre saisie est gardée, réessayez.');
+      form.hidden = true;
+      $('#merci').hidden = false;
+      // Le lien Google est proposé à tous, quelle que soit la note : Google interdit de ne solliciter que les avis positifs.
+      if (d.google) { $('#lien-google').href = d.google; $('#google').hidden = false; }
+      $('#merci').scrollIntoView({ block: 'start' });
+    } catch (e) {
+      erreur(e.message);
+      bouton.disabled = false; bouton.textContent = 'Envoyer mon avis';
+    }
+  });
+})();
+</script>
+</body>
+</html>

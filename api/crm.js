@@ -85,6 +85,7 @@
 
 import { timingSafeEqual, randomBytes, createHash } from 'node:crypto';
 import Anthropic from '@anthropic-ai/sdk';
+import { creerDemande, GOOGLE_AVIS_RE } from './_avis.js';
 import {
   deposerPiece, empreinte as empreinteTexte, etatDossier, lireFichier, majStatut, nouveauJeton, verifierSiret, aujourdHui as aujourdHuiF,
 } from './_formateurs.js';
@@ -112,7 +113,7 @@ const SUIVIS = ['a_lancer', 'financement_demande', 'financement_accepte', 'progr
   'convention_signee', 'convocations', 'formation_terminee', 'facturee', 'payee'];
 const ACTIONS = ['email', 'appel', 'rdv', 'autre'];
 const TYPES_ACTIVITE = ['note', 'appel', 'appel_sans_reponse', 'email_envoye', 'email_recu',
-  'brouillon', 'rdv', 'sms', 'relance_decalee', 'statut', 'import', 'linkedin'];
+  'brouillon', 'rdv', 'sms', 'relance_decalee', 'statut', 'import', 'linkedin', 'avis', 'paiement'];
 
 const TABLES = {
   leads: {
@@ -125,6 +126,7 @@ const TABLES = {
       prochaine_note: T, relances_sans_reponse: 'entier', dernier_contact: 'date', raison_perte: T,
       hubspot_id: T, archive: 'bool', tache_fil: T,
       suivi: ['enum', SUIVIS], formation_debut: 'date', formation_fin: 'date', financeur: T, financement_ref: T,
+      facture_le: 'date', facture_echeance: 'date', facture_fil: T, facture_objet: T, paiement_annonce: T, paye_le: 'date',
     },
   },
   contacts: {
@@ -154,7 +156,7 @@ const TABLES = {
   },
 };
 
-const REGLAGES_AUTORISES = ['signature', 'rappel_matin'];
+const REGLAGES_AUTORISES = ['signature', 'rappel_matin', 'lien_avis_google'];
 const MAX_LOT = 500;
 
 class Refus extends Error {
@@ -476,7 +478,7 @@ async function emailsEnvoyesAujourdhui() {
 
 async function lireTout() {
   const depuisLi = new Date(Date.now() - 45 * 86400000).toISOString();
-  const [leads, contacts, activites, memos, modeles, reglages, { lignes: entrants }, { lignes: ecartes }, formateurs, documents, programmes, { lignes: linkedin }] = await Promise.all([
+  const [leads, contacts, activites, memos, modeles, reglages, { lignes: entrants }, { lignes: ecartes }, formateurs, documents, programmes, { lignes: linkedin }, { lignes: avis }, { lignes: demandesAvis }] = await Promise.all([
     toutLire('iae_crm_leads', 'entreprise.asc'),
     toutLire('iae_crm_contacts', 'principal.desc,created_at.asc'),
     toutLire('iae_crm_activites', 'date.desc'),
@@ -489,9 +491,11 @@ async function lireTout() {
     sb('iae_crm_documents?select=id,created_at,lead_id,type,nom,chemin,mime,taille,depose_par,lecture,statut,motif,verifie_le,expire_le,archive&order=created_at.desc&limit=2000').then((x) => x.lignes),
     toutLire('iae_crm_programmes', 'created_at.desc'),
     sb(`iae_crm_linkedin?or=(statut.in.(brouillon,a_envoyer,en_cours,echec,a_verifier),created_at.gte.${encodeURIComponent(depuisLi)})&order=created_at.desc&limit=500&select=id,created_at,lead_id,contact_id,type,etape,texte,statut,valide_le,envoye_le,detail`),
+    sb('iae_crm_avis?order=created_at.desc&limit=300&select=*'),
+    sb('iae_crm_avis_demandes?order=created_at.desc&limit=300&select=id,lead_id,created_at,expire_le'),
   ]);
   return {
-    leads, contacts, activites, memos, modeles, entrants, ecartes, documents, programmes, linkedin: linkedin || [],
+    leads, contacts, activites, memos, modeles, entrants, ecartes, documents, programmes, linkedin: linkedin || [], avis: avis || [], demandes_avis: demandesAvis || [],
     formateurs: formateurs.map(({ jeton_hash: _h, signature, ...f }) => ({ ...f, signature: signature ? { nom: signature.nom, lieu: signature.lieu, date: signature.date, version: signature.version, empreinte: signature.empreinte, ip: signature.ip } : null })),
     reglages: Object.fromEntries(reglages.filter((r) => !r.cle.endsWith('_cle')).map((r) => [r.cle, r.valeur])),
     gmail: gmailConfigure(),
@@ -548,8 +552,10 @@ async function operation(corps) {
   if (op && op.startsWith('programme_')) return operationProgramme(corps);
   if (op === 'importer') return importer(corps);
   if (op === 'email') return envoyerEmail(corps);
+  if (/^(avis|paiement|facture)_[a-z_]+$/.test(op || '')) return operationApresFormation(corps);
   if (op === 'reglage') {
     if (!REGLAGES_AUTORISES.includes(corps.cle)) throw new Refus('reglage_inconnu');
+    if (corps.cle === 'lien_avis_google' && corps.valeur && !GOOGLE_AVIS_RE.test(String(corps.valeur).trim())) throw new Refus('lien_google_invalide');
     const valeur = convertir(corps.valeur ?? '', L, corps.cle) ?? '';
     const { lignes } = await sb('iae_crm_reglages?on_conflict=cle', {
       methode: 'POST',
@@ -1117,6 +1123,7 @@ const SCHEMA_TRI = {
           rdv_date: { type: 'string', description: 'AAAA-MM-JJ du rendez-vous validé, ou vide' },
           rdv_heure: { type: 'string', description: 'HH:MM, ou vide' },
           rdv_detail: { type: 'string' },
+          paiement: { type: 'string', description: 'si l\'email annonce un paiement fait ou programmé : une phrase avec la date et le montant si donnés ; vide sinon' },
           tache: { type: 'string' },
           resume: { type: 'string' },
           raison: { type: 'string' },
@@ -1125,7 +1132,7 @@ const SCHEMA_TRI = {
           prenom: { type: 'string' },
           nom: { type: 'string' },
         },
-        required: ['ref', 'action', 'lead_id', 'interet', 'a_faire', 'relance_date', 'rdv_date', 'rdv_heure', 'rdv_detail', 'tache', 'resume', 'raison', 'type', 'entreprise', 'prenom', 'nom'],
+        required: ['ref', 'action', 'lead_id', 'interet', 'a_faire', 'relance_date', 'rdv_date', 'rdv_heure', 'rdv_detail', 'paiement', 'tache', 'resume', 'raison', 'type', 'entreprise', 'prenom', 'nom'],
         additionalProperties: false,
       },
     },
@@ -1150,6 +1157,8 @@ a_faire, pour un email rattaché :
 
 rdv_date, rdv_heure, rdv_detail : seulement quand l'email fixe un rendez-vous accepté des deux côtés : la personne accepte un créneau proposé par Gabriel, ou confirme un rendez-vous (« OK pour jeudi 14 h », « je vous confirme notre rendez-vous du 12 à 10 h »). Pas pour une simple proposition de créneaux qui attend la réponse de Gabriel : là, a_faire = repondre et les trois restent vides. rdv_date en AAAA-MM-JJ, en résolvant « jeudi » ou « demain » d'après la date de réception de l'email ; rdv_heure en HH:MM, vide si l'heure n'est pas dite ; rdv_detail en quelques mots : le format et l'objet (« visio avec son directeur », « au cabinet à Nancy »). Un rendez-vous validé n'appelle pas de réponse (a_faire = rien), sauf si l'email demande aussi quelque chose (un lien, un document) : a_faire = repondre.
 
+paiement : seulement si l'email dit qu'un paiement a été fait ou est programmé (« virement effectué ce jour », « le règlement part en fin de mois », avis de paiement d'un OPCO ou de l'AGEFICE) : une phrase avec la date et le montant s'ils sont donnés (« Virement de 1 800 € annoncé le 12/11 »). Vide sinon, et vide pour une simple question sur une facture.
+
 tache : si a_faire n'est pas rien, une phrase à l'infinitif, adressée à Gabriel, qui dit exactement quoi faire avec les détails utiles (quoi, pour qui, chiffres, dates). Par exemple « Envoyer à Sarah tes tarifs et un plan de cours niveau 2 pour sa cliente (1 personne, Supply Chain, 1er semestre 2027) ». Jamais seulement « Répondre à l'email ».
 resume : une phrase qui dit ce que contient l'email, avec les faits.
 raison : pourquoi cette décision, en quelques mots (« élève, rendu de TD », « même domaine que Jean Piron, il répondra lundi »).
@@ -1159,7 +1168,7 @@ En français. N'invente rien : seulement ce qui est dans l'email et dans la list
 
 const resumeAnalyse = (d) => ({
   action: d.action, lead_id: d.lead_id || '', interet: d.interet, a_faire: d.a_faire, relance_date: d.relance_date || '',
-  rdv_date: d.rdv_date || '', rdv_heure: d.rdv_heure || '', rdv_detail: couper(d.rdv_detail || '', 200), tache: couper(d.tache, 600),
+  rdv_date: d.rdv_date || '', rdv_heure: d.rdv_heure || '', rdv_detail: couper(d.rdv_detail || '', 200), paiement: couper(d.paiement || '', 300), tache: couper(d.tache, 600),
   resume: couper(d.resume, 600), raison: couper(d.raison, 300), type: d.type || '', entreprise: couper(d.entreprise, 160), prenom: couper(d.prenom, 80), nom: couper(d.nom, 80), le: new Date().toISOString(),
 });
 
@@ -1285,6 +1294,8 @@ async function rattacherEmail(r, d, leadId, ann) {
   if (!lead?.dernier_contact || lead.dernier_contact < jour) maj.dernier_contact = jour;
   const rdv = rdvValide(d);
   if (rdv) await noterRdv(leadId, contact?.id, rdv, `confirmé par ${qui} (« ${r.objet} »)`, { fil: r.fil, objet: r.objet });
+  // Un paiement annoncé : le bloc Paiements demande à Gabriel de le vérifier sur son compte.
+  if (d?.paiement && String(d.paiement).trim()) maj.paiement_annonce = `${couper(String(d.paiement).trim(), 280)} (email de ${qui} du ${dateCourte(jour)})`;
   if (aFaire === 'repondre') {
     Object.assign(maj, { prochaine_relance: aujourdHuiParis(), prochaine_action: 'email', prochaine_note: `${d?.tache || `Répondre à ${qui} : « ${r.objet} »`}${rdv ? ` Puis ${texteRdv(rdv)}.` : ''}`.slice(0, 2000), tache_fil: r.fil || null });
   } else if (rdv) {
@@ -1390,10 +1401,13 @@ const SCHEMA_TACHE_FAITE = {
     rdv_date: { type: 'string', description: 'AAAA-MM-JJ du rendez-vous validé, ou vide' },
     rdv_heure: { type: 'string', description: 'HH:MM, ou vide' },
     rdv_detail: { type: 'string' },
+    facture: { type: 'boolean', description: "vrai si l'email envoie une facture au client" },
+    facture_echeance: { type: 'string', description: 'AAAA-MM-JJ, date limite de paiement si l\'email la donne, ou vide' },
   },
-  required: ['tache', 'reste', 'attente', 'rdv_date', 'rdv_heure', 'rdv_detail'],
+  required: ['tache', 'reste', 'attente', 'rdv_date', 'rdv_heure', 'rdv_detail', 'facture', 'facture_echeance'],
 };
-const CONSIGNES_TACHE_FAITE = `Tu tiens le CRM de Gabriel Vanderbecken (IA-Entrepreneur, formations à l'IA pour les entreprises). On te donne la tâche prévue sur une fiche, c'est-à-dire ce que Gabriel devait faire, et un email qu'il vient d'envoyer à un contact de cette fiche. Dis si cet email fait la tâche (sans_rapport s'il n'y a pas de tâche prévue), et s'il valide un rendez-vous.
+const CONSIGNES_TACHE_FAITE = `Tu tiens le CRM de Gabriel Vanderbecken (IA-Entrepreneur, formations à l'IA pour les entreprises). On te donne la tâche prévue sur une fiche, c'est-à-dire ce que Gabriel devait faire, et un email qu'il vient d'envoyer à un contact de cette fiche. Dis si cet email fait la tâche (sans_rapport s'il n'y a pas de tâche prévue), s'il valide un rendez-vous, et s'il envoie une facture.
+facture : vrai si l'email envoie une facture au client (une pièce jointe qui est une facture, ou « vous trouverez la facture en pièce jointe »). Faux pour un devis, une proposition, une convention ou un simple rappel de paiement. facture_echeance : la date limite de paiement si l'email la donne (« à régler sous 30 jours », « avant le 15/12 »), en AAAA-MM-JJ calculée depuis la date d'envoi ; vide sinon.
 - faite : l'email fait tout ce que la tâche demande. Une pièce jointe annoncée dans l'email (« vous trouverez la facture en pièce jointe ») compte comme envoyée.
 - en_partie : l'email fait une partie de la tâche seulement.
 - sans_rapport : l'email parle d'autre chose, ou il ne fait rien de ce que la tâche demande.
@@ -1401,7 +1415,7 @@ reste : pour en_partie seulement, ce qui manque, en une phrase qui commence par 
 attente : ce que Gabriel attend maintenant du destinataire, en une phrase courte (« Sarah doit dire où se trouve sa cliente. »). Vide s'il n'attend rien.
 rdv_date, rdv_heure, rdv_detail : seulement si l'email fixe un rendez-vous accepté des deux côtés : Gabriel accepte un créneau que le contact a proposé, ou confirme un rendez-vous déjà convenu (« OK pour jeudi 14 h », « je vous confirme notre visio du 12 à 10 h »). Pas quand Gabriel propose des créneaux sans réponse encore. rdv_date en AAAA-MM-JJ, en résolvant « jeudi » ou « demain » d'après la date d'envoi de l'email ; rdv_heure en HH:MM, vide si l'heure n'est pas dite ; rdv_detail en quelques mots : le format et l'objet (« visio avec son directeur »). Sinon les trois sont vides.
 Écris en français. N'invente rien qui ne soit pas dans la tâche ou dans l'email.`;
-async function jugerEnvoi(lead, { objet, texte, dest, quand }) {
+async function jugerEnvoi(lead, { objet, texte, dest, quand, pieces = [] }) {
   if (!process.env.ANTHROPIC_API_KEY || !texte) return null;
   const tache = lead.prochaine_note ? `Tâche prévue (${lead.prochaine_action || 'autre'}${lead.prochaine_relance ? `, pour le ${dateCourte(lead.prochaine_relance)}` : ''}) : ${lead.prochaine_note}` : 'Tâche prévue : aucune.';
   const envoi = new Date(quand).toLocaleString('fr-FR', { timeZone: 'Europe/Paris', weekday: 'long', day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
@@ -1411,7 +1425,7 @@ async function jugerEnvoi(lead, { objet, texte, dest, quand }) {
       schema: SCHEMA_TACHE_FAITE,
       max: 1500,
       timeout: 30000,
-      contenu: `Fiche : ${lead.entreprise}\n${tache}\n\nEmail envoyé le ${envoi} à ${dest.join(', ')}, objet « ${objet} » :\n${texte.slice(0, 6000)}`,
+      contenu: `Fiche : ${lead.entreprise}\n${tache}\n\nEmail envoyé le ${envoi} à ${dest.join(', ')}, objet « ${objet} »${pieces.length ? `, pièces jointes : ${pieces.join(', ')}` : ''} :\n${texte.slice(0, 6000)}`,
     });
     return ['faite', 'en_partie', 'sans_rapport'].includes(r?.tache) ? r : null;
   } catch (e) {
@@ -1457,7 +1471,7 @@ async function synchroEnvoyes(depuis, ann) {
       else if (fiches.length > 1) {
         // Nouveau fil vers une adresse qui a plusieurs dossiers : la fiche dont l'email fait la tâche, sinon la plus active.
         for (const x of fiches.slice(0, 3)) {
-          const j = await jugerEnvoi(ann.lead(x), { objet, texte, dest, quand });
+          const j = await jugerEnvoi(ann.lead(x), { objet, texte, dest, quand, pieces: piecesJointes(m.payload) });
           if (j && (j.tache === 'faite' || j.tache === 'en_partie')) { leadId = x; jugement = j; break; }
         }
         if (!leadId) leadId = fiches.slice().sort((a, b) => String(ann.lead(b).dernier_contact || '').localeCompare(String(ann.lead(a).dernier_contact || '')))[0];
@@ -1468,7 +1482,7 @@ async function synchroEnvoyes(depuis, ann) {
     const lead = ann.lead(leadId);
     const maj = {};
     if (!lead.dernier_contact || lead.dernier_contact < jour) maj.dernier_contact = jour;
-    const r = jugement || (await jugerEnvoi(lead, { objet, texte, dest, quand }));
+    const r = jugement || (await jugerEnvoi(lead, { objet, texte, dest, quand, pieces: piecesJointes(m.payload) }));
     const rdv = rdvValide(r);
     const confirme = `confirmé dans ton email du ${dateCourte(jour)} (« ${objet} »)`;
     if (rdv) await noterRdv(leadId, c?.id, rdv, confirme, { fil: m.threadId, objet });
@@ -1490,9 +1504,19 @@ async function synchroEnvoyes(depuis, ann) {
       if (!lead.prochaine_relance || lead.prochaine_relance >= rdv.date) Object.assign(maj, tacheRdv(rdv, `${texteRdv(rdv)}, ${confirme}. ${AGENDA_SI_BESOIN}`));
       else maj.prochaine_note = `${lead.prochaine_note || ''} Puis ${texteRdv(rdv)}.`.trim().slice(0, 2000);
     }
+    // Une facture dans l'email : le paiement est à vérifier à l'échéance (bloc Paiements), et la suite est la demande d'avis.
+    let factureVue = '';
+    if (r?.facture === true) {
+      const f = majFacture({ ...lead, ...maj }, jour, { fil: m.threadId, objet, echeance: r.facture_echeance });
+      Object.assign(maj, f);
+      factureVue = ` · facture repérée, paiement à vérifier le ${dateCourte(f.facture_echeance)}`;
+      if (verdict === 'faite' && !rdv && (lead.suivi || lead.type === 'client')) {
+        Object.assign(maj, { prochaine_relance: dansJoursOuvres(2), prochaine_action: 'email', prochaine_note: `Facture envoyée le ${dateCourte(jour)}. Demande son avis sur la formation (« Demander un avis » sur la fiche, facultatif), puis propose la suite. Paiement à vérifier le ${dateCourte(f.facture_echeance)}.`, tache_fil: null, relances_sans_reponse: 0 });
+      }
+    }
     await sb('iae_crm_activites', {
       methode: 'POST', prefer: 'return=minimal',
-      corps: { lead_id: leadId, contact_id: c?.id || null, date: quand, type: 'email_envoye', resume: `Email envoyé depuis Gmail : « ${objet} »${SUITE_TACHE[verdict] || ''}${rdv ? ` · ${texteRdv(rdv)}` : ''}`.slice(0, 2000), contenu: texte || null, source: 'gmail iae', meta: { gmail_id: id, fil: m.threadId, objet, a: dest.join(', '), tache: verdict } },
+      corps: { lead_id: leadId, contact_id: c?.id || null, date: quand, type: 'email_envoye', resume: `Email envoyé depuis Gmail : « ${objet} »${SUITE_TACHE[verdict] || ''}${rdv ? ` · ${texteRdv(rdv)}` : ''}${factureVue}`.slice(0, 2000), contenu: texte || null, source: 'gmail iae', meta: { gmail_id: id, fil: m.threadId, objet, a: dest.join(', '), tache: verdict } },
     });
     if (Object.keys(maj).length) {
       await sb(`iae_crm_leads?id=eq.${leadId}`, { methode: 'PATCH', prefer: 'return=minimal', corps: maj });
@@ -2422,6 +2446,79 @@ async function cleRobotValide(req) {
   const a = Buffer.from(createHash('sha256').update(donnee).digest('hex'));
   const b = Buffer.from(attendue);
   return a.length === b.length && timingSafeEqual(a, b);
+}
+
+/* ---------- Après la formation : facture, paiement, avis ---------- */
+// Gabriel, 09/11 : « une tâche qui me demande de vérifier que j'ai été payé, en faisant le lien avec mon agenda ou un
+// échange de mail » et « un email post formation, d'avis (facultatif) ; si avis positif on le met sur le site, et on
+// propose nos services par la suite ». Le CRM n'a pas accès au compte : il dit quand vérifier, Gabriel confirme.
+const ORDRE_SUIVI = (k) => SUIVIS.indexOf(k);
+// L'échéance de vérification : celle de l'email, sinon 30 jours, 60 si un financeur (OPCO, AGEFICE) paie (son choix du 09/11).
+function echeanceFacture(lead, jour, lue = '') {
+  if (DATE_RE.test(lue || '') && lue >= jour) return estOuvreIso(lue) ? lue : dansJoursOuvres(0, lue);
+  return dansJoursOuvres(lead.financeur ? 60 : 30, jour);
+}
+function majFacture(lead, jour, { fil = null, objet = null, echeance = '' } = {}) {
+  const maj = { facture_le: jour, facture_echeance: echeanceFacture(lead, jour, echeance), facture_fil: fil, facture_objet: objet ? couper(objet, 300) : null, paye_le: null, paiement_annonce: null };
+  if (lead.suivi && ORDRE_SUIVI(lead.suivi) < ORDRE_SUIVI('facturee')) maj.suivi = 'facturee';
+  return maj;
+}
+async function operationApresFormation(corps) {
+  const op = corps.op;
+  if (op === 'avis_demande') {
+    if (!UUID_RE.test(corps.lead_id || '')) throw new Refus('id_invalide');
+    const [l] = (await sb(`iae_crm_leads?id=eq.${corps.lead_id}&select=id`)).lignes;
+    if (!l) throw new Refus('introuvable', 404);
+    return creerDemande(l.id);
+  }
+  if (op === 'avis_publier' || op === 'avis_retirer') {
+    if (!UUID_RE.test(corps.id || '')) throw new Refus('id_invalide');
+    const [a] = (await sb(`iae_crm_avis?id=eq.${corps.id}&select=*`)).lignes;
+    if (!a) throw new Refus('introuvable', 404);
+    let maj;
+    if (op === 'avis_retirer') maj = { statut: 'retire' };
+    else {
+      if (!a.accord_publication) throw new Refus('avis_sans_accord', 409);
+      if (a.note < 4) throw new Refus('avis_pas_positif', 409);
+      const texte = String(corps.texte ?? a.texte_publie ?? a.utile ?? '').replace(/\s+/g, ' ').trim().slice(0, 1200);
+      if (!texte) throw new Refus('message_vide');
+      maj = { statut: 'publie', texte_publie: texte, publie_le: new Date().toISOString() };
+    }
+    const { lignes } = await sb(`iae_crm_avis?id=eq.${a.id}`, { methode: 'PATCH', corps: maj, prefer: 'return=representation' });
+    let lead = null;
+    if (op === 'avis_publier') {
+      await inserer('activites', { lead_id: a.lead_id, type: 'avis', resume: `Avis de ${a.nom || 'un participant'} publié sur le site`, source: 'crm', meta: { avis_id: a.id } });
+      // Une fois l'avis publié, la suite : proposer le niveau suivant dans une semaine.
+      const [l] = (await sb(`iae_crm_leads?id=eq.${a.lead_id}&select=prochaine_note`)).lignes;
+      if (l && /^Avis \d\/5 de /.test(l.prochaine_note || '')) lead = await modifier('leads', a.lead_id, { prochaine_relance: dansJoursOuvres(7), prochaine_action: 'email', prochaine_note: `Proposer la suite (avis ${a.note}/5 de ${a.nom || 'un participant'}, publié) : le niveau suivant, en partant de ce qui lui a été utile.` });
+    }
+    return { avis: lignes[0], lead };
+  }
+  if (!UUID_RE.test(corps.lead_id || '')) throw new Refus('id_invalide');
+  const [lead] = (await sb(`iae_crm_leads?id=eq.${corps.lead_id}&select=*`)).lignes;
+  if (!lead) throw new Refus('introuvable', 404);
+  const jour = aujourdHuiParis();
+  if (op === 'facture_envoyee') {
+    // Une facture envoyée hors de Gmail (ou que le CRM n'a pas repérée) : Gabriel le dit.
+    const quand = DATE_RE.test(corps.date || '') && corps.date <= jour ? corps.date : jour;
+    const maj = majFacture(lead, quand, { echeance: corps.echeance });
+    await inserer('activites', { lead_id: lead.id, type: 'paiement', resume: `Facture envoyée le ${dateCourte(quand)} : paiement à vérifier le ${dateCourte(maj.facture_echeance)}`, source: 'crm', meta: { etape: 'facture' } });
+    return { lead: await modifier('leads', lead.id, maj) };
+  }
+  if (op === 'paiement_recu') {
+    const quand = DATE_RE.test(corps.date || '') && corps.date <= jour ? corps.date : jour;
+    const maj = { paye_le: quand, paiement_annonce: null };
+    if (lead.suivi && ORDRE_SUIVI(lead.suivi) < ORDRE_SUIVI('payee')) Object.assign(maj, { suivi: 'payee' });
+    await inserer('activites', { lead_id: lead.id, type: 'paiement', resume: `Paiement reçu le ${dateCourte(quand)}${lead.facture_le ? ` (facture du ${dateCourte(lead.facture_le)})` : ''}, vérifié par Gabriel`, source: 'crm', meta: { etape: 'paye' } });
+    return { lead: await modifier('leads', lead.id, maj) };
+  }
+  if (op === 'paiement_decaler') {
+    const jours = Math.min(Math.max(Number(corps.jours) || 7, 1), 60);
+    const echeance = dansJoursOuvres(jours);
+    await inserer('activites', { lead_id: lead.id, type: 'paiement', resume: `Pas encore payé le ${dateCourte(jour)} : nouvelle vérification le ${dateCourte(echeance)}`, source: 'crm', meta: { etape: 'pas_encore' } });
+    return { lead: await modifier('leads', lead.id, { facture_echeance: echeance }) };
+  }
+  throw new Refus('op_inconnue');
 }
 
 /* ---------- La voix du mode oral (ElevenLabs) ---------- */

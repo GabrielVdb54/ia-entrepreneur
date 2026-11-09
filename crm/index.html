@@ -295,6 +295,13 @@
   .reco p { margin: 0; }
   .reco .pourquoi { color: var(--muted); margin-top: 3px; font-size: 13.5px; }
   .reco-attente { color: var(--muted); font-size: 13.5px; }
+  .paiements { display: flex; flex-direction: column; gap: 10px; }
+  .paiement { border: 1px solid var(--line); background: var(--card); border-radius: 12px; padding: 12px 14px; display: flex; flex-direction: column; gap: 6px; font-size: 14.5px; }
+  .paiement p { margin: 0; }
+  .avis-liste { list-style: none; margin: 10px 0 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
+  .avis { border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; display: flex; flex-direction: column; gap: 6px; font-size: 14.5px; }
+  .avis p { margin: 0; overflow-wrap: anywhere; }
+  .etoiles-avis { color: #D98E04; letter-spacing: 1px; }
   .li-bloc { border: 1px solid var(--line); border-radius: 12px; padding: 12px; margin-top: 10px; background: #fff; display: flex; flex-direction: column; gap: 8px; }
   .li-tete { display: flex; flex-wrap: wrap; gap: 4px 10px; align-items: baseline; }
   .li-etat { font-size: 12.5px; font-weight: 700; padding: 2px 9px; border-radius: 999px; background: #F4F5FA; color: var(--muted); }
@@ -612,7 +619,7 @@ const actionLue = (a) => (a === 'autre' ? 'À faire' : LIB_ACTION[a] || 'Relance
 const LIB_ACTIVITE = {
   note: 'Note', appel: 'Appel', appel_sans_reponse: 'Appel sans réponse', email_envoye: 'Email envoyé',
   email_recu: 'Réponse reçue', brouillon: 'Brouillon Gmail', rdv: 'Rendez-vous', sms: 'SMS',
-  relance_decalee: 'Relance déplacée', statut: 'Statut', import: 'Import', linkedin: 'LinkedIn',
+  relance_decalee: 'Relance déplacée', statut: 'Statut', import: 'Import', linkedin: 'LinkedIn', avis: 'Avis', paiement: 'Paiement',
 };
 const LIB_SOURCE = {
   pomolow: 'Pomolow', gmail: 'Gmail', hubspot: 'HubSpot', agenda: 'Agenda', fathom: 'Fathom',
@@ -629,6 +636,9 @@ const ERREURS = {
   gmail_mauvaise_boite: "La boîte reliée n'est pas gabriel@ia-entrepreneur.fr : rien n'est parti.",
   gmail_envoi: "Gmail a refusé le message : rien n'est parti.",
   trop_de_pieces: "5 pièces jointes au plus : rien n'est parti.",
+  lien_google_invalide: "Ce n'est pas un lien Google (g.page, maps.app.goo.gl ou google.com).",
+  avis_sans_accord: "La personne n'a pas accepté d'être citée : l'avis reste dans le CRM.",
+  avis_pas_positif: 'Seuls les avis à 4 ou 5 sur 5 vont sur le site.',
   profil_linkedin_absent: "Il manque l'adresse du profil LinkedIn sur ce contact.",
   deja_en_file: 'Déjà en file : ton Mac va l\'envoyer. Annule-le d\'abord pour le modifier.',
   deja_parti: 'Déjà parti : impossible de l\'annuler.',
@@ -984,6 +994,7 @@ function vueJour() {
     S.dusDuJour = { tout: dus.map((l) => l.id), email: emails.map((l) => l.id), appel: appels.map((l) => l.id), autre: autres.map((l) => l.id) };
   }
   h += barreLinkedin();
+  h += blocPaiements();
   h += blocATrier();
   S.ecartesEnBas = blocEcartes();
   if (retard.length) h += `<h2 class="groupe retard" id="g-retard">En retard <span>${retard.length}</span></h2><div class="grille">${retard.map((l) => carte(l)).join('')}</div>`;
@@ -1161,6 +1172,7 @@ function rendreFiche() {
       </div>
     </section>
     ${blocRecap(l)}
+    ${l.type === 'formateur' ? '' : blocApresFormation(l)}
     ${l.type === 'formateur' ? blocDossierFormateur(l) : blocProgramme(l)}
     <section class="bloc">
       <h3>Contacts <button type="button" class="btn petit" data-act="contact-nouveau">Ajouter</button></h3>
@@ -2695,6 +2707,141 @@ function synchroDiscrete() {
   }).catch(() => {});
 }
 
+/* ----- Après la formation : facture, paiement, avis ----- */
+// Gabriel, 09/11 : « une tâche qui me demande de vérifier que j'ai été payé, en faisant le lien avec mon agenda ou un
+// échange de mail » ; « un email post formation, d'avis (facultatif) ; si avis positif on le met sur le site, et on
+// propose nos services par la suite ». Le CRM ne voit pas le compte : il dit quand vérifier, Gabriel confirme.
+const avisDe = (leadId) => (D.avis || []).filter((a) => a.lead_id === leadId);
+const etoiles = (n) => '★★★★★'.slice(0, n) + '☆☆☆☆☆'.slice(0, 5 - n);
+// La fin de la formation : la date du suivi client, sinon le dernier RDV « formation » de l'agenda.
+function finFormation(l) {
+  if (l.formation_fin) return { date: l.formation_fin, source: 'suivi client' };
+  const d = activitesDe(l.id).filter((a) => a.type === 'rdv' && a.meta && /^\d{4}-\d{2}-\d{2}$/.test(a.meta.date_rdv || '') && /formation/i.test(a.resume || '')).map((a) => a.meta.date_rdv).sort().pop();
+  return d ? { date: d, source: 'ton agenda' } : null;
+}
+const echeanceParDefaut = (l, jour = aujourdhui()) => prochainOuvre(ajouterJours(jour, l.financeur ? 60 : 30));
+function paiementsDuJour() {
+  const t = aujourdhui();
+  const aVerifier = D.leads.filter((l) => !l.archive && l.facture_le && !l.paye_le && ((l.facture_echeance && l.facture_echeance <= t) || l.paiement_annonce));
+  const aFacturer = D.leads.filter((l) => {
+    if (l.archive || l.facture_le || l.paye_le || !(l.type === 'client' || l.suivi) || ['facturee', 'payee'].includes(l.suivi)) return false;
+    const f = finFormation(l);
+    return Boolean(f && f.date < t);
+  });
+  return { aVerifier, aFacturer };
+}
+function blocPaiements() {
+  const { aVerifier, aFacturer } = paiementsDuJour();
+  if (!aVerifier.length && !aFacturer.length) return '';
+  const verifier = (l) => `<article class="paiement" data-paiement="${l.id}">
+      <p><b>${esc(l.entreprise)}</b> <span class="meta">facture du ${esc(dateCourte(l.facture_le))}${l.facture_objet ? `, « ${esc(l.facture_objet)} »` : ''}${l.financeur ? `, payée par ${esc(l.financeur)}` : ''}</span></p>
+      <p>${l.paiement_annonce ? `Paiement annoncé : ${esc(l.paiement_annonce)}. Vérifie sur ton compte qu'il est arrivé.` : `Échéance ${esc(quand(l.facture_echeance))} : vérifie sur ton compte que le paiement est arrivé.`}</p>
+      <div class="actions"><button type="button" class="btn petit primaire" data-pay="ok">C'est payé</button><button type="button" class="btn petit" data-pay="pas">Pas encore : revoir dans 7 jours</button><button type="button" class="btn petit" data-pay="relancer">Relancer par email</button>${l.facture_fil ? '<button type="button" class="btn petit lien" data-pay="voir">Voir l\'email de la facture</button>' : ''}</div>
+    </article>`;
+  const facturer = (l) => { const f = finFormation(l); return `<article class="paiement" data-paiement="${l.id}">
+      <p><b>${esc(l.entreprise)}</b> <span class="meta">formation finie le ${esc(dateCourte(f.date))} (${esc(f.source)})</span></p>
+      <p>Aucune facture repérée dans tes emails envoyés : à facturer, ou dis-le si c'est déjà fait.</p>
+      <div class="actions"><button type="button" class="btn petit primaire" data-pay="facture">Facture envoyée</button>${emailDe(l) ? '<button type="button" class="btn petit" data-pay="ecrire">Écrire</button>' : ''}</div>
+    </article>`; };
+  return `<h2 class="groupe" id="g-paiements">Paiements <span>${aVerifier.length + aFacturer.length}</span></h2>
+    <p class="sous-titre">Le CRM ne voit pas ton compte : il te dit quand vérifier, d'après les factures repérées dans tes emails, les paiements annoncés et ton agenda.</p>
+    <div class="paiements">${aVerifier.map(verifier).join('')}${aFacturer.map(facturer).join('')}</div>`;
+}
+function blocApresFormation(l) {
+  const avis = avisDe(l.id);
+  if (!(l.type === 'client' || l.suivi || avis.length || l.facture_le)) return '';
+  const demande = (D.demandes_avis || []).find((d) => d.lead_id === l.id);
+  const etat = l.paye_le ? `Payé le ${dateCourte(l.paye_le)}${l.facture_le ? ` (facture du ${dateCourte(l.facture_le)})` : ''}.`
+    : l.facture_le ? `Facture envoyée le ${dateCourte(l.facture_le)}. Paiement à vérifier ${quand(l.facture_echeance)}.${l.paiement_annonce ? ` Annoncé : ${l.paiement_annonce}.` : ''}`
+    : 'Pas encore de facture repérée dans tes emails.';
+  const ligne = (a) => {
+    const qui = [a.nom, a.fonction, a.entreprise].filter(Boolean).join(', ') || 'Un participant (anonyme)';
+    const publiable = a.accord_publication && a.note >= 4;
+    return `<li class="avis" data-avis="${a.id}">
+      <p><span class="etoiles-avis" aria-label="${a.note} sur 5">${etoiles(a.note)}</span> <b>${a.note}/5</b> · ${esc(qui)} <span class="meta">${esc(instantLisible(a.created_at))}</span></p>
+      ${a.utile ? `<p><span class="meta">Utile :</span> ${esc(a.utile)}</p>` : ''}
+      ${a.ameliorer ? `<p><span class="meta">À améliorer :</span> ${esc(a.ameliorer)}</p>` : ''}
+      ${a.statut === 'publie' ? `<p class="meta">Publié sur le site le ${esc(instantLisible(a.publie_le))}.</p><div class="actions"><button type="button" class="btn petit" data-avis-retirer>Retirer du site</button></div>`
+        : publiable ? `<label class="champ">Texte publié sur le site (corrige une faute si besoin, sans changer le sens)<textarea data-avis-texte maxlength="1200">${esc(a.texte_publie || a.utile || '')}</textarea></label><div class="actions"><button type="button" class="btn petit primaire" data-avis-publier>Publier sur le site</button></div>`
+        : `<p class="meta">${a.note <= 3 ? 'Avis mitigé : à ne pas publier, appelle la personne.' : a.accord_publication ? '' : "N'a pas accepté d'être cité : il reste ici."}</p>`}
+    </li>`;
+  };
+  return `<section class="bloc apres-formation" data-paiement="${l.id}">
+    <h3>Facture, paiement et avis</h3>
+    <p>${esc(etat)}</p>
+    <div class="actions">${!l.facture_le ? '<button type="button" class="btn petit" data-pay="facture">Facture envoyée</button>' : ''}${l.facture_le && !l.paye_le ? '<button type="button" class="btn petit primaire" data-pay="ok">C\'est payé</button>' : ''}${emailDe(l) ? `<button type="button" class="btn petit" data-pay="avis">${demande ? 'Redemander un avis' : 'Demander un avis'}</button>` : ''}</div>
+    ${demande ? `<p class="meta">Avis demandé le ${esc(instantLisible(demande.created_at))}. Le lien reste valable jusqu'au ${esc(dateCourte(String(demande.expire_le).slice(0, 10)))}.</p>` : ''}
+    ${avis.length ? `<ul class="avis-liste">${avis.map(ligne).join('')}</ul>` : ''}
+  </section>`;
+}
+async function demanderAvis(leadId) {
+  const r = await api('POST', { op: 'avis_demande', lead_id: leadId });
+  if (!D.demandes_avis) D.demandes_avis = [];
+  D.demandes_avis.unshift(r.demande);
+  const lien = `${location.origin}/avis/#${r.jeton}`;
+  const c = contactsDe(leadId).find((x) => x.email && x.principal) || contactsDe(leadId).find((x) => x.email) || null;
+  ouvrirEmail(leadId, c ? c.id : undefined);
+  const nouveau = $('#modale [data-nouveau]');
+  if (nouveau && !nouveau.hidden) nouveau.click();
+  const el = $('#modale form').elements;
+  const sig = (D.reglages.signature || SIGNATURE_DEFAUT).trim();
+  el.objet.value = 'Votre avis sur la formation';
+  el.corps.value = `${salutation(c)}\n\nMerci encore pour la formation. Pour l'améliorer, votre avis compte : il prend deux minutes.\n${lien}\n\nVous pouvez transférer ce lien aux participants : chacun peut répondre.\n\nBonne journée,\n\n${sig}`;
+}
+function ouvrirFactureEnvoyee(l) {
+  ouvrirModale(`<h2>Facture envoyée : ${esc(l.entreprise)}</h2>
+    <div class="deux">${champ('Envoyée le', `<input type="date" name="date" value="${esc(aujourdhui())}" max="${esc(aujourdhui())}">`)}${champ('Paiement à vérifier le', `<input type="date" name="echeance" value="${esc(echeanceParDefaut(l))}">`, l.financeur ? `60 jours : ${esc(l.financeur)} paie.` : '30 jours après la facture.')}</div>
+    ${piedFormulaire('<button type="submit" class="btn primaire">Enregistrer</button>')}`, (form) => {
+    brancherAnnuler(form);
+    form.addEventListener('submit', (ev) => {
+      ev.preventDefault();
+      soumettre(form, async () => {
+        const r = await api('POST', { op: 'facture_envoyee', lead_id: l.id, date: form.elements.date.value, echeance: form.elements.echeance.value });
+        remplacerLead(r.lead); await charger(); fermerModale(); rendre(); if (S.fiche) rendreFiche();
+        toast(`Paiement à vérifier le ${dateCourte(r.lead.facture_echeance)}.`);
+      });
+    });
+  });
+}
+document.addEventListener('click', async (ev) => {
+  const b = ev.target.closest('[data-pay], [data-avis-publier], [data-avis-retirer]');
+  if (!b) return;
+  ev.preventDefault();
+  const id = (b.closest('[data-paiement]') || {}).dataset?.paiement;
+  const l = id && IDX.lead.get(id);
+  try {
+    if (b.hasAttribute('data-avis-publier') || b.hasAttribute('data-avis-retirer')) {
+      const li = b.closest('[data-avis]');
+      const publier = b.hasAttribute('data-avis-publier');
+      const r = await api('POST', { op: publier ? 'avis_publier' : 'avis_retirer', id: li.dataset.avis, texte: publier ? $('[data-avis-texte]', li).value : undefined });
+      await charger(); rendre(); if (S.fiche) rendreFiche();
+      toast(publier ? 'Avis publié sur le site. La suite est prévue dans une semaine.' : 'Avis retiré du site.');
+      return r;
+    }
+    if (!l) return;
+    const quoi = b.dataset.pay;
+    if (quoi === 'facture') return ouvrirFactureEnvoyee(l);
+    if (quoi === 'avis') return await demanderAvis(l.id);
+    if (quoi === 'ecrire') return ouvrirEmail(l.id);
+    if (quoi === 'voir') return ouvrirFilSeul(l.facture_fil, `Facture : ${l.entreprise}`);
+    if (quoi === 'relancer') {
+      const c = contactsDe(l.id).find((x) => x.email) || null;
+      ouvrirEmail(l.id, c ? c.id : undefined);
+      const nouveau = $('#modale [data-nouveau]');
+      if (nouveau && !nouveau.hidden) nouveau.click();
+      const el = $('#modale form').elements;
+      el.objet.value = `Facture du ${dateCourte(l.facture_le)}`;
+      el.corps.value = `${salutation(c)}\n\nSauf erreur de ma part, je n'ai pas encore reçu le règlement de la facture du ${dateCourte(l.facture_le)}${l.facture_objet ? ` (« ${l.facture_objet} »)` : ''}. Pouvez-vous me dire où il en est ?\n\nMerci d'avance,\n\n${(D.reglages.signature || SIGNATURE_DEFAUT).trim()}`;
+      return null;
+    }
+    b.disabled = true;
+    const r = await api('POST', quoi === 'ok' ? { op: 'paiement_recu', lead_id: l.id } : { op: 'paiement_decaler', lead_id: l.id, jours: 7 });
+    remplacerLead(r.lead); await charger(); rendre(); if (S.fiche) rendreFiche();
+    toast(quoi === 'ok' ? `${l.entreprise} : payé, c'est noté.` : `${l.entreprise} : on revérifie le ${dateCourte(r.lead.facture_echeance)}.`);
+  } catch (e) { b.disabled = false; toast(e.message); }
+  return null;
+});
+
 /* ----- LinkedIn ----- */
 
 const LINKEDIN_RE = /^https:\/\/([a-z]{2,3}\.)?linkedin\.com\/in\/[^\s"'<>]+$/;
@@ -3730,6 +3877,8 @@ function ouvrirReglages() {
   ouvrirModale(`<h2>Réglages</h2>
     ${champ('Signature des emails', `<textarea name="signature">${esc(D.reglages.signature || SIGNATURE_DEFAUT)}</textarea>`, 'Ajoutée en bas de chaque email écrit depuis le CRM.')}
     <div><button type="submit" class="btn primaire">Enregistrer la signature</button></div>
+    ${champ('Lien pour laisser un avis Google', `<input type="url" name="lien_google" value="${esc(D.reglages.lien_avis_google || '')}" placeholder="https://g.page/r/…/review">`, "Dans ta fiche Google Business : « Demander des avis », copie le lien. Il est proposé à toutes les personnes qui répondent à une demande d'avis.")}
+    <div><button type="button" class="btn" data-lien-google>Enregistrer le lien Google</button></div>
     <div class="alerte">Rythme des relances tant que personne ne répond : 3 jours après le premier contact, puis 7, puis 14, puis une prise de nouvelles tous les 3 mois. Les week-ends et jours fériés sont sautés. Tu peux toujours décaler à la main.</div>
     ${D.gmail ? `<fieldset><legend>Boîte et agenda</legend>
       <p class="aide">Synchronisés toutes les 15 minutes. Dernière lecture de la boîte : ${D.reglages.synchro_gmail && D.reglages.synchro_gmail.le ? esc(instantLisible(D.reglages.synchro_gmail.le)) : 'jamais'}.</p>
@@ -3752,6 +3901,13 @@ function ouvrirReglages() {
       });
     });
     $('[data-export="csv"]', form).addEventListener('click', () => exporterCsv());
+    $('[data-lien-google]', form).addEventListener('click', async () => {
+      try {
+        const r = await api('POST', { op: 'reglage', cle: 'lien_avis_google', valeur: form.elements.lien_google.value.trim() });
+        D.reglages.lien_avis_google = r.reglage.valeur;
+        toast('Lien Google enregistré.');
+      } catch (e) { montrerErreur(form, e.message, form.elements.lien_google); }
+    });
     const caseRappel = $('[data-rappel]', form);
     if (caseRappel) caseRappel.addEventListener('change', async () => {
       try {
@@ -3829,7 +3985,7 @@ function tacheSuivi(l, k, d = {}) {
     }
     case 'convocations': return tache(7, 'autre', 'Formation finie ? Récupérer les émargements et les évaluations, puis passer à « Formation terminée ».', fin && fin >= t ? dansJours(1, fin) : null);
     case 'formation_terminee': return tache(1, 'autre', 'Envoyer la facture avec les attestations et les émargements (au financeur ou au client).');
-    case 'facturee': return tache(30, 'autre', "Vérifier le paiement ; relancer s'il n'est pas arrivé.");
+    case 'facturee': return tache(2, 'email', "Demander son avis sur la formation (« Demander un avis » sur la fiche, facultatif), puis proposer la suite. Le paiement se vérifie dans « Paiements » à l'échéance.");
     case 'payee': return tache(90, 'email', 'Évaluation à froid de la formation, et proposer la suite (niveau suivant).');
     default: return {};
   }
@@ -3884,6 +4040,9 @@ async function changerSuivi(leadId, k, { donnees = null, vocal = null } = {}) {
   }
   d = d || {};
   const maj = { suivi: k || null, ...d };
+  // Facturée ou payée à la main : la facture et le paiement suivent (bloc Paiements).
+  if (k === 'facturee' && !l.facture_le) Object.assign(maj, { facture_le: aujourdhui(), facture_echeance: echeanceParDefaut({ ...l, ...d }) });
+  if (k === 'payee' && !l.paye_le) Object.assign(maj, { paye_le: aujourdhui(), paiement_annonce: null });
   if (k) {
     Object.assign(maj, tacheSuivi(l, k, d), { relances_sans_reponse: 0 });
     if (l.statut !== 'gagne') maj.statut = 'gagne';

@@ -2672,6 +2672,30 @@
 
       </div>
     </div>
+    <script>
+    // Les témoignages publiés depuis le CRM (avis recueillis après une formation, publiés avec l'accord de la personne).
+    (() => {
+      const grille = document.querySelector('#temoignages .temoignages-grid');
+      const intro = document.querySelector('#temoignages .section-sub');
+      if (!grille || !window.fetch) return;
+      const txt = (t) => { const s = document.createElement('span'); s.textContent = t; return s.innerHTML; };
+      fetch('/api/avis?publies=1').then((r) => (r.ok ? r.json() : { avis: [] })).then(({ avis }) => {
+        if (!avis || !avis.length) return;
+        if (intro) intro.textContent = "★★★★★ 5/5 sur 14 avis Google, et des témoignages de clients recueillis après leur formation, publiés avec leur accord.";
+        for (const a of avis.slice(0, 6)) {
+          const init = a.nom.split(/\s+/).map((m) => m[0] || '').join('').slice(0, 2).toUpperCase();
+          const d = a.date.split('-').reverse().join('/');
+          const carte = document.createElement('div');
+          carte.className = 'temoignage-card';
+          carte.innerHTML = `<div class="quote-icon">"</div><div class="stars" aria-label="${a.note} sur 5">${'<span class="star">★</span>'.repeat(a.note)}</div>
+            <p class="temoignage-text">"${txt(a.texte)}"</p>
+            <div class="temoignage-author"><div class="author-avatar" style="background:rgba(16,185,129,0.15);color:var(--accent);">${txt(init)}</div>
+            <div class="author-info"><strong>${txt(a.nom)}</strong><span>${txt([a.fonction, a.entreprise].filter(Boolean).join(', '))}</span><span style="display:block;margin-top:2px;font-size:.78rem;opacity:.75">Recueilli après la formation, le ${txt(d)}</span></div></div>`;
+          grille.appendChild(carte);
+        }
+      }).catch(() => {});
+    })();
+    </script>
   </section>
 
   <!-- ── Annuaire des IA ──────────────────────────────────────── -->

@@ -11,6 +11,7 @@ Disallow: /.DS_Store
 Disallow: /quiz/
 Disallow: /crm/
 Disallow: /espace-formateur/
+Disallow: /avis/
 Disallow: /rdv-confirme.html
 Disallow: /rendez-vous.html
 Disallow: /supabase/
