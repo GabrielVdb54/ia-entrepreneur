@@ -2852,7 +2852,7 @@ const ETAPES_LINKEDIN = [
   ['invitation', 'Invitation envoyée', 3, "LinkedIn : voir si l'invitation est acceptée"],
   ['acceptee', 'Invitation acceptée', 1, 'LinkedIn : envoyer le message 1'],
   ['message', 'Message envoyé', 4, 'LinkedIn : relance si pas de réponse'],
-  ['relance', 'Relance envoyée', 4, 'LinkedIn : dernier message (30 minutes, sinon je n\'insiste pas), puis on arrête'],
+  ['relance', 'Relance envoyée', 4, 'LinkedIn : dernier message (FindIA), puis on arrête'],
   ['reponse', 'Réponse reçue', 1, 'LinkedIn : répondre'],
   ['autre', 'Autre', null, ''],
 ];
@@ -2915,7 +2915,7 @@ function ouvrirLinkedin(leadId) {
 // détecte et dans les tâches du jour j'envoie le message ». Gabriel valide ici ; son Mac envoie (MCP LinkedIn) et,
 // chaque matin, relève les acceptations et les réponses.
 const LI_OUVERTS = ['brouillon', 'a_envoyer', 'en_cours', 'echec', 'a_verifier'];
-const LIB_LI = { invitation: 'Invitation', message: 'Message 1', relance: 'Relance', dernier: 'Dernier message', reponse: 'Réponse' };
+const LIB_LI = { invitation: 'Invitation', message: 'Message 1', relance: 'Relance', findia: 'Dernier message (FindIA)', reponse: 'Réponse' };
 const ETAT_LI = { brouillon: 'À valider', a_envoyer: 'En file : ton Mac l\'envoie bientôt', en_cours: 'Ton Mac l\'envoie…', envoye: 'Envoyé', echec: 'Pas parti', a_verifier: 'À vérifier sur LinkedIn', annule: 'Annulé' };
 const actionsLi = () => D.linkedin || [];
 const contactParId = (id) => (D.contacts || []).find((x) => x.id === id) || null;
@@ -2936,8 +2936,8 @@ function etapeLiSuivante(c) {
   const faits = activitesDe(c.lead_id).filter((a) => a.type === 'linkedin' && a.contact_id === c.id && a.meta).map((a) => a.meta.etape);
   if (faits[0] === 'reponse_recue') return 'reponse';
   if (c.linkedin_etat !== 'relation' && !faits.includes('message') && !faits.includes('acceptee')) return 'invitation';
-  if (faits.includes('dernier')) return null; // séquence terminée
-  if (faits.includes('relance')) return 'dernier';
+  if (faits.includes('findia')) return null; // séquence terminée : FindIA ne repart pas une deuxième fois
+  if (faits.includes('relance')) return 'findia';
   if (faits.includes('message')) return 'relance';
   return 'message';
 }

@@ -2097,14 +2097,13 @@ async function traiterEntrant(corps) {
 // et vérifie chaque matin qui a accepté ou répondu. Le serveur ne parle jamais à LinkedIn : il tient la file, le
 // Mac (robot local, MCP LinkedIn, clé X-Cle-Robot) l'exécute et rend compte.
 const PROFIL_LI_RE = /^https:\/\/([a-z]{2,3}\.)?linkedin\.com\/in\/[^\s"'<>]+$/;
-const ETAPES_LI = ['invitation', 'message', 'relance', 'dernier', 'reponse'];
-const LIB_ETAPE_LI = { invitation: 'Invitation', message: 'Message 1', relance: 'Relance', dernier: 'Dernier message', reponse: 'Réponse' };
+const ETAPES_LI = ['invitation', 'message', 'relance', 'findia', 'reponse'];
+const LIB_ETAPE_LI = { invitation: 'Invitation', message: 'Message 1', relance: 'Relance', findia: 'Dernier message (FindIA)', reponse: 'Réponse' };
 const OUVERTS_LI = ['brouillon', 'a_envoyer', 'en_cours', 'echec', 'a_verifier'];
 // Les règles d'écriture de la prospection (mémoire du 06/11) : un filet, en plus des consignes de rédaction.
 const INTERDITS_LI = [
   [/(sans|z[ée]ro)\s+reste\s+[àa]\s+charge/i, '« reste à charge »'], [/pris en charge [àa] 100|100\s?%/i, '« 100 % »'], [/\bCPF\b/, 'CPF'],
   [/certifiante/i, '« certifiante »'], [/\bRS\s?\d{4}\b/i, 'un code de certification'], [/\bROI\b|retour sur investissement/i, 'le ROI'], [/€|\d\s?euros?\b/i, 'un prix'],
-  [/gratuit/i, '« gratuit »'], // plus aucune exception depuis l'abandon de FindIA (Gabriel, 09/11/2026)
 ];
 const QUOTA_MESSAGES_LI = 20;
 const quotaInvitationsLi = (jour) => (jour <= '2026-11-20' ? 10 : 15); // 2 premières semaines au rythme doux, puis 15 au plus
@@ -2117,6 +2116,7 @@ function verifierTexteLi(etape, texte) {
   else if (t.length > 1900) throw new Refus('message_trop_long');
   if (/[\t\u0000-\u0008\u000b-\u001f\u007f\u0085\u2028\u2029]/.test(t)) throw new Refus('caractere_refuse');
   for (const [re, quoi] of INTERDITS_LI) if (re.test(t)) throw new Refus(`texte_interdit:${quoi}`);
+  if (etape !== 'findia' && /gratuit/i.test(t)) throw new Refus('texte_interdit:« gratuit »');
   return t || null;
 }
 const nomContactLi = (c) => [c?.prenom, c?.nom].filter(Boolean).join(' ').trim() || 'ce contact';
@@ -2159,7 +2159,7 @@ async function journalLi(l, c, etape, resume, contenu = null, extra = {}) {
 // rédiger le message automatiquement et que je valide ; une fois validé plus de 10 messages sans modif, on enverra
 // automatiquement ». Les réponses à un prospect qui a écrit restent toujours à valider.
 const SEUIL_CONFIANCE_LI = 10;
-const ETAPES_AUTO_LI = ['message', 'relance', 'dernier'];
+const ETAPES_AUTO_LI = ['message', 'relance', 'findia'];
 const normeLi = (t) => String(t || '').replace(/\s+/g, ' ').trim();
 async function confianceLi() { return (await lireReglage('linkedin_confiance')) || { serie: 0, auto: false }; }
 
@@ -2199,7 +2199,7 @@ Selon l'étape :
   4) Une question simple sur leur façon de faire aujourd'hui, à deux options dont une qui ne met pas la personne en défaut (Gabriel : « ou avez-vous une autre solution ? »). Modèle : « Chez X, c'est encore surtout fait à la main, ou vous avez déjà trouvé une solution ? ». Une question qui oppose déjà deux façons de faire reste telle quelle (« c'est une personne dédiée qui s'en charge, ou chacun gère ses dossiers ? »).
   Pas de demande de rendez-vous, pas de lien. Exemple validé par Gabriel : « Bonjour Quentin, dans votre post sur les 10 ans de FVP Courtage, vous parliez de « tout le plaisir de l'administratif » à vos débuts. Avec les recrutements et le développement du cabinet depuis, l'administratif a sûrement grandi lui aussi. Je forme des équipes de PME du Grand Est à l'alléger grâce à l'IA, avec des formations éligibles à votre budget formation. Aujourd'hui, c'est une personne dédiée qui s'en charge chez vous, ou chacun gère ses dossiers ? » Ne recopie pas cet exemple : le sujet de la déduction (l'administratif, les devis, les comptes rendus, le recrutement…) découle du fait que tu as trouvé.
 - relance (après 4 jours sans réponse) : 200 à 400 caractères. Reprend la question autrement. Redit en une phrase que les formations sont éligibles à leur budget formation (peut ajouter « nous montons le dossier avec votre OPCO »). Une seule demande : un échange de 30 minutes, avec deux créneaux précis dans les trois jours ouvrés qui suivent la date du jour.
-- dernier (dernier message, 8 jours ouvrés après la relance, toujours sans réponse) : 200 à 400 caractères. Reprend la proposition de 30 minutes avec deux créneaux précis dans les trois jours ouvrés qui suivent la date du jour, rappelle en une phrase que les formations sont éligibles à leur budget formation, et laisse une porte de sortie polie (« si ce n'est pas le moment, je n'insiste pas »). Pas de lien (Gabriel, 09/11/2026 : plus jamais FindIA).
+- findia (dernier message, 8 jours après la relance, seulement si la personne n'a répondu à rien) : 200 à 400 caractères. Apporte quelque chose sans rien demander : FindIA, l'outil gratuit du site qui dit quelle IA choisir pour quel usage (https://ia-entrepreneur.fr/meilleures-ia.html). Laisse partir poliment (« si ce n'est pas le moment, aucun souci »).
 - reponse : répond à son dernier message, fourni dans la fiche, simplement, en reprenant ce qu'il dit. S'il pose une question, réponds-y. S'il est intéressé, propose 30 minutes avec deux créneaux précis dans les trois jours ouvrés. S'il dit qu'il a déjà un prestataire, demande « vous en êtes satisfait à combien sur 10 ? ». S'il dit non, remercie et laisse la porte ouverte.
 - invitation : une note de 200 caractères au plus, une phrase sur eux et une question, sans présentation ni offre.
 
@@ -2207,7 +2207,8 @@ Règles :
 - Vouvoiement, sauf si la consigne demande le tutoiement. Commence par « Bonjour {prénom}, » si le prénom est connu. Finis par « Gabriel » sur sa propre ligne (pas pour une invitation).
 - Court, direct, centré sur la personne et son entreprise, pas sur IA-Entrepreneur : au plus une ligne sur Gabriel (temps 3 du message 1). Jamais « nous sommes… » ni « je suis… » en ouverture.
 - Jamais le prénom d'un salarié ou d'un tiers, même s'il apparaît dans un post ou dans la fiche.
-- Interdits : tout prix ou montant, chiffre de gain ou de ROI, « sans reste à charge », « zéro reste à charge », « pris en charge à 100 % », « gratuit », CPF, « certifiante », code de certification, mots techniques (LLM, prompt, agent, automatisation n8n).
+- FindIA et son lien seulement à l'étape findia : jamais dans le message 1, la relance ou une réponse (Gabriel, 09/11/2026).
+- Interdits : tout prix ou montant, chiffre de gain ou de ROI, « sans reste à charge », « zéro reste à charge », « pris en charge à 100 % », « gratuit » (sauf pour FindIA), CPF, « certifiante », code de certification, mots techniques (LLM, prompt, agent, automatisation n8n).
 - N'invente rien : seulement les faits de la fiche et de l'historique. Sans fait assez fort pour un message vraiment personnalisé, écris un message général assumé, construit sur son métier (Gabriel l'accepte) : ne force jamais un fait faible (la ville seule, un vieux post) pour avoir l'air de connaître la personne.
 - Pas de tiret long, pas d'emoji, pas de point d'exclamation.
 appuis : les faits de la fiche que tu as utilisés, en quelques mots chacun, avec leur source et leur date si elle est connue (« post sur les 10 ans du cabinet, il y a 5 semaines »).`;
@@ -2306,13 +2307,13 @@ async function appliquerEnvoiLi(a, { detail = '', statutMcp = '', resultat = nul
   await journalLi(l, c, a.etape, `${LIB_ETAPE_LI[a.etape]} envoyé${a.etape === 'relance' || a.etape === 'reponse' ? 'e' : ''} à ${nomContactLi(c)} sur LinkedIn (par ton Mac)`, a.texte);
   const maj = { dernier_contact: jour };
   if (a.etape === 'message') { maj.relances_sans_reponse = 0; if (l.statut === 'nouveau') maj.statut = 'contacte'; }
-  if (a.etape === 'relance' || a.etape === 'dernier') maj.relances_sans_reponse = (l.relances_sans_reponse || 0) + 1;
+  if (a.etape === 'relance' || a.etape === 'findia') maj.relances_sans_reponse = (l.relances_sans_reponse || 0) + 1;
   if (a.etape === 'reponse') maj.relances_sans_reponse = 0;
   const suite = {
     message: [dansJoursOuvres(4), 'autre', `LinkedIn : relancer ${prenom} s'il ne répond pas (message envoyé le ${dateCourte(jour)}).`],
     reponse: [dansJoursOuvres(4), 'autre', `LinkedIn : relancer ${prenom} s'il ne répond pas (réponse envoyée le ${dateCourte(jour)}).`],
-    relance: [dansJoursOuvres(8), 'autre', `LinkedIn : dernier message à ${prenom} (30 minutes, sinon je n'insiste pas), puis on arrête.`],
-    dernier: [dansJoursOuvres(90), 'autre', `Séquence LinkedIn terminée avec ${prenom} : prendre des nouvelles.`],
+    relance: [dansJoursOuvres(8), 'autre', `LinkedIn : dernier message à ${prenom} (FindIA), puis on arrête.`],
+    findia: [dansJoursOuvres(90), 'autre', `Séquence LinkedIn terminée avec ${prenom} : prendre des nouvelles.`],
   }[a.etape];
   if (suite) Object.assign(maj, { prochaine_relance: suite[0], prochaine_action: suite[1], prochaine_note: suite[2] });
   await majLeadLi(l.id, maj);
@@ -2407,7 +2408,7 @@ async function operationRobotLi(corps) {
       await majContactLi(c.id, { linkedin_etat: 'relation', linkedin_vu: texte });
       const fil = /^\/messaging\/thread\/[A-Za-z0-9=_-]+\/?$/.test(r.fil || '') ? `https://www.linkedin.com${r.fil}` : null;
       await journalLi(l, c, 'reponse_recue', `${nomContactLi(c)} t'a répondu sur LinkedIn`, texte, fil ? { fil_linkedin: fil } : {});
-      await sb(`iae_crm_linkedin?contact_id=eq.${c.id}&statut=in.(brouillon,a_envoyer)&etape=in.(message,relance,dernier)`, { methode: 'PATCH', corps: { statut: 'annule', detail: 'Il a répondu : la séquence s\'arrête.' }, prefer: 'return=minimal' });
+      await sb(`iae_crm_linkedin?contact_id=eq.${c.id}&statut=in.(brouillon,a_envoyer)&etape=in.(message,relance,findia)`, { methode: 'PATCH', corps: { statut: 'annule', detail: 'Il a répondu : la séquence s\'arrête.' }, prefer: 'return=minimal' });
       await preparerAvecClaude(c, l, 'reponse', { message: texte });
       const anna = /anna/i.test(l.source || '');
       await majLeadLi(l.id, { prochaine_relance: aujourdHuiParis(), prochaine_action: 'autre', prochaine_note: `LinkedIn : ${c.prenom || nomContactLi(c)} t'a répondu. Réponse proposée à relire.${anna ? ' Préviens Anna : elle a aussi cette entreprise dans ses listes.' : ''}`, relances_sans_reponse: 0, dernier_contact: aujourdHuiParis() });
@@ -2430,7 +2431,7 @@ async function operationRobotLi(corps) {
       if (bilan.suites >= 10) break;
       const [l] = (await sb(`iae_crm_leads?id=eq.${r.lead_id}&select=*`)).lignes;
       if (!l || l.archive || l.statut === 'perdu' || !l.prochaine_relance || l.prochaine_relance > aujourdHuiParis()) continue;
-      const etapeSuite = /^LinkedIn : relancer /.test(l.prochaine_note || '') ? 'relance' : /^LinkedIn : dernier message/.test(l.prochaine_note || '') ? 'dernier' : null;
+      const etapeSuite = /^LinkedIn : relancer /.test(l.prochaine_note || '') ? 'relance' : /^LinkedIn : dernier message/.test(l.prochaine_note || '') ? 'findia' : null;
       if (!etapeSuite) continue;
       const { lignes: ouverts } = await sb(`iae_crm_linkedin?contact_id=eq.${r.id}&statut=in.(${OUVERTS_LI.join(',')})&select=id&limit=1`);
       if (ouverts.length) continue;
