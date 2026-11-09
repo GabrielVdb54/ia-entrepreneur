@@ -10,6 +10,12 @@ Intra-entreprise et sur mesure (métier, cas réels et logiciels du client), gro
 - Niveau 3 : Automatisation & intégration (3 à 4 jours) : automatiser et intégrer soi-même des solutions IA liées au métier
 - Page : https://ia-entrepreneur.fr/formation-ia-entreprise.html
 
+### Où se déroulent les formations
+IA-Entrepreneur est installé à Nancy (5 rue Jacques Villermaux, 54000 Nancy). Les formations ont lieu dans les locaux du client ou à distance. En présentiel : Nancy et sa métropole, Metz et la Moselle, Strasbourg et l'Eurométropole. Ailleurs en France : en classe virtuelle, ou en présentiel avec un formateur de l'équipe installé dans la région.
+- Formation IA à Nancy : https://ia-entrepreneur.fr/formation-ia-nancy.html
+- Formation IA à Metz : https://ia-entrepreneur.fr/formation-ia-metz.html
+- Formation IA à Strasbourg : https://ia-entrepreneur.fr/formation-ia-strasbourg.html
+
 ### Formations thématiques (sur mesure, sur devis)
 - Formation IA et AI Act : l'article 4, applicable depuis le 2 février 2025, demande aux entreprises qui utilisent l'IA de prendre des mesures pour développer la maîtrise de l'IA de leur personnel ; depuis le règlement Digital Omnibus, c'est une obligation de moyens : https://ia-entrepreneur.fr/formation-ia-obligatoire-ai-act.html
 - Formation Claude en entreprise : documents longs, projets partagés, connecteurs (Google Drive, Microsoft 365, HubSpot), fichiers Excel, Word et PowerPoint : https://ia-entrepreneur.fr/formation-claude-entreprise.html
@@ -36,6 +42,7 @@ Intra-entreprise et sur mesure (métier, cas réels et logiciels du client), gro
 - NDA : 44 54 04871 54
 
 ## Contact
+- Adresse : 5 rue Jacques Villermaux, 54000 Nancy
 - Site : https://ia-entrepreneur.fr
 - Email : contact@ia-entrepreneur.fr
 - Prise de rendez-vous : https://ia-entrepreneur.fr/rendez-vous.html
