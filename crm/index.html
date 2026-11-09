@@ -2852,7 +2852,7 @@ const ETAPES_LINKEDIN = [
   ['invitation', 'Invitation envoyée', 3, "LinkedIn : voir si l'invitation est acceptée"],
   ['acceptee', 'Invitation acceptée', 1, 'LinkedIn : envoyer le message 1'],
   ['message', 'Message envoyé', 4, 'LinkedIn : relance si pas de réponse'],
-  ['relance', 'Relance envoyée', 4, 'LinkedIn : dernier message (FindIA), puis on arrête'],
+  ['relance', 'Relance envoyée', 4, 'LinkedIn : dernier message (30 minutes, sinon je n\'insiste pas), puis on arrête'],
   ['reponse', 'Réponse reçue', 1, 'LinkedIn : répondre'],
   ['autre', 'Autre', null, ''],
 ];
@@ -2915,7 +2915,7 @@ function ouvrirLinkedin(leadId) {
 // détecte et dans les tâches du jour j'envoie le message ». Gabriel valide ici ; son Mac envoie (MCP LinkedIn) et,
 // chaque matin, relève les acceptations et les réponses.
 const LI_OUVERTS = ['brouillon', 'a_envoyer', 'en_cours', 'echec', 'a_verifier'];
-const LIB_LI = { invitation: 'Invitation', message: 'Message 1', relance: 'Relance', findia: 'Dernier message (FindIA)', reponse: 'Réponse' };
+const LIB_LI = { invitation: 'Invitation', message: 'Message 1', relance: 'Relance', dernier: 'Dernier message', reponse: 'Réponse' };
 const ETAT_LI = { brouillon: 'À valider', a_envoyer: 'En file : ton Mac l\'envoie bientôt', en_cours: 'Ton Mac l\'envoie…', envoye: 'Envoyé', echec: 'Pas parti', a_verifier: 'À vérifier sur LinkedIn', annule: 'Annulé' };
 const actionsLi = () => D.linkedin || [];
 const contactParId = (id) => (D.contacts || []).find((x) => x.id === id) || null;
@@ -2936,7 +2936,8 @@ function etapeLiSuivante(c) {
   const faits = activitesDe(c.lead_id).filter((a) => a.type === 'linkedin' && a.contact_id === c.id && a.meta).map((a) => a.meta.etape);
   if (faits[0] === 'reponse_recue') return 'reponse';
   if (c.linkedin_etat !== 'relation' && !faits.includes('message') && !faits.includes('acceptee')) return 'invitation';
-  if (faits.includes('relance')) return 'findia';
+  if (faits.includes('dernier')) return null; // séquence terminée
+  if (faits.includes('relance')) return 'dernier';
   if (faits.includes('message')) return 'relance';
   return 'message';
 }
@@ -2975,6 +2976,7 @@ function blocLi(c) {
   const tete = `<div class="li-tete"><b>${esc(nom)}</b>${c.poste ? ` <span class="meta">${esc(c.poste)}</span>` : ''} <a href="${esc(c.linkedin)}" target="_blank" rel="noopener noreferrer">Profil</a>${a ? ` <span class="li-etat li-${a.statut}">${esc(ETAT_LI[a.statut])}</span>` : ''}</div>`;
   if (!a) {
     const etape = etapeLiSuivante(c);
+    if (!etape && c.linkedin_etat !== 'invitation_envoyee') return `<section class="li-bloc" data-li-contact="${c.id}">${tete}<p class="meta">Séquence terminée : dernier message envoyé, plus rien de prévu. Si la personne répond, ton Mac le verra le matin.</p></section>`;
     if (!etape) return `<section class="li-bloc" data-li-contact="${c.id}">${tete}<p class="meta">Invitation envoyée${c.linkedin_le ? ` le ${esc(dateCourte(c.linkedin_le.slice(0, 10)))}` : ''}. Ton Mac regarde chaque matin si elle est acceptée.</p></section>`;
     return `<section class="li-bloc" data-li-contact="${c.id}">${tete}<div class="actions"><button type="button" class="btn petit primaire" data-li-preparer="${etape}">${etape === 'invitation' ? 'Inviter sur LinkedIn (part tout seul)' : `Préparer : ${esc(LIB_LI[etape])}`}</button></div></section>`;
   }

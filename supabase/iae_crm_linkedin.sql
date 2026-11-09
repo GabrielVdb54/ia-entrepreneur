@@ -8,7 +8,7 @@ create table if not exists public.iae_crm_linkedin (
   lead_id uuid not null references public.iae_crm_leads(id) on delete cascade,
   contact_id uuid not null references public.iae_crm_contacts(id) on delete cascade,
   type text not null check (type in ('invitation', 'message')),
-  etape text not null check (etape in ('invitation', 'message', 'relance', 'findia', 'reponse')),
+  etape text not null check (etape in ('invitation', 'message', 'relance', 'dernier', 'reponse')),
   texte text check (texte is null or char_length(texte) <= 8000),
   statut text not null default 'brouillon' check (statut in ('brouillon', 'a_envoyer', 'en_cours', 'envoye', 'echec', 'a_verifier', 'annule')),
   valide_le timestamptz,
@@ -31,3 +31,8 @@ alter table public.iae_crm_contacts
 -- 09/11 : le texte tel que Claude l'a rédigé, pour savoir si Gabriel valide un message sans le modifier
 -- (après plus de 10 messages validés tels quels d'affilée, les messages partent seuls).
 alter table public.iae_crm_linkedin add column if not exists texte_claude text check (texte_claude is null or char_length(texte_claude) <= 8000);
+
+-- 09/11/2026 : plus jamais FindIA (Gabriel : « on envoie jamais vers findia »). L'étape devient « dernier » :
+-- 30 minutes avec deux créneaux, éligible au budget formation, porte de sortie polie, sans lien.
+alter table public.iae_crm_linkedin drop constraint if exists iae_crm_linkedin_etape_check;
+alter table public.iae_crm_linkedin add constraint iae_crm_linkedin_etape_check check (etape in ('invitation', 'message', 'relance', 'dernier', 'reponse'));
