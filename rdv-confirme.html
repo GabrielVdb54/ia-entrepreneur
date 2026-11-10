@@ -114,7 +114,7 @@
             <p id="mot">L'un de nos conseillers vous retrouve en visio pendant 30 minutes. Votre invitation vous indique avec qui. D'ici là, voici de quoi vous faire une idée de nos formations.</p>
           </div>
         </div>
-        <p class="infos">Vous allez recevoir une invitation par email, avec le lien de la visio. Besoin de changer de créneau ? Le lien pour replanifier se trouve dans cette invitation.</p>
+        <p class="infos">Vous allez recevoir une invitation par email, avec le lien de la visio. Besoin de changer de créneau ? Répondez simplement à cette invitation, nous trouverons un autre moment.</p>
       </div>
     </section>
 
@@ -239,6 +239,7 @@
     (function () {
       var CLOSERS = {
         axel: { nom: 'Axel Ouhadda', prenom: 'Axel', role: 'Conseiller formation IA', photo: '/images/signature/axel-ouhadda.png' },
+        dorian: { nom: 'Dorian Didiot', prenom: 'Dorian', role: 'Conseiller formation IA', photo: '/images/dorian-didiot.jpg' },
         gabriel: { nom: 'Gabriel Vanderbecken', prenom: 'Gabriel', role: 'Fondateur d\'IA-Entrepreneur', photo: '/images/signature/gabriel-vanderbecken.png' }
       };
       var rdv = {};
@@ -252,8 +253,8 @@
       var quand = new Date(rdv.date);
       if (rdv.date && !isNaN(quand.getTime())) {
         var jour = new Intl.DateTimeFormat('fr-FR', { weekday: 'long', day: 'numeric', month: 'long', timeZone: 'Europe/Paris' }).format(quand);
-        var heure = new Intl.DateTimeFormat('fr-FR', { hour: '2-digit', minute: '2-digit', timeZone: 'Europe/Paris' }).format(quand).replace(':', ' h ').replace(/^0/, '');
-        document.getElementById('date').textContent = jour.charAt(0).toUpperCase() + jour.slice(1) + ' à ' + heure + '30 minutes en visio';
+        var heure = new Intl.DateTimeFormat('fr-FR', { hour: '2-digit', minute: '2-digit', timeZone: 'Europe/Paris' }).format(quand).replace(':', ' h ').replace(/ h 00$/, ' h').replace(/^0/, '');
+        document.getElementById('date').textContent = jour.charAt(0).toUpperCase() + jour.slice(1) + ' à ' + heure + ', 30 minutes en visio';
       }
 
       var c = Object.prototype.hasOwnProperty.call(CLOSERS, rdv.closer) ? CLOSERS[rdv.closer] : null;
@@ -265,7 +266,7 @@
         img.src = c.photo; img.alt = c.nom; img.width = 104; img.height = 104;
         photos.appendChild(img);
         document.getElementById('nom').textContent = 'Vous avez rendez-vous avec ' + c.prenom;
-        document.getElementById('role').textContent = c.nom + '' + c.role;
+        document.getElementById('role').textContent = c.nom + ', ' + c.role;
         document.getElementById('mot').textContent = 'Merci pour votre réservation. Je vous retrouve en visio pendant 30 minutes. D\'ici là, voici de quoi vous faire une idée de nos formations.';
       }
     })();

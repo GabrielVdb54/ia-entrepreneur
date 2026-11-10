@@ -29,11 +29,45 @@
     .reservation p.appel{margin-top:-12px;font-size:0.95rem}
     .appel a{color:var(--primary);font-weight:700;white-space:nowrap}
     .appel a:hover{text-decoration:underline}
-    .calendrier{background:#fff;border:1px solid var(--border);border-radius:20px;overflow:hidden;min-height:640px}
-    .calendrier iframe{display:block}
+    .carte{background:#fff;border:1px solid var(--border);border-radius:20px;padding:26px 28px;max-width:760px}
+    .carte fieldset{border:0;margin:0 0 26px;padding:0;min-width:0}
+    .carte legend{font-size:1.05rem;font-weight:800;margin-bottom:12px;padding:0}
+    .carte legend small{font-weight:500;color:var(--muted);font-size:.85rem;margin-left:6px}
+    .puces{display:flex;flex-wrap:wrap;gap:8px}
+    .puce{position:relative}
+    .puce input{position:absolute;clip-path:inset(50%);width:1px;height:1px;margin:-1px;overflow:hidden;white-space:nowrap;border:0;padding:0}
+    .puce span{display:flex;flex-direction:column;align-items:center;justify-content:center;min-width:78px;min-height:48px;padding:8px 12px;border:1.5px solid rgba(10,15,44,.28);border-radius:12px;background:#fff;font-size:.95rem;font-weight:600;line-height:1.25;cursor:pointer;text-align:center;transition:border-color .15s,background .15s}
+    .puce span small{font-size:.78rem;font-weight:500;color:var(--muted)}
+    .puce input:checked+span{background:var(--primary);border-color:var(--primary);color:#fff}
+    .puce input:checked+span small{color:rgba(255,255,255,.85)}
+    .puce input:focus-visible+span{outline:3px solid #0b57d0;outline-offset:2px}
+    .puce span:hover{border-color:var(--primary)}
+    .heures-vide{color:var(--muted);font-size:.95rem}
+    .champs{display:grid;grid-template-columns:1fr 1fr;gap:14px 16px}
+    .champ{display:flex;flex-direction:column;gap:4px}
+    .champ.large{grid-column:1/-1}
+    .champ label{font-size:.9rem;font-weight:700}
+    .champ label .opt{font-weight:500;color:var(--muted)}
+    .champ input,.champ textarea{font:inherit;font-size:max(1rem,1em);padding:11px 12px;min-height:48px;border:1.5px solid #767676;border-radius:10px;background:#fff;color:var(--text);width:100%}
+    .champ textarea{min-height:88px;resize:vertical}
+    .champ input:focus-visible,.champ textarea:focus-visible{outline:3px solid #0b57d0;outline-offset:1px;border-color:#0b57d0}
+    .champ input:user-invalid{border-color:#B42318}
+    .piege{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
+    .recap{margin:0 0 16px;padding:12px 14px;border-radius:12px;background:var(--bg2);font-size:.97rem;font-weight:600}
+    .recap:empty{display:none}
+    .envoyer{display:inline-flex;align-items:center;justify-content:center;min-height:52px;padding:12px 26px;border:0;border-radius:12px;background:var(--primary);color:#fff;font:inherit;font-size:1.02rem;font-weight:800;cursor:pointer}
+    .envoyer:hover{background:#1230d9}
+    .envoyer:disabled{opacity:.6;cursor:wait}
+    .envoyer:focus-visible{outline:3px solid #0b57d0;outline-offset:2px}
+    .mention{font-size:.82rem!important;color:var(--muted);margin:12px 0 0!important}
+    .mention a{color:var(--primary);text-decoration:underline}
+    .etat{margin:0 0 14px;font-size:.97rem;color:var(--muted)}
+    .etat:empty{display:none}
+    .etat.erreur{color:#B42318;font-weight:600}
+    .etat button{font:inherit;font-weight:700;color:var(--primary);background:none;border:0;padding:0;text-decoration:underline;cursor:pointer}
     .programme-choisi{margin:0 0 18px;padding:14px 16px;border-radius:14px;background:rgba(16,185,129,.08);border:1px solid rgba(16,185,129,.3);font-size:.95rem;line-height:1.55}
     .programme-choisi b{display:block;font-size:1rem}
-    @media(max-width:560px){.container{padding:0 14px}.reservation{padding:28px 0 34px}}
+    @media(max-width:560px){.container{padding:0 14px}.reservation{padding:28px 0 34px}.carte{padding:20px 16px}.champs{grid-template-columns:1fr}.puce span{min-width:70px}.envoyer{width:100%}}
   </style>
 <link rel="stylesheet" href="/nav-dropdown.css"></head>
 <body>
@@ -52,9 +86,34 @@
         <p>30 minutes en visio avec un conseiller IA-Entrepreneur, pour faire le point sur l'usage de l'IA dans vos équipes et voir ce qui vous serait utile.</p>
         <p class="appel">Vous préférez en parler de vive voix ? <a class="tel-reveal" role="button" tabindex="0" data-tel="MzUgODIgMzEgNzUgNzA=" aria-label="Afficher le numéro de téléphone"> <span class="tel-value">Afficher le numéro</span></a></p>
         <p class="programme-choisi" id="programmeChoisi" hidden></p>
-        <div class="calendrier">
-          <div class="meetings-iframe-container" data-src="https://meetings-eu1.hubspot.com/gvanderbecken/rdv-decouverte?embed=true"></div>
-        </div>
+        <form class="carte" id="rdv" action="/api/rdv" method="POST">
+          <p class="etat" id="etat" role="status">Chargement des créneaux libres…</p>
+          <fieldset id="blocJours" hidden>
+            <legend>Le jour</legend>
+            <div class="puces" id="jours"></div>
+          </fieldset>
+          <fieldset id="blocHeures" hidden>
+            <legend>L'heure <small>(heure de Paris)</small></legend>
+            <div class="puces" id="heures"></div>
+          </fieldset>
+          <fieldset id="blocCoordonnees" hidden>
+            <legend>Vos coordonnées</legend>
+            <div class="champs">
+              <div class="champ"><label for="prenom">Prénom</label><input id="prenom" name="prenom" autocomplete="given-name" required maxlength="80" enterkeyhint="next" /></div>
+              <div class="champ"><label for="nom">Nom</label><input id="nom" name="nom" autocomplete="family-name" required maxlength="80" enterkeyhint="next" /></div>
+              <div class="champ"><label for="email">Email professionnel</label><input id="email" name="email" type="email" autocomplete="email" required maxlength="254" autocapitalize="none" autocorrect="off" spellcheck="false" enterkeyhint="next" /></div>
+              <div class="champ"><label for="telephone">Téléphone</label><input id="telephone" name="telephone" type="tel" autocomplete="tel" required maxlength="40" pattern="[0-9 +.\-]{9,40}" title="Votre numéro, avec 9 chiffres au moins" enterkeyhint="next" /></div>
+              <div class="champ large"><label for="entreprise">Entreprise</label><input id="entreprise" name="entreprise" autocomplete="organization" required maxlength="160" enterkeyhint="next" /></div>
+              <div class="champ large"><label for="message">Ce que vous aimeriez aborder <span class="opt">(facultatif)</span></label><textarea id="message" name="message" maxlength="2000" rows="3"></textarea></div>
+            </div>
+            <div class="piege" aria-hidden="true"><label for="site">Site</label><input id="site" name="_gotcha" tabindex="-1" autocomplete="off" /></div>
+          </fieldset>
+          <div id="blocEnvoi" hidden>
+            <p class="recap" id="recap" aria-live="polite"></p>
+            <button type="submit" class="envoyer" id="envoyer">Confirmer le rendez-vous</button>
+            <p class="mention">Vous recevez aussitôt l'invitation par email, avec le lien de la visio. Vos coordonnées servent à préparer ce rendez-vous (<a href="/politique-confidentialite.html">politique de confidentialité</a>).</p>
+          </div>
+        </form>
       </div>
     </section>
   </main>
@@ -81,28 +140,103 @@
       el.hidden = false;
     })();
   </script>
-  <script src="https://static.hsappstatic.net/MeetingsEmbed/ex/MeetingsEmbedCode.js"></script>
   <script>
-    // HubSpot prévient la page une fois le créneau réservé : on garde le closer attribué dans l'onglet, pas dans l'URL.
-    function traiterReservation(d) {
-      if (!d || !d.meetingBookSucceeded) return;
-      var reservation = (d.meetingsPayload || {}).bookingResponse || {};
-      var reponse = reservation.postResponse || {};
-      var organisateur = JSON.stringify(reponse.organizer || {}).toLowerCase();
-      var closer = organisateur.indexOf('axel') > -1 ? 'axel' : (organisateur.indexOf('gabriel') > -1 ? 'gabriel' : '');
-      try {
-        sessionStorage.setItem('rdv-ia-entrepreneur', JSON.stringify({
-          closer: closer,
-          prenom: (reponse.contact || {}).firstName || '',
-          date: (reservation.event || {}).dateTime || (reservation.event || {}).dateString || ''
-        }));
-      } catch (e) {}
-      if (programmeChoisi && window.gtag) { try { gtag('event', 'rdv_programme_type', { programme: programmeChoisi }); } catch (e) {} }
-      location.href = '/rdv-confirme.html';
-    }
-    window.addEventListener('message', function (e) {
-      if (/^https:\/\/meetings(-[a-z0-9]+)?\.hubspot\.com$/.test(e.origin)) traiterReservation(e.data);
-    });
+    // Prise de RDV en tour de rôle (10/11/2026) : /api/rdv donne les créneaux où au moins un conseiller
+    // (Axel, Dorian, Gabriel) est libre, puis pose le RDV dans l'agenda de celui qui reçoit le créneau.
+    (function () {
+      var form = document.getElementById('rdv'), etat = document.getElementById('etat');
+      var blocJours = document.getElementById('blocJours'), blocHeures = document.getElementById('blocHeures');
+      var blocCoord = document.getElementById('blocCoordonnees'), blocEnvoi = document.getElementById('blocEnvoi');
+      var jours = document.getElementById('jours'), heures = document.getElementById('heures');
+      var recap = document.getElementById('recap'), bouton = document.getElementById('envoyer');
+      var par = (new URLSearchParams(location.search).get('par') || '').toLowerCase().replace(/[^a-z]/g, '').slice(0, 20);
+      var parJour = {};
+      var fmtJourCle = new Intl.DateTimeFormat('fr-CA', { timeZone: 'Europe/Paris', year: 'numeric', month: '2-digit', day: '2-digit' });
+      var fmtSemaine = new Intl.DateTimeFormat('fr-FR', { timeZone: 'Europe/Paris', weekday: 'short' });
+      var fmtJour = new Intl.DateTimeFormat('fr-FR', { timeZone: 'Europe/Paris', day: 'numeric', month: 'short' });
+      var fmtLong = new Intl.DateTimeFormat('fr-FR', { timeZone: 'Europe/Paris', weekday: 'long', day: 'numeric', month: 'long' });
+      var fmtHeure = new Intl.DateTimeFormat('fr-FR', { timeZone: 'Europe/Paris', hour: '2-digit', minute: '2-digit' });
+      function heureLisible(d) { return fmtHeure.format(d).replace(':', ' h ').replace(/ h 00$/, ' h').replace(/^0/, ''); }
+      function majuscule(t) { return t.charAt(0).toUpperCase() + t.slice(1); }
+      function puce(nom, valeur, texte, sous) {
+        var l = document.createElement('label'); l.className = 'puce';
+        var i = document.createElement('input'); i.type = 'radio'; i.name = nom; i.value = valeur; i.required = true;
+        var sp = document.createElement('span'); sp.textContent = texte;
+        if (sous) { var sm = document.createElement('small'); sm.textContent = sous; sp.appendChild(sm); }
+        l.appendChild(i); l.appendChild(sp); return l;
+      }
+      function dire(texte, erreur, relancer) {
+        etat.textContent = texte; etat.className = 'etat' + (erreur ? ' erreur' : '');
+        if (relancer) {
+          var b = document.createElement('button'); b.type = 'button'; b.textContent = 'Réessayer';
+          b.addEventListener('click', charger); etat.appendChild(document.createTextNode(' ')); etat.appendChild(b);
+        }
+      }
+      function majRecap() {
+        var c = form.querySelector('input[name="debut"]:checked');
+        recap.textContent = c ? majuscule(fmtLong.format(new Date(c.value))) + ' à ' + heureLisible(new Date(c.value)) + ', 30 minutes en visio' : '';
+      }
+      function montrerHeures(cle) {
+        heures.textContent = '';
+        (parJour[cle] || []).forEach(function (iso) { heures.appendChild(puce('debut', iso, heureLisible(new Date(iso)))); });
+        blocHeures.hidden = false; majRecap();
+      }
+      function afficher(creneaux, garderChoix) {
+        var avant = garderChoix && form.querySelector('input[name="jour"]:checked');
+        avant = avant ? avant.value : '';
+        parJour = {};
+        creneaux.forEach(function (iso) { var c = fmtJourCle.format(new Date(iso)); (parJour[c] = parJour[c] || []).push(iso); });
+        var cles = Object.keys(parJour).sort();
+        jours.textContent = ''; heures.textContent = ''; blocHeures.hidden = true;
+        if (!cles.length) {
+          dire('Aucun créneau libre dans les 4 prochaines semaines. Appelez-nous, nous trouverons un moment ensemble.', true);
+          blocJours.hidden = blocCoord.hidden = blocEnvoi.hidden = true; return;
+        }
+        cles.forEach(function (c) { var d = new Date(parJour[c][0]); jours.appendChild(puce('jour', c, majuscule(fmtSemaine.format(d).replace('.', '')), fmtJour.format(d))); });
+        dire(''); blocJours.hidden = blocCoord.hidden = blocEnvoi.hidden = false;
+        if (avant && parJour[avant]) { form.querySelector('input[name="jour"][value="' + avant + '"]').checked = true; montrerHeures(avant); }
+        majRecap();
+      }
+      function charger(garderChoix) {
+        dire('Chargement des créneaux libres…');
+        return fetch('/api/rdv', { headers: { accept: 'application/json' } })
+          .then(function (r) { if (!r.ok) throw new Error(String(r.status)); return r.json(); })
+          .then(function (j) { afficher(j.creneaux || [], garderChoix === true); })
+          .catch(function () { dire('Le calendrier ne répond pas pour le moment. Réessayez dans un instant, ou appelez-nous.', true, true); });
+      }
+      jours.addEventListener('change', function (e) { if (e.target.name === 'jour') montrerHeures(e.target.value); });
+      heures.addEventListener('change', majRecap);
+      form.addEventListener('submit', function (e) {
+        e.preventDefault();
+        if (!form.reportValidity()) return;
+        var donnees = Object.fromEntries(new FormData(form));
+        delete donnees.jour;
+        donnees.programme = programmeChoisi || '';
+        if (par) donnees.par = par;
+        bouton.disabled = true; bouton.textContent = 'Réservation en cours…';
+        fetch('/api/rdv', { method: 'POST', headers: { 'Content-Type': 'application/json', accept: 'application/json' }, body: JSON.stringify(donnees) })
+          .then(function (r) { return r.json().catch(function () { return {}; }).then(function (j) { return { statut: r.status, j: j }; }); })
+          .then(function (x) {
+            if (x.statut === 200 && x.j.ok) {
+              try { sessionStorage.setItem('rdv-ia-entrepreneur', JSON.stringify({ closer: x.j.conseiller || '', prenom: donnees.prenom || '', date: x.j.debut || donnees.debut })); } catch (err) {}
+              if (window.gtag) {
+                try { gtag('event', 'rdv_reserve', { conseiller: x.j.conseiller || '' }); } catch (err) {}
+                if (programmeChoisi) { try { gtag('event', 'rdv_programme_type', { programme: programmeChoisi }); } catch (err) {} }
+              }
+              location.href = '/rdv-confirme.html';
+              return;
+            }
+            bouton.disabled = false; bouton.textContent = 'Confirmer le rendez-vous';
+            if (x.statut === 409) { charger(true).then(function () { dire('Ce créneau vient d\'être pris. Choisissez-en un autre, vos coordonnées sont gardées.', true); blocJours.scrollIntoView({ block: 'start' }); }); return; }
+            var champ = x.statut === 400 && x.j.erreur && form.elements[x.j.erreur];
+            if (champ && champ.focus) { champ.setCustomValidity('Vérifiez ce champ.'); champ.reportValidity(); champ.addEventListener('input', function () { champ.setCustomValidity(''); }, { once: true }); return; }
+            dire(x.statut === 429 ? 'Trop de tentatives en peu de temps. Réessayez dans quelques minutes, ou appelez-nous.' : 'La réservation n\'a pas abouti. Réessayez dans un instant, ou appelez-nous.', true);
+            etat.scrollIntoView({ block: 'center' });
+          })
+          .catch(function () { bouton.disabled = false; bouton.textContent = 'Confirmer le rendez-vous'; dire('La réservation n\'a pas abouti (connexion). Réessayez dans un instant.', true); });
+      });
+      charger();
+    })();
   </script>
 </body>
 </html>

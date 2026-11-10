@@ -225,6 +225,9 @@
     "api/opco.js": {
       "includeFiles": "data/siret-opco/**",
       "maxDuration": 60
+    },
+    "api/rdv.js": {
+      "maxDuration": 30
     }
   }
 }
