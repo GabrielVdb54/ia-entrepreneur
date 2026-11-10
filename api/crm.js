@@ -85,6 +85,11 @@
 
 import { timingSafeEqual, randomBytes, createHash } from 'node:crypto';
 import Anthropic from '@anthropic-ai/sdk';
+import {
+  ADMIN, ADMIN_EMAIL, avecUtilisateur, moi as utilisateurCourant, estAdmin, compte, nomComplet, pourMoi, cleReglage, cleReglageLue, garder,
+  utilisateurParCle, equipePourPage, closers, jetonGoogle, googleEquipeConfigure, urlConnexionGoogle, operationEquipe, membresConnectes,
+  OPS_EQUIPE, REGLAGES_EQUIPE,
+} from './_equipe.js';
 import { creerDemande, GOOGLE_AVIS_RE } from './_avis.js';
 import { MODALITES, nouveauJetonEval, questionnaire, propre as propreEval } from './_evaluations.js';
 import {
@@ -94,8 +99,8 @@ import {
 // La rédaction par Claude peut prendre une quinzaine de secondes.
 export const maxDuration = 60;
 
-const COMPTE = 'gabriel@ia-entrepreneur.fr';
-const EXPEDITEUR = `Gabriel Vanderbecken <${COMPTE}>`;
+// L'adresse et le nom de la personne connectée (Gabriel, ou un membre de l'équipe : api/_equipe.js).
+const expediteur = () => `${nomComplet()} <${compte()}>`;
 const GMAIL = 'https://gmail.googleapis.com/gmail/v1/users/me';
 const HOTES_AUTORISES = ['ia-entrepreneur.fr', 'www.ia-entrepreneur.fr'];
 const EMAIL_RE = /^[^@\s<>,;"]+@[^@\s<>,;".]+(\.[^@\s<>,;".]+)+$/;
@@ -125,7 +130,7 @@ const TABLES = {
       site_web: T, localisation: T, adresse: T, siret: T, valeur: 'nombre', besoin: L, service: T,
       budget: T, source: T, tags: 'tags', prochaine_relance: 'date', prochaine_action: ['enum', ACTIONS],
       prochaine_note: T, relances_sans_reponse: 'entier', dernier_contact: 'date', raison_perte: T,
-      hubspot_id: T, archive: 'bool', tache_fil: T,
+      hubspot_id: T, archive: 'bool', tache_fil: T, proprietaire: 'adresse', setter: 'adresse',
       suivi: ['enum', SUIVIS], formation_debut: 'date', formation_fin: 'date', financeur: T, financement_ref: T,
       facture_le: 'date', facture_echeance: 'date', facture_fil: T, facture_objet: T, paiement_annonce: T, paye_le: 'date',
     },
@@ -148,7 +153,7 @@ const TABLES = {
   memos: {
     nom: 'iae_crm_memos',
     requis: ['categorie', 'titre', 'contenu'],
-    colonnes: { categorie: T, titre: T, contenu: L, sources: 'tags', date_maj: 'date', ordre: 'entier' },
+    colonnes: { categorie: T, titre: T, contenu: L, sources: 'tags', date_maj: 'date', ordre: 'entier', prive: 'bool' },
   },
   modeles: {
     nom: 'iae_crm_modeles',
@@ -223,6 +228,13 @@ function convertir(v, type, cle) {
     case 'instant':
       if (Number.isNaN(Date.parse(v))) throw new Refus(`date_invalide:${cle}`);
       return new Date(v).toISOString();
+    case 'adresse': {
+      // Propriétaire ou setter d'un lead : une adresse de l'équipe.
+      const a = String(v).trim().toLowerCase();
+      if (a === '') return null;
+      if (!/^[a-z0-9._-]+@ia-entrepreneur\.fr$/.test(a)) throw new Refus(`adresse_invalide:${cle}`);
+      return a;
+    }
     case 'uuid':
       if (v === '') return null;
       if (!UUID_RE.test(v)) throw new Refus(`id_invalide:${cle}`);
@@ -291,6 +303,8 @@ function supabaseConfigure() {
 }
 
 async function sb(chemin, { methode = 'GET', corps, prefer, plage } = {}) {
+  // Un membre de l'équipe ne lit et n'écrit que ses leads (api/_equipe.js) ; Gabriel n'a aucun filtre.
+  ({ chemin, corps } = await garder(chemin, methode, corps));
   const cle = process.env.SUPABASE_SERVICE_ROLE_KEY;
   const entetes = { apikey: cle, Authorization: `Bearer ${cle}`, 'Content-Type': 'application/json' };
   if (prefer) entetes.Prefer = prefer;
@@ -346,6 +360,7 @@ function aujourdHuiParis() {
 /* ---------- Gmail (gabriel@ia-entrepreneur.fr) ---------- */
 
 function gmailConfigure() {
+  if (!estAdmin()) return Boolean(googleEquipeConfigure() && utilisateurCourant().google);
   return Boolean(process.env.GMAIL_IAE_CLIENT_ID && process.env.GMAIL_IAE_CLIENT_SECRET && process.env.GMAIL_IAE_REFRESH_TOKEN);
 }
 
@@ -353,6 +368,7 @@ let jetonGmail = null;
 let boiteVerifiee = false;
 
 async function accesGmail() {
+  if (!estAdmin()) return jetonGoogle(utilisateurCourant());
   if (jetonGmail && jetonGmail.expire > Date.now() + 60000) return jetonGmail.valeur;
   const r = await fetch('https://oauth2.googleapis.com/token', {
     method: 'POST',
@@ -373,7 +389,7 @@ async function accesGmail() {
   if (!boiteVerifiee) {
     const p = await fetch(`${GMAIL}/profile`, { headers: { Authorization: `Bearer ${j.access_token}` } });
     const profil = p.ok ? await p.json() : {};
-    if (String(profil.emailAddress || '').toLowerCase() !== COMPTE) {
+    if (String(profil.emailAddress || '').toLowerCase() !== compte()) {
       jetonGmail = null;
       throw new Refus('gmail_mauvaise_boite', 502);
     }
@@ -423,7 +439,7 @@ const nomRfc5987 = (t) => encodeURIComponent(t).replace(/['()*]/g, (c) => `%${c.
 function messageBrut({ a, objet, corps, enReponseA, references, pieces = [] }) {
   const idMessage = `<crm-${randomBytes(12).toString('hex')}@ia-entrepreneur.fr>`;
   const lignes = [
-    `From: ${EXPEDITEUR}`,
+    `From: ${expediteur()}`,
     `To: ${a}`,
     `Subject: ${entete(objet)}`,
     `Message-ID: ${idMessage}`,
@@ -467,7 +483,7 @@ async function envoyerGmail({ a, objet, corps, mode, fil, enReponseA, references
 
 async function emailsEnvoyesAujourdhui() {
   const debut = new Date(`${aujourdHuiParis()}T00:00:00+01:00`).toISOString();
-  const { r } = await sb(`iae_crm_activites?select=id&type=eq.email_envoye&source=eq.crm&date=gte.${encodeURIComponent(debut)}`, {
+  const { r } = await sb(`iae_crm_activites?select=id&type=eq.email_envoye&source=eq.crm&meta->>de=eq.${encodeURIComponent(compte())}&date=gte.${encodeURIComponent(debut)}`, {
     prefer: 'count=exact',
     plage: '0-0',
   });
@@ -479,35 +495,46 @@ async function emailsEnvoyesAujourdhui() {
 
 async function lireTout() {
   const depuisLi = new Date(Date.now() - 45 * 86400000).toISOString();
-  const [leads, contacts, activites, memos, modeles, reglages, { lignes: entrants }, { lignes: ecartes }, formateurs, documents, programmes, { lignes: linkedin }, { lignes: avis }, { lignes: demandesAvis }, evaluations, evalReponses] = await Promise.all([
+  // Formateurs, pièces, programmes, LinkedIn, avis et évaluations : à Gabriel seulement.
+  const admin = estAdmin();
+  const rien = Promise.resolve([]);
+  const rienSb = Promise.resolve({ lignes: [] });
+  const [leads, contacts, activites, memos, modeles, reglages, { lignes: entrants }, { lignes: ecartes }, formateurs, documents, programmes, { lignes: linkedin }, { lignes: avis }, { lignes: demandesAvis }, evaluations, evalReponses, equipe, closersListe] = await Promise.all([
     toutLire('iae_crm_leads', 'entreprise.asc'),
     toutLire('iae_crm_contacts', 'principal.desc,created_at.asc'),
     toutLire('iae_crm_activites', 'date.desc'),
     toutLire('iae_crm_memos', 'categorie.asc,ordre.asc,titre.asc'),
     toutLire('iae_crm_modeles', 'ordre.asc,nom.asc'),
     toutLire('iae_crm_reglages', 'cle.asc'),
-    sb('iae_crm_entrants?select=*&statut=eq.a_trier&order=recu_le.desc&limit=100'),
-    sb('iae_crm_entrants?select=id,recu_le,canal,de_email,de_nom,objet,fil,meta&statut=eq.ignore&order=recu_le.desc&limit=60'),
-    toutLire('iae_crm_formateurs', 'created_at.asc'),
-    sb('iae_crm_documents?select=id,created_at,lead_id,type,nom,chemin,mime,taille,depose_par,lecture,statut,motif,verifie_le,expire_le,archive&order=created_at.desc&limit=2000').then((x) => x.lignes),
-    toutLire('iae_crm_programmes', 'created_at.desc'),
-    sb(`iae_crm_linkedin?or=(statut.in.(brouillon,a_envoyer,en_cours,echec,a_verifier),created_at.gte.${encodeURIComponent(depuisLi)})&order=created_at.desc&limit=500&select=id,created_at,lead_id,contact_id,type,etape,texte,statut,valide_le,envoye_le,detail`),
-    sb('iae_crm_avis?order=created_at.desc&limit=300&select=*'),
-    sb('iae_crm_avis_demandes?order=created_at.desc&limit=300&select=id,lead_id,created_at,expire_le'),
-    toutLire('iae_crm_evaluations', 'created_at.desc'),
-    toutLire('iae_crm_evaluation_reponses', 'created_at.asc'),
+    // « À trier » : les emails de sa propre boîte (Gabriel ne trie pas celle de Dorian).
+    sb(`iae_crm_entrants?select=*&statut=eq.a_trier&proprietaire=eq.${encodeURIComponent(compte())}&order=recu_le.desc&limit=100`),
+    sb(`iae_crm_entrants?select=id,recu_le,canal,de_email,de_nom,objet,fil,meta&statut=eq.ignore&proprietaire=eq.${encodeURIComponent(compte())}&order=recu_le.desc&limit=60`),
+    admin ? toutLire('iae_crm_formateurs', 'created_at.asc') : rien,
+    !admin ? rien : sb('iae_crm_documents?select=id,created_at,lead_id,type,nom,chemin,mime,taille,depose_par,lecture,statut,motif,verifie_le,expire_le,archive&order=created_at.desc&limit=2000').then((x) => x.lignes),
+    admin ? toutLire('iae_crm_programmes', 'created_at.desc') : rien,
+    !admin ? rienSb : sb(`iae_crm_linkedin?or=(statut.in.(brouillon,a_envoyer,en_cours,echec,a_verifier),created_at.gte.${encodeURIComponent(depuisLi)})&order=created_at.desc&limit=500&select=id,created_at,lead_id,contact_id,type,etape,texte,statut,valide_le,envoye_le,detail`),
+    !admin ? rienSb : sb('iae_crm_avis?order=created_at.desc&limit=300&select=*'),
+    !admin ? rienSb : sb('iae_crm_avis_demandes?order=created_at.desc&limit=300&select=id,lead_id,created_at,expire_le'),
+    admin ? toutLire('iae_crm_evaluations', 'created_at.desc') : rien,
+    admin ? toutLire('iae_crm_evaluation_reponses', 'created_at.asc') : rien,
+    equipePourPage(),
+    closers(),
   ]);
+  const moiPublic = utilisateurCourant();
   return {
     leads, contacts, activites, memos, modeles, entrants, ecartes, documents, programmes, linkedin: linkedin || [], avis: avis || [], demandes_avis: demandesAvis || [],
     evaluations, evaluation_reponses: evalReponses,
     formateurs: formateurs.map(({ jeton_hash: _h, signature, ...f }) => ({ ...f, signature: signature ? { nom: signature.nom, lieu: signature.lieu, date: signature.date, version: signature.version, empreinte: signature.empreinte, ip: signature.ip } : null })),
-    reglages: Object.fromEntries(reglages.filter((r) => !r.cle.endsWith('_cle')).map((r) => [r.cle, r.valeur])),
+    reglages: Object.fromEntries(reglages.filter((r) => !r.cle.endsWith('_cle')).map((r) => [cleReglageLue(r.cle), r.valeur])),
     gmail: gmailConfigure(),
     agenda: gmailConfigure(),
     ia: Boolean(process.env.ANTHROPIC_API_KEY),
     voix: Boolean(process.env.ELEVENLABS_API_KEY),
-    expediteur: COMPTE,
+    expediteur: compte(),
     aujourdhui: aujourdHuiParis(),
+    // Qui est connecté, l'équipe (tout pour Gabriel, les noms pour un membre) et à qui confier un lead.
+    moi: { email: moiPublic.email, prenom: moiPublic.prenom, nom: moiPublic.nom, role: moiPublic.role, google: Boolean(moiPublic.google) },
+    equipe, closers: closersListe, google_equipe: googleEquipeConfigure(),
   };
 }
 
@@ -558,16 +585,20 @@ async function operation(corps) {
   if (op === 'email') return envoyerEmail(corps);
   if (/^(avis|paiement|facture)_[a-z_]+$/.test(op || '')) return operationApresFormation(corps);
   if (/^evaluation_[a-z_]+$/.test(op || '')) return operationEvaluation(corps);
+  // L'équipe : Gabriel crée les accès ; un membre connecte sa boîte Google.
+  if (/^equipe_[a-z]+$/.test(op || '')) return operationEquipe(corps);
+  if (op === 'google_connexion') return urlConnexionGoogle();
   if (op === 'reglage') {
     if (!REGLAGES_AUTORISES.includes(corps.cle)) throw new Refus('reglage_inconnu');
+    if (!estAdmin() && !REGLAGES_EQUIPE.has(corps.cle)) throw new Refus('reserve_admin', 403);
     if (corps.cle === 'lien_avis_google' && corps.valeur && !GOOGLE_AVIS_RE.test(String(corps.valeur).trim())) throw new Refus('lien_google_invalide');
     const valeur = convertir(corps.valeur ?? '', L, corps.cle) ?? '';
     const { lignes } = await sb('iae_crm_reglages?on_conflict=cle', {
       methode: 'POST',
-      corps: { cle: corps.cle, valeur },
+      corps: { cle: cleReglage(corps.cle), valeur },
       prefer: 'resolution=merge-duplicates,return=representation',
     });
-    return { reglage: lignes[0] };
+    return { reglage: { ...lignes[0], cle: cleReglageLue(lignes[0].cle) } };
   }
   throw new Refus('operation_inconnue');
 }
@@ -647,7 +678,7 @@ async function envoyerEmail(corps) {
       resume: `${mode === 'brouillon' ? 'Brouillon Gmail' : 'Email envoyé'} à ${a} : « ${objet} »`.slice(0, 2000),
       contenu: texte,
       source: 'crm',
-      meta: { ...gmail, a, objet, de: COMPTE, ...(pieces.length ? { pieces: pieces.map((p) => p.nom) } : {}) },
+      meta: { ...gmail, a, objet, de: compte(), ...(pieces.length ? { pieces: pieces.map((p) => p.nom) } : {}) },
     });
     if (majLead && Object.keys(majLead).length) lead = await modifier('leads', corps.lead_id, majLead);
   } catch (e) {
@@ -781,7 +812,7 @@ async function rediger(corps, ip) {
       betas: ['server-side-fallback-2026-07-01'],
       fallbacks: 'default',
       system: [
-        { type: 'text', text: CONSIGNES_REDACTION },
+        { type: 'text', text: pourMoi(CONSIGNES_REDACTION) },
         { type: 'text', text: `# Mémo commercial d'IA-Entrepreneur\n\n${memo}`, cache_control: { type: 'ephemeral' } },
       ],
       messages: [{ role: 'user', content: fiche }],
@@ -825,11 +856,11 @@ async function google(url, options = {}) {
   return r.json();
 }
 async function lireReglage(cle) {
-  const { lignes } = await sb(`iae_crm_reglages?select=valeur&cle=eq.${encodeURIComponent(cle)}`);
+  const { lignes } = await sb(`iae_crm_reglages?select=valeur&cle=eq.${encodeURIComponent(cleReglage(cle))}`);
   return lignes[0] ? lignes[0].valeur : null;
 }
 async function ecrireReglage(cle, valeur) {
-  await sb('iae_crm_reglages?on_conflict=cle', { methode: 'POST', corps: { cle, valeur }, prefer: 'resolution=merge-duplicates,return=minimal' });
+  await sb('iae_crm_reglages?on_conflict=cle', { methode: 'POST', corps: { cle: cleReglage(cle), valeur }, prefer: 'resolution=merge-duplicates,return=minimal' });
 }
 const jourParis = (d) => new Intl.DateTimeFormat('fr-CA', { timeZone: 'Europe/Paris', year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date(d));
 const heureParis = (d) => new Intl.DateTimeFormat('fr-FR', { timeZone: 'Europe/Paris', hour: '2-digit', minute: '2-digit' }).format(new Date(d)).replace(':', ' h ').replace(/ h 00$/, ' h');
@@ -911,7 +942,7 @@ function messagesDuFil(t) {
     const brut = partieTexte(m.payload);
     return {
       id: m.id, date: new Date(Number(m.internalDate) || Date.now()).toISOString(), de: de.nom || de.email, email: de.email,
-      moi: de.email === COMPTE, a: String(h.to || '').slice(0, 300), cc: String(h.cc || '').slice(0, 300), objet: String(h.subject || '').slice(0, 300),
+      moi: de.email === compte(), a: String(h.to || '').slice(0, 300), cc: String(h.cc || '').slice(0, 300), objet: String(h.subject || '').slice(0, 300),
       texte: (sansCitation(brut) || texteBrut(m.snippet)).slice(0, 5000), complet: propre(brut).slice(0, 15000), pieces: piecesJointes(m.payload),
       fichiers: fichiersJoints(m.payload).map(({ att: _a, ...f }) => f),
       message_id: /^<[^<>\s]{3,200}>$/.test(String(h['message-id'] || '').trim()) ? String(h['message-id']).trim() : null,
@@ -932,7 +963,7 @@ async function filAutorise(fil, messages) {
   const adresses = new Set();
   for (const m of messages || []) {
     const h = enTetes(m);
-    for (const x of [...listeAdresses(h.from), ...listeAdresses(h.to), ...listeAdresses(h.cc)]) if (x !== COMPTE) adresses.add(x.toLowerCase());
+    for (const x of [...listeAdresses(h.from), ...listeAdresses(h.to), ...listeAdresses(h.cc)]) if (x !== compte()) adresses.add(x.toLowerCase());
   }
   if (!adresses.size) return false;
   const { lignes } = await sb('iae_crm_contacts?select=email&email=not.is.null&limit=5000');
@@ -996,11 +1027,11 @@ async function boiteDuLead(leadId) {
     const avec = new Set();
     for (const m of ms) {
       const x = enTetes(m);
-      for (const ad of [...listeAdresses(x.from), ...listeAdresses(x.to), ...listeAdresses(x.cc)]) if (ad !== COMPTE) avec.add(ad);
+      for (const ad of [...listeAdresses(x.from), ...listeAdresses(x.to), ...listeAdresses(x.cc)]) if (ad !== compte()) avec.add(ad);
     }
     return {
       fil, objet: String(enTetes(ms[0]).subject || h.subject || '').slice(0, 300), dernier: new Date(Number(dernier.internalDate) || Date.now()).toISOString(), n: ms.length,
-      extrait: texteBrut(dernier.snippet).slice(0, 220), dernier_moi: de.email === COMPTE, dernier_de: de.nom || de.email,
+      extrait: texteBrut(dernier.snippet).slice(0, 220), dernier_moi: de.email === compte(), dernier_de: de.nom || de.email,
       avec: [...avec].slice(0, 6), pj: avecPj.has(fil) && ms.some((m) => fichiersJoints(m.payload).length > 0),
       non_lu: ms.some((m) => (m.labelIds || []).includes('UNREAD')), tache: fil === lead.tache_fil,
     };
@@ -1209,7 +1240,7 @@ async function analyserEmails(items, ann) {
         output_config: { effort: 'low', format: { type: 'json_schema', schema: SCHEMA_TRI } },
         betas: ['server-side-fallback-2026-07-01'],
         fallbacks: 'default',
-        system: [{ type: 'text', text: CONSIGNES_TRI, cache_control: { type: 'ephemeral' } }],
+        system: [{ type: 'text', text: pourMoi(CONSIGNES_TRI), cache_control: { type: 'ephemeral' } }],
         messages: [{ role: 'user', content: contenu }],
       });
       if (r.stop_reason === 'refusal') continue;
@@ -1232,7 +1263,7 @@ async function dernierMessageDeMoi(fil) {
   try {
     const t = await google(`${GMAIL}/threads/${encodeURIComponent(fil)}?format=metadata&metadataHeaders=From`);
     const dernier = (t.messages || []).filter((m) => !(m.labelIds || []).includes('DRAFT')).slice(-1)[0];
-    return adresse(enTetes(dernier || {}).from).email === COMPTE;
+    return adresse(enTetes(dernier || {}).from).email === compte();
   } catch { return false; }
 }
 
@@ -1324,7 +1355,7 @@ async function synchroGmail() {
   const items = [];
   if (ids.length) {
     const deja = new Set();
-    (await sb(`iae_crm_entrants?select=ref_externe&ref_externe=in.(${ids.join(',')})`)).lignes.forEach((x) => deja.add(x.ref_externe));
+    (await sb(`iae_crm_entrants?select=ref_externe&proprietaire=eq.${encodeURIComponent(compte())}&ref_externe=in.(${ids.join(',')})`)).lignes.forEach((x) => deja.add(x.ref_externe));
     (await sb(`iae_crm_activites?select=meta&meta->>gmail_id=in.(${ids.join(',')})`)).lignes.forEach((x) => deja.add(x.meta.gmail_id));
     for (const id of ids.filter((x) => !deja.has(x))) {
       const r = await lireRecu(id);
@@ -1345,7 +1376,7 @@ async function synchroGmail() {
   // Du plus ancien au plus récent : la tâche qui reste est celle du dernier message.
   items.sort((a, b) => a.quand.localeCompare(b.quand));
   // Rattrapage : les « À trier » jamais analysés, quelques-uns à chaque passage.
-  const { lignes: enAttente } = await sb('iae_crm_entrants?select=*&statut=eq.a_trier&meta->analyse=is.null&order=recu_le.asc&limit=10');
+  const { lignes: enAttente } = await sb(`iae_crm_entrants?select=*&statut=eq.a_trier&proprietaire=eq.${encodeURIComponent(compte())}&meta->analyse=is.null&order=recu_le.asc&limit=10`);
   for (const e of enAttente) {
     let r = { de: { email: e.de_email || '', nom: e.de_nom || '' }, objet: e.objet || '', fil: e.fil, quand: e.recu_le, texte: e.extrait || '', complet: '', pieces: [] };
     if (e.canal === 'email' && /^[0-9a-f]+$/i.test(e.ref_externe || '')) { try { r = { ...r, ...(await lireRecu(e.ref_externe)) }; } catch { /* on garde l'extrait */ } }
@@ -1381,7 +1412,7 @@ async function synchroGmail() {
       continue;
     }
     const ecarte = d?.action === 'ignorer';
-    await sb('iae_crm_entrants?on_conflict=ref_externe', {
+    await sb('iae_crm_entrants?on_conflict=proprietaire,ref_externe', {
       methode: 'POST', prefer: 'resolution=ignore-duplicates,return=minimal',
       corps: { recu_le: r.quand, canal: 'email', de_email: r.de.email, de_nom: r.de.nom || null, objet: r.objet, extrait: couper(r.texte, 1500), ref_externe: r.ref, fil: r.fil, statut: ecarte ? 'ignore' : 'a_trier', meta: { ...(d ? { analyse: resumeAnalyse(d) } : {}), candidats: r.candidats } },
     });
@@ -1730,7 +1761,7 @@ async function appelClaude({ consignes, schema, contenu, effort = 'low', max = 6
       output_config: { effort, format: { type: 'json_schema', schema } },
       betas: ['server-side-fallback-2026-07-01'],
       fallbacks: 'default',
-      system: [{ type: 'text', text: consignes, cache_control: { type: 'ephemeral' } }],
+      system: [{ type: 'text', text: pourMoi(consignes), cache_control: { type: 'ephemeral' } }],
       messages: [{ role: 'user', content: contenu }],
     });
   } catch (e) {
@@ -1896,7 +1927,7 @@ async function recapLead(corps) {
     for (const f of fils) {
       try {
         const ms = (await lireFil(f)).slice(-6);
-        textesFils.push(`Fil « ${ms[0]?.objet || ''} » :\n${ms.map((x) => `- ${new Date(x.date).toLocaleString('fr-FR', { timeZone: 'Europe/Paris' })}, ${x.moi ? 'Gabriel' : x.de} : ${couper(x.texte, 900)}`).join('\n')}`);
+        textesFils.push(`Fil « ${ms[0]?.objet || ''} » :\n${ms.map((x) => `- ${new Date(x.date).toLocaleString('fr-FR', { timeZone: 'Europe/Paris' })}, ${x.moi ? utilisateurCourant().prenom : x.de} : ${couper(x.texte, 900)}`).join('\n')}`);
       } catch { /* fil illisible : on fait avec l'historique */ }
     }
   }
@@ -1921,7 +1952,7 @@ async function recapLead(corps) {
       output_config: { effort: 'low', format: { type: 'json_schema', schema: SCHEMA_RECAP } },
       betas: ['server-side-fallback-2026-07-01'],
       fallbacks: 'default',
-      system: [{ type: 'text', text: CONSIGNES_RECAP, cache_control: { type: 'ephemeral' } }],
+      system: [{ type: 'text', text: pourMoi(CONSIGNES_RECAP), cache_control: { type: 'ephemeral' } }],
       messages: [{ role: 'user', content: contexte }],
     });
   } catch (e) {
@@ -1989,9 +2020,9 @@ async function synchroAgenda() {
         if (jour >= aujourd) await sb(`iae_crm_leads?id=eq.${c.lead_id}`, { methode: 'PATCH', prefer: 'return=minimal', corps: { prochaine_relance: jour, prochaine_action: 'rdv', prochaine_note: `RDV${heure ? ` à ${heure}` : ''} : ${(ev.summary || '').slice(0, 300)}`, relances_sans_reponse: 0, archive: false } });
         rdv++;
       } else if (jour >= aujourd) {
-        const { lignes: dejaTrie } = await sb(`iae_crm_entrants?select=id&ref_externe=eq.${encodeURIComponent(ref)}&limit=1`);
+        const { lignes: dejaTrie } = await sb(`iae_crm_entrants?select=id&proprietaire=eq.${encodeURIComponent(compte())}&ref_externe=eq.${encodeURIComponent(ref)}&limit=1`);
         if (dejaTrie.length) continue;
-        await sb('iae_crm_entrants?on_conflict=ref_externe', { methode: 'POST', prefer: 'resolution=ignore-duplicates,return=minimal', corps: { recu_le: ev.created || debut.toISOString(), canal: 'agenda', de_email: email, de_nom: a.displayName || null, objet: `RDV : ${libelle}`.slice(0, 300), extrait: texteBrut(ev.description).slice(0, 1000) || null, ref_externe: ref, meta: { event_id: ev.id, event_ref: ref, date_rdv: jour, heure, lien_agenda: ev.htmlLink } } });
+        await sb('iae_crm_entrants?on_conflict=proprietaire,ref_externe', { methode: 'POST', prefer: 'resolution=ignore-duplicates,return=minimal', corps: { recu_le: ev.created || debut.toISOString(), canal: 'agenda', de_email: email, de_nom: a.displayName || null, objet: `RDV : ${libelle}`.slice(0, 300), extrait: texteBrut(ev.description).slice(0, 1000) || null, ref_externe: ref, meta: { event_id: ev.id, event_ref: ref, date_rdv: jour, heure, lien_agenda: ev.htmlLink } } });
         nouveaux++;
       }
     }
@@ -2789,7 +2820,7 @@ async function interpreterVocal(corps, ip) {
       output_config: { effort: 'low', format: { type: 'json_schema', schema: SCHEMA_VOCAL } },
       betas: ['server-side-fallback-2026-07-01'],
       fallbacks: 'default',
-      system: [{ type: 'text', text: CONSIGNES_VOCAL, cache_control: { type: 'ephemeral' } }],
+      system: [{ type: 'text', text: pourMoi(CONSIGNES_VOCAL), cache_control: { type: 'ephemeral' } }],
       messages: [{ role: 'user', content: contexte }],
     });
   } catch (e) {
@@ -2836,15 +2867,18 @@ async function rappelDuMatin(force = false) {
   if (!force && dernier && dernier.le === jour) return { envoye: false, raison: 'deja_envoye' };
   // Un premier tour de boîte et d'agenda, pour que le récapitulatif soit à jour, et les échéances des formateurs.
   await synchroniser().catch(() => null);
-  await echeancesFormateurs().catch((e) => console.error('crm échéances formateurs', e?.message || e));
+  const admin = estAdmin();
+  if (admin) await echeancesFormateurs().catch((e) => console.error('crm échéances formateurs', e?.message || e));
+  const rienSb = Promise.resolve({ lignes: [] });
   const [{ lignes: leads }, { lignes: contacts }, { lignes: entrants }, { lignes: fileLi }, { lignes: derniereLi }, { lignes: pasPartisLi }, robotLi] = await Promise.all([
-    sb(`iae_crm_leads?select=id,entreprise,prochaine_relance,prochaine_action,prochaine_note,relances_sans_reponse&archive=is.false&prochaine_relance=lte.${jour}&order=prochaine_relance.asc,entreprise.asc`),
+    // Gabriel voit tous les leads dans le CRM, mais son récap ne liste que les siens.
+    sb(`iae_crm_leads?select=id,entreprise,prochaine_relance,prochaine_action,prochaine_note,relances_sans_reponse&archive=is.false&prochaine_relance=lte.${jour}${admin ? `&proprietaire=eq.${encodeURIComponent(ADMIN_EMAIL)}` : ''}&order=prochaine_relance.asc,entreprise.asc`),
     sb('iae_crm_contacts?select=id,lead_id,prenom,nom,principal&order=principal.desc'),
-    sb('iae_crm_entrants?select=de_nom,de_email,objet,canal&statut=eq.a_trier&order=recu_le.desc&limit=10'),
-    sb('iae_crm_linkedin?type=eq.invitation&statut=in.(a_envoyer,en_cours)&select=id'),
-    sb('iae_crm_linkedin?type=eq.invitation&statut=eq.envoye&order=envoye_le.desc&limit=1&select=envoye_le'),
-    sb('iae_crm_linkedin?statut=in.(echec,a_verifier)&order=created_at.asc&limit=30&select=lead_id,contact_id,etape,statut,detail'),
-    etatRobotLi(),
+    sb(`iae_crm_entrants?select=de_nom,de_email,objet,canal&statut=eq.a_trier&proprietaire=eq.${encodeURIComponent(compte())}&order=recu_le.desc&limit=10`),
+    admin ? sb('iae_crm_linkedin?type=eq.invitation&statut=in.(a_envoyer,en_cours)&select=id') : rienSb,
+    admin ? sb('iae_crm_linkedin?type=eq.invitation&statut=eq.envoye&order=envoye_le.desc&limit=1&select=envoye_le') : rienSb,
+    admin ? sb('iae_crm_linkedin?statut=in.(echec,a_verifier)&order=created_at.asc&limit=30&select=lead_id,contact_id,etape,statut,detail') : rienSb,
+    admin ? etatRobotLi() : Promise.resolve({}),
   ]);
   // LinkedIn : la file qui se vide, puis ce qui n'est pas parti (sauf les leads déjà dans la liste du jour, qui ont leur tâche).
   const lignesLi = [];
@@ -2877,7 +2911,7 @@ async function rappelDuMatin(force = false) {
   const resume = [dujour.length && `${dujour.length} relance${dujour.length > 1 ? 's' : ''} pour aujourd'hui`, retards.length && `${retards.length} en retard`,
     entrants.length && `${entrants.length} message${entrants.length > 1 ? 's' : ''} à trier`, lignesLi.length && `${lignesLi.length} point${lignesLi.length > 1 ? 's' : ''} LinkedIn`].filter(Boolean).join(', ');
   const corps = [
-    'Bonjour Gabriel,', '',
+    `Bonjour ${utilisateurCourant().prenom},`, '',
     `Aujourd'hui, ${dateLongue} : ${resume}.`, '',
     retards.length ? `En retard\n${retards.map(ligne).join('\n')}\n` : null,
     dujour.length ? `Aujourd'hui\n${dujour.map(ligne).join('\n')}\n` : null,
@@ -2889,7 +2923,7 @@ async function rappelDuMatin(force = false) {
   const total = leads.length;
   const objet = total ? `Tes ${total} relance${total > 1 ? 's' : ''} du jour${retards.length ? ` (${retards.length} en retard)` : ''}`
     : entrants.length ? `${entrants.length} message${entrants.length > 1 ? 's' : ''} à trier dans ton CRM` : 'LinkedIn : à regarder dans ton CRM';
-  const envoi = await envoyerGmail({ a: COMPTE, objet, corps, mode: 'envoyer' });
+  const envoi = await envoyerGmail({ a: compte(), objet, corps, mode: 'envoyer' });
   await ecrireReglage('rappel_matin_envoye', { le: jour, relances: total, a_trier: entrants.length });
   return { envoye: true, objet, gmail_id: envoi.gmail_id };
 }
@@ -2936,8 +2970,11 @@ export default async function handler(req, res) {
     const attendu = Buffer.from(process.env.CRON_SECRET ? `Bearer ${process.env.CRON_SECRET}` : '');
     const donne = Buffer.from(String(req.headers.authorization || ''));
     if (!process.env.CRON_SECRET || attendu.length !== donne.length || !timingSafeEqual(attendu, donne)) return res.status(401).json({ erreur: 'non_autorise' });
-    if (tache === 'matin') return res.status(200).json(await rappelDuMatin(new URL(req.url, 'http://local').searchParams.get('force') === '1'));
-    return res.status(200).json(await synchroniser());
+    if (tache === 'matin') {
+      const force = new URL(req.url, 'http://local').searchParams.get('force') === '1';
+      return res.status(200).json(await pourChacun(() => rappelDuMatin(force)));
+    }
+    return res.status(200).json(await pourChacun(synchroniser));
   }
   if (origineEtrangere(req)) return res.status(403).json({ erreur: 'origine' });
 
@@ -2962,11 +2999,34 @@ export default async function handler(req, res) {
 
   const ip = empreinte(req);
   if (tropDEchecs(ip)) return res.status(429).json({ erreur: 'trop_de_tentatives' });
-  if (!cleValide(req)) {
+  let utilisateur = null;
+  try {
+    utilisateur = cleValide(req) ? ADMIN : await utilisateurParCle(req.headers['x-cle-crm']);
+  } catch {
+    return res.status(502).json({ erreur: 'base_indisponible' });
+  }
+  if (!utilisateur) {
     noterEchec(ip);
     return res.status(401).json({ erreur: 'cle_invalide' });
   }
+  // Toute la suite se fait au nom de cette personne (api/_equipe.js) : le garde de la base, la boîte Gmail, les consignes.
+  return avecUtilisateur(utilisateur, () => traiter(req, res, ip));
+}
 
+// Gabriel, puis chaque membre dont la boîte est connectée, en parallèle et chacun dans son contexte.
+async function pourChacun(fn) {
+  const resultat = { [ADMIN_EMAIL]: await fn().catch((e) => ({ erreur: e?.code || 'erreur' })) };
+  if (!googleEquipeConfigure()) return resultat;
+  const liste = await membresConnectes().catch(() => []);
+  const issues = await Promise.allSettled(liste.map((m) => avecUtilisateur(m, fn)));
+  liste.forEach((m, i) => {
+    resultat[m.email] = issues[i].status === 'fulfilled' ? issues[i].value : { erreur: issues[i].reason?.code || 'erreur' };
+    if (issues[i].status === 'rejected') console.error('crm tâche', m.email, issues[i].reason?.code || issues[i].reason?.message);
+  });
+  return resultat;
+}
+
+async function traiter(req, res, ip) {
   try {
     if (req.method === 'GET') {
       const params = new URL(req.url, 'http://local').searchParams;
@@ -3005,6 +3065,7 @@ export default async function handler(req, res) {
         throw new Refus('json_invalide');
       }
     }
+    if (!estAdmin() && !OPS_EQUIPE.has(String(corps?.op || ''))) throw new Refus('reserve_admin', 403);
     if (corps && corps.op === 'rediger') return res.status(200).json(await rediger(corps, ip));
     if (corps && corps.op === 'vocal') return res.status(200).json(await interpreterVocal(corps, ip));
     if (corps && corps.op === 'voix') return await envoyerVoix(res, corps, ip);

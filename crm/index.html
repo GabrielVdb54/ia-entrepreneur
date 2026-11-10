@@ -570,6 +570,18 @@
     dl.infos dt { margin-top: 8px; }
     .btn-texte-long { display: none; }
   }
+
+/* CRM à plusieurs (crm/equipe.js) : un membre de l'équipe ne voit ni les formateurs, ni la satisfaction, ni LinkedIn. */
+body.equipe [data-vue="formateurs"], body.equipe [data-vue="satisfaction"], body.equipe [data-act="linkedin"] { display: none !important; }
+.filtre-equipe { font: inherit; font-size: 14px; padding: 7px 8px; border: 1px solid var(--bord, #D5D8E8); border-radius: 8px; background: #fff; max-width: 160px; }
+.suivi-par { margin: 6px 20px 0; }
+.suivi-par select { font: inherit; margin-left: 6px; padding: 3px 6px; }
+.liste-equipe { list-style: none; padding: 0; margin: 8px 0; display: grid; gap: 10px; }
+.liste-equipe li { display: flex; flex-wrap: wrap; gap: 8px; justify-content: space-between; align-items: center; border: 1px solid var(--bord, #D5D8E8); border-radius: 8px; padding: 8px 10px; }
+.equipe-reglages .ligne-champs { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 8px; }
+.equipe-reglages code { word-break: break-all; font-size: 15px; }
+.connecter-google { margin: 0 0 16px; }
+@media (max-width: 600px) { .filtre-equipe { max-width: 110px; } }
 </style>
 </head>
 <body>
@@ -625,12 +637,13 @@
 /* ================= Réglages fixes ================= */
 
 const API = '/api/crm';
-const COMPTE = 'gabriel@ia-entrepreneur.fr';
+// Celui ou celle qui est connecté : remplacé au chargement par crm/equipe.js (CRM à plusieurs, 10/11/2026).
+let COMPTE = 'gabriel@ia-entrepreneur.fr';
 // Rythme de relance tant que personne ne répond : 3 jours après le premier
 // contact, puis 7, puis 14, puis une prise de nouvelles tous les 3 mois.
 const CADENCE = [3, 7, 14];
 const NURTURING = 90;
-const SIGNATURE_DEFAUT = 'Gabriel Vanderbecken\nIA-Entrepreneur\nhttps://ia-entrepreneur.fr';
+let SIGNATURE_DEFAUT = 'Gabriel Vanderbecken\nIA-Entrepreneur\nhttps://ia-entrepreneur.fr';
 
 const STATUTS = [['nouveau', 'Nouveau'], ['contacte', 'Contacté'], ['qualifie', 'Qualifié'], ['proposition', 'Proposition'],
   ['negociation', 'Négociation'], ['gagne', 'Gagné'], ['perdu', 'Perdu']];
@@ -935,6 +948,7 @@ async function charger() {
   D = await api('GET');
   S.chargeA = Date.now();
   indexer();
+  if (typeof apresChargement === 'function') apresChargement(); // crm/equipe.js
 }
 
 function remplacerLead(l) { if (!l) return; const i = D.leads.findIndex((x) => x.id === l.id); if (i >= 0) D.leads[i] = l; else D.leads.push(l); }
@@ -968,7 +982,8 @@ function rendre() {
   const compteur = $('#compteur');
   compteur.hidden = aFaire === 0;
   compteur.textContent = aFaire;
-  document.title = aFaire ? `(${aFaire}) CRM de Gabriel` : 'CRM de Gabriel';
+  const titreCrm = `CRM de ${(D.moi && D.moi.prenom) || 'Gabriel'}`;
+  document.title = aFaire ? `(${aFaire}) ${titreCrm}` : titreCrm;
   // Dans le tableau, la recherche filtre les lignes ; ailleurs, elle ouvre les résultats.
   if (S.vue === 'tableau') vue.innerHTML = vueTableau();
   else if (S.q) vue.innerHTML = vueRecherche();
@@ -1026,7 +1041,7 @@ function vueJour() {
   for (const l of semaine) { if (!parJour.has(l.prochaine_relance)) parJour.set(l.prochaine_relance, []); parJour.get(l.prochaine_relance).push(l); }
   const enCours = D.leads.filter(actif).length;
   const heure = new Date().getHours();
-  let h = `<div class="salut"><img src="/images/signature/gabriel-vanderbecken.png" alt="" width="52" height="52"><div><p class="meta">${heure < 18 ? 'Bonjour' : 'Bonsoir'} Gabriel</p><h1 class="titre-vue">${esc(dateLongue(t).replace(/^./, (c) => c.toUpperCase()))}</h1></div></div>
+  let h = `<div class="salut"><img src="${esc(typeof photoDe === 'function' ? photoDe(D.moi) : '/images/signature/gabriel-vanderbecken.png')}" alt="" width="52" height="52"><div><p class="meta">${heure < 18 ? 'Bonjour' : 'Bonsoir'} ${esc((D.moi && D.moi.prenom) || 'Gabriel')}</p><h1 class="titre-vue">${esc(dateLongue(t).replace(/^./, (c) => c.toUpperCase()))}</h1></div></div>
     <div class="resume-jour">
       <a class="chiffre ${retard.length ? 'alerte-chiffre' : ''}" href="#g-retard"><b>${retard.length}</b>en retard</a>
       <a class="chiffre" href="#g-jour"><b>${jour.length}</b>pour aujourd'hui</a>
@@ -5488,7 +5503,7 @@ $('#q').addEventListener('input', (ev) => {
   minuteurRecherche = setTimeout(() => { S.q = ev.target.value.trim().length >= 2 ? ev.target.value : ''; rendre(); }, 150);
 });
 $('#btn-nouveau').addEventListener('click', ouvrirNouveau);
-$('#btn-reglages').addEventListener('click', ouvrirReglages);
+$('#btn-reglages').addEventListener('click', () => ouvrirReglages()); // par son nom : crm/equipe.js l'enrichit
 $('#fiche').addEventListener('close', () => { S.fiche = null; });
 // Un clic sur le voile ferme le panneau ou la fenêtre.
 for (const d of [$('#fiche'), $('#modale')]) {
@@ -5569,5 +5584,6 @@ $('#form-cle').addEventListener('submit', async (ev) => {
 
 if (S.cle) demarrer(); else deconnecter('');
 </script>
+<script src="/crm/equipe.js"></script>
 </body>
 </html>
