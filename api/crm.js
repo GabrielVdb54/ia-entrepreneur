@@ -86,6 +86,7 @@
 import { timingSafeEqual, randomBytes, createHash } from 'node:crypto';
 import Anthropic from '@anthropic-ai/sdk';
 import { creerDemande, GOOGLE_AVIS_RE } from './_avis.js';
+import { MODALITES, nouveauJetonEval, questionnaire, propre as propreEval } from './_evaluations.js';
 import {
   deposerPiece, empreinte as empreinteTexte, etatDossier, lireFichier, majStatut, nouveauJeton, verifierSiret, aujourdHui as aujourdHuiF,
 } from './_formateurs.js';
@@ -478,7 +479,7 @@ async function emailsEnvoyesAujourdhui() {
 
 async function lireTout() {
   const depuisLi = new Date(Date.now() - 45 * 86400000).toISOString();
-  const [leads, contacts, activites, memos, modeles, reglages, { lignes: entrants }, { lignes: ecartes }, formateurs, documents, programmes, { lignes: linkedin }, { lignes: avis }, { lignes: demandesAvis }] = await Promise.all([
+  const [leads, contacts, activites, memos, modeles, reglages, { lignes: entrants }, { lignes: ecartes }, formateurs, documents, programmes, { lignes: linkedin }, { lignes: avis }, { lignes: demandesAvis }, evaluations, evalReponses] = await Promise.all([
     toutLire('iae_crm_leads', 'entreprise.asc'),
     toutLire('iae_crm_contacts', 'principal.desc,created_at.asc'),
     toutLire('iae_crm_activites', 'date.desc'),
@@ -493,9 +494,12 @@ async function lireTout() {
     sb(`iae_crm_linkedin?or=(statut.in.(brouillon,a_envoyer,en_cours,echec,a_verifier),created_at.gte.${encodeURIComponent(depuisLi)})&order=created_at.desc&limit=500&select=id,created_at,lead_id,contact_id,type,etape,texte,statut,valide_le,envoye_le,detail`),
     sb('iae_crm_avis?order=created_at.desc&limit=300&select=*'),
     sb('iae_crm_avis_demandes?order=created_at.desc&limit=300&select=id,lead_id,created_at,expire_le'),
+    toutLire('iae_crm_evaluations', 'created_at.desc'),
+    toutLire('iae_crm_evaluation_reponses', 'created_at.asc'),
   ]);
   return {
     leads, contacts, activites, memos, modeles, entrants, ecartes, documents, programmes, linkedin: linkedin || [], avis: avis || [], demandes_avis: demandesAvis || [],
+    evaluations, evaluation_reponses: evalReponses,
     formateurs: formateurs.map(({ jeton_hash: _h, signature, ...f }) => ({ ...f, signature: signature ? { nom: signature.nom, lieu: signature.lieu, date: signature.date, version: signature.version, empreinte: signature.empreinte, ip: signature.ip } : null })),
     reglages: Object.fromEntries(reglages.filter((r) => !r.cle.endsWith('_cle')).map((r) => [r.cle, r.valeur])),
     gmail: gmailConfigure(),
@@ -553,6 +557,7 @@ async function operation(corps) {
   if (op === 'importer') return importer(corps);
   if (op === 'email') return envoyerEmail(corps);
   if (/^(avis|paiement|facture)_[a-z_]+$/.test(op || '')) return operationApresFormation(corps);
+  if (/^evaluation_[a-z_]+$/.test(op || '')) return operationEvaluation(corps);
   if (op === 'reglage') {
     if (!REGLAGES_AUTORISES.includes(corps.cle)) throw new Refus('reglage_inconnu');
     if (corps.cle === 'lien_avis_google' && corps.valeur && !GOOGLE_AVIS_RE.test(String(corps.valeur).trim())) throw new Refus('lien_google_invalide');
@@ -2584,6 +2589,98 @@ async function operationApresFormation(corps) {
     const echeance = dansJoursOuvres(jours);
     await inserer('activites', { lead_id: lead.id, type: 'paiement', resume: `Pas encore payé le ${dateCourte(jour)} : nouvelle vérification le ${dateCourte(echeance)}`, source: 'crm', meta: { etape: 'pas_encore' } });
     return { lead: await modifier('leads', lead.id, { facture_echeance: echeance }) };
+  }
+  throw new Refus('op_inconnue');
+}
+
+/* ---------- Évaluations à chaud (10/11/2026) ---------- */
+
+// Gabriel : « construire les évaluations à chaud directement dans le CRM ; envoyer le lien aux apprenants pour qu'ils
+// laissent un avis, et piloter le niveau de satisfaction d'une formation ainsi que du formateur qui l'effectue ».
+// Questionnaire et calcul de la note : api/_evaluations.js (repris d'Ella). Une évaluation = une formation, un lien.
+const FORMATEUR_DEFAUT = 'Gabriel Vanderbecken';
+async function champsEvaluation(corps, ancienne = null) {
+  const v = {};
+  if (corps.titre !== undefined || !ancienne) {
+    v.titre = propreEval(corps.titre, 200).replace(/\s+/g, ' ');
+    if (!v.titre) throw new Refus('titre_requis');
+  }
+  for (const k of ['debut', 'fin']) {
+    if (corps[k] === undefined) continue;
+    if (corps[k] && !DATE_RE.test(corps[k])) throw new Refus('date_invalide');
+    v[k] = corps[k] || null;
+  }
+  const debut = v.debut !== undefined ? v.debut : ancienne?.debut, fin = v.fin !== undefined ? v.fin : ancienne?.fin;
+  if (debut && fin && fin < debut) throw new Refus('dates_inversees');
+  if (corps.modalite !== undefined) { if (!MODALITES.includes(corps.modalite)) throw new Refus('modalite_invalide'); v.modalite = corps.modalite; }
+  if (corps.inscrits !== undefined) {
+    const n = corps.inscrits === null || corps.inscrits === '' ? null : Number(corps.inscrits);
+    if (n !== null && (!Number.isInteger(n) || n < 1 || n > 500)) throw new Refus('inscrits_invalide');
+    v.inscrits = n;
+  }
+  if (corps.objectifs !== undefined) {
+    if (!Array.isArray(corps.objectifs)) throw new Refus('objectifs_invalides');
+    v.objectifs = corps.objectifs.map((o) => propreEval(o, 300).replace(/\s+/g, ' ')).filter(Boolean).slice(0, 12);
+  }
+  for (const k of ['lead_id', 'programme_id']) {
+    if (corps[k] === undefined) continue;
+    if (corps[k] && !UUID_RE.test(corps[k])) throw new Refus('id_invalide');
+    v[k] = corps[k] || null;
+  }
+  if (v.lead_id) { const [l] = (await sb(`iae_crm_leads?id=eq.${v.lead_id}&select=id`)).lignes; if (!l) throw new Refus('introuvable', 404); }
+  if (v.programme_id) { const [p] = (await sb(`iae_crm_programmes?id=eq.${v.programme_id}&select=id`)).lignes; if (!p) throw new Refus('introuvable', 404); }
+  if (corps.formateur_id !== undefined) {
+    // Le formateur : une fiche de type formateur, ou Gabriel (vide).
+    if (corps.formateur_id) {
+      if (!UUID_RE.test(corps.formateur_id)) throw new Refus('id_invalide');
+      const [f] = (await sb(`iae_crm_leads?id=eq.${corps.formateur_id}&type=eq.formateur&select=id,entreprise`)).lignes;
+      if (!f) throw new Refus('formateur_introuvable', 404);
+      Object.assign(v, { formateur_id: f.id, formateur_nom: couper(f.entreprise, 120) });
+    } else Object.assign(v, { formateur_id: null, formateur_nom: FORMATEUR_DEFAUT });
+  } else if (!ancienne) Object.assign(v, { formateur_id: null, formateur_nom: FORMATEUR_DEFAUT });
+  if (corps.ouverte !== undefined) v.ouverte = corps.ouverte === true;
+  return v;
+}
+async function operationEvaluation(corps) {
+  const op = corps.op;
+  if (op === 'evaluation_creer') {
+    const v = await champsEvaluation(corps);
+    v.modalite = v.modalite || 'distanciel';
+    v.objectifs = v.objectifs || [];
+    v.questions = questionnaire(v);
+    v.jeton = nouveauJetonEval();
+    const { lignes } = await sb('iae_crm_evaluations', { methode: 'POST', corps: v, prefer: 'return=representation' });
+    if (v.lead_id) await inserer('activites', { lead_id: v.lead_id, type: 'note', source: 'crm', resume: `Évaluation à chaud créée : « ${v.titre} », formateur ${v.formateur_nom}`, meta: { evaluation_id: lignes[0].id } });
+    return { evaluation: lignes[0] };
+  }
+  if (!UUID_RE.test(corps.id || '')) throw new Refus('id_invalide');
+  if (op === 'evaluation_reponse_supprimer') {
+    // Une réponse de test (Gabriel essaie le lien) fausserait la moyenne : on peut la retirer.
+    const { lignes } = await sb(`iae_crm_evaluation_reponses?id=eq.${corps.id}&select=id`);
+    if (!lignes.length) throw new Refus('introuvable', 404);
+    await sb(`iae_crm_evaluation_reponses?id=eq.${corps.id}`, { methode: 'DELETE' });
+    return { supprime: true };
+  }
+  const [e] = (await sb(`iae_crm_evaluations?id=eq.${corps.id}&select=*`)).lignes;
+  if (!e) throw new Refus('introuvable', 404);
+  const { lignes: reps } = await sb(`iae_crm_evaluation_reponses?evaluation_id=eq.${e.id}&select=id&limit=1`);
+  if (op === 'evaluation_supprimer') {
+    // Des réponses reçues sont une preuve (Qualiopi, indicateur 30) : on ferme l'évaluation, on ne l'efface pas.
+    if (reps.length) throw new Refus('evaluation_avec_reponses', 409);
+    await sb(`iae_crm_evaluations?id=eq.${e.id}`, { methode: 'DELETE' });
+    return { supprime: true };
+  }
+  if (op === 'evaluation_maj') {
+    const v = await champsEvaluation(corps, e);
+    const changeQuestions = ['objectifs', 'modalite', 'inscrits'].some((k) => v[k] !== undefined && JSON.stringify(v[k]) !== JSON.stringify(e[k]));
+    if (changeQuestions) {
+      // Les questions sont figées dès la première réponse : sinon deux participants n'auraient pas répondu au même questionnaire.
+      if (reps.length && (v.objectifs !== undefined && JSON.stringify(v.objectifs) !== JSON.stringify(e.objectifs) || v.modalite !== undefined && v.modalite !== e.modalite)) throw new Refus('questions_figees', 409);
+      if (!reps.length) v.questions = questionnaire({ ...e, ...v });
+    }
+    if (!Object.keys(v).length) throw new Refus('rien_a_modifier');
+    const { lignes } = await sb(`iae_crm_evaluations?id=eq.${e.id}`, { methode: 'PATCH', corps: v, prefer: 'return=representation' });
+    return { evaluation: lignes[0] };
   }
   throw new Refus('op_inconnue');
 }

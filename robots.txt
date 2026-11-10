@@ -12,6 +12,7 @@ Disallow: /quiz/
 Disallow: /crm/
 Disallow: /espace-formateur/
 Disallow: /avis/
+Disallow: /evaluation/
 Disallow: /rdv-confirme.html
 Disallow: /rendez-vous.html
 Disallow: /supabase/

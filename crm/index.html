@@ -490,12 +490,54 @@
   .carte.glisse { opacity: .5; }
   .compteur-sms { font-size: 12px; color: var(--muted); font-weight: 400; }
 
+  /* Satisfaction : évaluations à chaud */
+  .lib-court { display: none; }
+  .sat-tuiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; margin: 14px 0; }
+  .sat-tuile { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); padding: 14px 16px; display: flex; flex-direction: column; gap: 2px; }
+  .sat-tuile .libelle { font-size: 13.5px; color: var(--muted); font-weight: 600; }
+  .sat-tuile .valeur { font-size: 28px; font-weight: 800; letter-spacing: -0.01em; line-height: 1.15; font-variant-numeric: tabular-nums; }
+  .sat-tuile .valeur small { font-size: 15px; font-weight: 600; color: var(--muted); }
+  .sat-tuile .detail { font-size: 13.5px; color: var(--muted); }
+  .sat-tuile .ok { color: var(--accent-dark); font-weight: 700; }
+  .sat-table-zone { overflow-x: auto; background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); margin: 8px 0 18px; }
+  .sat-table { width: 100%; border-collapse: collapse; font-size: 14.5px; }
+  .sat-table th, .sat-table td { padding: 9px 12px; text-align: left; border-bottom: 1px solid var(--line); white-space: nowrap; }
+  .sat-table th { font-size: 13px; color: var(--muted); font-weight: 600; }
+  .sat-table td.num, .sat-table th.num { text-align: right; font-variant-numeric: tabular-nums; }
+  .sat-table tr:last-child td { border-bottom: 0; }
+  .sat-table .nom { white-space: normal; font-weight: 600; }
+  .sat-h2 { font-size: 17px; margin: 18px 0 4px; }
+  .note-eval { font-weight: 800; font-variant-numeric: tabular-nums; }
+  .statut.n-bon { background: var(--accent-soft); color: var(--accent-dark); border-color: transparent; }
+  .statut.n-moyen { background: #FEF1DC; color: #874A08; border-color: transparent; }
+  .statut.n-bas { background: var(--danger-soft, #FDECEA); color: var(--danger); border-color: transparent; }
+  .lien-eval { display: flex; gap: 8px; align-items: stretch; }
+  .lien-eval input { flex: 1; min-width: 0; font-size: 14px; }
+  .qr-eval { display: flex; gap: 16px; align-items: center; flex-wrap: wrap; margin: 6px 0; }
+  .qr-eval .qr { width: 196px; height: 196px; background: #fff; border: 1px solid var(--line); border-radius: 12px; padding: 6px; flex: none; }
+  .qr-eval .qr svg { width: 100%; height: 100%; display: block; }
+  .rub-eval { border-top: 1px solid var(--line); padding: 12px 0; }
+  .rub-eval h4 { display: flex; justify-content: space-between; gap: 10px; font-size: 15.5px; margin-bottom: 6px; }
+  .q-eval { display: grid; grid-template-columns: minmax(0, 1fr) 64px; gap: 2px 12px; padding: 6px 0; font-size: 14.5px; }
+  .q-eval .q-note { text-align: right; font-weight: 700; font-variant-numeric: tabular-nums; }
+  .q-eval .q-repartition { grid-column: 1 / -1; color: var(--muted); font-size: 13px; }
+  .barre-note { grid-column: 1 / -1; height: 6px; border-radius: 4px; background: var(--line); overflow: hidden; }
+  .barre-note span { display: block; height: 100%; background: var(--primary); border-radius: 4px; }
+  .comm-eval { list-style: none; padding: 0; margin: 6px 0 0; display: flex; flex-direction: column; gap: 8px; }
+  .comm-eval li { background: var(--bg); border-radius: 10px; padding: 10px 12px; font-size: 14.5px; overflow-wrap: anywhere; }
+  .comm-eval li.bas { background: var(--danger-soft, #FDECEA); }
+  .eval-liste { list-style: none; padding: 0; margin: 8px 0 0; display: flex; flex-direction: column; gap: 8px; }
+  .eval-liste li { display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: wrap; border: 1px solid var(--line); border-radius: 10px; padding: 8px 10px; }
   @media (max-width: 760px) {
     .barre-in { flex-wrap: wrap; padding: 10px 12px; }
     .recherche { order: 3; flex-basis: 100%; }
     .marque { margin-right: auto; }
     .onglets { position: fixed; bottom: 0; left: 0; right: 0; background: var(--card); border-top: 1px solid var(--line); z-index: 30; padding: 0 0 env(safe-area-inset-bottom); justify-content: space-around; max-width: none; gap: 0; }
     .onglets button { flex: 1 1 auto; padding: 13px 2px; border-bottom: 0; border-top: 2px solid transparent; font-size: 13px; white-space: nowrap; }
+    .onglets .lib-long { display: none; }
+    .onglets .lib-court { display: inline; }
+    .sat-tuile .valeur { font-size: 24px; }
+    .qr-eval .qr { width: 168px; height: 168px; }
     .compteur { min-width: 18px; padding: 0 5px; font-size: 11px; line-height: 18px; margin-left: 3px; vertical-align: 1px; }
     .onglets button[aria-selected="true"] { border-top-color: var(--primary); }
     main { padding: 14px 12px 110px; }
@@ -565,6 +607,7 @@
       <button type="button" data-vue="pipeline" aria-selected="false">Pipeline</button>
       <button type="button" data-vue="tableau" aria-selected="false">Tableau</button>
       <button type="button" data-vue="formateurs" aria-selected="false">Formateurs</button>
+      <button type="button" data-vue="satisfaction" aria-selected="false"><span class="lib-long">Satisfaction</span><span class="lib-court" aria-hidden="true">Avis</span></button>
       <button type="button" data-vue="memo" aria-selected="false">Mémo</button>
     </nav>
   </header>
@@ -628,6 +671,12 @@ const LIB_SOURCE = {
   fichier: 'Fichier', drive: 'Drive',
 };
 const ERREURS = {
+  titre_requis: 'Donne un titre à la formation.',
+  dates_inversees: 'La date de fin est avant la date de début.',
+  inscrits_invalide: 'Le nombre de participants doit être un nombre entier entre 1 et 500.',
+  formateur_introuvable: 'Ce formateur n\'existe plus dans le CRM.',
+  evaluation_avec_reponses: 'Cette évaluation a déjà des réponses : ferme-la plutôt que de la supprimer (elles servent de preuve pour Qualiopi).',
+  questions_figees: 'Des participants ont déjà répondu : les objectifs et la modalité ne peuvent plus changer (tout le monde doit répondre au même questionnaire).',
   cle_invalide: "La clé n'est pas la bonne.",
   trop_de_tentatives: 'Trop de tentatives. Réessaie dans dix minutes.',
   crm_non_configure: "Le CRM n'est pas encore configuré sur le serveur.",
@@ -854,6 +903,8 @@ function indexer() {
   IDX.formateur = new Map((D.formateurs || []).map((f) => [f.lead_id, f]));
   IDX.programmes = new Map();
   for (const pr of (D.programmes || []).slice().sort((a, b) => (a.created_at < b.created_at ? 1 : -1))) { if (!IDX.programmes.has(pr.lead_id)) IDX.programmes.set(pr.lead_id, []); IDX.programmes.get(pr.lead_id).push(pr); }
+  IDX.evalReps = new Map();
+  for (const r of D.evaluation_reponses || []) { if (!IDX.evalReps.has(r.evaluation_id)) IDX.evalReps.set(r.evaluation_id, []); IDX.evalReps.get(r.evaluation_id).push(r); }
   IDX.documents = new Map();
   for (const d of D.documents || []) { if (!IDX.documents.has(d.lead_id)) IDX.documents.set(d.lead_id, []); IDX.documents.get(d.lead_id).push(d); }
 }
@@ -924,6 +975,7 @@ function rendre() {
   else if (S.vue === 'pipeline') vue.innerHTML = vuePipeline();
   else if (S.vue === 'memo') vue.innerHTML = vueMemo();
   else if (S.vue === 'formateurs') vue.innerHTML = vueFormateurs();
+  else if (S.vue === 'satisfaction') vue.innerHTML = vueSatisfaction();
   else vue.innerHTML = vueJour();
   chargerLogos();
   if (S.vue === 'jour' && !S.q) setTimeout(recosEnFond, 300);
@@ -1176,6 +1228,7 @@ function rendreFiche() {
     </section>
     ${blocRecap(l)}
     ${l.type === 'formateur' ? '' : blocApresFormation(l)}
+    ${blocEvaluations(l)}
     ${l.type === 'formateur' ? blocDossierFormateur(l) : blocProgramme(l)}
     <section class="bloc">
       <h3>Contacts <button type="button" class="btn petit" data-act="contact-nouveau">Ajouter</button></h3>
@@ -1760,7 +1813,7 @@ document.addEventListener('keydown', (ev) => {
 function brancherDictee(form) {
   if (!Reco) return;
   for (const champ of $$('textarea, input[name="resume"], input[name="consigne"], input[name="apres_note"]', form)) {
-    if (champ.name === 'texte' || champ.dataset.dictee) continue;
+    if (champ.name === 'texte' || champ.dataset.dictee || champ.readOnly || champ.disabled) continue;
     champ.dataset.dictee = '1';
     const b = document.createElement('button');
     b.type = 'button';
@@ -4974,6 +5027,352 @@ document.addEventListener('drop', (ev) => {
   if (id && IDX.lead.has(id)) { if (col.dataset.suivi) changerSuivi(id, col.dataset.suivi); else changerStatut(id, col.dataset.statut); }
 });
 
+/* ================= Satisfaction : évaluations à chaud (10/11/2026) ================= */
+// Gabriel : « envoyer le lien aux apprenants pour qu'ils laissent un avis, et que je puisse piloter le niveau de
+// satisfaction d'une formation ainsi que du formateur qui l'effectue ». Questionnaire d'Ella ; note sur 10 calculée
+// comme dans Ella (même règle que api/_evaluations.js : la réponse la plus basse vaut 0, une rubrique = la moyenne de
+// ses questions notées, une formation = la moyenne de ses rubriques ; un groupe de formations pèse chacune par son
+// nombre de réponses). Les objectifs, le rythme, le oui/non et les textes ne comptent pas dans la note.
+const MODALITES_EVAL = { distanciel: 'À distance', presentiel: 'En présentiel', mixte: 'En présentiel et à distance' };
+const SEUIL_AO = 8; // ce que demandent les acheteurs publics (marché Nouvelle-Aquitaine, novembre 2026)
+const SEUIL_MITIGE_EVAL = 6;
+const FORMATEUR_GABRIEL = 'Gabriel Vanderbecken';
+const moyenneEval = (xs) => (xs.length ? xs.reduce((a, b) => a + b, 0) / xs.length : null);
+const surDix = (n) => (n === null || n === undefined ? '' : (Math.round(n * 10) / 10).toFixed(1).replace('.', ','));
+const pourcent = (x) => `${Math.round(x * 100)} %`;
+function noteQuestionEval(q, v) {
+  if (q.type === 'echelle' && typeof v === 'number') { const min = q.min ?? 1, max = q.max ?? 5; return max > min ? ((v - min) / (max - min)) * 10 : null; }
+  if (q.type === 'niveaux' && typeof v === 'string') { const i = (q.niveaux || []).indexOf(v); return i < 0 || q.niveaux.length < 2 ? null : (i / (q.niveaux.length - 1)) * 10; }
+  return null;
+}
+function rubriquesEval(questions, reponses) {
+  const rubs = [{ titre: null, questions: [] }];
+  for (const q of questions) {
+    if (q.type === 'rubrique') { rubs.push({ titre: q.intitule, questions: [] }); continue; }
+    if (q.objectif || (q.type !== 'echelle' && q.type !== 'niveaux')) continue;
+    const notes = reponses.map((r) => noteQuestionEval(q, r[q.id])).filter((x) => x !== null);
+    rubs.at(-1).questions.push({ q, note: moyenneEval(notes), n: notes.length });
+  }
+  return rubs.filter((r) => r.questions.length).map((r) => ({ ...r, note: moyenneEval(r.questions.map((x) => x.note).filter((x) => x !== null)) })).filter((r) => r.note !== null);
+}
+const evaluations = () => D.evaluations || [];
+const evalParId = (id) => evaluations().find((e) => e.id === id);
+const repsEval = (id) => (IDX.evalReps && IDX.evalReps.get(id)) || [];
+function statsEval(e) {
+  const reps = repsEval(e.id);
+  const rec = reps.filter((r) => typeof r.recommande === 'boolean');
+  return {
+    n: reps.length,
+    note: moyenneEval(rubriquesEval(e.questions || [], reps.map((r) => r.reponses)).map((r) => r.note)),
+    etoiles: moyenneEval(reps.map((r) => r.etoiles).filter((x) => typeof x === 'number')),
+    recOui: rec.filter((r) => r.recommande).length, recN: rec.length,
+  };
+}
+function statsGroupe(es) {
+  let somme = 0, poids = 0, n = 0, formations = 0, recOui = 0, recN = 0;
+  for (const e of es) {
+    const s = statsEval(e);
+    if (!s.n) continue;
+    formations++; n += s.n; recOui += s.recOui; recN += s.recN;
+    if (s.note !== null) { somme += s.note * s.n; poids += s.n; }
+  }
+  return { note: poids ? somme / poids : null, n, formations, recommande: recN ? recOui / recN : null };
+}
+function etatEval(e) {
+  if (!e.ouverte) return 'fermee';
+  if (e.fin && aujourdhui() > ajouterJours(e.fin, 60)) return 'expiree';
+  return 'ouverte';
+}
+const LIB_ETAT_EVAL = { ouverte: 'Lien ouvert', fermee: 'Close', expiree: 'Délai passé (60 jours après la fin)' };
+const classeNote = (n) => (n === null ? '' : n >= SEUIL_AO ? 'n-bon' : n >= SEUIL_MITIGE_EVAL ? 'n-moyen' : 'n-bas');
+const lienEval = (e) => `${location.origin}/evaluation/#${e.jeton}`;
+function datesEval(e) {
+  if (!e.debut && !e.fin) return '';
+  if (e.debut && e.fin && e.fin !== e.debut) return `du ${dateCourte(e.debut)} au ${dateCourte(e.fin)}`;
+  return `le ${dateCourte(e.debut || e.fin)}`;
+}
+const clientEval = (e) => (e.lead_id && IDX.lead.get(e.lead_id) ? IDX.lead.get(e.lead_id).entreprise : '');
+const noteEnTexte = (s) => (s.note === null ? 'pas encore de réponse' : `${surDix(s.note)}/10`);
+
+function vueSatisfaction() {
+  const es = evaluations().slice().sort((a, b) => String(b.fin || b.debut || b.created_at).localeCompare(String(a.fin || a.debut || a.created_at)));
+  const tete = `<div class="tete-vue"><div><h1 class="titre-vue">Satisfaction</h1>
+      <p class="sous-titre">Les évaluations à chaud de tes formations : un lien par formation, à donner aux participants à la fin (chat de la visio, QR code projeté, email au client). Questionnaire et note sur 10 repris d'Ella.</p></div>
+      <button type="button" class="btn primaire" data-act="eval-nouvelle">Nouvelle évaluation</button></div>`;
+  if (!es.length) return `${tete}<section class="bloc vide-sat"><p>Aucune évaluation pour l'instant. Crée la première pour ta prochaine formation : le lien et le QR code sont prêts tout de suite, et les notes arrivent ici au fil des réponses.</p></section>`;
+  const g = statsGroupe(es);
+  const parF = new Map();
+  for (const e of es) { if (!parF.has(e.formateur_nom)) parF.set(e.formateur_nom, []); parF.get(e.formateur_nom).push(e); }
+  const lignesF = [...parF].map(([nom, liste]) => ({ nom, total: liste.length, ...statsGroupe(liste) })).sort((a, b) => b.n - a.n || a.nom.localeCompare(b.nom, 'fr'));
+  const bas = (D.evaluation_reponses || []).filter((r) => r.note !== null && Number(r.note) < SEUIL_MITIGE_EVAL).length;
+  const tuiles = `<div class="sat-tuiles">
+    <div class="sat-tuile"><span class="libelle">Note moyenne, tous formateurs</span><span class="valeur">${g.note === null ? '<small>pas encore de réponse</small>' : `${surDix(g.note)}<small> / 10</small>`}</span><span class="detail">${g.n} réponse${g.n > 1 ? 's' : ''}, ${g.formations} formation${g.formations > 1 ? 's' : ''} évaluée${g.formations > 1 ? 's' : ''}</span></div>
+    <div class="sat-tuile"><span class="libelle">Recommandent la formation</span><span class="valeur">${g.recommande === null ? '<small>pas encore de réponse</small>' : pourcent(g.recommande)}</span><span class="detail">à un collègue</span></div>
+    <div class="sat-tuile"><span class="libelle">Seuil des appels d'offres</span><span class="valeur">${SEUIL_AO}<small> / 10</small></span><span class="detail">${g.note === null ? 'À comparer dès les premières réponses.' : g.note >= SEUIL_AO ? `<span class="ok">Atteint</span> (${surDix(g.note)}/10).` : `Pas atteint pour l'instant (${surDix(g.note)}/10).`}${bas ? ` ${bas} réponse${bas > 1 ? 's' : ''} sous ${SEUIL_MITIGE_EVAL}/10 à regarder.` : ''}</span></div>
+  </div>
+  <div class="actions"><button type="button" class="btn" data-act="eval-bilan">Copier le bilan pour un appel d'offres</button></div>`;
+  const tableF = `<h2 class="sat-h2">Par formateur</h2><div class="sat-table-zone"><table class="sat-table"><thead><tr><th>Formateur</th><th class="num">Formations</th><th class="num">Réponses</th><th class="num">Note /10</th><th class="num">Recommandent</th></tr></thead><tbody>
+    ${lignesF.map((f) => `<tr><td class="nom">${esc(f.nom)}</td><td class="num">${f.total}</td><td class="num">${f.n}</td><td class="num"><span class="note-eval">${f.note === null ? '' : surDix(f.note)}</span></td><td class="num">${f.recommande === null ? '' : pourcent(f.recommande)}</td></tr>`).join('')}
+  </tbody></table></div>`;
+  return `${tete}${tuiles}${tableF}<h2 class="sat-h2">Formations</h2><div class="grille">${es.map(carteEval).join('')}</div>`;
+}
+function carteEval(e) {
+  const s = statsEval(e);
+  const etat = etatEval(e);
+  const client = clientEval(e);
+  return `<article class="carte" data-eval="${e.id}">
+    <div class="carte-haut"><div class="carte-titre"><h3><button type="button" class="lien-carte" data-act="eval-resultats">${esc(e.titre)}</button></h3>
+      <p class="meta">${esc([client, e.formateur_nom].filter(Boolean).join(', '))}</p></div>
+      <span class="statut ${classeNote(s.note)}">${s.note === null ? 'Pas de réponse' : `${surDix(s.note)}/10`}</span></div>
+    <p class="meta">${esc([MODALITES_EVAL[e.modalite], datesEval(e)].filter(Boolean).join(', '))}</p>
+    <p class="meta">${s.n} réponse${s.n > 1 ? 's' : ''}${e.inscrits ? ` sur ${e.inscrits} participant${e.inscrits > 1 ? 's' : ''}` : ''}${s.recN ? `, ${pourcent(s.recOui / s.recN)} recommandent` : ''}. ${esc(LIB_ETAT_EVAL[etat])}.</p>
+    <div class="carte-actions">${etat === 'ouverte' ? '<button type="button" class="btn petit primaire" data-act="eval-lien">Lien et QR code</button>' : ''}<button type="button" class="btn petit" data-act="eval-resultats">Résultats</button></div>
+  </article>`;
+}
+function blocEvaluations(l) {
+  const es = evaluations().filter((e) => (l.type === 'formateur' ? e.formateur_id === l.id : e.lead_id === l.id));
+  if (!es.length && !(l.type === 'client' || l.suivi || l.type === 'formateur')) return '';
+  const g = statsGroupe(es);
+  const bouton = l.type === 'formateur'
+    ? `<button type="button" class="btn petit" data-act="eval-nouvelle" data-formateur="${l.id}">Nouvelle évaluation</button>`
+    : `<button type="button" class="btn petit" data-act="eval-nouvelle" data-lead="${l.id}">Créer l'évaluation</button>`;
+  const resume = g.n ? `<p><b>${surDix(g.note)}/10</b> sur ${g.n} réponse${g.n > 1 ? 's' : ''}${g.formations > 1 ? `, ${g.formations} formations` : ''}${g.recommande !== null ? `. ${pourcent(g.recommande)} recommandent la formation.` : '.'}</p>`
+    : es.length ? '<p class="meta">Pas encore de réponse.</p>'
+    : `<p class="aide">${l.type === 'formateur' ? 'Aucune formation évaluée pour ce formateur.' : 'Crée le lien à donner aux participants à la fin de la formation : chacun répond depuis son téléphone, la note arrive ici et dans l\'onglet Satisfaction.'}</p>`;
+  return `<section class="bloc"><h3>Évaluations à chaud ${bouton}</h3>${resume}
+    ${es.length ? `<ul class="eval-liste">${es.map((e) => { const s = statsEval(e); return `<li data-eval="${e.id}"><span><b>${esc(e.titre)}</b> <span class="meta">${esc([l.type === 'formateur' ? clientEval(e) : e.formateur_nom, datesEval(e)].filter(Boolean).join(', '))}, ${s.n} réponse${s.n > 1 ? 's' : ''}</span></span>
+      <span class="actions">${s.note !== null ? `<span class="statut ${classeNote(s.note)}">${surDix(s.note)}/10</span>` : ''}${etatEval(e) === 'ouverte' ? '<button type="button" class="btn petit" data-act="eval-lien">Lien</button>' : ''}<button type="button" class="btn petit" data-act="eval-resultats">Résultats</button></span></li>`; }).join('')}</ul>` : ''}
+  </section>`;
+}
+
+/* ----- Créer ou modifier une évaluation ----- */
+function ouvrirEvaluation(e = null, { leadId = '', formateurId = '' } = {}) {
+  const lead = IDX.lead.get(e ? e.lead_id : leadId) || null;
+  const programme = lead && !e ? (IDX.programmes.get(lead.id) || [])[0] : null;
+  const fige = e && repsEval(e.id).length > 0;
+  const objectifs = e ? e.objectifs : programme && programme.contenu ? programme.contenu.objectifs || [] : [];
+  const formateursListe = D.leads.filter((x) => x.type === 'formateur' && !x.archive).sort((a, b) => a.entreprise.localeCompare(b.entreprise, 'fr'));
+  const fId = e ? e.formateur_id || '' : formateurId || (programme && programme.formateur_id) || '';
+  const clients = D.leads.filter((x) => !x.archive && x.type !== 'formateur').sort((a, b) => a.entreprise.localeCompare(b.entreprise, 'fr'));
+  const estClient = (x) => x.type === 'client' || x.statut === 'gagne';
+  const optLead = (x) => `<option value="${x.id}" ${lead && lead.id === x.id ? 'selected' : ''}>${esc(x.entreprise)}</option>`;
+  const titre = e ? e.titre : programme && programme.contenu ? programme.contenu.titre : lead ? `Formation IA, ${lead.entreprise}` : '';
+  ouvrirModale(`<h2>${e ? 'Modifier l\'évaluation' : 'Nouvelle évaluation à chaud'}</h2>
+    <p class="aide">Un seul lien pour toute la formation, à donner aux participants à la fin : chacun répond une fois, depuis son téléphone ou son ordinateur, sans compte. Le questionnaire est celui d'Ella : avant la formation, organisation, animation, contenu, ce que la formation apporte, l'atteinte de chaque objectif, puis une note sur 5 étoiles, la recommandation et deux commentaires.</p>
+    ${champ('Titre de la formation', `<input type="text" name="titre" maxlength="200" required value="${esc(titre)}" ${e ? '' : 'autofocus'}>`)}
+    <div class="deux">
+      ${champ('Client', `<select name="lead_id"><option value="">Aucun (formation inter-entreprises)</option><optgroup label="Clients">${clients.filter(estClient).map(optLead).join('')}</optgroup><optgroup label="Autres fiches">${clients.filter((x) => !estClient(x)).map(optLead).join('')}</optgroup></select>`, 'Les participants pourront accepter que leur commentaire soit publié sur le site : il arrive alors dans les avis du client.')}
+      ${champ('Formateur', `<select name="formateur_id"><option value="">${FORMATEUR_GABRIEL}</option>${formateursListe.map((f) => `<option value="${f.id}" ${f.id === fId ? 'selected' : ''}>${esc(f.entreprise)}</option>`).join('')}</select>`)}
+    </div>
+    <div class="deux">
+      ${champ('Début', `<input type="date" name="debut" value="${esc(e ? e.debut || '' : lead && lead.formation_debut || '')}">`)}
+      ${champ('Fin', `<input type="date" name="fin" value="${esc(e ? e.fin || '' : lead && lead.formation_fin || '')}">`, 'Le lien reste ouvert jusqu\'à 60 jours après la fin.')}
+    </div>
+    <div class="deux">
+      ${champ('Modalité', `<select name="modalite" ${fige ? 'disabled' : ''}>${options(Object.entries(MODALITES_EVAL), e ? e.modalite : 'distanciel')}</select>`, 'Elle change la question sur l\'organisation (salle ou visio).')}
+      ${champ('Nombre de participants', `<input type="number" name="inscrits" min="1" max="500" inputmode="numeric" value="${esc(e && e.inscrits ? e.inscrits : '')}">`, 'Facultatif : sert à suivre le taux de réponse.')}
+    </div>
+    ${champ('Objectifs de la formation, un par ligne', `<textarea name="objectifs" rows="5" ${fige ? 'disabled' : ''} placeholder="Rédiger un email client avec un assistant IA&#10;Vérifier une réponse et repérer une erreur">${esc(objectifs.join('\n'))}</textarea>`, fige ? 'Des participants ont déjà répondu : les objectifs ne changent plus.' : programme ? `Repris du programme « ${esc(programme.titre)} ». Pour chacun, le participant dit si la formation lui a permis de l'atteindre.` : 'Ceux du programme. Pour chacun, le participant dit si la formation lui a permis de l\'atteindre (sans objectif, le bloc n\'apparaît pas).')}
+    <input type="hidden" name="programme_id" value="${esc(e ? e.programme_id || '' : programme ? programme.id : '')}">
+    ${piedFormulaire(`<button type="submit" class="btn primaire">${e ? 'Enregistrer' : 'Créer le lien'}</button>`)}`, (form) => {
+    brancherAnnuler(form);
+    form.addEventListener('submit', (ev) => {
+      ev.preventDefault();
+      const el = form.elements;
+      if (!el.titre.value.trim()) return montrerErreur(form, ERREURS.titre_requis, el.titre);
+      soumettre(form, async () => {
+        const valeurs = { titre: el.titre.value, lead_id: el.lead_id.value || null, formateur_id: el.formateur_id.value || null, debut: el.debut.value || null, fin: el.fin.value || null, inscrits: el.inscrits.value ? Number(el.inscrits.value) : null };
+        if (!fige) Object.assign(valeurs, { modalite: el.modalite.value, objectifs: el.objectifs.value.split('\n').map((x) => x.replace(/^\s*[-•*\d.)]+\s*/, '').trim()).filter(Boolean) });
+        if (!e) valeurs.programme_id = el.programme_id.value || null;
+        const r = await api('POST', { op: e ? 'evaluation_maj' : 'evaluation_creer', ...(e ? { id: e.id } : {}), ...valeurs });
+        D.evaluations = [r.evaluation, ...evaluations().filter((x) => x.id !== r.evaluation.id)];
+        if (!e) await charger();
+        rendre(); if (S.fiche) rendreFiche();
+        if (e) { fermerModale(); toast('Évaluation enregistrée.'); } else ouvrirLienEvaluation(r.evaluation);
+      });
+    });
+  });
+}
+
+/* ----- Le lien, le QR code et le message à donner aux participants ----- */
+let qrPret = null;
+function chargerQr() {
+  if (!qrPret) qrPret = new Promise((ok, ko) => { const sc = document.createElement('script'); sc.src = '/crm/qrcode.js'; sc.onload = () => ok(window.qrcode); sc.onerror = () => { qrPret = null; ko(new Error('qr')); }; document.head.append(sc); });
+  return qrPret;
+}
+async function svgQr(texte) {
+  const qrcode = await chargerQr();
+  const q = qrcode(0, 'M');
+  q.addData(texte);
+  q.make();
+  return q.createSvgTag({ cellSize: 4, margin: 4, scalable: true, alt: 'QR code du lien de l\'évaluation' });
+}
+const messageEval = (e) => `Merci pour votre participation ! Avant de partir, pouvez-vous évaluer la formation ? Cela prend 3 minutes, depuis votre téléphone ou votre ordinateur : ${lienEval(e)}`;
+function ouvrirLienEvaluation(e) {
+  const lead = IDX.lead.get(e.lead_id);
+  const avecEmail = lead && emailDe(lead);
+  ouvrirModale(`<h2>Lien de l'évaluation</h2>
+    <p class="aide">« ${esc(e.titre)} »${clientEval(e) ? `, ${esc(clientEval(e))}` : ''}, formateur ${esc(e.formateur_nom)}. Un seul lien pour tous les participants : donne-le à la fin de la dernière séance, pendant qu'ils sont encore là, c'est là que presque tout le monde répond.</p>
+    <div class="lien-eval"><input type="text" readonly value="${esc(lienEval(e))}" aria-label="Lien de l'évaluation"><button type="button" class="btn" data-copier="${esc(lienEval(e))}">Copier le lien</button></div>
+    <div class="qr-eval"><div class="qr" data-qr aria-busy="true"></div><div><p class="meta">En présentiel : projette le QR code, ils le scannent avec l'appareil photo de leur téléphone.</p><p><button type="button" class="btn" data-act="eval-qr-grand" data-eval="${e.id}">Afficher en grand pour le projeter</button></p></div></div>
+    ${champ('Message à coller dans le chat de la visio', `<textarea readonly rows="3">${esc(messageEval(e))}</textarea>`)}
+    <div class="actions"><button type="button" class="btn" data-copier="${esc(messageEval(e))}">Copier le message</button>${avecEmail ? `<button type="button" class="btn" data-act="eval-email" data-eval="${e.id}">L'envoyer à ${esc(nomContact(contactPrincipal(lead.id)) || lead.entreprise)} pour qu'il le transfère</button>` : ''}<a class="btn lien" href="${esc(lienEval(e))}" target="_blank" rel="noopener">Voir le questionnaire</a></div>
+    <p class="meta">Si tu ouvres le questionnaire pour l'essayer et que tu l'envoies, supprime ensuite ta réponse de test dans Résultats : elle compterait dans la moyenne.</p>
+    <div class="pied"><button type="button" class="btn primaire" data-fermer>Fermer</button></div>`, (form) => {
+    brancherAnnuler(form);
+    svgQr(lienEval(e)).then((svg) => { const z = $('[data-qr]', form); if (z) { z.innerHTML = svg; z.removeAttribute('aria-busy'); } })
+      .catch(() => { const z = $('[data-qr]', form); if (z) z.outerHTML = '<p class="meta">Le QR code ne s\'affiche pas : copie le lien.</p>'; });
+  });
+}
+async function afficherQrGrand(e) {
+  const w = window.open('', '_blank');
+  if (!w) return toast('Autorise les fenêtres pour afficher le QR code.');
+  const svg = await svgQr(lienEval(e)).catch(() => '');
+  w.document.write(`<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8"><title>Évaluation de la formation</title><style>
+    body { margin: 0; font-family: Arial, sans-serif; color: #0A0F2C; background: #fff; min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 18px; text-align: center; padding: 24px; box-sizing: border-box; }
+    h1 { font-size: clamp(24px, 4vw, 44px); margin: 0; } p { font-size: clamp(16px, 2vw, 24px); margin: 0; color: #525880; }
+    .qr { width: min(70vh, 80vw); height: min(70vh, 80vw); } .qr svg { width: 100%; height: 100%; } img { height: 34px; }
+  </style></head><body><img src="${location.origin}/images/logo-ia-entrepreneur-compact.png" alt="IA-Entrepreneur"><h1>Évaluez la formation</h1><div class="qr">${svg}</div><p>Scannez avec l'appareil photo de votre téléphone : 3 minutes, merci !</p></body></html>`);
+  w.document.close();
+}
+function envoyerLienEval(e) {
+  const lead = IDX.lead.get(e.lead_id);
+  if (!lead) return;
+  const c = contactsDe(lead.id).find((x) => x.email && x.principal) || contactsDe(lead.id).find((x) => x.email) || null;
+  ouvrirEmail(lead.id, c ? c.id : undefined);
+  const nouveau = $('#modale [data-nouveau]');
+  if (nouveau && !nouveau.hidden) nouveau.click();
+  const el = $('#modale form').elements;
+  const sig = (D.reglages.signature || SIGNATURE_DEFAUT).trim();
+  el.objet.value = `Évaluation de la formation « ${e.titre} »`;
+  el.corps.value = `${salutation(c)}\n\nMerci encore pour la formation. Pouvez-vous transférer ce lien aux participants ? Chacun peut l'évaluer en 3 minutes, depuis son téléphone ou son ordinateur :\n${lienEval(e)}\n\nLeurs réponses nous servent à améliorer la formation.\n\nBonne journée,\n\n${sig}`;
+}
+
+/* ----- Les résultats d'une formation ----- */
+function repartition(q, reps) {
+  const opts = q.type === 'niveaux' ? q.niveaux : q.type === 'choix' ? q.choix : q.type === 'oui_non' ? [true, false] : q.type === 'echelle' ? Array.from({ length: q.max - q.min + 1 }, (_, i) => q.max - i) : [];
+  const lib = (o) => (q.type === 'oui_non' ? (o ? 'Oui' : 'Non') : q.type === 'echelle' ? `${o} étoile${o > 1 ? 's' : ''}` : o);
+  return opts.map((o) => [lib(o), reps.filter((r) => r[q.id] === o).length]).filter(([, n]) => n).map(([l, n]) => `${l} ${n}`).join(', ');
+}
+function htmlResultats(e, { imprime = false } = {}) {
+  const reps = repsEval(e.id);
+  const r = reps.map((x) => x.reponses);
+  const s = statsEval(e);
+  const qs = e.questions || [];
+  const rubs = rubriquesEval(qs, r);
+  const objectifs = qs.filter((q) => q.objectif);
+  const q12 = qs.find((q) => q.id === 'q12');
+  const ligneQ = (q, note, n) => `<div class="q-eval"><span>${esc(q.intitule)}</span><span class="q-note">${note === null ? '' : surDix(note)}</span>
+    ${note === null ? '' : `<div class="barre-note" aria-hidden="true"><span style="width:${Math.round(note * 10)}%"></span></div>`}<span class="q-repartition">${esc(repartition(q, r))}${n ? '' : 'pas de réponse'}</span></div>`;
+  const tuiles = `<div class="sat-tuiles">
+    <div class="sat-tuile"><span class="libelle">Note de la formation</span><span class="valeur">${s.note === null ? '<small>pas encore de réponse</small>' : `${surDix(s.note)}<small> / 10</small>`}</span></div>
+    <div class="sat-tuile"><span class="libelle">Réponses</span><span class="valeur">${s.n}${e.inscrits ? `<small> sur ${e.inscrits}</small>` : ''}</span><span class="detail">${e.inscrits && s.n ? `taux de réponse ${pourcent(Math.min(1, s.n / e.inscrits))}` : ''}</span></div>
+    <div class="sat-tuile"><span class="libelle">Note donnée</span><span class="valeur">${s.etoiles === null ? '<small>pas encore</small>' : `${surDix(s.etoiles)}<small> / 5 étoiles</small>`}</span></div>
+    <div class="sat-tuile"><span class="libelle">Recommandent</span><span class="valeur">${s.recN ? pourcent(s.recOui / s.recN) : '<small>pas encore</small>'}</span></div>
+  </div>`;
+  const parRub = rubs.map((rb) => `<div class="rub-eval"><h4><span>${esc(rb.titre || 'Questions')}</span><span class="note-eval">${surDix(rb.note)}/10</span></h4>${rb.questions.map((x) => ligneQ(x.q, x.note, x.n)).join('')}</div>`).join('');
+  const blocObj = objectifs.length ? `<div class="rub-eval"><h4><span>Atteinte des objectifs</span><span class="meta">hors note</span></h4>${objectifs.map((q) => {
+    const vals = r.map((x) => noteQuestionEval(q, x[q.id])).filter((x) => x !== null);
+    const atteint = r.filter((x) => ['En partie', 'Totalement'].includes(x[q.id])).length;
+    return `<div class="q-eval"><span>${esc(q.intitule)}</span><span class="q-note">${vals.length ? surDix(moyenneEval(vals)) : ''}</span>${vals.length ? `<div class="barre-note" aria-hidden="true"><span style="width:${Math.round(moyenneEval(vals) * 10)}%"></span></div>` : ''}<span class="q-repartition">${vals.length ? `${pourcent(atteint / vals.length)} l'estiment atteint en partie ou totalement. ${esc(repartition(q, r))}` : 'pas de réponse'}</span></div>`;
+  }).join('')}</div>` : '';
+  const rythme = q12 && r.length ? `<p class="meta">Rythme : ${esc(repartition(q12, r))}.</p>` : '';
+  const comms = reps.filter((x) => x.reponses.q26 || x.reponses.q27);
+  const blocComms = `<div class="rub-eval"><h4><span>Commentaires</span><span class="meta">${comms.length}</span></h4>${comms.length ? `<ul class="comm-eval">${comms.map((x) => `<li class="${x.note !== null && Number(x.note) < SEUIL_MITIGE_EVAL ? 'bas' : ''}"><p class="meta">${esc(x.participant || 'Anonyme')}, ${esc(instantLisible(x.created_at))}${x.note !== null ? `, ${surDix(Number(x.note))}/10` : ''}</p>${x.reponses.q26 ? `<p><b>Le plus apprécié :</b> ${esc(x.reponses.q26)}</p>` : ''}${x.reponses.q27 ? `<p><b>À améliorer :</b> ${esc(x.reponses.q27)}</p>` : ''}</li>`).join('')}</ul>` : '<p class="meta">Aucun commentaire.</p>'}</div>`;
+  const blocReps = imprime ? '' : `<div class="rub-eval"><h4><span>Réponses une par une</span><span class="meta">${reps.length}</span></h4>${reps.length ? `<div class="sat-table-zone"><table class="sat-table"><thead><tr><th>Reçue le</th><th>Participant</th><th class="num">Note /10</th><th class="num">Étoiles</th><th>Recommande</th><th></th></tr></thead><tbody>${reps.slice().reverse().map((x) => `<tr data-reponse="${x.id}"><td>${esc(instantLisible(x.created_at))}</td><td class="nom">${esc(x.participant || 'Anonyme')}</td><td class="num">${x.note === null ? '' : surDix(Number(x.note))}</td><td class="num">${x.etoiles ?? ''}</td><td>${x.recommande === true ? 'Oui' : x.recommande === false ? 'Non' : ''}</td><td><button type="button" class="btn petit lien" data-act="eval-reponse-suppr">Supprimer (test)</button></td></tr>`).join('')}</tbody></table></div>` : '<p class="meta">Pas encore de réponse.</p>'}</div>`;
+  return `${tuiles}${parRub}${rythme}${blocObj}${blocComms}${blocReps}`;
+}
+function ouvrirResultatsEvaluation(e) {
+  const etat = etatEval(e);
+  const s = statsEval(e);
+  ouvrirModale(`<h2>${esc(e.titre)}</h2>
+    <p class="meta">${esc([clientEval(e), `formateur ${e.formateur_nom}`, MODALITES_EVAL[e.modalite], datesEval(e)].filter(Boolean).join(', '))}. ${esc(LIB_ETAT_EVAL[etat])}.</p>
+    <div class="actions">${etat === 'ouverte' ? '<button type="button" class="btn primaire" data-act="eval-lien">Lien et QR code</button>' : ''}<button type="button" class="btn" data-act="eval-imprimer">Imprimer ou PDF</button><button type="button" class="btn" data-act="eval-modifier">Modifier</button>${e.ouverte ? '<button type="button" class="btn" data-act="eval-fermer">Clore l\'évaluation</button>' : '<button type="button" class="btn" data-act="eval-rouvrir">Rouvrir</button>'}${s.n ? '' : '<button type="button" class="btn lien" data-act="eval-supprimer">Supprimer</button>'}</div>
+    ${htmlResultats(e)}
+    <div class="pied"><button type="button" class="btn" data-fermer>Fermer</button></div>`, (form) => { form.dataset.eval = e.id; brancherAnnuler(form); }, { large: true });
+}
+function imprimerResultats(e) {
+  const w = window.open('', '_blank');
+  if (!w) return toast('Autorise les fenêtres pour imprimer.');
+  w.document.write(`<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8"><title>Évaluation à chaud : ${esc(e.titre)}</title><style>
+    body { font-family: Arial, sans-serif; color: #0A0F2C; font-size: 10.5pt; line-height: 1.4; max-width: 780px; margin: 24px auto; padding: 0 20px; }
+    header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #1A3CFF; padding-bottom: 10px; margin-bottom: 12px; } header img { height: 28px; }
+    h1 { font-size: 16pt; margin: 0 0 4px; } .meta { color: #525880; } p { margin: 3px 0; }
+    .sat-tuiles { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin: 12px 0; } .sat-tuile { border: 1px solid #C9D0EA; border-radius: 8px; padding: 8px 10px; display: flex; flex-direction: column; }
+    .sat-tuile .libelle { font-size: 9pt; color: #525880; } .sat-tuile .valeur { font-size: 16pt; font-weight: bold; } .sat-tuile small { font-size: 9pt; color: #525880; } .detail { font-size: 9pt; color: #525880; }
+    .rub-eval { border-top: 1px solid #E3E7F5; padding: 8px 0; break-inside: avoid; } h4 { display: flex; justify-content: space-between; margin: 0 0 4px; font-size: 11.5pt; }
+    .q-eval { display: grid; grid-template-columns: 1fr 50px; gap: 1px 10px; padding: 3px 0; } .q-note { text-align: right; font-weight: bold; } .q-repartition { grid-column: 1 / -1; color: #525880; font-size: 9pt; }
+    .barre-note { display: none; } .comm-eval { list-style: none; padding: 0; margin: 4px 0; } .comm-eval li { border-left: 3px solid #C9D0EA; padding: 2px 8px; margin: 4px 0; break-inside: avoid; }
+    footer { margin-top: 16px; border-top: 1px solid #C9D0EA; padding-top: 8px; font-size: 8.5pt; color: #525880; }
+  </style></head><body><header><img src="${location.origin}/images/logo-ia-entrepreneur-compact.png" alt="IA-Entrepreneur"><span>Évaluation à chaud</span></header>
+    <h1>${esc(e.titre)}</h1><p class="meta">${esc([clientEval(e), `formateur : ${e.formateur_nom}`, MODALITES_EVAL[e.modalite], datesEval(e)].filter(Boolean).join(', '))}. Édité le ${esc(dateCourte(aujourdhui()))}.</p>
+    ${htmlResultats(e, { imprime: true })}
+    <footer>IA-Entrepreneur, organisme de formation certifié Qualiopi au titre des actions de formation. Note sur 10 : chaque réponse est placée sur son échelle (la plus basse vaut 0, la plus haute 10), une rubrique vaut la moyenne de ses questions, la formation la moyenne de ses rubriques ; l'atteinte des objectifs, le rythme et la recommandation sont présentés à part.</footer>
+    <script>window.onload = () => setTimeout(() => window.print(), 300);<\/script></body></html>`);
+  w.document.close();
+}
+function texteBilanAO() {
+  const es = evaluations();
+  const g = statsGroupe(es);
+  if (!g.n) return 'Pas encore de réponse aux évaluations à chaud : le bilan sera disponible après les premières formations évaluées.';
+  const dates = es.filter((e) => repsEval(e.id).length).map((e) => e.fin || e.debut).filter(Boolean).sort();
+  const periode = dates.length ? (dates[0] === dates.at(-1) ? `, formation du ${dateCourte(dates[0])}` : `, formations du ${dateCourte(dates[0])} au ${dateCourte(dates.at(-1))}`) : '';
+  const parF = new Map();
+  for (const e of es) { if (!parF.has(e.formateur_nom)) parF.set(e.formateur_nom, []); parF.get(e.formateur_nom).push(e); }
+  const lignes = [...parF].map(([nom, l]) => ({ nom, ...statsGroupe(l) })).filter((f) => f.n).sort((a, b) => b.n - a.n);
+  return [
+    `Satisfaction des participants à nos formations (évaluations à chaud, IA-Entrepreneur, au ${dateCourte(aujourdhui())}) : ${surDix(g.note)}/10 en moyenne, sur ${g.n} réponse${g.n > 1 ? 's' : ''} de participants (${g.formations} formation${g.formations > 1 ? 's' : ''}${periode}).`,
+    g.recommande !== null ? `${pourcent(g.recommande)} des participants recommandent la formation à un collègue.` : '',
+    lignes.length > 1 ? `Par formateur :\n${lignes.map((f) => `- ${f.nom} : ${surDix(f.note)}/10 (${f.n} réponse${f.n > 1 ? 's' : ''}, ${f.formations} formation${f.formations > 1 ? 's' : ''})`).join('\n')}` : '',
+    'Méthode : questionnaire de fin de formation rempli par chaque participant (organisation, animation, contenu, apports de la formation). Chaque réponse est placée sur son échelle, la plus basse valant 0 et la plus haute 10 ; la note d\'une formation est la moyenne de ces rubriques, et la moyenne générale pèse chaque formation par son nombre de réponses.',
+  ].filter(Boolean).join('\n\n');
+}
+function ouvrirBilanAO() {
+  const t = texteBilanAO();
+  ouvrirModale(`<h2>Bilan pour un appel d'offres</h2>
+    <p class="aide">Calculé sur les réponses réellement reçues, à coller dans un mémoire technique (Ludovic). Les réponses de test supprimées n'y sont pas.</p>
+    ${champ('Texte', `<textarea readonly rows="12">${esc(t)}</textarea>`)}
+    <div class="pied"><button type="button" class="btn primaire" data-copier="${esc(t)}">Copier</button><button type="button" class="btn" data-fermer>Fermer</button></div>`, (form) => brancherAnnuler(form));
+}
+async function actionEval(act, cible) {
+  const zone = cible.closest('[data-eval]');
+  const e = evalParId(cible.dataset.eval || (zone && zone.dataset.eval) || '');
+  if (act === 'eval-nouvelle') return ouvrirEvaluation(null, { leadId: cible.dataset.lead || '', formateurId: cible.dataset.formateur || '' });
+  if (act === 'eval-bilan') return ouvrirBilanAO();
+  if (!e) return;
+  if (act === 'eval-lien') return ouvrirLienEvaluation(e);
+  if (act === 'eval-resultats') return ouvrirResultatsEvaluation(e);
+  if (act === 'eval-modifier') return ouvrirEvaluation(e);
+  if (act === 'eval-imprimer') return imprimerResultats(e);
+  if (act === 'eval-qr-grand') return afficherQrGrand(e);
+  if (act === 'eval-email') return envoyerLienEval(e);
+  try {
+    if (act === 'eval-fermer' || act === 'eval-rouvrir') {
+      const r = await api('POST', { op: 'evaluation_maj', id: e.id, ouverte: act === 'eval-rouvrir' });
+      D.evaluations = evaluations().map((x) => (x.id === e.id ? r.evaluation : x));
+      rendre(); if (S.fiche) rendreFiche();
+      ouvrirResultatsEvaluation(r.evaluation);
+      return toast(act === 'eval-fermer' ? 'Évaluation close : le lien ne prend plus de réponse.' : 'Évaluation rouverte.');
+    }
+    if (act === 'eval-supprimer') {
+      if (!confirm(`Supprimer l'évaluation « ${e.titre} » ? Le lien ne marchera plus.`)) return;
+      await api('POST', { op: 'evaluation_supprimer', id: e.id });
+      D.evaluations = evaluations().filter((x) => x.id !== e.id);
+      fermerModale(); rendre(); if (S.fiche) rendreFiche();
+      return toast('Évaluation supprimée.');
+    }
+    if (act === 'eval-reponse-suppr') {
+      const tr = cible.closest('[data-reponse]');
+      if (!tr || !confirm('Supprimer cette réponse ? Elle ne comptera plus dans la moyenne. À réserver aux essais.')) return;
+      await api('POST', { op: 'evaluation_reponse_supprimer', id: tr.dataset.reponse });
+      D.evaluation_reponses = (D.evaluation_reponses || []).filter((x) => x.id !== tr.dataset.reponse);
+      indexer(); rendre(); if (S.fiche) rendreFiche();
+      ouvrirResultatsEvaluation(e);
+      return toast('Réponse supprimée.');
+    }
+  } catch (err) { toast(err.message); }
+}
+
 /* ================= Événements ================= */
 
 document.addEventListener('click', (ev) => {
@@ -4992,6 +5391,7 @@ document.addEventListener('click', (ev) => {
   switch (act) {
     case 'ouvrir': S.journalEdition = false; return ouvrirFiche(leadId);
     case 'echanges': return ouvrirEchanges(leadId, cible.dataset.fil || null);
+    case 'eval-nouvelle': case 'eval-bilan': case 'eval-lien': case 'eval-resultats': case 'eval-modifier': case 'eval-imprimer': case 'eval-qr-grand': case 'eval-email': case 'eval-fermer': case 'eval-rouvrir': case 'eval-supprimer': case 'eval-reponse-suppr': return actionEval(act, cible);
     case 'formateur-nouveau': return ouvrirNouveauFormateur();
     case 'programme-generer': return ouvrirGenererProgramme(IDX.lead.get(leadId));
     case 'programme-ouvrir': return ouvrirProgramme(cible.dataset.programme, { reco: cible.dataset.reco === '1' });

@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Évaluation de la formation (IA-Entrepreneur)</title>
+<!-- Page ouverte avec le lien d'une formation, donné aux participants à la fin : jamais dans Google, liée nulle part. -->
+<meta name="robots" content="noindex, nofollow">
+<meta name="referrer" content="no-referrer">
+<meta name="theme-color" content="#FFFFFF">
+<link rel="icon" type="image/png" href="/favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #F7F8FD; --card: #FFFFFF; --text: #0A0F2C; --muted: #525880; --line: #E3E7F5; --line-strong: #C9D0EA;
+    --primary: #1A3CFF; --primary-dark: #1532D6; --primary-soft: #EEF1FF; --accent: #10B981;
+    --danger: #B42318; --danger-soft: #FDECEA; --etoile: #F5A524; --radius: 14px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { -webkit-text-size-adjust: 100%; scroll-padding-top: 16px; }
+  body { background: var(--bg); color: var(--text); font-family: 'Plus Jakarta Sans', Arial, sans-serif; font-size: 16px; line-height: 1.55; padding-bottom: 48px; }
+  a { color: var(--primary); }
+  .haut { background: #fff; border-bottom: 1px solid var(--line); padding: 14px 20px; }
+  .haut img { height: 26px; width: auto; display: block; }
+  main { max-width: 680px; margin: 0 auto; padding: 24px 16px; }
+  h1 { font-size: 24px; line-height: 1.25; letter-spacing: -0.01em; }
+  .sous { color: var(--muted); margin-top: 6px; }
+  .infos { margin-top: 10px; font-size: 14.5px; color: var(--muted); display: flex; flex-direction: column; gap: 2px; }
+  .infos b { color: var(--text); font-weight: 600; }
+  form, #questions { display: flex; flex-direction: column; gap: 16px; }
+  form { margin-top: 20px; }
+  .rubrique, .fin, .merci, .erreur-page, .deja { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); padding: 18px; display: flex; flex-direction: column; gap: 20px; }
+  .rubrique h2 { font-size: 18px; line-height: 1.3; }
+  .rubrique .aide-rubrique { color: var(--muted); font-size: 14.5px; margin-top: -14px; }
+  fieldset { border: 0; display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+  legend { font-weight: 700; font-size: 15.5px; line-height: 1.4; margin-bottom: 10px; padding: 0; }
+  legend .fac { font-weight: 400; color: var(--muted); font-size: 13.5px; }
+  fieldset.manque legend { color: var(--danger); }
+  fieldset.manque .options label { border-color: var(--danger); }
+  .options { display: grid; grid-template-columns: repeat(var(--n, 4), minmax(0, 1fr)); gap: 8px; }
+  .options input { position: absolute; opacity: 0; width: 1px; height: 1px; }
+  .options label { display: flex; align-items: center; justify-content: center; text-align: center; min-height: 48px; padding: 8px 6px; border: 1px solid var(--line-strong); border-radius: 10px; background: #fff; font-size: 14.5px; font-weight: 600; line-height: 1.25; cursor: pointer; user-select: none; }
+  .options label:hover { border-color: var(--primary); }
+  .options input:checked + label { background: var(--primary); border-color: var(--primary); color: #fff; }
+  .options input:focus-visible + label { outline: 2px solid var(--primary); outline-offset: 2px; }
+  .etoiles { display: flex; gap: 6px; flex-direction: row-reverse; justify-content: flex-end; }
+  .etoiles input { position: absolute; opacity: 0; width: 1px; height: 1px; }
+  .etoiles label { font-size: 40px; line-height: 1; color: var(--line-strong); cursor: pointer; padding: 2px; border-radius: 8px; }
+  .etoiles input:checked ~ label, .etoiles label:hover, .etoiles label:hover ~ label { color: var(--etoile); }
+  .etoiles input:focus-visible + label { outline: 2px solid var(--primary); outline-offset: 2px; }
+  fieldset.manque .etoiles label { color: #F2B8B5; }
+  .objectif-texte { font-weight: 600; }
+  label.champ { display: flex; flex-direction: column; gap: 6px; font-weight: 600; font-size: 15px; }
+  label.champ .fac { font-weight: 400; color: var(--muted); font-size: 13.5px; }
+  textarea, input[type="text"] { font: inherit; font-size: 16px; border: 1px solid var(--line-strong); border-radius: 10px; padding: 10px 12px; background: #fff; color: var(--text); width: 100%; }
+  textarea { min-height: 96px; resize: vertical; }
+  .case { display: flex; gap: 10px; align-items: flex-start; font-size: 15px; font-weight: 400; }
+  .case input { width: 20px; height: 20px; margin-top: 2px; flex: none; }
+  .cite { display: flex; flex-direction: column; gap: 12px; border-top: 1px solid var(--line); padding-top: 14px; }
+  .btn { font: inherit; font-weight: 700; font-size: 16px; border-radius: 12px; padding: 13px 18px; border: 1px solid var(--line-strong); background: #fff; color: var(--text); cursor: pointer; text-decoration: none; display: inline-flex; justify-content: center; align-items: center; min-height: 48px; }
+  .btn.primaire { background: var(--primary); border-color: var(--primary); color: #fff; }
+  .btn.primaire:hover { background: var(--primary-dark); }
+  .btn:disabled { opacity: .6; cursor: default; }
+  .erreur { color: var(--danger); font-weight: 600; font-size: 15px; }
+  .merci h2, .deja h2 { font-size: 20px; }
+  .rgpd { font-size: 12.5px; color: var(--muted); }
+  .avancement { position: sticky; top: 0; z-index: 2; background: var(--bg); padding: 8px 0; font-size: 13.5px; color: var(--muted); }
+  .avancement .barre { height: 4px; background: var(--line); border-radius: 4px; margin-top: 4px; overflow: hidden; }
+  .avancement .barre span { display: block; height: 100%; width: 0; background: var(--primary); transition: width .2s; }
+  [hidden] { display: none !important; }
+  @media (max-width: 520px) {
+    h1 { font-size: 21px; }
+    .rubrique, .fin { padding: 16px 14px; }
+    .options[style*="--n:4"] { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .etoiles label { font-size: 36px; }
+  }
+</style>
+</head>
+<body>
+<div class="haut"><img src="/images/logo-ia-entrepreneur-compact.png" alt="IA-Entrepreneur" width="120" height="26"></div>
+<main>
+  <h1>Évaluation de la formation</h1>
+  <p class="sous">Quelques minutes pour nous dire comment s'est passée la formation. Vos réponses servent à l'améliorer.</p>
+  <div class="infos" id="infos" hidden></div>
+
+  <div class="avancement" id="avancement" hidden aria-hidden="true"><span id="avancement-texte"></span><div class="barre"><span id="avancement-barre"></span></div></div>
+
+  <form id="eval" novalidate hidden>
+    <div id="questions"></div>
+    <section class="fin">
+      <label class="champ">Votre prénom et votre nom <span class="fac">(facultatif)</span><input type="text" name="participant" maxlength="120" autocomplete="name"></label>
+      <div id="bloc-cite" hidden>
+        <label class="case"><input type="checkbox" name="accord"> J'accepte que mon commentaire « Ce que vous avez le plus apprécié » soit publié sur ia-entrepreneur.fr avec mon nom, ma fonction et mon entreprise.</label>
+        <div class="cite" id="cite" hidden>
+          <label class="champ">Votre prénom et votre nom<input type="text" name="nom" maxlength="120" autocomplete="name"></label>
+          <label class="champ">Votre fonction <span class="fac">(facultatif)</span><input type="text" name="fonction" maxlength="120" autocomplete="organization-title"></label>
+          <label class="champ">Votre entreprise<input type="text" name="entreprise" maxlength="160" autocomplete="organization"></label>
+        </div>
+      </div>
+      <p class="erreur" id="erreur" role="alert" hidden></p>
+      <button type="submit" class="btn primaire">Envoyer mon évaluation</button>
+      <p class="rgpd">Vos réponses sont lues par Gabriel Vanderbecken (IA-Entrepreneur, marque de Clindit SASU, organisme de formation certifié Qualiopi) et par le formateur, pour améliorer la formation. Votre nom est facultatif. Votre commentaire n'est publié que si vous cochez la case, et vous pouvez demander à tout moment qu'il soit retiré ou supprimé en écrivant à gabriel@ia-entrepreneur.fr. <a href="/politique-confidentialite.html">Politique de confidentialité</a>.</p>
+    </section>
+  </form>
+
+  <section class="merci" id="merci" hidden aria-live="polite">
+    <h2>Merci pour votre évaluation</h2>
+    <p>Elle est bien enregistrée. Bonne continuation avec l'IA !</p>
+    <div id="google" hidden>
+      <p>Si vous le souhaitez, vous pouvez aussi laisser un avis sur notre fiche Google : il aide d'autres entreprises à nous trouver.</p>
+      <p style="margin-top:12px"><a class="btn" id="lien-google" href="#" target="_blank" rel="noopener noreferrer">Laisser un avis sur Google</a></p>
+    </div>
+  </section>
+
+  <section class="deja" id="deja" hidden>
+    <h2>Vous avez déjà répondu</h2>
+    <p>Votre évaluation a été envoyée depuis cet appareil. Merci !</p>
+    <p><button type="button" class="btn" id="autre">Répondre pour une autre personne</button></p>
+  </section>
+
+  <section class="erreur-page" id="perdu" hidden>
+    <p id="perdu-texte">Ce lien n'est pas valide. Demandez le bon lien à votre formateur, ou écrivez à gabriel@ia-entrepreneur.fr.</p>
+  </section>
+</main>
+<script>
+(() => {
+  // Le jeton est dans l'ancre de l'adresse (#…) : il ne part jamais dans une requête ni dans l'historique du serveur.
+  const cle = 'eval_jeton';
+  if (/^#[A-Za-z0-9_-]{32}$/.test(location.hash)) { sessionStorage.setItem(cle, location.hash.slice(1)); history.replaceState(null, '', location.pathname); }
+  const jeton = sessionStorage.getItem(cle) || '';
+  const $ = (s, r = document) => r.querySelector(s);
+  const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  const form = $('#eval');
+  const perdu = (texte) => { if (texte) $('#perdu-texte').textContent = texte; $('#perdu').hidden = false; form.hidden = true; $('#avancement').hidden = true; };
+  if (!jeton) { perdu(); return; }
+  const fait = `eval_fait_${jeton.slice(0, 12)}`;
+  const lireFait = () => { try { return localStorage.getItem(fait); } catch { return null; } };
+  const appel = (methode, corps) => fetch('/api/evaluation', { method: methode, headers: { 'X-Jeton': jeton, ...(corps ? { 'Content-Type': 'application/json' } : {}) }, body: corps ? JSON.stringify(corps) : undefined });
+  const dateFr = (iso) => (iso ? new Date(`${iso}T12:00:00`).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' }) : '');
+  let Q = [];
+
+  function champ(q) {
+    const fac = q.obligatoire ? '' : ' <span class="fac">(facultatif)</span>';
+    const nom = `r_${q.id}`;
+    if (q.type === 'niveaux' || q.type === 'choix' || q.type === 'oui_non') {
+      const opts = q.type === 'niveaux' ? q.niveaux : q.type === 'choix' ? q.choix : ['Oui', 'Non'];
+      return `<fieldset data-q="${esc(q.id)}"><legend${q.objectif ? ' class="objectif-texte"' : ''}>${esc(q.intitule)}${fac}</legend>
+        <div class="options" style="--n:${opts.length}">${opts.map((o, i) => `<input type="radio" name="${nom}" id="${nom}_${i}" value="${esc(o)}"><label for="${nom}_${i}">${esc(o)}</label>`).join('')}</div></fieldset>`;
+    }
+    if (q.type === 'echelle') {
+      const n = [];
+      for (let v = q.max; v >= q.min; v--) n.push(`<input type="radio" name="${nom}" id="${nom}_${v}" value="${v}"><label for="${nom}_${v}" title="${v} sur ${q.max}">★</label>`);
+      return `<fieldset data-q="${esc(q.id)}"><legend>${esc(q.intitule)}${fac}</legend><div class="etoiles" role="radiogroup" aria-label="Note sur ${q.max}">${n.join('')}</div></fieldset>`;
+    }
+    if (q.type === 'texte') return `<label class="champ" data-q="${esc(q.id)}">${esc(q.intitule)}${fac}<textarea name="${nom}" maxlength="2000"></textarea></label>`;
+    return '';
+  }
+  function construire(questions) {
+    const blocs = [];
+    let cur = null;
+    for (const q of questions) {
+      if (q.type === 'rubrique') { cur = { titre: q.intitule, aide: q.aide, items: [] }; blocs.push(cur); continue; }
+      if (!cur) { cur = { titre: '', items: [] }; blocs.push(cur); }
+      cur.items.push(champ(q));
+    }
+    $('#questions').innerHTML = blocs.map((b) => `<section class="rubrique">${b.titre ? `<h2>${esc(b.titre)}</h2>` : ''}${b.aide ? `<p class="aide-rubrique">${esc(b.aide)}</p>` : ''}${b.items.join('')}</section>`).join('');
+  }
+  const aRepondre = () => Q.filter((q) => q.type !== 'rubrique' && q.obligatoire);
+  function valeur(q) {
+    const el = form.elements[`r_${q.id}`];
+    if (!el) return undefined;
+    if (q.type === 'texte') return el.value.trim() || undefined;
+    const coche = form.querySelector(`input[name="r_${q.id}"]:checked`);
+    if (!coche) return undefined;
+    if (q.type === 'echelle') return Number(coche.value);
+    if (q.type === 'oui_non') return coche.value === 'Oui';
+    return coche.value;
+  }
+  function avancer() {
+    const ob = aRepondre();
+    const n = ob.filter((q) => valeur(q) !== undefined).length;
+    $('#avancement-texte').textContent = `${n} réponse${n > 1 ? 's' : ''} sur ${ob.length} questions obligatoires`;
+    $('#avancement-barre').style.width = `${ob.length ? Math.round((100 * n) / ob.length) : 100}%`;
+  }
+
+  function demarrer(d) {
+    Q = d.questions || [];
+    const lignes = [`<b>${esc(d.titre)}</b>`];
+    if (d.entreprise) lignes.push(`Pour ${esc(d.entreprise)}`);
+    lignes.push(`Formateur : ${esc(d.formateur)}`);
+    if (d.debut) lignes.push(d.fin && d.fin !== d.debut ? `Du ${esc(dateFr(d.debut))} au ${esc(dateFr(d.fin))}` : `Le ${esc(dateFr(d.debut))}`);
+    $('#infos').innerHTML = lignes.map((l) => `<span>${l}</span>`).join('');
+    $('#infos').hidden = false;
+    construire(Q);
+    if (d.citable) { $('#bloc-cite').hidden = false; if (d.entreprise) form.elements.entreprise.value = d.entreprise; }
+    if (lireFait()) { $('#deja').hidden = false; return; }
+    form.hidden = false; $('#avancement').hidden = false;
+    avancer();
+  }
+  $('#autre').addEventListener('click', () => { $('#deja').hidden = true; form.reset(); form.hidden = false; $('#avancement').hidden = false; avancer(); window.scrollTo(0, 0); });
+
+  appel('GET').then(async (r) => {
+    const d = await r.json().catch(() => ({}));
+    if (r.status === 410) return perdu(d.erreur === 'evaluation_fermee' ? "Cette évaluation est close. Merci d'avoir pensé à répondre !" : "Le délai pour répondre à cette évaluation est passé. Merci d'avoir pensé à nous !");
+    if (!r.ok) return perdu();
+    demarrer(d);
+  }).catch(() => perdu('La page ne se charge pas. Vérifiez votre connexion et réessayez.'));
+
+  form.addEventListener('change', (ev) => {
+    const fs = ev.target.closest('fieldset.manque');
+    if (fs) fs.classList.remove('manque');
+    if (ev.target.name === 'accord') {
+      $('#cite').hidden = !ev.target.checked;
+      if (ev.target.checked) { if (!form.elements.nom.value) form.elements.nom.value = form.elements.participant.value; form.elements.nom.focus(); }
+    }
+    avancer();
+  });
+  const erreur = (t) => { const e = $('#erreur'); e.textContent = t; e.hidden = false; };
+  const MESSAGES = { nom_requis: 'Indiquez votre nom pour que votre commentaire puisse être cité, ou décochez la case.', texte_requis: 'Écrivez ce que vous avez le plus apprécié pour qu\'il puisse être cité, ou décochez la case.', trop_de_reponses: 'Cette évaluation a reçu trop de réponses. Prévenez votre formateur.', trop_de_demandes: 'Trop d\'envois en peu de temps. Réessayez dans quelques minutes.', evaluation_fermee: 'Cette évaluation vient d\'être close.', evaluation_expiree: 'Le délai pour répondre est passé.' };
+  function montrerManque(id) {
+    const el = form.querySelector(`[data-q="${id}"]`);
+    if (!el) return erreur('Une réponse manque.');
+    el.classList.add('manque');
+    el.scrollIntoView({ block: 'center', behavior: 'smooth' });
+    const premier = el.querySelector('input, textarea');
+    if (premier) premier.focus({ preventScroll: true });
+  }
+  form.addEventListener('submit', async (ev) => {
+    ev.preventDefault();
+    $('#erreur').hidden = true;
+    const reponses = {};
+    for (const q of Q) { if (q.type === 'rubrique') continue; const v = valeur(q); if (v !== undefined) reponses[q.id] = v; }
+    const manque = aRepondre().filter((q) => reponses[q.id] === undefined);
+    if (manque.length) {
+      manque.forEach((q) => { const el = form.querySelector(`[data-q="${q.id}"]`); if (el) el.classList.add('manque'); });
+      erreur(manque.length > 1 ? `Il manque ${manque.length} réponses, en rouge.` : 'Il manque une réponse, en rouge.');
+      return montrerManque(manque[0].id);
+    }
+    const el = form.elements;
+    const accord = Boolean(el.accord && el.accord.checked && !$('#bloc-cite').hidden);
+    if (accord && !el.nom.value.trim()) { el.nom.focus(); return erreur(MESSAGES.nom_requis); }
+    if (accord && !reponses.q26) { erreur(MESSAGES.texte_requis); return montrerManque('q26'); }
+    const bouton = form.querySelector('button[type="submit"]');
+    bouton.disabled = true; bouton.textContent = 'Envoi…';
+    try {
+      const r = await appel('POST', { reponses, participant: el.participant.value, accord, nom: accord ? el.nom.value : '', fonction: accord ? el.fonction.value : '', entreprise: accord ? el.entreprise.value : '' });
+      const d = await r.json().catch(() => ({}));
+      if (!r.ok) {
+        const code = String(d.erreur || '');
+        if (code.startsWith('manque:')) { erreur('Il manque une réponse, en rouge.'); montrerManque(code.slice(7)); throw null; }
+        throw new Error(MESSAGES[code] || 'L\'envoi n\'a pas marché. Vos réponses sont gardées, réessayez.');
+      }
+      try { localStorage.setItem(fait, new Date().toISOString()); } catch { /* navigation privée : tant pis */ }
+      form.hidden = true; $('#avancement').hidden = true;
+      $('#merci').hidden = false;
+      // Le lien Google est proposé à tous, quelle que soit la note : Google interdit de ne solliciter que les avis positifs.
+      if (d.google) { $('#lien-google').href = d.google; $('#google').hidden = false; }
+      window.scrollTo(0, 0);
+    } catch (e) {
+      if (e) erreur(e.message);
+      bouton.disabled = false; bouton.textContent = 'Envoyer mon évaluation';
+    }
+  });
+})();
+</script>
+</body>
+</html>
