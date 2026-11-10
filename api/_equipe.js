@@ -15,6 +15,9 @@
  *   programmes, LinkedIn, avis, évaluations, utilisateurs) et contrôle chaque
  *   création. Un oubli ailleurs dans le code ne peut donc pas montrer la fiche
  *   d'un autre.
+ * - LinkedIn (10/11/2026) : un membre qui a un robot sur son ordinateur (clé
+ *   robot_cle_hash, créée par Gabriel) voit et valide les envois de son propre
+ *   compte (colonne compte de iae_crm_linkedin), jamais ceux d'un autre.
  * - La boîte Gmail et l'agenda d'un membre : il les connecte lui-même depuis le
  *   CRM (client OAuth « Application Web » du Workspace, GOOGLE_CRM_CLIENT_ID /
  *   GOOGLE_CRM_CLIENT_SECRET, retour sur /api/crm-google). Le jeton de
@@ -94,10 +97,10 @@ async function sbBrut(chemin, { methode = 'GET', corps, prefer } = {}) {
   return t ? JSON.parse(t) : null;
 }
 
-const CHAMPS_PUBLICS = 'email,prenom,nom,role,fonction,telephone,actif,cle_le,google,created_at';
+const CHAMPS_PUBLICS = 'email,prenom,nom,role,fonction,telephone,actif,cle_le,google,created_at,robot_cle_le';
 function publique(u) {
   if (!u) return null;
-  const { google, cle_hash: _empreinte, ...reste } = u;
+  const { google, cle_hash: _empreinte, robot_cle_hash: _robot, ...reste } = u;
   return { ...reste, google: Boolean(google && google.refresh), google_email: google ? google.email || null : null, google_le: google ? google.le || null : null };
 }
 
@@ -108,6 +111,14 @@ export async function utilisateurParCle(cle) {
   const c = String(cle || '');
   if (c.length < 32 || c.length > 200) return null;
   const lignes = await sbBrut(`iae_crm_utilisateurs?cle_hash=eq.${empreinteCle(c)}&actif=is.true&select=${CHAMPS_PUBLICS}`);
+  return publique(lignes && lignes[0]);
+}
+
+// La clé du robot LinkedIn d'un membre (10/11/2026) : le robot de son ordinateur agit en son nom, avec sa file.
+export async function utilisateurParCleRobot(cle) {
+  const c = String(cle || '');
+  if (c.length < 32 || c.length > 200) return null;
+  const lignes = await sbBrut(`iae_crm_utilisateurs?robot_cle_hash=eq.${empreinteCle(c)}&actif=is.true&select=${CHAMPS_PUBLICS}`);
   return publique(lignes && lignes[0]);
 }
 
@@ -166,6 +177,23 @@ export async function garder(chemin, methode = 'GET', corps) {
     const lignes = Array.isArray(corps) ? corps : [corps];
     if (methode !== 'POST' || !lignes.every((l) => l && typeof l.cle === 'string' && l.cle.endsWith(`|${u.email}`))) throw new RefusEquipe('reserve_admin');
     return { chemin, corps };
+  }
+  if (table === 'iae_crm_linkedin') {
+    // LinkedIn d'un membre (10/11/2026) : seulement les envois de son propre compte, et sur ses leads.
+    const sien = `compte=eq.${encodeURIComponent(u.email)}`;
+    if (methode === 'GET' || methode === 'DELETE') return { chemin: ajouterFiltre(chemin, sien), corps };
+    if (methode === 'PATCH') {
+      const c = corps && typeof corps === 'object' ? { ...corps } : corps;
+      if (c && typeof c === 'object') { delete c.compte; delete c.lead_id; delete c.contact_id; }
+      return { chemin: ajouterFiltre(chemin, sien), corps: c };
+    }
+    if (methode === 'POST') {
+      if (/[?&]on_conflict=/.test(chemin)) throw new RefusEquipe('reserve_admin');
+      const lignes = (Array.isArray(corps) ? corps : [corps]).map((l) => ({ ...(l || {}), compte: u.email }));
+      if (!(await leadsVisibles(lignes.map((l) => l.lead_id), u.email))) throw new RefusEquipe('lead_inaccessible');
+      return { chemin, corps: Array.isArray(corps) ? lignes : lignes[0] };
+    }
+    throw new RefusEquipe('reserve_admin');
   }
   if (LECTURE_SEULE.has(table)) {
     if (methode !== 'GET') throw new RefusEquipe('reserve_admin');
@@ -370,6 +398,14 @@ export async function operationEquipe(corps) {
     cacheEquipe.le = 0;
     return { utilisateur: publique(lignes[0]), cle };
   }
+  if (corps.op === 'equipe_robot_cle') {
+    // La clé du robot LinkedIn de son ordinateur : montrée une fois, à coller dans sa configuration à l'installation.
+    const cle = nouvelleCle();
+    const lignes = await sbBrut(`iae_crm_utilisateurs?email=eq.${encodeURIComponent(email)}`, { methode: 'PATCH', corps: { robot_cle_hash: empreinteCle(cle), robot_cle_le: maintenant, updated_at: maintenant }, prefer: 'return=representation' });
+    if (!lignes || !lignes.length) throw new RefusEquipe('introuvable', 404);
+    cacheEquipe.le = 0;
+    return { utilisateur: publique(lignes[0]), cle };
+  }
   if (corps.op === 'equipe_maj') {
     const v = { updated_at: maintenant };
     if (corps.role !== undefined) {
@@ -397,5 +433,7 @@ export async function membresConnectes() {
 
 // Ce qu'un membre a le droit de demander (le reste est à Gabriel).
 export const OPS_EQUIPE = new Set(['creer', 'maj', 'supprimer', 'journal', 'lot', 'synchro', 'entrant', 'recap', 'email',
-  'reglage', 'rediger', 'vocal', 'voix', 'importer', 'google_connexion']);
+  'reglage', 'rediger', 'vocal', 'voix', 'importer', 'google_connexion',
+  // LinkedIn depuis son propre compte (10/11/2026) : sa file seulement (garder filtre par compte).
+  'linkedin_preparer', 'linkedin_rediger', 'linkedin_valider', 'linkedin_annuler', 'linkedin_parti', 'linkedin_auto_couper']);
 export const REGLAGES_EQUIPE = new Set(['signature', 'rappel_matin']);

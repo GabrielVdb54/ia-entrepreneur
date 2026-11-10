@@ -4,8 +4,9 @@
  * Chargé après le script de la page (même portée globale : D, S, COMPTE, api, toast…).
  *
  * - Un membre (closer, setter) : ses leads seulement (le serveur filtre), pas de
- *   formateurs, satisfaction, LinkedIn, paiements ni programmes ; un bouton pour
- *   connecter sa boîte Google ; sa signature et sa photo.
+ *   formateurs, satisfaction, paiements ni programmes ; un bouton pour connecter sa
+ *   boîte Google ; sa signature et sa photo. LinkedIn seulement quand son robot est
+ *   installé sur son ordinateur (robot_cle_le, 10/11/2026) : sa propre file.
  * - Gabriel : un filtre « Mes leads / Toute l'équipe / par personne » (ses leads par
  *   défaut, pour que ses relances du jour restent les siennes), « Suivi par » sur la
  *   fiche, et la gestion des accès dans Réglages.
@@ -96,10 +97,35 @@ function poserFiltreEquipe(visible) {
 
 /* ---------- Ce qu'un membre ne voit pas ---------- */
 
-for (const nom of ['blocPaiements', 'barreLinkedin', 'blocProgramme', 'blocApresFormation', 'blocEvaluations']) {
+for (const nom of ['blocPaiements', 'blocProgramme', 'blocApresFormation', 'blocEvaluations']) {
   const original = window[nom];
   if (typeof original === 'function') window[nom] = function (...args) { return estEquipe() ? '' : original.apply(this, args); };
 }
+
+/* ---------- LinkedIn d'un membre : son robot, sur son ordinateur (10/11/2026) ---------- */
+
+const robotInstalle = () => !estEquipe() || Boolean(D.moi && D.moi.robot_cle_le);
+const barreLinkedinEquipe = window.barreLinkedin;
+if (typeof barreLinkedinEquipe === 'function') window.barreLinkedin = function (...args) { return robotInstalle() ? barreLinkedinEquipe.apply(this, args) : ''; };
+const ouvrirLinkedinEquipe = window.ouvrirLinkedin;
+if (typeof ouvrirLinkedinEquipe === 'function') window.ouvrirLinkedin = function (...args) {
+  if (!robotInstalle()) { toast("Ton LinkedIn n'est pas encore relié au CRM : Gabriel installe d'abord le robot sur ton ordinateur."); return undefined; }
+  return ouvrirLinkedinEquipe.apply(this, args);
+};
+// Les textes de la page parlent du Mac de Gabriel ; chez un membre, c'est son ordinateur.
+const MOTS_MAC = [[/\bmon Mac\b/g, 'mon ordinateur'], [/\bton Mac\b/g, 'ton ordinateur'], [/\bTon Mac\b/g, 'Ton ordinateur'], [/\ble Mac\b/g, "l'ordinateur"]];
+function sansMac(racine) {
+  if (!estEquipe() || !racine) return;
+  const w = document.createTreeWalker(racine, NodeFilter.SHOW_TEXT);
+  for (let n = w.nextNode(); n; n = w.nextNode()) {
+    if (!/Mac\b/.test(n.nodeValue)) continue;
+    let t = n.nodeValue;
+    for (const [re, mot] of MOTS_MAC) t = t.replace(re, mot);
+    if (t !== n.nodeValue) n.nodeValue = t;
+  }
+}
+new MutationObserver((liste) => { if (estEquipe()) for (const m of liste) for (const x of m.addedNodes) if (x.nodeType === 1) sansMac(x); })
+  .observe(document.body, { childList: true, subtree: true });
 
 // Aujourd'hui : un membre sans boîte connectée voit d'abord le bouton.
 const vueJourEquipe = window.vueJour;
@@ -189,10 +215,10 @@ function dessinerEquipe(fs, cleMontree = null) {
   const liste = D.equipe || [];
   fs.innerHTML = `<legend>Équipe</legend>
     <p class="aide">Chacun entre avec sa clé, ne voit que ses leads (et ceux qu'il a posés, pour un setter) et envoie depuis sa propre boîte. Toi, tu vois tout.</p>
-    ${cleMontree ? `<div class="alerte"><p><b>Clé de ${esc(cleMontree.prenom)} :</b> <code data-cle>${esc(cleMontree.cle)}</code></p><p class="aide">Elle ne s'affichera plus. Donne-la-lui par SMS ou de vive voix, avec le lien https://ia-entrepreneur.fr/crm/.</p><div class="actions"><button type="button" class="btn petit" data-copier-cle>Copier la clé</button></div></div>` : ''}
+    ${cleMontree ? `<div class="alerte"><p><b>${cleMontree.robot ? 'Clé du robot LinkedIn' : 'Clé'} de ${esc(cleMontree.prenom)} :</b> <code data-cle>${esc(cleMontree.cle)}</code></p><p class="aide">${cleMontree.robot ? "Elle ne s'affichera plus. Elle se colle dans la configuration du robot, sur son ordinateur, pendant l'installation (avec Claude) : ne l'envoie pas par email." : "Elle ne s'affichera plus. Donne-la-lui par SMS ou de vive voix, avec le lien https://ia-entrepreneur.fr/crm/."}</p><div class="actions"><button type="button" class="btn petit" data-copier-cle>Copier la clé</button></div></div>` : ''}
     ${liste.length ? `<ul class="liste-equipe">${liste.map((m) => `<li data-membre="${esc(m.email)}">
-      <span><b>${esc(m.prenom)} ${esc(m.nom || '')}</b> · ${esc(LIB_ROLE[m.role] || m.role)} · ${esc(m.email)}<br><span class="meta">${m.actif ? 'Accès actif' : 'Accès coupé'}${m.google ? ', boîte Google connectée' : ', boîte Google pas connectée'}${m.cle_le ? `, clé du ${esc(instantLisible(m.cle_le))}` : ''}</span></span>
-      <span class="actions"><button type="button" class="btn petit" data-equipe="cle">Nouvelle clé</button><button type="button" class="btn petit" data-equipe="actif">${m.actif ? "Couper l'accès" : "Rétablir l'accès"}</button></span>
+      <span><b>${esc(m.prenom)} ${esc(m.nom || '')}</b> · ${esc(LIB_ROLE[m.role] || m.role)} · ${esc(m.email)}<br><span class="meta">${m.actif ? 'Accès actif' : 'Accès coupé'}${m.google ? ', boîte Google connectée' : ', boîte Google pas connectée'}${m.cle_le ? `, clé du ${esc(instantLisible(m.cle_le))}` : ''}${m.robot_cle_le ? `, robot LinkedIn relié le ${esc(instantLisible(m.robot_cle_le))}` : ', pas de robot LinkedIn'}</span></span>
+      <span class="actions"><button type="button" class="btn petit" data-equipe="cle">Nouvelle clé</button><button type="button" class="btn petit" data-equipe="robot">${m.robot_cle_le ? 'Nouvelle clé de robot LinkedIn' : 'Clé de robot LinkedIn'}</button><button type="button" class="btn petit" data-equipe="actif">${m.actif ? "Couper l'accès" : "Rétablir l'accès"}</button></span>
     </li>`).join('')}</ul>` : '<p class="meta">Personne pour l\'instant.</p>'}
     <details${liste.length ? '' : ' open'}><summary>Ajouter quelqu'un</summary>
       <div class="ligne-champs">
@@ -216,13 +242,17 @@ function dessinerEquipe(fs, cleMontree = null) {
       } else if (b.dataset.equipe === 'cle') {
         if (!confirm(`Nouvelle clé pour ${membre.prenom} ? L'ancienne ne marchera plus.`)) { b.disabled = false; return; }
         r = await api('POST', { op: 'equipe_cle', email });
+      } else if (b.dataset.equipe === 'robot') {
+        if (membre.robot_cle_le && !confirm(`Nouvelle clé de robot pour ${membre.prenom} ? Son robot actuel s'arrêtera jusqu'à ce qu'on colle la nouvelle.`)) { b.disabled = false; return; }
+        r = await api('POST', { op: 'equipe_robot_cle', email });
+        r.robot = true;
       } else {
         r = await api('POST', { op: 'equipe_maj', email, actif: !membre.actif });
       }
       const u = r.utilisateur;
       const i = (D.equipe || []).findIndex((x) => x.email === u.email);
       if (i >= 0) D.equipe[i] = u; else D.equipe = [...(D.equipe || []), u];
-      dessinerEquipe(fs, r.cle ? { prenom: u.prenom, cle: r.cle } : null);
+      dessinerEquipe(fs, r.cle ? { prenom: u.prenom, cle: r.cle, robot: Boolean(r.robot) } : null);
       poserFiltreEquipe(true);
       if (!r.cle) toast(u.actif ? `Accès de ${u.prenom} actif.` : `Accès de ${u.prenom} coupé.`);
     } catch (e) {

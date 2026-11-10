@@ -87,7 +87,7 @@ import { timingSafeEqual, randomBytes, createHash } from 'node:crypto';
 import Anthropic from '@anthropic-ai/sdk';
 import {
   ADMIN, ADMIN_EMAIL, avecUtilisateur, moi as utilisateurCourant, estAdmin, compte, nomComplet, pourMoi, cleReglage, cleReglageLue, garder,
-  utilisateurParCle, equipePourPage, closers, jetonGoogle, googleEquipeConfigure, urlConnexionGoogle, operationEquipe, membresConnectes,
+  utilisateurParCle, utilisateurParCleRobot, fonctionDe, equipePourPage, closers, jetonGoogle, googleEquipeConfigure, urlConnexionGoogle, operationEquipe, membresConnectes,
   OPS_EQUIPE, REGLAGES_EQUIPE,
 } from './_equipe.js';
 import { creerDemande, GOOGLE_AVIS_RE } from './_avis.js';
@@ -512,7 +512,8 @@ async function lireTout() {
     admin ? toutLire('iae_crm_formateurs', 'created_at.asc') : rien,
     !admin ? rien : sb('iae_crm_documents?select=id,created_at,lead_id,type,nom,chemin,mime,taille,depose_par,lecture,statut,motif,verifie_le,expire_le,archive&order=created_at.desc&limit=2000').then((x) => x.lignes),
     admin ? toutLire('iae_crm_programmes', 'created_at.desc') : rien,
-    !admin ? rienSb : sb(`iae_crm_linkedin?or=(statut.in.(brouillon,a_envoyer,en_cours,echec,a_verifier),created_at.gte.${encodeURIComponent(depuisLi)})&order=created_at.desc&limit=500&select=id,created_at,lead_id,contact_id,type,etape,texte,statut,valide_le,envoye_le,detail`),
+    // LinkedIn : la file du compte de la personne connectée (Gabriel : la sienne ; un commercial : la sienne, filtrée aussi par garder).
+    sb(`iae_crm_linkedin?${filtreCompteLi()}&or=(statut.in.(brouillon,a_envoyer,en_cours,echec,a_verifier),created_at.gte.${encodeURIComponent(depuisLi)})&order=created_at.desc&limit=500&select=id,created_at,lead_id,contact_id,type,etape,texte,statut,valide_le,envoye_le,detail`),
     !admin ? rienSb : sb('iae_crm_avis?order=created_at.desc&limit=300&select=*'),
     !admin ? rienSb : sb('iae_crm_avis_demandes?order=created_at.desc&limit=300&select=id,lead_id,created_at,expire_le'),
     admin ? toutLire('iae_crm_evaluations', 'created_at.desc') : rien,
@@ -533,7 +534,7 @@ async function lireTout() {
     expediteur: compte(),
     aujourdhui: aujourdHuiParis(),
     // Qui est connecté, l'équipe (tout pour Gabriel, les noms pour un membre) et à qui confier un lead.
-    moi: { email: moiPublic.email, prenom: moiPublic.prenom, nom: moiPublic.nom, role: moiPublic.role, google: Boolean(moiPublic.google) },
+    moi: { email: moiPublic.email, prenom: moiPublic.prenom, nom: moiPublic.nom, role: moiPublic.role, google: Boolean(moiPublic.google), robot_cle_le: moiPublic.robot_cle_le || null },
     equipe, closers: closersListe, google_equipe: googleEquipeConfigure(),
   };
 }
@@ -586,7 +587,7 @@ async function operation(corps) {
   if (/^(avis|paiement|facture)_[a-z_]+$/.test(op || '')) return operationApresFormation(corps);
   if (/^evaluation_[a-z_]+$/.test(op || '')) return operationEvaluation(corps);
   // L'équipe : Gabriel crée les accès ; un membre connecte sa boîte Google.
-  if (/^equipe_[a-z]+$/.test(op || '')) return operationEquipe(corps);
+  if (/^equipe_[a-z_]+$/.test(op || '')) return operationEquipe(corps);
   if (op === 'google_connexion') return urlConnexionGoogle();
   if (op === 'reglage') {
     if (!REGLAGES_AUTORISES.includes(corps.cle)) throw new Refus('reglage_inconnu');
@@ -2163,6 +2164,13 @@ function pageMetierLi(l) {
     skill: p.skill ? { quoi: p.skill.quoi, url: `https://ia-entrepreneur.fr/skills-ia-gratuits.html#${p.skill.ancre}` } : null } : null;
 }
 const QUOTA_MESSAGES_LI = 20;
+// Plusieurs comptes (10/11/2026, Gabriel : « ok on part sur leur ordinateur ») : chaque commercial a son robot sur son
+// ordinateur, qui agit en son nom (clé robot_cle_hash, contexte avecUtilisateur) ; chaque envoi porte le compte qui
+// l'envoie (colonne compte), chaque contact le compte avec qui il est en relation (linkedin_compte, vide = Gabriel).
+const machineLi = () => (estAdmin() ? 'ton Mac' : 'ton ordinateur');
+const filtreCompteLi = () => `compte=eq.${encodeURIComponent(compte())}`;
+const filtreContactsLi = () => (estAdmin() ? `or=(linkedin_compte.is.null,linkedin_compte.eq.${encodeURIComponent(ADMIN_EMAIL)})` : `linkedin_compte=eq.${encodeURIComponent(compte())}`);
+const contactDuCompteLi = (c) => (c.linkedin_compte || ADMIN_EMAIL) === compte();
 // 10 par jour au départ ; 20 au plus dès le 12/11, du lundi au vendredi (Gabriel, 10/11, conseil des spécialistes LinkedIn :
 // « On m'a conseillé 20 par jour, mais que pendant 5 jours » ; le Mac ne tourne que les jours ouvrés).
 const quotaInvitationsLi = (jour) => (jour <= '2026-11-10' ? 10 : 20);
@@ -2197,6 +2205,12 @@ async function actionLi(id) {
   if (!a) throw new Refus('introuvable', 404);
   return a;
 }
+// Un robot ne touche qu'aux envois de son compte (Gabriel est admin : garder ne le filtre pas).
+async function actionDuCompteLi(id) {
+  const a = await actionLi(id);
+  if ((a.compte || ADMIN_EMAIL) !== compte()) throw new Refus('introuvable', 404);
+  return a;
+}
 async function majActionLi(id, valeurs) {
   const { lignes } = await sb(`iae_crm_linkedin?id=eq.${id}`, { methode: 'PATCH', corps: valeurs, prefer: 'return=representation' });
   return lignes[0];
@@ -2228,7 +2242,7 @@ const PROFIL_IMPOSSIBLE_LI = {
   follow_only: (nom) => `LinkedIn : pas d'invitation possible pour ${nom} (son profil ne propose que « Suivre »). Passe par l'email ou le téléphone ; sinon Anna peut appeler.`,
   connect_unavailable: (nom) => `LinkedIn : pas d'invitation possible pour ${nom} (LinkedIn ne propose pas « Se connecter »). Passe par l'email ou le téléphone ; sinon Anna peut appeler.`,
   // Le MCP refuse l'adresse avant toute action (emoji dans /in/…, page qui n'est pas un profil) : rien n'est parti, Gabriel invite à la main.
-  invalid_argument: (nom) => `LinkedIn : ton Mac ne lit pas l'adresse du profil de ${nom}, rien n'est parti. Envoie l'invitation à la main depuis son profil (« Se connecter », sans note), puis clique « Je l'ai envoyé moi-même » sur la fiche.`,
+  invalid_argument: (nom) => `LinkedIn : ${machineLi()} ne lit pas l'adresse du profil de ${nom}, rien n'est parti. Envoie l'invitation à la main depuis son profil (« Se connecter », sans note), puis clique « Je l'ai envoyé moi-même » sur la fiche.`,
 };
 // La file d'invitations se vide : une ligne dans la barre LinkedIn et dans le récap de 7 h (une par jour, pas une tâche
 // par lead). À 0, seulement si une invitation est partie dans les 7 derniers jours : sinon la prospection est en pause.
@@ -2254,7 +2268,7 @@ async function preparerLi(c, l, etape, texte, { claude = false } = {}) {
   const type = etape === 'invitation' ? 'invitation' : 'message';
   const t = texte == null ? null : String(texte).replace(/\r\n?/g, '\n').trim().slice(0, 8000) || null;
   const { lignes: ouverts } = await sb(`iae_crm_linkedin?contact_id=eq.${c.id}&statut=in.(${OUVERTS_LI.join(',')})&select=*`);
-  const modifiable = ouverts.find((a) => ['brouillon', 'echec', 'a_verifier'].includes(a.statut));
+  const modifiable = ouverts.find((a) => (a.compte || ADMIN_EMAIL) === compte() && ['brouillon', 'echec', 'a_verifier'].includes(a.statut));
   if (ouverts.some((a) => ['a_envoyer', 'en_cours'].includes(a.statut))) throw new Refus('deja_en_file', 409);
   const maintenant = new Date().toISOString();
   let valeurs = { type, etape, texte: t, statut: 'brouillon', detail: null };
@@ -2267,7 +2281,7 @@ async function preparerLi(c, l, etape, texte, { claude = false } = {}) {
     } catch { /* un mot interdit : le texte reste à relire */ }
   }
   if (modifiable) return majActionLi(modifiable.id, valeurs);
-  const { lignes } = await sb('iae_crm_linkedin', { methode: 'POST', corps: { lead_id: l.id, contact_id: c.id, ...valeurs }, prefer: 'return=representation' });
+  const { lignes } = await sb('iae_crm_linkedin', { methode: 'POST', corps: { lead_id: l.id, contact_id: c.id, compte: compte(), ...valeurs }, prefer: 'return=representation' });
   return lignes[0];
 }
 
@@ -2315,6 +2329,7 @@ async function redigerLi(c, l, etape, { consigne = '', message = '' } = {}) {
     c.notes ? `Notes sur la personne : ${couper(c.notes, 600)}` : '',
     message ? `Son dernier message : ${couper(message, 2000)}` : '',
     consigne ? `Consigne de Gabriel : ${couper(consigne, 300)}` : '',
+    estAdmin() ? '' : `Expéditeur : ${nomComplet()}, ${fonctionDe()} chez IA-Entrepreneur (il ne donne pas les formations lui-même) : au temps 3 du message 1, écris « Chez IA-Entrepreneur, nous formons des équipes de PME du Grand Est à… » plutôt que « Je forme… », et signe de son prénom.`,
     acts.length ? `Historique (du plus récent au plus ancien) :\n${acts.map((a) => `- ${String(a.date).slice(0, 10)} ${a.type} : ${couper(a.resume, 200)}${a.contenu && a.type === 'linkedin' ? ` | texte : ${couper(a.contenu, 500)}` : ''}`).join('\n')}` : '',
   ].filter(Boolean).join('\n');
   const r = await appelClaude({ consignes: CONSIGNES_LI, schema: SCHEMA_LI, contenu: fiche, max: 2000, timeout: 40000 });
@@ -2366,7 +2381,7 @@ async function operationLinkedin(corps, ip) {
   }
   if (op === 'linkedin_annuler') {
     if (['en_cours', 'envoye'].includes(a.statut)) throw new Refus('deja_parti', 409);
-    return { action: await majActionLi(a.id, { statut: 'annule', detail: 'Annulé par Gabriel' }) };
+    return { action: await majActionLi(a.id, { statut: 'annule', detail: `Annulé par ${utilisateurCourant().prenom}` }) };
   }
   if (op === 'linkedin_parti') {
     // « Ton Mac ne sait pas si c'est parti » : Gabriel a regardé sur LinkedIn, c'est parti. Ou le Mac a échoué
@@ -2385,19 +2400,19 @@ async function appliquerEnvoiLi(a, { detail = '', statutMcp = '', resultat = nul
   const prenom = c.prenom || nomContactLi(c);
   if (a.type === 'invitation') {
     if (statutMcp === 'already_connected') {
-      await majContactLi(c.id, { linkedin_etat: 'relation', linkedin_le: new Date().toISOString() });
+      await majContactLi(c.id, { linkedin_etat: 'relation', linkedin_le: new Date().toISOString(), linkedin_compte: a.compte || ADMIN_EMAIL });
       await journalLi(l, c, 'acceptee', `${nomContactLi(c)} est déjà dans tes relations LinkedIn : pas d'invitation, le message 1 est prêt`);
       await preparerAvecClaude(c, l, 'message');
       await majLeadLi(l.id, { prochaine_relance: jour, prochaine_action: 'autre', prochaine_note: `LinkedIn : ${prenom} est déjà dans tes relations. Message 1 prêt à valider.` });
       return { action };
     }
-    await majContactLi(c.id, { linkedin_etat: 'invitation_envoyee', linkedin_le: new Date().toISOString() });
-    await journalLi(l, c, 'invitation', `Invitation LinkedIn envoyée à ${nomContactLi(c)}${a.texte ? ', avec une note' : ', sans note'} (par ton Mac)`, a.texte);
-    await majLeadLi(l.id, { prochaine_relance: dansJoursOuvres(21), prochaine_action: 'autre', prochaine_note: `LinkedIn : invitation envoyée à ${prenom} le ${dateCourte(jour)}. Ton Mac regarde chaque matin si elle est acceptée.` });
+    await majContactLi(c.id, { linkedin_etat: 'invitation_envoyee', linkedin_le: new Date().toISOString(), linkedin_compte: a.compte || ADMIN_EMAIL });
+    await journalLi(l, c, 'invitation', `Invitation LinkedIn envoyée à ${nomContactLi(c)}${a.texte ? ', avec une note' : ', sans note'} (par ${machineLi()})`, a.texte);
+    await majLeadLi(l.id, { prochaine_relance: dansJoursOuvres(21), prochaine_action: 'autre', prochaine_note: `LinkedIn : invitation envoyée à ${prenom} le ${dateCourte(jour)}. ${machineLi().replace(/^t/, 'T')} regarde chaque matin si elle est acceptée.` });
     return { action };
   }
-  await majContactLi(c.id, { linkedin_etat: 'relation' });
-  await journalLi(l, c, a.etape, `${LIB_ETAPE_LI[a.etape]} envoyé${a.etape === 'relance' || a.etape === 'reponse' ? 'e' : ''} à ${nomContactLi(c)} sur LinkedIn (par ton Mac)`, a.texte);
+  await majContactLi(c.id, { linkedin_etat: 'relation', linkedin_compte: a.compte || ADMIN_EMAIL });
+  await journalLi(l, c, a.etape, `${LIB_ETAPE_LI[a.etape]} envoyé${a.etape === 'relance' || a.etape === 'reponse' ? 'e' : ''} à ${nomContactLi(c)} sur LinkedIn (par ${machineLi()})`, a.texte);
   const maj = { dernier_contact: jour };
   if (a.etape === 'message') { maj.relances_sans_reponse = 0; if (l.statut === 'nouveau') maj.statut = 'contacte'; }
   if (a.etape === 'relance' || a.etape === 'findia') maj.relances_sans_reponse = (l.relances_sans_reponse || 0) + 1;
@@ -2418,12 +2433,12 @@ async function etatRobotLi() { return (await lireReglage('linkedin_robot')) || {
 async function fileRobotLi() {
   const jour = aujourdHuiParis();
   const coince = new Date(Date.now() - 30 * 60000).toISOString();
-  await sb(`iae_crm_linkedin?statut=eq.en_cours&pris_le=lt.${encodeURIComponent(coince)}`, { methode: 'PATCH', corps: { statut: 'a_verifier', detail: "Ton Mac s'est arrêté pendant l'envoi : regarde sur LinkedIn si c'est parti." }, prefer: 'return=minimal' });
+  await sb(`iae_crm_linkedin?${filtreCompteLi()}&statut=eq.en_cours&pris_le=lt.${encodeURIComponent(coince)}`, { methode: 'PATCH', corps: { statut: 'a_verifier', detail: `${machineLi().replace(/^t/, 'T')} s'est arrêté pendant l'envoi : regarde sur LinkedIn si c'est parti.` }, prefer: 'return=minimal' });
   const debut = new Date(`${jour}T00:00:00+01:00`).toISOString();
   const [{ lignes: file }, { lignes: suivis }, { lignes: faits }, etat] = await Promise.all([
-    sb('iae_crm_linkedin?statut=eq.a_envoyer&order=valide_le.asc&limit=40&select=id,type,etape,texte,contact_id,lead_id'),
-    sb('iae_crm_contacts?linkedin_etat=not.is.null&select=id,lead_id,prenom,nom,linkedin,linkedin_etat,linkedin_le,linkedin_vu&limit=1000'),
-    sb(`iae_crm_linkedin?statut=in.(envoye,en_cours,a_verifier)&pris_le=gte.${encodeURIComponent(debut)}&select=type`),
+    sb(`iae_crm_linkedin?${filtreCompteLi()}&statut=eq.a_envoyer&order=valide_le.asc&limit=40&select=id,type,etape,texte,contact_id,lead_id`),
+    sb(`iae_crm_contacts?${filtreContactsLi()}&linkedin_etat=not.is.null&select=id,lead_id,prenom,nom,linkedin,linkedin_etat,linkedin_le,linkedin_vu&limit=1000`),
+    sb(`iae_crm_linkedin?${filtreCompteLi()}&statut=in.(envoye,en_cours,a_verifier)&pris_le=gte.${encodeURIComponent(debut)}&select=type`),
     etatRobotLi(),
   ]);
   const ids = [...new Set([...file.map((a) => a.contact_id), ...suivis.map((x) => x.id)])];
@@ -2460,11 +2475,13 @@ async function ajouterProspectLi(corps) {
   const prenom = couper(String(p.prenom || '').trim(), 80);
   const nom = couper(String(p.nom || '').trim(), 80);
   if (!entreprise || !prenom || !nom || !ident) throw new Refus('valeur_invalide:prospect');
-  const [parSiren, parProfil, parNom] = await Promise.all([
+  // Les doublons se cherchent dans toute la base : le robot d'un commercial ne voit que ses leads, et deux comptes ne
+  // doivent jamais contacter la même entreprise.
+  const [parSiren, parProfil, parNom] = await avecUtilisateur(ADMIN, () => Promise.all([
     siret ? sb(`iae_crm_leads?siret=like.${siret.slice(0, 9)}*&select=id&limit=1`) : { lignes: [] },
     sb(`iae_crm_contacts?linkedin=ilike.*${encodeURIComponent(`/in/${ident}`)}*&select=id&limit=1`),
     sb(`iae_crm_leads?entreprise=ilike.${encodeURIComponent(entreprise)}&select=id&limit=1`),
-  ]);
+  ]));
   if (parSiren.lignes.length || parProfil.lignes.length || parNom.lignes.length) return { ok: true, doublon: true };
   const secteur = Object.hasOwn(SECTEURS_PROSPECT_LI, p.secteur) ? p.secteur : null;
   const anna = couper(String(p.anna || '').trim(), 40);
@@ -2474,14 +2491,14 @@ async function ajouterProspectLi(corps) {
   const { lignes: [l] } = await sb('iae_crm_leads', { methode: 'POST', prefer: 'return=representation', corps: {
     entreprise, type: 'prospect', statut: 'nouveau', source: 'LinkedIn · cœur de cible (Altares)', secteur, siret,
     tags: ['linkedin', 'coeur-cible', 'actif-linkedin', ...(secteur ? [SECTEURS_PROSPECT_LI[secteur]] : []), ...(chezAnna ? ['liste-anna'] : [])],
-    besoin: `${secteur || 'Entreprise'}${salaries ? ` (${salaries} salariés)` : ''}, cœur de cible${chezAnna ? ` ; dans la base d'Anna (${anna})` : ''}. Profil LinkedIn trouvé par ton Mac${titre ? ` : « ${titre} »` : ''}.`,
+    besoin: `${secteur || 'Entreprise'}${salaries ? ` (${salaries} salariés)` : ''}, cœur de cible${chezAnna ? ` ; dans la base d'Anna (${anna})` : ''}. Profil LinkedIn trouvé par ${machineLi()}${titre ? ` : « ${titre} »` : ''}.`,
     localisation: couper(String(p.localisation || '').trim(), 80) || null, prochaine_action: 'autre', relances_sans_reponse: 0,
-    prochaine_note: `LinkedIn : invitation en file d'envoi, ton Mac l'envoie (20 par jour au plus).${chezAnna ? " Anna l'a aussi dans sa base : dès qu'un des deux canaux a une réponse, l'autre s'arrête." : ''}`,
+    prochaine_note: `LinkedIn : invitation en file d'envoi, ${machineLi()} l'envoie (20 par jour au plus).${chezAnna ? " Anna l'a aussi dans sa base : dès qu'un des deux canaux a une réponse, l'autre s'arrête." : ''}`,
   } });
   const { lignes: [c] } = await sb('iae_crm_contacts', { methode: 'POST', prefer: 'return=representation', corps: {
     lead_id: l.id, prenom, nom, poste: couper(String(p.poste || '').trim(), 80) || null, linkedin, principal: true,
   } });
-  await journalLi(l, c, 'trouve', `Profil LinkedIn de ${nomContactLi(c)} trouvé par ton Mac (cœur de cible)`, titre || null);
+  await journalLi(l, c, 'trouve', `Profil LinkedIn de ${nomContactLi(c)} trouvé par ${machineLi()} (cœur de cible)`, titre || null);
   await preparerLi(c, l, 'invitation', null);
   return { ok: true, cree: true, lead_id: l.id };
 }
@@ -2493,8 +2510,9 @@ async function ajouterProspectLi(corps) {
 const ANNA_LI = 'anna@ia-entrepreneur.fr';
 async function prevenirAnnaLi(bilan) {
   bilan.anna = 0;
+  if (!estAdmin()) return;
   const depuis = new Date(Date.now() - 30 * 86400000).toISOString();
-  const { lignes: ecrits } = await sb(`iae_crm_linkedin?type=eq.message&etape=eq.message&statut=eq.envoye&envoye_le=gte.${encodeURIComponent(depuis)}&select=lead_id,contact_id,envoye_le&order=envoye_le.asc&limit=500`);
+  const { lignes: ecrits } = await sb(`iae_crm_linkedin?${filtreCompteLi()}&type=eq.message&etape=eq.message&statut=eq.envoye&envoye_le=gte.${encodeURIComponent(depuis)}&select=lead_id,contact_id,envoye_le&order=envoye_le.asc&limit=500`);
   for (const m of ecrits) {
     const jourEnvoi = String(m.envoye_le).slice(0, 10);
     if (dansJoursOuvres(2, jourEnvoi) > aujourdHuiParis()) continue;
@@ -2525,7 +2543,7 @@ async function operationRobotLi(corps) {
   if (etat.pause_jusqua && etat.pause_jusqua > maintenant) return { ok: false, raison: 'pause' };
   if (etape === 'prospect') return ajouterProspectLi(corps);
   if (etape === 'prendre') {
-    const a = await actionLi(corps.id);
+    const a = await actionDuCompteLi(corps.id);
     const file = await fileRobotLi();
     const q = a.type === 'invitation' ? file.quotas.invitations : file.quotas.messages;
     if (q.faits >= q.max) return { ok: false, raison: 'quota' };
@@ -2534,12 +2552,12 @@ async function operationRobotLi(corps) {
   }
   if (etape === 'rendre') {
     // Le navigateur était occupé avant tout envoi : l'action retourne dans la file.
-    const a = await actionLi(corps.id);
+    const a = await actionDuCompteLi(corps.id);
     if (a.statut === 'en_cours') await majActionLi(a.id, { statut: 'a_envoyer', pris_le: null });
     return { ok: true };
   }
   if (etape === 'resultat') {
-    const a = await actionLi(corps.id);
+    const a = await actionDuCompteLi(corps.id);
     if (a.statut !== 'en_cours') throw new Refus('valeur_invalide:statut');
     const detail = couper(corps.detail || '', 400);
     const resultat = corps.resultat && typeof corps.resultat === 'object' ? JSON.parse(JSON.stringify(corps.resultat).slice(0, 4000)) : null;
@@ -2558,9 +2576,9 @@ async function operationRobotLi(corps) {
     const bilan = { acceptes: 0, reponses: 0, a_retirer: 0 };
     for (const id of (corps.acceptes || []).slice(0, 50)) {
       const { c, l } = await contactEtLeadLi(id);
-      if (c.linkedin_etat !== 'invitation_envoyee') continue;
+      if (c.linkedin_etat !== 'invitation_envoyee' || !contactDuCompteLi(c)) continue;
       await majContactLi(c.id, { linkedin_etat: 'relation', linkedin_le: maintenant });
-      await journalLi(l, c, 'acceptee', `${nomContactLi(c)} a accepté ton invitation LinkedIn (vu par ton Mac)`);
+      await journalLi(l, c, 'acceptee', `${nomContactLi(c)} a accepté ton invitation LinkedIn (vu par ${machineLi()})`);
       await preparerAvecClaude(c, l, 'message');
       await majLeadLi(l.id, { prochaine_relance: aujourdHuiParis(), prochaine_action: 'autre', prochaine_note: `LinkedIn : ${c.prenom || nomContactLi(c)} a accepté ton invitation. Message 1 prêt à valider.`, relances_sans_reponse: 0 });
       bilan.acceptes++;
@@ -2568,7 +2586,7 @@ async function operationRobotLi(corps) {
     for (const r of (corps.reponses || []).slice(0, 50)) {
       const { c, l } = await contactEtLeadLi(r.contact_id);
       const texte = couper(String(r.texte || '').trim(), 4000);
-      if (!texte || texte === c.linkedin_vu) continue;
+      if (!texte || texte === c.linkedin_vu || !contactDuCompteLi(c)) continue;
       // Une réponse suppose que Gabriel a écrit : sinon c'est un vieux message d'une relation, gardé comme « vu ».
       const { lignes: ecrit } = await sb(`iae_crm_linkedin?contact_id=eq.${c.id}&type=eq.message&statut=eq.envoye&limit=1&select=id`);
       if (!ecrit.length) { await majContactLi(c.id, { linkedin_vu: texte }); continue; }
@@ -2583,7 +2601,7 @@ async function operationRobotLi(corps) {
     }
     // Invitation sans réponse depuis 3 semaines : on la retire (à la main, aucun outil ne le fait) et on arrête.
     const limite = new Date(Date.now() - 21 * 86400000).toISOString();
-    const { lignes: vieilles } = await sb(`iae_crm_contacts?linkedin_etat=eq.invitation_envoyee&linkedin_le=lt.${encodeURIComponent(limite)}&select=id`);
+    const { lignes: vieilles } = await sb(`iae_crm_contacts?${filtreContactsLi()}&linkedin_etat=eq.invitation_envoyee&linkedin_le=lt.${encodeURIComponent(limite)}&select=id`);
     for (const v of vieilles) {
       const { c, l } = await contactEtLeadLi(v.id);
       await majContactLi(c.id, { linkedin_etat: 'a_retirer' });
@@ -2594,14 +2612,14 @@ async function operationRobotLi(corps) {
     await prevenirAnnaLi(bilan);
     // Les suites du jour (relance, dernier message) sont rédigées par Claude, comme le message 1.
     bilan.suites = 0;
-    const { lignes: relations } = await sb('iae_crm_contacts?linkedin_etat=eq.relation&select=id,lead_id&limit=1000');
+    const { lignes: relations } = await sb(`iae_crm_contacts?${filtreContactsLi()}&linkedin_etat=eq.relation&select=id,lead_id&limit=1000`);
     for (const r of relations) {
       if (bilan.suites >= 10) break;
       const [l] = (await sb(`iae_crm_leads?id=eq.${r.lead_id}&select=*`)).lignes;
       if (!l || l.archive || l.statut === 'perdu' || !l.prochaine_relance || l.prochaine_relance > aujourdHuiParis()) continue;
       const etapeSuite = /^LinkedIn : relancer /.test(l.prochaine_note || '') ? 'relance' : /^LinkedIn : dernier message/.test(l.prochaine_note || '') ? 'findia' : null;
       if (!etapeSuite) continue;
-      const { lignes: ouverts } = await sb(`iae_crm_linkedin?contact_id=eq.${r.id}&statut=in.(${OUVERTS_LI.join(',')})&select=id&limit=1`);
+      const { lignes: ouverts } = await sb(`iae_crm_linkedin?${filtreCompteLi()}&contact_id=eq.${r.id}&statut=in.(${OUVERTS_LI.join(',')})&select=id&limit=1`);
       if (ouverts.length) continue;
       const [c] = (await sb(`iae_crm_contacts?id=eq.${r.id}&select=*`)).lignes;
       await preparerAvecClaude(c, l, etapeSuite);
@@ -2613,14 +2631,18 @@ async function operationRobotLi(corps) {
   throw new Refus('op_inconnue');
 }
 
-// La clé du Mac : son empreinte SHA-256 est dans iae_crm_reglages (linkedin_robot_cle), jamais la clé elle-même.
-async function cleRobotValide(req) {
+// La clé du Mac de Gabriel : son empreinte SHA-256 est dans iae_crm_reglages (linkedin_robot_cle), jamais la clé elle-même.
+// Celle du robot d'un commercial : dans iae_crm_utilisateurs (robot_cle_hash). Renvoie la personne, ou null.
+async function robotDeLaCle(req) {
   const donnee = String(req.headers['x-cle-robot'] || '');
+  if (!donnee) return null;
   const attendue = await lireReglage('linkedin_robot_cle');
-  if (!donnee || typeof attendue !== 'string' || !/^[0-9a-f]{64}$/.test(attendue)) return false;
-  const a = Buffer.from(createHash('sha256').update(donnee).digest('hex'));
-  const b = Buffer.from(attendue);
-  return a.length === b.length && timingSafeEqual(a, b);
+  if (typeof attendue === 'string' && /^[0-9a-f]{64}$/.test(attendue)) {
+    const a = Buffer.from(createHash('sha256').update(donnee).digest('hex'));
+    const b = Buffer.from(attendue);
+    if (a.length === b.length && timingSafeEqual(a, b)) return ADMIN;
+  }
+  return utilisateurParCleRobot(donnee);
 }
 
 /* ---------- Après la formation : facture, paiement, avis ---------- */
@@ -2945,9 +2967,9 @@ async function rappelDuMatin(force = false) {
     sb(`iae_crm_leads?select=id,entreprise,prochaine_relance,prochaine_action,prochaine_note,relances_sans_reponse&archive=is.false&prochaine_relance=lte.${jour}${admin ? `&proprietaire=eq.${encodeURIComponent(ADMIN_EMAIL)}` : ''}&order=prochaine_relance.asc,entreprise.asc`),
     sb('iae_crm_contacts?select=id,lead_id,prenom,nom,principal&order=principal.desc'),
     sb(`iae_crm_entrants?select=de_nom,de_email,objet,canal&statut=eq.a_trier&proprietaire=eq.${encodeURIComponent(compte())}&order=recu_le.desc&limit=10`),
-    admin ? sb('iae_crm_linkedin?type=eq.invitation&statut=in.(a_envoyer,en_cours)&select=id') : rienSb,
-    admin ? sb('iae_crm_linkedin?type=eq.invitation&statut=eq.envoye&order=envoye_le.desc&limit=1&select=envoye_le') : rienSb,
-    admin ? sb('iae_crm_linkedin?statut=in.(echec,a_verifier)&order=created_at.asc&limit=30&select=lead_id,contact_id,etape,statut,detail') : rienSb,
+    admin ? sb(`iae_crm_linkedin?${filtreCompteLi()}&type=eq.invitation&statut=in.(a_envoyer,en_cours)&select=id`) : rienSb,
+    admin ? sb(`iae_crm_linkedin?${filtreCompteLi()}&type=eq.invitation&statut=eq.envoye&order=envoye_le.desc&limit=1&select=envoye_le`) : rienSb,
+    admin ? sb(`iae_crm_linkedin?${filtreCompteLi()}&statut=in.(echec,a_verifier)&order=created_at.asc&limit=30&select=lead_id,contact_id,etape,statut,detail`) : rienSb,
     admin ? etatRobotLi() : Promise.resolve({}),
   ]);
   // LinkedIn : la file qui se vide, puis ce qui n'est pas parti (sauf les leads déjà dans la liste du jour, qui ont leur tâche).
@@ -3048,18 +3070,20 @@ export default async function handler(req, res) {
   }
   if (origineEtrangere(req)) return res.status(403).json({ erreur: 'origine' });
 
-  // Le Mac de Gabriel (robot LinkedIn) : sa propre clé, et seulement la file LinkedIn.
+  // Les robots LinkedIn (le Mac de Gabriel, l'ordinateur d'un commercial) : leur propre clé, et seulement leur file LinkedIn.
   if (req.headers['x-cle-robot']) {
     const ipRobot = empreinte(req);
     if (tropDEchecs(ipRobot)) return res.status(429).json({ erreur: 'trop_de_tentatives' });
     try {
-      if (!(await cleRobotValide(req))) {
+      const qui = await robotDeLaCle(req);
+      if (!qui) {
         noterEchec(ipRobot);
         return res.status(401).json({ erreur: 'cle_invalide' });
       }
-      if (req.method === 'GET') return res.status(200).json(await fileRobotLi());
+      // Le robot d'un commercial agit en son nom : ses leads, sa file, ses réglages, ses messages (garder et pourMoi).
+      if (req.method === 'GET') return res.status(200).json(await avecUtilisateur(qui, () => fileRobotLi()));
       const corpsRobot = typeof req.body === 'string' ? JSON.parse(req.body || '{}') : req.body || {};
-      return res.status(200).json(await operationRobotLi(corpsRobot));
+      return res.status(200).json(await avecUtilisateur(qui, () => operationRobotLi(corpsRobot)));
     } catch (e) {
       if (e instanceof Refus || (e && e.refus)) return res.status(e.statut || 400).json({ erreur: e.code });
       console.error('crm robot', e);
