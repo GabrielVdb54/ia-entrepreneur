@@ -2132,7 +2132,7 @@ function pageMetierLi(l) {
     skill: p.skill ? { quoi: p.skill.quoi, url: `https://ia-entrepreneur.fr/skills-ia-gratuits.html#${p.skill.ancre}` } : null } : null;
 }
 const QUOTA_MESSAGES_LI = 20;
-const quotaInvitationsLi = (jour) => (jour <= '2026-11-20' ? 10 : 15); // 2 premières semaines au rythme doux, puis 15 au plus
+const quotaInvitationsLi = (jour) => (jour <= '2026-11-10' ? 10 : 15); // 10 par jour au départ ; 15 au plus dès le 12/11 (Gabriel, 10/11 : « oui pour 15 ajouts »)
 
 function verifierTexteLi(etape, texte) {
   const t = String(texte ?? '').replace(/\r\n?/g, '\n').trim();
