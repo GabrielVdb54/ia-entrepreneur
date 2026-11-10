@@ -152,7 +152,7 @@ export function parIdcc(idcc) {
 const titres = new Map();
 
 /** IDCC → nom court de la convention et sa page sur le Code du travail numérique. */
-async function convention(idcc) {
+export async function convention(idcc) {
   const num = Number(idcc);
   if (titres.has(num)) return titres.get(num);
   const r = await lireJson(`${API_CONVENTIONS}?q=${num}`, 3500);

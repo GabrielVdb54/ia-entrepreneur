@@ -55,6 +55,9 @@
     '.oo .oo-gate p{margin:0 0 14px;font-size:.92rem;line-height:1.6;color:var(--oo-m)}',
     '.oo .oo-rgpd{font-size:.76rem!important;margin:10px 0 0!important;line-height:1.5!important}',
     '.oo .oo-piege{position:absolute!important;left:-9999px!important;width:1px;height:1px;opacity:0}',
+    '.oo .oo-idcc{margin:14px 0 0;padding:14px 16px;border-radius:12px;background:#F6F7FB;border:1px dashed var(--oo-b)}',
+    '.oo .oo-idcc p{margin:0 0 10px!important;font-size:.88rem!important;line-height:1.55!important;color:var(--oo-m)}',
+    '.oo .oo-idcc .oo-champ{flex:0 1 160px}',
     '.oo .oo-sal{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px;margin:0!important;font-size:.88rem!important;color:var(--oo-m)}',
     '.oo .oo-sal input{flex:0 0 110px;width:110px;padding:10px 12px;font-size:1rem}',
     '.oo .oo-case{display:flex;align-items:flex-start;gap:8px;margin:10px 0 0!important;font-size:.82rem!important;line-height:1.5!important;color:var(--oo-m);cursor:pointer}',
@@ -128,6 +131,7 @@
 
     var page = location.pathname;
     var dernier = null;
+    var idccSaisi = ''; // convention donnée par le visiteur quand l'outil n'en trouve pas
 
     champ.addEventListener('input', function () {
       var pos = champ.value.length;
@@ -154,7 +158,7 @@
       // et elle met parfois une quinzaine de secondes : on le dit.
       var lent = setTimeout(function () { message('La table officielle de France compétences est longue à répondre aujourd’hui : encore quelques secondes…', true); }, 4000);
       evenement('outil_opco_recherche', { page: page });
-      fetch(API + '?siret=' + n, { headers: { accept: 'application/json' } })
+      fetch(API + '?siret=' + n + (idccSaisi ? '&idcc=' + idccSaisi : ''), { headers: { accept: 'application/json' } })
         .then(function (r) {
           if (r.status === 429) return { etat: 'trop' };
           return r.json();
@@ -164,7 +168,7 @@
         .then(function () { clearTimeout(lent); bouton.disabled = false; bouton.textContent = 'Trouver mon OPCO'; });
     }
 
-    form.addEventListener('submit', function (e) { e.preventDefault(); chercher(); });
+    form.addEventListener('submit', function (e) { e.preventDefault(); idccSaisi = ''; chercher(); });
 
     function afficher(d) {
       var erreurs = {
@@ -193,6 +197,8 @@
         boite.appendChild(el('strong', { texte: o.ambigu ? o.candidats.join(' ou ') : o.nom }));
         var src = d.methode === 'siret'
           ? 'Source officielle : table SIRET-OPCO de France compétences, données du ' + dateFr(d.donnee_maj) + '.'
+          : d.methode === 'idcc_saisi'
+          ? 'Déduit de la convention collective que vous avez indiquée, rattachée à cet OPCO dans la table de France compétences.'
           : 'Déduit de votre convention collective, rattachée à cet OPCO dans la table de France compétences.';
         boite.appendChild(el('p', { texte: src }));
         if (o.gestion) boite.appendChild(el('p', { texte: 'Votre dossier est géré par ' + o.gestion + ', qui reçoit les demandes de prise en charge.' }));
@@ -208,6 +214,26 @@
       if (d.convention) faits.push(el('li', null, [el('b', { texte: 'Convention collective' }), (d.convention.titre ? d.convention.titre + ' ' : '') + '(IDCC ' + d.convention.idcc + ')']));
       if (d.effectif && d.effectif.libelle) faits.push(el('li', null, [el('b', { texte: 'Effectif' }), d.effectif.libelle + (d.effectif.annee ? ' (Insee, ' + d.effectif.annee + ')' : '')]));
       if (faits.length) res.appendChild(el('ul', { classe: 'oo-faits' }, faits));
+
+      // Ni OPCO ni convention trouvés : le visiteur peut donner son IDCC.
+      if (!d.opco || !d.convention || d.idcc_saisi === 'inconnu') {
+        var champIdcc = el('input', { classe: 'oo-champ', type: 'text', inputmode: 'numeric', maxlength: '4', autocomplete: 'off', placeholder: 'ex. 1596', 'aria-label': 'Numéro IDCC de votre convention collective' });
+        var okIdcc = el('button', { classe: 'oo-btn', type: 'submit', texte: 'Valider' });
+        var fIdcc = el('form', { classe: 'oo-idcc', novalidate: '' }, [
+          el('p', null, [el('b', { texte: 'Vous avez des salariés ? ' }), 'Indiquez le numéro IDCC de votre convention collective (4 chiffres, en haut de vos bulletins de paie). ', lienExterne('https://code.travail.gouv.fr/outils/convention-collective', 'Trouver mon IDCC')]),
+          d.idcc_saisi === 'inconnu' ? el('p', { classe: 'oo-msg', texte: 'Ce numéro ne correspond à aucune convention rattachée à un OPCO dans la table de France compétences. Vérifiez-le sur un bulletin de paie.' }) : null,
+          el('div', { classe: 'oo-ligne' }, [champIdcc, okIdcc]),
+        ]);
+        fIdcc.addEventListener('submit', function (ev) {
+          ev.preventDefault();
+          var v = chiffres(champIdcc.value);
+          if (!v || v.length > 4) { champIdcc.focus(); return; }
+          idccSaisi = v;
+          evenement('outil_opco_idcc', { page: page });
+          chercher();
+        });
+        res.appendChild(fIdcc);
+      }
 
       var eff = d.effectif || {};
       if (o && eff.moins_de_50 === true && eff.tranche !== 'NN' && eff.tranche !== '00') {
@@ -264,7 +290,7 @@
         fetch(API, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json', accept: 'application/json' },
-          body: JSON.stringify({ siret: d.siret || d.numero, email: adresse, page: page, piege: piege.value, salaries: salaries.value.trim(), newsletter: !refus.checked }),
+          body: JSON.stringify({ siret: d.siret || d.numero, email: adresse, page: page, piege: piege.value, salaries: salaries.value.trim(), newsletter: !refus.checked, idcc: idccSaisi || undefined }),
         })
           .then(function (r) { return r.json().catch(function () { return {}; }).then(function (j) { return { statut: r.status, j: j }; }); })
           .then(function (x) {

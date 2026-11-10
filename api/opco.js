@@ -12,7 +12,8 @@
  *   GET  /api/opco?siret=<SIRET ou SIREN>
  *        → l'entreprise, son effectif, son OPCO, sa convention. Sans le lien
  *          du barème : c'est ce que le visiteur reçoit par email.
- *   POST /api/opco { siret, email, page?, piege?, salaries?, newsletter? }
+ *   GET  /api/opco?siret=…&idcc=…   (idcc facultatif, saisi par le visiteur)
+ *   POST /api/opco { siret, email, page?, piege?, salaries?, newsletter?, idcc? }
  *        → le serveur refait la recherche, envoie le résultat par email
  *          (Brevo) et pose le lead dans le CRM, à traiter aujourd'hui.
  *
@@ -33,7 +34,7 @@
  * « non » pour couper).
  */
 
-import { rechercher, SOCLE, FONDS_NON_SALARIES } from './_entreprise-opco.js';
+import { rechercher, SOCLE, FONDS_NON_SALARIES, parIdcc, convention as ficheConvention } from './_entreprise-opco.js';
 import { crmDisponible, enregistrerDemande } from './_crm-site.js';
 import { baremePour } from './_baremes.js';
 
@@ -112,6 +113,7 @@ function publique(r) {
       : null,
     methode: r.methode,
     convention: r.convention ? { idcc: r.convention.idcc, titre: r.convention.titre } : null,
+    idcc_saisi: r.idcc_saisi || null,
     // Le montant lui-même part par email ; la page dit seulement qu'il est prêt.
     // Vrai seulement si l'email donnera un montant (pas pour une enveloppe épuisée).
     bareme: Boolean(o && !o.ambigu && baremePour((o.gestion || o).code, r.convention?.idcc, r.effectif.tranche)?.paliers.length),
@@ -158,7 +160,7 @@ function contenu(r) {
   const bareme = o && !o.ambigu ? baremePour(ref.code, conv?.idcc, eff.tranche, eff.bornes) : null;
 
   const infos = [
-    conv && (conv.titre ? `${conv.titre} (IDCC ${conv.idcc})` : `IDCC ${conv.idcc}`),
+    conv && `${conv.titre ? `${conv.titre} (IDCC ${conv.idcc}` : `IDCC ${conv.idcc}`}${r.idcc_saisi === conv.idcc ? ', indiquée par vous' : ''}${conv.titre ? ')' : ''}`,
     eff.declare !== undefined
       ? `${eff.libelle} (selon vous)`
       : eff.libelle && !['NN', '00'].includes(eff.tranche) && `${eff.libelle.toLowerCase()}${eff.annee ? ` (Insee, ${eff.annee})` : ''}`,
@@ -266,6 +268,30 @@ async function brevo(message) {
   }
 }
 
+// --- Convention saisie par le visiteur ------------------------------------------
+
+// Gabriel, 10/11/2026 : « au pire proposer de mettre manuellement l'IDCC ».
+// Sirene ne montre pas toujours la convention (banc du 10/11 : 11 entreprises
+// sur 23 « sans convention » avaient pourtant un OPCO). Quand l'outil ne
+// trouve ni OPCO ni convention, le visiteur peut donner son IDCC (bulletin
+// de paie). Il complète ce qui manque, jamais ce que la table officielle a
+// dit pour cet établissement.
+async function avecIdccSaisi(r, saisie) {
+  if (r.etat !== 'trouve' || saisie === undefined || saisie === null || String(saisie).trim() === '') return r;
+  if (r.opco && r.convention) return r; // rien ne manque : la saisie ne sert pas
+  const chiffres = String(saisie).replace(/\D/g, '');
+  const idcc = chiffres && chiffres.length <= 4 ? chiffres.padStart(4, '0') : null;
+  const opco = idcc ? parIdcc(idcc) : null;
+  if (!opco) return { ...r, idcc_saisi: 'inconnu' };
+  const res = { ...r, idcc_saisi: idcc };
+  if (!r.opco) {
+    res.opco = opco;
+    res.methode = 'idcc_saisi';
+  }
+  if (!r.opco || !r.convention) res.convention = await ficheConvention(idcc);
+  return res;
+}
+
 // --- Effectif déclaré ---------------------------------------------------------
 
 // Le visiteur peut donner son nombre de salariés (facultatif) : il le connaît
@@ -349,7 +375,7 @@ function versCrm(r, email, page, newsletter) {
   const nom = r.entreprise?.nom || nomEntreprise(r);
   const constat = [
     o ? `OPCO ${o.nom}${o.gestion ? ` (géré par ${o.gestion.nom})` : ''}${o.ambigu ? ' à confirmer' : ''}` : 'OPCO non trouvé (pas dans la table de France compétences)',
-    conv && `convention ${conv.titre || ''} (IDCC ${conv.idcc})`.replace('  ', ' '),
+    conv && `convention ${conv.titre || ''} (IDCC ${conv.idcc}${r.idcc_saisi === conv.idcc ? ', indiquée par le visiteur' : ''})`.replace('  ', ' '),
     r.effectif.declare !== undefined
       ? `effectif déclaré ${r.effectif.libelle}${r.effectif.insee ? ` (Insee : ${r.effectif.insee})` : ''}`
       : r.effectif.libelle && `effectif ${r.effectif.libelle}${r.effectif.annee ? ` en ${r.effectif.annee}` : ''}`,
@@ -402,7 +428,7 @@ export default async function handler(req, res) {
 
   if (req.method === 'GET') {
     if (tropDeDemandes('lecture', ip)) return res.status(429).json({ erreur: 'trop_de_demandes' });
-    const r = await rechercher(req.query?.siret || req.query?.numero);
+    const r = await avecIdccSaisi(await rechercher(req.query?.siret || req.query?.numero), req.query?.idcc);
     return res.status(200).json(publique(r));
   }
 
@@ -420,7 +446,7 @@ export default async function handler(req, res) {
   }
   if (tropDeDemandes('envoi', ip)) return res.status(429).json({ erreur: 'trop_de_demandes' });
 
-  const r = await rechercher(corps.siret || corps.numero);
+  const r = await avecIdccSaisi(await rechercher(corps.siret || corps.numero), corps.idcc);
   if (r.etat !== 'trouve') {
     return res.status(r.etat === 'indisponible' ? 503 : 400).json({ erreur: r.etat });
   }
