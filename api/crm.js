@@ -2194,6 +2194,8 @@ const PROFIL_IMPOSSIBLE_LI = {
   unavailable: (nom) => `LinkedIn : profil introuvable pour ${nom}. Vérifie l'adresse, ou demande à Claude de le rechercher ; sinon Anna peut appeler.`,
   follow_only: (nom) => `LinkedIn : pas d'invitation possible pour ${nom} (son profil ne propose que « Suivre »). Passe par l'email ou le téléphone ; sinon Anna peut appeler.`,
   connect_unavailable: (nom) => `LinkedIn : pas d'invitation possible pour ${nom} (LinkedIn ne propose pas « Se connecter »). Passe par l'email ou le téléphone ; sinon Anna peut appeler.`,
+  // Le MCP refuse l'adresse avant toute action (emoji dans /in/…, page qui n'est pas un profil) : rien n'est parti, Gabriel invite à la main.
+  invalid_argument: (nom) => `LinkedIn : ton Mac ne lit pas l'adresse du profil de ${nom}, rien n'est parti. Envoie l'invitation à la main depuis son profil (« Se connecter », sans note), puis clique « Je l'ai envoyé moi-même » sur la fiche.`,
 };
 // La file d'invitations se vide : une ligne dans la barre LinkedIn et dans le récap de 7 h (une par jour, pas une tâche
 // par lead). À 0, seulement si une invitation est partie dans les 7 derniers jours : sinon la prospection est en pause.
