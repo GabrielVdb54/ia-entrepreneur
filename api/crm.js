@@ -2163,7 +2163,9 @@ function pageMetierLi(l) {
     skill: p.skill ? { quoi: p.skill.quoi, url: `https://ia-entrepreneur.fr/skills-ia-gratuits.html#${p.skill.ancre}` } : null } : null;
 }
 const QUOTA_MESSAGES_LI = 20;
-const quotaInvitationsLi = (jour) => (jour <= '2026-11-10' ? 10 : 15); // 10 par jour au départ ; 15 au plus dès le 12/11 (Gabriel, 10/11 : « oui pour 15 ajouts »)
+// 10 par jour au départ ; 20 au plus dès le 12/11, du lundi au vendredi (Gabriel, 10/11, conseil des spécialistes LinkedIn :
+// « On m'a conseillé 20 par jour, mais que pendant 5 jours » ; le Mac ne tourne que les jours ouvrés).
+const quotaInvitationsLi = (jour) => (jour <= '2026-11-10' ? 10 : 20);
 
 function verifierTexteLi(etape, texte) {
   const t = String(texte ?? '').replace(/\r\n?/g, '\n').trim();
@@ -2442,6 +2444,72 @@ async function fileRobotLi() {
   };
 }
 
+// Gabriel, 10/11 : « ajouter un maximum de personnes qui sont actives ou en tout cas potentiellement intéressées », avec la
+// méthode validée par les spécialistes LinkedIn. Le Mac cherche chaque matin les dirigeants du cœur de cible (liste Altares
+// triée : BTP, propreté, assurance, 6 à 99 salariés, Lorraine) et n'envoie ici que les profils sûrs et renseignés ; un profil
+// vide ou introuvable reste pour Anna. Ici : aucun doublon (même SIREN, même profil, même nom d'entreprise), puis lead, contact
+// et invitation automatique, comme une invitation préparée à la main.
+const SECTEURS_PROSPECT_LI = { BTP: 'btp', 'Propreté': 'proprete', Assurance: 'assurance' };
+async function ajouterProspectLi(corps) {
+  const p = corps.prospect && typeof corps.prospect === 'object' ? corps.prospect : {};
+  const linkedin = String(p.linkedin || '').trim();
+  if (!PROFIL_LI_RE.test(linkedin)) throw new Refus('profil_linkedin_absent');
+  const ident = (linkedin.match(/\/in\/([^/?#]+)/) || [])[1] || '';
+  const siret = /^\d{14}$/.test(String(p.siret || '')) ? String(p.siret) : null;
+  const entreprise = couper(String(p.entreprise || '').trim(), 200);
+  const prenom = couper(String(p.prenom || '').trim(), 80);
+  const nom = couper(String(p.nom || '').trim(), 80);
+  if (!entreprise || !prenom || !nom || !ident) throw new Refus('valeur_invalide:prospect');
+  const [parSiren, parProfil, parNom] = await Promise.all([
+    siret ? sb(`iae_crm_leads?siret=like.${siret.slice(0, 9)}*&select=id&limit=1`) : { lignes: [] },
+    sb(`iae_crm_contacts?linkedin=ilike.*${encodeURIComponent(`/in/${ident}`)}*&select=id&limit=1`),
+    sb(`iae_crm_leads?entreprise=ilike.${encodeURIComponent(entreprise)}&select=id&limit=1`),
+  ]);
+  if (parSiren.lignes.length || parProfil.lignes.length || parNom.lignes.length) return { ok: true, doublon: true };
+  const secteur = Object.hasOwn(SECTEURS_PROSPECT_LI, p.secteur) ? p.secteur : null;
+  const anna = couper(String(p.anna || '').trim(), 40);
+  const chezAnna = Boolean(anna) && anna !== 'hors de sa base';
+  const salaries = couper(String(p.salaries || '').trim(), 20);
+  const titre = couper(String(p.titre || '').trim(), 220);
+  const { lignes: [l] } = await sb('iae_crm_leads', { methode: 'POST', prefer: 'return=representation', corps: {
+    entreprise, type: 'prospect', statut: 'nouveau', source: 'LinkedIn · cœur de cible (Altares)', secteur, siret,
+    tags: ['linkedin', 'coeur-cible', 'actif-linkedin', ...(secteur ? [SECTEURS_PROSPECT_LI[secteur]] : []), ...(chezAnna ? ['liste-anna'] : [])],
+    besoin: `${secteur || 'Entreprise'}${salaries ? ` (${salaries} salariés)` : ''}, cœur de cible${chezAnna ? ` ; dans la base d'Anna (${anna})` : ''}. Profil LinkedIn trouvé par ton Mac${titre ? ` : « ${titre} »` : ''}.`,
+    localisation: couper(String(p.localisation || '').trim(), 80) || null, prochaine_action: 'autre', relances_sans_reponse: 0,
+    prochaine_note: `LinkedIn : invitation en file d'envoi, ton Mac l'envoie (20 par jour au plus).${chezAnna ? " Anna l'a aussi dans sa base : dès qu'un des deux canaux a une réponse, l'autre s'arrête." : ''}`,
+  } });
+  const { lignes: [c] } = await sb('iae_crm_contacts', { methode: 'POST', prefer: 'return=representation', corps: {
+    lead_id: l.id, prenom, nom, poste: couper(String(p.poste || '').trim(), 80) || null, linkedin, principal: true,
+  } });
+  await journalLi(l, c, 'trouve', `Profil LinkedIn de ${nomContactLi(c)} trouvé par ton Mac (cœur de cible)`, titre || null);
+  await preparerLi(c, l, 'invitation', null);
+  return { ok: true, cree: true, lead_id: l.id };
+}
+
+// Gabriel, 10/11 : « quelqu'un à qui j'ai envoyé des messages et qui n'a pas répondu, Anna doit être au courant dans le CRM.
+// Par contre si quelqu'un m'a répondu et est OK pour un rendez-vous, je le gère moi-même. » Message 1 sans réponse depuis
+// 2 jours ouvrés : Anna devient setter du lead, donc le voit avec son journal. Rien ne lui dit d'appeler : à elle et à
+// Gabriel de décider. Un lead qui a répondu reste à Gabriel seul.
+const ANNA_LI = 'anna@ia-entrepreneur.fr';
+async function prevenirAnnaLi(bilan) {
+  bilan.anna = 0;
+  const depuis = new Date(Date.now() - 30 * 86400000).toISOString();
+  const { lignes: ecrits } = await sb(`iae_crm_linkedin?type=eq.message&etape=eq.message&statut=eq.envoye&envoye_le=gte.${encodeURIComponent(depuis)}&select=lead_id,contact_id,envoye_le&order=envoye_le.asc&limit=500`);
+  for (const m of ecrits) {
+    const jourEnvoi = String(m.envoye_le).slice(0, 10);
+    if (dansJoursOuvres(2, jourEnvoi) > aujourdHuiParis()) continue;
+    const [l] = (await sb(`iae_crm_leads?id=eq.${m.lead_id}&select=id,setter,statut,archive,tags`)).lignes;
+    if (!l || l.setter || l.archive || !['nouveau', 'contacte'].includes(l.statut) || !(l.tags || []).includes('linkedin')) continue;
+    const { lignes: reponse } = await sb(`iae_crm_activites?lead_id=eq.${l.id}&type=eq.linkedin&meta->>etape=eq.reponse_recue&select=id&limit=1`);
+    if (reponse.length) continue;
+    const { c } = await contactEtLeadLi(m.contact_id);
+    if (c.linkedin_vu) continue;
+    await majLeadLi(l.id, { setter: ANNA_LI });
+    await journalLi(l, c, 'anna_prevenue', `Pas de réponse de ${nomContactLi(c)} au message LinkedIn du ${dateCourte(jourEnvoi)} : Anna voit maintenant ce lead`);
+    bilan.anna++;
+  }
+}
+
 async function operationRobotLi(corps) {
   const etape = corps.etape;
   const etat = await etatRobotLi();
@@ -2455,6 +2523,7 @@ async function operationRobotLi(corps) {
     return { ok: true };
   }
   if (etat.pause_jusqua && etat.pause_jusqua > maintenant) return { ok: false, raison: 'pause' };
+  if (etape === 'prospect') return ajouterProspectLi(corps);
   if (etape === 'prendre') {
     const a = await actionLi(corps.id);
     const file = await fileRobotLi();
@@ -2522,6 +2591,7 @@ async function operationRobotLi(corps) {
       await majLeadLi(l.id, { prochaine_relance: aujourdHuiParis(), prochaine_action: 'autre', prochaine_note: `LinkedIn : retire l'invitation à ${c.prenom || nomContactLi(c)} (en attente depuis 3 semaines), puis on arrête.` });
       bilan.a_retirer++;
     }
+    await prevenirAnnaLi(bilan);
     // Les suites du jour (relance, dernier message) sont rédigées par Claude, comme le message 1.
     bilan.suites = 0;
     const { lignes: relations } = await sb('iae_crm_contacts?linkedin_etat=eq.relation&select=id,lead_id&limit=1000');
