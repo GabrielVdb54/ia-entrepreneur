@@ -150,6 +150,9 @@
       bouton.disabled = true;
       bouton.textContent = 'Recherche…';
       message('Recherche dans les registres publics (Insee, France compétences)…', true);
+      // Sans convention déclarée, seule la table de France compétences répond,
+      // et elle met parfois une quinzaine de secondes : on le dit.
+      var lent = setTimeout(function () { message('La table officielle de France compétences est longue à répondre aujourd’hui : encore quelques secondes…', true); }, 4000);
       evenement('outil_opco_recherche', { page: page });
       fetch(API + '?siret=' + n, { headers: { accept: 'application/json' } })
         .then(function (r) {
@@ -158,7 +161,7 @@
         })
         .then(function (d) { afficher(d); })
         .catch(function () { message('Les registres publics ne répondent pas pour le moment. Réessayez dans un instant.'); })
-        .then(function () { bouton.disabled = false; bouton.textContent = 'Trouver mon OPCO'; });
+        .then(function () { clearTimeout(lent); bouton.disabled = false; bouton.textContent = 'Trouver mon OPCO'; });
     }
 
     form.addEventListener('submit', function (e) { e.preventDefault(); chercher(); });

@@ -95,7 +95,19 @@ export function numeroValide(n) {
 
 // --- Appels ----------------------------------------------------------------
 
-async function lireJson(url, delai = DELAI_MS) {
+// Sirene (Recherche d'entreprises) limite à 7 appels par seconde et renvoie
+// parfois une erreur passagère : sans nouvel essai, le visiteur obtenait un
+// résultat amputé (sans nom ni effectif, voire un autre OPCO). Banc de test
+// du 10/11/2026.
+async function lireJson(url, delai = DELAI_MS, essais = 1) {
+  for (let i = 0; ; i += 1) {
+    const r = await lireUneFois(url, delai);
+    if (r.data || i + 1 >= essais || r.erreur === 400 || r.erreur === 404) return r;
+    await new Promise((ok) => setTimeout(ok, 400 * (i + 1)));
+  }
+}
+
+async function lireUneFois(url, delai) {
   const stop = new AbortController();
   const minuteur = setTimeout(() => stop.abort(), delai);
   try {
@@ -193,13 +205,34 @@ function exception(siret) {
  *   { etat: 'trouve', siret, siege, entreprise, effectif, opco, methode,
  *     convention, ... }                              opco null si non trouvé
  */
+// Le même SIRET est cherché deux fois de suite : à l'affichage (GET) puis à
+// l'envoi de l'email (POST). Une mémoire de 15 min par instance rend l'email
+// identique à l'écran et évite d'attendre deux fois la table de France
+// compétences. Les échecs passagers ne sont jamais gardés.
+const memoire = new Map();
+const MEMOIRE_MS = 15 * 60 * 1000;
+
 export async function rechercher(saisie) {
+  const cle = String(saisie || '').replace(/\D/g, '');
+  const vu = memoire.get(cle);
+  if (vu && Date.now() - vu.t < MEMOIRE_MS) return structuredClone(vu.r);
+  const r = await chercher(saisie);
+  const provisoire = r.provisoire;
+  delete r.provisoire;
+  if (!provisoire && (r.etat === 'trouve' || r.etat === 'introuvable')) {
+    if (memoire.size > 500) memoire.clear();
+    memoire.set(cle, { t: Date.now(), r: structuredClone(r) });
+  }
+  return r;
+}
+
+async function chercher(saisie) {
   const numero = String(saisie || '').replace(/\D/g, '');
   if (numero.length !== 9 && numero.length !== 14) return { etat: 'format' };
   if (!numeroValide(numero)) return { etat: 'invalide' };
   const siren = numero.slice(0, 9);
 
-  const re = await lireJson(`${API_ENTREPRISES}?q=${numero}&per_page=1`);
+  const re = await lireJson(`${API_ENTREPRISES}?q=${numero}&per_page=1`, 4000, 3);
   const unite = (re.data?.results || []).find((u) => u.siren === siren) || null;
   let etab = null;
   if (unite) {
@@ -211,11 +244,21 @@ export async function rechercher(saisie) {
 
   let opco = null;
   let methode = null;
-  const declares = [...(etab?.liste_idcc || []), ...(unite?.complements?.liste_idcc || [])];
-  // Plusieurs conventions déclarées (ouvriers, ETAM, cadres) : on retient la
-  // plus répandue dans la table, en général celle de la plupart des salariés.
+  let provisoire = false; // une source n'a pas répondu : ne pas garder ce résultat
+  if (!re.data) provisoire = true;
+  // La convention de l'établissement d'abord : celles de l'entreprise mêlent
+  // tous ses sites (un groupe de 1 000 établissements en déclare dix).
+  const propres = (liste) => [...new Set((liste || []).map(idccPropre).filter(Boolean))];
+  const deLEtablissement = propres(etab?.liste_idcc);
+  const candidats = deLEtablissement.length ? deLEtablissement : propres(unite?.complements?.liste_idcc);
+  // Plusieurs conventions (ouvriers, ETAM, cadres) : on retient la plus
+  // répandue dans la table, en général celle de la plupart des salariés.
   const poids = (x) => IDCC[x]?.etablissements || 0;
-  const idcc = [...new Set(declares.map(idccPropre).filter(Boolean))].sort((a, b) => poids(b) - poids(a))[0] || null;
+  const idcc = [...candidats].sort((a, b) => poids(b) - poids(a))[0] || null;
+  // Ces conventions mènent-elles à des OPCO différents ? Alors seule la table
+  // de France compétences peut trancher pour cet établissement.
+  const opcosPossibles = new Set(candidats.map((x) => IDCC[x]?.opco).filter(Boolean));
+  const incertain = opcosPossibles.size > 1;
 
   // 1. Établissement que sa convention ne situe pas.
   const exc = siret ? exception(siret) : null;
@@ -224,17 +267,23 @@ export async function rechercher(saisie) {
     if (exc.gestion) opco.gestion = fiche(exc.gestion);
     methode = 'siret';
   }
-  // 2. La convention collective.
-  if (!opco && idcc) {
+  // 2. La convention collective, quand elle ne laisse pas de doute.
+  if (!opco && idcc && !incertain) {
     opco = parIdcc(idcc);
     if (opco) methode = 'idcc';
   }
   // 3. La table entière, lente : seulement quand rien d'autre n'a répondu.
   let idccTable = null;
-  // Un établissement que Sirene dit non employeur n'est pas dans cette table
-  // (elle vient de la DSN) : inutile de faire attendre le visiteur.
-  if (!opco && siret && etab?.caractere_employeur !== 'N') {
-    const t = await lireJson(`${API_TABULAIRE}?SIRET__exact=${siret}`, 9000);
+  // Un établissement sans salarié n'est pas dans cette table (elle vient de
+  // la DSN) : inutile de faire attendre le visiteur.
+  // Sirene se contredit parfois (« non employeur » avec 1 ou 2 salariés) :
+  // une tranche d'effectif l'emporte.
+  const sansSalarie = etab?.caractere_employeur === 'N' && ['NN', '00', null, undefined].includes(unite?.tranche_effectif_salarie);
+  if (!opco && siret && !sansSalarie) {
+    // Lente (6 à 14 s) et parfois en erreur : deux essais, dans les 60 s de
+    // la fonction (vercel.json).
+    const t = await lireJson(`${API_TABULAIRE}?SIRET__exact=${siret}`, 17000, 2);
+    if (!t.data) provisoire = true;
     const ligne = t.data?.data?.[0];
     if (ligne?.OPCO_PROPRIETAIRE) {
       opco = fiche(ligne.OPCO_PROPRIETAIRE);
@@ -244,12 +293,20 @@ export async function rechercher(saisie) {
     }
   }
 
+  // 4. Table muette sur un cas incertain : la première convention que Sirene
+  // donne pour l'établissement, à défaut celle de l'entreprise.
+  if (!opco && incertain) {
+    opco = parIdcc(candidats[0]);
+    if (opco) methode = 'idcc';
+  }
+
   if (!unite && !opco) {
     // Sirene a répondu sans rien trouver : le numéro n'existe pas (ou n'est
     // pas diffusible). Sinon, c'est la source qui ne répond pas.
     return re.data ? { etat: 'introuvable', numero } : { etat: 'indisponible', numero };
   }
-  const idccRetenu = idcc || idccTable;
+  // La table parle de cet établissement : sa convention prime.
+  const idccRetenu = idccTable || (incertain ? candidats[0] : idcc);
 
   const tranche = unite?.tranche_effectif_salarie || null;
   const annee = unite?.annee_tranche_effectif_salarie || null;
@@ -258,6 +315,7 @@ export async function rechercher(saisie) {
 
   return {
     etat: 'trouve',
+    provisoire,
     numero,
     siret,
     siege: numero.length === 9 || Boolean(etab?.est_siege),

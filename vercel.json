@@ -189,7 +189,8 @@
   ],
   "functions": {
     "api/opco.js": {
-      "includeFiles": "data/siret-opco/**"
+      "includeFiles": "data/siret-opco/**",
+      "maxDuration": 60
     }
   }
 }
