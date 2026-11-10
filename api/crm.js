@@ -2313,8 +2313,9 @@ async function operationLinkedin(corps, ip) {
     if (!['brouillon', 'echec', 'a_verifier'].includes(a.statut)) throw new Refus('deja_en_file', 409);
     const texte = verifierTexteLi(a.etape, corps.texte ?? a.texte);
     // La confiance : des messages de Claude validés tels quels, d'affilée. Un texte modifié remet le compteur à zéro.
+    // Un renvoi après un échec du Mac, texte inchangé, ne compte pas une deuxième fois.
     let confiance = null;
-    if (a.type === 'message' && ETAPES_AUTO_LI.includes(a.etape)) {
+    if (a.type === 'message' && ETAPES_AUTO_LI.includes(a.etape) && (a.statut === 'brouillon' || normeLi(texte) !== normeLi(a.texte))) {
       const avant = await confianceLi();
       const telQuel = Boolean(a.texte_claude) && normeLi(texte) === normeLi(a.texte_claude);
       const serie = telQuel ? (avant.serie || 0) + 1 : 0;
@@ -2328,9 +2329,10 @@ async function operationLinkedin(corps, ip) {
     return { action: await majActionLi(a.id, { statut: 'annule', detail: 'Annulé par Gabriel' }) };
   }
   if (op === 'linkedin_parti') {
-    // « Ton Mac ne sait pas si c'est parti » : Gabriel a regardé sur LinkedIn, c'est parti.
-    if (a.statut !== 'a_verifier') throw new Refus('valeur_invalide:statut');
-    return appliquerEnvoiLi(a, { detail: 'Confirmé par Gabriel sur LinkedIn' });
+    // « Ton Mac ne sait pas si c'est parti » : Gabriel a regardé sur LinkedIn, c'est parti. Ou le Mac a échoué
+    // (10/11 : « LinkedIn did not expose one usable message composer ») et Gabriel l'a envoyé lui-même.
+    if (!['a_verifier', 'echec'].includes(a.statut)) throw new Refus('valeur_invalide:statut');
+    return appliquerEnvoiLi(a, { detail: a.statut === 'echec' ? 'Envoyé à la main par Gabriel' : 'Confirmé par Gabriel sur LinkedIn' });
   }
   throw new Refus('op_inconnue');
 }

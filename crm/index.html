@@ -2993,7 +2993,9 @@ function blocLi(c) {
     ${a.detail ? `<p class="li-detail${a.statut === 'echec' || a.statut === 'a_verifier' ? ' alerte-li' : ''}">${esc(a.detail)}</p>` : ''}
     <label class="champ">${esc(LIB_LI[a.etape])}${invitation ? ' : note facultative' : ''}<textarea data-li-texte rows="${invitation ? 2 : 6}" maxlength="${invitation ? 200 : 1900}" placeholder="${invitation ? 'Sans note, c\'est conseillé (3 notes par mois en compte gratuit)' : 'Le message, que tu relis avant l\'envoi'}">${esc(texte)}</textarea><span class="aide" data-li-compte>${texte.length} / ${invitation ? 200 : 1900}</span></label>
     <div class="actions">
-      ${a.statut === 'a_verifier' ? '<button type="button" class="btn petit primaire" data-li-parti>C\'est parti</button><button type="button" class="btn petit" data-li-valider>Pas parti : renvoyer</button>' : '<button type="button" class="btn petit primaire" data-li-valider>Envoyer par mon Mac</button>'}
+      ${a.statut === 'a_verifier' ? '<button type="button" class="btn petit primaire" data-li-parti>C\'est parti</button><button type="button" class="btn petit" data-li-valider>Pas parti : renvoyer</button>'
+        : a.statut === 'echec' ? `<button type="button" class="btn petit primaire" data-li-valider>Réessayer par mon Mac</button><button type="button" class="btn petit" data-li-parti>Je l'ai envoyé moi-même</button>`
+        : '<button type="button" class="btn petit primaire" data-li-valider>Envoyer par mon Mac</button>'}
       ${invitation || !D.ia ? '' : '<button type="button" class="btn petit" data-li-rediger>Rédiger avec Claude</button>'}
       <button type="button" class="btn petit lien" data-li-annuler>Annuler</button>
     </div>
