@@ -13,9 +13,10 @@
  * et entreprise obligatoires. Ils se changent sans code dans le réglage `rdv_tour`
  * (iae_crm_reglages) : conseillers, debut, fin, duree, pas, preavis_heures, semaines.
  *
- *   GET  /api/rdv  → { creneaux: ["2026-11-12T08:00:00.000Z", …] }, jamais qui est libre
+ *   GET  /api/rdv  → { creneaux: ["2026-11-12T08:00:00.000Z", …], jeton, turnstile? },
+ *                    jamais qui est libre
  *   POST /api/rdv  { debut, prenom, nom, email, telephone, entreprise, message?,
- *                    programme?, par?, _gotcha } → { ok, conseiller, prenom, nom, debut }
+ *                    programme?, par?, jeton, turnstile?, _gotcha } → { ok, conseiller, prenom, nom, debut }
  *
  * Agendas : le jeton Google de gabriel@ia-entrepreneur.fr (GMAIL_IAE_*, portée
  * calendar.events), qui est propriétaire des agendas d'Axel et de Dorian dans le
@@ -30,12 +31,17 @@
  * Le conseiller reçoit un email (Brevo, depuis gabriel@ia-entrepreneur.fr).
  *
  * Route publique : origine vérifiée et champ piège pour la réservation, 20
- * réservations et 120 lectures par IP et par 10 minutes. Créneau revérifié dans
+ * réservations et 120 lectures par IP et par 10 minutes. Depuis les deux faux RDV des
+ * 11 et 12/11 (robot, adresse jetable, lien d'hameçonnage dans le message), les barrières
+ * de _anti-robot.js : pas de lien, pas d'adresse jetable ni de domaine sans email, jeton
+ * de la page (3 s au moins), et Cloudflare Turnstile quand ses clés sont sur Vercel.
+ * Créneau revérifié dans
  * les agendas au moment de réserver ; deux réservations simultanées du même
  * créneau sont départagées par l'index unique de iae_crm_rdv (supabase/iae_crm_rdv.sql).
  */
 import { randomUUID } from 'node:crypto';
 import { crmDisponible, sb, aujourdhui } from './_crm-site.js';
+import { contientLien, emailRefuse, jetonPage, jetonRefuse, turnstileCle, turnstileValide } from './_anti-robot.js';
 
 const HOTES = ['ia-entrepreneur.fr', 'www.ia-entrepreneur.fr'];
 const EMAIL_RE = /^[^\s@<>()",;:]+@[^\s@<>()",;:]+\.[a-z]{2,}$/i;
@@ -368,7 +374,7 @@ function tropDePassages(sorte, ip, max) {
 
 const PROGRAMMES = { 'niveau-1': 'Niveau 1, Acculturation IA', 'niveau-2': 'Niveau 2, IA métier', 'niveau-3': 'Niveau 3, Automatisation & intégration' };
 
-async function reserver(corps) {
+async function reserver(corps, ip) {
   const r = await reglages();
   const d = {
     prenom: ligne(corps.prenom, 80), nom: ligne(corps.nom, 80), email: ligne(corps.email, 254),
@@ -378,9 +384,17 @@ async function reserver(corps) {
   for (const champ of ['prenom', 'nom', 'entreprise']) if (!d[champ]) return { statut: 400, corps: { erreur: champ } };
   if (!d.email || !EMAIL_RE.test(d.email)) return { statut: 400, corps: { erreur: 'email' } };
   if (!d.telephone || (d.telephone.match(/\d/g) || []).length < 9) return { statut: 400, corps: { erreur: 'telephone' } };
+  // Les faux RDV des 11 et 12/11 portaient un lien d'hameçonnage dans le message.
+  for (const champ of ['message', 'entreprise', 'nom', 'prenom']) {
+    if (contientLien(d[champ])) { console.error('rdv refusé : lien', champ); return { statut: 400, corps: { erreur: champ, motif: 'lien' } }; }
+  }
+  const motifEmail = await emailRefuse(d.email);
+  if (motifEmail) { console.error('rdv refusé : email', motifEmail, d.email.split('@').pop()); return { statut: 400, corps: { erreur: 'email', motif: motifEmail } }; }
   const debut = Date.parse(String(corps.debut || ''));
   if (!Number.isFinite(debut) || !creneauxPossibles(r).includes(debut)) return { statut: 409, corps: { erreur: 'creneau' } };
   const fin = debut + r.duree * 60000;
+  // Le captcha en dernier : son jeton ne sert qu'une fois, la page en redemande un après chaque refus.
+  if (!(await turnstileValide(corps.turnstile, ip))) return { statut: 400, corps: { erreur: 'robot', motif: 'captcha' } };
   const setter = r.setters[String(corps.par || '').toLowerCase()] || null;
 
   // Le créneau est relu dans les agendas à l'instant, sans cache.
@@ -450,7 +464,8 @@ export default async function handler(req, res) {
   try {
     if (req.method === 'GET') {
       if (tropDePassages('lecture', ip, 120)) return res.status(429).json({ erreur: 'trop' });
-      return res.status(200).json({ creneaux: await creneauxLibres() });
+      const cle = turnstileCle();
+      return res.status(200).json({ creneaux: await creneauxLibres(), jeton: jetonPage(), ...(cle ? { turnstile: cle } : {}) });
     }
     if (req.method === 'POST') {
       let corps = req.body;
@@ -459,7 +474,9 @@ export default async function handler(req, res) {
       if (!origineAutorisee(req)) return res.status(403).json({ erreur: 'origine' });
       if (texte(corps._gotcha, 10)) return res.status(200).json({ ok: true });
       if (tropDePassages('reservation', ip, 20)) return res.status(429).json({ erreur: 'trop' });
-      const { statut, corps: sortie } = await reserver(corps);
+      const motifJeton = jetonRefuse(corps.jeton);
+      if (motifJeton) { console.error('rdv refusé : jeton', motifJeton); return res.status(400).json({ erreur: 'robot', motif: motifJeton }); }
+      const { statut, corps: sortie } = await reserver(corps, ip);
       return res.status(statut).json(sortie);
     }
     res.setHeader('Allow', 'GET, POST');

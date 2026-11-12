@@ -63,6 +63,8 @@
     .mention a{color:var(--primary);text-decoration:underline}
     .etat{margin:0 0 14px;font-size:.97rem;color:var(--muted)}
     .etat:empty{display:none}
+    .anti-robot{max-width:100%;overflow:hidden}
+    .anti-robot.visible{margin:0 0 14px}
     .etat.erreur{color:#B42318;font-weight:600}
     .etat button{font:inherit;font-weight:700;color:var(--primary);background:none;border:0;padding:0;text-decoration:underline;cursor:pointer}
     .programme-choisi{margin:0 0 18px;padding:14px 16px;border-radius:14px;background:rgba(16,185,129,.08);border:1px solid rgba(16,185,129,.3);font-size:.95rem;line-height:1.55}
@@ -110,6 +112,7 @@
           </fieldset>
           <div id="blocEnvoi" hidden>
             <p class="recap" id="recap" aria-live="polite"></p>
+            <div class="anti-robot" id="antiRobot"></div>
             <button type="submit" class="envoyer" id="envoyer">Confirmer le rendez-vous</button>
             <p class="mention">Vous recevez aussitôt l'invitation par email, avec le lien de la visio. Vos coordonnées servent à préparer ce rendez-vous (<a href="/politique-confidentialite.html">politique de confidentialité</a>).</p>
           </div>
@@ -150,6 +153,38 @@
       var jours = document.getElementById('jours'), heures = document.getElementById('heures');
       var recap = document.getElementById('recap'), bouton = document.getElementById('envoyer');
       var par = (new URLSearchParams(location.search).get('par') || '').toLowerCase().replace(/[^a-z]/g, '').slice(0, 20);
+      // Anti-robot (12/11/2026, après deux faux RDV) : le jeton signé que donne /api/rdv à l'ouverture,
+      // et Cloudflare Turnstile quand le serveur envoie sa clé (le plus souvent invisible).
+      var jeton = '', cleTs = '', widgetTs = null, jetonTs = '', attenteTs = false, tsHs = false;
+      var MSG_TS = 'La vérification anti-robot n\'a pas abouti. Réessayez dans un instant, ou appelez-nous.';
+      var AIDE = {
+        lien: 'Retirez le lien : décrivez votre besoin en quelques mots, sans adresse web.',
+        jetable: 'Les adresses email jetables ne sont pas acceptées : indiquez votre adresse professionnelle.',
+        domaine: 'Cette adresse ne peut pas recevoir d\'email : vérifiez ce qui suit le @.'
+      };
+      function chargerTurnstile() {
+        if (!cleTs || document.getElementById('scriptTs')) return;
+        var zone = document.getElementById('antiRobot');
+        window.iaeTurnstilePret = function () {
+          try {
+            widgetTs = window.turnstile.render(zone, {
+              sitekey: cleTs, action: 'rdv', language: 'fr', theme: 'light', appearance: 'interaction-only',
+              size: window.innerWidth < 360 ? 'compact' : 'flexible',
+              'before-interactive-callback': function () { zone.classList.add('visible'); },
+              'after-interactive-callback': function () { zone.classList.remove('visible'); },
+              callback: function (t) { jetonTs = t; if (attenteTs) { attenteTs = false; envoyer(); } },
+              'expired-callback': function () { jetonTs = ''; },
+              'error-callback': function () { jetonTs = ''; if (attenteTs) { attenteTs = false; finEnvoi(); dire(MSG_TS, true); } }
+            });
+          } catch (err) { tsHs = true; }
+        };
+        var sc = document.createElement('script'); sc.id = 'scriptTs'; sc.async = true;
+        sc.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit&onload=iaeTurnstilePret';
+        sc.onerror = function () { tsHs = true; if (attenteTs) { attenteTs = false; finEnvoi(); dire(MSG_TS, true); } };
+        document.head.appendChild(sc);
+      }
+      function nouveauTs() { jetonTs = ''; if (widgetTs !== null && window.turnstile) { try { window.turnstile.reset(widgetTs); } catch (err) {} } }
+      function finEnvoi() { bouton.disabled = false; bouton.textContent = 'Confirmer le rendez-vous'; }
       var parJour = {};
       var fmtJourCle = new Intl.DateTimeFormat('fr-CA', { timeZone: 'Europe/Paris', year: 'numeric', month: '2-digit', day: '2-digit' });
       var fmtSemaine = new Intl.DateTimeFormat('fr-FR', { timeZone: 'Europe/Paris', weekday: 'short' });
@@ -201,7 +236,11 @@
         dire('Chargement des créneaux libres…');
         return fetch('/api/rdv', { headers: { accept: 'application/json' } })
           .then(function (r) { if (!r.ok) throw new Error(String(r.status)); return r.json(); })
-          .then(function (j) { afficher(j.creneaux || [], garderChoix === true); })
+          .then(function (j) {
+            if (j.jeton && !jeton) jeton = j.jeton;
+            if (j.turnstile && !cleTs) { cleTs = j.turnstile; chargerTurnstile(); }
+            afficher(j.creneaux || [], garderChoix === true);
+          })
           .catch(function () { dire('Le calendrier ne répond pas pour le moment. Réessayez dans un instant, ou appelez-nous.', true, true); });
       }
       jours.addEventListener('change', function (e) { if (e.target.name === 'jour') montrerHeures(e.target.value); });
@@ -209,10 +248,21 @@
       form.addEventListener('submit', function (e) {
         e.preventDefault();
         if (!form.reportValidity()) return;
+        if (cleTs && !jetonTs) {
+          // Le captcha n'a pas encore rendu son jeton (ou n'a pas pu se charger).
+          if (tsHs) { dire(MSG_TS, true); etat.scrollIntoView({ block: 'center' }); return; }
+          attenteTs = true; bouton.disabled = true; bouton.textContent = 'Vérification anti-robot…';
+          return;
+        }
+        envoyer();
+      });
+      function envoyer() {
         var donnees = Object.fromEntries(new FormData(form));
         delete donnees.jour;
         donnees.programme = programmeChoisi || '';
         if (par) donnees.par = par;
+        donnees.jeton = jeton;
+        if (cleTs) donnees.turnstile = jetonTs;
         bouton.disabled = true; bouton.textContent = 'Réservation en cours…';
         fetch('/api/rdv', { method: 'POST', headers: { 'Content-Type': 'application/json', accept: 'application/json' }, body: JSON.stringify(donnees) })
           .then(function (r) { return r.json().catch(function () { return {}; }).then(function (j) { return { statut: r.status, j: j }; }); })
@@ -226,15 +276,24 @@
               location.href = '/rdv-confirme.html';
               return;
             }
-            bouton.disabled = false; bouton.textContent = 'Confirmer le rendez-vous';
+            finEnvoi();
+            nouveauTs();
+            if (x.statut === 400 && x.j.erreur === 'robot') {
+              if (x.j.motif === 'captcha') { dire(MSG_TS, true); etat.scrollIntoView({ block: 'center' }); return; }
+              if (x.j.motif === 'vite') { dire('Vérifiez vos informations, puis confirmez à nouveau.'); recap.scrollIntoView({ block: 'center' }); return; }
+              // Jeton absent ou périmé (page ouverte depuis plus de 12 h) : on en reprend un avec les créneaux.
+              jeton = '';
+              charger(true).then(function () { dire('La page était ouverte depuis longtemps. Vérifiez votre créneau, puis confirmez à nouveau.', true); blocJours.scrollIntoView({ block: 'start' }); });
+              return;
+            }
             if (x.statut === 409) { charger(true).then(function () { dire('Ce créneau vient d\'être pris. Choisissez-en un autre, vos coordonnées sont gardées.', true); blocJours.scrollIntoView({ block: 'start' }); }); return; }
             var champ = x.statut === 400 && x.j.erreur && form.elements[x.j.erreur];
-            if (champ && champ.focus) { champ.setCustomValidity('Vérifiez ce champ.'); champ.reportValidity(); champ.addEventListener('input', function () { champ.setCustomValidity(''); }, { once: true }); return; }
+            if (champ && champ.focus) { champ.setCustomValidity(AIDE[x.j.motif] || 'Vérifiez ce champ.'); champ.reportValidity(); champ.addEventListener('input', function () { champ.setCustomValidity(''); }, { once: true }); return; }
             dire(x.statut === 429 ? 'Trop de tentatives en peu de temps. Réessayez dans quelques minutes, ou appelez-nous.' : 'La réservation n\'a pas abouti. Réessayez dans un instant, ou appelez-nous.', true);
             etat.scrollIntoView({ block: 'center' });
           })
-          .catch(function () { bouton.disabled = false; bouton.textContent = 'Confirmer le rendez-vous'; dire('La réservation n\'a pas abouti (connexion). Réessayez dans un instant.', true); });
-      });
+          .catch(function () { finEnvoi(); nouveauTs(); dire('La réservation n\'a pas abouti (connexion). Réessayez dans un instant.', true); });
+      }
       charger();
     })();
   </script>
