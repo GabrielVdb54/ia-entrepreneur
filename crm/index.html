@@ -323,6 +323,12 @@
   .li-barre .li-confiance { font-size: 13.5px; }
   .li-barre .li-file { display: inline-block; margin-top: 4px; font-size: 13.5px; font-weight: 700; color: var(--text); }
   .li-barre.alerte-li p { color: var(--danger); }
+  .em-barre .em-bilan { font-size: 13.5px; }
+  .em-adresse { margin: 0; font-size: 14px; overflow-wrap: anywhere; }
+  .em-verifiee { display: inline-block; font-size: 12px; font-weight: 700; padding: 1px 8px; border-radius: 999px; background: var(--accent-soft); color: var(--accent-dark); }
+  .em-appuis { margin: 4px 0 0; padding-left: 18px; font-size: 13.5px; overflow-wrap: anywhere; }
+  .em-appuis li + li { margin-top: 3px; }
+  .em-bloc .champ input { font-weight: 600; }
   .boite { display: grid; gap: 18px; }
   .boite > section { min-width: 0; }
   @media (min-width: 900px) {
@@ -710,6 +716,16 @@ const ERREURS = {
   caractere_refuse: 'Le texte contient un caractère que LinkedIn refuse (tabulation ou caractère invisible).',
   texte_interdit: 'Ce texte contient un mot interdit en prospection LinkedIn (prix, ROI, CPF, « reste à charge », « 100 % », « certifiante », « gratuit ») : corrige-le.',
   lien_interdit: 'Ce lien n\'a pas sa place à cette étape : aucun lien dans le message 1, FindIA ou le skill du métier seulement dans le dernier message.',
+  email_en_file: 'Déjà en file : il part le prochain matin de jour ouvré. Écarte-le pour ne pas l\'envoyer.',
+  objet_trop_long: 'Objet trop long (90 caractères au plus).',
+  objet_majuscules: "L'objet est tout en majuscules : écris-le normalement.",
+  email_interdit: 'Ce texte contient un mot interdit en prospection (prix, ROI, CPF, OPCO, « reste à charge », « 100 % », « certifiante », « gratuit ») : corrige-le.',
+  email_lien: "Pas de lien ni d'adresse dans le message : le lien « se désinscrire » s'ajoute tout seul en bas.",
+  email_origine: "Le message parle de l'origine de l'adresse ou de LinkedIn : retire cette phrase (on ne dit jamais d'où vient l'adresse).",
+  variable_restante: 'Une variable entre accolades ou chevrons reste à remplacer.',
+  adresse_manquante: "Pas encore d'adresse vérifiée pour ce dirigeant.",
+  adresse_opposee: "Cette personne s'est désinscrite : plus aucun message ne lui part.",
+  adresse_non_verifiee: "FullEnrich ne donne pas cette adresse comme vérifiée (DELIVERABLE) : on ne l'utilise pas.",
   pieces_trop_lourdes: "Pièces jointes trop lourdes pour le CRM (3,3 Mo au plus) : rien n'est parti. Envoie ce message depuis Gmail.",
   piece_invalide: "Une pièce jointe est vide ou illisible : rien n'est parti.",
   piece_trop_lourde: 'Pièce jointe trop lourde pour le CRM (plus de 4 Mo) : ouvre le fil dans Gmail.',
@@ -1062,6 +1078,7 @@ function vueJour() {
     S.dusDuJour = { tout: dus.map((l) => l.id), email: emails.map((l) => l.id), appel: appels.map((l) => l.id), autre: autres.map((l) => l.id) };
   }
   h += barreLinkedin();
+  h += barreEmail();
   h += blocPaiements();
   h += blocATrier();
   S.ecartesEnBas = blocEcartes();
@@ -1241,6 +1258,7 @@ function rendreFiche() {
       </div>
     </section>
     ${blocRecap(l)}
+    ${blocEmailFiche(l)}
     ${l.type === 'formateur' ? '' : blocApresFormation(l)}
     ${blocEvaluations(l)}
     ${l.type === 'formateur' ? blocDossierFormateur(l) : blocProgramme(l)}
@@ -3214,6 +3232,205 @@ document.addEventListener('click', async (ev) => {
     D.reglages.linkedin_confiance = r.confiance;
     rendre();
     toast('Envoi automatique coupé : chaque message attend de nouveau ton clic.');
+  } catch (e) { toast(e.message); }
+});
+
+/* ----- Prospection email : la barre, les emails à valider, l'état sur la fiche ----- */
+// Gabriel, 12/11 : « mets le bilan dans le crm, il faut qu'on en envoie tous les jours ». Le serveur vérifie le registre,
+// trouve l'adresse vérifiée (FullEnrich), lit les faits publics, Claude écrit l'objet et l'accroche ; ici Gabriel relit et
+// valide d'un clic, puis le serveur envoie par Brevo le matin d'un jour ouvré (5 par jour au plus, « molo »). Après 10
+// emails validés tels quels d'affilée, ils partent seuls, comme LinkedIn. Gabriel seulement : un membre ne reçoit rien.
+const ETAT_EMAIL = { a_enrichir: 'Adresse en cours de recherche', a_rediger: 'Claude rédige au prochain passage', brouillon: 'À valider', a_envoyer: 'En file : part le prochain matin', en_cours: "Brevo l'envoie…", envoye: 'Envoyé', echec: 'Pas parti', annule: 'Arrêté', sans_email: "Pas d'adresse vérifiée" };
+const CLASSE_ETAT_EMAIL = { brouillon: 'li-brouillon', a_envoyer: 'li-a_envoyer', en_cours: 'li-en_cours', echec: 'li-echec', sans_email: 'li-echec' };
+const EVENEMENTS_LUS = { delivered: 'arrivé', hard_bounce: 'adresse en erreur', invalid: 'adresse en erreur', blocked: 'bloqué par Brevo', soft_bounce: 'boîte pleine ou indisponible', spam: 'signalé comme spam', unsubscribed: 'désinscrit' };
+const emailsProspection = () => D.emails || [];
+const emailsAValider = () => emailsProspection().filter((e) => ['brouillon', 'echec'].includes(e.statut));
+const emailsDuLead = (id) => emailsProspection().filter((e) => e.lead_id === id).sort((a, b) => (a.created_at < b.created_at ? 1 : -1));
+function majEmailProspection(e) {
+  if (!e) return;
+  if (!D.emails) D.emails = [];
+  const i = D.emails.findIndex((x) => x.id === e.id);
+  if (i >= 0) D.emails[i] = { ...D.emails[i], ...e }; else D.emails.unshift(e);
+  const p = D.prospection_email;
+  if (p) { p.a_valider = emailsAValider().length; p.en_file = emailsProspection().filter((x) => ['a_envoyer', 'en_cours'].includes(x.statut)).length; }
+}
+const plurielEm = (n, un, plusieurs = `${un}s`) => `${n} ${n > 1 ? plusieurs : un}`;
+const texteBilanEm = (b) => `${plurielEm(b.envoyes, 'envoyé')}, ${plurielEm(b.arrives, 'arrivé')}, ${plurielEm(b.erreurs, 'adresse en erreur', 'adresses en erreur')}, ${plurielEm(b.spam, 'spam', 'spams')}, ${plurielEm(b.desinscriptions, 'désinscription')}, ${plurielEm(b.reponses, 'réponse')}`;
+const heureEm = (hm) => String(hm || '').replace(/^0/, '').replace(':', ' h ').replace(/ h 00$/, ' h');
+const fenetreEm = () => { const f = (D.prospection_email && D.prospection_email.fenetre) || ['08:30', '11:30']; return `entre ${heureEm(f[0])} et ${heureEm(f[1])}`; };
+function texteConfianceEmail() {
+  const k = (D.reglages && D.reglages.email_confiance) || {};
+  if (k.auto) return { texte: "Les emails rédigés par Claude partent tout seuls (sauf ceux qui portent une alerte, qui t'attendent).", auto: true };
+  const n = Math.min(k.serie || 0, 10);
+  return { texte: `${n} email${n > 1 ? 's' : ''} validé${n > 1 ? 's' : ''} tel${n > 1 ? 's' : ''} quel${n > 1 ? 's' : ''} d'affilée sur 10 ; après 10, ils partiront tout seuls.`, auto: false };
+}
+function barreEmail() {
+  const p = D.prospection_email;
+  if (!p || (!p.actif && !emailsProspection().length)) return '';
+  const b = p.bilan;
+  const etats = [];
+  if (p.pause) etats.push(`En pause : ${p.pause.raison}`);
+  if (!p.brevo) etats.push("La clé Brevo n'est pas sur le serveur : rien ne part.");
+  if (p.a_enrichir && !p.fullenrich) etats.push(`${plurielEm(p.a_enrichir, 'dirigeant attend', 'dirigeants attendent')} une adresse : la clé FullEnrich n'est pas branchée (Claude Code peut les chercher).`);
+  else if (p.a_enrichir) etats.push(`${plurielEm(p.a_enrichir, 'adresse')} en cours de recherche.`);
+  if (p.fullenrich_erreur) etats.push(p.fullenrich_erreur);
+  const alerte = Boolean(p.pause || !p.brevo || p.fullenrich_erreur);
+  const k = texteConfianceEmail();
+  const n = emailsAValider().length;
+  return `<div class="li-barre em-barre${alerte ? ' alerte-li' : ''}" data-em-barre><p><b>Prospection email</b> · Aujourd'hui : ${b.aujourdhui.envoyes} envoyé${b.aujourdhui.envoyes > 1 ? 's' : ''} sur ${b.aujourdhui.quota}${p.en_file ? `, ${p.en_file} en file (${esc(fenetreEm())}, jours ouvrés)` : ''}.<br><span class="em-bilan">7 derniers jours : ${esc(texteBilanEm(b.semaine))}.</span><br><span class="em-bilan">Depuis le début : ${esc(texteBilanEm(b.debut))}.</span>${etats.length ? `<br><span class="li-file" role="status">${esc(etats.join(' '))}</span>` : ''}<br><span class="li-confiance">${esc(k.texte)}</span></p><div class="actions">${n ? `<button type="button" class="btn petit primaire" data-em-jour>Emails à valider (${n})</button>` : ''}${p.pause ? '<button type="button" class="btn petit" data-em-reprendre>Reprendre</button>' : ''}${k.auto ? '<button type="button" class="btn petit lien" data-em-couper>Couper l\'envoi automatique</button>' : ''}</div></div>`;
+}
+function adresseEmailLue(e) {
+  if (!e.email) return '<span class="meta">Pas encore d\'adresse</span>';
+  const verifiee = e.email_statut === 'DELIVERABLE' ? ' <span class="em-verifiee">vérifiée</span>' : e.source_email === 'site' ? ' <span class="meta">(site de l\'entreprise)</span>' : e.source_email === 'manuel' ? ' <span class="meta">(posée à la main)</span>' : '';
+  return `${esc(e.email)}${verifiee}`;
+}
+const evenementsLus = (e) => [...new Set(Object.keys(e.evenements || {}).map((k) => EVENEMENTS_LUS[k]).filter(Boolean))].join(', ');
+function blocEmail(e) {
+  const l = IDX.lead.get(e.lead_id);
+  const c = contactParId(e.contact_id) || (l ? contactPrincipal(l.id) : null);
+  const qui = [e.civilite || '', nomContact(c)].filter(Boolean).join(' ') || 'Dirigeant';
+  const tete = `<div class="li-tete"><b>${esc(l ? l.entreprise : 'Lead supprimé')}</b> <span class="meta">${esc(qui)}${c && c.poste ? `, ${esc(c.poste)}` : ''}</span> <span class="li-etat ${CLASSE_ETAT_EMAIL[e.statut] || ''}">${esc(ETAT_EMAIL[e.statut] || e.statut)}</span></div><p class="em-adresse">${adresseEmailLue(e)}</p>`;
+  const appuis = Array.isArray(e.appuis) && e.appuis.length ? `<div><p class="meta">Ce qui justifie le message</p><ul class="em-appuis">${e.appuis.map((a) => `<li>${esc(a.fait)}${a.source && a.source !== 'aucune' ? ` <span class="meta">· ${esc(a.source)}${a.date ? `, ${esc(/^\d{4}-\d{2}-\d{2}$/.test(a.date) ? dateCourte(a.date) : a.date)}` : ''}</span>` : ''}</li>`).join('')}</ul></div>` : '';
+  const detail = e.detail ? `<p class="li-detail${['echec', 'annule', 'sans_email'].includes(e.statut) || /erreur|interdit|nomme|montant|majuscules|lien|origine|annuaire/i.test(e.detail) ? ' alerte-li' : ''}">${esc(e.detail)}</p>` : '';
+  if (['brouillon', 'echec'].includes(e.statut)) {
+    return `<section class="li-bloc em-bloc" data-em-id="${e.id}">${tete}${detail}
+      <label class="champ">Objet<input type="text" data-em-objet maxlength="90" value="${esc(e.objet || '')}"></label>
+      <label class="champ">Message<textarea data-em-texte rows="12" maxlength="3000">${esc(e.texte || '')}</textarea><span class="aide">Le lien « se désinscrire » s'ajoute en bas à l'envoi.</span></label>
+      ${appuis}
+      <div class="actions">
+        <button type="button" class="btn petit primaire" data-em-valider>${e.statut === 'echec' ? 'Renvoyer' : 'Valider l\'envoi'}</button>
+        ${D.ia ? '<button type="button" class="btn petit" data-em-rediger>Rédiger avec Claude</button>' : ''}
+        <button type="button" class="btn petit lien" data-em-ecarter>Écarter</button>
+      </div></section>`;
+  }
+  const lu = e.envoye_le ? `<p class="meta">Envoyé le ${esc(instantLisible(e.envoye_le))}${e.brevo_campagne ? ` (campagne Brevo ${e.brevo_campagne})` : ''}${evenementsLus(e) ? ` · ${esc(evenementsLus(e))}` : ''}</p>` : '';
+  const texte = e.objet || e.texte ? `<p class="meta">Objet : « ${esc(e.objet || '')} »</p>${e.texte ? `<p class="li-texte">${esc(e.texte)}</p>` : ''}` : '';
+  return `<section class="li-bloc em-bloc" data-em-id="${e.id}">${tete}${detail}${lu}${texte}${appuis}
+    ${e.statut === 'a_envoyer' ? `<p class="aide">Part le prochain matin de jour ouvré, ${esc(fenetreEm())}.</p>` : ''}
+    ${['a_envoyer', 'a_rediger', 'a_enrichir'].includes(e.statut) ? `<div class="actions">${e.statut === 'a_rediger' && D.ia ? '<button type="button" class="btn petit" data-em-rediger>Rédiger maintenant</button>' : ''}<button type="button" class="btn petit lien" data-em-ecarter>${e.statut === 'a_envoyer' ? 'Ne pas l\'envoyer' : 'Écarter'}</button></div>` : ''}
+  </section>`;
+}
+function rendreBlocEmail(form, id) {
+  const e = emailsProspection().find((x) => x.id === id);
+  const ancien = $(`[data-em-id="${id}"]`, form);
+  if (!e || !ancien) return;
+  const tmp = document.createElement('div');
+  tmp.innerHTML = blocEmail(e);
+  ancien.replaceWith(tmp.firstElementChild);
+}
+// Les boutons d'un email, où qu'il soit (fenêtre des emails à valider, ou celle d'un lead).
+function brancherEmail(form) {
+  form.addEventListener('click', async (ev) => {
+    const b = ev.target.closest('[data-em-valider], [data-em-rediger], [data-em-ecarter]');
+    if (!b) return;
+    ev.preventDefault();
+    const bloc = b.closest('.em-bloc');
+    const id = bloc.dataset.emId;
+    const avant = b.textContent;
+    const err = $('[data-erreur]', form);
+    if (err) err.hidden = true;
+    b.disabled = true;
+    try {
+      if (b.hasAttribute('data-em-valider')) {
+        b.textContent = 'Validation…';
+        const r = await api('POST', { op: 'email_valider', id, objet: $('[data-em-objet]', bloc).value, texte: $('[data-em-texte]', bloc).value });
+        majEmailProspection(r.email);
+        if (r.confiance) D.reglages.email_confiance = r.confiance;
+        toast(r.confiance && r.confiance.auto && r.confiance.depuis && Date.now() - Date.parse(r.confiance.depuis) < 60000 ? 'En file. Tu as validé 10 emails tels quels : les suivants partiront tout seuls.' : `En file : il part le prochain matin de jour ouvré, ${fenetreEm()}.`, 6000);
+      } else if (b.hasAttribute('data-em-rediger')) {
+        b.textContent = 'Claude rédige…';
+        const r = await api('POST', { op: 'email_rediger', id });
+        majEmailProspection(r.email);
+      } else {
+        const r = await api('POST', { op: 'email_ecarter', id });
+        majEmailProspection(r.email);
+        toast('Écarté : cet email ne partira pas.');
+      }
+      rendreBlocEmail(form, id);
+      rendre();
+      if (S.fiche) rendreFiche();
+    } catch (e) {
+      b.disabled = false;
+      b.textContent = avant;
+      if (err) { err.textContent = e.message; err.hidden = false; err.scrollIntoView({ block: 'nearest' }); } else toast(e.message);
+    }
+  });
+}
+// Les emails à valider (ou tous ceux d'un lead) : à relire, corriger et valider un par un, ou tous d'un coup.
+function ouvrirEmailsDuJour(leadId = null) {
+  const p = D.prospection_email || {};
+  const liste = leadId ? emailsDuLead(leadId) : emailsAValider();
+  const l = leadId ? IDX.lead.get(leadId) : null;
+  ouvrirModale(`<h2>${l ? `Prospection email : ${esc(l.entreprise)}` : 'Emails à valider'}</h2>
+    ${p.pause ? `<p class="li-mac alerte-li">En pause : ${esc(p.pause.raison)} Rien ne part tant que tu n'as pas cliqué « Reprendre ».</p>` : ''}
+    <p class="aide">${esc(texteConfianceEmail().texte)} Relis l'objet, le message et ce qui le justifie, puis « Valider l'envoi » : Brevo l'envoie le prochain matin de jour ouvré, ${esc(fenetreEm())}, ${p.quota || 5} par jour au plus.</p>
+    ${liste.length ? liste.map((e) => blocEmail(e)).join('') : '<p class="vide">Rien à valider pour le moment.</p>'}
+    ${!leadId && liste.filter((e) => e.statut === 'brouillon').length > 1 ? '<div class="actions"><button type="button" class="btn primaire" data-em-tout>Tout valider</button></div>' : ''}
+    ${piedFormulaire('')}`, (form) => {
+    brancherAnnuler(form);
+    brancherEmail(form);
+    const tout = $('[data-em-tout]', form);
+    if (tout) tout.addEventListener('click', async () => {
+      tout.disabled = true;
+      tout.textContent = 'Validation…';
+      let n = 0;
+      for (const bloc of $$('.em-bloc[data-em-id]', form)) {
+        const e = emailsProspection().find((x) => x.id === bloc.dataset.emId);
+        if (!e || e.statut !== 'brouillon') continue;
+        try {
+          const r = await api('POST', { op: 'email_valider', id: e.id, objet: ($('[data-em-objet]', bloc) || {}).value ?? e.objet, texte: ($('[data-em-texte]', bloc) || {}).value ?? e.texte });
+          majEmailProspection(r.email);
+          if (r.confiance) D.reglages.email_confiance = r.confiance;
+          n++;
+        } catch (err) {
+          const lead = IDX.lead.get(e.lead_id);
+          montrerErreur(form, `${lead ? lead.entreprise : 'Un email'} : ${err.message}`);
+        }
+        rendreBlocEmail(form, e.id);
+      }
+      tout.textContent = n ? `${n} en file` : 'Tout valider';
+      tout.disabled = Boolean(n);
+      rendre();
+      if (n) toast(`${n} email${n > 1 ? 's' : ''} en file : ils partent le prochain matin de jour ouvré, ${fenetreEm()}.`, 6000);
+    });
+  }, { large: true });
+}
+// Sur la fiche d'un lead : où en est son email de prospection.
+function blocEmailFiche(l) {
+  const es = emailsDuLead(l.id);
+  if (!es.length) return '';
+  const e = es[0];
+  const aValider = ['brouillon', 'echec'].includes(e.statut);
+  return `<section class="bloc"><h3>Prospection email <button type="button" class="btn petit${aValider ? ' primaire' : ''}" data-em-jour data-em-lead="${l.id}">${aValider ? 'Relire et valider' : 'Voir'}</button></h3>
+    <p><span class="li-etat ${CLASSE_ETAT_EMAIL[e.statut] || ''}">${esc(ETAT_EMAIL[e.statut] || e.statut)}</span></p>
+    <p class="em-adresse" style="margin-top:6px">${adresseEmailLue(e)}</p>
+    ${e.objet ? `<p class="meta">Objet : « ${esc(e.objet)} »</p>` : ''}
+    ${e.envoye_le ? `<p class="meta">Envoyé le ${esc(instantLisible(e.envoye_le))}${evenementsLus(e) ? ` · ${esc(evenementsLus(e))}` : ''}</p>` : ''}
+    ${e.detail ? `<p class="li-detail">${esc(e.detail)}</p>` : ''}
+  </section>`;
+}
+document.addEventListener('click', (ev) => {
+  const b = ev.target.closest('[data-em-jour]');
+  if (!b) return;
+  ev.preventDefault();
+  ouvrirEmailsDuJour(b.dataset.emLead || null);
+});
+document.addEventListener('click', async (ev) => {
+  const b = ev.target.closest('[data-em-reprendre], [data-em-couper]');
+  if (!b) return;
+  ev.preventDefault();
+  try {
+    if (b.hasAttribute('data-em-reprendre')) {
+      const r = await api('POST', { op: 'email_reprendre' });
+      D.reglages.email_prospection = r.reglage;
+      if (D.prospection_email) D.prospection_email.pause = null;
+      toast('Prospection email reprise : les envois repartent le prochain matin de jour ouvré.', 6000);
+    } else {
+      const r = await api('POST', { op: 'email_auto_couper' });
+      D.reglages.email_confiance = r.confiance;
+      toast('Envoi automatique coupé : chaque email attend de nouveau ton clic.');
+    }
+    rendre();
   } catch (e) { toast(e.message); }
 });
 
