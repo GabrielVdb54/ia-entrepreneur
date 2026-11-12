@@ -16,8 +16,11 @@
  *
  *   GET  /api/rdv  → { creneaux: ["2026-11-12T08:00:00.000Z", …], jeton, turnstile? },
  *                    jamais qui est libre
+ *   GET  /api/rdv?avec=gabriel → les créneaux de ce seul conseiller (lien personnel,
+ *                    `rendez-vous.html?avec=gabriel` ou /rdv/gabriel), plus { avec: { prenom, nom,
+ *                    fonction } } ; 404 { erreur: 'conseiller' } pour un nom inconnu
  *   POST /api/rdv  { debut, prenom, nom, email, telephone, entreprise, message?,
- *                    programme?, par?, jeton, turnstile?, _gotcha } → { ok, conseiller, prenom, nom, debut }
+ *                    programme?, par?, avec?, jeton, turnstile?, _gotcha } → { ok, conseiller, prenom, nom, debut }
  *
  * Agendas : le jeton Google de gabriel@ia-entrepreneur.fr (GMAIL_IAE_*, portée
  * calendar.events), qui est propriétaire des agendas d'Axel et de Dorian dans le
@@ -84,16 +87,18 @@ async function reglages() {
   } catch (e) { console.error('rdv reglages', e?.message || e); }
   const heure = (v, d) => (/^([01]\d|2[0-3]):[0-5]\d$/.test(String(v || '')) ? v : d);
   const entier = (v, d, min, max) => (Number.isInteger(v) && v >= min && v <= max ? v : d);
-  const conseillers = (Array.isArray(perso.conseillers) ? perso.conseillers : DEFAUT.conseillers)
-    .filter((c) => c && /^[a-z0-9._-]+@ia-entrepreneur\.fr$/.test(String(c.email || '')) && c.actif !== false)
+  const tous = (Array.isArray(perso.conseillers) ? perso.conseillers : DEFAUT.conseillers)
+    .filter((c) => c && /^[a-z0-9._-]+@ia-entrepreneur\.fr$/.test(String(c.email || '')))
     .map((c) => ({
+      actif: c.actif !== false,
       email: c.email, prenom: String(c.prenom || c.email.split('@')[0]).slice(0, 40), nom: String(c.nom || '').slice(0, 60), fonction: String(c.fonction || 'conseiller formation IA').slice(0, 80),
       // Son agenda IA-E d'abord, puis ceux du réglage et d'AGENDAS_EN_PLUS, sans doublon.
       agendas: [...new Set([c.email, ...(Array.isArray(c.agendas) ? c.agendas : []), ...(AGENDAS_EN_PLUS[c.email] || [])]
         .map((x) => String(x || '').trim().toLowerCase()).filter((x) => AGENDA_RE.test(x)))].slice(0, 6),
     }));
   const valeur = {
-    conseillers,
+    // Le tour de rôle ne prend que les conseillers actifs ; le lien personnel (`avec`) les prend tous.
+    conseillers: tous.filter((c) => c.actif), tous,
     debut: heure(perso.debut, DEFAUT.debut), fin: heure(perso.fin, DEFAUT.fin),
     duree: entier(perso.duree, DEFAUT.duree, 15, 120), pas: entier(perso.pas, DEFAUT.pas, 15, 120),
     preavis_heures: entier(perso.preavis_heures, DEFAUT.preavis_heures, 0, 168), semaines: entier(perso.semaines, DEFAUT.semaines, 1, 8),
@@ -103,6 +108,17 @@ async function reglages() {
   return valeur;
 }
 const cleDe = (email) => email.split('@')[0];
+// Lien personnel d'un conseiller : `?avec=gabriel` (12/11/2026). Gabriel avait envoyé à un prospect
+// LinkedIn sa page de réservation Google, qui ne lit que l'agenda IA-E et proposait donc ses cours
+// Clindit ; il veut un lien « où on est sûr à 100 % ». Avec `avec`, seul ce conseiller est proposé,
+// tous ses agendas lus, avec les mêmes règles que le tour de rôle (s'il manque un agenda, aucun créneau).
+const cleAvec = (v) => String(v || '').toLowerCase().replace(/[^a-z0-9._-]/g, '').slice(0, 40);
+// null : personne de ce nom (lien faux ou conseiller retiré du réglage).
+function conseillersDe(r, avec) {
+  if (!avec) return r.conseillers;
+  const c = r.tous.find((x) => cleDe(x.email) === avec);
+  return c ? [c] : null;
+}
 
 /* ---------- Dates à Paris ---------- */
 
@@ -282,16 +298,18 @@ function creneauxPossibles(r, maintenant = Date.now()) {
   return sorties;
 }
 
-let cacheCreneaux = { le: 0, valeur: null };
-async function creneauxLibres() {
-  if (cacheCreneaux.valeur && Date.now() - cacheCreneaux.le < 60000) return cacheCreneaux.valeur;
+// Gardés 1 min, un jeu par lien (tour de rôle : clé '' ; lien personnel : clé du conseiller).
+const cacheCreneaux = new Map();
+async function creneauxLibres(conseillers, cle = '') {
+  const deja = cacheCreneaux.get(cle);
+  if (deja && Date.now() - deja.le < 60000) return deja.valeur;
   const r = await reglages();
   const possibles = creneauxPossibles(r);
   if (!possibles.length) return [];
-  const agendasLus = await agendas(r.conseillers, possibles[0], possibles[possibles.length - 1] + r.duree * 60000);
+  const agendasLus = await agendas(conseillers, possibles[0], possibles[possibles.length - 1] + r.duree * 60000);
   if (!agendasLus.some((c) => c.occupe)) throw new Error('aucun agenda lisible');
   const valeur = possibles.filter((d) => agendasLus.some((c) => libre(c, d, d + r.duree * 60000))).map((d) => new Date(d).toISOString());
-  cacheCreneaux = { le: Date.now(), valeur };
+  cacheCreneaux.set(cle, { le: Date.now(), valeur });
   return valeur;
 }
 
@@ -323,11 +341,11 @@ async function leadExistant(email) {
   return l ? { ...l, contact_id: c.id } : null;
 }
 
-async function versCrm({ d, conseiller, debut, fin, evenement, existant, leadId, setter, rdvId }) {
+async function versCrm({ d, conseiller, debut, fin, evenement, existant, leadId, setter, rdvId, perso }) {
   const jour = jourParis(debut);
   const quand = `${dateLongue(debut)} à ${heureLisible(debut)}`;
   const avec = nomComplet(conseiller);
-  const origine = setter ? 'posé par Anna' : 'pris sur le site';
+  const origine = setter ? 'posé par Anna' : perso ? 'pris avec ton lien de RDV' : 'pris sur le site';
   const tache = {
     prochaine_relance: jour, prochaine_action: 'rdv', relances_sans_reponse: 0,
     prochaine_note: `RDV découverte le ${quand} (30 min, Meet) avec ${avec}, ${origine}. Il est dans ton agenda Google.${d.programme ? ` Programme type regardé sur le site : ${d.programme}.` : ''}`.slice(0, 2000),
@@ -356,7 +374,7 @@ async function versCrm({ d, conseiller, debut, fin, evenement, existant, leadId,
       methode: 'POST', prefer: 'return=minimal',
       corps: {
         id: leadId, entreprise: d.entreprise, type: 'prospect', statut: 'qualifie',
-        source: setter ? 'Anna : RDV en tour de rôle' : 'Site : prise de rendez-vous', tags: ['site', 'rdv'],
+        source: setter ? 'Anna : RDV en tour de rôle' : perso ? `Lien de RDV de ${conseiller.prenom}` : 'Site : prise de rendez-vous', tags: ['site', 'rdv'],
         besoin: [d.programme, d.message && d.message.slice(0, 400)].filter(Boolean).join(', ') || null,
         dernier_contact: aujourdhui(), proprietaire: conseiller.email, setter: setter || null, ...tache,
       },
@@ -369,7 +387,7 @@ async function versCrm({ d, conseiller, debut, fin, evenement, existant, leadId,
     corps: {
       lead_id: leadId, contact_id: contactId || null, type: 'rdv', source: 'site',
       resume: `RDV découverte ${origine} pour le ${quand} avec ${avec}`.slice(0, 2000), contenu: detail,
-      meta: { date_rdv: jour, heure: heureParis(debut), origine: setter ? 'setter' : 'site', conseiller: conseiller.email, setter: setter || null, evenement: evenement.id || null, meet: evenement.hangoutLink || null, rdv_tour: rdvId },
+      meta: { date_rdv: jour, heure: heureParis(debut), origine: setter ? 'setter' : 'site', lien_perso: perso || undefined, conseiller: conseiller.email, setter: setter || null, evenement: evenement.id || null, meet: evenement.hangoutLink || null, rdv_tour: rdvId },
     },
   });
   await sb(`iae_crm_rdv?id=eq.${rdvId}`, { methode: 'PATCH', corps: { lead_id: leadId }, prefer: 'return=minimal' });
@@ -443,6 +461,9 @@ const PROGRAMMES = { 'niveau-1': 'Niveau 1, Acculturation IA', 'niveau-2': 'Nive
 
 async function reserver(corps, ip) {
   const r = await reglages();
+  const avec = cleAvec(corps.avec);
+  const choix = conseillersDe(r, avec);
+  if (!choix) return { statut: 400, corps: { erreur: 'conseiller' } };
   const d = {
     prenom: ligne(corps.prenom, 80), nom: ligne(corps.nom, 80), email: ligne(corps.email, 254),
     telephone: ligne(corps.telephone, 40), entreprise: ligne(corps.entreprise, 160), message: texte(corps.message, 2000),
@@ -465,7 +486,7 @@ async function reserver(corps, ip) {
   const setter = r.setters[String(corps.par || '').toLowerCase()] || null;
 
   // Le créneau est relu dans les agendas à l'instant, sans cache.
-  const libres = (await agendas(r.conseillers, debut, fin)).filter((c) => libre(c, debut, fin));
+  const libres = (await agendas(choix, debut, fin)).filter((c) => libre(c, debut, fin));
   if (!libres.length) return { statut: 409, corps: { erreur: 'creneau' } };
   const existant = await leadExistant(d.email);
   const leadId = existant ? existant.id : randomUUID();
@@ -511,13 +532,13 @@ async function reserver(corps, ip) {
     }
     await sb(`iae_crm_rdv?id=eq.${rdv.id}`, { methode: 'PATCH', corps: { evenement: evenement.id || null, meet: evenement.hangoutLink || null }, prefer: 'return=minimal' }).catch((e) => console.error('rdv maj', e?.message || e));
     try {
-      await versCrm({ d, conseiller, debut, fin, evenement, existant, leadId, setter, rdvId: rdv.id });
+      await versCrm({ d, conseiller, debut, fin, evenement, existant, leadId, setter, rdvId: rdv.id, perso: Boolean(avec) });
     } catch (e) {
       // Le RDV est posé et le prospect invité : une panne du CRM ne doit pas lui afficher une erreur.
       console.error('rdv crm', e?.message || e);
     }
     await prevenir(conseiller, d, debut, evenement, setter);
-    cacheCreneaux = { le: 0, valeur: null };
+    cacheCreneaux.clear();
     return { statut: 200, corps: { ok: true, conseiller: cleDe(conseiller.email), prenom: conseiller.prenom, nom: conseiller.nom, debut: new Date(debut).toISOString() } };
   }
   return { statut: 409, corps: { erreur: 'creneau' } };
@@ -532,7 +553,12 @@ export default async function handler(req, res) {
     if (req.method === 'GET') {
       if (tropDePassages('lecture', ip, 120)) return res.status(429).json({ erreur: 'trop' });
       const cle = turnstileCle();
-      return res.status(200).json({ creneaux: await creneauxLibres(), jeton: jetonPage(), ...(cle ? { turnstile: cle } : {}) });
+      const avec = cleAvec(new URL(req.url || '/', 'http://x').searchParams.get('avec'));
+      const choix = conseillersDe(await reglages(), avec);
+      if (!choix) return res.status(404).json({ erreur: 'conseiller' });
+      // Lien personnel : la page nomme le conseiller (le tour de rôle, lui, ne dit jamais qui est libre).
+      const qui = avec ? { avec: { prenom: choix[0].prenom, nom: choix[0].nom, fonction: choix[0].fonction } } : {};
+      return res.status(200).json({ creneaux: await creneauxLibres(choix, avec), jeton: jetonPage(), ...qui, ...(cle ? { turnstile: cle } : {}) });
     }
     if (req.method === 'POST') {
       let corps = req.body;

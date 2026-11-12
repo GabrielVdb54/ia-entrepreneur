@@ -2,6 +2,11 @@
   "cleanUrls": false,
   "redirects": [
     {
+      "source": "/rdv/:qui",
+      "destination": "/rendez-vous.html?avec=:qui",
+      "permanent": false
+    },
+    {
       "source": "/formations-entreprises",
       "destination": "/formation-ia-entreprise.html",
       "permanent": true

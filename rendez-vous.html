@@ -85,7 +85,7 @@
     <section class="reservation">
       <div class="container">
         <h1>Choisissez votre créneau</h1>
-        <p>30 minutes en visio avec un conseiller IA-Entrepreneur, pour faire le point sur l'usage de l'IA dans vos équipes et voir ce qui vous serait utile.</p>
+        <p id="intro">30 minutes en visio avec un conseiller IA-Entrepreneur, pour faire le point sur l'usage de l'IA dans vos équipes et voir ce qui vous serait utile.</p>
         <p class="appel">Vous préférez en parler de vive voix ? <a class="tel-reveal" role="button" tabindex="0" data-tel="MzUgODIgMzEgNzUgNzA=" aria-label="Afficher le numéro de téléphone"> <span class="tel-value">Afficher le numéro</span></a></p>
         <p class="programme-choisi" id="programmeChoisi" hidden></p>
         <form class="carte" id="rdv" action="/api/rdv" method="POST">
@@ -153,6 +153,8 @@
       var jours = document.getElementById('jours'), heures = document.getElementById('heures');
       var recap = document.getElementById('recap'), bouton = document.getElementById('envoyer');
       var par = (new URLSearchParams(location.search).get('par') || '').toLowerCase().replace(/[^a-z]/g, '').slice(0, 20);
+      // Lien personnel d'un conseiller (12/11/2026) : ?avec=gabriel ne propose que ses créneaux, tous ses agendas lus.
+      var avec = (new URLSearchParams(location.search).get('avec') || '').toLowerCase().replace(/[^a-z0-9._-]/g, '').slice(0, 40);
       // Anti-robot (12/11/2026, après deux faux RDV) : le jeton signé que donne /api/rdv à l'ouverture,
       // et Cloudflare Turnstile quand le serveur envoie sa clé (le plus souvent invisible).
       var jeton = '', cleTs = '', widgetTs = null, jetonTs = '', attenteTs = false, tsHs = false;
@@ -234,14 +236,25 @@
       }
       function charger(garderChoix) {
         dire('Chargement des créneaux libres…');
-        return fetch('/api/rdv', { headers: { accept: 'application/json' } })
-          .then(function (r) { if (!r.ok) throw new Error(String(r.status)); return r.json(); })
+        return fetch('/api/rdv' + (avec ? '?avec=' + encodeURIComponent(avec) : ''), { headers: { accept: 'application/json' } })
+          .then(function (r) { if (r.status === 404 && avec) throw new Error('conseiller'); if (!r.ok) throw new Error(String(r.status)); return r.json(); })
           .then(function (j) {
+            if (j.avec && j.avec.prenom) {
+              document.getElementById('intro').textContent = '30 minutes en visio avec ' + [j.avec.prenom, j.avec.nom].join(' ').trim() + ', ' + (j.avec.fonction || 'conseiller IA-Entrepreneur') + ', pour faire le point sur l\'usage de l\'IA dans vos équipes et voir ce qui vous serait utile.';
+            }
             if (j.jeton && !jeton) jeton = j.jeton;
             if (j.turnstile && !cleTs) { cleTs = j.turnstile; chargerTurnstile(); }
             afficher(j.creneaux || [], garderChoix === true);
           })
-          .catch(function () { dire('Le calendrier ne répond pas pour le moment. Réessayez dans un instant, ou appelez-nous.', true, true); });
+          .catch(function (err) {
+            if (err && err.message === 'conseiller') {
+              // Lien faux ou conseiller parti : on renvoie vers la page de tous les conseillers.
+              etat.textContent = 'Ce lien de rendez-vous n\'est plus valable. '; etat.className = 'etat erreur';
+              var a = document.createElement('a'); a.href = '/rendez-vous.html'; a.textContent = 'Choisir un créneau avec un conseiller';
+              a.style.textDecoration = 'underline'; etat.appendChild(a); return;
+            }
+            dire('Le calendrier ne répond pas pour le moment. Réessayez dans un instant, ou appelez-nous.', true, true);
+          });
       }
       jours.addEventListener('change', function (e) { if (e.target.name === 'jour') montrerHeures(e.target.value); });
       heures.addEventListener('change', majRecap);
@@ -261,6 +274,7 @@
         delete donnees.jour;
         donnees.programme = programmeChoisi || '';
         if (par) donnees.par = par;
+        if (avec) donnees.avec = avec;
         donnees.jeton = jeton;
         if (cleTs) donnees.turnstile = jetonTs;
         bouton.disabled = true; bouton.textContent = 'Réservation en cours…';
