@@ -2726,7 +2726,9 @@ const EN_ATTENTE_EMAIL = ['a_enrichir', 'a_rediger', 'brouillon', 'a_envoyer', '
 // « molo » : 5 par jour au plus, 2 par passage pour les étaler, entre 8 h 30 et 11 h 30 à Paris, jours ouvrés. FullEnrich :
 // 3 recherches par jour au plus, et seulement pour un contact ultra qualifié (Gabriel, 12/11 : « un peu de fullenrich sur
 // des contacts ultra qualifiés »). L'expéditeur est réglable pour passer plus tard à un domaine dédié.
-const EMAIL_PROSPECTION = { par_jour: 5, par_passage: 2, enrichissements: 3, debut: '08:30', fin: '11:30', expediteur: ADMIN_EMAIL, expediteur_nom: 'Gabriel Vanderbecken' };
+// enrichissements : adresses trouvées par FullEnrich par jour (Gabriel, 12/11 : « on peut partir sur 3 recherches abouties par
+// jour ») ; FullEnrich ne fait payer que les adresses trouvées. tentatives_fullenrich : le garde-fou des recherches lancées.
+const EMAIL_PROSPECTION = { par_jour: 5, par_passage: 2, enrichissements: 3, tentatives_fullenrich: 10, debut: '08:30', fin: '11:30', expediteur: ADMIN_EMAIL, expediteur_nom: 'Gabriel Vanderbecken' };
 const SEUIL_CONFIANCE_EMAIL = SEUIL_CONFIANCE_LI;
 const SOURCE_EMAIL = 'crm, prospection email (Brevo)';
 const URL_STOP = 'https://ia-entrepreneur.fr/api/crm?stop=';
@@ -3768,8 +3770,11 @@ async function adressesEmails(r, bilan, reste) {
   const cle = process.env.FULLENRICH_API_KEY;
   let place = 0;
   if (cle) {
-    const { lignes: faites } = await sb(`iae_crm_emails?fullenrich_le=gte.${encodeURIComponent(minuitParis(aujourdHuiParis()))}&select=id`);
-    place = Math.max(0, Math.min(r.enrichissements - faites.length, 100));
+    // Le plafond compte les recherches abouties (adresse du dirigeant posée) et celles en cours, qui peuvent aboutir.
+    const { lignes: dujour } = await sb(`iae_crm_emails?fullenrich_le=gte.${encodeURIComponent(minuitParis(aujourdHuiParis()))}&select=id,statut,email,source_email,fullenrich_id`);
+    const abouties = dujour.filter((x) => x.source_email === 'fullenrich' && x.email).length;
+    const enCours = dujour.filter((x) => x.statut === 'a_enrichir' && x.fullenrich_id).length;
+    place = Math.max(0, Math.min(r.enrichissements - abouties - enCours, r.tentatives_fullenrich - dujour.length, 100));
   }
   let recherches = 0;
   const lot = [];
@@ -3806,7 +3811,7 @@ async function adressesEmails(r, bilan, reste) {
       continue;
     }
     const attente = !cle ? 'Ultra qualifié, en attente de FullEnrich : la clé FullEnrich n\'est pas sur Vercel (Claude Code peut chercher l\'adresse avec le MCP FullEnrich).'
-      : lot.length >= place ? `Ultra qualifié, en attente de FullEnrich : plafond du jour atteint (${r.enrichissements} par jour).` : null;
+      : lot.length >= place ? `Ultra qualifié, en attente de FullEnrich : plafond du jour atteint (${r.enrichissements} adresses trouvées par jour).` : null;
     if (!e.faits?.ultra || attente !== e.detail) e = await majLigneEmail(e.id, { faits: { ...(e.faits || {}), ultra: { le: e.faits?.ultra?.le || new Date().toISOString(), forts: u.forts.slice(0, 3) } }, detail: attente });
     if (attente) continue;
     if (c.email && (await enOpposition(c.email))) { await majLigneEmail(e.id, { statut: 'annule', detail: 'Adresse en opposition.' }); continue; }
@@ -4148,6 +4153,7 @@ async function operationEmail(corps, ip) {
     if (corps.par_jour !== undefined) v.par_jour = entier(corps.par_jour, 0, 50);
     if (corps.par_passage !== undefined) v.par_passage = entier(corps.par_passage, 1, 5);
     if (corps.enrichissements !== undefined) v.enrichissements = entier(corps.enrichissements, 0, 100);
+    if (corps.tentatives_fullenrich !== undefined) v.tentatives_fullenrich = entier(corps.tentatives_fullenrich, 0, 100);
     if (corps.expediteur !== undefined) { const a = normEmail(corps.expediteur); if (!EMAIL_RE.test(a)) throw new Refus('adresse_invalide'); v.expediteur = a; }
     if (corps.expediteur_nom !== undefined) v.expediteur_nom = couper(String(corps.expediteur_nom).replace(/[\r\n<>"]+/g, ' ').trim(), 70) || EMAIL_PROSPECTION.expediteur_nom;
     if (!Object.keys(v).length) throw new Refus('rien_a_modifier');
