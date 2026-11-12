@@ -2728,7 +2728,9 @@ const EN_ATTENTE_EMAIL = ['a_enrichir', 'a_rediger', 'brouillon', 'a_envoyer', '
 // des contacts ultra qualifiés »). L'expéditeur est réglable pour passer plus tard à un domaine dédié.
 // enrichissements : adresses trouvées par FullEnrich par jour (Gabriel, 12/11 : « on peut partir sur 3 recherches abouties par
 // jour ») ; FullEnrich ne fait payer que les adresses trouvées. tentatives_fullenrich : le garde-fou des recherches lancées.
-const EMAIL_PROSPECTION = { par_jour: 5, par_passage: 2, enrichissements: 3, tentatives_fullenrich: 10, debut: '08:30', fin: '11:30', expediteur: ADMIN_EMAIL, expediteur_nom: 'Gabriel Vanderbecken' };
+// rdv_minutes : le trajet en voiture depuis Nancy au-delà duquel on ne propose plus de venir (Gabriel, 12/11 : « 40 mn me va,
+// pas plus ») ; rdv_km : le seuil à vol d'oiseau quand OSRM ne répond pas (prudent).
+const EMAIL_PROSPECTION = { par_jour: 5, par_passage: 2, enrichissements: 3, tentatives_fullenrich: 10, debut: '08:30', fin: '11:30', expediteur: ADMIN_EMAIL, expediteur_nom: 'Gabriel Vanderbecken', rdv_minutes: 40, rdv_km: 25 };
 const SEUIL_CONFIANCE_EMAIL = SEUIL_CONFIANCE_LI;
 const SOURCE_EMAIL = 'crm, prospection email (Brevo)';
 const URL_STOP = 'https://ia-entrepreneur.fr/api/crm?stop=';
@@ -2800,19 +2802,50 @@ const COLONNES_EMAIL_PAGE = 'id,created_at,lead_id,contact_id,etape,statut,email
 
 /* ----- Les textes : le modèle validé par Gabriel le 12/11, l'accroche et l'objet de Claude ----- */
 
-// Gabriel, 12/11 (relecture de l'email à Eric Vigneron) : « vraiment dire qu'on peut aider du quotidien dans les mails, la
-// relation client, la réponse aux appels d'offres, la gestion etc. », pas seulement sur le fait trouvé.
-const QUOTIDIEN_EMAIL = (metier) => (metier === 'de PME' ? 'les emails, la relation client, les devis, la gestion' : 'les emails, la relation client, les devis et les appels d\'offres, la gestion');
-const LIGNE_GABRIEL_EMAIL = (metier) => `Je forme des équipes ${metier} du Grand Est à gagner du temps grâce à l'IA sur ce quotidien : ${QUOTIDIEN_EMAIL(metier)}. Les formations sont éligibles à votre budget formation.`;
-// La question nomme l'entreprise (« Chez X, … » : le modèle de Gabriel du 09/11), sans sa forme juridique.
-const FORMES_JURIDIQUES_RE = /\b(SARL|SAS|SASU|EURL|SA|SNC|SCOP|SELARL|SCI)\b\.?/gi;
-function nomEntrepriseEmail(l) {
-  const n = nomPropre(String(l?.entreprise || '').replace(/\s*\([^)]*\)/g, '').replace(/(^|\s)(S\.A\.R\.L|S\.A\.S\.U|S\.A\.S|E\.U\.R\.L)\.?(?=\s|$)/gi, ' ').replace(FORMES_JURIDIQUES_RE, ' ').replace(/\s+/g, ' ').trim());
-  return n.length >= 2 && n.length <= 40 ? n : '';
-}
-const questionEmail = (l) => `${nomEntrepriseEmail(l) ? `Chez ${nomEntrepriseEmail(l)}` : 'Chez vous'}, tout ça se fait encore surtout à la main, ou vous avez déjà trouvé une solution ?`;
-const QUESTION_EMAIL = questionEmail(null);
+// Le modèle validé par Gabriel le 12/11 (deuxième relecture, sur l'email à Eric Vigneron) : « montrer que c'est du
+// personnalisé + aller sur des valeurs ajoutées personnalisées mais aussi dire ce qu'on fait assez généralement ». Refusés
+// le même jour : « nous connaissons bien le quotidien d'une entreprise comme la vôtre » (peut être mal perçu) et « vous avez
+// déjà trouvé une solution ? » (trop faible). Une seule question dans tout le message ; plus de phrase « Chez X, … ».
+// Claude écrit l'objet, l'accroche (« J'ai vu que vous… »), la valeur (la tâche précise liée aux faits, à l'infinitif, avec
+// un exemple concret), le reste du bureau (trois tâches de la liste fermée) et le document de l'exemple ; le reste est fixe.
+const RESTE_BUREAU_EMAIL = ['emails', 'devis', 'relation client', 'suivi de chantier', 'plannings', 'factures et relances', 'recrutement'];
+const RESTE_DEFAUT_EMAIL = { 'du BTP': ['emails', 'devis', 'relation client', 'plannings'], 'de la propreté': ['plannings', 'devis', 'relation client', 'emails'], 'de PME': ['emails', 'devis', 'relation client', 'factures et relances'] };
+// Quand Claude n'a pas pu rédiger (3 essais) : une valeur neutre du métier, que Gabriel adapte avec l'accroche.
+const VALEUR_DEFAUT_EMAIL = {
+  'du BTP': ["préparer plus vite leurs devis avec l'IA, par exemple à partir de leurs notes de visite", 'devis'],
+  'de la propreté': ["préparer plus vite leurs devis avec l'IA, par exemple à partir de leurs notes de visite de site", 'devis'],
+  'de PME': ["traiter plus vite leurs emails avec l'IA, par exemple en partant de leurs réponses types", 'emails'],
+};
+const LIEU_DISTANCE_EMAIL = 'en visio ou par téléphone';
 const SIGNATURE_EMAIL = 'Gabriel Vanderbecken\nIA-Entrepreneur';
+const motsEmail = (t) => String(t || '').split(/\s+/).filter((m) => /[\p{L}\p{N}]/u.test(m)).length;
+// La valeur : à l'infinitif, sans point final ni « à » devant (la phrase fixe le met), première lettre en minuscule.
+function nettoyerValeurEmail(v) {
+  let x = String(v || '').replace(/\s+/g, ' ').trim().replace(/^[àa]\s+/i, '').replace(/[.;:,!\s]+$/, '');
+  if (/^\p{Lu}\p{Ll}/u.test(x)) x = x[0].toLowerCase() + x.slice(1);
+  return couper(x, 220);
+}
+// Le reste du bureau : trois tâches de la liste fermée, sans redire la valeur, complétées par celles du métier.
+function resteBureauEmail(reste, valeur, metier) {
+  const v = normaliser(valeur);
+  const choisis = [];
+  for (const r of [...(Array.isArray(reste) ? reste : []), ...(RESTE_DEFAUT_EMAIL[metier] || []), ...RESTE_BUREAU_EMAIL]) {
+    const k = String(r || '').trim().toLowerCase();
+    if (!RESTE_BUREAU_EMAIL.includes(k) || choisis.includes(k)) continue;
+    // « factures et relances » redit « factures » ; « suivi de chantier » redit « chantier » : un mot commun suffit.
+    if (normaliser(k).split(' ').some((m) => m.length > 3 && m !== 'client' && v.split(' ').some((w) => w === m || w === `${m}s` || `${w}s` === m))) continue;
+    choisis.push(k);
+    if (choisis.length === 3) break;
+  }
+  return choisis;
+}
+// Le document de l'exemple, au pluriel, pour « sur un de vos propres … » (« mémoires », « devis », « comptes rendus »).
+function documentEmail(d, defaut = 'devis') {
+  const x = String(d || '').replace(/\s+/g, ' ').trim().replace(/^(vos|des|les|leurs)\s+/i, '').replace(/[.,;:!?]+$/, '').toLowerCase();
+  return x && x.length <= 40 && x.split(' ').length <= 4 && /^[\p{Ll}' -]+$/u.test(x) ? x : defaut;
+}
+const ligneValeurEmail = (metier, valeur, reste) => `Je forme les équipes ${metier} à ${valeur}, et aussi à alléger le reste du bureau : ${reste.join(', ')}. Les formations sont éligibles à votre budget formation.`;
+const ligneRdvEmail = (document, lieu) => `Si ça vous parle, je peux vous montrer en 20 minutes ce que ça donne sur un de vos propres ${document}, ${lieu}. Ça vous intéresse ?`;
 function metierEmail(l) {
   const m = pageMetierLi(l)?.metier || '';
   return /BTP/.test(m) ? 'du BTP' : /propret/.test(m) ? 'de la propreté' : 'de PME';
@@ -2823,8 +2856,14 @@ function salutationEmail(civilite, c) {
   const qui = [c?.prenom, nom].filter(Boolean).join(' ');
   return qui ? `Bonjour ${qui},` : 'Bonjour,';
 }
-function texteEmail(e, l, c, accroche) {
-  return [salutationEmail(e.civilite, c), '', String(accroche || '').trim(), '', LIGNE_GABRIEL_EMAIL(metierEmail(l)), '', questionEmail(l), '', SIGNATURE_EMAIL].join('\n');
+// Le message entier : salutation, accroche, valeur et reste du bureau, proposition de rendez-vous (lieu selon le trajet
+// depuis Nancy), signature texte. Ces deux lignes de signature sont remplacées par la signature Gmail à l'envoi.
+function texteEmail(e, l, c, { accroche = '', valeur = '', reste = [], document = '', lieu = LIEU_DISTANCE_EMAIL } = {}) {
+  const metier = metierEmail(l);
+  const [valeurDefaut, documentDefaut] = VALEUR_DEFAUT_EMAIL[metier];
+  const v = nettoyerValeurEmail(valeur) || valeurDefaut;
+  return [salutationEmail(e.civilite, c), '', String(accroche || '').trim(), '', ligneValeurEmail(metier, v, resteBureauEmail(reste, v, metier)), '',
+    ligneRdvEmail(documentEmail(document, documentDefaut), lieu || LIEU_DISTANCE_EMAIL), '', SIGNATURE_EMAIL].join('\n');
 }
 
 // Le filet : les interdits de LinkedIn, plus « gratuit », aucun lien, rien sur l'origine de l'adresse (Gabriel, 28/10 :
@@ -2902,6 +2941,8 @@ async function lireRegistre(siren, c) {
     filiale: (e.dirigeants || []).some((d) => d.type_dirigeant === 'personne morale' && /pr[ée]sident/i.test(d.qualite || '')),
     dirigeants_connus: physiques.length, en_place: Boolean(sien), qualite: sien ? couper(sien.qualite || '', 80) : null,
     personnes: physiques.slice(0, 8).map((d) => ({ prenom: couper(String(d.prenoms || '').trim().split(/\s+/)[0] || '', 60), nom: couper(String(d.nom || '').trim(), 80), qualite: couper(d.qualite || '', 60) })),
+    // Le siège (latitude, longitude, commune) : le lieu du rendez-vous proposé dépend du trajet depuis Nancy (Gabriel, 12/11).
+    siege: e.siege ? { lat: Number.parseFloat(e.siege.latitude) || null, lon: Number.parseFloat(e.siege.longitude) || null, commune: couper(e.siege.libelle_commune || '', 80) || null, code_commune: e.siege.commune || null, code_postal: e.siege.code_postal || null } : null,
   };
 }
 // Marchés publics attribués (DECP) : la date et l'objet, jamais le montant (on ne le lit même pas).
@@ -2956,8 +2997,9 @@ async function lireBodacc(siren, depuis) {
   });
 }
 // Avis d'attribution du BOAMP (12 derniers mois) : au format eForms, chaque titulaire porte son SIRET
-// (cac:PartyLegalEntity/cbc:CompanyID) et son email (cac:Contact/cbc:ElectronicMail). Vérifié le 12/11/2026 sur un avis
-// réel (26-1301). Un avis d'un autre format ne donne rien, sans erreur.
+// (cac:PartyLegalEntity/cbc:CompanyID) et son email (cac:Contact/cbc:ElectronicMail). Vérifié le 12/11/2026 sur des avis
+// réels : 24-127807 et 24-130758 (eForms, l'email du titulaire y est) ; 26-1301 (format simple, sans email) ne donne rien,
+// sans erreur.
 async function lireBoamp(siren, depuis) {
   const q = new URLSearchParams({ where: `search("${siren}") and dateparution >= date'${depuis}'`, order_by: 'dateparution desc', limit: '5', select: 'idweb,dateparution,donnees' });
   const j = await lireJsonPublic(`${BOAMP}?${q}`, 8000);
@@ -3424,44 +3466,138 @@ const SCHEMA_EMAIL = {
   properties: {
     objet: { type: 'string' },
     accroche: { type: 'string' },
+    valeur: { type: 'string' },
+    reste: { type: 'array', items: { type: 'string', enum: RESTE_BUREAU_EMAIL } },
+    document: { type: 'string' },
     general: { type: 'boolean' },
     appuis: { type: 'array', items: { type: 'object', additionalProperties: false, properties: { fait: { type: 'string' }, source: { type: 'string' }, date: { type: 'string' } }, required: ['fait', 'source', 'date'] } },
   },
-  required: ['objet', 'accroche', 'general', 'appuis'],
+  required: ['objet', 'accroche', 'valeur', 'reste', 'document', 'general', 'appuis'],
 };
-const CONSIGNES_EMAIL = `Tu écris le premier email de prospection de Gabriel Vanderbecken (IA-Entrepreneur, organisme de formation à l'IA pour les entreprises, en Lorraine et dans le Grand Est) au dirigeant d'une petite entreprise (6 à 99 salariés) qu'il ne connaît pas. Gabriel le relit avant l'envoi. Tu n'écris que l'objet et l'accroche : le reste du message est fixe (modèle validé par Gabriel le 12/11/2026) et le CRM l'ajoute tel quel autour de ton accroche :
+const CONSIGNES_EMAIL = `Tu écris le premier email de prospection de Gabriel Vanderbecken (IA-Entrepreneur, organisme de formation à l'IA pour les entreprises, à Nancy) au dirigeant d'une petite entreprise (6 à 99 salariés) qu'il ne connaît pas. Gabriel le relit avant l'envoi. Le modèle a été validé par Gabriel le 12/11/2026 : « montrer que c'est du personnalisé + aller sur des valeurs ajoutées personnalisées mais aussi dire ce qu'on fait assez généralement ». Tu écris cinq morceaux (objet, accroche, valeur, reste, document) ; le CRM les place dans le modèle, le reste est fixe. Exemple validé, pour une entreprise du BTP qui a remporté des marchés publics cette année :
 
-Bonjour Monsieur Martin,
+Objet : Vos appels d'offres
 
-<ton accroche>
+Bonjour Monsieur Vigneron,
 
-Je forme des équipes du BTP du Grand Est à gagner du temps grâce à l'IA sur ce quotidien : les emails, la relation client, les devis et les appels d'offres, la gestion. Les formations sont éligibles à votre budget formation.
+J'ai vu que vous aviez remporté plusieurs chantiers publics cette année, dont la rénovation thermique d'une école et une mise en accessibilité.
 
-Chez Martin Toitures, tout ça se fait encore surtout à la main, ou vous avez déjà trouvé une solution ?
+Je forme les équipes du BTP à répondre plus vite aux appels d'offres avec l'IA, par exemple en partant de leurs anciens mémoires techniques, et aussi à alléger le reste du bureau : emails, devis, relation client. Les formations sont éligibles à votre budget formation.
+
+Si ça vous parle, je peux vous montrer en 20 minutes ce que ça donne sur un de vos propres mémoires, en visio ou dans vos bureaux à Lunéville. Ça vous intéresse ?
 
 Gabriel Vanderbecken
 IA-Entrepreneur
 
-L'accroche : deux phrases courtes, 150 à 300 caractères, qui justifient la prise de contact (Gabriel, 09/11/2026, d'une phrase générale : « on dirait juste une phrase bateau »).
-1) Un fait réel sur l'entreprise, daté, pris dans les faits publics de la fiche : des marchés publics remportés, une qualification RGE obtenue, un nouvel établissement, un anniversaire de création. Dis-le simplement, en une phrase, avec la période en clair (« cette année », « en septembre », « depuis octobre »), sans dire où tu l'as lu. Pas d'énumération de chantiers ou de lieux (Gabriel, 12/11 : « je suis pas fan ») : plusieurs marchés se disent « plusieurs marchés publics cette année ».
-2) La déduction qui justifie le message, marquée par « sûrement » : ce que ce fait demande en temps, en plus du quotidien de l'entreprise (Gabriel, 12/11 : « long à monter, long à gérer en plus du quotidien »). La phrase fixe qui suit dit « gagner du temps grâce à l'IA sur ce quotidien » : ta déduction doit donc finir sur le quotidien. Elle n'affirme rien d'inventé.
-Exemple validé par Gabriel le 12/11 (ne le recopie pas, adapte-le au fait trouvé) : « Vous avez remporté plusieurs marchés publics cette année. Ce sont des dossiers longs à monter, puis longs à gérer, qui s'ajoutent sûrement à un quotidien déjà bien rempli. »
-Choisis le fait le plus fort et le plus récent (12 derniers mois).
+Ici : accroche = « J'ai vu que vous aviez remporté plusieurs chantiers publics cette année, dont la rénovation thermique d'une école et une mise en accessibilité. » ; valeur = « répondre plus vite aux appels d'offres avec l'IA, par exemple en partant de leurs anciens mémoires techniques » ; reste = ["emails", "devis", "relation client"] ; document = « mémoires ». La phrase « Je forme les équipes {métier} à {valeur}, et aussi à alléger le reste du bureau : {reste}. Les formations sont éligibles à votre budget formation. », la proposition « Si ça vous parle, … sur un de vos propres {document}, {lieu}. Ça vous intéresse ? » et la signature sont fixes : ne les écris pas. Le lieu est donné dans la fiche.
 
-L'objet : 2 à 6 mots, concret, tiré du fait. Exemples validés par Gabriel : « Vos marchés publics », « Votre qualification chaudière bois », « 40 ans en avril ». Pas de majuscules partout, pas de point d'exclamation, pas de question, pas de « Re: ».
+accroche : une seule phrase qui commence par « J'ai vu que vous », 15 à 30 mots, sur des faits réels de la fiche (marchés publics remportés, qualification RGE obtenue, nouvel établissement, anniversaire de création).
+- La période juste : « cette année » seulement si tous les faits cités sont de l'année civile en cours (la date du jour est dans la fiche) ; sinon le mois et l'année (« en décembre 2025 »), ou « depuis l'an dernier ».
+- Pas d'énumération de chantiers ni de lieux : au plus un ou deux exemples, décrits par leur nature (« la rénovation thermique d'une école »), jamais une liste de communes.
+- Fidèle au périmètre réel : si l'entreprise n'a fait qu'un lot, dis le lot (« les sols et faïences de travaux d'accessibilité »), pas le chantier entier ; un seul marché ne devient pas « plusieurs ».
+- Pas de « sûrement », pas de déduction sur leur charge de travail, pas de question.
+
+valeur : la tâche précise que ces faits rendent utile, à l'infinitif, suivie d'un exemple concret introduit par « par exemple » ; 10 à 20 mots, sans chiffre, sans point final, sans « à » devant (la phrase fixe le met). Exemples : « répondre plus vite aux appels d'offres avec l'IA, par exemple en partant de leurs anciens mémoires techniques » ; « monter plus vite les dossiers d'aides de leurs clients avec l'IA, par exemple à partir des devis signés » ; « préparer plus vite les plannings des équipes avec l'IA, par exemple à partir de ceux de la semaine passée ».
+
+reste : exactement trois tâches du quotidien du bureau, prises dans la liste : emails, devis, relation client, suivi de chantier, plannings, factures et relances, recrutement. Aucune ne redit la valeur (si la valeur parle de devis, pas « devis »). « suivi de chantier » seulement pour le BTP.
+
+document : le document de l'exemple, au pluriel, pour « sur un de vos propres … » : « mémoires », « devis », « comptes rendus », « plannings », « dossiers d'aides »… Il doit coller à la valeur.
+
+objet : 2 à 5 mots, concret, tiré du fait, qui ne ressemble pas à un email de veille d'appels d'offres : jamais « Vos chantiers publics », « Vos marchés publics », « Nouveau marché », « Opportunité ». Exemples validés par Gabriel : « Vos appels d'offres », « Vos chantiers d'accessibilité », « Votre qualification chaudière bois », « 40 ans en avril ». Pas de majuscules partout, pas de point d'exclamation, pas de question, pas de « Re: ».
+
+Le message entier, hors signature, vise 70 à 95 mots : garde l'accroche et la valeur courtes. Une seule question dans tout le message : celle de la phrase fixe.
 
 Interdits :
 - aucun montant, aucun prix, aucun chiffre de gain ou de ROI, même quand le marché public en donne un ;
 - jamais le nom de l'acheteur ni d'un tiers : ni la commune, le département ou la région qui achète, ni le bailleur, ni le client, ni le nom d'une personne. Un lieu ou un bâtiment peut se nommer (« Haroué », « la Villa Majorelle », « une école ») ;
 - jamais d'où vient l'adresse, ni comment tu connais l'entreprise : ni annuaire, ni fichier, ni registre, ni LinkedIn (règle de Gabriel du 28/10) ;
 - aucun lien ni adresse email, pas de « gratuit », ni CPF, ni OPCO, ni « certifiante », ni code de certification, ni « reste à charge », ni « 100 % » ;
-- pas de présentation de Gabriel (elle est dans la phrase fixe), pas de formule creuse (« j'espère que vous allez bien », « je me permets »), pas de tiret long, pas d'emoji, pas de point d'exclamation. Vouvoiement.
+- pas de « nous connaissons bien le quotidien d'une entreprise comme la vôtre » ni rien qui prétend connaître leur quotidien (Gabriel, 12/11 : peut être mal perçu), pas de formule creuse (« j'espère que vous allez bien », « je me permets »), pas de tiret long, pas d'emoji, pas de point d'exclamation. Vouvoiement.
 
-N'invente rien : seulement les faits de la fiche. Sans fait assez fort (rien de récent, ou seulement la ville et la taille), écris une accroche générale assumée, construite sur le métier (« Dans une entreprise de métallerie de votre taille, les devis, les emails et le suivi des chantiers s'ajoutent sûrement à un quotidien déjà bien rempli. »), mets general à vrai et ne fais pas semblant de connaître l'entreprise.
+N'invente rien : seulement les faits de la fiche. Sans fait récent assez fort (rien dans les 12 derniers mois, ou seulement la ville et la taille), écris une accroche simple et vraie tirée de la fiche, toujours « J'ai vu que … » (« J'ai vu que votre entreprise de nettoyage est installée à Frouard depuis 2016. »), une valeur tirée du métier, et mets general à vrai.
 
 appuis : chaque fait utilisé, avec sa source et sa date telles que la fiche les donne (fait : « marché de ferronnerie notifié », source : « marchés publics attribués (DECP) », date : « 2026-09-17 »). Pour une accroche générale : un seul appui, fait « message général sur le métier », source « aucune », date vide.`;
 
-async function redigerEmail(e, l, c, { consigne = '' } = {}) {
+/* ----- Le rendez-vous proposé : dans ses bureaux si le trajet depuis Nancy est court, sinon visio ou téléphone ----- */
+
+// Gabriel, 12/11 : « moi j'habite à Nancy, du coup je veux bien rdv mais pas trop loin, sinon un appel ou visio quand c'est
+// plus loin », puis « 40 mn me va, pas plus ». Le temps de route vient d'OSRM (serveur public de démonstration : un seul
+// appel par entreprise, gardé dans faits.rdv) ; si OSRM ne répond pas, la distance à vol d'oiseau avec un seuil prudent
+// (25 km) ; sans coordonnées sûres du siège, « en visio ou par téléphone ».
+const NANCY = { lat: 48.6921, lon: 6.1844 };
+const OSRM = 'https://router.project-osrm.org/route/v1/driving';
+const GEO_COMMUNES = 'https://geo.api.gouv.fr/communes';
+function kmVolOiseau(a, b) {
+  const rad = (x) => (x * Math.PI) / 180;
+  const h = Math.sin(rad(b.lat - a.lat) / 2) ** 2 + Math.cos(rad(a.lat)) * Math.cos(rad(b.lat)) * Math.sin(rad(b.lon - a.lon) / 2) ** 2;
+  return 6371 * 2 * Math.asin(Math.sqrt(h));
+}
+const coordonneeSure = (lat, lon) => Number.isFinite(lat) && Number.isFinite(lon) && lat > 41 && lat < 52 && lon > -6 && lon < 10;
+// La commune du siège, au nom propre (« Lunéville », pas « LUNEVILLE »), et ses coordonnées si le registre n'en a pas.
+async function communeGeo(siege, p) {
+  if (/^\d[\dAB]\d{3}$/.test(siege?.code_commune || '')) {
+    const j = await lireJsonPublic(`${GEO_COMMUNES}/${siege.code_commune}?fields=nom,centre`, 4000);
+    if (j?.nom) return { nom: j.nom, centre: j.centre?.coordinates || null };
+  }
+  const nom = siege?.commune || p?.commune;
+  const dep = String(siege?.code_postal || '').slice(0, 2) || p?.dep;
+  if (!nom || !/^\d[\dAB]$/.test(dep || '')) return null;
+  const j = await lireJsonPublic(`${GEO_COMMUNES}?${new URLSearchParams({ nom, codeDepartement: dep, fields: 'nom,centre', boost: 'population', limit: '5' })}`, 4000);
+  // Seulement une commune du même nom (aux accents près) : jamais la plus proche par défaut.
+  const x = (Array.isArray(j) ? j : []).find((c) => normaliser(c.nom) === normaliser(nom));
+  return x ? { nom: x.nom, centre: x.centre?.coordinates || null } : null;
+}
+async function minutesDeRoute(lat, lon) {
+  try {
+    const r = await fetch(`${OSRM}/${NANCY.lon},${NANCY.lat};${lon},${lat}?overview=false`, { headers: { accept: 'application/json' }, signal: AbortSignal.timeout(4000) });
+    if (!r.ok) { console.error('crm email osrm', r.status); return null; }
+    const j = await r.json();
+    const s = j?.code === 'Ok' ? Number(j.routes?.[0]?.duration) : NaN;
+    return Number.isFinite(s) && s > 0 ? Math.round(s / 60) : null;
+  } catch (x) {
+    console.error('crm email osrm', x?.name || x?.message);
+    return null;
+  }
+}
+// Le lieu de la phrase fixe, et ce qui le justifie (gardé dans faits.rdv : une seule lecture d'OSRM par entreprise).
+async function lieuRdvEmail(e, l, c) {
+  const r = await reglageEmail();
+  const maxMinutes = Number.isFinite(r.rdv_minutes) ? r.rdv_minutes : EMAIL_PROSPECTION.rdv_minutes;
+  const maxKm = Number.isFinite(r.rdv_km) ? r.rdv_km : EMAIL_PROSPECTION.rdv_km;
+  const f = e.faits || {};
+  // Gardé dès qu'on a les coordonnées (OSRM n'est jamais relu) ; sans coordonnées (registre ou geo.api muets), on recherche
+  // à la rédaction suivante : ces deux lectures sont gratuites.
+  let rdv = f.rdv && f.rdv.lu_le && f.rdv.coord ? { ...f.rdv } : null;
+  if (!rdv) {
+    let siege = f.registre?.siege || null;
+    const siren = String(f.prospect?.siren || l?.siret || '').replace(/\D/g, '').slice(0, 9);
+    // Une ligne lue avant le 12/11 au soir n'a pas le siège : le registre est relu une fois.
+    if (!siege && /^\d{9}$/.test(siren)) siege = (await lireRegistre(siren, c))?.siege || null;
+    const geo = await communeGeo(siege, f.prospect);
+    let lat = Number(siege?.lat);
+    let lon = Number(siege?.lon);
+    let coord = 'registre';
+    if (!coordonneeSure(lat, lon) && geo?.centre) { [lon, lat] = geo.centre.map(Number); coord = 'commune'; }
+    rdv = { lu_le: new Date().toISOString(), commune: geo?.nom || null, coord: coordonneeSure(lat, lon) ? coord : null };
+    if (rdv.coord) {
+      rdv.lat = Math.round(lat * 1e5) / 1e5;
+      rdv.lon = Math.round(lon * 1e5) / 1e5;
+      rdv.km = Math.round(kmVolOiseau(NANCY, { lat, lon }) * 10) / 10;
+      rdv.minutes = await minutesDeRoute(lat, lon);
+      rdv.osrm = rdv.minutes == null ? 'sans réponse' : 'ok';
+    }
+  }
+  // La décision se refait à chaque rédaction avec les réglages du moment, sans relire OSRM.
+  rdv.calcul = !rdv.coord ? 'sans coordonnées' : rdv.minutes != null ? 'route' : 'vol d\'oiseau';
+  rdv.bureaux = rdv.calcul === 'route' ? rdv.minutes <= maxMinutes : rdv.calcul === 'vol d\'oiseau' ? rdv.km <= maxKm : false;
+  rdv.seuil = rdv.calcul === 'route' ? `${maxMinutes} min` : rdv.calcul === 'vol d\'oiseau' ? `${maxKm} km` : null;
+  const lieu = rdv.bureaux ? (rdv.commune ? `en visio ou dans vos bureaux à ${rdv.commune}` : 'en visio ou dans vos bureaux') : LIEU_DISTANCE_EMAIL;
+  return { lieu, rdv };
+}
+
+/* ----- La rédaction ----- */
+
+async function redigerEmail(e, l, c, { consigne = '', lieu = LIEU_DISTANCE_EMAIL } = {}) {
   const f = e.faits || {};
   const p = f.prospect || {};
   const { recents, autres } = faitsPourClaude(f);
@@ -3469,7 +3605,9 @@ async function redigerEmail(e, l, c, { consigne = '' } = {}) {
   const fiche = [
     `Date du jour : ${jour}`,
     `Entreprise : ${l.entreprise}${l.secteur ? ` (${l.secteur})` : ''}${l.localisation ? `, ${l.localisation}` : ''}${p.salaries ? `, ${p.salaries} salariés` : ''}`,
+    f.rdv?.commune ? `Commune du siège : ${f.rdv.commune}` : '',
     `Métier dans la phrase fixe : ${metierEmail(l)}`,
+    `Lieu du rendez-vous dans la phrase fixe : ${lieu}`,
     `Dirigeant : ${salutationEmail(e.civilite, c).replace(/^Bonjour /, '').replace(/,$/, '')}${c?.poste ? `, ${c.poste}` : ''}`,
     l.besoin ? `Ce que le CRM sait de l'entreprise : ${couper(l.besoin, 400)}` : '',
     `Faits publics des 12 derniers mois, du plus récent au plus ancien :\n${recents.join('\n') || '(aucun)'}`,
@@ -3478,29 +3616,52 @@ async function redigerEmail(e, l, c, { consigne = '' } = {}) {
   ].filter(Boolean).join('\n');
   const r = await appelClaude({ consignes: CONSIGNES_EMAIL, schema: SCHEMA_EMAIL, contenu: fiche, max: 3000, timeout: 40000 });
   const objet = String(r.objet || '').replace(/[\r\n]+/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 120);
-  const accroche = String(r.accroche || '').replace(/\r\n?/g, '\n').trim();
+  const accroche = String(r.accroche || '').replace(/\s+/g, ' ').trim();
   if (!objet || !accroche) throw new Refus('ia_erreur', 502);
   const appuis = (Array.isArray(r.appuis) ? r.appuis : []).slice(0, 4).map((a) => ({ fait: couper(String(a?.fait || ''), 300), source: couper(String(a?.source || ''), 120), date: couper(String(a?.date || ''), 40) }));
-  return { objet, texte: texteEmail(e, l, c, accroche), appuis, general: r.general === true };
+  const texte = texteEmail(e, l, c, { accroche, valeur: r.valeur, reste: r.reste, document: r.document, lieu });
+  return { objet, texte, appuis, general: r.general === true, accroche };
+}
+
+// Ce que le modèle du 12/11 demande et que le filet peut voir, signalé à côté du texte (un envoi automatique attend).
+function alertesModeleEmail(objet, texte, { appuis = [], accroche = null, general = false } = {}) {
+  const a = [];
+  const corps = String(texte || '').replace(/\n+Gabriel Vanderbecken(\nIA-Entrepreneur)?\s*$/, '');
+  const questions = (corps.match(/\?/g) || []).length;
+  if (questions > 1) a.push(`${questions} questions dans le message : une seule (Gabriel, 12/11).`);
+  const mots = motsEmail(corps);
+  // 70 à 95 mots visés ; l'exemple validé en compte un peu plus de 100 au décompte simple, d'où la marge.
+  if (mots > 110 || mots < 60) a.push(`Le message fait ${mots} mots (70 à 95 visés).`);
+  const motsObjet = motsEmail(objet);
+  if (motsObjet < 2 || motsObjet > 5) a.push(`L'objet fait ${motsObjet} mot${motsObjet > 1 ? 's' : ''} (2 à 5).`);
+  if (/(chantiers?|march[ée]s?) publics?|nouveau march|opportunit|veille|avis d'appel/i.test(objet || '')) a.push("L'objet ressemble à un email de veille d'appels d'offres.");
+  if (accroche != null && !general && !/^J'ai vu que /.test(accroche)) a.push("L'accroche ne commence pas par « J'ai vu que ».");
+  const annee = aujourdHuiParis().slice(0, 4);
+  if (/cette ann[ée]e/i.test(corps) && appuis.some((x) => /^\d{4}/.test(x.date || '') && x.date.slice(0, 4) !== annee)) a.push(`« Cette année » alors qu'un fait cité date d'avant ${annee}.`);
+  return a;
 }
 
 // Claude rédige ; le texte reste à valider, sauf si la confiance est acquise et que rien ne cloche (filet et alertes).
+// Un brouillon déjà écrit n'est jamais réécrit seul (Gabriel retouche parfois à la main) : seulement « Rédiger avec Claude ».
 async function preparerEmailAvecClaude(e, l, c, { auto = true, consigne = '' } = {}) {
+  let place = { lieu: LIEU_DISTANCE_EMAIL, rdv: null };
+  try { place = await lieuRdvEmail(e, l, c); } catch (x) { console.error('crm email lieu', x?.message); }
+  const faits = { ...(e.faits || {}), ...(place.rdv ? { rdv: place.rdv } : {}) };
   let red;
   try {
-    red = await redigerEmail(e, l, c, { consigne });
+    red = await redigerEmail({ ...e, faits }, l, c, { consigne, lieu: place.lieu });
   } catch (err) {
     // Claude a échoué : nouvel essai au passage suivant, puis, après 3 essais, la ligne passe à Gabriel avec le modèle vide.
     const essais = (e.faits?.essais_claude || 0) + 1;
     await majLigneEmail(e.id, essais >= 3
-      ? { statut: 'brouillon', objet: null, texte: texteEmail(e, l, c, ''), faits: { ...(e.faits || {}), essais_claude: essais }, detail: "Claude n'a pas pu rédiger ce message : écris l'objet et l'accroche toi-même." }
-      : { faits: { ...(e.faits || {}), essais_claude: essais }, detail: "Claude n'a pas pu rédiger : nouvel essai au prochain passage." });
+      ? { statut: 'brouillon', objet: null, texte: texteEmail(e, l, c, { lieu: place.lieu }), faits: { ...faits, essais_claude: essais }, detail: "Claude n'a pas pu rédiger ce message : écris l'objet et l'accroche toi-même, et adapte la valeur." }
+      : { faits: { ...faits, essais_claude: essais }, detail: "Claude n'a pas pu rédiger : nouvel essai au prochain passage." });
     throw err;
   }
-  const alertes = alertesEmail(red.objet, red.texte);
+  const alertes = [...alertesEmail(red.objet, red.texte), ...alertesModeleEmail(red.objet, red.texte, red)];
   let propre = true;
   try { verifierTexteEmail(red.objet, red.texte); } catch (x) { propre = false; alertes.unshift(messageRefusEmail(x)); }
-  const valeurs = { objet: red.objet, texte: red.texte, texte_claude: `${red.objet}\n---\n${red.texte}`, appuis: red.appuis.length ? red.appuis : [{ fait: 'message général sur le métier', source: 'aucune', date: '' }], statut: 'brouillon', valide_le: null, detail: alertes.length ? alertes.join(' ') : null };
+  const valeurs = { objet: red.objet, texte: red.texte, texte_claude: `${red.objet}\n---\n${red.texte}`, faits, appuis: red.appuis.length ? red.appuis : [{ fait: 'message général sur le métier', source: 'aucune', date: '' }], statut: 'brouillon', valide_le: null, detail: alertes.length ? alertes.join(' ') : null };
   if (auto && propre && !alertes.length && (await confianceEmail()).auto) {
     Object.assign(valeurs, { statut: 'a_envoyer', valide_le: new Date().toISOString(), detail: "Envoi automatique : 10 messages validés tels quels d'affilée." });
   }
@@ -3672,20 +3833,80 @@ const echapperHtml = (t) => String(t ?? '').replace(/&/g, '&amp;').replace(/</g,
 class ErreurBrevo extends Error {
   constructor(message, { arret = false, inconnu = false } = {}) { super(message); this.arret = arret; this.inconnu = inconnu; }
 }
-// Brevo transactionnel (POST /v3/smtp/email, comme api/rdv.js) : aspect texte, sans image ; le lien d'opposition en bas,
-// et dans les en-têtes List-Unsubscribe (lien https + mailto) et List-Unsubscribe-Post (désinscription en un clic,
-// RFC 8058, demandée par Gmail et Yahoo pour les envois en nombre).
-async function envoyerBrevoEmail(e, c, r, jeton) {
+/* ----- La signature Gmail de Gabriel, ajoutée à l'envoi ----- */
+
+// Gabriel, 12/11 : « mets MA signature gmail dedans directement ». Lue par l'API Gmail (users.settings.sendAs.get, champ
+// signature, en HTML ; la portée gmail.readonly suffit), gardée 24 h dans le réglage email_signature { html, texte, le }.
+// Si Gmail ne répond pas : la dernière signature lue, sinon la signature texte du message (« Gabriel Vanderbecken /
+// IA-Entrepreneur »). Le texte validé par Gabriel garde ces deux lignes : le filet anti-liens ne voit pas la signature.
+const SIGNATURE_DUREE = 24 * 3600 * 1000;
+const entitesSignature = (t) => String(t || '').replace(/&nbsp;/gi, ' ').replace(/&#(\d+);/g, (_, n) => String.fromCodePoint(Number(n))).replace(/&#x([0-9a-f]+);/gi, (_, n) => String.fromCodePoint(parseInt(n, 16)))
+  .replace(/&lt;/gi, '<').replace(/&gt;/gi, '>').replace(/&quot;/gi, '"').replace(/&#39;|&apos;/gi, "'").replace(/&amp;/gi, '&');
+// Une signature Gmail est déjà nettoyée par Gmail ; on retire quand même tout ce qui pourrait exécuter quelque chose.
+function nettoyerSignatureHtml(h) {
+  const x = String(h || '').slice(0, 30000)
+    .replace(/<(script|style|iframe|object|embed|form|svg|math)\b[\s\S]*?<\/\1\s*>/gi, '').replace(/<(script|style|iframe|object|embed|form|meta|link|base)\b[^>]*>/gi, '')
+    .replace(/\son[a-z]+\s*=\s*("[^"]*"|'[^']*'|[^\s>]+)/gi, '')
+    .replace(/\s(href|src)\s*=\s*("\s*(javascript|vbscript|data):[^"]*"|'\s*(javascript|vbscript|data):[^']*')/gi, '');
+  return x.trim();
+}
+// La version texte (textContent de Brevo) : les lignes de la signature, le téléphone, « Prendre RDV : <lien> ».
+function signatureEnTexte(h) {
+  const meme = (a, b) => { const n = (u) => String(u).toLowerCase().replace(/^https?:\/\//, '').replace(/^www\./, '').replace(/\/+$/, ''); return n(a) === n(b); };
+  const t = String(h || '')
+    .replace(/<img\b[^>]*>/gi, '')
+    .replace(/<a\b[^>]*?href\s*=\s*("([^"]*)"|'([^']*)')[^>]*>([\s\S]*?)<\/a\s*>/gi, (_m, _q, h1, h2, dedans) => {
+      const href = entitesSignature(h1 ?? h2 ?? '').trim();
+      const txt = entitesSignature(dedans.replace(/<[^>]+>/g, '')).replace(/\s+/g, ' ').trim(); // « IA<span>-</span>Entrepreneur »
+      if (/^(tel|mailto):/i.test(href)) return txt || href.replace(/^(tel|mailto):/i, '');
+      // L'accueil du site se lit sans son adresse ; une page précise (« Prendre RDV ») garde son lien.
+      const racine = (() => { try { const u = new URL(href); return u.pathname === '/' && !u.search; } catch { return false; } })();
+      if (/^https?:\/\//i.test(href)) return !txt ? '' : meme(txt, href) || racine ? txt : `${txt} : ${href}`;
+      return txt;
+    })
+    .replace(/<br\s*\/?>/gi, '\n').replace(/<\/(p|div|tr|li|h[1-6]|table|tbody)\s*>/gi, '\n').replace(/<\/t[dh]\s*>/gi, ' ')
+    .replace(/<[^>]+>/g, '');
+  const lignes = entitesSignature(t).split('\n').map((x) => x.replace(/[ \t\u00a0]+/g, ' ').trim()).filter(Boolean);
+  return lignes.filter((x, i) => x !== lignes[i - 1]).join('\n').slice(0, 1500);
+}
+async function signatureEmail({ forcer = false } = {}) {
+  const cache = await lireReglage('email_signature');
+  if (!forcer && cache?.html && cache.le && Date.now() - Date.parse(cache.le) < SIGNATURE_DUREE) return cache;
+  try {
+    if (!gmailConfigure()) throw new Error('Gmail non configuré');
+    const jeton = await accesGmail();
+    const r = await fetch(`${GMAIL}/settings/sendAs/${encodeURIComponent(ADMIN_EMAIL)}`, { headers: { Authorization: `Bearer ${jeton}` }, signal: AbortSignal.timeout(8000) });
+    if (!r.ok) throw new Error(`Gmail ${r.status}`);
+    const html = nettoyerSignatureHtml((await r.json()).signature);
+    const texte = signatureEnTexte(html);
+    if (!html || !texte) throw new Error('signature vide');
+    const n = { html, texte, le: new Date().toISOString() };
+    await ecrireReglage('email_signature', n);
+    return n;
+  } catch (x) {
+    console.error('crm email signature', x?.code || x?.message);
+    return cache?.html ? cache : null;
+  }
+}
+// Le corps sans les deux lignes de signature texte du modèle (remplacées par la signature Gmail).
+const sansSignatureTexte = (t) => String(t || '').replace(/\s*\n\s*Gabriel Vanderbecken\s*(\n\s*IA-Entrepreneur\s*)?$/, '').trimEnd();
+
+// Brevo transactionnel (POST /v3/smtp/email, comme api/rdv.js) : le message en paragraphes simples, la signature Gmail de
+// Gabriel, le lien d'opposition en bas, et dans les en-têtes List-Unsubscribe (lien https + mailto) et
+// List-Unsubscribe-Post (désinscription en un clic, RFC 8058, demandée par Gmail et Yahoo pour les envois en nombre).
+async function envoyerBrevoEmail(e, c, r, jeton, signature = null) {
   const lien = `${URL_STOP}${jeton}`;
-  const paragraphes = e.texte.split(/\n{2,}/).map((p) => `<p style="margin:0 0 14px">${echapperHtml(p).replace(/\n/g, '<br>')}</p>`).join('');
-  const html = `<!doctype html><html lang="fr"><head><meta charset="utf-8"></head><body style="margin:0;padding:16px;font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:1.5;color:#1f2330">${paragraphes}<p style="margin:22px 0 0;font-size:12px;color:#6b7080">Pour ne plus recevoir mes messages : <a href="${echapperHtml(lien)}" style="color:#6b7080">se désinscrire</a></p></body></html>`;
+  const corpsTexte = signature ? sansSignatureTexte(e.texte) : e.texte;
+  const paragraphes = corpsTexte.split(/\n{2,}/).map((p) => `<p style="margin:0 0 14px">${echapperHtml(p).replace(/\n/g, '<br>')}</p>`).join('');
+  const blocSignature = signature ? `<div style="margin:18px 0 0">${signature.html}</div>` : '';
+  const html = `<!doctype html><html lang="fr"><head><meta charset="utf-8"></head><body style="margin:0;padding:16px;font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:1.5;color:#1f2330">${paragraphes}${blocSignature}<p style="margin:22px 0 0;font-size:12px;color:#6b7080">Pour ne plus recevoir mes messages : <a href="${echapperHtml(lien)}" style="color:#6b7080">se désinscrire</a></p></body></html>`;
   const corps = {
     sender: { email: r.expediteur, name: r.expediteur_nom },
     replyTo: { email: ADMIN_EMAIL, name: 'Gabriel Vanderbecken' },
     to: [{ email: e.email, name: nomContactEmail(c) === 'ce contact' ? e.email : nomContactEmail(c) }],
     subject: e.objet,
     htmlContent: html,
-    textContent: `${e.texte}\n\n--\nPour ne plus recevoir mes messages, se désinscrire : ${lien}`,
+    textContent: `${corpsTexte}${signature ? `\n\n${signature.texte}` : ''}\n\n--\nPour ne plus recevoir mes messages, se désinscrire : ${lien}`,
     headers: { 'List-Unsubscribe': `<${lien}>, <mailto:${ADMIN_EMAIL}?subject=D%C3%A9sinscription>`, 'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click' },
     ...(r.sans_tag ? {} : { tags: ['prospection-email'] }),
   };
@@ -3733,7 +3954,7 @@ async function appliquerEnvoiEmail(e, l, c, { messageId = null, envoyeLe = new D
   return ligne;
 }
 
-async function envoyerFileEmail(r, bilan, reste) {
+async function envoyerFileEmail(r, bilan, reste, signature = null) {
   let place = Math.min(r.par_passage, r.par_jour - (await envoyesDuJourEmail()));
   if (place <= 0) return;
   const { lignes } = await sb(`iae_crm_emails?statut=eq.a_envoyer&order=valide_le.asc&limit=${place + 20}&select=*`);
@@ -3757,7 +3978,7 @@ async function envoyerFileEmail(r, bilan, reste) {
     try { verifierTexteEmail(e.objet, e.texte); } catch (x) { await majLigneEmail(e.id, { statut: 'brouillon', valide_le: null, detail: messageRefusEmail(x) }); continue; }
     let messageId;
     try {
-      messageId = await envoyerBrevoEmail(e, c, r, jeton);
+      messageId = await envoyerBrevoEmail(e, c, r, jeton, signature);
     } catch (x) {
       await majLigneEmail(e.id, { statut: 'echec', detail: couper(x.message, 400) });
       bilan.echecs++;
@@ -4086,6 +4307,7 @@ async function etatProspectionEmail({ lignes = null, recus = null } = {}) {
   const leadsEnvoyes = [...new Set(tout.filter((e) => e.statut === 'envoye').map((e) => e.lead_id))];
   const rec = recus || (leadsEnvoyes.length ? (await sb(`iae_crm_activites?type=eq.email_recu&lead_id=in.(${leadsEnvoyes.join(',')})&select=lead_id,date`)).lignes : []);
   const suivi = (await lireReglage('email_prospection_suivi')) || {};
+  const signature = await lireReglage('email_signature');
   const n = (s) => tout.filter((e) => e.statut === s).length;
   // Où en sont les candidats (Gabriel, 12/11) : en attente du registre ou de la recherche gratuite, adresse trouvée
   // gratuitement, ultra qualifiés en attente de FullEnrich, sans adresse (pour Anna).
@@ -4104,6 +4326,9 @@ async function etatProspectionEmail({ lignes = null, recus = null } = {}) {
     fullenrich: Boolean(process.env.FULLENRICH_API_KEY), brevo: Boolean(process.env.BREVO_API_KEY), fullenrich_erreur: suivi.fullenrich_erreur || null,
     a_valider: n('brouillon') + n('echec'), en_file: n('a_envoyer') + n('en_cours'), a_enrichir: n('a_enrichir'), a_rediger: n('a_rediger'), sans_email: n('sans_email'),
     campagnes: suivi.campagnes || {}, dernier_passage: suivi.passage_le || null,
+    // La signature ajoutée à l'envoi : sa version texte pour l'aperçu de la page (jamais son HTML, qui ne s'affiche pas ici).
+    signature: signature?.texte ? { texte: signature.texte, le: signature.le || null } : null, gmail: gmailConfigure(),
+    rdv: { minutes: Number.isFinite(r.rdv_minutes) ? r.rdv_minutes : EMAIL_PROSPECTION.rdv_minutes, km: Number.isFinite(r.rdv_km) ? r.rdv_km : EMAIL_PROSPECTION.rdv_km },
     bilan: bilanEmail(tout, rec, { quota: r.par_jour }),
   };
 }
@@ -4128,9 +4353,11 @@ async function prospectionEmail({ limite = Date.now() + 40000 } = {}) {
   const jour = aujourdHuiParis();
   const r = await reglageEmail();
   if (!estOuvreIso(jour) || pause) { await noterPassageEmail(bilan); return { ...bilan, pause: Boolean(pause), ouvre: estOuvreIso(jour) }; }
+  // La signature Gmail, relue une fois par 24 h : l'aperçu de « Emails à valider » est prêt avant le premier envoi.
+  const signature = gmailConfigure() ? await signatureEmail().catch(() => null) : null;
   // 3. Les envois du matin, dans le quota.
   const hm = heureMinuteParis();
-  if (process.env.BREVO_API_KEY && hm >= r.debut && hm < r.fin) await envoyerFileEmail(r, bilan, reste);
+  if (process.env.BREVO_API_KEY && hm >= r.debut && hm < r.fin) await envoyerFileEmail(r, bilan, reste, signature);
   // 4. Registre et faits publics, adresse gratuite du dirigeant, FullEnrich pour les ultra qualifiés ; 5. lecture des
   // recherches FullEnrich finies ; 6. rédaction par Claude.
   if (reste()) await adressesEmails(r, bilan, reste).catch((x) => console.error('crm email adresses', x?.code || x?.message));
@@ -4164,6 +4391,8 @@ async function operationEmail(corps, ip) {
     if (corps.par_passage !== undefined) v.par_passage = entier(corps.par_passage, 1, 5);
     if (corps.enrichissements !== undefined) v.enrichissements = entier(corps.enrichissements, 0, 100);
     if (corps.tentatives_fullenrich !== undefined) v.tentatives_fullenrich = entier(corps.tentatives_fullenrich, 0, 100);
+    if (corps.rdv_minutes !== undefined) v.rdv_minutes = entier(corps.rdv_minutes, 0, 180);
+    if (corps.rdv_km !== undefined) v.rdv_km = entier(corps.rdv_km, 0, 200);
     if (corps.expediteur !== undefined) { const a = normEmail(corps.expediteur); if (!EMAIL_RE.test(a)) throw new Refus('adresse_invalide'); v.expediteur = a; }
     if (corps.expediteur_nom !== undefined) v.expediteur_nom = couper(String(corps.expediteur_nom).replace(/[\r\n<>"]+/g, ' ').trim(), 70) || EMAIL_PROSPECTION.expediteur_nom;
     if (!Object.keys(v).length) throw new Refus('rien_a_modifier');

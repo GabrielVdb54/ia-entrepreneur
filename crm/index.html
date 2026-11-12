@@ -326,6 +326,8 @@
   .em-barre .em-bilan { font-size: 13.5px; }
   .em-adresse { margin: 0; font-size: 14px; overflow-wrap: anywhere; }
   .em-vues { margin: 0; overflow-wrap: anywhere; }
+  .em-signature summary { cursor: pointer; font-size: 14px; color: var(--primary-dark); padding: 12px 0; }
+  .em-signature pre { margin: 6px 0 0; padding: 10px 12px; white-space: pre-wrap; overflow-wrap: anywhere; font: inherit; font-size: 13.5px; background: var(--bg); border: 1px solid var(--line); border-radius: 8px; }
   .em-verifiee { display: inline-block; font-size: 12px; font-weight: 700; padding: 1px 8px; border-radius: 999px; background: var(--accent-soft); color: var(--accent-dark); }
   .em-appuis { margin: 4px 0 0; padding-left: 18px; font-size: 13.5px; overflow-wrap: anywhere; }
   .em-appuis li + li { margin-top: 3px; }
@@ -3377,6 +3379,13 @@ function brancherEmail(form) {
     }
   });
 }
+// La signature Gmail de Gabriel remplace « Gabriel Vanderbecken / IA-Entrepreneur » à l'envoi (Gabriel, 12/11 : « mets MA
+// signature gmail dedans directement ») ; l'aperçu montre sa version texte, lue par le serveur (au plus une fois par 24 h).
+function signatureEm(p) {
+  const s = p.signature;
+  if (s && s.texte) return `<details class="em-signature" data-em-signature><summary>Ta signature Gmail est ajoutée à l'envoi</summary><p class="meta">À la place des deux dernières lignes du message. Lue dans Gmail le ${esc(s.le ? instantLisible(s.le) : '')} ; voici sa version texte (l'email part avec la version complète, photo et bouton compris).</p><pre>${esc(s.texte)}</pre></details>`;
+  return `<p class="aide" data-em-signature>Ta signature Gmail est ajoutée à l'envoi${p.gmail === false ? " dès que Gmail est branché ; d'ici là, les deux lignes de signature du message" : ' (lue au prochain passage ; si Gmail ne répond pas, les deux lignes de signature du message)'}.</p>`;
+}
 // Les emails à valider (ou tous ceux d'un lead) : à relire, corriger et valider un par un, ou tous d'un coup.
 function ouvrirEmailsDuJour(leadId = null) {
   const p = D.prospection_email || {};
@@ -3385,6 +3394,7 @@ function ouvrirEmailsDuJour(leadId = null) {
   ouvrirModale(`<h2>${l ? `Prospection email : ${esc(l.entreprise)}` : 'Emails à valider'}</h2>
     ${p.pause ? `<p class="li-mac alerte-li">En pause : ${esc(p.pause.raison)} Rien ne part tant que tu n'as pas cliqué « Reprendre ».</p>` : ''}
     <p class="aide">${esc(texteConfianceEmail().texte)} Relis l'objet, le message et ce qui le justifie, puis « Valider l'envoi » : Brevo l'envoie le prochain matin de jour ouvré, ${esc(fenetreEm())}, ${p.quota || 5} par jour au plus.</p>
+    ${signatureEm(p)}
     ${liste.length ? liste.map((e) => blocEmail(e)).join('') : '<p class="vide">Rien à valider pour le moment.</p>'}
     ${!leadId && liste.filter((e) => e.statut === 'brouillon').length > 1 ? '<div class="actions"><button type="button" class="btn primaire" data-em-tout>Tout valider</button></div>' : ''}
     ${piedFormulaire('')}`, (form) => {
