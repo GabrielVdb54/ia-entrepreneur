@@ -12,7 +12,8 @@
  *   est appelée par sb() avant CHAQUE requête à la base : pour un membre, elle
  *   ajoute « visible_par contient mon adresse » aux lectures, modifications et
  *   suppressions, refuse les tables réservées à Gabriel (formateurs, pièces,
- *   programmes, LinkedIn, avis, évaluations, utilisateurs) et contrôle chaque
+ *   programmes, LinkedIn, avis, évaluations, utilisateurs, prospection email et
+ *   oppositions) et contrôle chaque
  *   création. Un oubli ailleurs dans le code ne peut donc pas montrer la fiche
  *   d'un autre.
  * - LinkedIn (10/11/2026) : un membre qui a un robot sur son ordinateur (clé

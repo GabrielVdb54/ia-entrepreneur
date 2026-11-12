@@ -50,7 +50,28 @@
  *        besoin et les échanges, puis les formateurs recommandés pour ce
  *        programme (seul un formateur validé peut être choisi)
  *   GET  /api/crm?tache=synchro      la même synchro, lancée par Vercel Cron
- *        toutes les 15 minutes (en-tête Authorization: Bearer CRON_SECRET)
+ *        toutes les 15 minutes (en-tête Authorization: Bearer CRON_SECRET) ;
+ *        puis la prospection email (Gabriel seul, voir plus bas)
+ *   POST { op: 'prospect_email', prospect }   un dirigeant à prospecter par email
+ *        (clé du CRM de Gabriel, ou clé du robot de son Mac quand LinkedIn ne
+ *        donne pas de profil utilisable)
+ *   POST { op: 'email_valider' | 'email_rediger' | 'email_ecarter' | 'email_adresse'
+ *          | 'email_reprendre' | 'email_pause' | 'email_auto_couper' | 'email_reglage'
+ *          | 'email_passage', … }   la prospection email depuis la page
+ *   GET|POST /api/crm?stop=<jeton>   public, sans clé : la désinscription d'un
+ *        prospect (page avec un bouton ; le POST en un clic de la messagerie)
+ *
+ * Prospection email (12/11/2026, Gabriel : « il faut qu'on en envoie tous les
+ * jours », « vas y molo sur les emails ») : le circuit LinkedIn transposé à
+ * l'email. Un dirigeant sans profil LinkedIn utilisable → registre national
+ * (toujours en place, pas d'opposition à la prospection) → adresse vérifiée par
+ * FullEnrich (DELIVERABLE seulement) → faits publics datés (marchés publics,
+ * RGE, BODACC) → Claude écrit l'objet et l'accroche → Gabriel valide d'un clic
+ * (envoi automatique après 10 messages validés tels quels d'affilée) → Brevo
+ * envoie les jours ouvrés entre 8 h 30 et 11 h 30, 5 par jour au plus, 2 par
+ * passage → événements Brevo, pause automatique (1 spam, ou plus d'1 adresse en
+ * erreur), bilan dans « Aujourd'hui » et dans le récap de 7 h. Une réponse, sur
+ * n'importe quel canal, arrête tout ce qui attend (email et LinkedIn).
  *
  * Synchro (06/11/2026, choix de Gabriel) : chaque email reçu est lu en entier
  * et analysé par Claude. S'il concerne un lead (adresse connue, même domaine,
@@ -81,6 +102,12 @@
  *       gabriel@ia-entrepreneur.fr, rien ne part.
  *   ANTHROPIC_API_KEY  la rédaction d'après les notes (déjà utilisée par
  *       /api/conseil). Sans elle, la page n'affiche pas le bouton.
+ *   BREVO_API_KEY  l'envoi de la prospection email et la lecture de ses
+ *       événements (la même clé que /api/rdv et /api/quiz). Sans elle, rien ne
+ *       part et la barre le dit.
+ *   FULLENRICH_API_KEY  la recherche de l'adresse vérifiée (1 crédit par adresse
+ *       trouvée, jamais le téléphone). Sans elle, les dirigeants attendent et la
+ *       barre le dit ; Claude Code peut poser l'adresse (op email_adresse).
  */
 
 import { timingSafeEqual, randomBytes, createHash } from 'node:crypto';
@@ -499,7 +526,8 @@ async function lireTout() {
   const admin = estAdmin();
   const rien = Promise.resolve([]);
   const rienSb = Promise.resolve({ lignes: [] });
-  const [leads, contacts, activites, memos, modeles, reglages, { lignes: entrants }, { lignes: ecartes }, formateurs, documents, programmes, { lignes: linkedin }, { lignes: avis }, { lignes: demandesAvis }, evaluations, evalReponses, equipe, closersListe] = await Promise.all([
+  const depuisEmails = new Date(Date.now() - 60 * 86400000).toISOString();
+  const [leads, contacts, activites, memos, modeles, reglages, { lignes: entrants }, { lignes: ecartes }, formateurs, documents, programmes, { lignes: linkedin }, { lignes: avis }, { lignes: demandesAvis }, evaluations, evalReponses, equipe, closersListe, { lignes: emails }, { lignes: emailsBilan }] = await Promise.all([
     toutLire('iae_crm_leads', 'entreprise.asc'),
     toutLire('iae_crm_contacts', 'principal.desc,created_at.asc'),
     toutLire('iae_crm_activites', 'date.desc'),
@@ -520,11 +548,16 @@ async function lireTout() {
     admin ? toutLire('iae_crm_evaluation_reponses', 'created_at.asc') : rien,
     equipePourPage(),
     closers(),
+    // Prospection email (12/11/2026), à Gabriel seulement : ce qui attend, et ce qui est parti dans les 60 derniers jours ;
+    // puis, pour le bilan depuis le début, toutes les lignes parties (sans leur texte).
+    !admin ? rienSb : sb(`iae_crm_emails?or=(statut.in.(a_enrichir,a_rediger,brouillon,a_envoyer,en_cours,echec),created_at.gte.${encodeURIComponent(depuisEmails)})&order=created_at.desc&limit=1000&select=${COLONNES_EMAIL_PAGE}`),
+    !admin ? rienSb : lignesBilanEmail().then((lignes) => ({ lignes })),
   ]);
   const moiPublic = utilisateurCourant();
+  const prospectionEmailEtat = admin ? await etatProspectionEmail({ lignes: emailsBilan || [], recus: activites.filter((a) => a.type === 'email_recu') }).catch((e) => { console.error('crm email état', e?.code || e?.message); return null; }) : null;
   return {
     leads, contacts, activites, memos, modeles, entrants, ecartes, documents, programmes, linkedin: linkedin || [], avis: avis || [], demandes_avis: demandesAvis || [],
-    evaluations, evaluation_reponses: evalReponses,
+    evaluations, evaluation_reponses: evalReponses, emails: emails || [], prospection_email: prospectionEmailEtat,
     formateurs: formateurs.map(({ jeton_hash: _h, signature, ...f }) => ({ ...f, signature: signature ? { nom: signature.nom, lieu: signature.lieu, date: signature.date, version: signature.version, empreinte: signature.empreinte, ip: signature.ip } : null })),
     reglages: Object.fromEntries(reglages.filter((r) => !r.cle.endsWith('_cle')).map((r) => [cleReglageLue(r.cle), r.valeur])),
     gmail: gmailConfigure(),
@@ -1342,6 +1375,31 @@ async function rattacherEmail(r, d, leadId, ann) {
   }
   await sb(`iae_crm_leads?id=eq.${leadId}`, { methode: 'PATCH', prefer: 'return=minimal', corps: maj });
   if (lead) Object.assign(lead, maj);
+  await apresReponseProspect(leadId, contact, r);
+}
+
+// Un prospect a répondu par email (12/11/2026) : tout ce qui attend sur son lead s'arrête, email et LinkedIn (un canal
+// répond, l'autre s'arrête). Une réponse « stop » ou « désinscription » à un email de prospection vaut opposition.
+const DESINSCRIPTION_RE = /^\s*(re\s*:\s*)?d[ée]sinscription\s*$/i;
+async function apresReponseProspect(leadId, contact, r) {
+  // Une réponse automatique (« absent du bureau », en-tête Auto-Submitted) n'est pas une réponse : rien ne s'arrête.
+  if (/^auto-(replied|generated)/i.test(String(r.h?.['auto-submitted'] || ''))) return;
+  try {
+    // LinkedIn s'arrête aussi pour un prospect ; un client ou un partenaire qui écrit garde ce que Gabriel lui a préparé.
+    const { lignes: [l] } = await avecUtilisateur(ADMIN, () => sb(`iae_crm_leads?id=eq.${leadId}&select=type,statut`));
+    const prospect = Boolean(l) && l.type === 'prospect' && ['nouveau', 'contacte'].includes(l.statut);
+    const arret = await arreterEnvoisEnAttente(leadId, `${r.de.nom || r.de.email} a répondu par email le ${dateCourte(jourParis(r.quand))} : la prospection s'arrête.`, { linkedin: prospect });
+    if (arret.emails || arret.linkedin) {
+      await avecUtilisateur(ADMIN, () => sb('iae_crm_activites', { methode: 'POST', prefer: 'return=minimal', corps: { lead_id: leadId, contact_id: contact?.id || null, type: 'note', resume: `Réponse reçue : ${[arret.emails && `${arret.emails} email${arret.emails > 1 ? 's' : ''}`, arret.linkedin && `${arret.linkedin} message${arret.linkedin > 1 ? 's' : ''} LinkedIn`].filter(Boolean).join(' et ')} en attente annulé${arret.emails + arret.linkedin > 1 ? 's' : ''} (un canal répond, l'autre s'arrête).`, source: 'crm, prospection email', meta: { canal: 'email', etape: 'arret_croise' } } }));
+    }
+    const stop = DESINSCRIPTION_RE.test(r.objet || '') || /^\s*(stop|d[ée]sinscri\w*)\W{0,3}$/i.test(r.texte || '');
+    if (stop) {
+      const { lignes } = await avecUtilisateur(ADMIN, () => sb(`iae_crm_emails?email=eq.${encodeURIComponent(r.de.email)}&statut=eq.envoye&select=id,lead_id,contact_id,email,evenements&limit=1`));
+      if (lignes.length) await enregistrerOpposition(r.de.email, 'réponse « stop » ou désinscription par email', { ligne: lignes[0] });
+    }
+  } catch (e) {
+    console.error('crm arrêt croisé', e?.code || e?.message);
+  }
 }
 
 async function synchroGmail() {
@@ -2123,6 +2181,7 @@ async function traiterEntrant(corps) {
     else if (rdv) Object.assign(maj, tacheRdv(rdv, `${texteRdv(rdv)}, confirmé par ${qui} (« ${String(e.objet || '').slice(0, 200)} »). ${AGENDA_SI_BESOIN}`));
     else if (aFaire === 'relancer_le' && DATE_RE.test(an?.relance_date || '') && an.relance_date >= aujourdHuiParis()) Object.assign(maj, { prochaine_relance: an.relance_date, prochaine_note: (an.tache || an.resume || '').slice(0, 2000) || null, tache_fil: e.fil || null });
     await modifier('leads', lead.id, maj);
+    await apresReponseProspect(lead.id, { id: contactId }, { de: { email: String(e.de_email || '').toLowerCase(), nom: e.de_nom || '' }, quand: e.recu_le, objet: e.objet || '', texte: e.extrait || '' });
   }
   await sb(`iae_crm_entrants?id=eq.${e.id}`, { methode: 'PATCH', corps: { statut: action === 'creer' ? 'cree' : 'rattache', lead_id: lead.id }, prefer: 'return=minimal' });
   return { lead_id: lead.id };
@@ -2594,6 +2653,8 @@ async function operationRobotLi(corps) {
       const fil = /^\/messaging\/thread\/[A-Za-z0-9=_-]+\/?$/.test(r.fil || '') ? `https://www.linkedin.com${r.fil}` : null;
       await journalLi(l, c, 'reponse_recue', `${nomContactLi(c)} t'a répondu sur LinkedIn`, texte, fil ? { fil_linkedin: fil } : {});
       await sb(`iae_crm_linkedin?contact_id=eq.${c.id}&statut=in.(brouillon,a_envoyer)&etape=in.(message,relance,findia)`, { methode: 'PATCH', corps: { statut: 'annule', detail: 'Il a répondu : la séquence s\'arrête.' }, prefer: 'return=minimal' });
+      // Un canal répond, l'autre s'arrête (12/11/2026) : l'email de prospection en attente ne part pas.
+      await arreterEnvoisEnAttente(l.id, `${nomContactLi(c)} a répondu sur LinkedIn : l'email ne part pas.`, { linkedin: false }).catch((e) => console.error('crm arrêt croisé', e?.code || e?.message));
       await preparerAvecClaude(c, l, 'reponse', { message: texte });
       const anna = /anna/i.test(l.source || '');
       await majLeadLi(l.id, { prochaine_relance: aujourdHuiParis(), prochaine_action: 'autre', prochaine_note: `LinkedIn : ${c.prenom || nomContactLi(c)} t'a répondu. Réponse proposée à relire.${anna ? ' Préviens Anna : elle a aussi cette entreprise dans ses listes.' : ''}`, relances_sans_reponse: 0, dernier_contact: aujourdHuiParis() });
@@ -2643,6 +2704,1024 @@ async function robotDeLaCle(req) {
     if (a.length === b.length && timingSafeEqual(a, b)) return ADMIN;
   }
   return utilisateurParCleRobot(donnee);
+}
+
+/* ---------- Prospection email : registre, adresse vérifiée, faits publics, Claude, Brevo ---------- */
+// Gabriel, 12/11 : « mets le bilan dans le crm, il faut qu'on en envoie tous les jours » (avant : « vas y molo sur les
+// emails, mais on peut déjà tenter »). Le circuit LinkedIn, déjà validé par Gabriel, transposé à l'email : un dirigeant
+// sans profil LinkedIn utilisable → son adresse vérifiée → des faits publics datés → Claude rédige → Gabriel valide d'un
+// clic (envoi automatique après 10 messages validés tels quels d'affilée, comme LinkedIn) → le serveur envoie par Brevo
+// les matins de jours ouvrés, dans un quota → bilan dans « Aujourd'hui » et dans le récap de 7 h. Tout tourne dans la
+// synchro de 15 minutes, pour le seul compte de Gabriel (les emails partent de son adresse). Une ligne par email dans
+// iae_crm_emails (supabase/iae_crm_emails.sql) : a_enrichir → a_rediger → brouillon → a_envoyer → en_cours → envoye,
+// ou sans_email (pas d'adresse vérifiée : la fiche reste pour Anna, au téléphone), annule, echec.
+const EN_ATTENTE_EMAIL = ['a_enrichir', 'a_rediger', 'brouillon', 'a_envoyer', 'echec'];
+// « molo » : 5 par jour au plus, 2 par passage pour les étaler, entre 8 h 30 et 11 h 30 à Paris, jours ouvrés ; 15
+// recherches d'adresse par jour. L'expéditeur est réglable pour passer plus tard à un domaine dédié.
+const EMAIL_PROSPECTION = { par_jour: 5, par_passage: 2, enrichissements: 15, debut: '08:30', fin: '11:30', expediteur: ADMIN_EMAIL, expediteur_nom: 'Gabriel Vanderbecken' };
+const SEUIL_CONFIANCE_EMAIL = SEUIL_CONFIANCE_LI;
+const SOURCE_EMAIL = 'crm, prospection email (Brevo)';
+const URL_STOP = 'https://ia-entrepreneur.fr/api/crm?stop=';
+const BREVO = 'https://api.brevo.com/v3';
+// Documentation officielle lue le 12/11/2026 : https://docs.fullenrich.com/api/v2/contact/enrich/bulk/post.md et
+// https://docs.fullenrich.com/api/v2/contact/enrich/bulk/get.md. POST /contact/enrich/bulk (Authorization: Bearer <clé>,
+// 100 contacts au plus, enrich_fields par contact, custom renvoyé tel quel) rend { enrichment_id } ; puis
+// GET /contact/enrich/bulk/{enrichment_id} rend status (CREATED, IN_PROGRESS, FINISHED, CANCELED, CREDITS_INSUFFICIENT,
+// RATE_LIMIT, UNKNOWN ; 400 error.enrichment.in_progress tant que ce n'est pas fini) et data[].contact_info
+// .most_probable_work_email { email, status } (DELIVERABLE, HIGH_PROBABILITY, CATCH_ALL, INVALID, INVALID_DOMAIN,
+// UNVERIFIED). Email pro : 1 crédit ; le téléphone (10 crédits) n'est jamais demandé.
+const FULLENRICH = 'https://app.fullenrich.com/api/v2';
+// Sources publiques et gratuites, en JSON, vérifiées le 12/11/2026 (SIREN 323375659).
+const DECP = 'https://data.economie.gouv.fr/api/explore/v2.1/catalog/datasets/decp-2022-marches-valides/records';
+const RGE = 'https://data.ademe.fr/data-fair/api/v1/datasets/liste-des-entreprises-rge-2/lines';
+const BODACC = 'https://bodacc-datadila.opendatasoft.com/api/explore/v2.1/catalog/datasets/annonces-commerciales/records';
+const REGISTRE = 'https://recherche-entreprises.api.gouv.fr/search';
+
+async function reglageEmail() { return { ...EMAIL_PROSPECTION, ...((await lireReglage('email_prospection')) || {}) }; }
+async function majReglageEmail(valeurs) {
+  const n = { ...((await lireReglage('email_prospection')) || {}), ...valeurs };
+  await ecrireReglage('email_prospection', n);
+  return { ...EMAIL_PROSPECTION, ...n };
+}
+async function confianceEmail() { return (await lireReglage('email_confiance')) || { serie: 0, auto: false }; }
+const normEmail = (e) => String(e || '').trim().toLowerCase();
+// Minuit à Paris, en instant UTC (heure d'été comme d'hiver).
+function minuitParis(jour) {
+  const h = Number(new Intl.DateTimeFormat('en-GB', { timeZone: 'Europe/Paris', hour: '2-digit', hourCycle: 'h23' }).format(new Date(`${jour}T12:00:00Z`)));
+  return new Date(Date.parse(`${jour}T00:00:00Z`) - (h - 12) * 3600000).toISOString();
+}
+const heureMinuteParis = () => new Intl.DateTimeFormat('fr-FR', { timeZone: 'Europe/Paris', hour: '2-digit', minute: '2-digit', hourCycle: 'h23' }).format(new Date());
+// « DEFRANCE » → « Defrance » ; un nom déjà écrit en minuscules reste tel quel.
+function nomPropre(n) {
+  const t = String(n || '').trim().replace(/\s+/g, ' ');
+  if (!t || t !== t.toUpperCase()) return t;
+  return t.toLowerCase().replace(/(^|[\s'’-])(\p{L})/gu, (m, a, b) => a + b.toUpperCase());
+}
+const nomContactEmail = (c) => [c?.prenom, nomPropre(c?.nom)].filter(Boolean).join(' ').trim() || 'ce contact';
+
+async function ligneEmail(id) {
+  if (!UUID_RE.test(id || '')) throw new Refus('id_invalide');
+  const [e] = (await sb(`iae_crm_emails?id=eq.${id}&select=*`)).lignes;
+  if (!e) throw new Refus('introuvable', 404);
+  return e;
+}
+async function majLigneEmail(id, valeurs) {
+  const { lignes } = await sb(`iae_crm_emails?id=eq.${id}`, { methode: 'PATCH', corps: valeurs, prefer: 'return=representation' });
+  return lignes[0];
+}
+async function leadEtContactEmail(e) {
+  const [{ lignes: [l] }, { lignes: cs }] = await Promise.all([
+    sb(`iae_crm_leads?id=eq.${e.lead_id}&select=*`),
+    e.contact_id ? sb(`iae_crm_contacts?id=eq.${e.contact_id}&select=*`) : sb(`iae_crm_contacts?lead_id=eq.${e.lead_id}&order=principal.desc,created_at.asc&limit=1&select=*`),
+  ]);
+  return { l: l || null, c: cs[0] || null };
+}
+async function journalEmail(l, c, type, resume, contenu = null, meta = {}, date = null) {
+  await sb('iae_crm_activites', {
+    methode: 'POST', prefer: 'return=minimal',
+    corps: { lead_id: l.id, contact_id: c?.id || null, type, resume: resume.slice(0, 2000), contenu: contenu ? String(contenu).slice(0, 8000) : null, source: type === 'email_envoye' ? SOURCE_EMAIL : 'crm, prospection email', meta: { canal: 'email', ...meta }, ...(date ? { date } : {}) },
+  });
+}
+// Ce que la page reçoit d'une ligne : ni l'empreinte du lien de désinscription, ni le texte de Claude, ni les faits bruts.
+const emailPourPage = (e) => e && Object.fromEntries(Object.entries(e).filter(([k]) => !['jeton_stop_hash', 'texte_claude', 'faits', 'fullenrich_id'].includes(k)));
+const COLONNES_EMAIL_PAGE = 'id,created_at,lead_id,contact_id,etape,statut,email,email_statut,source_email,civilite,objet,texte,appuis,valide_le,envoye_le,brevo_message_id,brevo_campagne,evenements,detail';
+
+/* ----- Les textes : le modèle validé par Gabriel le 12/11, l'accroche et l'objet de Claude ----- */
+
+const LIGNE_GABRIEL_EMAIL = (metier) => `Je forme des équipes ${metier} du Grand Est à alléger ce travail grâce à l'IA, avec des formations éligibles à votre budget formation.`;
+const QUESTION_EMAIL = "Chez vous, c'est encore surtout fait à la main, ou vous avez déjà trouvé une solution ?";
+const SIGNATURE_EMAIL = 'Gabriel Vanderbecken\nIA-Entrepreneur';
+function metierEmail(l) {
+  const m = pageMetierLi(l)?.metier || '';
+  return /BTP/.test(m) ? 'du BTP' : /propret/.test(m) ? 'de la propreté' : 'de PME';
+}
+function salutationEmail(civilite, c) {
+  const nom = nomPropre(c?.nom);
+  if (civilite && nom) return `Bonjour ${civilite === 'Mme' ? 'Madame' : 'Monsieur'} ${nom},`;
+  const qui = [c?.prenom, nom].filter(Boolean).join(' ');
+  return qui ? `Bonjour ${qui},` : 'Bonjour,';
+}
+function texteEmail(e, l, c, accroche) {
+  return [salutationEmail(e.civilite, c), '', String(accroche || '').trim(), '', LIGNE_GABRIEL_EMAIL(metierEmail(l)), '', QUESTION_EMAIL, '', SIGNATURE_EMAIL].join('\n');
+}
+
+// Le filet : les interdits de LinkedIn, plus « gratuit », aucun lien, rien sur l'origine de l'adresse (Gabriel, 28/10 :
+// ne jamais dire d'où vient l'adresse), aucune variable oubliée. Un texte qui ne passe pas reste à relire.
+const INTERDITS_EMAIL = [...INTERDITS_LI, [/gratuit/i, '« gratuit »'], [/\bOPCO\b/i, 'OPCO']];
+const LIEN_EMAIL_RE = /https?:\/\/|www\.|\b[a-z0-9-]+\.(fr|com|net|org|eu|io|info|biz)\b|[^\s@]+@[^\s@]+\.[a-z]{2,}/i;
+const ORIGINE_EMAIL_RE = /trouv[ée]e? (votre|vos) (adresse|coordonn|e-?mail)|vos coordonn[ée]es|votre (adresse|e-?mail|courriel)[^.]{0,30}(communiqu|transmi|donn|trouv)|fullenrich|altares|linkedin/i;
+function verifierTexteEmail(objet, texte) {
+  const o = String(objet ?? '').replace(/\s+/g, ' ').trim();
+  const t = String(texte ?? '').replace(/\r\n?/g, '\n').trim();
+  if (!o) throw new Refus('objet_invalide');
+  if (o.length > 90) throw new Refus('objet_trop_long');
+  const lettres = o.replace(/[^\p{L}]/gu, '');
+  if (lettres.length >= 6 && lettres === lettres.toUpperCase()) throw new Refus('objet_majuscules');
+  if (!t) throw new Refus('message_vide');
+  if (t.length > 3000) throw new Refus('message_trop_long');
+  if (/[\t\u0000-\u0008\u000b-\u001f\u007f]/.test(t)) throw new Refus('caractere_refuse');
+  const tout = `${o}\n${t}`;
+  for (const [re, quoi] of INTERDITS_EMAIL) if (re.test(tout)) throw new Refus(`email_interdit:${quoi}`);
+  if (LIEN_EMAIL_RE.test(tout)) throw new Refus('email_lien');
+  if (ORIGINE_EMAIL_RE.test(tout)) throw new Refus('email_origine');
+  if (/\{[^}\n]{1,40}\}|<[^>\n]{1,40}>/.test(tout)) throw new Refus('variable_restante');
+  return { objet: o, texte: t };
+}
+// Signalé à côté du texte, sans bloquer l'envoi validé par Gabriel ; un envoi automatique, lui, attend (12/11 : ne jamais
+// nommer l'acheteur ni le bailleur ; un lieu ou un bâtiment peut se nommer, comme « Haroué et la Villa Majorelle »).
+const ALERTES_EMAIL = [
+  [/annuaire|base de donn[ée]es|\bfichier\b|registre/i, "Le texte parle d'un annuaire, d'un fichier ou d'un registre : vérifie qu'il ne dit pas d'où vient l'adresse."],
+  [/\b(conseil (d[ée]partemental|r[ée]gional)|mairie|la ville de|commune de|communaut[ée] (de communes|d'agglom[ée]ration)|m[ée]tropole|office public|OPH|bailleur|d[ée]partement de|r[ée]gion grand est)\b/i, "Le texte semble nommer l'acheteur ou un tiers : on ne nomme ni le client, ni la collectivité, ni le bailleur."],
+  [/\b(march[ée]|lot) de \d|\b\d{1,3}(?:[\s.]\d{3})+\b|\b\d{5,}\b/i, "Le texte contient un grand nombre : vérifie qu'il ne s'agit pas d'un montant."],
+];
+const alertesEmail = (objet, texte) => ALERTES_EMAIL.filter(([re]) => re.test(`${objet}\n${texte}`)).map(([, m]) => m);
+const MESSAGES_REFUS_EMAIL = {
+  objet_invalide: "Il manque l'objet.", objet_trop_long: 'Objet trop long (90 caractères au plus).', objet_majuscules: "L'objet est tout en majuscules.",
+  message_vide: 'Le message est vide.', message_trop_long: 'Message trop long (3 000 caractères au plus).', caractere_refuse: 'Le texte contient un caractère invisible.',
+  email_interdit: 'Le texte contient un mot interdit (prix, ROI, CPF, OPCO, « reste à charge », « 100 % », « certifiante », « gratuit »).',
+  email_lien: "Le texte contient un lien ou une adresse : aucun lien dans le message (le lien de désinscription s'ajoute seul).",
+  email_origine: "Le texte parle de l'origine de l'adresse ou de LinkedIn : à retirer.", variable_restante: 'Une variable entre accolades ou chevrons reste à remplacer.',
+};
+const messageRefusEmail = (x) => MESSAGES_REFUS_EMAIL[String(x?.code || '').split(':')[0]] || 'Le texte ne passe pas le contrôle.';
+
+/* ----- Les faits publics, par SIREN : registre, marchés publics, RGE, BODACC (12 derniers mois) ----- */
+
+async function lireJsonPublic(url, delai = 6000) {
+  try {
+    const r = await fetch(url, { headers: { accept: 'application/json' }, signal: AbortSignal.timeout(delai) });
+    if (!r.ok) { console.error('crm email faits', new URL(url).hostname, r.status); return null; }
+    return await r.json();
+  } catch (e) {
+    console.error('crm email faits', new URL(url).hostname, e?.name || e?.message);
+    return null;
+  }
+}
+// Le registre national (API Recherche d'entreprises, https://recherche-entreprises.api.gouv.fr/openapi.json) : l'entreprise
+// est-elle ouverte, le dirigeant toujours en place, et l'entreprise s'est-elle opposée à la prospection commerciale
+// (opposition_diffusion_commerciale : « Opposition à la réutilisation des données de l'unité légale à des fins de
+// prospection commerciale », article 21.2 du RGPD et R.123-320 du Code de commerce) ? On ne garde aucun autre nom.
+async function lireRegistre(siren, c) {
+  const j = await lireJsonPublic(`${REGISTRE}?q=${siren}&page=1&per_page=5`);
+  if (!j) return null;
+  const e = (j.results || []).find((x) => x.siren === siren);
+  if (!e) return { trouve: false };
+  const qui = normaliser(c?.nom).split(' ').filter((x) => x.length > 1);
+  const prenom = normaliser(c?.prenom).split(' ')[0] || '';
+  const physiques = (e.dirigeants || []).filter((d) => d.type_dirigeant !== 'personne morale');
+  // Le nom suffit (un prénom d'usage peut différer du prénom d'état civil) ; le prénom, quand il colle, départage un père et un fils.
+  const memeNom = physiques.filter((d) => { const n = new Set(normaliser(d.nom).split(' ')); return qui.length && qui.every((x) => n.has(x)); });
+  const sien = memeNom.find((d) => prenom && normaliser(d.prenoms).split(' ').includes(prenom)) || memeNom[0];
+  return {
+    trouve: true, nom: couper(e.nom_complet || '', 200), etat: e.etat_administratif || null, creation: e.date_creation || null,
+    opposition: e.opposition_diffusion_commerciale === true, effectif: e.tranche_effectif_salarie || null,
+    // Une filiale (président personne morale) n'est jamais contactée (Gabriel et Anna, 10/11).
+    filiale: (e.dirigeants || []).some((d) => d.type_dirigeant === 'personne morale' && /pr[ée]sident/i.test(d.qualite || '')),
+    dirigeants_connus: physiques.length, en_place: Boolean(sien), qualite: sien ? couper(sien.qualite || '', 80) : null,
+  };
+}
+// Marchés publics attribués (DECP) : la date et l'objet, jamais le montant (on ne le lit même pas).
+async function lireMarches(siren, depuis) {
+  const q = new URLSearchParams({ where: `startswith(titulaire_id_1,"${siren}")`, order_by: 'datenotification desc', limit: '10', select: 'datenotification,objet,lieuexecution_code' });
+  const j = await lireJsonPublic(`${DECP}?${q}`);
+  if (!j) return null;
+  const vus = new Set();
+  return (j.results || []).filter((m) => m.datenotification && m.datenotification >= depuis && m.objet)
+    .filter((m) => { const k = normaliser(m.objet).slice(0, 80); if (vus.has(k)) return false; vus.add(k); return true; })
+    .slice(0, 5).map((m) => ({ date: String(m.datenotification).slice(0, 10), objet: couper(String(m.objet).replace(/\s+/g, ' '), 300), lieu: m.lieuexecution_code || null }));
+}
+// Annuaire RGE de l'ADEME : les qualifications en cours (et leur date), et le domaine de l'email public de l'entreprise,
+// qui aide FullEnrich à trouver la bonne adresse.
+async function lireRge(siren) {
+  const j = await lireJsonPublic(`${RGE}?${new URLSearchParams({ qs: `siret:${siren}*`, size: '30' })}`);
+  if (!j) return null;
+  const jour = aujourdHuiParis();
+  const vues = new Map();
+  let domaine = null;
+  for (const x of j.results || []) {
+    const d = String(x.email || '').split('@')[1]?.toLowerCase();
+    if (d && !DOMAINES_PERSO.has(d) && DOMAINE_RE.test(d)) domaine = domaine || d;
+    if (!x.nom_qualification || (x.lien_date_fin && x.lien_date_fin < jour)) continue;
+    const k = normaliser(x.nom_qualification);
+    if (!vues.has(k)) vues.set(k, { qualification: couper(x.nom_qualification, 200), certificat: couper(x.nom_certificat || '', 80), domaine: couper(x.domaine || '', 120), depuis: x.lien_date_debut || null, jusqua: x.lien_date_fin || null });
+  }
+  return { qualifications: [...vues.values()].sort((a, b) => String(b.depuis).localeCompare(String(a.depuis))).slice(0, 8), domaine };
+}
+// BODACC : modifications, créations, ventes des 12 derniers mois (sans les noms des personnes) ; une procédure collective
+// ou une radiation arrête la prospection de l'entreprise.
+async function lireBodacc(siren, depuis) {
+  const q = new URLSearchParams({ where: `registre like "%${siren}%"`, order_by: 'dateparution desc', limit: '20', select: 'dateparution,familleavis,familleavis_lib,modificationsgenerales,listeetablissements,jugement' });
+  const j = await lireJsonPublic(`${BODACC}?${q}`);
+  if (!j) return null;
+  const lire = (v) => { if (!v) return null; if (typeof v === 'object') return v; try { return JSON.parse(v); } catch { return null; } };
+  return (j.results || []).filter((a) => a.dateparution >= depuis && a.familleavis && a.familleavis !== 'dpc').slice(0, 6).map((a) => {
+    const modif = lire(a.modificationsgenerales);
+    const jugement = lire(a.jugement);
+    const etab = lire(a.listeetablissements)?.etablissement;
+    const activite = (Array.isArray(etab) ? etab[0] : etab)?.activite;
+    const detail = modif?.descriptif || jugement?.nature || (activite ? `établissement : ${activite}` : '');
+    return { date: a.dateparution, famille: a.familleavis, libelle: a.familleavis_lib || a.familleavis, detail: couper(String(detail || ''), 240) };
+  });
+}
+async function lireFaitsPublics(siren, c) {
+  const depuis = ajouterJoursIso(aujourdHuiParis(), -365);
+  const [registre, marches, rge, bodacc] = await Promise.all([lireRegistre(siren, c), lireMarches(siren, depuis), lireRge(siren), lireBodacc(siren, depuis)]);
+  return { registre, marches, rge, bodacc, lu_le: new Date().toISOString() };
+}
+// Ce qui arrête la prospection de l'entreprise, d'après les faits publics (la raison va sur la ligne et au journal).
+function raisonDArret(f, c) {
+  const r = f.registre;
+  if (r && r.trouve === false) return "SIREN introuvable au registre national : on n'écrit pas.";
+  if (r?.etat === 'C') return 'Entreprise fermée au registre national.';
+  if (r?.opposition) return "L'entreprise s'est opposée à la prospection commerciale (registre national des entreprises) : on ne lui écrit pas.";
+  if (r?.filiale) return "Filiale d'un groupe (président personne morale au registre) : pas de prospection.";
+  if (r && r.dirigeants_connus > 0 && !r.en_place) return `${nomContactEmail(c)} n'apparaît plus parmi les dirigeants au registre national : à vérifier avant d'écrire.`;
+  const grave = (f.bodacc || []).find((a) => ['collective', 'radiation', 'retablissement_professionnel'].includes(a.famille));
+  if (grave) return `${grave.libelle} au BODACC le ${dateCourte(grave.date)} : on n'écrit pas.`;
+  return null;
+}
+// Les faits pour Claude, datés et sourcés, du plus récent au plus ancien.
+function faitsPourClaude(f) {
+  const jour = aujourdHuiParis();
+  const recents = [];
+  for (const m of f.marches || []) recents.push([m.date, 'marchés publics attribués (DECP)', `marché notifié : ${m.objet}${m.lieu ? ` (lieu d'exécution : ${m.lieu})` : ''}`]);
+  for (const q of f.rge?.qualifications || []) if (q.depuis && q.depuis >= ajouterJoursIso(jour, -365)) recents.push([q.depuis, "annuaire RGE de l'ADEME", `qualification obtenue ou renouvelée : « ${q.qualification} »${q.certificat ? ` (${q.certificat})` : ''}`]);
+  for (const a of f.bodacc || []) recents.push([a.date, 'BODACC', `${a.libelle}${a.detail ? ` : ${a.detail}` : ''}`]);
+  recents.sort((a, b) => b[0].localeCompare(a[0]));
+  const autres = [];
+  const creation = f.registre?.creation;
+  if (creation && DATE_RE.test(creation)) {
+    const an = Number(jour.slice(0, 4));
+    let anniv = `${an}${creation.slice(4)}`;
+    if (anniv < ajouterJoursIso(jour, -30)) anniv = `${an + 1}${creation.slice(4)}`;
+    const ans = Number(anniv.slice(0, 4)) - Number(creation.slice(0, 4));
+    const proche = anniv <= ajouterJoursIso(jour, 183);
+    autres.push([creation, 'registre national des entreprises', `entreprise créée le ${dateCourte(creation)}${proche && ans > 0 ? ` : ${ans} ans le ${dateCourte(anniv)}` : ''}`]);
+  }
+  const anciennes = (f.rge?.qualifications || []).filter((q) => !q.depuis || q.depuis < ajouterJoursIso(jour, -365));
+  if (anciennes.length) autres.push(['', "annuaire RGE de l'ADEME", `qualifications en cours : ${anciennes.map((q) => `« ${q.qualification} »`).join(', ')}`]);
+  const ligne = ([d, s, t]) => `- ${d || 'sans date'} · ${s} · ${t}`;
+  return { recents: recents.map(ligne), autres: autres.map(ligne) };
+}
+
+const SCHEMA_EMAIL = {
+  type: 'object', additionalProperties: false,
+  properties: {
+    objet: { type: 'string' },
+    accroche: { type: 'string' },
+    general: { type: 'boolean' },
+    appuis: { type: 'array', items: { type: 'object', additionalProperties: false, properties: { fait: { type: 'string' }, source: { type: 'string' }, date: { type: 'string' } }, required: ['fait', 'source', 'date'] } },
+  },
+  required: ['objet', 'accroche', 'general', 'appuis'],
+};
+const CONSIGNES_EMAIL = `Tu écris le premier email de prospection de Gabriel Vanderbecken (IA-Entrepreneur, organisme de formation à l'IA pour les entreprises, en Lorraine et dans le Grand Est) au dirigeant d'une petite entreprise (6 à 99 salariés) qu'il ne connaît pas. Gabriel le relit avant l'envoi. Tu n'écris que l'objet et l'accroche : le reste du message est fixe (modèle validé par Gabriel le 12/11/2026) et le CRM l'ajoute tel quel autour de ton accroche :
+
+Bonjour Monsieur Martin,
+
+<ton accroche>
+
+Je forme des équipes du BTP du Grand Est à alléger ce travail grâce à l'IA, avec des formations éligibles à votre budget formation.
+
+Chez vous, c'est encore surtout fait à la main, ou vous avez déjà trouvé une solution ?
+
+Gabriel Vanderbecken
+IA-Entrepreneur
+
+L'accroche : deux phrases, 200 à 380 caractères, qui justifient la prise de contact (Gabriel, 09/11/2026, d'une phrase générale : « on dirait juste une phrase bateau »).
+1) Un fait réel sur l'entreprise, daté, pris dans les faits publics de la fiche : un marché public remporté, une qualification RGE obtenue, un nouvel établissement, un anniversaire de création. Dis-le simplement, au passé ou au présent, avec la date en clair (« en septembre », « depuis octobre »), sans dire où tu l'as lu.
+2) La déduction qui justifie le message, marquée par « sûrement », qui nomme en toutes lettres un travail concret que ce fait alourdit (les comptes rendus de chantier, les devis, les dossiers de candidature, les plannings, le suivi administratif, les rapports d'intervention…). La phrase fixe qui suit dit « alléger ce travail » : ta déduction doit donc finir sur ce travail. Elle n'affirme rien d'inventé.
+Exemple du ton (ne le recopie pas, le travail nommé découle du fait que tu as trouvé) : « Vous avez remporté en septembre les travaux de ferronnerie d'un monument nancéien. Avec plusieurs chantiers publics en parallèle, les comptes rendus et le suivi administratif ont sûrement pris de la place. »
+Choisis le fait le plus fort et le plus récent (12 derniers mois) ; un seul suffit, deux au plus s'ils vont ensemble.
+
+L'objet : 2 à 6 mots, concret, tiré du fait. Exemples validés par Gabriel : « Blénod et Ecrouves », « Haroué et la Villa Majorelle », « Votre qualification chaudière bois », « 40 ans en avril ». Pas de majuscules partout, pas de point d'exclamation, pas de question, pas de « Re: ».
+
+Interdits :
+- aucun montant, aucun prix, aucun chiffre de gain ou de ROI, même quand le marché public en donne un ;
+- jamais le nom de l'acheteur ni d'un tiers : ni la commune, le département ou la région qui achète, ni le bailleur, ni le client, ni le nom d'une personne. Un lieu ou un bâtiment peut se nommer (« Haroué », « la Villa Majorelle », « une école ») ;
+- jamais d'où vient l'adresse, ni comment tu connais l'entreprise : ni annuaire, ni fichier, ni registre, ni LinkedIn (règle de Gabriel du 28/10) ;
+- aucun lien ni adresse email, pas de « gratuit », ni CPF, ni OPCO, ni « certifiante », ni code de certification, ni « reste à charge », ni « 100 % » ;
+- pas de présentation de Gabriel (elle est dans la phrase fixe), pas de formule creuse (« j'espère que vous allez bien », « je me permets »), pas de tiret long, pas d'emoji, pas de point d'exclamation. Vouvoiement.
+
+N'invente rien : seulement les faits de la fiche. Sans fait assez fort (rien de récent, ou seulement la ville et la taille), écris une accroche générale assumée, construite sur le métier (« Dans une entreprise de métallerie de votre taille, les devis et les comptes rendus de chantier se font sûrement le soir, après les chantiers. »), mets general à vrai et ne fais pas semblant de connaître l'entreprise.
+
+appuis : chaque fait utilisé, avec sa source et sa date telles que la fiche les donne (fait : « marché de ferronnerie notifié », source : « marchés publics attribués (DECP) », date : « 2026-09-17 »). Pour une accroche générale : un seul appui, fait « message général sur le métier », source « aucune », date vide.`;
+
+async function redigerEmail(e, l, c, { consigne = '' } = {}) {
+  const f = e.faits || {};
+  const p = f.prospect || {};
+  const { recents, autres } = faitsPourClaude(f);
+  const jour = new Intl.DateTimeFormat('fr-FR', { timeZone: 'Europe/Paris', weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }).format(new Date());
+  const fiche = [
+    `Date du jour : ${jour}`,
+    `Entreprise : ${l.entreprise}${l.secteur ? ` (${l.secteur})` : ''}${l.localisation ? `, ${l.localisation}` : ''}${p.salaries ? `, ${p.salaries} salariés` : ''}`,
+    `Métier dans la phrase fixe : ${metierEmail(l)}`,
+    `Dirigeant : ${salutationEmail(e.civilite, c).replace(/^Bonjour /, '').replace(/,$/, '')}${c?.poste ? `, ${c.poste}` : ''}`,
+    l.besoin ? `Ce que le CRM sait de l'entreprise : ${couper(l.besoin, 400)}` : '',
+    `Faits publics des 12 derniers mois, du plus récent au plus ancien :\n${recents.join('\n') || '(aucun)'}`,
+    autres.length ? `Autres faits publics :\n${autres.join('\n')}` : '',
+    consigne ? `Consigne de Gabriel : ${couper(consigne, 300)}` : '',
+  ].filter(Boolean).join('\n');
+  const r = await appelClaude({ consignes: CONSIGNES_EMAIL, schema: SCHEMA_EMAIL, contenu: fiche, max: 3000, timeout: 40000 });
+  const objet = String(r.objet || '').replace(/[\r\n]+/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 120);
+  const accroche = String(r.accroche || '').replace(/\r\n?/g, '\n').trim();
+  if (!objet || !accroche) throw new Refus('ia_erreur', 502);
+  const appuis = (Array.isArray(r.appuis) ? r.appuis : []).slice(0, 4).map((a) => ({ fait: couper(String(a?.fait || ''), 300), source: couper(String(a?.source || ''), 120), date: couper(String(a?.date || ''), 40) }));
+  return { objet, texte: texteEmail(e, l, c, accroche), appuis, general: r.general === true };
+}
+
+// Claude rédige ; le texte reste à valider, sauf si la confiance est acquise et que rien ne cloche (filet et alertes).
+async function preparerEmailAvecClaude(e, l, c, { auto = true, consigne = '' } = {}) {
+  let red;
+  try {
+    red = await redigerEmail(e, l, c, { consigne });
+  } catch (err) {
+    // Claude a échoué : nouvel essai au passage suivant, puis, après 3 essais, la ligne passe à Gabriel avec le modèle vide.
+    const essais = (e.faits?.essais_claude || 0) + 1;
+    await majLigneEmail(e.id, essais >= 3
+      ? { statut: 'brouillon', objet: null, texte: texteEmail(e, l, c, ''), faits: { ...(e.faits || {}), essais_claude: essais }, detail: "Claude n'a pas pu rédiger ce message : écris l'objet et l'accroche toi-même." }
+      : { faits: { ...(e.faits || {}), essais_claude: essais }, detail: "Claude n'a pas pu rédiger : nouvel essai au prochain passage." });
+    throw err;
+  }
+  const alertes = alertesEmail(red.objet, red.texte);
+  let propre = true;
+  try { verifierTexteEmail(red.objet, red.texte); } catch (x) { propre = false; alertes.unshift(messageRefusEmail(x)); }
+  const valeurs = { objet: red.objet, texte: red.texte, texte_claude: `${red.objet}\n---\n${red.texte}`, appuis: red.appuis.length ? red.appuis : [{ fait: 'message général sur le métier', source: 'aucune', date: '' }], statut: 'brouillon', valide_le: null, detail: alertes.length ? alertes.join(' ') : null };
+  if (auto && propre && !alertes.length && (await confianceEmail()).auto) {
+    Object.assign(valeurs, { statut: 'a_envoyer', valide_le: new Date().toISOString(), detail: "Envoi automatique : 10 messages validés tels quels d'affilée." });
+  }
+  return majLigneEmail(e.id, valeurs);
+}
+
+/* ----- Opposition et arrêt croisé : un canal répond, l'autre s'arrête ----- */
+
+async function enOpposition(email) {
+  const { lignes } = await sb(`iae_crm_oppositions?email=eq.${encodeURIComponent(normEmail(email))}&select=email&limit=1`);
+  return lignes.length > 0;
+}
+// Une réponse, sur n'importe quel canal, arrête tout ce qui attend sur ce lead, email et LinkedIn (règle de Gabriel du
+// 09/11 pour la liste BTP d'Anna en double canal, reprise le 12/11 pour l'email). Une réponse LinkedIn déjà préparée pour
+// quelqu'un qui a écrit reste (étape reponse). Toujours au nom de Gabriel : la table des emails lui est réservée.
+async function arreterEnvoisEnAttente(leadId, pourquoi, { linkedin = true } = {}) {
+  if (!UUID_RE.test(leadId || '')) return { emails: 0, linkedin: 0 };
+  return avecUtilisateur(ADMIN, async () => {
+    const { lignes: emails } = await sb(`iae_crm_emails?lead_id=eq.${leadId}&statut=in.(${EN_ATTENTE_EMAIL.join(',')})`, { methode: 'PATCH', corps: { statut: 'annule', detail: pourquoi }, prefer: 'return=representation' });
+    let li = [];
+    if (linkedin) ({ lignes: li } = await sb(`iae_crm_linkedin?lead_id=eq.${leadId}&statut=in.(brouillon,a_envoyer,echec,a_verifier)&etape=in.(invitation,message,relance,findia)`, { methode: 'PATCH', corps: { statut: 'annule', detail: pourquoi }, prefer: 'return=representation' }));
+    return { emails: (emails || []).length, linkedin: (li || []).length };
+  });
+}
+// Désinscription (lien, bouton de la messagerie, réponse « stop ») ou signalement comme spam : plus jamais rien à cette
+// adresse ; le lead passe en perdu, tout ce qui attend s'arrête (email et LinkedIn), et Brevo la met sur liste noire.
+async function enregistrerOpposition(email, origine, { leadId = null, ligne = null } = {}) {
+  const adresse = normEmail(email);
+  if (!EMAIL_RE.test(adresse)) return false;
+  return avecUtilisateur(ADMIN, async () => {
+    if (await enOpposition(adresse)) return false;
+    await sb('iae_crm_oppositions?on_conflict=email', { methode: 'POST', prefer: 'resolution=ignore-duplicates,return=minimal', corps: { email: adresse, origine: couper(origine, 200), lead_id: leadId || ligne?.lead_id || null } });
+    const { lignes: lignesEmail } = await sb(`iae_crm_emails?email=eq.${encodeURIComponent(adresse)}&select=id,lead_id,contact_id,evenements`);
+    const leads = new Set([leadId, ligne?.lead_id, ...lignesEmail.map((x) => x.lead_id)].filter(Boolean));
+    const quand = new Date().toISOString();
+    for (const x of lignesEmail) if (!x.evenements?.unsubscribed && /d[ée]sinscri|stop|un clic/i.test(origine)) await majLigneEmail(x.id, { evenements: { ...(x.evenements || {}), unsubscribed: quand } });
+    for (const id of leads) {
+      await arreterEnvoisEnAttente(id, `Désinscription (${origine}) : plus aucun envoi.`);
+      const { l, c } = await leadEtContactEmail({ lead_id: id, contact_id: lignesEmail.find((x) => x.lead_id === id)?.contact_id || null });
+      if (!l) continue;
+      await journalEmail(l, c, 'note', `${nomContactEmail(c)} ne veut plus recevoir de message (${origine}) : plus aucun email ni message LinkedIn ne partira.`, null, { etape: 'opposition', email: adresse });
+      if (['nouveau', 'contacte'].includes(l.statut)) await sb(`iae_crm_leads?id=eq.${l.id}`, { methode: 'PATCH', prefer: 'return=minimal', corps: { statut: 'perdu', raison_perte: 'désinscription email', prochaine_relance: null, prochaine_note: null } });
+    }
+    // Liste noire des campagnes Brevo (https://developers.brevo.com, POST /v3/contacts, emailBlacklisted) : une campagne
+    // future ne lui écrira pas non plus. Nos envois transactionnels, eux, regardent iae_crm_oppositions.
+    if (process.env.BREVO_API_KEY) {
+      try {
+        const r = await fetch(`${BREVO}/contacts`, { method: 'POST', headers: { 'api-key': process.env.BREVO_API_KEY, 'Content-Type': 'application/json', accept: 'application/json' }, body: JSON.stringify({ email: adresse, emailBlacklisted: true, updateEnabled: true }), signal: AbortSignal.timeout(8000) });
+        if (!r.ok) console.error('crm email liste noire', r.status, (await r.text()).slice(0, 200));
+      } catch (e) { console.error('crm email liste noire', e?.message || e); }
+    }
+    return true;
+  });
+}
+
+/* ----- Les candidats : le robot du Mac (pas de profil LinkedIn utilisable) ou Claude Code (clé du CRM) ----- */
+
+function civiliteDe(v) {
+  const t = String(v || '').trim().replace(/\.$/, '').toLowerCase();
+  return ['m', 'mr', 'monsieur'].includes(t) ? 'M.' : ['mme', 'madame', 'mlle', 'mademoiselle'].includes(t) ? 'Mme' : null;
+}
+async function ajouterProspectEmail(corps) {
+  // Les emails partent de l'adresse de Gabriel : le robot d'un commercial garde ses prospects pour LinkedIn et le téléphone.
+  if (!estAdmin()) return { ok: false, raison: 'reserve_gabriel' };
+  const p = corps.prospect && typeof corps.prospect === 'object' ? corps.prospect : {};
+  const siret = /^\d{14}$/.test(String(p.siret || '').replace(/\s/g, '')) ? String(p.siret).replace(/\s/g, '') : null;
+  const siren = /^\d{9}$/.test(String(p.siren || '').replace(/\s/g, '')) ? String(p.siren).replace(/\s/g, '') : siret ? siret.slice(0, 9) : null;
+  const entreprise = couper(String(p.entreprise || '').trim(), 200);
+  let prenom = couper(String(p.prenom || '').trim(), 80);
+  let nom = couper(String(p.nom || '').trim(), 80);
+  if (!prenom || !nom) {
+    const mots = String(p.dirigeant || '').replace(/,/g, ' ').split(/\s+/).filter(Boolean);
+    if (mots.length >= 2) { prenom = prenom || couper(mots[0], 80); nom = nom || couper(mots.slice(1).join(' '), 80); }
+  }
+  if (!entreprise || !siren || !prenom || !nom) throw new Refus('valeur_invalide:prospect');
+  const email = p.email ? normEmail(p.email) : null;
+  if (email && !EMAIL_RE.test(email)) throw new Refus('adresse_invalide');
+  const sourceEmail = email ? (['fullenrich', 'site', 'manuel'].includes(p.source_email) ? p.source_email : 'manuel') : null;
+  const statutEmail = email ? String(p.email_statut || (sourceEmail === 'fullenrich' ? '' : 'MANUEL')).toUpperCase().slice(0, 40) : null;
+  if (sourceEmail === 'fullenrich' && statutEmail !== 'DELIVERABLE') throw new Refus('adresse_non_verifiee');
+  // Aucun doublon dans toute la base, comme LinkedIn : même SIREN, même nom d'entreprise, même adresse.
+  const [parSiren, parNom, parEmail] = await avecUtilisateur(ADMIN, () => Promise.all([
+    sb(`iae_crm_leads?siret=like.${siren}*&select=id&limit=1`),
+    sb(`iae_crm_leads?entreprise=ilike.${encodeURIComponent(entreprise)}&select=id&limit=1`),
+    email ? sb(`iae_crm_contacts?email=ilike.${encodeURIComponent(email)}&select=id&limit=1`) : { lignes: [] },
+  ]));
+  if (parSiren.lignes.length || parNom.lignes.length || parEmail.lignes.length) return { ok: true, doublon: true };
+  if (email && (await enOpposition(email))) return { ok: true, opposition: true };
+  const secteurBrut = String(p.secteur || '').trim();
+  const secteur = Object.hasOwn(SECTEURS_PROSPECT_LI, secteurBrut) ? secteurBrut : /^BTP/i.test(secteurBrut) ? 'BTP' : /propret/i.test(secteurBrut) ? 'Propreté' : /assuranc/i.test(secteurBrut) ? 'Assurance' : null;
+  const anna = couper(String(p.anna || '').trim(), 40);
+  const chezAnna = Boolean(anna) && anna !== 'hors de sa base';
+  const salaries = couper(String(p.salaries || '').trim(), 20);
+  const commune = couper(String(p.commune || '').trim(), 80);
+  const dep = /^\d{2,3}$|^2[AB]$/i.test(String(p.dep || '').trim()) ? String(p.dep).trim() : '';
+  const fonction = couper(String(p.fonction || '').trim(), 80);
+  const recherche = ['vide', 'doute', 'introuvable'].includes(p.recherche_linkedin) ? p.recherche_linkedin : '';
+  const pourquoi = { vide: 'profil LinkedIn vide', doute: 'plusieurs profils LinkedIn possibles', introuvable: 'pas de profil LinkedIn' }[recherche] || '';
+  const { lignes: [l] } = await sb('iae_crm_leads', { methode: 'POST', prefer: 'return=representation', corps: {
+    entreprise, type: 'prospect', statut: 'nouveau', source: 'Email · cœur de cible (Altares)', secteur, siret: siret || siren,
+    tags: ['email', 'coeur-cible', ...(secteur ? [SECTEURS_PROSPECT_LI[secteur]] : []), ...(chezAnna ? ['liste-anna'] : [])],
+    besoin: `${secteur || 'Entreprise'}${salaries ? ` (${salaries} salariés)` : ''}, cœur de cible${chezAnna ? ` ; dans la base d'Anna (${anna})` : ''}.${pourquoi ? ` Prospection par email : ${pourquoi} (recherche du Mac).` : ''}`,
+    localisation: commune ? `${nomPropre(commune)}${dep ? ` (${dep})` : ''}` : null, prochaine_action: 'autre', relances_sans_reponse: 0,
+    prochaine_note: `Email : ${email ? 'adresse connue' : 'adresse vérifiée en cours de recherche'}, puis message rédigé par Claude, à valider dans « Emails à valider ».${chezAnna ? " Anna l'a aussi dans sa base : dès qu'un canal a une réponse, l'autre s'arrête." : ''}`,
+  } });
+  const { lignes: [c] } = await sb('iae_crm_contacts', { methode: 'POST', prefer: 'return=representation', corps: { lead_id: l.id, prenom, nom: nomPropre(nom), poste: fonction || null, email, principal: true } });
+  const { lignes: [e] } = await sb('iae_crm_emails', { methode: 'POST', prefer: 'return=representation', corps: {
+    lead_id: l.id, contact_id: c.id, compte: ADMIN_EMAIL, etape: 'message', statut: email ? 'a_rediger' : 'a_enrichir', email, email_statut: statutEmail, source_email: sourceEmail,
+    civilite: civiliteDe(p.civilite), faits: { prospect: { siren, salaries, commune, dep, fonction, recherche_linkedin: recherche || null } },
+  } });
+  await journalEmail(l, c, 'note', `Prospection email : ${nomContactEmail(c)}${fonction ? ` (${fonction})` : ''}${pourquoi ? `, ${pourquoi}` : ''}. ${email ? 'Adresse connue' : 'Adresse à vérifier'}, puis message à valider.`, null, { etape: 'candidat' });
+  return { ok: true, cree: true, lead_id: l.id, email_id: e.id };
+}
+
+/* ----- Le passage de la synchro : événements, envois, registre et adresses, rédaction ----- */
+
+// Registre et faits publics d'une ligne qui n'en a pas encore. null : le registre ne répond pas, on réessaiera.
+async function verifierFaitsEmail(e, l, c, bilan) {
+  if (e.faits?.registre) return e;
+  const siren = String(e.faits?.prospect?.siren || l?.siret || '').replace(/\D/g, '').slice(0, 9);
+  if (!/^\d{9}$/.test(siren)) return e; // lead sans SIREN (ajouté à la main) : rien à vérifier ici
+  const f = await lireFaitsPublics(siren, c);
+  if (!f.registre) return null;
+  const faits = { ...(e.faits || {}), ...f, prospect: { ...(e.faits?.prospect || {}), siren } };
+  const raison = raisonDArret(faits, c);
+  if (raison) {
+    await majLigneEmail(e.id, { statut: 'annule', faits, detail: raison });
+    if (l) await journalEmail(l, c, 'note', `Prospection email arrêtée pour ${l.entreprise} : ${raison}`, null, { etape: 'annule' });
+    if (bilan) bilan.annules++;
+    return false;
+  }
+  return majLigneEmail(e.id, { faits });
+}
+
+async function envoyesDuJourEmail() {
+  const debut = minuitParis(aujourdHuiParis());
+  const { lignes } = await sb(`iae_crm_emails?statut=eq.envoye&envoye_le=gte.${encodeURIComponent(debut)}&select=envoye_le`);
+  return lignes.filter((x) => Date.parse(x.envoye_le) <= Date.now()).length;
+}
+
+// Avant chaque envoi : jamais une adresse en opposition, un lead archivé ou perdu, ni quelqu'un qui a déjà répondu
+// (email, appel abouti, RDV ou réponse LinkedIn), ni deux fois le même message 1.
+async function refusAvantEnvoi(e, l) {
+  if (!e.email || !EMAIL_RE.test(e.email)) return "Pas d'adresse : rien n'est parti.";
+  if (await enOpposition(e.email)) return 'Adresse en opposition (désinscription ou spam) : rien ne part.';
+  if (!l || l.archive || l.statut === 'perdu') return 'Lead archivé ou perdu : rien ne part.';
+  if (!['nouveau', 'contacte'].includes(l.statut)) return `Le lead est déjà à l'étape « ${l.statut} » : plus de message de prospection.`;
+  const { lignes: acts } = await sb(`iae_crm_activites?lead_id=eq.${l.id}&type=in.(email_recu,appel,rdv,linkedin)&select=type,meta&limit=200`);
+  const repondu = acts.find((a) => a.type !== 'linkedin' || a.meta?.etape === 'reponse_recue');
+  if (repondu) return `Il a déjà répondu ou échangé (${{ email_recu: 'email', appel: 'appel', rdv: 'rendez-vous', linkedin: 'LinkedIn' }[repondu.type]}) : le message de prospection ne part pas.`;
+  const { lignes: deja } = await sb(`iae_crm_emails?lead_id=eq.${l.id}&etape=eq.${e.etape}&statut=eq.envoye&select=id&limit=1`);
+  if (deja.length) return 'Un message de cette étape est déjà parti pour ce lead.';
+  return null;
+}
+
+const echapperHtml = (t) => String(t ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+class ErreurBrevo extends Error {
+  constructor(message, { arret = false, inconnu = false } = {}) { super(message); this.arret = arret; this.inconnu = inconnu; }
+}
+// Brevo transactionnel (POST /v3/smtp/email, comme api/rdv.js) : aspect texte, sans image ; le lien d'opposition en bas,
+// et dans les en-têtes List-Unsubscribe (lien https + mailto) et List-Unsubscribe-Post (désinscription en un clic,
+// RFC 8058, demandée par Gmail et Yahoo pour les envois en nombre).
+async function envoyerBrevoEmail(e, c, r, jeton) {
+  const lien = `${URL_STOP}${jeton}`;
+  const paragraphes = e.texte.split(/\n{2,}/).map((p) => `<p style="margin:0 0 14px">${echapperHtml(p).replace(/\n/g, '<br>')}</p>`).join('');
+  const html = `<!doctype html><html lang="fr"><head><meta charset="utf-8"></head><body style="margin:0;padding:16px;font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:1.5;color:#1f2330">${paragraphes}<p style="margin:22px 0 0;font-size:12px;color:#6b7080">Pour ne plus recevoir mes messages : <a href="${echapperHtml(lien)}" style="color:#6b7080">se désinscrire</a></p></body></html>`;
+  const corps = {
+    sender: { email: r.expediteur, name: r.expediteur_nom },
+    replyTo: { email: ADMIN_EMAIL, name: 'Gabriel Vanderbecken' },
+    to: [{ email: e.email, name: nomContactEmail(c) === 'ce contact' ? e.email : nomContactEmail(c) }],
+    subject: e.objet,
+    htmlContent: html,
+    textContent: `${e.texte}\n\n--\nPour ne plus recevoir mes messages, se désinscrire : ${lien}`,
+    headers: { 'List-Unsubscribe': `<${lien}>, <mailto:${ADMIN_EMAIL}?subject=D%C3%A9sinscription>`, 'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click' },
+    ...(r.sans_tag ? {} : { tags: ['prospection-email'] }),
+  };
+  const poster = async (c2) => {
+    try {
+      return await fetch(`${BREVO}/smtp/email`, { method: 'POST', headers: { 'api-key': process.env.BREVO_API_KEY, 'Content-Type': 'application/json', accept: 'application/json' }, body: JSON.stringify(c2), signal: AbortSignal.timeout(15000) });
+    } catch (x) {
+      // Pas de réponse : on ne sait pas si c'est parti. Jamais de second essai.
+      throw new ErreurBrevo(`Brevo n'a pas répondu (${x?.name || 'réseau'}) : regarde dans Brevo (journal des emails transactionnels) si c'est parti avant de renvoyer.`, { inconnu: true });
+    }
+  };
+  let rep = await poster(corps);
+  let texteErreur = rep.ok ? '' : await rep.text();
+  // Si l'offre gratuite refuse les tags, on envoie sans et on suit par messageId (les événements sont relus par messageId).
+  if (!rep.ok && rep.status === 400 && corps.tags && /tag/i.test(texteErreur)) {
+    const { tags: _t, ...sansTag } = corps;
+    rep = await poster(sansTag);
+    texteErreur = rep.ok ? '' : await rep.text();
+    if (rep.ok) await majReglageEmail({ sans_tag: true });
+  }
+  if (!rep.ok) {
+    console.error('crm email brevo', rep.status, texteErreur.slice(0, 300));
+    throw new ErreurBrevo(`Brevo a refusé l'envoi (${rep.status}) : ${couper(texteErreur.replace(/\s+/g, ' '), 200)}`, { arret: [401, 402, 403].includes(rep.status) });
+  }
+  const d = await rep.json().catch(() => ({}));
+  return String(d.messageId || '');
+}
+
+// Après l'envoi (ou quand Brevo dit qu'une campagne est partie) : historique, compteurs et tâche du lead.
+async function appliquerEnvoiEmail(e, l, c, { messageId = null, envoyeLe = new Date().toISOString(), campagne = null } = {}) {
+  const jourEnvoi = jourParis(envoyeLe);
+  const ligne = await majLigneEmail(e.id, { statut: 'envoye', envoye_le: envoyeLe, suite_le: new Date().toISOString(), ...(messageId ? { brevo_message_id: messageId } : {}), detail: campagne ? e.detail : null });
+  if (!l) return ligne;
+  const r = await reglageEmail();
+  await journalEmail(l, c, 'email_envoye', `Email de prospection envoyé à ${nomContactEmail(c)}${e.email ? ` (${e.email})` : ''}${campagne ? `, campagne Brevo ${campagne}` : ''} : « ${e.objet || ''} »`, e.texte || null,
+    { etape: e.etape, a: e.email, objet: e.objet, de: r.expediteur, brevo_message_id: messageId, brevo_campagne: campagne, prospection_email: e.id }, envoyeLe);
+  const maj = { relances_sans_reponse: 0, tache_fil: null };
+  if (!l.dernier_contact || l.dernier_contact < jourEnvoi) maj.dernier_contact = jourEnvoi;
+  if (l.statut === 'nouveau') maj.statut = 'contacte';
+  // Une tâche déjà écrite pour cet envoi (la campagne 1, préparée par Claude Code le 12/11) reste telle quelle.
+  if (!(campagne && /^Email :/.test(l.prochaine_note || ''))) {
+    Object.assign(maj, { prochaine_relance: dansJoursOuvres(4, jourEnvoi), prochaine_action: 'autre', prochaine_note: `Email : pas de réponse de ${nomContactEmail(c)} au message du ${dateCourte(jourEnvoi).slice(0, 5)} : décider de la relance (email ou appel d'Anna).` });
+  }
+  await sb(`iae_crm_leads?id=eq.${l.id}`, { methode: 'PATCH', prefer: 'return=minimal', corps: maj });
+  return ligne;
+}
+
+async function envoyerFileEmail(r, bilan, reste) {
+  let place = Math.min(r.par_passage, r.par_jour - (await envoyesDuJourEmail()));
+  if (place <= 0) return;
+  const { lignes } = await sb(`iae_crm_emails?statut=eq.a_envoyer&order=valide_le.asc&limit=${place + 5}&select=*`);
+  for (const e of lignes) {
+    if (place <= 0 || !reste()) break;
+    // La ligne est prise d'abord : un autre passage qui tournerait en même temps ne l'enverra pas une deuxième fois.
+    const jeton = randomBytes(24).toString('base64url');
+    const { lignes: pris } = await sb(`iae_crm_emails?id=eq.${e.id}&statut=eq.a_envoyer`, { methode: 'PATCH', prefer: 'return=representation', corps: { statut: 'en_cours', pris_le: new Date().toISOString(), jeton_stop_hash: createHash('sha256').update(jeton).digest('hex') } });
+    if (!pris || !pris.length) continue;
+    const { l, c } = await leadEtContactEmail(e);
+    // Jamais d'envoi sans le registre (opposition à la prospection, entreprise fermée…) : une ligne rédigée à la main
+    // pendant que le registre ne répondait pas est vérifiée ici ; s'il ne répond toujours pas, elle attend.
+    if (l && !e.faits?.registre) {
+      const v = await verifierFaitsEmail(e, l, c, bilan);
+      if (v === false) continue;
+      if (v === null) { await majLigneEmail(e.id, { statut: 'a_envoyer', pris_le: null }); continue; }
+    }
+    const refus = await refusAvantEnvoi(e, l);
+    if (refus) { await majLigneEmail(e.id, { statut: 'annule', detail: refus }); bilan.annules++; continue; }
+    try { verifierTexteEmail(e.objet, e.texte); } catch (x) { await majLigneEmail(e.id, { statut: 'brouillon', valide_le: null, detail: messageRefusEmail(x) }); continue; }
+    let messageId;
+    try {
+      messageId = await envoyerBrevoEmail(e, c, r, jeton);
+    } catch (x) {
+      await majLigneEmail(e.id, { statut: 'echec', detail: couper(x.message, 400) });
+      bilan.echecs++;
+      if (x.arret) break;
+      continue;
+    }
+    await appliquerEnvoiEmail(e, l, c, { messageId });
+    place--;
+    bilan.envoyes++;
+  }
+}
+
+async function enrichirEmails(r, bilan, reste) {
+  const { lignes } = await sb('iae_crm_emails?statut=eq.a_enrichir&fullenrich_id=is.null&order=created_at.asc&limit=20&select=*');
+  if (!lignes.length) return;
+  const cle = process.env.FULLENRICH_API_KEY;
+  let place = 0;
+  if (cle) {
+    const { lignes: faites } = await sb(`iae_crm_emails?fullenrich_le=gte.${encodeURIComponent(minuitParis(aujourdHuiParis()))}&select=id`);
+    place = Math.max(0, Math.min(r.enrichissements - faites.length, 100));
+  }
+  const lot = [];
+  for (const e0 of lignes) {
+    if (!reste()) break;
+    // Le registre d'abord : gratuit, il évite de payer une adresse qu'on n'utilisera pas (entreprise fermée, opposition…).
+    const { l, c } = await leadEtContactEmail(e0);
+    if (!l || !c) { await majLigneEmail(e0.id, { statut: 'annule', detail: 'Lead ou contact supprimé.' }); continue; }
+    const e = await verifierFaitsEmail(e0, l, c, bilan);
+    if (!e) continue;
+    bilan.verifies++;
+    if (lot.length >= place) continue;
+    if (c.email && (await enOpposition(c.email))) { await majLigneEmail(e.id, { statut: 'annule', detail: 'Adresse en opposition.' }); continue; }
+    if (!c.prenom || !c.nom) { await majLigneEmail(e.id, { statut: 'sans_email', detail: "Prénom ou nom du dirigeant manquant : pas de recherche d'adresse." }); continue; }
+    const domaine = e.faits?.rge?.domaine || (String(l.site_web || '').replace(/^https?:\/\//, '').replace(/^www\./, '').split('/')[0].toLowerCase() || null);
+    lot.push({ e, l, c, domaine: domaine && DOMAINE_RE.test(domaine) ? domaine : null });
+  }
+  if (!lot.length) return;
+  const corps = {
+    name: `CRM IA-Entrepreneur, prospection email du ${dateCourte(aujourdHuiParis())}`,
+    data: lot.map(({ e, l, c, domaine }) => ({ first_name: c.prenom, last_name: nomPropre(c.nom), company_name: l.entreprise, ...(domaine ? { domain: domaine } : {}), enrich_fields: ['contact.work_emails'], custom: { ligne: e.id } })),
+  };
+  let rep;
+  try {
+    rep = await fetch(`${FULLENRICH}/contact/enrich/bulk`, { method: 'POST', headers: { Authorization: `Bearer ${cle}`, 'Content-Type': 'application/json' }, body: JSON.stringify(corps), signal: AbortSignal.timeout(15000) });
+  } catch (x) {
+    console.error('crm email fullenrich', x?.name || x?.message);
+    return;
+  }
+  if (!rep.ok) {
+    const t = (await rep.text()).slice(0, 300);
+    console.error('crm email fullenrich', rep.status, t);
+    await ecrireReglage('email_prospection_suivi', { ...((await lireReglage('email_prospection_suivi')) || {}), fullenrich_erreur: `FullEnrich a refusé la recherche (${rep.status}) le ${dateCourte(aujourdHuiParis())}${rep.status === 402 ? ' : crédits épuisés' : rep.status === 401 ? ' : clé refusée' : ''}.` });
+    return;
+  }
+  const { enrichment_id: id } = await rep.json();
+  if (!id) return;
+  const maintenant = new Date().toISOString();
+  await sb(`iae_crm_emails?id=in.(${lot.map((x) => x.e.id).join(',')})`, { methode: 'PATCH', prefer: 'return=minimal', corps: { fullenrich_id: String(id).slice(0, 80), fullenrich_le: maintenant, detail: 'Adresse en cours de recherche (FullEnrich).' } });
+  const suivi = (await lireReglage('email_prospection_suivi')) || {};
+  if (suivi.fullenrich_erreur) await ecrireReglage('email_prospection_suivi', { ...suivi, fullenrich_erreur: null });
+  bilan.enrichis += lot.length;
+}
+
+async function lireEnrichissements(bilan, reste) {
+  const cle = process.env.FULLENRICH_API_KEY;
+  if (!cle) return;
+  const { lignes } = await sb('iae_crm_emails?statut=eq.a_enrichir&fullenrich_id=not.is.null&select=*&limit=200');
+  const parId = new Map();
+  for (const e of lignes) { if (!parId.has(e.fullenrich_id)) parId.set(e.fullenrich_id, []); parId.get(e.fullenrich_id).push(e); }
+  for (const [id, ls] of parId) {
+    if (!reste()) break;
+    let rep;
+    try {
+      rep = await fetch(`${FULLENRICH}/contact/enrich/bulk/${encodeURIComponent(id)}`, { headers: { Authorization: `Bearer ${cle}` }, signal: AbortSignal.timeout(15000) });
+    } catch { continue; }
+    if (rep.status === 400) continue; // error.enrichment.in_progress : pas encore fini
+    const d = rep.status === 402 || rep.ok ? await rep.json().catch(() => null) : null;
+    if (!d) { console.error('crm email fullenrich lecture', rep.status); continue; }
+    if (['CREATED', 'IN_PROGRESS'].includes(d.status)) continue;
+    const resultats = new Map((d.data || []).map((x) => [x?.custom?.ligne, x]));
+    for (const e of ls) {
+      const x = resultats.get(e.id);
+      const trouve = x?.contact_info?.most_probable_work_email || (x?.contact_info?.work_emails || []).find((w) => w?.status === 'DELIVERABLE') || null;
+      const adresse = normEmail(trouve?.email);
+      const { l, c } = await leadEtContactEmail(e);
+      if (!x && d.status !== 'FINISHED') {
+        // Crédits épuisés, annulé, limite : la ligne repart dans la file des recherches (demain, le plafond du jour étant pris).
+        await majLigneEmail(e.id, { fullenrich_id: null, detail: `FullEnrich n'a pas fini (${d.status}) : nouvel essai plus tard.` });
+        continue;
+      }
+      if (trouve?.status === 'DELIVERABLE' && EMAIL_RE.test(adresse)) {
+        if (await enOpposition(adresse)) { await majLigneEmail(e.id, { statut: 'annule', email: adresse, detail: 'Adresse en opposition (désinscription ou spam) : rien ne part.' }); continue; }
+        await majLigneEmail(e.id, { statut: 'a_rediger', email: adresse, email_statut: 'DELIVERABLE', source_email: 'fullenrich', detail: null });
+        if (c && !c.email) await sb(`iae_crm_contacts?id=eq.${c.id}`, { methode: 'PATCH', prefer: 'return=minimal', corps: { email: adresse } });
+        if (l) await journalEmail(l, c, 'note', `Adresse vérifiée trouvée pour ${nomContactEmail(c)} (FullEnrich) : ${adresse}. Message en cours de rédaction.`, null, { etape: 'adresse', email: adresse });
+        bilan.adresses++;
+      } else {
+        const pourquoi = trouve?.status ? `FullEnrich : ${trouve.status}` : 'FullEnrich ne trouve rien';
+        await majLigneEmail(e.id, { statut: 'sans_email', email_statut: trouve?.status || 'INTROUVABLE', detail: `Pas d'adresse vérifiée (${pourquoi}) : la fiche reste pour Anna, au téléphone.` });
+        if (l) {
+          await journalEmail(l, c, 'note', `Pas d'adresse vérifiée pour ${nomContactEmail(c)} (${pourquoi}) : pas d'email, la fiche reste pour Anna, au téléphone.`, null, { etape: 'sans_email' });
+          if (/^Email :/.test(l.prochaine_note || '')) await sb(`iae_crm_leads?id=eq.${l.id}`, { methode: 'PATCH', prefer: 'return=minimal', corps: { prochaine_note: "Email : pas d'adresse vérifiée. La fiche reste pour Anna, au téléphone." } });
+        }
+        bilan.sans_email++;
+      }
+    }
+  }
+}
+
+async function redigerEmails(bilan, reste) {
+  if (!process.env.ANTHROPIC_API_KEY) return;
+  const { lignes } = await sb('iae_crm_emails?statut=eq.a_rediger&order=created_at.asc&limit=4&select=*');
+  let n = 0;
+  for (const e0 of lignes) {
+    // Deux rédactions par passage : la synchro a 60 secondes en tout, et la boîte Gmail passe avant.
+    if (n >= 2 || !reste()) break;
+    const { l, c } = await leadEtContactEmail(e0);
+    if (!l) { await majLigneEmail(e0.id, { statut: 'annule', detail: 'Lead supprimé.' }); continue; }
+    const e = await verifierFaitsEmail(e0, l, c, bilan);
+    if (!e) continue;
+    n++;
+    try {
+      await preparerEmailAvecClaude(e, l, c);
+      bilan.rediges++;
+    } catch (x) {
+      console.error('crm email rédaction', x?.code || x?.message);
+    }
+  }
+}
+
+/* ----- Le bilan : événements Brevo, campagne, pause automatique ----- */
+
+// Les noms d'événements de Brevo (GET /v3/smtp/statistics/events), ramenés aux nôtres.
+const EVENEMENTS_BREVO = {
+  delivered: 'delivered', hardbounces: 'hard_bounce', hardbounce: 'hard_bounce', softbounces: 'soft_bounce', softbounce: 'soft_bounce',
+  spam: 'spam', complaint: 'spam', unsubscribed: 'unsubscribed', unsubscribe: 'unsubscribed', blocked: 'blocked', invalid: 'invalid',
+  error: 'error', deferred: 'deferred', opened: 'opened', loadedbyproxy: 'opened', clicks: 'clicked', click: 'clicked', requests: 'demande', request: 'demande',
+};
+const ERREURS_ADRESSE = ['hard_bounce', 'invalid', 'blocked'];
+const sansChevrons = (m) => String(m || '').trim().replace(/^<|>$/g, '');
+const instantIso = (d) => { const t = Date.parse(d || ''); return new Date(Number.isNaN(t) ? Date.now() : t).toISOString(); };
+
+// Ajoute les nouveaux événements d'une ligne et en tire les conséquences (spam, désinscription, adresse en erreur).
+async function noterEvenementsEmail(e, nouveaux, bilan, { raison = '' } = {}) {
+  const avant = e.evenements || {};
+  const ajout = Object.fromEntries(Object.entries(nouveaux).filter(([k, v]) => v && !avant[k]));
+  if (!Object.keys(ajout).length) return;
+  const evenements = { ...avant, ...ajout, ...(raison && !avant.raison ? { raison: couper(raison, 200) } : {}) };
+  await majLigneEmail(e.id, { evenements });
+  bilan.evenements += Object.keys(ajout).length;
+  const { l, c } = await leadEtContactEmail(e);
+  if (ajout.spam) await enregistrerOpposition(e.email, 'signalé comme spam (Brevo)', { ligne: e });
+  else if (ajout.unsubscribed) await enregistrerOpposition(e.email, 'désinscription Brevo', { ligne: e });
+  if (ERREURS_ADRESSE.some((k) => ajout[k]) && l) {
+    await majLigneEmail(e.id, { detail: `Adresse en erreur${raison ? ` (${couper(raison, 160)})` : ''} : l'email n'est pas arrivé.` });
+    await journalEmail(l, c, 'note', `L'email de prospection à ${e.email} n'est pas arrivé (adresse en erreur${raison ? ` : ${couper(raison, 160)}` : ''}).`, null, { etape: 'erreur_adresse' });
+    if (['nouveau', 'contacte'].includes(l.statut)) await sb(`iae_crm_leads?id=eq.${l.id}`, { methode: 'PATCH', prefer: 'return=minimal', corps: { prochaine_relance: aujourdHuiParis(), prochaine_action: 'autre', prochaine_note: `Email : l'adresse de ${nomContactEmail(c)} est en erreur, le message n'est pas arrivé. Passer par le téléphone (Anna) ou trouver une autre adresse.` } });
+  }
+}
+
+async function suivreEvenementsEmail(bilan) {
+  const depuis30 = new Date(Date.now() - 30 * 86400000).toISOString();
+  const { lignes } = await sb(`iae_crm_emails?statut=eq.envoye&brevo_message_id=not.is.null&envoye_le=gte.${encodeURIComponent(depuis30)}&select=*`);
+  if (!lignes.length) return;
+  const parMessage = new Map(lignes.map((e) => [sansChevrons(e.brevo_message_id), e]));
+  const jour = aujourdHuiParis();
+  const plusAncien = lignes.map((e) => jourParis(e.envoye_le)).sort()[0];
+  const suivi = (await lireReglage('email_prospection_suivi')) || {};
+  // Depuis le dernier passage (un jour de marge : Brevo compte en dates), jamais plus de 30 jours.
+  const debut = [suivi.evenements_depuis ? ajouterJoursIso(suivi.evenements_depuis, -1) : plusAncien, plusAncien].sort().pop();
+  const q = new URLSearchParams({ startDate: debut, endDate: jour, limit: '2500', sort: 'asc' });
+  const r = await fetch(`${BREVO}/smtp/statistics/events?${q}`, { headers: { 'api-key': process.env.BREVO_API_KEY, accept: 'application/json' }, signal: AbortSignal.timeout(15000) });
+  if (!r.ok) { console.error('crm email événements', r.status, (await r.text()).slice(0, 200)); return; }
+  const d = await r.json();
+  const parLigne = new Map();
+  for (const ev of d.events || []) {
+    const e = parMessage.get(sansChevrons(ev.messageId));
+    const nom = EVENEMENTS_BREVO[String(ev.event || '').toLowerCase()];
+    if (!e || !nom) continue;
+    if (!parLigne.has(e.id)) parLigne.set(e.id, { e, nouveaux: {}, raison: '' });
+    const x = parLigne.get(e.id);
+    if (!x.nouveaux[nom]) x.nouveaux[nom] = instantIso(ev.date);
+    if (ev.reason && !x.raison) x.raison = String(ev.reason);
+  }
+  for (const { e, nouveaux, raison } of parLigne.values()) await noterEvenementsEmail(e, nouveaux, bilan, { raison });
+  await ecrireReglage('email_prospection_suivi', { ...((await lireReglage('email_prospection_suivi')) || {}), evenements_depuis: jour, evenements_le: new Date().toISOString() });
+}
+
+// La campagne Brevo 1 du 13/11 (et les suivantes) : GET /v3/emailCampaigns/{id} pour l'état et les chiffres, et les
+// statistiques de chaque destinataire (GET /v3/contacts/{email}/campaignStats) pour savoir qui s'est désinscrit ou a
+// signalé un spam. Quand Brevo la dit partie, l'envoi entre dans l'historique du lead, une seule fois.
+async function suivreCampagnesEmail(bilan) {
+  const depuis30 = new Date(Date.now() - 30 * 86400000).toISOString();
+  const { lignes } = await sb(`iae_crm_emails?brevo_campagne=not.is.null&statut=eq.envoye&or=(suite_le.is.null,envoye_le.gte.${encodeURIComponent(depuis30)})&select=*`);
+  if (!lignes.length) return;
+  const cle = process.env.BREVO_API_KEY;
+  const suivi = (await lireReglage('email_prospection_suivi')) || {};
+  const campagnes = { ...(suivi.campagnes || {}) };
+  for (const n of [...new Set(lignes.map((e) => e.brevo_campagne))]) {
+    const r = await fetch(`${BREVO}/emailCampaigns/${Number(n)}`, { headers: { 'api-key': cle, accept: 'application/json' }, signal: AbortSignal.timeout(15000) });
+    if (!r.ok) { console.error('crm email campagne', n, r.status); continue; }
+    const k = await r.json();
+    const g = k.statistics?.globalStats || {};
+    campagnes[n] = { statut: k.status || null, partie_le: k.sentDate || null, envoyes: g.sent ?? null, arrives: g.delivered ?? null, erreurs: g.hardBounces ?? null, spam: g.complaints ?? null, desinscriptions: g.unsubscriptions ?? null, lu_le: new Date().toISOString() };
+    if (k.status !== 'sent') continue;
+    for (const e of lignes.filter((x) => x.brevo_campagne === n)) {
+      const { l, c } = await leadEtContactEmail(e);
+      if (!e.suite_le) {
+        // Pas deux fois le même envoi dans l'historique (Claude Code a pu le noter à la main).
+        const { lignes: deja } = await sb(`iae_crm_activites?lead_id=eq.${e.lead_id}&type=eq.email_envoye&meta->>brevo_campagne=eq.${n}&select=id&limit=1`);
+        if (deja.length) await majLigneEmail(e.id, { suite_le: new Date().toISOString(), envoye_le: k.sentDate || e.envoye_le });
+        else await appliquerEnvoiEmail({ ...e, texte: e.texte }, l, c, { envoyeLe: k.sentDate || e.envoye_le, campagne: n });
+        e.envoye_le = k.sentDate || e.envoye_le;
+      }
+      const rs = await fetch(`${BREVO}/contacts/${encodeURIComponent(e.email)}/campaignStats`, { headers: { 'api-key': cle, accept: 'application/json' }, signal: AbortSignal.timeout(15000) });
+      if (!rs.ok) continue;
+      const s = await rs.json();
+      const quand = (liste) => { const t = Array.isArray(liste) ? liste.find((x) => Number(x.campaignId) === Number(n))?.eventTime : null; return t ? instantIso(t) : null; };
+      await noterEvenementsEmail(e, {
+        delivered: quand(s.delivered), hard_bounce: quand(s.hardBounces), soft_bounce: quand(s.softBounces), spam: quand(s.complaints),
+        unsubscribed: quand(s.unsubscriptions?.userUnsubscription), opened: quand(s.opened), clicked: quand(s.clicked),
+      }, bilan);
+    }
+  }
+  await ecrireReglage('email_prospection_suivi', { ...((await lireReglage('email_prospection_suivi')) || {}), campagnes });
+}
+
+// Pause automatique (Gabriel, 12/11 : « molo ») : dès 1 signalement comme spam, ou plus d'1 adresse en erreur, depuis la
+// dernière reprise. Seul Gabriel reprend (bouton « Reprendre »).
+async function verifierPauseEmail() {
+  const r = await reglageEmail();
+  if (r.pause) return r.pause;
+  const depuis = r.reprise_le || '2000-01-01T00:00:00Z';
+  const depuis60 = new Date(Date.now() - 60 * 86400000).toISOString();
+  const { lignes } = await sb(`iae_crm_emails?statut=eq.envoye&evenements=not.is.null&envoye_le=gte.${encodeURIComponent(depuis60)}&select=evenements`);
+  const apres = (ev, k) => ev?.[k] && Date.parse(ev[k]) >= Date.parse(depuis);
+  const spam = lignes.filter((x) => apres(x.evenements, 'spam')).length;
+  const erreurs = lignes.filter((x) => ERREURS_ADRESSE.some((k) => apres(x.evenements, k))).length;
+  const raison = spam >= 1 ? `${spam} message${spam > 1 ? 's' : ''} signalé${spam > 1 ? 's' : ''} comme spam` : erreurs > 1 ? `${erreurs} adresses en erreur` : null;
+  if (!raison) return null;
+  const pause = { le: new Date().toISOString(), raison: `${raison} : envois arrêtés automatiquement.`, auto: true };
+  await majReglageEmail({ pause });
+  return pause;
+}
+
+// Le bilan, pour la barre et le récap de 7 h : aujourd'hui N envoyés sur le quota ; depuis le début et sur 7 jours :
+// envoyés, arrivés, adresses en erreur, spam, désinscriptions, réponses (email reçu sur le lead après l'envoi). Pas de
+// taux d'ouverture : Apple le fausse.
+function bilanEmail(envoyes, recus, { quota, jour = aujourdHuiParis() } = {}) {
+  const maintenant = Date.now();
+  const partis = envoyes.filter((e) => e.statut === 'envoye' && e.envoye_le && Date.parse(e.envoye_le) <= maintenant);
+  const recuParLead = new Map();
+  for (const a of recus) { if (!recuParLead.has(a.lead_id)) recuParLead.set(a.lead_id, []); recuParLead.get(a.lead_id).push(a.date); }
+  const a = (e, ...k) => k.some((x) => e.evenements?.[x]);
+  const compter = (liste) => ({
+    envoyes: liste.length,
+    arrives: liste.filter((e) => a(e, 'delivered')).length,
+    erreurs: liste.filter((e) => a(e, ...ERREURS_ADRESSE)).length,
+    spam: liste.filter((e) => a(e, 'spam')).length,
+    desinscriptions: liste.filter((e) => a(e, 'unsubscribed')).length,
+    reponses: liste.filter((e) => (recuParLead.get(e.lead_id) || []).some((d) => Date.parse(d) >= Date.parse(e.envoye_le))).length,
+  });
+  const il7 = maintenant - 7 * 86400000;
+  return { aujourdhui: { envoyes: partis.filter((e) => jourParis(e.envoye_le) === jour).length, quota }, debut: compter(partis), semaine: compter(partis.filter((e) => Date.parse(e.envoye_le) >= il7)) };
+}
+const pluriel = (n, un, plusieurs = `${un}s`) => `${n} ${n > 1 ? plusieurs : un}`;
+function texteBilanEmail(b) {
+  return `${pluriel(b.envoyes, 'envoyé')}, ${pluriel(b.arrives, 'arrivé')}, ${pluriel(b.erreurs, 'adresse en erreur', 'adresses en erreur')}, ${pluriel(b.spam, 'spam', 'spams')}, ${pluriel(b.desinscriptions, 'désinscription')}, ${pluriel(b.reponses, 'réponse')}`;
+}
+// Toutes les lignes, sans leur texte (Supabase plafonne une réponse à 1 000 lignes : on pagine, comme toutLire).
+async function lignesBilanEmail() {
+  const lignes = [];
+  for (let debut = 0; debut < 50000; debut += 1000) {
+    const { lignes: page } = await sb('iae_crm_emails?select=id,lead_id,statut,envoye_le,evenements&order=created_at.asc', { plage: `${debut}-${debut + 999}` });
+    lignes.push(...page);
+    if (page.length < 1000) break;
+  }
+  return lignes;
+}
+async function etatProspectionEmail({ lignes = null, recus = null } = {}) {
+  const r = await reglageEmail();
+  const tout = lignes || (await lignesBilanEmail());
+  const leadsEnvoyes = [...new Set(tout.filter((e) => e.statut === 'envoye').map((e) => e.lead_id))];
+  const rec = recus || (leadsEnvoyes.length ? (await sb(`iae_crm_activites?type=eq.email_recu&lead_id=in.(${leadsEnvoyes.join(',')})&select=lead_id,date`)).lignes : []);
+  const suivi = (await lireReglage('email_prospection_suivi')) || {};
+  const n = (s) => tout.filter((e) => e.statut === s).length;
+  return {
+    actif: tout.length > 0, pause: r.pause || null, quota: r.par_jour, fenetre: [r.debut, r.fin], expediteur: r.expediteur,
+    fullenrich: Boolean(process.env.FULLENRICH_API_KEY), brevo: Boolean(process.env.BREVO_API_KEY), fullenrich_erreur: suivi.fullenrich_erreur || null,
+    a_valider: n('brouillon') + n('echec'), en_file: n('a_envoyer') + n('en_cours'), a_enrichir: n('a_enrichir'), a_rediger: n('a_rediger'), sans_email: n('sans_email'),
+    campagnes: suivi.campagnes || {}, dernier_passage: suivi.passage_le || null,
+    bilan: bilanEmail(tout, rec, { quota: r.par_jour }),
+  };
+}
+
+// Un passage, toutes les 15 minutes, après la boîte de Gabriel (une réponse arrivée entre-temps arrête l'envoi).
+async function prospectionEmail({ limite = Date.now() + 40000 } = {}) {
+  if (!estAdmin()) return { ignore: 'equipe' };
+  const bilan = { verifies: 0, enrichis: 0, adresses: 0, sans_email: 0, rediges: 0, envoyes: 0, echecs: 0, annules: 0, evenements: 0 };
+  const { lignes: ouvertes } = await sb('iae_crm_emails?statut=in.(a_enrichir,a_rediger,a_envoyer,en_cours,envoye)&select=id&limit=1');
+  if (!ouvertes.length) return { rien: true };
+  const reste = () => Date.now() < limite;
+  // 1. Ce que Brevo a vu (tous les jours, même en pause : c'est le bilan, et ce qui déclenche la pause).
+  if (process.env.BREVO_API_KEY) {
+    await suivreEvenementsEmail(bilan).catch((x) => console.error('crm email événements', x?.code || x?.message));
+    await suivreCampagnesEmail(bilan).catch((x) => console.error('crm email campagnes', x?.code || x?.message));
+  }
+  const pause = await verifierPauseEmail();
+  // 2. Une ligne restée « en cours » 30 minutes : on ne sait pas si elle est partie, jamais de second essai.
+  const coince = new Date(Date.now() - 30 * 60000).toISOString();
+  await sb(`iae_crm_emails?statut=eq.en_cours&pris_le=lt.${encodeURIComponent(coince)}`, { methode: 'PATCH', prefer: 'return=minimal', corps: { statut: 'echec', detail: "Le passage s'est arrêté pendant l'envoi : regarde dans Brevo (journal des emails transactionnels) si c'est parti avant de renvoyer." } });
+  const jour = aujourdHuiParis();
+  const r = await reglageEmail();
+  if (!estOuvreIso(jour) || pause) { await noterPassageEmail(bilan); return { ...bilan, pause: Boolean(pause), ouvre: estOuvreIso(jour) }; }
+  // 3. Les envois du matin, dans le quota.
+  const hm = heureMinuteParis();
+  if (process.env.BREVO_API_KEY && hm >= r.debut && hm < r.fin) await envoyerFileEmail(r, bilan, reste);
+  // 4. Registre, puis adresses vérifiées ; 5. lecture des recherches finies ; 6. rédaction par Claude.
+  if (reste()) await enrichirEmails(r, bilan, reste).catch((x) => console.error('crm email registre', x?.code || x?.message));
+  if (reste()) await lireEnrichissements(bilan, reste).catch((x) => console.error('crm email fullenrich', x?.code || x?.message));
+  if (reste()) await redigerEmails(bilan, reste).catch((x) => console.error('crm email rédaction', x?.code || x?.message));
+  await noterPassageEmail(bilan);
+  return bilan;
+}
+async function noterPassageEmail(bilan) {
+  await ecrireReglage('email_prospection_suivi', { ...((await lireReglage('email_prospection_suivi')) || {}), passage_le: new Date().toISOString(), dernier_bilan: bilan });
+}
+
+/* ----- Les opérations de la page (Gabriel seul) ----- */
+
+async function operationEmail(corps, ip) {
+  const op = corps.op;
+  if (op === 'prospect_email') return ajouterProspectEmail(corps);
+  if (op === 'email_reprendre') {
+    const r = await majReglageEmail({ pause: null, reprise_le: new Date().toISOString() });
+    return { reglage: r };
+  }
+  if (op === 'email_pause') return { reglage: await majReglageEmail({ pause: { le: new Date().toISOString(), raison: couper(String(corps.raison || 'Mise en pause par Gabriel.'), 200), auto: false } }) };
+  if (op === 'email_auto_couper') {
+    await ecrireReglage('email_confiance', { serie: 0, auto: false, coupe_le: new Date().toISOString() });
+    return { confiance: await confianceEmail() };
+  }
+  if (op === 'email_reglage') {
+    const v = {};
+    const entier = (x, min, max) => { const n = Number(x); if (!Number.isInteger(n) || n < min || n > max) throw new Refus('valeur_invalide:reglage'); return n; };
+    if (corps.par_jour !== undefined) v.par_jour = entier(corps.par_jour, 0, 50);
+    if (corps.par_passage !== undefined) v.par_passage = entier(corps.par_passage, 1, 5);
+    if (corps.enrichissements !== undefined) v.enrichissements = entier(corps.enrichissements, 0, 100);
+    if (corps.expediteur !== undefined) { const a = normEmail(corps.expediteur); if (!EMAIL_RE.test(a)) throw new Refus('adresse_invalide'); v.expediteur = a; }
+    if (corps.expediteur_nom !== undefined) v.expediteur_nom = couper(String(corps.expediteur_nom).replace(/[\r\n<>"]+/g, ' ').trim(), 70) || EMAIL_PROSPECTION.expediteur_nom;
+    if (!Object.keys(v).length) throw new Refus('rien_a_modifier');
+    return { reglage: await majReglageEmail(v) };
+  }
+  if (op === 'email_passage') return { bilan: await prospectionEmail({ limite: Date.now() + 40000 }), etat: await etatProspectionEmail() };
+  const e = await ligneEmail(corps.id);
+  if (op === 'email_valider') {
+    if (!['brouillon', 'echec'].includes(e.statut)) throw new Refus('email_en_file', 409);
+    const { objet, texte } = verifierTexteEmail(corps.objet ?? e.objet, corps.texte ?? e.texte);
+    if (!e.email) throw new Refus('adresse_manquante');
+    if (await enOpposition(e.email)) throw new Refus('adresse_opposee', 409);
+    // La confiance : des messages de Claude validés tels quels (objet et texte), d'affilée. Un texte modifié, ou écrit par
+    // Gabriel, remet le compteur à zéro. Un renvoi après un échec ne compte pas une deuxième fois.
+    let confiance = null;
+    if (e.statut === 'brouillon') {
+      const avant = await confianceEmail();
+      const telQuel = Boolean(e.texte_claude) && normeLi(`${objet}\n---\n${texte}`) === normeLi(e.texte_claude);
+      const serie = telQuel ? (avant.serie || 0) + 1 : 0;
+      confiance = { ...avant, serie, auto: avant.auto || serie >= SEUIL_CONFIANCE_EMAIL, ...(serie >= SEUIL_CONFIANCE_EMAIL && !avant.auto ? { depuis: new Date().toISOString() } : {}) };
+      await ecrireReglage('email_confiance', confiance);
+    }
+    return { email: emailPourPage(await majLigneEmail(e.id, { objet, texte, statut: 'a_envoyer', valide_le: new Date().toISOString(), detail: null })), confiance };
+  }
+  if (op === 'email_ecarter') {
+    if (['en_cours', 'envoye'].includes(e.statut)) throw new Refus('deja_parti', 409);
+    return { email: emailPourPage(await majLigneEmail(e.id, { statut: 'annule', detail: `Écarté par ${utilisateurCourant().prenom}${corps.raison ? ` : ${couper(String(corps.raison), 200)}` : ''}.` })) };
+  }
+  if (op === 'email_rediger') {
+    if (tropDeRedactions(ip)) throw new Refus('ia_trop_de_demandes', 429);
+    if (!['a_rediger', 'brouillon', 'echec'].includes(e.statut)) throw new Refus('email_en_file', 409);
+    const { l, c } = await leadEtContactEmail(e);
+    if (!l) throw new Refus('introuvable', 404);
+    const verifiee = await verifierFaitsEmail(e, l, c, null);
+    if (verifiee === false) return { email: emailPourPage(await ligneEmail(e.id)), annule: true };
+    const ligne = await preparerEmailAvecClaude(verifiee || e, l, c, { auto: false, consigne: String(corps.consigne || '') });
+    return { email: emailPourPage(ligne) };
+  }
+  if (op === 'email_adresse') {
+    // L'adresse posée à la main (Claude Code avec le MCP FullEnrich quand la clé n'est pas sur Vercel, ou une adresse lue
+    // sur le site de l'entreprise) : seulement une adresse vérifiée DELIVERABLE quand elle vient de FullEnrich.
+    const email = normEmail(corps.email);
+    if (!EMAIL_RE.test(email)) throw new Refus('adresse_invalide');
+    const source = ['fullenrich', 'site', 'manuel'].includes(corps.source) ? corps.source : 'manuel';
+    const statutEmail = String(corps.email_statut || (source === 'fullenrich' ? '' : 'MANUEL')).toUpperCase().slice(0, 40);
+    if (source === 'fullenrich' && statutEmail !== 'DELIVERABLE') throw new Refus('adresse_non_verifiee');
+    if (!['a_enrichir', 'sans_email', 'a_rediger', 'brouillon', 'echec'].includes(e.statut)) throw new Refus('email_en_file', 409);
+    if (await enOpposition(email)) throw new Refus('adresse_opposee', 409);
+    const valeurs = { email, email_statut: statutEmail, source_email: source, fullenrich_id: null, detail: null };
+    if (['a_enrichir', 'sans_email'].includes(e.statut)) valeurs.statut = 'a_rediger';
+    const ligne = await majLigneEmail(e.id, valeurs);
+    const { l, c } = await leadEtContactEmail(e);
+    if (c && !c.email) await sb(`iae_crm_contacts?id=eq.${c.id}`, { methode: 'PATCH', prefer: 'return=minimal', corps: { email } });
+    if (l) await journalEmail(l, c, 'note', `Adresse de ${nomContactEmail(c)} posée à la main (${source}) : ${email}.`, null, { etape: 'adresse', email });
+    return { email: emailPourPage(ligne) };
+  }
+  throw new Refus('op_inconnue');
+}
+
+/* ----- La désinscription : GET /api/crm?stop=<jeton> (une page et un bouton), POST (le bouton, ou un clic dans la messagerie) ----- */
+
+// Un GET ne désinscrit jamais : les antivirus des messageries ouvrent les liens des emails pour les tester, et le
+// prospect perdrait le lead sans avoir rien demandé (RFC 8058 : la désinscription en un clic se fait par POST). Le GET
+// montre donc un bouton ; le POST (ce bouton, ou le bouton « Se désinscrire » de Gmail) enregistre l'opposition.
+const STYLE_STOP = 'body{margin:0;font-family:Arial,Helvetica,sans-serif;background:#f4f5fa;color:#1f2330}main{max-width:520px;margin:12vh auto;padding:28px 22px;background:#fff;border-radius:14px}h1{font-size:22px;margin:6px 0 12px}p{line-height:1.5;margin:0 0 14px}.marque{font-weight:700;color:#2c3e94;margin:0}button{font:inherit;font-weight:700;padding:12px 18px;border:0;border-radius:10px;background:#2c3e94;color:#fff;cursor:pointer;width:100%}';
+function pageStop(res, statut, titre, texte, jeton = null) {
+  const bouton = jeton ? `<form method="post" action="/api/crm?stop=${encodeURIComponent(jeton)}"><button type="submit">Ne plus recevoir de messages</button></form>` : '';
+  res.setHeader('Content-Type', 'text/html; charset=utf-8');
+  res.setHeader('Content-Security-Policy', "default-src 'none'; style-src 'unsafe-inline'; form-action 'self'; frame-ancestors 'none'; base-uri 'none'");
+  res.setHeader('Referrer-Policy', 'no-referrer');
+  return res.status(statut).send(`<!doctype html><html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="robots" content="noindex"><title>${echapperHtml(titre)}</title><style>${STYLE_STOP}</style></head><body><main><p class="marque">IA-Entrepreneur</p><h1>${echapperHtml(titre)}</h1><p>${echapperHtml(texte)}</p>${bouton}</main></body></html>`);
+}
+async function desinscription(req, res, jeton) {
+  const ip = empreinte(req);
+  if (tropDEchecs(ip)) return pageStop(res, 429, 'Trop de tentatives', 'Réessayez dans dix minutes, ou répondez simplement « stop » à mon email.');
+  const valide = /^[A-Za-z0-9_-]{20,80}$/.test(jeton);
+  const e = valide ? (await sb(`iae_crm_emails?jeton_stop_hash=eq.${createHash('sha256').update(jeton).digest('hex')}&select=id,lead_id,contact_id,email,evenements&limit=1`)).lignes[0] : null;
+  if (!e || !e.email) {
+    noterEchec(ip);
+    return pageStop(res, 404, 'Lien inconnu', 'Ce lien ne correspond à aucun message. Pour ne plus recevoir de message, répondez simplement « stop » à mon email.');
+  }
+  const deja = await enOpposition(e.email);
+  if (req.method === 'POST' && !deja) await enregistrerOpposition(e.email, req.body && String(req.body['List-Unsubscribe'] || '') === 'One-Click' ? 'désinscription en un clic depuis la messagerie' : 'lien de désinscription', { ligne: e });
+  if (req.method === 'POST' || deja) return pageStop(res, 200, "C'est noté", "C'est noté, vous ne recevrez plus de message. Gabriel Vanderbecken, IA-Entrepreneur");
+  return pageStop(res, 200, 'Ne plus recevoir mes messages', "Un clic sur le bouton, et vous ne recevrez plus aucun message de ma part (Gabriel Vanderbecken, IA-Entrepreneur).", jeton);
 }
 
 /* ---------- Après la formation : facture, paiement, avis ---------- */
@@ -2988,7 +4067,9 @@ async function rappelDuMatin(force = false) {
       lignesLi.push(`- ${ents.find((x) => x.id === a.lead_id)?.entreprise || 'Lead'}${nom ? ` (${nom})` : ''} : ${LIB_ETAPE_LI[a.etape] || 'Envoi'} pas parti${['invitation', 'relance', 'reponse'].includes(a.etape) ? 'e' : ''}${a.statut === 'a_verifier' ? ' ou à vérifier' : ''}. ${String(a.detail || '').slice(0, 200)}`.trim());
     }
   }
-  if (!leads.length && !entrants.length && !lignesLi.length) return { envoye: false, raison: 'rien_a_faire' };
+  // Prospection email (12/11/2026) : la pause, ce qui attend Gabriel, puis le bilan.
+  const lignesEmail = admin ? await lignesRecapEmail().catch((e) => { console.error('crm récap email', e?.code || e?.message); return { lignes: [], urgent: false }; }) : { lignes: [], urgent: false };
+  if (!leads.length && !entrants.length && !lignesLi.length && !lignesEmail.urgent) return { envoye: false, raison: 'rien_a_faire' };
   const qui = (id) => { const c = contacts.find((x) => x.lead_id === id); return c ? [c.prenom, c.nom].filter(Boolean).join(' ') : ''; };
   const ACTION = { email: 'email', appel: 'appel', rdv: 'rendez-vous', autre: 'à faire' };
   const ecart = (d) => Math.round((Date.parse(jour) - Date.parse(d)) / 86400000);
@@ -3001,7 +4082,8 @@ async function rappelDuMatin(force = false) {
   const dujour = leads.filter((l) => l.prochaine_relance === jour);
   const dateLongue = new Intl.DateTimeFormat('fr-FR', { timeZone: 'Europe/Paris', weekday: 'long', day: 'numeric', month: 'long' }).format(new Date());
   const resume = [dujour.length && `${dujour.length} relance${dujour.length > 1 ? 's' : ''} pour aujourd'hui`, retards.length && `${retards.length} en retard`,
-    entrants.length && `${entrants.length} message${entrants.length > 1 ? 's' : ''} à trier`, lignesLi.length && `${lignesLi.length} point${lignesLi.length > 1 ? 's' : ''} LinkedIn`].filter(Boolean).join(', ');
+    entrants.length && `${entrants.length} message${entrants.length > 1 ? 's' : ''} à trier`, lignesLi.length && `${lignesLi.length} point${lignesLi.length > 1 ? 's' : ''} LinkedIn`,
+    lignesEmail.resume].filter(Boolean).join(', ');
   const corps = [
     `Bonjour ${utilisateurCourant().prenom},`, '',
     `Aujourd'hui, ${dateLongue} : ${resume}.`, '',
@@ -3009,15 +4091,35 @@ async function rappelDuMatin(force = false) {
     dujour.length ? `Aujourd'hui\n${dujour.map(ligne).join('\n')}\n` : null,
     entrants.length ? `À trier\n${entrants.map((e) => `- ${e.de_nom || e.de_email} : ${e.objet || ''}`).join('\n')}\n` : null,
     lignesLi.length ? `LinkedIn\n${lignesLi.join('\n')}\n` : null,
+    lignesEmail.lignes.length ? `Prospection email\n${lignesEmail.lignes.join('\n')}\n` : null,
     "Pour tout enchaîner : https://ia-entrepreneur.fr/crm/ (bouton « Enchaîner les relances »).", '',
     'Bonne journée,', 'Ton CRM',
   ].filter((x) => x !== null).join('\n');
   const total = leads.length;
   const objet = total ? `Tes ${total} relance${total > 1 ? 's' : ''} du jour${retards.length ? ` (${retards.length} en retard)` : ''}`
-    : entrants.length ? `${entrants.length} message${entrants.length > 1 ? 's' : ''} à trier dans ton CRM` : 'LinkedIn : à regarder dans ton CRM';
+    : entrants.length ? `${entrants.length} message${entrants.length > 1 ? 's' : ''} à trier dans ton CRM` : lignesLi.length ? 'LinkedIn : à regarder dans ton CRM' : 'Prospection email : à regarder dans ton CRM';
   const envoi = await envoyerGmail({ a: compte(), objet, corps, mode: 'envoyer' });
   await ecrireReglage('rappel_matin_envoye', { le: jour, relances: total, a_trier: entrants.length });
   return { envoye: true, objet, gmail_id: envoi.gmail_id };
+}
+
+// Les lignes du récap de 7 h pour la prospection email : vide tant qu'elle n'a pas commencé. « urgent » : une pause ou des
+// emails à valider suffisent à envoyer le récap, le bilan seul non.
+const heureLue = (hm) => String(hm).replace(/^0/, '').replace(':', ' h ').replace(/ h 00$/, ' h');
+async function lignesRecapEmail() {
+  const etat = await etatProspectionEmail();
+  if (!etat.actif) return { lignes: [], urgent: false };
+  const b = etat.bilan;
+  const lignes = [];
+  if (etat.pause) lignes.push(`- EN PAUSE : ${etat.pause.raison} Pour reprendre : bouton « Reprendre » dans la barre « Prospection email » du CRM.`);
+  if (etat.a_valider) lignes.push(`- ${pluriel(etat.a_valider, 'email')} à valider (bouton « Emails à valider » dans Aujourd'hui).`);
+  if (etat.a_enrichir && !etat.fullenrich) lignes.push(`- ${pluriel(etat.a_enrichir, 'dirigeant attend', 'dirigeants attendent')} une adresse vérifiée : la clé FullEnrich n'est pas sur Vercel (Claude Code peut les chercher avec le MCP FullEnrich).`);
+  if (etat.fullenrich_erreur) lignes.push(`- ${etat.fullenrich_erreur}`);
+  lignes.push(`- Aujourd'hui : ${b.aujourdhui.envoyes} envoyé${b.aujourdhui.envoyes > 1 ? 's' : ''} sur ${b.aujourdhui.quota}${etat.en_file ? ` (${etat.en_file} en file, ils partent entre ${heureLue(etat.fenetre[0])} et ${heureLue(etat.fenetre[1])})` : ''}.`);
+  lignes.push(`- 7 derniers jours : ${texteBilanEmail(b.semaine)}.`);
+  lignes.push(`- Depuis le début : ${texteBilanEmail(b.debut)}.`);
+  const urgent = Boolean(etat.pause || etat.a_valider);
+  return { lignes, urgent, resume: etat.pause ? 'prospection email en pause' : etat.a_valider ? `${pluriel(etat.a_valider, 'email')} à valider` : null };
 }
 
 /* ---------- Logos des entreprises ---------- */
@@ -3057,6 +4159,14 @@ export default async function handler(req, res) {
     res.setHeader('Allow', 'GET, POST');
     return res.status(405).json({ erreur: 'methode' });
   }
+  // La désinscription d'un prospect : publique, sans clé, avant tout le reste (le POST en un clic vient de sa messagerie).
+  const stop = new URL(req.url, 'http://local').searchParams.get('stop');
+  if (stop !== null) {
+    try { return await desinscription(req, res, stop); } catch (e) {
+      console.error('crm désinscription', e?.code || e?.message);
+      return pageStop(res, 503, 'Un souci de notre côté', 'Réessayez dans un moment, ou répondez simplement « stop » à mon email : je ne vous écrirai plus.');
+    }
+  }
   const tache = req.method === 'GET' ? new URL(req.url, 'http://local').searchParams.get('tache') : null;
   if (tache === 'synchro' || tache === 'matin') {
     const attendu = Buffer.from(process.env.CRON_SECRET ? `Bearer ${process.env.CRON_SECRET}` : '');
@@ -3066,7 +4176,12 @@ export default async function handler(req, res) {
       const force = new URL(req.url, 'http://local').searchParams.get('force') === '1';
       return res.status(200).json(await pourChacun(() => rappelDuMatin(force)));
     }
-    return res.status(200).json(await pourChacun(synchroniser));
+    const debutTache = Date.now();
+    const resultat = await pourChacun(synchroniser);
+    // La prospection email de Gabriel, après sa boîte : une réponse arrivée entre-temps arrête l'envoi. 50 secondes au plus
+    // depuis le début de la tâche (la fonction en a 60).
+    resultat.prospection_email = await prospectionEmail({ limite: debutTache + 50000 }).catch((e) => { console.error('crm prospection email', e?.code || e?.message); return { erreur: e?.code || 'erreur' }; });
+    return res.status(200).json(resultat);
   }
   if (origineEtrangere(req)) return res.status(403).json({ erreur: 'origine' });
 
@@ -3083,6 +4198,8 @@ export default async function handler(req, res) {
       // Le robot d'un commercial agit en son nom : ses leads, sa file, ses réglages, ses messages (garder et pourMoi).
       if (req.method === 'GET') return res.status(200).json(await avecUtilisateur(qui, () => fileRobotLi()));
       const corpsRobot = typeof req.body === 'string' ? JSON.parse(req.body || '{}') : req.body || {};
+      // Un dirigeant sans profil LinkedIn utilisable : la prospection passe par l'email (12/11/2026, Gabriel seul).
+      if (corpsRobot.op === 'prospect_email') return res.status(200).json(await avecUtilisateur(qui, () => ajouterProspectEmail(corpsRobot)));
       return res.status(200).json(await avecUtilisateur(qui, () => operationRobotLi(corpsRobot)));
     } catch (e) {
       if (e instanceof Refus || (e && e.refus)) return res.status(e.statut || 400).json({ erreur: e.code });
@@ -3168,6 +4285,8 @@ async function traiter(req, res, ip) {
       return res.status(200).json(await operationProgramme(corps));
     }
     if (corps && /^linkedin_[a-z_]+$/.test(String(corps.op || ''))) return res.status(200).json(await operationLinkedin(corps, ip));
+    // La prospection email : Gabriel seul (un membre est refusé plus haut, ces opérations ne sont pas dans OPS_EQUIPE).
+    if (corps && (/^email_[a-z_]+$/.test(String(corps.op || '')) || corps.op === 'prospect_email')) return res.status(200).json(await operationEmail(corps, ip));
     if (corps && corps.op === 'recap') {
       if (tropDeRedactions(ip)) throw new Refus('ia_trop_de_demandes', 429);
       return res.status(200).json(await recapLead(corps));
