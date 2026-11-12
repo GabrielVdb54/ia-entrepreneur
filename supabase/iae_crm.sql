@@ -203,7 +203,7 @@ create table if not exists public.iae_crm_emails (
   envoye_le timestamptz,
   suite_le timestamptz,                      -- quand l'historique et la tâche du lead ont suivi l'envoi
   brevo_message_id text,
-  brevo_campagne integer,                    -- campagne Brevo (la campagne 1 du 13/11 : Defrance, Adam)
+  brevo_campagne integer,                    -- campagne Brevo (la campagne 1 du 13/11 : Adam)
   evenements jsonb,                          -- { delivered: date, hard_bounce: date, spam: date, unsubscribed: date… }
   detail text,
   jeton_stop_hash text                       -- empreinte SHA-256 du lien de désinscription, jamais le lien lui-même

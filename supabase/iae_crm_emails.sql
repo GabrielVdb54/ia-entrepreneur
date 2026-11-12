@@ -31,7 +31,7 @@ create table if not exists public.iae_crm_emails (
   envoye_le timestamptz,
   suite_le timestamptz,                      -- quand l'historique et la tâche du lead ont suivi l'envoi
   brevo_message_id text,
-  brevo_campagne integer,                    -- campagne Brevo (la campagne 1 du 13/11 : Defrance, Adam)
+  brevo_campagne integer,                    -- campagne Brevo (la campagne 1 du 13/11 : Adam)
   evenements jsonb,                          -- { delivered: date, hard_bounce: date, spam: date, unsubscribed: date… }
   detail text,
   jeton_stop_hash text                       -- empreinte SHA-256 du lien de désinscription, jamais le lien lui-même
@@ -54,13 +54,19 @@ create table if not exists public.iae_crm_oppositions (
 alter table public.iae_crm_oppositions enable row level security;
 revoke all on public.iae_crm_oppositions from anon, authenticated;
 
--- La campagne Brevo 1 du 13/11/2026 à 8 h 30 (liste 5, test sur 20) : ses deux emails entrent dans le bilan. La synchro lit
--- la campagne chez Brevo ; quand Brevo la dit partie, elle met l'envoi dans l'historique des deux leads (une seule fois).
+-- La campagne Brevo 1 du 13/11/2026 à 8 h 30 (liste 5, test sur 20) : son email entre dans le bilan. La synchro lit
+-- la campagne chez Brevo ; quand Brevo la dit partie, elle met l'envoi dans l'historique du lead (une seule fois).
+-- Michael Defrance (Les Métalliers Lorrains) a été retiré de la liste le 12/11 : l'entreprise s'oppose à la prospection
+-- commerciale au registre national (opposition_diffusion_commerciale, RGPD art. 21.2) ; son adresse va en opposition.
 -- Rejouer cette partie ne crée rien de plus.
 insert into public.iae_crm_emails (lead_id, contact_id, statut, email, email_statut, source_email, civilite, objet, envoye_le, brevo_campagne, detail)
 select c.lead_id, c.id, 'envoye', lower(c.email), null, 'manuel', 'M.', x.objet, timestamptz '2026-11-13 08:30:00+01', 1,
        'Campagne Brevo 1 (test sur 20), programmée le 13/11 à 8 h 30 : le texte est dans Brevo.'
 from public.iae_crm_contacts c
-join (values ('mdefrance@metallierslorrains.fr', 'Haroué et la Villa Majorelle'),
-             ('fabrice.adam@solemo.fr', 'Vos chantiers d''accessibilité')) as x (email, objet) on lower(c.email) = x.email
+join (values ('fabrice.adam@solemo.fr', 'Vos chantiers d''accessibilité')) as x (email, objet) on lower(c.email) = x.email
 where not exists (select 1 from public.iae_crm_emails e where e.brevo_campagne = 1 and e.email = lower(c.email));
+
+insert into public.iae_crm_oppositions (email, origine, lead_id)
+select 'mdefrance@metallierslorrains.fr', 'registre national : opposition à la prospection commerciale (vue le 12/11/2026)', l.id
+from public.iae_crm_leads l where l.siret like '323375659%'
+on conflict (email) do nothing;
