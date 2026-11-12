@@ -11,7 +11,8 @@
  * Réglages repris de la page HubSpot (Round Robin) : 30 minutes, de 9 h à 17 h les
  * jours ouvrés, au moins 24 h à l'avance, jusqu'à 4 semaines, Google Meet, téléphone
  * et entreprise obligatoires. Ils se changent sans code dans le réglage `rdv_tour`
- * (iae_crm_reglages) : conseillers, debut, fin, duree, pas, preavis_heures, semaines.
+ * (iae_crm_reglages) : conseillers (dont leurs `agendas` en plus), debut, fin, duree, pas,
+ * preavis_heures, semaines.
  *
  *   GET  /api/rdv  → { creneaux: ["2026-11-12T08:00:00.000Z", …], jeton, turnstile? },
  *                    jamais qui est libre
@@ -21,7 +22,12 @@
  * Agendas : le jeton Google de gabriel@ia-entrepreneur.fr (GMAIL_IAE_*, portée
  * calendar.events), qui est propriétaire des agendas d'Axel et de Dorian dans le
  * Workspace (vérifié le 10/11). Lecture par events.list (freeBusy demande une autre
- * portée). L'événement est posé dans l'agenda du conseiller, qui en est
+ * portée). Un conseiller peut avoir plusieurs agendas (`agendas`) : il n'est libre
+ * que s'il l'est dans tous, et si l'un d'eux ne répond pas, il n'est proposé nulle
+ * part et Gabriel reçoit une alerte. Gabriel a ainsi toujours son agenda Clindit
+ * (AGENDAS_EN_PLUS) : ses cours et RDV y sont, et leur copie dans l'agenda IA-E
+ * (Apps Script) ne tourne plus depuis le 10/11, d'où des créneaux proposés le
+ * 13/11 alors qu'il était en cours (constat du 12/11). L'événement est posé dans l'agenda du conseiller, qui en est
  * l'organisateur, avec un lien Meet, et le prospect est invité : Google lui envoie
  * l'invitation, comme le faisait HubSpot. C'est voulu ici, à l'inverse de
  * creerEvenement dans le CRM, qui pose ses RDV sans invités.
@@ -59,6 +65,12 @@ const DEFAUT = {
   debut: '09:00', fin: '17:00', duree: 30, pas: 30, preavis_heures: 24, semaines: 4,
   setters: { anna: 'anna@ia-entrepreneur.fr' },
 };
+// Lus en plus de l'agenda IA-E, que le réglage `rdv_tour` les cite ou non : un réglage
+// réécrit sans eux ne doit pas refaire croire Gabriel libre pendant ses cours Clindit.
+// gabriel@clindit.com est partagé avec gabriel@ia-entrepreneur.fr en « Apporter des
+// modifications aux événements » depuis le 10/11.
+const AGENDAS_EN_PLUS = { [ADMIN]: ['gabriel@clindit.com'] };
+const AGENDA_RE = /^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$/i;
 
 /* ---------- Réglages ---------- */
 
@@ -74,7 +86,12 @@ async function reglages() {
   const entier = (v, d, min, max) => (Number.isInteger(v) && v >= min && v <= max ? v : d);
   const conseillers = (Array.isArray(perso.conseillers) ? perso.conseillers : DEFAUT.conseillers)
     .filter((c) => c && /^[a-z0-9._-]+@ia-entrepreneur\.fr$/.test(String(c.email || '')) && c.actif !== false)
-    .map((c) => ({ email: c.email, prenom: String(c.prenom || c.email.split('@')[0]).slice(0, 40), nom: String(c.nom || '').slice(0, 60), fonction: String(c.fonction || 'conseiller formation IA').slice(0, 80) }));
+    .map((c) => ({
+      email: c.email, prenom: String(c.prenom || c.email.split('@')[0]).slice(0, 40), nom: String(c.nom || '').slice(0, 60), fonction: String(c.fonction || 'conseiller formation IA').slice(0, 80),
+      // Son agenda IA-E d'abord, puis ceux du réglage et d'AGENDAS_EN_PLUS, sans doublon.
+      agendas: [...new Set([c.email, ...(Array.isArray(c.agendas) ? c.agendas : []), ...(AGENDAS_EN_PLUS[c.email] || [])]
+        .map((x) => String(x || '').trim().toLowerCase()).filter((x) => AGENDA_RE.test(x)))].slice(0, 6),
+    }));
   const valeur = {
     conseillers,
     debut: heure(perso.debut, DEFAUT.debut), fin: heure(perso.fin, DEFAUT.fin),
@@ -186,15 +203,65 @@ async function occupations(email, de, a) {
   return plages;
 }
 
-// Pour chaque conseiller : ses plages occupées, ou null si son agenda ne répond pas
-// (il n'est alors proposé sur aucun créneau, plutôt que de risquer un doublon).
+// Pour chaque conseiller : ses plages occupées dans tous ses agendas, ou null si l'un
+// d'eux ne répond pas (il n'est alors proposé sur aucun créneau, plutôt que de risquer
+// un RDV pendant un cours qu'on n'a pas pu voir), et Gabriel est prévenu.
 async function agendas(conseillers, de, a) {
-  return Promise.all(conseillers.map(async (c) => {
-    try { return { ...c, occupe: await occupations(c.email, de, a) }; } catch (e) {
-      console.error('rdv agenda', c.email, e?.message || e);
-      return { ...c, occupe: null };
-    }
+  const illisibles = [];
+  const sortie = await Promise.all(conseillers.map(async (c) => {
+    const lus = await Promise.all((c.agendas || [c.email]).map(async (cal) => {
+      try { return await occupations(cal, de, a); } catch (e) {
+        console.error('rdv agenda', cal, e?.message || e);
+        illisibles.push({ agenda: cal, conseiller: c, erreur: String(e?.message || e).slice(0, 160) });
+        return null;
+      }
+    }));
+    return { ...c, occupe: lus.some((x) => x === null) ? null : lus.flat() };
   }));
+  if (illisibles.length) await alerterAgendas(illisibles);
+  return sortie;
+}
+
+// Un agenda illisible ne se voit pas sur la page (les créneaux des autres restent) :
+// Gabriel reçoit un email, au plus un toutes les 6 heures tant que ce sont les mêmes
+// agendas. C'est ce qui manquait quand la copie de l'agenda Clindit s'est arrêtée sans bruit.
+const ALERTE_MS = 6 * 3600000;
+let derniereAlerte = { le: 0, cle: '' };
+async function alerterAgendas(illisibles) {
+  const cle = [...new Set(illisibles.map((x) => x.agenda))].sort().join(',');
+  if (derniereAlerte.cle === cle && Date.now() - derniereAlerte.le < ALERTE_MS) return;
+  derniereAlerte = { le: Date.now(), cle };
+  try {
+    const [l] = await sb('iae_crm_reglages?cle=eq.rdv_alerte_agendas&select=valeur');
+    const avant = l && l.valeur;
+    if (avant && avant.cle === cle && Date.now() - Date.parse(avant.le) < ALERTE_MS) return;
+    await sb('iae_crm_reglages?on_conflict=cle', { methode: 'POST', corps: { cle: 'rdv_alerte_agendas', valeur: { cle, le: new Date().toISOString() } }, prefer: 'resolution=merge-duplicates,return=minimal' });
+  } catch (e) { console.error('rdv alerte reglage', e?.message || e); }
+  if (!process.env.BREVO_API_KEY) return;
+  const qui = [...new Set(illisibles.map((x) => x.conseiller.prenom))];
+  const lignes = [
+    'Bonjour Gabriel,', '',
+    `La page de prise de rendez-vous n'arrive plus à lire ${illisibles.length > 1 ? 'ces agendas' : 'cet agenda'} :`,
+    ...[...new Map(illisibles.map((x) => [x.agenda, x])).values()].map((x) => `- ${x.agenda} (${x.conseiller.prenom}) : ${x.erreur}`), '',
+    `Tant que c'est le cas, ${qui.join(', ')} ${qui.length > 1 ? "ne sont proposés" : "n'est proposé"} sur aucun créneau : aucun RDV ne tombera pendant un moment qu'on ne voit pas, mais la page ne ${qui.length > 1 ? 'leur' : 'lui'} en donne plus.`, '',
+    "À vérifier : le partage de l'agenda avec gabriel@ia-entrepreneur.fr (« Apporter des modifications aux événements » ou « Afficher tous les détails des événements »), et la connexion Google de gabriel@ia-entrepreneur.fr si tous les agendas sont touchés.", '',
+    "Cet email repart au plus toutes les 6 heures tant que le problème dure.", '',
+    'Le CRM IA-Entrepreneur',
+  ];
+  const stop = new AbortController();
+  const minuteur = setTimeout(() => stop.abort(), 8000);
+  try {
+    const r = await fetch('https://api.brevo.com/v3/smtp/email', {
+      method: 'POST', signal: stop.signal,
+      headers: { 'api-key': process.env.BREVO_API_KEY, 'Content-Type': 'application/json', accept: 'application/json' },
+      body: JSON.stringify({ sender: { email: ADMIN, name: 'CRM IA-Entrepreneur' }, to: [{ email: ADMIN, name: 'Gabriel Vanderbecken' }], subject: `Prise de RDV : agenda illisible (${cle})`.slice(0, 180), textContent: lignes.join('\n') }),
+    });
+    if (!r.ok) throw new Error(`brevo ${r.status} ${(await r.text()).slice(0, 200)}`);
+  } catch (e) {
+    console.error('rdv alerte brevo', e?.message || e);
+  } finally {
+    clearTimeout(minuteur);
+  }
 }
 const libre = (c, debut, fin) => Array.isArray(c.occupe) && !c.occupe.some(([d, f]) => d < fin && f > debut);
 
