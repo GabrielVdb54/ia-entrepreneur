@@ -2800,8 +2800,18 @@ const COLONNES_EMAIL_PAGE = 'id,created_at,lead_id,contact_id,etape,statut,email
 
 /* ----- Les textes : le modèle validé par Gabriel le 12/11, l'accroche et l'objet de Claude ----- */
 
-const LIGNE_GABRIEL_EMAIL = (metier) => `Je forme des équipes ${metier} du Grand Est à alléger ce travail grâce à l'IA, avec des formations éligibles à votre budget formation.`;
-const QUESTION_EMAIL = "Chez vous, c'est encore surtout fait à la main, ou vous avez déjà trouvé une solution ?";
+// Gabriel, 12/11 (relecture de l'email à Eric Vigneron) : « vraiment dire qu'on peut aider du quotidien dans les mails, la
+// relation client, la réponse aux appels d'offres, la gestion etc. », pas seulement sur le fait trouvé.
+const QUOTIDIEN_EMAIL = (metier) => (metier === 'de PME' ? 'les emails, la relation client, les devis, la gestion' : 'les emails, la relation client, les devis et les appels d\'offres, la gestion');
+const LIGNE_GABRIEL_EMAIL = (metier) => `Je forme des équipes ${metier} du Grand Est à gagner du temps grâce à l'IA sur ce quotidien : ${QUOTIDIEN_EMAIL(metier)}. Les formations sont éligibles à votre budget formation.`;
+// La question nomme l'entreprise (« Chez X, … » : le modèle de Gabriel du 09/11), sans sa forme juridique.
+const FORMES_JURIDIQUES_RE = /\b(SARL|SAS|SASU|EURL|SA|SNC|SCOP|SELARL|SCI)\b\.?/gi;
+function nomEntrepriseEmail(l) {
+  const n = nomPropre(String(l?.entreprise || '').replace(/\s*\([^)]*\)/g, '').replace(/(^|\s)(S\.A\.R\.L|S\.A\.S\.U|S\.A\.S|E\.U\.R\.L)\.?(?=\s|$)/gi, ' ').replace(FORMES_JURIDIQUES_RE, ' ').replace(/\s+/g, ' ').trim());
+  return n.length >= 2 && n.length <= 40 ? n : '';
+}
+const questionEmail = (l) => `${nomEntrepriseEmail(l) ? `Chez ${nomEntrepriseEmail(l)}` : 'Chez vous'}, tout ça se fait encore surtout à la main, ou vous avez déjà trouvé une solution ?`;
+const QUESTION_EMAIL = questionEmail(null);
 const SIGNATURE_EMAIL = 'Gabriel Vanderbecken\nIA-Entrepreneur';
 function metierEmail(l) {
   const m = pageMetierLi(l)?.metier || '';
@@ -2814,7 +2824,7 @@ function salutationEmail(civilite, c) {
   return qui ? `Bonjour ${qui},` : 'Bonjour,';
 }
 function texteEmail(e, l, c, accroche) {
-  return [salutationEmail(e.civilite, c), '', String(accroche || '').trim(), '', LIGNE_GABRIEL_EMAIL(metierEmail(l)), '', QUESTION_EMAIL, '', SIGNATURE_EMAIL].join('\n');
+  return [salutationEmail(e.civilite, c), '', String(accroche || '').trim(), '', LIGNE_GABRIEL_EMAIL(metierEmail(l)), '', questionEmail(l), '', SIGNATURE_EMAIL].join('\n');
 }
 
 // Le filet : les interdits de LinkedIn, plus « gratuit », aucun lien, rien sur l'origine de l'adresse (Gabriel, 28/10 :
@@ -3425,20 +3435,20 @@ Bonjour Monsieur Martin,
 
 <ton accroche>
 
-Je forme des équipes du BTP du Grand Est à alléger ce travail grâce à l'IA, avec des formations éligibles à votre budget formation.
+Je forme des équipes du BTP du Grand Est à gagner du temps grâce à l'IA sur ce quotidien : les emails, la relation client, les devis et les appels d'offres, la gestion. Les formations sont éligibles à votre budget formation.
 
-Chez vous, c'est encore surtout fait à la main, ou vous avez déjà trouvé une solution ?
+Chez Martin Toitures, tout ça se fait encore surtout à la main, ou vous avez déjà trouvé une solution ?
 
 Gabriel Vanderbecken
 IA-Entrepreneur
 
-L'accroche : deux phrases, 200 à 380 caractères, qui justifient la prise de contact (Gabriel, 09/11/2026, d'une phrase générale : « on dirait juste une phrase bateau »).
-1) Un fait réel sur l'entreprise, daté, pris dans les faits publics de la fiche : un marché public remporté, une qualification RGE obtenue, un nouvel établissement, un anniversaire de création. Dis-le simplement, au passé ou au présent, avec la date en clair (« en septembre », « depuis octobre »), sans dire où tu l'as lu.
-2) La déduction qui justifie le message, marquée par « sûrement », qui nomme en toutes lettres un travail concret que ce fait alourdit (les comptes rendus de chantier, les devis, les dossiers de candidature, les plannings, le suivi administratif, les rapports d'intervention…). La phrase fixe qui suit dit « alléger ce travail » : ta déduction doit donc finir sur ce travail. Elle n'affirme rien d'inventé.
-Exemple du ton (ne le recopie pas, le travail nommé découle du fait que tu as trouvé) : « Vous avez remporté en septembre les travaux de ferronnerie d'un monument nancéien. Avec plusieurs chantiers publics en parallèle, les comptes rendus et le suivi administratif ont sûrement pris de la place. »
-Choisis le fait le plus fort et le plus récent (12 derniers mois) ; un seul suffit, deux au plus s'ils vont ensemble.
+L'accroche : deux phrases courtes, 150 à 300 caractères, qui justifient la prise de contact (Gabriel, 09/11/2026, d'une phrase générale : « on dirait juste une phrase bateau »).
+1) Un fait réel sur l'entreprise, daté, pris dans les faits publics de la fiche : des marchés publics remportés, une qualification RGE obtenue, un nouvel établissement, un anniversaire de création. Dis-le simplement, en une phrase, avec la période en clair (« cette année », « en septembre », « depuis octobre »), sans dire où tu l'as lu. Pas d'énumération de chantiers ou de lieux (Gabriel, 12/11 : « je suis pas fan ») : plusieurs marchés se disent « plusieurs marchés publics cette année ».
+2) La déduction qui justifie le message, marquée par « sûrement » : ce que ce fait demande en temps, en plus du quotidien de l'entreprise (Gabriel, 12/11 : « long à monter, long à gérer en plus du quotidien »). La phrase fixe qui suit dit « gagner du temps grâce à l'IA sur ce quotidien » : ta déduction doit donc finir sur le quotidien. Elle n'affirme rien d'inventé.
+Exemple validé par Gabriel le 12/11 (ne le recopie pas, adapte-le au fait trouvé) : « Vous avez remporté plusieurs marchés publics cette année. Ce sont des dossiers longs à monter, puis longs à gérer, qui s'ajoutent sûrement à un quotidien déjà bien rempli. »
+Choisis le fait le plus fort et le plus récent (12 derniers mois).
 
-L'objet : 2 à 6 mots, concret, tiré du fait. Exemples validés par Gabriel : « Blénod et Ecrouves », « Haroué et la Villa Majorelle », « Votre qualification chaudière bois », « 40 ans en avril ». Pas de majuscules partout, pas de point d'exclamation, pas de question, pas de « Re: ».
+L'objet : 2 à 6 mots, concret, tiré du fait. Exemples validés par Gabriel : « Vos marchés publics », « Votre qualification chaudière bois », « 40 ans en avril ». Pas de majuscules partout, pas de point d'exclamation, pas de question, pas de « Re: ».
 
 Interdits :
 - aucun montant, aucun prix, aucun chiffre de gain ou de ROI, même quand le marché public en donne un ;
@@ -3447,7 +3457,7 @@ Interdits :
 - aucun lien ni adresse email, pas de « gratuit », ni CPF, ni OPCO, ni « certifiante », ni code de certification, ni « reste à charge », ni « 100 % » ;
 - pas de présentation de Gabriel (elle est dans la phrase fixe), pas de formule creuse (« j'espère que vous allez bien », « je me permets »), pas de tiret long, pas d'emoji, pas de point d'exclamation. Vouvoiement.
 
-N'invente rien : seulement les faits de la fiche. Sans fait assez fort (rien de récent, ou seulement la ville et la taille), écris une accroche générale assumée, construite sur le métier (« Dans une entreprise de métallerie de votre taille, les devis et les comptes rendus de chantier se font sûrement le soir, après les chantiers. »), mets general à vrai et ne fais pas semblant de connaître l'entreprise.
+N'invente rien : seulement les faits de la fiche. Sans fait assez fort (rien de récent, ou seulement la ville et la taille), écris une accroche générale assumée, construite sur le métier (« Dans une entreprise de métallerie de votre taille, les devis, les emails et le suivi des chantiers s'ajoutent sûrement à un quotidien déjà bien rempli. »), mets general à vrai et ne fais pas semblant de connaître l'entreprise.
 
 appuis : chaque fait utilisé, avec sa source et sa date telles que la fiche les donne (fait : « marché de ferronnerie notifié », source : « marchés publics attribués (DECP) », date : « 2026-09-17 »). Pour une accroche générale : un seul appui, fait « message général sur le métier », source « aucune », date vide.`;
 
