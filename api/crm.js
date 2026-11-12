@@ -79,6 +79,13 @@
  * 12/11 : « on n'écrit pas aux adresses générales » : partout (recherche gratuite,
  * FullEnrich, adresse posée à la main, envoi), une adresse n'est gardée que si elle
  * est celle du dirigeant ou d'un co-dirigeant au registre, sur un domaine avec MX.
+ * Le soir du 12/11, il assouplit : « on tente de les contacter en direct, même si
+ * on sait que c'est des mails génériques […] en prenant en compte qu'on écrit à
+ * l'accueil ». En dernier recours seulement (pas d'adresse du dirigeant gratuite,
+ * ni de la base Google Maps, ni de FullEnrich, ou 3 jours ouvrés d'attente pour un
+ * ultra qualifié) : l'adresse générale de l'entreprise elle-même, et un message
+ * pour l'accueil (« merci de bien vouloir le lui transmettre »). Le quota monte par
+ * paliers (10 par jour à partir du 16/11) si le bilan reste propre.
  *
  * Synchro (06/11/2026, choix de Gabriel) : chaque email reçu est lu en entier
  * et analysé par Claude. S'il concerne un lead (adresse connue, même domaine,
@@ -1126,6 +1133,8 @@ function estOuvreIso(s) {
   return j !== 0 && j !== 6 && !feries.includes(s);
 }
 function dansJoursOuvres(n, depuis = aujourdHuiParis()) { let d = ajouterJoursIso(depuis, n); while (!estOuvreIso(d)) d = ajouterJoursIso(d, 1); return d; }
+// n jours ouvrés après un jour (jeudi 12/11 + 3 → mardi 17/11).
+function apresJoursOuvres(n, depuis) { let d = depuis; for (let k = 0; k < n;) { d = ajouterJoursIso(d, 1); if (estOuvreIso(d)) k++; } return d; }
 const dateCourte = (iso) => iso.split('-').reverse().join('/');
 
 /* ---------- Qui est qui : leads et contacts, pour relier un email au bon lead ---------- */
@@ -2750,7 +2759,11 @@ const EN_ATTENTE_EMAIL = ['a_enrichir', 'a_rediger', 'brouillon', 'a_envoyer', '
 // jour ») ; FullEnrich ne fait payer que les adresses trouvées. tentatives_fullenrich : le garde-fou des recherches lancées.
 // rdv_minutes : le trajet en voiture depuis Nancy au-delà duquel on ne propose plus de venir (Gabriel, 12/11 : « 40 mn me va,
 // pas plus ») ; rdv_km : le seuil à vol d'oiseau quand OSRM ne répond pas (prudent).
-const EMAIL_PROSPECTION = { par_jour: 5, par_passage: 2, enrichissements: 3, tentatives_fullenrich: 10, debut: '08:30', fin: '11:30', expediteur: ADMIN_EMAIL, expediteur_nom: 'Gabriel Vanderbecken', rdv_minutes: 40, rdv_km: 25 };
+// fullenrich_deduites : une adresse déduite (base Google Maps) part aussi chez FullEnrich, dans le même plafond (Gabriel, 12/11).
+// paliers : le quota monte seul à une date, si le bilan depuis le début est propre (Gabriel, 12/11 : 10 par jour à partir du
+// lundi 16/11 ; pas de palier à 20 sans son accord, et sans doute pas sans domaine dédié).
+const EMAIL_PROSPECTION = { par_jour: 5, par_passage: 2, enrichissements: 3, tentatives_fullenrich: 10, debut: '08:30', fin: '11:30', expediteur: ADMIN_EMAIL, expediteur_nom: 'Gabriel Vanderbecken', rdv_minutes: 40, rdv_km: 25,
+  fullenrich_deduites: true, paliers: [{ a_partir_du: '2026-11-16', par_jour: 10 }] };
 const SEUIL_CONFIANCE_EMAIL = SEUIL_CONFIANCE_LI;
 const SOURCE_EMAIL = 'crm, prospection email (Brevo)';
 const URL_STOP = 'https://ia-entrepreneur.fr/api/crm?stop=';
@@ -2910,13 +2923,46 @@ function salutationEmail(civilite, c) {
   const qui = [c?.prenom, nom].filter(Boolean).join(' ');
   return qui ? `Bonjour ${qui},` : 'Bonjour,';
 }
+// Le message pour l'accueil (Gabriel, 12/11 à 17 h : « en prenant en compte qu'on écrit à l'accueil ») : « Bonjour, », la
+// demande de transmettre au dirigeant (pas une question), puis le même message, adressé à lui par son nom.
+function qualiteCourteEmail(poste, civilite) {
+  const p = normaliser(poste);
+  const f = civilite === 'Mme';
+  if (/president/.test(p)) return f || /presidente/.test(p) ? 'présidente' : 'président';
+  if (/directeur general|directrice generale/.test(p)) return f || /directrice/.test(p) ? 'directrice générale' : 'directeur général';
+  if (/cogerant/.test(p)) return f || /cogerante/.test(p) ? 'cogérante' : 'cogérant';
+  if (/gerant/.test(p)) return f || /gerante/.test(p) ? 'gérante' : 'gérant';
+  if (/directeur|directrice/.test(p)) return f || /directrice/.test(p) ? 'directrice' : 'directeur';
+  return couper(String(poste || '').trim().toLowerCase(), 40);
+}
+function destinataireAccueil(civilite, c) {
+  const nom = nomPropre(c?.nom);
+  const nomme = civilite && nom ? `${civilite === 'Mme' ? 'Madame' : 'Monsieur'} ${nom}` : [c?.prenom, nom].filter(Boolean).join(' ');
+  const qualite = qualiteCourteEmail(c?.poste, civilite);
+  return { nomme, qualite, feminin: civilite === 'Mme' || /^(gérante|présidente|directrice|cogérante)/.test(qualite) };
+}
+const voyelleEmail = (t) => /^[aeiouyàâäéèêëîïôöùûüœ]/i.test(String(t || ''));
+function objetAccueilEmail(civilite, c) {
+  const d = destinataireAccueil(civilite, c);
+  if (d.nomme) return `À l'attention ${voyelleEmail(d.nomme) ? "d'" : 'de '}${d.nomme}`;
+  if (d.qualite) return `À l'attention ${voyelleEmail(d.qualite) ? "de l'" : d.feminin ? 'de la ' : 'du '}${d.qualite}`;
+  return "À l'attention de la direction";
+}
+function debutAccueilEmail(civilite, c, accroche) {
+  const d = destinataireAccueil(civilite, c);
+  const pour = d.nomme || (d.qualite ? `${voyelleEmail(d.qualite) ? "l'" : d.feminin ? 'la ' : 'le '}${d.qualite}` : 'la direction');
+  const a = String(accroche || '').trim();
+  return ['Bonjour,', '', `Ce message est pour ${pour}${d.nomme && d.qualite ? `, ${d.qualite}` : ''} : merci de bien vouloir le lui transmettre.`, '',
+    d.nomme && a ? `${d.nomme}, ${a.replace(/^\p{Lu}(?=[\p{Ll}'’])/u, (m) => m.toLowerCase())}` : a];
+}
 // Le message entier : salutation, accroche, valeur et reste du bureau, proposition de rendez-vous (lieu selon le trajet
 // depuis Nancy), signature texte. Ces deux lignes de signature sont remplacées par la signature Gmail à l'envoi.
-function texteEmail(e, l, c, { accroche = '', valeur = '', reste = [], document = '', lieu = LIEU_DISTANCE_EMAIL } = {}) {
+function texteEmail(e, l, c, { accroche = '', valeur = '', reste = [], document = '', lieu = LIEU_DISTANCE_EMAIL, accueil = false } = {}) {
   const metier = metierEmail(l);
   const [valeurDefaut, documentDefaut] = jeuMetierEmail(metier).neutre;
   const v = nettoyerValeurEmail(valeur) || valeurDefaut;
-  return [salutationEmail(e.civilite, c), '', String(accroche || '').trim(), '', ligneValeurEmail(metier, v, resteBureauEmail(reste, v, metier)), '',
+  const debut = accueil ? debutAccueilEmail(e.civilite, c, accroche) : [salutationEmail(e.civilite, c), '', String(accroche || '').trim()];
+  return [...debut, '', ligneValeurEmail(metier, v, resteBureauEmail(reste, v, metier)), '',
     ligneRdvEmail(documentEmail(document, documentDefaut), lieu || LIEU_DISTANCE_EMAIL), '', SIGNATURE_EMAIL].join('\n');
 }
 
@@ -3081,7 +3127,7 @@ async function lireBoamp(siren, depuis) {
 }
 async function lireFaitsPublics(siren, c) {
   const depuis = ajouterJoursIso(aujourdHuiParis(), -365);
-  const [registre, marches, rge, bodacc, boamp] = await Promise.all([lireRegistre(siren, c), lireMarches(siren, depuis), lireRge(siren), lireBodacc(siren, depuis), lireBoamp(siren, depuis)]);
+  const [registre, marches, rge, bodacc, boamp] = await Promise.all([lireRegistre(siren, c), lireMarches(siren, depuis), lireRge(siren), lireBodacc(siren, depuis), lireBoamp(siren, ajouterJoursIso(aujourdHuiParis(), -730))]);
   return { registre, marches, rge, bodacc, boamp, lu_le: new Date().toISOString() };
 }
 // Ce qui arrête la prospection de l'entreprise, d'après les faits publics (la raison va sur la ligne et au journal).
@@ -3368,6 +3414,116 @@ function siteDe(f, l) {
 }
 const CODES_ADRESSE = { invalide: 'adresse_invalide', generique: 'adresse_generale', societe: 'adresse_societe', autre: 'adresse_autre_personne', ambigue: 'adresse_ambigue' };
 const SOURCES_GRATUITES = { site: "site de l'entreprise", ademe: "annuaire RGE de l'ADEME", boamp: 'avis BOAMP' };
+
+/* ----- Le repli sur l'adresse générale de l'entreprise (l'accueil), en dernier recours ----- */
+
+// Gabriel, 12/11 à 17 h : « j'aimerais aussi qu'on tente de les contacter en direct, même si on sait que c'est des mails
+// génériques. on tente de personnaliser par rapport au domaine etc mais en prenant en compte qu'on écrit à l'accueil ».
+// Seulement quand aucune adresse du dirigeant n'est disponible ; le registre reste bloquant. Acceptée : la boîte de
+// l'entreprise elle-même (contact@, info@, accueil@, secretariat@, agence@…, ou à son nom ou à celui de sa commune, même sur
+// un webmail : laqueste.alessi@wanadoo.fr, chatillon@ pour une agence de Châtillon), vue dans une source publique.
+// Refusées : un autre salarié (catherine@), une autre agence du réseau ou un siège (amiens@maif.fr pour Chaumont), une
+// agence web (domaine d'un autre site), un service (compta@, rh@, recrutement@, sav@, noreply…). Rang : 0 contact@, info@,
+// accueil@, secretariat@ du domaine de l'entreprise ; 1 agence@, bureau@, direction@… ; 2 au nom de la société ou de la
+// commune (et tout webmail) ; 3 commercial@ ; 4 devis@ (seulement s'il n'y a rien de plus général).
+const RANGS_ACCUEIL = { contact: 0, contacts: 0, info: 0, infos: 0, information: 0, informations: 0, accueil: 0, secretariat: 0,
+  agence: 1, bureau: 1, bureaux: 1, direction: 1, administration: 1, administratif: 1, hello: 1, bonjour: 1, mail: 1, email: 1, courrier: 1,
+  office: 1, standard: 1, reception: 1, renseignements: 1, gestion: 1, cabinet: 1, siege: 1, general: 1, generale: 1, commercial: 3, commerciale: 3, devis: 4 };
+const SERVICES_REFUSES = new Set(['noreply', 'nepasrepondre', 'compta', 'comptabilite', 'facturation', 'facture', 'factures', 'paie', 'rh', 'drh',
+  'recrutement', 'emploi', 'emplois', 'jobs', 'job', 'candidature', 'candidatures', 'sav', 'webmaster', 'postmaster', 'hostmaster', 'admin', 'dpo',
+  'rgpd', 'privacy', 'newsletter', 'marketing', 'presse', 'abuse', 'support', 'technique', 'informatique', 'juridique', 'communication', 'achat', 'achats']);
+const MOTS_VIDES_COMMUNE = new Set(['le', 'la', 'les', 'l', 'de', 'des', 'du', 'd', 'sur', 'sous', 'en', 'lez', 'et', 'aux', 'au', 'cedex']);
+const RANG_SOURCE_GENERALE = { site: 0, ademe: 1, boamp: 2, outscraper: 3 };
+const SOURCES_GENERALES = { ...SOURCES_GRATUITES, outscraper: 'base Google Maps (Outscraper)' };
+// Un morceau d'adresse fait-il de mots connus, chacun d'au moins 2 lettres et l'un d'au moins 3 (« amcest », « contactamc ») ?
+function decoupable(jeton, mots) {
+  const ok = new Array(jeton.length + 1).fill(null);
+  ok[0] = { long: false };
+  for (let i = 0; i < jeton.length; i++) {
+    if (!ok[i]) continue;
+    for (const m of mots) if (m.length >= 2 && jeton.startsWith(m, i) && !ok[i + m.length]) ok[i + m.length] = { long: ok[i].long || m.length >= 3 };
+  }
+  return Boolean(ok[jeton.length]?.long);
+}
+function jugerGenerale(email, { entreprise, communes = [], domaineSite = null }) {
+  const a = normEmail(email);
+  if (!EMAIL_RE.test(a)) return { ok: false, raison: 'invalide' };
+  const [loc, dom] = a.split('@');
+  const local = loc.normalize('NFD').replace(/\p{M}/gu, '');
+  const jetons = local.split(/[._+-]|\d+/).filter(Boolean);
+  const compact = jetons.join('');
+  if (!jetons.length || /^(no|ne)-?(reply|pas-?repondre)/.test(local) || jetons.some((j) => SERVICES_REFUSES.has(j)) || SERVICES_REFUSES.has(compact)) return { ok: false, raison: 'service' };
+  const webmail = WEBMAILS.has(dom);
+  if (!webmail && domaineSite && sansWww(dom) !== domaineSite && !dom.endsWith(`.${domaineSite}`)) return { ok: false, raison: 'domaine' };
+  // Le nom de la société (sans les mots du métier), ses initiales (era@ pour « Etude et Réalisation d'Assurances »), le nom
+  // de son domaine (erassur@erassur.com) et sa commune.
+  const motsNom = motsDe(entreprise).filter((m) => !['et', 'de', 'd', 'du', 'des', 'la', 'le', 'l', 'les', 'sa', 'sarl', 'sas', 'sasu', 'eurl', 'sci', 'snc'].includes(m));
+  const initiales = motsNom.length >= 2 ? motsNom.map((m) => m[0]).join('') : '';
+  const etiquette = webmail ? '' : (dom.split('.').slice(-2)[0] || '').replace(/[^a-z0-9]/g, '');
+  const propres = [...new Set([...motsDe(entreprise).filter((m) => !FORMES_JURIDIQUES.has(m)), ...communes.flatMap((c) => motsDe(c)).filter((m) => !MOTS_VIDES_COMMUNE.has(m)), initiales, etiquette])].filter((m) => m.length >= 2);
+  const generaux = Object.keys(RANGS_ACCUEIL);
+  const tous = [...new Set([...propres, ...generaux, ...[...FORMES_JURIDIQUES].filter((m) => m.length >= 2)])];
+  // Un mot inconnu (un prénom, une autre ville, un service) : la boîte d'un autre, pas celle de l'accueil.
+  if (!jetons.every((j) => decoupable(j, tous))) return { ok: false, raison: 'autre_boite' };
+  const aPropre = jetons.some((j) => propres.some((m) => m.length >= 3 && j.includes(m)));
+  if (webmail && !aPropre) return { ok: false, raison: 'autre_boite' };
+  const g = Math.min(...jetons.map((j) => RANGS_ACCUEIL[j] ?? 9));
+  const rang = webmail ? Math.max(2, g === 9 ? 2 : g) : g <= 1 ? g : g === 9 ? 2 : g;
+  return { ok: true, rang, type: g <= 1 && !webmail ? 'accueil' : 'societe' };
+}
+const MOTIFS_GENERALE = { invalide: 'adresse invalide', service: "adresse d'un service (compta, RH, recrutement, SAV, noreply…)", domaine: "domaine d'un autre site (agence web, hébergeur…)",
+  autre_boite: "boîte d'une autre personne, d'une autre agence du réseau ou d'un siège", mx: 'domaine sans serveur de messagerie (MX)' };
+// Les adresses générales possibles d'une ligne, d'après ce qui a déjà été lu (site, ADEME, BOAMP de moins de 24 mois, base
+// Google Maps), de la meilleure à la moins bonne ; et celles écartées, avec la raison.
+function adressesGeneralesDe(e, l) {
+  const f = e.faits || {};
+  const site = f.adresse?.site || siteDe(f, l);
+  let domaineSite = null;
+  try { domaineSite = site ? sansWww(new URL(/^https?:\/\//i.test(site) ? site : `https://${site}`).hostname) : null; } catch { /* rien */ }
+  const communes = [f.registre?.siege?.commune, f.rdv?.commune, f.prospect?.commune, String(l?.localisation || '').replace(/\s*\(.*$/, '')].filter(Boolean);
+  const depuis = ajouterJoursIso(aujourdHuiParis(), -730);
+  const vus = new Set(); const choisies = []; const ecartees = [];
+  const examiner = (email, source, url, dejaRefusee = null) => {
+    const a = normEmail(email);
+    if (!EMAIL_RE.test(a) || vus.has(a)) return;
+    vus.add(a);
+    // Une adresse d'un autre domaine déjà écartée sur le site (agence web) le reste ; les autres sont jugées ici.
+    const j = dejaRefusee === MOTIFS_ADRESSE.domaine ? { ok: false, raison: 'domaine' } : jugerGenerale(a, { entreprise: l?.entreprise, communes, domaineSite: source === 'site' ? domaineSite : null });
+    if (j.ok) choisies.push({ email: a, source, url: url || null, rang: j.rang, type: j.type });
+    else ecartees.push({ email: a, source, raison: MOTIFS_GENERALE[j.raison] || j.raison });
+  };
+  for (const v of [...(f.adresse?.vues_dirigeant || []), ...(f.adresse?.vues || [])]) examiner(v.email, v.source || 'site', v.url, v.raison);
+  for (const em of f.rge?.emails || []) examiner(em, 'ademe', f.rge?.lien);
+  for (const x of f.boamp || []) if (!x.date || x.date >= depuis) examiner(x.email, 'boamp', x.url);
+  if (f.adresse_connue?.email && f.adresse_connue.fiabilite === 'fiable') examiner(f.adresse_connue.email, 'outscraper', null);
+  choisies.sort((a, b) => a.rang - b.rang || (RANG_SOURCE_GENERALE[a.source] ?? 9) - (RANG_SOURCE_GENERALE[b.source] ?? 9));
+  return { choisies, ecartees };
+}
+// Le repli : la meilleure adresse générale qui reçoit des emails (MX), ou sans adresse pour Anna, avec la raison.
+async function repliAdresseGenerale(e, l, c, raison, bilan = null, { rattrapage = false } = {}) {
+  const { choisies, ecartees } = adressesGeneralesDe(e, l);
+  const essai = { le: new Date().toISOString(), raison: couper(raison, 300), ecartees: ecartees.slice(0, 8) };
+  for (const g of choisies) {
+    if (await enOpposition(g.email)) { essai.ecartees.push({ email: g.email, source: g.source, raison: 'adresse en opposition' }); continue; }
+    const mx = await mxDuDomaine(g.email.split('@')[1]);
+    if (mx === 'inconnu') { await majLigneEmail(e.id, { detail: "Le DNS ne répond pas pour vérifier l'adresse générale : nouvel essai au prochain passage." }); return { attente: true }; }
+    if (mx !== 'oui') { essai.ecartees.push({ email: g.email, source: g.source, raison: MOTIFS_GENERALE.mx }); continue; }
+    // La page montre ce qui a été écarté pour l'accueil ; ce qui l'avait été en cherchant le dirigeant reste à côté.
+    const avant = e.faits?.adresse || {};
+    const adresse = { ...avant, generique: true, email: g.email, source: g.source, url: g.url, rang: g.rang, personne: null, cherchee_le: avant.cherchee_le || essai.le, vues_dirigeant: avant.vues_dirigeant || avant.vues || [], vues: essai.ecartees.slice(0, 8) };
+    await majLigneEmail(e.id, { statut: 'a_rediger', email: g.email, email_statut: 'GENERIQUE', source_email: 'site', fullenrich_id: null, detail: null, faits: { ...(e.faits || {}), adresse, repli: essai } });
+    if (l) {
+      await journalEmail(l, c, 'note', `Prospection email : pas d'adresse de ${nomContactEmail(c)} (${couper(raison, 200)}). Adresse générale de l'entreprise : ${g.email} (${SOURCES_GENERALES[g.source] || g.source}${g.url ? ` : ${g.url}` : ''}), message pour l'accueil à son attention.`, null, { etape: 'adresse', email: g.email, generique: true });
+      if (/^Email :/.test(l.prochaine_note || '')) await sb(`iae_crm_leads?id=eq.${l.id}`, { methode: 'PATCH', prefer: 'return=minimal', corps: { prochaine_note: "Email : pas d'adresse du dirigeant, message à l'accueil (adresse générale), à valider dans « Emails à valider »." } });
+    }
+    if (bilan) bilan.generales = (bilan.generales || 0) + 1;
+    return { posee: true, email: g.email };
+  }
+  // Le rattrapage d'une ligne déjà « sans adresse » ne réécrit pas l'historique : seulement la raison et l'essai.
+  if (rattrapage) await majLigneEmail(e.id, { faits: { ...(e.faits || {}), repli: essai }, detail: `${raison}, et aucune adresse générale de l'entreprise utilisable : la fiche reste pour Anna, au téléphone.`.slice(0, 1000) });
+  else { await sansAdresse(e, l, c, `${raison}, et aucune adresse générale de l'entreprise utilisable`, { faits: { ...(e.faits || {}), repli: essai } }); if (bilan) bilan.sans_email++; }
+  return { posee: false };
+}
 // La recherche gratuite d'une ligne : l'ADEME et le BOAMP (déjà lus avec les faits publics), puis le site. Elle rend
 // { adresse } (ce qui a été vu, pour les faits), { trouvee } (la première adresse du dirigeant dont le domaine a un MX)
 // ou { attente } (le DNS n'a pas répondu : on recommencera).
@@ -3376,7 +3532,7 @@ async function chercherAdresseGratuite(e, l, c) {
   const siren = String(f.prospect?.siren || l?.siret || '').replace(/\D/g, '').slice(0, 9);
   // Une ligne lue par la première version (matin du 12/11) n'a ni les adresses de l'ADEME, ni le BOAMP : on les lit maintenant.
   if (/^\d{9}$/.test(siren) && (!f.rge || !('emails' in f.rge) || f.boamp === undefined)) {
-    const depuis = ajouterJoursIso(aujourdHuiParis(), -365);
+    const depuis = ajouterJoursIso(aujourdHuiParis(), -730);
     const [rge, boamp] = await Promise.all([lireRge(siren), lireBoamp(siren, depuis)]);
     if (rge) f.rge = rge;
     if (boamp) f.boamp = boamp;
@@ -3394,7 +3550,9 @@ async function chercherAdresseGratuite(e, l, c) {
     candidates.push({ email, source, url, personne: j.personne });
   };
   for (const email of e.faits.rge?.emails || []) examiner(email, 'ademe', e.faits.rge.lien || null);
-  for (const x of e.faits.boamp || []) examiner(x.email, 'boamp', x.url);
+  // Le dirigeant : avis de moins de 12 mois ; les plus anciens (jusqu'à 24 mois) ne servent qu'à l'adresse générale.
+  const depuis12 = ajouterJoursIso(aujourdHuiParis(), -365);
+  for (const x of e.faits.boamp || []) if (!x.date || x.date >= depuis12) examiner(x.email, 'boamp', x.url);
   const site = siteDe(e.faits, l);
   let lecture = null;
   if (site && !candidates.some((x) => x.personne.contact)) {
@@ -3568,6 +3726,8 @@ objet : 2 à 5 mots, concret, tiré du fait ou de la valeur, qui ne ressemble pa
 
 Le message entier, hors signature, vise 70 à 95 mots : garde l'accroche et la valeur courtes. Une seule question dans tout le message : celle de la phrase fixe.
 
+À l'accueil : quand la fiche dit que le message part à l'adresse générale de l'entreprise (Gabriel, 12/11 : « en prenant en compte qu'on écrit à l'accueil »), écris les mêmes morceaux, sans rien changer à l'accroche : elle reste « J'ai vu que vous… », adressée au dirigeant. Le CRM écrit avant elle « Bonjour, Ce message est pour Monsieur X, gérant : merci de bien vouloir le lui transmettre. » et met « Monsieur X, » devant ton accroche ; l'objet devient « À l'attention de Monsieur X ».
+
 Interdits :
 - aucun montant, aucun prix, aucun chiffre de gain ou de ROI, même quand le marché public en donne un ;
 - jamais le nom de l'acheteur ni d'un tiers : ni la commune, le département ou la région qui achète, ni le bailleur, ni le client, ni le nom d'une personne. Un lieu ou un bâtiment peut se nommer (« Haroué », « la Villa Majorelle », « une école ») ;
@@ -3660,6 +3820,7 @@ async function lieuRdvEmail(e, l, c) {
 
 async function redigerEmail(e, l, c, { consigne = '', lieu = LIEU_DISTANCE_EMAIL } = {}) {
   const f = e.faits || {};
+  const accueil = estGeneraleEmail(e);
   const p = f.prospect || {};
   const { recents, autres } = faitsPourClaude(f);
   const metier = metierEmail(l);
@@ -3675,6 +3836,7 @@ async function redigerEmail(e, l, c, { consigne = '', lieu = LIEU_DISTANCE_EMAIL
     `Exemples de document pour ce métier : ${jeu.documents.join(', ')}`,
     `Exemples d'objet pour ce métier : ${jeu.objets.map((o) => `« ${o} »`).join(', ')}`,
     `Lieu du rendez-vous dans la phrase fixe : ${lieu}`,
+    accueil ? "Destinataire : l'adresse générale de l'entreprise (c'est l'accueil qui lit et transmet). Ton accroche reste adressée au dirigeant (« J'ai vu que vous… ») ; le CRM écrit avant elle « Bonjour, Ce message est pour … : merci de bien vouloir le lui transmettre. » puis le nom du dirigeant, et l'objet « À l'attention de … ». Ne parle pas de l'accueil." : '',
     `Dirigeant : ${salutationEmail(e.civilite, c).replace(/^Bonjour /, '').replace(/,$/, '')}${c?.poste ? `, ${c.poste}` : ''}`,
     l.besoin ? `Ce que le CRM sait de l'entreprise : ${couper(l.besoin, 400)}` : '',
     `Faits publics des 12 derniers mois, du plus récent au plus ancien :\n${recents.join('\n') || '(aucun)'}`,
@@ -3686,22 +3848,26 @@ async function redigerEmail(e, l, c, { consigne = '', lieu = LIEU_DISTANCE_EMAIL
   const accroche = String(r.accroche || '').replace(/\s+/g, ' ').trim();
   if (!objet || !accroche) throw new Refus('ia_erreur', 502);
   const appuis = (Array.isArray(r.appuis) ? r.appuis : []).slice(0, 4).map((a) => ({ fait: couper(String(a?.fait || ''), 300), source: couper(String(a?.source || ''), 120), date: couper(String(a?.date || ''), 40) }));
-  const texte = texteEmail(e, l, c, { accroche, valeur: r.valeur, reste: r.reste, document: r.document, lieu });
-  return { objet, texte, appuis, general: r.general === true, accroche };
+  const texte = texteEmail(e, l, c, { accroche, valeur: r.valeur, reste: r.reste, document: r.document, lieu, accueil });
+  return { objet: accueil ? objetAccueilEmail(e.civilite, c) : objet, texte, appuis, general: r.general === true, accroche, accueil };
 }
 
 // Ce que le modèle du 12/11 demande et que le filet peut voir, signalé à côté du texte (un envoi automatique attend).
-function alertesModeleEmail(objet, texte, { appuis = [], accroche = null, general = false } = {}) {
+function alertesModeleEmail(objet, texte, { appuis = [], accroche = null, general = false, accueil = false } = {}) {
   const a = [];
   const corps = String(texte || '').replace(/\n+Gabriel Vanderbecken(\nIA-Entrepreneur)?\s*$/, '');
   const questions = (corps.match(/\?/g) || []).length;
   if (questions > 1) a.push(`${questions} questions dans le message : une seule (Gabriel, 12/11).`);
   const mots = motsEmail(corps);
-  // 70 à 95 mots visés ; l'exemple validé en compte un peu plus de 100 au décompte simple, d'où la marge.
-  if (mots > 110 || mots < 60) a.push(`Le message fait ${mots} mots (70 à 95 visés).`);
-  const motsObjet = motsEmail(objet);
-  if (motsObjet < 2 || motsObjet > 5) a.push(`L'objet fait ${motsObjet} mot${motsObjet > 1 ? 's' : ''} (2 à 5).`);
-  if (/(chantiers?|march[ée]s?) publics?|nouveau march|opportunit|veille|avis d'appel/i.test(objet || '')) a.push("L'objet ressemble à un email de veille d'appels d'offres.");
+  // 70 à 95 mots visés ; l'exemple validé en compte un peu plus de 100 au décompte simple, d'où la marge (25 de plus pour la
+  // demande de transmission du message pour l'accueil).
+  const [min, max] = accueil ? [70, 135] : [60, 110];
+  if (mots > max || mots < min) a.push(`Le message fait ${mots} mots (70 à 95 visés${accueil ? ', plus la demande de transmission' : ''}).`);
+  if (!accueil) {
+    const motsObjet = motsEmail(objet);
+    if (motsObjet < 2 || motsObjet > 5) a.push(`L'objet fait ${motsObjet} mot${motsObjet > 1 ? 's' : ''} (2 à 5).`);
+    if (/(chantiers?|march[ée]s?) publics?|nouveau march|opportunit|veille|avis d'appel/i.test(objet || '')) a.push("L'objet ressemble à un email de veille d'appels d'offres.");
+  }
   if (accroche != null && !general && !/^J'ai vu que /.test(accroche)) a.push("L'accroche ne commence pas par « J'ai vu que ».");
   const annee = aujourdHuiParis().slice(0, 4);
   if (/cette ann[ée]e/i.test(corps) && appuis.some((x) => /^\d{4}/.test(x.date || '') && x.date.slice(0, 4) !== annee)) a.push(`« Cette année » alors qu'un fait cité date d'avant ${annee}.`);
@@ -3721,7 +3887,7 @@ async function preparerEmailAvecClaude(e, l, c, { auto = true, consigne = '' } =
     // Claude a échoué : nouvel essai au passage suivant, puis, après 3 essais, la ligne passe à Gabriel avec le modèle vide.
     const essais = (e.faits?.essais_claude || 0) + 1;
     await majLigneEmail(e.id, essais >= 3
-      ? { statut: 'brouillon', objet: null, texte: texteEmail(e, l, c, { lieu: place.lieu }), faits: { ...faits, essais_claude: essais }, detail: "Claude n'a pas pu rédiger ce message : écris l'objet et l'accroche toi-même, et adapte la valeur." }
+      ? { statut: 'brouillon', objet: estGeneraleEmail(e) ? objetAccueilEmail(e.civilite, c) : null, texte: texteEmail(e, l, c, { lieu: place.lieu, accueil: estGeneraleEmail(e) }), faits: { ...faits, essais_claude: essais }, detail: "Claude n'a pas pu rédiger ce message : écris l'objet et l'accroche toi-même, et adapte la valeur." }
       : { faits: { ...faits, essais_claude: essais }, detail: "Claude n'a pas pu rédiger : nouvel essai au prochain passage." });
     throw err;
   }
@@ -4018,9 +4184,16 @@ async function envoyesDuJourEmail() {
 async function refusAvantEnvoi(e, l, c) {
   if (!e.email || !EMAIL_RE.test(e.email)) return "Pas d'adresse : rien n'est parti.";
   if (await enOpposition(e.email)) return 'Adresse en opposition (désinscription ou spam) : rien ne part.';
-  // Le filet de la règle du 12/11 : l'adresse doit être celle de la personne saluée, jamais une adresse générale.
-  const j = jugerAdresse(e.email, c ? [{ prenom: c.prenom, nom: c.nom, contact: true }] : [], l?.entreprise);
-  if (!j.ok) return `${e.email} : ${MOTIFS_ADRESSE[j.raison]}. Rien ne part (Gabriel, 12/11 : jamais d'adresse générale, seulement celle du dirigeant).`;
+  // Le filet de la règle du 12/11 : l'adresse doit être celle de la personne saluée ; une adresse générale (le repli du soir)
+  // doit être celle de l'entreprise elle-même, et le message, celui pour l'accueil.
+  if (estGeneraleEmail(e)) {
+    const g = adressesGeneralesDe(e, l).choisies.find((x) => x.email === normEmail(e.email)) || (() => { const j = jugerGenerale(e.email, { entreprise: l?.entreprise, communes: [e.faits?.registre?.siege?.commune, e.faits?.rdv?.commune, e.faits?.prospect?.commune].filter(Boolean) }); return j.ok ? j : null; })();
+    if (!g) return `${e.email} : pas une adresse générale de l'entreprise. Rien ne part.`;
+    if (!/merci de bien vouloir le lui transmettre/.test(e.texte || '')) return `${e.email} est une adresse générale : le message doit être celui pour l'accueil (« merci de bien vouloir le lui transmettre »). Rien ne part.`;
+  } else {
+    const j = jugerAdresse(e.email, c ? [{ prenom: c.prenom, nom: c.nom, contact: true }] : [], l?.entreprise);
+    if (!j.ok) return `${e.email} : ${MOTIFS_ADRESSE[j.raison]}. Rien ne part (Gabriel, 12/11 : jamais d'adresse générale sans le message pour l'accueil, sinon seulement celle du dirigeant).`;
+  }
   const mx = await mxDuDomaine(e.email.split('@')[1]);
   if (mx === 'non') return `${e.email} : ${MOTIFS_ADRESSE.mx}. Rien ne part.`;
   if (mx === 'inconnu') return { attente: 'Le DNS ne répond pas pour vérifier le domaine : nouvel essai au prochain passage.' };
@@ -4108,7 +4281,8 @@ async function envoyerBrevoEmail(e, c, r, jeton, signature = null) {
   const corps = {
     sender: { email: r.expediteur, name: r.expediteur_nom },
     replyTo: { email: ADMIN_EMAIL, name: 'Gabriel Vanderbecken' },
-    to: [{ email: e.email, name: nomContactEmail(c) === 'ce contact' ? e.email : nomContactEmail(c) }],
+    // À l'accueil, l'adresse seule : le nom du dirigeant n'est pas celui de la boîte.
+    to: [estGeneraleEmail(e) || nomContactEmail(c) === 'ce contact' ? { email: e.email } : { email: e.email, name: nomContactEmail(c) }],
     subject: e.objet,
     htmlContent: html,
     textContent: `${corpsTexte}${signature ? `\n\n${signature.texte}` : ''}\n\n--\nPour ne plus recevoir mes messages, se désinscrire : ${lien}`,
@@ -4222,7 +4396,8 @@ async function adressesEmails(r, bilan, reste) {
     let e = await verifierFaitsEmail(e0, l, c, bilan);
     if (!e) continue;
     bilan.verifies++;
-    if (!c.prenom || !c.nom) { await sansAdresse(e, l, c, 'Prénom ou nom du dirigeant manquant'); bilan.sans_email++; continue; }
+    // Sans nom, pas d'adresse du dirigeant à chercher : l'adresse générale, « à l'attention du gérant » (Gabriel, 12/11).
+    if (!c.prenom || !c.nom) { await repliAdresseGenerale(e, l, c, 'Prénom ou nom du dirigeant manquant', bilan); continue; }
     // 2. Une adresse déjà connue (import de la base Google Maps d'Anna) : la règle de l'adresse du dirigeant, avec les
     // dirigeants du registre, et le MX, une fois. « fiable » : posée ; « déduite » : jamais envoyée telle quelle, seulement
     // si FullEnrich confirme une adresse du dirigeant (plus bas). Une adresse qui ne passe pas : le circuit normal.
@@ -4264,18 +4439,24 @@ async function adressesEmails(r, bilan, reste) {
       }
       e = await majLigneEmail(e.id, { faits });
     }
-    // 4. Pas d'adresse gratuite : FullEnrich seulement pour un contact ultra qualifié (une adresse déduite aussi : elle n'est
-    // utilisée que si FullEnrich confirme une adresse DELIVERABLE du dirigeant).
+    // 4. Pas d'adresse gratuite : FullEnrich pour un contact ultra qualifié, ou pour vérifier une adresse déduite (réglage
+    // fullenrich_deduites, oui depuis le 12/11) ; elle n'est utilisée que si FullEnrich confirme une adresse DELIVERABLE du
+    // dirigeant. 5. Sinon, l'adresse générale de l'entreprise (repli).
     const u = ultraQualifie(e, l);
-    if (!u.ok) {
-      await sansAdresse(e, l, c, `${ecartee}${deduite ? `Adresse déduite (${deduite}) jamais vérifiée, ` : ''}${deduite ? "pas d'adresse" : "Pas d'adresse"} du dirigeant dans les sources publiques, et pas assez qualifié pour FullEnrich (${u.manque.join(', ')})`);
-      bilan.sans_email++;
+    const verifierDeduite = Boolean(deduite) && r.fullenrich_deduites !== false;
+    if (!u.ok && !verifierDeduite) {
+      await repliAdresseGenerale(e, l, c, `${ecartee}${deduite ? `Adresse déduite (${deduite}) jamais vérifiée, ` : ''}${deduite ? "pas d'adresse" : "Pas d'adresse"} du dirigeant dans les sources publiques, et pas assez qualifié pour FullEnrich (${u.manque.join(', ')})`, bilan);
       continue;
     }
     const enAttente = deduite ? `Adresse déduite à vérifier (${deduite})` : 'Ultra qualifié, en attente de FullEnrich';
-    const attente = !cle ? `${enAttente} : la clé FullEnrich n'est pas sur Vercel (Claude Code peut chercher l'adresse avec le MCP FullEnrich).`
-      : lot.length >= place ? `${enAttente} : plafond du jour atteint (${r.enrichissements} adresses trouvées par jour).` : null;
-    if (!e.faits?.ultra || attente !== e.detail) e = await majLigneEmail(e.id, { faits: { ...(e.faits || {}), ultra: { le: e.faits?.ultra?.le || new Date().toISOString(), forts: u.forts.slice(0, 3) } }, detail: attente });
+    const cause = !cle ? "la clé FullEnrich n'est pas sur Vercel" : lot.length >= place ? `plafond du jour atteint (${r.enrichissements} adresses trouvées par jour)` : null;
+    const attente = cause ? `${enAttente} : ${cause}${!cle ? ' (Claude Code peut chercher l\'adresse avec le MCP FullEnrich)' : ''}.` : null;
+    if (!e.faits?.ultra || attente !== e.detail) e = await majLigneEmail(e.id, { faits: { ...(e.faits || {}), ultra: { le: e.faits?.ultra?.le || new Date().toISOString(), forts: u.forts.slice(0, 3), ...(u.ok ? {} : { deduite: true }) } }, detail: attente });
+    // Au plus 3 jours ouvrés d'attente d'une adresse du dirigeant (Gabriel, 12/11), puis l'adresse générale.
+    if (attente && aujourdHuiParis() >= apresJoursOuvres(3, jourParis(e.faits.ultra.le))) {
+      await repliAdresseGenerale(e, l, c, `${enAttente} depuis 3 jours ouvrés (${cause})`, bilan);
+      continue;
+    }
     if (attente) continue;
     if (c.email && (await enOpposition(c.email))) { await majLigneEmail(e.id, { statut: 'annule', detail: 'Adresse en opposition.' }); continue; }
     const site = siteDe(e.faits || {}, l);
@@ -4338,16 +4519,16 @@ async function lireEnrichissements(bilan, reste) {
         continue;
       }
       if (trouve?.status !== 'DELIVERABLE' || !EMAIL_RE.test(adresse)) {
-        await sansAdresse(e, l, c, `Pas d'adresse vérifiée (${trouve?.status ? `FullEnrich : ${trouve.status}` : 'FullEnrich ne trouve rien'})`, { email_statut: trouve?.status || 'INTROUVABLE', fullenrich_id: null });
-        bilan.sans_email++;
+        await majLigneEmail(e.id, { fullenrich_id: null, email_statut: trouve?.status || 'INTROUVABLE' });
+        await repliAdresseGenerale(e, l, c, `Pas d'adresse vérifiée du dirigeant (${trouve?.status ? `FullEnrich : ${trouve.status}` : 'FullEnrich ne trouve rien'})`, bilan);
         continue;
       }
       // Même une adresse vérifiée doit être celle du dirigeant (Gabriel, 12/11 : jamais d'adresse générale).
       const j = jugerAdresse(adresse, await personnesDe(e, c), l?.entreprise);
       const mx = j.ok ? await mxDuDomaine(adresse.split('@')[1]) : null;
       if (!j.ok || mx === 'non') {
-        await sansAdresse(e, l, c, `FullEnrich donne ${adresse} : ${MOTIFS_ADRESSE[j.ok ? 'mx' : j.raison]}`, { email_statut: 'DELIVERABLE', fullenrich_id: null });
-        bilan.sans_email++;
+        await majLigneEmail(e.id, { fullenrich_id: null });
+        await repliAdresseGenerale(e, l, c, `FullEnrich donne ${adresse} : ${MOTIFS_ADRESSE[j.ok ? 'mx' : j.raison]}`, bilan);
         continue;
       }
       if (await enOpposition(adresse)) { await majLigneEmail(e.id, { statut: 'annule', email: adresse, detail: 'Adresse en opposition (désinscription ou spam) : rien ne part.' }); continue; }
@@ -4502,7 +4683,7 @@ function bilanEmail(envoyes, recus, { quota, jour = aujourdHuiParis() } = {}) {
   const recuParLead = new Map();
   for (const a of recus) { if (!recuParLead.has(a.lead_id)) recuParLead.set(a.lead_id, []); recuParLead.get(a.lead_id).push(a.date); }
   const a = (e, ...k) => k.some((x) => e.evenements?.[x]);
-  const compter = (liste) => ({
+  const compterBase = (liste) => ({
     envoyes: liste.length,
     arrives: liste.filter((e) => a(e, 'delivered')).length,
     erreurs: liste.filter((e) => a(e, ...ERREURS_ADRESSE)).length,
@@ -4510,15 +4691,46 @@ function bilanEmail(envoyes, recus, { quota, jour = aujourdHuiParis() } = {}) {
     desinscriptions: liste.filter((e) => a(e, 'unsubscribed')).length,
     reponses: liste.filter((e) => (recuParLead.get(e.lead_id) || []).some((d) => Date.parse(d) >= Date.parse(e.envoye_le))).length,
   });
+  // Au dirigeant (adresse nominative) et à l'accueil (adresse générale), comptés à part (Gabriel, 12/11).
+  const compter = (liste) => ({ ...compterBase(liste), nominatives: compterBase(liste.filter((e) => !estGeneraleEmail(e))), generales: compterBase(liste.filter(estGeneraleEmail)) });
   const il7 = maintenant - 7 * 86400000;
   return { aujourdhui: { envoyes: partis.filter((e) => jourParis(e.envoye_le) === jour).length, quota }, debut: compter(partis), semaine: compter(partis.filter((e) => Date.parse(e.envoye_le) >= il7)) };
+}
+const estGeneraleEmail = (e) => e.email_statut === 'GENERIQUE' || Boolean((e.adresse ?? e.faits?.adresse)?.generique);
+// Le quota du jour : le dernier palier atteint, si le bilan depuis le début est propre (aucun signalement comme spam, au plus
+// 1 adresse en erreur et moins de 2 % des envoyés, pas de pause) ; sinon le palier d'avant (ou le quota de base), et pourquoi.
+function quotaEmail(r, debut, pause, jour = aujourdHuiParis()) {
+  const paliers = (Array.isArray(r.paliers) ? r.paliers : []).filter((x) => DATE_RE.test(String(x?.a_partir_du || '')) && Number.isInteger(x.par_jour)).sort((a, b) => a.a_partir_du.localeCompare(b.a_partir_du));
+  const atteints = paliers.filter((x) => x.a_partir_du <= jour);
+  const d = debut || { envoyes: 0, erreurs: 0, spam: 0 };
+  const raisons = [];
+  if (d.spam > 0) raisons.push(`${pluriel(d.spam, 'signalement', 'signalements')} comme spam`);
+  if (d.erreurs > 1 || (d.erreurs > 0 && d.erreurs >= 0.02 * d.envoyes)) raisons.push(`${pluriel(d.erreurs, 'adresse en erreur', 'adresses en erreur')} sur ${pluriel(d.envoyes, 'envoi')}`);
+  if (pause) raisons.push('prospection en pause');
+  const propre = !raisons.length;
+  const palier = atteints.at(-1) || null;
+  const precedent = atteints.at(-2) || null;
+  const par_jour = !palier || propre ? (palier ? palier.par_jour : r.par_jour) : (precedent ? precedent.par_jour : r.par_jour);
+  return { par_jour, palier: propre ? palier : precedent, prochain: paliers.find((x) => x.a_partir_du > jour) || null, bloque: palier && !propre ? { par_jour: palier.par_jour, raison: raisons.join(', ') } : null, propre, raisons };
+}
+// Le bilan depuis le début, pour les paliers (seulement s'il y a un palier à décider).
+async function bilanDebutEmail(r) {
+  if (!(Array.isArray(r.paliers) && r.paliers.some((x) => x?.a_partir_du <= aujourdHuiParis()))) return null;
+  return bilanEmail(await lignesBilanEmail(), [], { quota: r.par_jour }).debut;
+}
+function texteQuotaEmail(q) {
+  const jourCourt = (iso) => dateCourte(iso).slice(0, 5);
+  const morceaux = [];
+  if (q.bloque) morceaux.push(`palier de ${q.bloque.par_jour} par jour suspendu : ${q.bloque.raison}`);
+  if (q.prochain) morceaux.push(`${q.prochain.par_jour} par jour à partir du ${jourCourt(q.prochain.a_partir_du)}${q.propre ? ' si le bilan reste propre' : ' quand le bilan sera propre'}`);
+  return morceaux.join(' ; ');
 }
 const pluriel = (n, un, plusieurs = `${un}s`) => `${n} ${n > 1 ? plusieurs : un}`;
 function texteCandidatsEmail(etat) {
   const k = etat.candidats || {};
   return [`${k.en_attente || 0} en attente (registre, adresse)`, `${pluriel(k.gratuites || 0, 'adresse trouvée', 'adresses trouvées')} gratuitement`,
-    `${pluriel(k.ultra_attente || 0, 'ultra qualifié', 'ultra qualifiés')} en attente de FullEnrich${k.ultra_attente && !etat.fullenrich ? ' (clé FullEnrich absente)' : ''}`,
-    ...(k.ultra_en_cours ? [`${k.ultra_en_cours} en cours chez FullEnrich`] : []), `${k.sans_adresse || 0} sans adresse (pour Anna)`].join(', ');
+    `${k.ultra_attente || 0} en attente de FullEnrich (ultra qualifiés ou adresses déduites)${k.ultra_attente && !etat.fullenrich ? ', clé FullEnrich absente' : ''}`,
+    ...(k.ultra_en_cours ? [`${k.ultra_en_cours} en cours chez FullEnrich`] : []), `${pluriel(k.generales || 0, 'adresse générale', 'adresses générales')} (accueil)`, `${k.sans_adresse || 0} sans adresse (pour Anna)`].join(', ');
 }
 function texteBilanEmail(b) {
   return `${pluriel(b.envoyes, 'envoyé')}, ${pluriel(b.arrives, 'arrivé')}, ${pluriel(b.erreurs, 'adresse en erreur', 'adresses en erreur')}, ${pluriel(b.spam, 'spam', 'spams')}, ${pluriel(b.desinscriptions, 'désinscription')}, ${pluriel(b.reponses, 'réponse')}`;
@@ -4527,7 +4739,7 @@ function texteBilanEmail(b) {
 async function lignesBilanEmail() {
   const lignes = [];
   for (let debut = 0; debut < 50000; debut += 1000) {
-    const { lignes: page } = await sb('iae_crm_emails?select=id,lead_id,statut,envoye_le,evenements,fullenrich_id,adresse:faits->adresse,ultra:faits->ultra&order=created_at.asc', { plage: `${debut}-${debut + 999}` });
+    const { lignes: page } = await sb('iae_crm_emails?select=id,lead_id,statut,email_statut,envoye_le,evenements,fullenrich_id,adresse:faits->adresse,ultra:faits->ultra&order=created_at.asc', { plage: `${debut}-${debut + 999}` });
     lignes.push(...page);
     if (page.length < 1000) break;
   }
@@ -4547,28 +4759,33 @@ async function etatProspectionEmail({ lignes = null, recus = null } = {}) {
   const ultraDe = (e) => e.ultra ?? e.faits?.ultra ?? null;
   const candidats = {
     en_attente: tout.filter((e) => e.statut === 'a_enrichir' && !ultraDe(e)).length,
-    gratuites: tout.filter((e) => e.statut !== 'annule' && ['site', 'ademe', 'boamp', 'outscraper'].includes(adresseDe(e)?.source)).length,
+    gratuites: tout.filter((e) => e.statut !== 'annule' && !estGeneraleEmail(e) && ['site', 'ademe', 'boamp', 'outscraper'].includes(adresseDe(e)?.source)).length,
+    generales: tout.filter((e) => e.statut !== 'annule' && estGeneraleEmail(e)).length,
     ultra_attente: tout.filter((e) => e.statut === 'a_enrichir' && ultraDe(e) && !e.fullenrich_id).length,
     ultra_en_cours: tout.filter((e) => e.statut === 'a_enrichir' && e.fullenrich_id).length,
     sans_adresse: n('sans_email'),
   };
+  const bilan = bilanEmail(tout, rec, { quota: r.par_jour });
+  const q = quotaEmail(r, bilan.debut, r.pause);
+  bilan.aujourdhui.quota = q.par_jour;
   return {
     candidats,
-    actif: tout.length > 0, pause: r.pause || null, quota: r.par_jour, fenetre: [r.debut, r.fin], expediteur: r.expediteur,
+    actif: tout.length > 0, pause: r.pause || null, quota: q.par_jour, palier: { actuel: q.palier, prochain: q.prochain, bloque: q.bloque, texte: texteQuotaEmail(q) || null },
+    fenetre: [r.debut, r.fin], expediteur: r.expediteur,
     fullenrich: Boolean(process.env.FULLENRICH_API_KEY), brevo: Boolean(process.env.BREVO_API_KEY), fullenrich_erreur: suivi.fullenrich_erreur || null,
     a_valider: n('brouillon') + n('echec'), en_file: n('a_envoyer') + n('en_cours'), a_enrichir: n('a_enrichir'), a_rediger: n('a_rediger'), sans_email: n('sans_email'),
     campagnes: suivi.campagnes || {}, dernier_passage: suivi.passage_le || null,
     // La signature ajoutée à l'envoi : sa version texte pour l'aperçu de la page (jamais son HTML, qui ne s'affiche pas ici).
     signature: signature?.texte ? { texte: signature.texte, le: signature.le || null } : null, gmail: gmailConfigure(),
     rdv: { minutes: Number.isFinite(r.rdv_minutes) ? r.rdv_minutes : EMAIL_PROSPECTION.rdv_minutes, km: Number.isFinite(r.rdv_km) ? r.rdv_km : EMAIL_PROSPECTION.rdv_km },
-    bilan: bilanEmail(tout, rec, { quota: r.par_jour }),
+    bilan,
   };
 }
 
 // Un passage, toutes les 15 minutes, après la boîte de Gabriel (une réponse arrivée entre-temps arrête l'envoi).
 async function prospectionEmail({ limite = Date.now() + 40000 } = {}) {
   if (!estAdmin()) return { ignore: 'equipe' };
-  const bilan = { verifies: 0, gratuites: 0, enrichis: 0, adresses: 0, sans_email: 0, rediges: 0, envoyes: 0, echecs: 0, annules: 0, evenements: 0 };
+  const bilan = { verifies: 0, gratuites: 0, generales: 0, enrichis: 0, adresses: 0, sans_email: 0, rediges: 0, envoyes: 0, echecs: 0, annules: 0, evenements: 0 };
   const { lignes: ouvertes } = await sb('iae_crm_emails?statut=in.(a_enrichir,a_rediger,a_envoyer,en_cours,envoye)&select=id&limit=1');
   if (!ouvertes.length) return { rien: true };
   // marge : le temps qu'il faut encore pour finir proprement ce qu'on commence (une lecture de site, une rédaction).
@@ -4589,14 +4806,35 @@ async function prospectionEmail({ limite = Date.now() + 40000 } = {}) {
   const signature = gmailConfigure() ? await signatureEmail().catch(() => null) : null;
   // 3. Les envois du matin, dans le quota.
   const hm = heureMinuteParis();
-  if (process.env.BREVO_API_KEY && hm >= r.debut && hm < r.fin) await envoyerFileEmail(r, bilan, reste, signature);
+  if (process.env.BREVO_API_KEY && hm >= r.debut && hm < r.fin) {
+    // Le quota du jour suit les paliers, si le bilan depuis le début est propre (Gabriel, 12/11).
+    const q = quotaEmail(r, (await bilanDebutEmail(r)), pause);
+    await envoyerFileEmail({ ...r, par_jour: q.par_jour }, bilan, reste, signature);
+  }
   // 4. Registre et faits publics, adresse gratuite du dirigeant, FullEnrich pour les ultra qualifiés ; 5. lecture des
   // recherches FullEnrich finies ; 6. rédaction par Claude.
   if (reste()) await adressesEmails(r, bilan, reste).catch((x) => console.error('crm email adresses', x?.code || x?.message));
   if (reste()) await lireEnrichissements(bilan, reste).catch((x) => console.error('crm email fullenrich', x?.code || x?.message));
   if (reste()) await redigerEmails(bilan, reste).catch((x) => console.error('crm email rédaction', x?.code || x?.message));
+  // 7. Le rattrapage du repli sur l'adresse générale (lignes « sans adresse » depuis le 12/11), 10 par passage.
+  if (reste(10000)) await rattraperGenerales(bilan, reste).catch((x) => console.error('crm email repli', x?.code || x?.message));
   await noterPassageEmail(bilan);
   return bilan;
+}
+// Le rattrapage du repli (12/11 au soir) : les lignes « sans adresse » depuis le 12/11 (sans adresse nominative, ou FullEnrich
+// sans résultat) passent une fois par le repli sur l'adresse générale, 10 par passage, sans intervention.
+const RATTRAPAGE_REPLI = { depuis: '2026-11-12T00:00:00+01:00', par_passage: 10 };
+async function rattraperGenerales(bilan, reste) {
+  const { lignes } = await sb(`iae_crm_emails?statut=eq.sans_email&created_at=gte.${encodeURIComponent(RATTRAPAGE_REPLI.depuis)}&order=created_at.asc&limit=200&select=*`);
+  let n = 0;
+  for (const e of lignes) {
+    if (n >= RATTRAPAGE_REPLI.par_passage || !reste(5000)) break;
+    if (e.faits?.repli) continue;
+    n++;
+    const { l, c } = await leadEtContactEmail(e);
+    if (!l || l.archive || !['nouveau', 'contacte'].includes(l.statut)) { await majLigneEmail(e.id, { faits: { ...(e.faits || {}), repli: { le: new Date().toISOString(), raison: 'lead archivé, perdu ou déjà plus loin' } } }); continue; }
+    await repliAdresseGenerale(e, l, c, String(e.detail || "Pas d'adresse du dirigeant").replace(/ : la fiche reste pour Anna, au téléphone\.$/, ''), bilan, { rattrapage: true });
+  }
 }
 async function noterPassageEmail(bilan) {
   await ecrireReglage('email_prospection_suivi', { ...((await lireReglage('email_prospection_suivi')) || {}), passage_le: new Date().toISOString(), dernier_bilan: bilan });
@@ -4626,6 +4864,11 @@ async function operationEmail(corps, ip) {
     if (corps.tentatives_fullenrich !== undefined) v.tentatives_fullenrich = entier(corps.tentatives_fullenrich, 0, 100);
     if (corps.rdv_minutes !== undefined) v.rdv_minutes = entier(corps.rdv_minutes, 0, 180);
     if (corps.rdv_km !== undefined) v.rdv_km = entier(corps.rdv_km, 0, 200);
+    if (corps.fullenrich_deduites !== undefined) { if (typeof corps.fullenrich_deduites !== 'boolean') throw new Refus('valeur_invalide:reglage'); v.fullenrich_deduites = corps.fullenrich_deduites; }
+    if (corps.paliers !== undefined) {
+      if (!Array.isArray(corps.paliers) || corps.paliers.length > 10) throw new Refus('valeur_invalide:reglage');
+      v.paliers = corps.paliers.map((x) => { if (!DATE_RE.test(String(x?.a_partir_du || ''))) throw new Refus('valeur_invalide:reglage'); return { a_partir_du: x.a_partir_du, par_jour: entier(x.par_jour, 0, 50) }; }).sort((a, b) => a.a_partir_du.localeCompare(b.a_partir_du));
+    }
     if (corps.expediteur !== undefined) { const a = normEmail(corps.expediteur); if (!EMAIL_RE.test(a)) throw new Refus('adresse_invalide'); v.expediteur = a; }
     if (corps.expediteur_nom !== undefined) v.expediteur_nom = couper(String(corps.expediteur_nom).replace(/[\r\n<>"]+/g, ' ').trim(), 70) || EMAIL_PROSPECTION.expediteur_nom;
     if (!Object.keys(v).length) throw new Refus('rien_a_modifier');
@@ -4680,8 +4923,10 @@ async function operationEmail(corps, ip) {
     if (!j.ok) throw new Refus(CODES_ADRESSE[j.raison]);
     if ((await mxDuDomaine(email.split('@')[1])) === 'non') throw new Refus('domaine_sans_mx');
     const url = /^https:\/\/[^\s"'<>]{4,300}$/.test(String(corps.url || '')) ? String(corps.url) : null;
-    const faits = { ...(e.faits || {}), adresse: { ...(e.faits?.adresse || {}), cherchee_le: e.faits?.adresse?.cherchee_le || new Date().toISOString(), email, source: source === 'fullenrich' ? 'fullenrich' : source === 'site' ? 'site' : 'manuel', url } };
-    const ligne = await poserAdresse(e, l, c, { email, personne: j.personne, source_email: source, email_statut: statutEmail, faits, journal: `Adresse de {qui} posée à la main (${source}${url ? ` : ${url}` : ''}) : ${email}.` });
+    const faits = { ...(e.faits || {}), adresse: { ...(e.faits?.adresse || {}), cherchee_le: e.faits?.adresse?.cherchee_le || new Date().toISOString(), email, source: source === 'fullenrich' ? 'fullenrich' : source === 'site' ? 'site' : 'manuel', url, generique: false } };
+    let ligne = await poserAdresse(e, l, c, { email, personne: j.personne, source_email: source, email_statut: statutEmail, faits, journal: `Adresse de {qui} posée à la main (${source}${url ? ` : ${url}` : ''}) : ${email}.` });
+    // Un message écrit pour l'accueil ne part jamais au dirigeant lui-même : Claude le réécrit.
+    if (estGeneraleEmail(e) && ['brouillon', 'echec'].includes(ligne.statut)) ligne = await majLigneEmail(e.id, { statut: 'a_rediger', valide_le: null, detail: "Adresse du dirigeant posée : le message pour l'accueil est réécrit pour lui." });
     return { email: emailPourPage(ligne) };
   }
   throw new Refus('op_inconnue');
@@ -5106,9 +5351,13 @@ async function lignesRecapEmail() {
   if (etat.a_valider) lignes.push(`- ${pluriel(etat.a_valider, 'email')} à valider (bouton « Emails à valider » dans Aujourd'hui).`);
   lignes.push(`- Candidats : ${texteCandidatsEmail(etat)}.`);
   if (etat.fullenrich_erreur) lignes.push(`- ${etat.fullenrich_erreur}`);
-  lignes.push(`- Aujourd'hui : ${b.aujourdhui.envoyes} envoyé${b.aujourdhui.envoyes > 1 ? 's' : ''} sur ${b.aujourdhui.quota}${etat.en_file ? ` (${etat.en_file} en file, ils partent entre ${heureLue(etat.fenetre[0])} et ${heureLue(etat.fenetre[1])})` : ''}.`);
+  lignes.push(`- Aujourd'hui : ${b.aujourdhui.envoyes} envoyé${b.aujourdhui.envoyes > 1 ? 's' : ''} sur ${b.aujourdhui.quota}${etat.en_file ? ` (${etat.en_file} en file, ils partent entre ${heureLue(etat.fenetre[0])} et ${heureLue(etat.fenetre[1])})` : ''}.${etat.palier?.texte ? ` Palier : ${etat.palier.texte}.` : ''}`);
+  // Au dirigeant et à l'accueil, à part (Gabriel, 12/11 : le repli sur l'adresse générale).
+  const parType = (x) => `au dirigeant : ${texteBilanEmail(x.nominatives || x)} ; à l'accueil (adresse générale) : ${texteBilanEmail(x.generales || { envoyes: 0, arrives: 0, erreurs: 0, spam: 0, desinscriptions: 0, reponses: 0 })}`;
   lignes.push(`- 7 derniers jours : ${texteBilanEmail(b.semaine)}.`);
+  lignes.push(`  (${parType(b.semaine)})`);
   lignes.push(`- Depuis le début : ${texteBilanEmail(b.debut)}.`);
+  lignes.push(`  (${parType(b.debut)})`);
   const urgent = Boolean(etat.pause || etat.a_valider);
   return { lignes, urgent, resume: etat.pause ? 'prospection email en pause' : etat.a_valider ? `${pluriel(etat.a_valider, 'email')} à valider` : null };
 }
