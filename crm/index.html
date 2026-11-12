@@ -3145,6 +3145,7 @@ function brancherLi(form) {
         b.textContent = 'Envoi…';
         const r = await api('POST', { op: 'linkedin_valider', id, texte: zone ? zone.value : null });
         majLi(r.action);
+        if (r.lead) { remplacerLead(r.lead); indexer(); }
         if (r.confiance) D.reglages.linkedin_confiance = r.confiance;
         toast(r.confiance && r.confiance.auto && r.confiance.depuis && Date.now() - Date.parse(r.confiance.depuis) < 60000 ? 'En file. Tu as validé 10 messages tels quels : les suivants partiront tout seuls.' : 'En file : ton Mac l\'envoie dans le quart d\'heure, s\'il est allumé.', 6000);
       } else if (b.hasAttribute('data-li-annuler')) {
@@ -3194,6 +3195,7 @@ function ouvrirLinkedinDuJour() {
         try {
           const r = await api('POST', { op: 'linkedin_valider', id: a.id, texte: ($('[data-li-texte]', bloc) || {}).value ?? a.texte });
           majLi(r.action);
+          if (r.lead) { remplacerLead(r.lead); indexer(); }
           if (r.confiance) D.reglages.linkedin_confiance = r.confiance;
           n++;
         } catch (err) {

@@ -2443,7 +2443,19 @@ async function operationLinkedin(corps, ip) {
       confiance = { ...avant, serie, auto: avant.auto || serie >= SEUIL_CONFIANCE_LI, ...(serie >= SEUIL_CONFIANCE_LI && !avant.auto ? { depuis: new Date().toISOString() } : {}) };
       await ecrireReglage('linkedin_confiance', confiance);
     }
-    return { action: await majActionLi(a.id, { texte, statut: 'a_envoyer', valide_le: new Date().toISOString(), detail: null }), confiance };
+    const action = await majActionLi(a.id, { texte, statut: 'a_envoyer', valide_le: new Date().toISOString(), detail: null });
+    // Gabriel, 12/11 : « j'ai validé les messages LinkedIn et ça apparaît toujours dans mes relances du jour ». Validé =
+    // plus rien à faire aujourd'hui : la tâche passe au jour ouvré suivant (l'envoi la remplace par la relance à 4 jours ;
+    // si rien n'est parti d'ici là, elle revient).
+    let lead = null;
+    if (a.type === 'message') {
+      const [l] = (await sb(`iae_crm_leads?id=eq.${a.lead_id}&select=id,prochaine_note`)).lignes;
+      if (l && (!l.prochaine_note || /^LinkedIn :/.test(l.prochaine_note))) {
+        const [c] = (await sb(`iae_crm_contacts?id=eq.${a.contact_id}&select=prenom,nom`)).lignes;
+        lead = await majLeadLi(l.id, { prochaine_relance: dansJoursOuvres(1), prochaine_action: 'autre', prochaine_note: `LinkedIn : ${LIB_ETAPE_LI[a.etape].toLowerCase()} à ${c?.prenom || nomContactLi(c)} validé le ${dateCourte(aujourdHuiParis())}, ${machineLi()} l'envoie. S'il n'est pas parti, regarde la barre LinkedIn.` });
+      }
+    }
+    return { action, confiance, lead };
   }
   if (op === 'linkedin_annuler') {
     if (['en_cours', 'envoye'].includes(a.statut)) throw new Refus('deja_parti', 409);
@@ -2501,12 +2513,16 @@ async function fileRobotLi() {
   const coince = new Date(Date.now() - 30 * 60000).toISOString();
   await sb(`iae_crm_linkedin?${filtreCompteLi()}&statut=eq.en_cours&pris_le=lt.${encodeURIComponent(coince)}`, { methode: 'PATCH', corps: { statut: 'a_verifier', detail: `${machineLi().replace(/^t/, 'T')} s'est arrêté pendant l'envoi : regarde sur LinkedIn si c'est parti.` }, prefer: 'return=minimal' });
   const debut = new Date(`${jour}T00:00:00+01:00`).toISOString();
-  const [{ lignes: file }, { lignes: suivis }, { lignes: faits }, etat] = await Promise.all([
-    sb(`iae_crm_linkedin?${filtreCompteLi()}&statut=eq.a_envoyer&order=valide_le.asc&limit=40&select=id,type,etape,texte,contact_id,lead_id`),
+  // Les messages d'abord, puis les invitations, chacun avec sa propre limite (12/11 : la recherche automatique garde
+  // 40 invitations d'avance ; une seule limite à 40 aurait caché les messages validés derrière elles).
+  const [{ lignes: fileMessages }, { lignes: fileInvitations }, { lignes: suivis }, { lignes: faits }, etat] = await Promise.all([
+    sb(`iae_crm_linkedin?${filtreCompteLi()}&statut=eq.a_envoyer&type=eq.message&order=valide_le.asc&limit=40&select=id,type,etape,texte,contact_id,lead_id`),
+    sb(`iae_crm_linkedin?${filtreCompteLi()}&statut=eq.a_envoyer&type=eq.invitation&order=valide_le.asc&limit=60&select=id,type,etape,texte,contact_id,lead_id`),
     sb(`iae_crm_contacts?${filtreContactsLi()}&linkedin_etat=not.is.null&select=id,lead_id,prenom,nom,linkedin,linkedin_etat,linkedin_le,linkedin_vu&limit=1000`),
     sb(`iae_crm_linkedin?${filtreCompteLi()}&statut=in.(envoye,en_cours,a_verifier)&pris_le=gte.${encodeURIComponent(debut)}&select=type`),
     etatRobotLi(),
   ]);
+  const file = [...fileMessages, ...fileInvitations];
   const ids = [...new Set([...file.map((a) => a.contact_id), ...suivis.map((x) => x.id)])];
   const contacts = new Map(suivis.map((x) => [x.id, x]));
   const manquants = file.map((a) => a.contact_id).filter((id) => !contacts.has(id));
