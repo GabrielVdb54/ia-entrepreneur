@@ -55,6 +55,8 @@
  *   POST { op: 'prospect_email', prospect }   un dirigeant à prospecter par email
  *        (clé du CRM de Gabriel, ou clé du robot de son Mac quand LinkedIn ne
  *        donne pas de profil utilisable)
+ *   POST { op: 'email_importer', candidats: [...] }   une liste de dirigeants dont l'adresse
+ *        est connue (base Google Maps d'Anna, Outscraper : fiable ou déduite), Gabriel seul
  *   POST { op: 'email_valider' | 'email_rediger' | 'email_ecarter' | 'email_adresse'
  *          | 'email_reprendre' | 'email_pause' | 'email_auto_couper' | 'email_reglage'
  *          | 'email_passage', … }   la prospection email depuis la page
@@ -2824,14 +2826,43 @@ const COLONNES_EMAIL_PAGE = 'id,created_at,lead_id,contact_id,etape,statut,email
 // déjà trouvé une solution ? » (trop faible). Une seule question dans tout le message ; plus de phrase « Chez X, … ».
 // Claude écrit l'objet, l'accroche (« J'ai vu que vous… »), la valeur (la tâche précise liée aux faits, à l'infinitif, avec
 // un exemple concret), le reste du bureau (trois tâches de la liste fermée) et le document de l'exemple ; le reste est fixe.
-const RESTE_BUREAU_EMAIL = ['emails', 'devis', 'relation client', 'suivi de chantier', 'plannings', 'factures et relances', 'recrutement'];
-const RESTE_DEFAUT_EMAIL = { 'du BTP': ['emails', 'devis', 'relation client', 'plannings'], 'de la propreté': ['plannings', 'devis', 'relation client', 'emails'], 'de PME': ['emails', 'devis', 'relation client', 'factures et relances'] };
-// Quand Claude n'a pas pu rédiger (3 essais) : une valeur neutre du métier, que Gabriel adapte avec l'accroche.
-const VALEUR_DEFAUT_EMAIL = {
-  'du BTP': ["préparer plus vite leurs devis avec l'IA, par exemple à partir de leurs notes de visite", 'devis'],
-  'de la propreté': ["préparer plus vite leurs devis avec l'IA, par exemple à partir de leurs notes de visite de site", 'devis'],
-  'de PME': ["traiter plus vite leurs emails avec l'IA, par exemple en partant de leurs réponses types", 'emails'],
+// Un jeu par métier (Gabriel, 12/11, pour la base Google Maps d'Anna : immobilier et assurance en plus du BTP et de la
+// propreté) : le reste du bureau en liste fermée (celui par défaut d'abord), des exemples de valeur et de document pour
+// Claude, et la valeur neutre quand Claude n'a pas pu rédiger (3 essais), que Gabriel adapte avec l'accroche.
+const RESTE_BTP_EMAIL = ['emails', 'devis', 'relation client', 'suivi de chantier', 'plannings', 'factures et relances', 'recrutement'];
+const JEUX_METIER_EMAIL = {
+  'du BTP': {
+    reste: RESTE_BTP_EMAIL, defaut: ['emails', 'devis', 'relation client', 'plannings'],
+    valeurs: ["répondre plus vite aux appels d'offres avec l'IA, par exemple en partant de leurs anciens mémoires techniques", "monter plus vite les dossiers d'aides de leurs clients avec l'IA, par exemple à partir des devis signés", "préparer plus vite leurs devis avec l'IA, par exemple à partir de leurs notes de visite"],
+    documents: ['mémoires', 'devis', "dossiers d'aides", 'comptes rendus'], objets: ["Vos appels d'offres", "Vos chantiers d'accessibilité", 'Votre qualification chaudière bois', '40 ans en avril'],
+    neutre: ["préparer plus vite leurs devis avec l'IA, par exemple à partir de leurs notes de visite", 'devis'],
+  },
+  'de la propreté': {
+    reste: RESTE_BTP_EMAIL.filter((x) => x !== 'suivi de chantier'), defaut: ['plannings', 'devis', 'relation client', 'emails'],
+    valeurs: ["préparer plus vite les plannings des équipes avec l'IA, par exemple à partir de ceux de la semaine passée", "répondre plus vite aux appels d'offres avec l'IA, par exemple en partant de leurs anciens mémoires techniques", "préparer plus vite leurs devis avec l'IA, par exemple à partir de leurs notes de visite de site"],
+    documents: ['plannings', 'devis', 'mémoires'], objets: ["Vos appels d'offres", "Vos plannings d'équipe", '20 ans en mars'],
+    neutre: ["préparer plus vite leurs devis avec l'IA, par exemple à partir de leurs notes de visite de site", 'devis'],
+  },
+  'des agences immobilières': {
+    reste: ['emails', 'annonces', 'comptes rendus de visite', 'relances vendeurs et acquéreurs', 'gestion des mandats', 'estimations', 'relation client'], defaut: ['emails', 'comptes rendus de visite', 'relances vendeurs et acquéreurs', 'annonces'],
+    valeurs: ["rédiger plus vite leurs annonces avec l'IA, par exemple à partir de leurs notes de visite", "préparer plus vite les comptes rendus de visite pour leurs vendeurs avec l'IA, par exemple à partir d'une note vocale", "répondre plus vite aux demandes des acquéreurs avec l'IA, par exemple à partir de leurs fiches de biens"],
+    documents: ['annonces', 'comptes rendus de visite', 'mandats', 'fiches de biens'], objets: ['Vos annonces', 'Vos comptes rendus de visite', '15 ans à Vincennes'],
+    neutre: ["rédiger plus vite leurs annonces avec l'IA, par exemple à partir de leurs notes de visite", 'annonces'],
+  },
+  "des cabinets d'assurance": {
+    reste: ['emails', 'devis', 'gestion des sinistres', 'relances', 'renouvellements', 'relation client'], defaut: ['emails', 'relances', 'renouvellements', 'devis'],
+    valeurs: ["traiter plus vite les déclarations de sinistre avec l'IA, par exemple à partir des emails de leurs clients", "préparer plus vite leurs comparatifs avec l'IA, par exemple à partir des conditions des assureurs", "préparer plus vite les renouvellements avec l'IA, par exemple à partir des contrats en cours"],
+    documents: ['dossiers sinistres', 'comparatifs', 'contrats', 'devis'], objets: ['Vos dossiers sinistres', 'Vos renouvellements', '30 ans à Metz'],
+    neutre: ["traiter plus vite les déclarations de sinistre avec l'IA, par exemple à partir des emails de leurs clients", 'dossiers sinistres'],
+  },
+  'des PME': {
+    reste: ['emails', 'devis', 'relation client', 'factures et relances', 'plannings', 'recrutement'], defaut: ['emails', 'devis', 'relation client', 'factures et relances'],
+    valeurs: ["traiter plus vite leurs emails avec l'IA, par exemple en partant de leurs réponses types", "préparer plus vite leurs devis avec l'IA, par exemple à partir de leurs anciens devis"],
+    documents: ['emails', 'devis', 'comptes rendus'], objets: ['Vos devis', 'Vos emails clients', '10 ans en juin'],
+    neutre: ["traiter plus vite leurs emails avec l'IA, par exemple en partant de leurs réponses types", 'emails'],
+  },
 };
+const jeuMetierEmail = (metier) => JEUX_METIER_EMAIL[metier] || JEUX_METIER_EMAIL['des PME'];
 const LIEU_DISTANCE_EMAIL = 'en visio ou par téléphone';
 const SIGNATURE_EMAIL = 'Gabriel Vanderbecken\nIA-Entrepreneur';
 const motsEmail = (t) => String(t || '').split(/\s+/).filter((m) => /[\p{L}\p{N}]/u.test(m)).length;
@@ -2844,12 +2875,13 @@ function nettoyerValeurEmail(v) {
 // Le reste du bureau : trois tâches de la liste fermée, sans redire la valeur, complétées par celles du métier.
 function resteBureauEmail(reste, valeur, metier) {
   const v = normaliser(valeur);
+  const jeu = jeuMetierEmail(metier);
   const choisis = [];
-  for (const r of [...(Array.isArray(reste) ? reste : []), ...(RESTE_DEFAUT_EMAIL[metier] || []), ...RESTE_BUREAU_EMAIL]) {
+  for (const r of [...(Array.isArray(reste) ? reste : []), ...jeu.defaut, ...jeu.reste]) {
     const k = String(r || '').trim().toLowerCase();
-    if (!RESTE_BUREAU_EMAIL.includes(k) || choisis.includes(k)) continue;
+    if (!jeu.reste.includes(k) || choisis.includes(k)) continue;
     // « factures et relances » redit « factures » ; « suivi de chantier » redit « chantier » : un mot commun suffit.
-    if (normaliser(k).split(' ').some((m) => m.length > 3 && m !== 'client' && v.split(' ').some((w) => w === m || w === `${m}s` || `${w}s` === m))) continue;
+    if (normaliser(k).split(' ').some((m) => m.length > 3 && !['client', 'gestion', 'visite'].includes(m) && v.split(' ').some((w) => w === m || w === `${m}s` || `${w}s` === m))) continue;
     choisis.push(k);
     if (choisis.length === 3) break;
   }
@@ -2861,10 +2893,14 @@ function documentEmail(d, defaut = 'devis') {
   return x && x.length <= 40 && x.split(' ').length <= 4 && /^[\p{Ll}' -]+$/u.test(x) ? x : defaut;
 }
 const ligneValeurEmail = (metier, valeur, reste) => `Je forme les équipes ${metier} à ${valeur}, et aussi à alléger le reste du bureau : ${reste.join(', ')}. Les formations sont éligibles à votre budget formation.`;
-const ligneRdvEmail = (document, lieu) => `Si ça vous parle, je peux vous montrer en 20 minutes ce que ça donne sur un de vos propres ${document}, ${lieu}. Ça vous intéresse ?`;
+// « un de vos propres mémoires », mais « une de vos propres annonces » : le genre se lit sur le premier mot du document.
+const DOCUMENTS_FEMININS_EMAIL = /^(annonces|fiches|estimations|factures|offres|réponses|propositions|notes|déclarations|attestations|relances|lettres|synthèses|notices|demandes|candidatures|consultations|analyses)\b/;
+const ligneRdvEmail = (document, lieu) => `Si ça vous parle, je peux vous montrer en 20 minutes ce que ça donne sur ${DOCUMENTS_FEMININS_EMAIL.test(document) ? 'une' : 'un'} de vos propres ${document}, ${lieu}. Ça vous intéresse ?`;
+// Le métier de la phrase fixe (Gabriel, 12/11 : immobilier, gestion locative et syndic → agences immobilières ; assurance
+// et courtage → cabinets d'assurance ; sinon des PME).
 function metierEmail(l) {
   const m = pageMetierLi(l)?.metier || '';
-  return /BTP/.test(m) ? 'du BTP' : /propret/.test(m) ? 'de la propreté' : 'de PME';
+  return /BTP/.test(m) ? 'du BTP' : /propret/.test(m) ? 'de la propreté' : /immobili|syndic|gestion locative/.test(m) ? 'des agences immobilières' : /assurance/.test(m) ? "des cabinets d'assurance" : 'des PME';
 }
 function salutationEmail(civilite, c) {
   const nom = nomPropre(c?.nom);
@@ -2876,7 +2912,7 @@ function salutationEmail(civilite, c) {
 // depuis Nancy), signature texte. Ces deux lignes de signature sont remplacées par la signature Gmail à l'envoi.
 function texteEmail(e, l, c, { accroche = '', valeur = '', reste = [], document = '', lieu = LIEU_DISTANCE_EMAIL } = {}) {
   const metier = metierEmail(l);
-  const [valeurDefaut, documentDefaut] = VALEUR_DEFAUT_EMAIL[metier];
+  const [valeurDefaut, documentDefaut] = jeuMetierEmail(metier).neutre;
   const v = nettoyerValeurEmail(valeur) || valeurDefaut;
   return [salutationEmail(e.civilite, c), '', String(accroche || '').trim(), '', ligneValeurEmail(metier, v, resteBureauEmail(reste, v, metier)), '',
     ligneRdvEmail(documentEmail(document, documentDefaut), lieu || LIEU_DISTANCE_EMAIL), '', SIGNATURE_EMAIL].join('\n');
@@ -3073,8 +3109,11 @@ const ADRESSES_GENERALES = new Set(['contact', 'contacts', 'info', 'infos', 'inf
   'planning', 'exploitation', 'etude', 'etudes', 'commande', 'commandes', 'magasin', 'boutique', 'showroom', 'reception', 'standard', 'assistante',
   'assistant', 'adv', 'paie', 'team', 'equipe', 'entreprise', 'societe', 'sarl', 'sas', 'sasu', 'eurl', 'sci', 'snc', 'webmaster', 'postmaster',
   'abuse', 'newsletter', 'general', 'generale', 'siege', 'groupe', 'cabinet', 'mairie', 'gerance', 'location', 'renseignements', 'demande', 'demandes']);
+// Les mots qui ne font pas le nom d'une société : formes juridiques, et (12/11, base Google Maps) les mots du métier
+// (« Cabinet Safar » : safar@ est la boîte de la société, comme chiarizia@ pour CHIARIZIA).
 const FORMES_JURIDIQUES = new Set(['sarl', 'sas', 'sasu', 'sa', 'eurl', 'sci', 'snc', 'scop', 'ets', 'etablissements', 'etablissement', 'entreprise',
-  'entreprises', 'societe', 'ste', 'et', 'fils', 'freres', 'cie', 'groupe', 'de', 'des', 'du', 'la', 'le', 'les', 'l', 'd']);
+  'entreprises', 'societe', 'ste', 'et', 'fils', 'freres', 'cie', 'groupe', 'group', 'holding', 'cabinet', 'agence', 'immobilier', 'immobiliere', 'immo',
+  'assurance', 'assurances', 'courtage', 'de', 'des', 'du', 'la', 'le', 'les', 'l', 'd']);
 const PARTICULES = new Set(['de', 'du', 'des', 'la', 'le', 'd', 'l', 'van', 'von', 'da', 'di', 'dos']);
 // Les domaines des messageries grand public : jamais le domaine d'un site d'entreprise.
 const WEBMAILS = new Set([...DOMAINES_PERSO, 'club-internet.fr', 'aliceadsl.fr', 'cegetel.net', 'noos.fr', 'voila.fr', 'ymail.com', 'yahoo.co.uk',
@@ -3082,6 +3121,7 @@ const WEBMAILS = new Set([...DOMAINES_PERSO, 'club-internet.fr', 'aliceadsl.fr',
 const MOTIFS_ADRESSE = {
   invalide: 'adresse invalide', generique: 'adresse générale', societe: 'adresse au nom de la société',
   autre: "pas l'adresse du dirigeant (une autre personne, ou une adresse non nominative)", mx: 'domaine sans serveur de messagerie (MX)',
+  ambigue: 'adresse au seul nom de famille de plusieurs dirigeants : impossible de savoir qui la lit',
   domaine: "domaine d'un autre site (agence web, hébergeur…)",
 };
 const motsDe = (t) => String(t || '').normalize('NFD').replace(/\p{M}/gu, '').toLowerCase().split(/[^a-z0-9]+/).filter(Boolean);
@@ -3119,8 +3159,10 @@ function jugerAdresse(email, personnes, entreprise) {
   // dirigeant (chiarizia@ pour CHIARIZIA : impossible de savoir qui lit cette boîte).
   const societe = motsDe(entreprise).filter((m) => !FORMES_JURIDIQUES.has(m)).join('');
   if (societe.length >= 3 && (compact === societe || compact.replace(/\d+/g, '') === societe)) return { ok: false, raison: 'societe' };
-  const personne = (personnes || []).find((p) => formesDuNom(p).has(compact));
-  if (personne) return { ok: true, personne };
+  const qui = (personnes || []).filter((p) => formesDuNom(p).has(compact));
+  // safar@ quand le registre a Olivier et Patrick Safar : impossible de savoir lequel la lit (12/11, base Google Maps).
+  if (qui.length > 1 && qui.some((p) => !memePersonne(p, qui[0]))) return { ok: false, raison: 'ambigue' };
+  if (qui.length) return { ok: true, personne: qui[0] };
   return { ok: false, raison: 'autre' };
 }
 const memePersonne = (p, c) => {
@@ -3316,13 +3358,13 @@ async function lireSite(depart) {
 function siteDe(f, l) {
   if (f.rge?.site) return f.rge.site;
   if (l?.site_web) return l.site_web;
-  for (const email of [...(f.rge?.emails || []), ...(f.boamp || []).map((x) => x.email)]) {
+  for (const email of [...(f.rge?.emails || []), ...(f.boamp || []).map((x) => x.email), ...(f.adresse_connue?.email ? [f.adresse_connue.email] : [])]) {
     const d = String(email).split('@')[1];
     if (d && !WEBMAILS.has(d) && DOMAINE_RE.test(d)) return `https://${d}/`;
   }
   return null;
 }
-const CODES_ADRESSE = { invalide: 'adresse_invalide', generique: 'adresse_generale', societe: 'adresse_societe', autre: 'adresse_autre_personne' };
+const CODES_ADRESSE = { invalide: 'adresse_invalide', generique: 'adresse_generale', societe: 'adresse_societe', autre: 'adresse_autre_personne', ambigue: 'adresse_ambigue' };
 const SOURCES_GRATUITES = { site: "site de l'entreprise", ademe: "annuaire RGE de l'ADEME", boamp: 'avis BOAMP' };
 // La recherche gratuite d'une ligne : l'ADEME et le BOAMP (déjà lus avec les faits publics), puis le site. Elle rend
 // { adresse } (ce qui a été vu, pour les faits), { trouvee } (la première adresse du dirigeant dont le domaine a un MX)
@@ -3477,20 +3519,21 @@ function faitsPourClaude(f) {
   return { recents: recents.map(ligne), autres: autres.map(ligne) };
 }
 
-const SCHEMA_EMAIL = {
+// Le schéma de la réponse : la liste fermée du reste du bureau est celle du métier.
+const schemaEmail = (jeu) => ({
   type: 'object', additionalProperties: false,
   properties: {
     objet: { type: 'string' },
     accroche: { type: 'string' },
     valeur: { type: 'string' },
-    reste: { type: 'array', items: { type: 'string', enum: RESTE_BUREAU_EMAIL } },
+    reste: { type: 'array', items: { type: 'string', enum: jeu.reste } },
     document: { type: 'string' },
     general: { type: 'boolean' },
     appuis: { type: 'array', items: { type: 'object', additionalProperties: false, properties: { fait: { type: 'string' }, source: { type: 'string' }, date: { type: 'string' } }, required: ['fait', 'source', 'date'] } },
   },
   required: ['objet', 'accroche', 'valeur', 'reste', 'document', 'general', 'appuis'],
-};
-const CONSIGNES_EMAIL = `Tu écris le premier email de prospection de Gabriel Vanderbecken (IA-Entrepreneur, organisme de formation à l'IA pour les entreprises, à Nancy) au dirigeant d'une petite entreprise (6 à 99 salariés) qu'il ne connaît pas. Gabriel le relit avant l'envoi. Le modèle a été validé par Gabriel le 12/11/2026 : « montrer que c'est du personnalisé + aller sur des valeurs ajoutées personnalisées mais aussi dire ce qu'on fait assez généralement ». Tu écris cinq morceaux (objet, accroche, valeur, reste, document) ; le CRM les place dans le modèle, le reste est fixe. Exemple validé, pour une entreprise du BTP qui a remporté des marchés publics cette année :
+});
+const CONSIGNES_EMAIL = `Tu écris le premier email de prospection de Gabriel Vanderbecken (IA-Entrepreneur, organisme de formation à l'IA pour les entreprises, à Nancy) au dirigeant d'une petite entreprise (3 à 99 salariés) qu'il ne connaît pas. Gabriel le relit avant l'envoi. Le modèle a été validé par Gabriel le 12/11/2026 : « montrer que c'est du personnalisé + aller sur des valeurs ajoutées personnalisées mais aussi dire ce qu'on fait assez généralement ». Tu écris cinq morceaux (objet, accroche, valeur, reste, document) ; le CRM les place dans le modèle, le reste est fixe. Exemple validé, pour une entreprise du BTP qui a remporté des marchés publics cette année :
 
 Objet : Vos appels d'offres
 
@@ -3505,7 +3548,7 @@ Si ça vous parle, je peux vous montrer en 20 minutes ce que ça donne sur un de
 Gabriel Vanderbecken
 IA-Entrepreneur
 
-Ici : accroche = « J'ai vu que vous aviez remporté plusieurs chantiers publics cette année, dont la rénovation thermique d'une école et une mise en accessibilité. » ; valeur = « répondre plus vite aux appels d'offres avec l'IA, par exemple en partant de leurs anciens mémoires techniques » ; reste = ["emails", "devis", "relation client"] ; document = « mémoires ». La phrase « Je forme les équipes {métier} à {valeur}, et aussi à alléger le reste du bureau : {reste}. Les formations sont éligibles à votre budget formation. », la proposition « Si ça vous parle, … sur un de vos propres {document}, {lieu}. Ça vous intéresse ? » et la signature sont fixes : ne les écris pas. Le lieu est donné dans la fiche.
+Ici : accroche = « J'ai vu que vous aviez remporté plusieurs chantiers publics cette année, dont la rénovation thermique d'une école et une mise en accessibilité. » ; valeur = « répondre plus vite aux appels d'offres avec l'IA, par exemple en partant de leurs anciens mémoires techniques » ; reste = ["emails", "devis", "relation client"] ; document = « mémoires ». La phrase « Je forme les équipes {métier} à {valeur}, et aussi à alléger le reste du bureau : {reste}. Les formations sont éligibles à votre budget formation. », la proposition « Si ça vous parle, … sur un (ou une) de vos propres {document}, {lieu}. Ça vous intéresse ? » et la signature sont fixes : ne les écris pas. Le métier (« du BTP », « de la propreté », « des agences immobilières », « des cabinets d'assurance », « des PME »), le lieu et le jeu du métier (liste fermée du reste du bureau, exemples de valeur, de document et d'objet) sont donnés dans la fiche : tiens-t'en à ce jeu.
 
 accroche : une seule phrase qui commence par « J'ai vu que vous », 15 à 30 mots, sur des faits réels de la fiche (marchés publics remportés, qualification RGE obtenue, nouvel établissement, anniversaire de création).
 - La période juste : « cette année » seulement si tous les faits cités sont de l'année civile en cours (la date du jour est dans la fiche) ; sinon le mois et l'année (« en décembre 2025 »), ou « depuis l'an dernier ».
@@ -3513,13 +3556,13 @@ accroche : une seule phrase qui commence par « J'ai vu que vous », 15 à 30 mo
 - Fidèle au périmètre réel : si l'entreprise n'a fait qu'un lot, dis le lot (« les sols et faïences de travaux d'accessibilité »), pas le chantier entier ; un seul marché ne devient pas « plusieurs ».
 - Pas de « sûrement », pas de déduction sur leur charge de travail, pas de question.
 
-valeur : la tâche précise que ces faits rendent utile, à l'infinitif, suivie d'un exemple concret introduit par « par exemple » ; 10 à 20 mots, sans chiffre, sans point final, sans « à » devant (la phrase fixe le met). Exemples : « répondre plus vite aux appels d'offres avec l'IA, par exemple en partant de leurs anciens mémoires techniques » ; « monter plus vite les dossiers d'aides de leurs clients avec l'IA, par exemple à partir des devis signés » ; « préparer plus vite les plannings des équipes avec l'IA, par exemple à partir de ceux de la semaine passée ».
+valeur : la tâche précise que ces faits rendent utile dans ce métier, à l'infinitif, suivie d'un exemple concret introduit par « par exemple » ; 10 à 20 mots, sans chiffre, sans point final, sans « à » devant (la phrase fixe le met). Inspire-toi des exemples du métier donnés dans la fiche, sans les recopier si un fait permet mieux.
 
-reste : exactement trois tâches du quotidien du bureau, prises dans la liste : emails, devis, relation client, suivi de chantier, plannings, factures et relances, recrutement. Aucune ne redit la valeur (si la valeur parle de devis, pas « devis »). « suivi de chantier » seulement pour le BTP.
+reste : exactement trois tâches du quotidien du bureau, prises dans la liste fermée du métier donnée dans la fiche. Aucune ne redit la valeur (si la valeur parle des annonces, pas « annonces »).
 
-document : le document de l'exemple, au pluriel, pour « sur un de vos propres … » : « mémoires », « devis », « comptes rendus », « plannings », « dossiers d'aides »… Il doit coller à la valeur.
+document : le document de l'exemple, au pluriel, pour « sur un de vos propres … » (ou « une » : le CRM accorde) (exemples du métier dans la fiche : « mémoires », « annonces », « dossiers sinistres »…). Il doit coller à la valeur.
 
-objet : 2 à 5 mots, concret, tiré du fait, qui ne ressemble pas à un email de veille d'appels d'offres : jamais « Vos chantiers publics », « Vos marchés publics », « Nouveau marché », « Opportunité ». Exemples validés par Gabriel : « Vos appels d'offres », « Vos chantiers d'accessibilité », « Votre qualification chaudière bois », « 40 ans en avril ». Pas de majuscules partout, pas de point d'exclamation, pas de question, pas de « Re: ».
+objet : 2 à 5 mots, concret, tiré du fait ou de la valeur, qui ne ressemble pas à un email de veille d'appels d'offres : jamais « Vos chantiers publics », « Vos marchés publics », « Nouveau marché », « Opportunité ». Exemples validés par Gabriel pour le BTP : « Vos appels d'offres », « Vos chantiers d'accessibilité », « Votre qualification chaudière bois », « 40 ans en avril » ; ceux du métier sont dans la fiche. Pas de majuscules partout, pas de point d'exclamation, pas de question, pas de « Re: ».
 
 Le message entier, hors signature, vise 70 à 95 mots : garde l'accroche et la valeur courtes. Une seule question dans tout le message : celle de la phrase fixe.
 
@@ -3530,7 +3573,7 @@ Interdits :
 - aucun lien ni adresse email, pas de « gratuit », ni CPF, ni OPCO, ni « certifiante », ni code de certification, ni « reste à charge », ni « 100 % » ;
 - pas de « nous connaissons bien le quotidien d'une entreprise comme la vôtre » ni rien qui prétend connaître leur quotidien (Gabriel, 12/11 : peut être mal perçu), pas de formule creuse (« j'espère que vous allez bien », « je me permets »), pas de tiret long, pas d'emoji, pas de point d'exclamation. Vouvoiement.
 
-N'invente rien : seulement les faits de la fiche. Sans fait récent assez fort (rien dans les 12 derniers mois, ou seulement la ville et la taille), écris une accroche simple et vraie tirée de la fiche, toujours « J'ai vu que … » (« J'ai vu que votre entreprise de nettoyage est installée à Frouard depuis 2016. »), une valeur tirée du métier, et mets general à vrai.
+N'invente rien : seulement les faits de la fiche. Sans fait récent assez fort (rien dans les 12 derniers mois, ou seulement la ville et la taille), écris une accroche simple et vraie tirée de la fiche, toujours « J'ai vu que … » (« J'ai vu que votre entreprise de nettoyage est installée à Frouard depuis 2016. », « J'ai vu que votre agence immobilière est installée à Vincennes depuis 2012. »), une valeur tirée du métier, et mets general à vrai. L'ancienneté se compte depuis la date de création du registre ; la commune est celle du siège donnée dans la fiche.
 
 appuis : chaque fait utilisé, avec sa source et sa date telles que la fiche les donne (fait : « marché de ferronnerie notifié », source : « marchés publics attribués (DECP) », date : « 2026-09-17 »). Pour une accroche générale : un seul appui, fait « message général sur le métier », source « aucune », date vide.`;
 
@@ -3617,12 +3660,18 @@ async function redigerEmail(e, l, c, { consigne = '', lieu = LIEU_DISTANCE_EMAIL
   const f = e.faits || {};
   const p = f.prospect || {};
   const { recents, autres } = faitsPourClaude(f);
+  const metier = metierEmail(l);
+  const jeu = jeuMetierEmail(metier);
   const jour = new Intl.DateTimeFormat('fr-FR', { timeZone: 'Europe/Paris', weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }).format(new Date());
   const fiche = [
     `Date du jour : ${jour}`,
     `Entreprise : ${l.entreprise}${l.secteur ? ` (${l.secteur})` : ''}${l.localisation ? `, ${l.localisation}` : ''}${p.salaries ? `, ${p.salaries} salariés` : ''}`,
     f.rdv?.commune ? `Commune du siège : ${f.rdv.commune}` : '',
-    `Métier dans la phrase fixe : ${metierEmail(l)}`,
+    `Métier dans la phrase fixe : ${metier}`,
+    `Reste du bureau, liste fermée pour ce métier : ${jeu.reste.join(', ')}`,
+    `Exemples de valeur pour ce métier : ${jeu.valeurs.map((v) => `« ${v} »`).join(' ; ')}`,
+    `Exemples de document pour ce métier : ${jeu.documents.join(', ')}`,
+    `Exemples d'objet pour ce métier : ${jeu.objets.map((o) => `« ${o} »`).join(', ')}`,
     `Lieu du rendez-vous dans la phrase fixe : ${lieu}`,
     `Dirigeant : ${salutationEmail(e.civilite, c).replace(/^Bonjour /, '').replace(/,$/, '')}${c?.poste ? `, ${c.poste}` : ''}`,
     l.besoin ? `Ce que le CRM sait de l'entreprise : ${couper(l.besoin, 400)}` : '',
@@ -3630,7 +3679,7 @@ async function redigerEmail(e, l, c, { consigne = '', lieu = LIEU_DISTANCE_EMAIL
     autres.length ? `Autres faits publics :\n${autres.join('\n')}` : '',
     consigne ? `Consigne de Gabriel : ${couper(consigne, 300)}` : '',
   ].filter(Boolean).join('\n');
-  const r = await appelClaude({ consignes: CONSIGNES_EMAIL, schema: SCHEMA_EMAIL, contenu: fiche, max: 3000, timeout: 40000 });
+  const r = await appelClaude({ consignes: CONSIGNES_EMAIL, schema: schemaEmail(jeu), contenu: fiche, max: 3000, timeout: 40000 });
   const objet = String(r.objet || '').replace(/[\r\n]+/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 120);
   const accroche = String(r.accroche || '').replace(/\s+/g, ' ').trim();
   if (!objet || !accroche) throw new Refus('ia_erreur', 502);
@@ -3796,6 +3845,144 @@ async function ajouterProspectEmail(corps) {
   } });
   await journalEmail(l, c, 'note', `Prospection email : ${nomContactEmail(c)}${fonction ? ` (${fonction})` : ''}${pourquoi ? `, ${pourquoi}` : ''}. ${email ? 'Adresse connue' : 'Adresse à vérifier'}, puis message à valider.`, null, { etape: 'candidat' });
   return { ok: true, cree: true, lead_id: l.id, email_id: e.id };
+}
+
+/* ----- L'import d'une liste de dirigeants dont l'adresse est connue (base Google Maps d'Anna, Outscraper) ----- */
+
+// Gabriel, 12/11 : 1 email par jour, « vraiment pas assez » ; la base Outscraper extraite pour Anna donne des dirigeants
+// dont l'adresse à leur nom est connue. L'adresse n'est jamais envoyée telle quelle : elle attend le registre, puis la
+// règle de l'adresse du dirigeant et le MX (adressesEmails). « fiable » (trouvée sur le site, trouvée et vérifiée,
+// vérifiée par Outscraper) : posée ; « déduite » (modèle prenom.nom@ vu sur le domaine) : seulement si FullEnrich confirme.
+// Les courtiers en crédit et conseillers en patrimoine sont écartés (Gabriel, 04/11).
+const SECTEURS_ECARTES_EMAIL = /banque|cr[ée]dit|patrimoine/i;
+const IMPORT_EMAIL_MAX = 200;
+const slugSecteur = (s) => normaliser(s).replace(/\s+/g, '-').slice(0, 40);
+async function colonnesDeTout(table, select) {
+  const lignes = [];
+  for (let debut = 0; debut < 50000; debut += 1000) {
+    const { lignes: page } = await sb(`${table}?select=${select}&order=id.asc`, { plage: `${debut}-${debut + 999}` });
+    lignes.push(...page);
+    if (page.length < 1000) break;
+  }
+  return lignes;
+}
+// Un candidat de la liste, tel que Claude Code le passe (ou tel que le fichier de la base le donne : decideur
+// « Prénom NOM · qualité », type fiable|deduit).
+function candidatImport(x) {
+  const d = x?.dirigeant && typeof x.dirigeant === 'object' ? x.dirigeant : null;
+  let prenom = couper(String(d?.prenom || '').trim(), 80);
+  let nom = couper(String(d?.nom || '').trim(), 80);
+  let qualite = couper(String(d?.qualite || '').trim(), 80);
+  let plusieurs = false;
+  if (!prenom || !nom) {
+    const [qui, q] = String((typeof x?.dirigeant === 'string' ? x.dirigeant : x?.decideur) || '').split('·').map((t) => t.trim());
+    // « Yohann Saccucci et Didier Vitet » : deux personnes sur une ligne, l'adresse ne peut être celle des deux.
+    plusieurs = /\s(et|&)\s|\/|,/i.test(qui || '');
+    const mots = (qui || '').split(/\s+/).filter(Boolean);
+    // « Maite GENY » : le nom est en majuscules ; sinon le dernier mot.
+    const i = mots.findIndex((m, k) => k > 0 && m === m.toUpperCase() && /\p{Lu}/u.test(m));
+    if (mots.length >= 2) { prenom = prenom || mots.slice(0, i > 0 ? i : mots.length - 1).join(' '); nom = nom || mots.slice(i > 0 ? i : mots.length - 1).join(' '); }
+    qualite = qualite || couper(q || '', 80);
+  }
+  const fiabiliteBrute = String(x?.fiabilite || '').trim();
+  const type = ['fiable', 'deduit'].includes(x?.type) ? x.type : ['fiable', 'deduit'].includes(fiabiliteBrute) ? fiabiliteBrute : /^d[ée]duit/i.test(fiabiliteBrute) ? 'deduit' : 'fiable';
+  const siret = String(x?.siret || '').replace(/\s/g, '');
+  return {
+    entreprise: couper(String(x?.entreprise || '').trim(), 200), siret: /^\d{14}$/.test(siret) ? siret : null, siren: /^\d{14}$|^\d{9}$/.test(siret) ? siret.slice(0, 9) : null,
+    secteur: couper(String(x?.secteur || '').trim(), 60), salaries: couper(String(x?.salaries || '').trim(), 20), ville: couper(String(x?.ville || '').trim(), 80),
+    region: couper(String(x?.region || '').trim(), 60), anna: couper(String(x?.statut_anna || '').trim(), 60),
+    prenom: couper(prenom, 80), nom: couper(nom, 80), qualite, email: normEmail(x?.email), type, detail: couper(fiabiliteBrute || type, 200), plusieurs,
+    source: couper(String(x?.source || 'outscraper').trim().toLowerCase(), 40) || 'outscraper',
+  };
+}
+async function importerEmails(corps) {
+  const liste = Array.isArray(corps.candidats) ? corps.candidats : [];
+  if (!liste.length) throw new Refus('valeur_invalide:candidats');
+  if (liste.length > IMPORT_EMAIL_MAX) throw new Refus('trop_de_candidats');
+  // Toute la base d'un coup (dédoublonnage), puis les insertions groupées : 67 candidats tiennent dans une requête.
+  const [leads, contacts, ouvertes, oppositions] = await Promise.all([
+    colonnesDeTout('iae_crm_leads', 'id,entreprise,siret,statut,archive,proprietaire,tags'),
+    colonnesDeTout('iae_crm_contacts', 'id,lead_id,prenom,nom,email,principal'),
+    colonnesDeTout('iae_crm_emails', 'id,lead_id,statut'),
+    colonnesDeTout('iae_crm_oppositions', 'email'),
+  ]);
+  const opposees = new Set(oppositions.map((o) => normEmail(o.email)));
+  const lignesOuvertes = new Map();
+  for (const e of ouvertes) if ([...EN_ATTENTE_EMAIL, 'en_cours', 'envoye'].includes(e.statut)) lignesOuvertes.set(e.lead_id, e.statut);
+  const leadParSiren = new Map(); const leadParNom = new Map(); const leadParId = new Map(leads.map((l) => [l.id, l]));
+  for (const l of leads) {
+    const sir = String(l.siret || '').replace(/\D/g, '').slice(0, 9);
+    if (sir.length === 9 && !leadParSiren.has(sir)) leadParSiren.set(sir, l);
+    const n = normaliser(l.entreprise);
+    if (n && !leadParNom.has(n)) leadParNom.set(n, l);
+  }
+  const leadParEmail = new Map();
+  for (const c of contacts) if (c.email && !leadParEmail.has(normEmail(c.email))) leadParEmail.set(normEmail(c.email), c.lead_id);
+  const crees = []; const rattaches = []; const ignores = [];
+  const vus = new Set();
+  const aCreer = []; const aRattacher = [];
+  for (const brut of liste) {
+    const x = candidatImport(brut);
+    const nomListe = x.entreprise || '(sans nom)';
+    const ignorer = (raison) => ignores.push({ entreprise: nomListe, email: x.email || null, raison });
+    if (!x.entreprise || !x.siren) { ignorer('SIRET manquant ou invalide (le registre est lu avant tout envoi)'); continue; }
+    if (x.plusieurs) { ignorer('plusieurs dirigeants sur la même ligne : à séparer à la main (une adresse par personne)'); continue; }
+    if (!x.prenom || !x.nom) { ignorer('prénom ou nom du dirigeant manquant'); continue; }
+    if (!EMAIL_RE.test(x.email)) { ignorer('adresse invalide'); continue; }
+    if (SECTEURS_ECARTES_EMAIL.test(x.secteur)) { ignorer('secteur écarté (courtiers en crédit et conseillers en patrimoine, Gabriel le 04/11)'); continue; }
+    const cles = [`s:${x.siren}`, `n:${normaliser(x.entreprise)}`, `e:${x.email}`];
+    if (cles.some((k) => vus.has(k))) { ignorer('doublon dans la liste'); continue; }
+    cles.forEach((k) => vus.add(k));
+    if (opposees.has(x.email)) { ignorer('adresse en opposition (désinscription ou spam)'); continue; }
+    const existant = leadParSiren.get(x.siren) || leadParId.get(leadParEmail.get(x.email)) || leadParNom.get(normaliser(x.entreprise));
+    if (existant) {
+      // Un lead déjà là reçoit la ligne email s'il n'en a pas déjà une ouverte (ou partie), et s'il est encore à prospecter.
+      if (existant.archive || existant.statut === 'perdu') { ignorer(`déjà dans le CRM (${existant.entreprise}), archivé ou perdu`); continue; }
+      if (!['nouveau', 'contacte'].includes(existant.statut)) { ignorer(`déjà dans le CRM (${existant.entreprise}), à l'étape « ${existant.statut} »`); continue; }
+      if (existant.proprietaire && existant.proprietaire !== ADMIN_EMAIL) { ignorer(`déjà dans le CRM (${existant.entreprise}), lead de ${existant.proprietaire}`); continue; }
+      if (lignesOuvertes.has(existant.id)) { ignorer(`déjà dans le CRM (${existant.entreprise}), avec un email de prospection ${lignesOuvertes.get(existant.id) === 'envoye' ? 'déjà parti' : 'en cours'}`); continue; }
+      const contact = contacts.find((c) => c.lead_id === existant.id && memePersonne({ prenom: x.prenom, nom: x.nom }, c)) || null;
+      aRattacher.push({ x, l: existant, contact });
+      continue;
+    }
+    aCreer.push(x);
+  }
+  const faitsDe = (x) => ({
+    prospect: { siren: x.siren, salaries: x.salaries, commune: x.ville, dep: '', region: x.region, fonction: x.qualite, source: x.source, statut_anna: x.anna || null },
+    adresse_connue: { email: x.email, source: x.source, fiabilite: x.type, detail: x.detail, importee_le: new Date().toISOString() },
+  });
+  const secteurDe = (x) => (/^BTP/i.test(x.secteur) ? 'BTP' : /propret/i.test(x.secteur) ? 'Propreté' : /assuranc|courtage/i.test(x.secteur) ? 'Assurance' : /immobili|syndic|gestion locative/i.test(x.secteur) ? 'Immobilier' : x.secteur || null);
+  const SOURCE_IMPORT = 'Email · base Google Maps (Outscraper)';
+  if (aCreer.length) {
+    const { lignes: ls } = await sb('iae_crm_leads', { methode: 'POST', prefer: 'return=representation', corps: aCreer.map((x) => {
+      const secteur = secteurDe(x);
+      const anna = Boolean(x.anna) && !/hors de sa base/i.test(x.anna);
+      return {
+        entreprise: x.entreprise, type: 'prospect', statut: 'nouveau', source: SOURCE_IMPORT, secteur, siret: x.siret || x.siren,
+        tags: ['email', 'outscraper', ...(secteur ? [SECTEURS_PROSPECT_LI[secteur] || slugSecteur(secteur)] : []), ...(anna ? ['liste-anna'] : [])],
+        besoin: `${secteur || 'Entreprise'}${x.salaries ? ` (${x.salaries} salariés)` : ''}, base Google Maps d'Anna (Outscraper)${anna ? ` ; chez Anna : ${x.anna}` : ''}.`,
+        localisation: x.ville ? `${x.ville}${x.region ? ` (${x.region})` : ''}` : null, prochaine_action: 'autre', relances_sans_reponse: 0,
+        prochaine_note: `Email : adresse connue (base Google Maps, ${x.type === 'fiable' ? 'fiable' : 'déduite, à vérifier'}), vérifiée après le registre, puis message rédigé par Claude, à valider dans « Emails à valider ».${anna ? " Anna l'a aussi dans sa base : dès qu'un canal a une réponse, l'autre s'arrête." : ''}`,
+      };
+    }) });
+    const { lignes: cs } = await sb('iae_crm_contacts', { methode: 'POST', prefer: 'return=representation', corps: aCreer.map((x, k) => ({ lead_id: ls[k].id, prenom: x.prenom, nom: nomPropre(x.nom), poste: x.qualite || null, email: null, principal: true })) });
+    const { lignes: es } = await sb('iae_crm_emails', { methode: 'POST', prefer: 'return=representation', corps: aCreer.map((x, k) => ({
+      lead_id: ls[k].id, contact_id: cs[k].id, compte: ADMIN_EMAIL, etape: 'message', statut: 'a_enrichir', email: null, email_statut: null, source_email: null, civilite: null, faits: faitsDe(x),
+    })) });
+    aCreer.forEach((x, k) => crees.push({ entreprise: x.entreprise, lead_id: ls[k].id, email_id: es[k].id, fiabilite: x.type }));
+    await sb('iae_crm_activites', { methode: 'POST', prefer: 'return=minimal', corps: aCreer.map((x, k) => ({
+      lead_id: ls[k].id, contact_id: cs[k].id, type: 'import', resume: `Prospection email : ${x.prenom} ${nomPropre(x.nom)}${x.qualite ? ` (${x.qualite})` : ''}, importé de la base Google Maps d'Anna (Outscraper). Adresse ${x.type === 'fiable' ? 'connue' : 'déduite'} : ${x.email} (${x.detail}), vérifiée après le registre.`.slice(0, 2000),
+      contenu: null, source: 'crm, prospection email', meta: { canal: 'email', etape: 'candidat', source: x.source },
+    })) });
+  }
+  for (const { x, l, contact } of aRattacher) {
+    const c = contact || (await sb('iae_crm_contacts', { methode: 'POST', prefer: 'return=representation', corps: { lead_id: l.id, prenom: x.prenom, nom: nomPropre(x.nom), poste: x.qualite || null, email: null, principal: false } })).lignes[0];
+    const { lignes: [e] } = await sb('iae_crm_emails', { methode: 'POST', prefer: 'return=representation', corps: { lead_id: l.id, contact_id: c.id, compte: ADMIN_EMAIL, etape: 'message', statut: 'a_enrichir', email: null, civilite: null, faits: faitsDe(x) } });
+    await sb(`iae_crm_leads?id=eq.${l.id}`, { methode: 'PATCH', prefer: 'return=minimal', corps: { tags: [...new Set([...(l.tags || []), 'email', 'outscraper'])] } });
+    await journalEmail(l, c, 'note', `Prospection email : ${x.prenom} ${nomPropre(x.nom)}, adresse ${x.type === 'fiable' ? 'connue' : 'déduite'} par la base Google Maps d'Anna (Outscraper) : ${x.email}. Vérifiée après le registre.`, null, { etape: 'candidat' });
+    rattaches.push({ entreprise: l.entreprise, lead_id: l.id, email_id: e.id, fiabilite: x.type });
+  }
+  return { ok: true, crees, rattaches, ignores, compte: { crees: crees.length, rattaches: rattaches.length, ignores: ignores.length } };
 }
 
 /* ----- Le passage de la synchro : événements, envois, registre et adresses, rédaction ----- */
@@ -4034,12 +4221,37 @@ async function adressesEmails(r, bilan, reste) {
     if (!e) continue;
     bilan.verifies++;
     if (!c.prenom || !c.nom) { await sansAdresse(e, l, c, 'Prénom ou nom du dirigeant manquant'); bilan.sans_email++; continue; }
-    // 2. L'adresse du dirigeant dans les sources publiques, une fois par ligne.
+    // 2. Une adresse déjà connue (import de la base Google Maps d'Anna) : la règle de l'adresse du dirigeant, avec les
+    // dirigeants du registre, et le MX, une fois. « fiable » : posée ; « déduite » : jamais envoyée telle quelle, seulement
+    // si FullEnrich confirme une adresse du dirigeant (plus bas). Une adresse qui ne passe pas : le circuit normal.
+    const connue = e.faits?.adresse_connue;
+    if (connue?.email && !connue.jugee_le) {
+      const personnes = await personnesDe(e, c);
+      const j = jugerAdresse(connue.email, personnes, l.entreprise);
+      const mx = j.ok ? await mxDuDomaine(connue.email.split('@')[1]) : null;
+      if (mx === 'inconnu') { await majLigneEmail(e.id, { detail: "Le DNS ne répond pas pour vérifier le domaine de l'adresse connue : nouvel essai au prochain passage." }); continue; }
+      const refus = !j.ok ? MOTIFS_ADRESSE[j.raison] : mx === 'non' ? MOTIFS_ADRESSE.mx : null;
+      const qui = j.ok ? [j.personne.prenom, j.personne.nom].filter(Boolean).join(' ') : null;
+      const faits = { ...(e.faits || {}), adresse_connue: { ...connue, jugee_le: new Date().toISOString(), ...(refus ? { refus } : { personne: qui }) } };
+      if (!refus && connue.fiabilite === 'fiable') {
+        if (await enOpposition(connue.email)) { await majLigneEmail(e.id, { statut: 'annule', email: connue.email, faits, detail: 'Adresse en opposition (désinscription ou spam) : rien ne part.' }); continue; }
+        const adresse = { cherchee_le: new Date().toISOString(), source: 'outscraper', email: connue.email, fiabilite: connue.detail || 'fiable', url: null, personne: qui, vues: [] };
+        await poserAdresse(e, l, c, { email: connue.email, personne: j.personne, source_email: 'site', email_statut: 'OUTSCRAPER', faits: { ...faits, adresse }, journal: `Adresse de {qui} connue par la base Google Maps d'Anna (Outscraper : ${connue.detail || 'fiable'}) : ${connue.email}, conforme à la règle de l'adresse du dirigeant. Message en cours de rédaction.` });
+        bilan.gratuites++;
+        continue;
+      }
+      e = await majLigneEmail(e.id, { faits });
+    }
+    const deduite = e.faits?.adresse_connue?.fiabilite === 'deduit' && !e.faits.adresse_connue.refus ? e.faits.adresse_connue.email : null;
+    const ecartee = e.faits?.adresse_connue?.refus ? `Adresse de la base Google Maps écartée (${e.faits.adresse_connue.email} : ${e.faits.adresse_connue.refus}). ` : '';
+    // 3. L'adresse du dirigeant dans les sources publiques, une fois par ligne.
     if (!e.faits?.adresse?.cherchee_le) {
       if (recherches >= RECHERCHES_GRATUITES_PAR_PASSAGE || !reste(15000)) continue;
       recherches++;
       const res = await chercherAdresseGratuite(e, l, c);
       if (res.attente) { await majLigneEmail(e.id, { detail: res.attente }); continue; }
+      const ac = e.faits?.adresse_connue;
+      if (ac?.refus && res.adresse) res.adresse.vues = [{ email: ac.email, source: 'outscraper', url: null, raison: ac.refus }, ...(res.adresse.vues || [])].slice(0, 12);
       const faits = { ...(e.faits || {}), adresse: res.adresse };
       if (res.trouvee) {
         const t = res.trouvee;
@@ -4050,15 +4262,17 @@ async function adressesEmails(r, bilan, reste) {
       }
       e = await majLigneEmail(e.id, { faits });
     }
-    // 3. Pas d'adresse gratuite : FullEnrich seulement pour un contact ultra qualifié.
+    // 4. Pas d'adresse gratuite : FullEnrich seulement pour un contact ultra qualifié (une adresse déduite aussi : elle n'est
+    // utilisée que si FullEnrich confirme une adresse DELIVERABLE du dirigeant).
     const u = ultraQualifie(e, l);
     if (!u.ok) {
-      await sansAdresse(e, l, c, `Pas d'adresse du dirigeant dans les sources publiques, et pas assez qualifié pour FullEnrich (${u.manque.join(', ')})`);
+      await sansAdresse(e, l, c, `${ecartee}${deduite ? `Adresse déduite (${deduite}) jamais vérifiée, ` : ''}${deduite ? "pas d'adresse" : "Pas d'adresse"} du dirigeant dans les sources publiques, et pas assez qualifié pour FullEnrich (${u.manque.join(', ')})`);
       bilan.sans_email++;
       continue;
     }
-    const attente = !cle ? 'Ultra qualifié, en attente de FullEnrich : la clé FullEnrich n\'est pas sur Vercel (Claude Code peut chercher l\'adresse avec le MCP FullEnrich).'
-      : lot.length >= place ? `Ultra qualifié, en attente de FullEnrich : plafond du jour atteint (${r.enrichissements} adresses trouvées par jour).` : null;
+    const enAttente = deduite ? `Adresse déduite à vérifier (${deduite})` : 'Ultra qualifié, en attente de FullEnrich';
+    const attente = !cle ? `${enAttente} : la clé FullEnrich n'est pas sur Vercel (Claude Code peut chercher l'adresse avec le MCP FullEnrich).`
+      : lot.length >= place ? `${enAttente} : plafond du jour atteint (${r.enrichissements} adresses trouvées par jour).` : null;
     if (!e.faits?.ultra || attente !== e.detail) e = await majLigneEmail(e.id, { faits: { ...(e.faits || {}), ultra: { le: e.faits?.ultra?.le || new Date().toISOString(), forts: u.forts.slice(0, 3) } }, detail: attente });
     if (attente) continue;
     if (c.email && (await enOpposition(c.email))) { await majLigneEmail(e.id, { statut: 'annule', detail: 'Adresse en opposition.' }); continue; }
@@ -4331,7 +4545,7 @@ async function etatProspectionEmail({ lignes = null, recus = null } = {}) {
   const ultraDe = (e) => e.ultra ?? e.faits?.ultra ?? null;
   const candidats = {
     en_attente: tout.filter((e) => e.statut === 'a_enrichir' && !ultraDe(e)).length,
-    gratuites: tout.filter((e) => e.statut !== 'annule' && ['site', 'ademe', 'boamp'].includes(adresseDe(e)?.source)).length,
+    gratuites: tout.filter((e) => e.statut !== 'annule' && ['site', 'ademe', 'boamp', 'outscraper'].includes(adresseDe(e)?.source)).length,
     ultra_attente: tout.filter((e) => e.statut === 'a_enrichir' && ultraDe(e) && !e.fullenrich_id).length,
     ultra_en_cours: tout.filter((e) => e.statut === 'a_enrichir' && e.fullenrich_id).length,
     sans_adresse: n('sans_email'),
@@ -4391,6 +4605,7 @@ async function noterPassageEmail(bilan) {
 async function operationEmail(corps, ip) {
   const op = corps.op;
   if (op === 'prospect_email') return ajouterProspectEmail(corps);
+  if (op === 'email_importer') return importerEmails(corps);
   if (op === 'email_reprendre') {
     const r = await majReglageEmail({ pause: null, reprise_le: new Date().toISOString() });
     return { reglage: r };

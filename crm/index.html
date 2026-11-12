@@ -732,6 +732,7 @@ const ERREURS = {
   adresse_generale: "C'est une adresse générale (contact@, info@, accueil@…) : on n'écrit qu'au dirigeant (Gabriel, 12/11).",
   adresse_societe: "Cette adresse est au nom de la société, pas du dirigeant : on n'écrit qu'au dirigeant.",
   adresse_autre_personne: "Cette adresse n'est pas celle du dirigeant ni d'un co-dirigeant au registre.",
+  adresse_ambigue: "Cette adresse porte le seul nom de famille de plusieurs dirigeants : impossible de savoir qui la lit.",
   domaine_sans_mx: "Ce domaine ne reçoit pas d'email (pas de serveur de messagerie).",
   pieces_trop_lourdes: "Pièces jointes trop lourdes pour le CRM (3,3 Mo au plus) : rien n'est parti. Envoie ce message depuis Gmail.",
   piece_invalide: "Une pièce jointe est vide ou illisible : rien n'est parti.",
@@ -3294,7 +3295,7 @@ function barreEmail() {
   return `<div class="li-barre em-barre${alerte ? ' alerte-li' : ''}" data-em-barre><p><b>Prospection email</b> · Aujourd'hui : ${b.aujourdhui.envoyes} envoyé${b.aujourdhui.envoyes > 1 ? 's' : ''} sur ${b.aujourdhui.quota}${p.en_file ? `, ${p.en_file} en file (${esc(fenetreEm())}, jours ouvrés)` : ''}.<br><span class="em-bilan">7 derniers jours : ${esc(texteBilanEm(b.semaine))}.</span><br><span class="em-bilan">Depuis le début : ${esc(texteBilanEm(b.debut))}.</span>${p.candidats ? `<br><span class="em-bilan" data-em-candidats>Candidats : ${esc(texteCandidatsEm(p))}.</span>` : ''}${etats.length ? `<br><span class="li-file" role="status">${esc(etats.join(' '))}</span>` : ''}<br><span class="li-confiance">${esc(k.texte)}</span></p><div class="actions">${n ? `<button type="button" class="btn petit primaire" data-em-jour>Emails à valider (${n})</button>` : ''}${p.pause ? '<button type="button" class="btn petit" data-em-reprendre>Reprendre</button>' : ''}${k.auto ? '<button type="button" class="btn petit lien" data-em-couper>Couper l\'envoi automatique</button>' : ''}</div></div>`;
 }
 // D'où vient l'adresse, avec le lien de la page où elle a été lue (site, annuaire RGE de l'ADEME, avis BOAMP), ou FullEnrich.
-const SOURCES_ADRESSE = { site: "site de l'entreprise", ademe: "annuaire RGE de l'ADEME", boamp: 'avis BOAMP', fullenrich: 'FullEnrich', manuel: 'posée à la main' };
+const SOURCES_ADRESSE = { site: "site de l'entreprise", ademe: "annuaire RGE de l'ADEME", boamp: 'avis BOAMP', outscraper: 'base Google Maps (Outscraper)', fullenrich: 'FullEnrich', manuel: 'posée à la main' };
 const sourceAdresse = (e) => e.adresse_source || (e.faits && e.faits.adresse) || null;
 function adresseEmailLue(e) {
   if (!e.email) return '<span class="meta">Pas encore d\'adresse</span>';
@@ -3302,7 +3303,8 @@ function adresseEmailLue(e) {
   const cle = s.email === e.email && SOURCES_ADRESSE[s.source] ? s.source : e.source_email === 'fullenrich' ? 'fullenrich' : e.source_email === 'site' ? 'site' : 'manuel';
   const lien = s.email === e.email && /^https:\/\//.test(s.url || '') ? ` <a href="${esc(s.url)}" target="_blank" rel="noopener noreferrer">voir la page</a>` : '';
   const verifiee = e.email_statut === 'DELIVERABLE' ? ' <span class="em-verifiee">vérifiée</span>' : '';
-  return `${esc(e.email)}${verifiee} <span class="meta" data-em-source="${esc(cle)}">(${esc(SOURCES_ADRESSE[cle])})</span>${lien}`;
+  const fiabilite = cle === 'outscraper' && s.fiabilite ? `, ${s.fiabilite}` : '';
+  return `${esc(e.email)}${verifiee} <span class="meta" data-em-source="${esc(cle)}">(${esc(SOURCES_ADRESSE[cle])}${esc(fiabilite)})</span>${lien}`;
 }
 // Ce qui a été vu puis écarté (adresses générales, au nom de la société, d'une autre personne…), pour que Gabriel voie pourquoi.
 function vuesEcarteesEm(e) {
