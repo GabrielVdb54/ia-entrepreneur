@@ -54,7 +54,6 @@
     '.oo .oo-gate h3{margin:0 0 6px;font-size:1.12rem;line-height:1.35;color:var(--oo-t)}',
     '.oo .oo-gate p{margin:0 0 14px;font-size:.92rem;line-height:1.6;color:var(--oo-m)}',
     '.oo .oo-rgpd{font-size:.76rem!important;margin:10px 0 0!important;line-height:1.5!important}',
-    '.oo .oo-piege{position:absolute!important;left:-9999px!important;width:1px;height:1px;opacity:0}',
     '.oo .oo-idcc{margin:14px 0 0;padding:14px 16px;border-radius:12px;background:#F6F7FB;border:1px dashed var(--oo-b)}',
     '.oo .oo-idcc p{margin:0 0 10px!important;font-size:.88rem!important;line-height:1.55!important;color:var(--oo-m)}',
     '.oo .oo-idcc .oo-champ{flex:0 1 160px}',
@@ -252,14 +251,17 @@
       var o = d.opco;
       var nomOpco = o ? (o.gestion || (o.ambigu ? 'votre OPCO' : o.nom)) : null;
       var gate = el('div', { classe: 'oo-gate' });
-      gate.appendChild(el('h3', { texte: d.bareme ? 'Votre budget formation 2026 est prêt' : nomOpco ? 'Combien ' + nomOpco + ' peut financer ?' : 'Quels financements pour votre entreprise ?' }));
+      gate.appendChild(el('h3', { texte: d.bareme ? 'Votre budget formation 2026 est prêt' : nomOpco ? 'Combien ' + nomOpco + ' peut financer\u00a0?' : 'Quels financements pour votre entreprise\u00a0?' }));
       gate.appendChild(el('p', { texte: d.bareme
         ? 'Nous avons le barème 2026 de votre branche chez ' + nomOpco + '. Recevez par email le montant auquel votre entreprise a droit, avec le lien officiel.'
         : nomOpco
         ? 'Recevez par email le lien direct vers la page ' + de(nomOpco) + ' qui donne le montant pour votre branche.'
         : 'Recevez par email les financeurs possibles pour votre entreprise et les liens vers leurs critères de prise en charge. Si vous avez des salariés, nous vérifions votre OPCO avec vous.' }));
       var email = el('input', { classe: 'oo-champ', type: 'email', autocomplete: 'email', placeholder: 'vous@entreprise.fr', 'aria-label': 'Votre adresse email', required: '' });
-      var piege = el('input', { classe: 'oo-piege', type: 'text', name: 'site_web', tabindex: '-1', autocomplete: 'off', 'aria-hidden': 'true' });
+      // Plus de champ caché anti-robot (12/11/2026) : le remplissage automatique
+      // du navigateur le remplissait, et la demande se perdait sans un mot. Le
+      // serveur reçoit seulement le temps passé sur le formulaire.
+      var ouvert = Date.now();
       var envoyer = el('button', { classe: 'oo-btn vert', type: 'submit', texte: 'Recevoir mon budget' });
       // Facultatif : le nombre de salariés du jour affine le palier du barème
       // (l'Insee publie au mieux la tranche de l'année n-2).
@@ -269,7 +271,7 @@
       var ligneSal = el('label', { classe: 'oo-sal', for: idSal }, ['Nombre de salariés aujourd’hui (facultatif, pour affiner le montant)', salaries]);
       if (eff.libelle && eff.tranche !== 'NN' && eff.tranche !== '00') ligneSal.appendChild(el('span', { texte: 'Insee' + (eff.annee ? ' ' + eff.annee : '') + ' : ' + eff.libelle.toLowerCase() }));
       var refus = el('input', { type: 'checkbox' });
-      var f = el('form', { novalidate: '' }, [ligneSal, el('div', { classe: 'oo-ligne', style: 'margin-top:12px' }, [email, envoyer]), piege,
+      var f = el('form', { novalidate: '' }, [ligneSal, el('div', { classe: 'oo-ligne', style: 'margin-top:12px' }, [email, envoyer]),
         el('label', { classe: 'oo-case' }, [refus, 'Je ne souhaite pas recevoir la newsletter d’IA-Entrepreneur.'])]);
       gate.appendChild(f);
       gate.appendChild(el('p', { classe: 'oo-rgpd' }, ['Votre adresse sert à vous envoyer ce résultat, à vous recontacter au sujet de votre projet de formation et à vous adresser notre newsletter (IA et financement de la formation), dont vous pouvez vous désinscrire en un clic. ', el('a', { href: '/politique-confidentialite.html', classe: 'oo-lien', texte: 'Politique de confidentialité' }), '.']));
@@ -290,7 +292,7 @@
         fetch(API, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json', accept: 'application/json' },
-          body: JSON.stringify({ siret: d.siret || d.numero, email: adresse, page: page, piege: piege.value, salaries: salaries.value.trim(), newsletter: !refus.checked, idcc: idccSaisi || undefined }),
+          body: JSON.stringify({ siret: d.siret || d.numero, email: adresse, page: page, duree: Date.now() - ouvert, salaries: salaries.value.trim(), newsletter: !refus.checked, idcc: idccSaisi || undefined }),
         })
           .then(function (r) { return r.json().catch(function () { return {}; }).then(function (j) { return { statut: r.status, j: j }; }); })
           .then(function (x) {
@@ -304,9 +306,15 @@
               gate.appendChild(el('a', { href: '/rendez-vous.html', classe: 'oo-btn vert', style: 'display:inline-block;text-decoration:none', texte: 'Prendre rendez-vous' }));
               return;
             }
-            if (x.j && x.j.erreur === 'email_invalide') {
+            var adresseRefusee = {
+              email_invalide: 'Cette adresse email semble incomplète.',
+              email_domaine: 'Cette adresse ne peut pas recevoir d’email. Vérifiez l’orthographe, surtout après le @.',
+              email_jetable: 'Les adresses temporaires ne sont pas acceptées : indiquez votre adresse habituelle, professionnelle de préférence.',
+            }[x.j && x.j.erreur];
+            if (adresseRefusee) {
               retour.innerHTML = '';
-              retour.appendChild(el('p', { classe: 'oo-msg', texte: 'Cette adresse email semble incomplète.' }));
+              retour.appendChild(el('p', { classe: 'oo-msg', texte: adresseRefusee }));
+              email.focus();
               return;
             }
             if (x.statut === 429) {
@@ -314,9 +322,11 @@
               retour.appendChild(el('p', { classe: 'oo-msg', texte: 'Beaucoup de demandes en peu de temps : patientez quelques minutes avant de réessayer.' }));
               return;
             }
-            // L'email n'a pas pu partir : le visiteur repart quand même avec les liens.
+            // L'email n'a pas pu partir : la demande est quand même chez Gabriel
+            // (alerte et lead), et le visiteur repart avec les liens qu'on a.
+            var avecLiens = Boolean(x.j && x.j.liens && x.j.liens.criteres);
             var remplacant = liensDirects(x.j && x.j.liens, null);
-            remplacant.insertBefore(el('p', { classe: 'oo-msg', style: 'margin:0 0 12px', texte: 'L’email n’a pas pu partir. Voici directement les liens, et nous vous recontactons.' }), remplacant.firstChild);
+            remplacant.insertBefore(el('p', { classe: 'oo-msg', style: 'margin:0 0 12px', texte: 'L’email n’a pas pu partir, mais votre demande nous est bien parvenue : nous vous envoyons votre budget nous-mêmes.' + (avecLiens ? ' En attendant, voici les liens officiels.' : '') }), remplacant.firstChild);
             gate.parentNode.replaceChild(remplacant, gate);
           })
           .catch(function () {
@@ -332,7 +342,7 @@
       var b = el('div', { classe: 'oo-gate' });
       var o = dernier && dernier.opco;
       var nomOpco = o ? (o.gestion || o.nom) : null;
-      b.appendChild(el('h3', { texte: nomOpco ? 'Combien ' + nomOpco + ' peut financer ?' : 'Les financeurs possibles' }));
+      b.appendChild(el('h3', { texte: nomOpco ? 'Combien ' + nomOpco + ' peut financer\u00a0?' : 'Les financeurs possibles' }));
       var items = [];
       if (liens && liens.criteres) {
         var l = (liens.gestion && liens.gestion.criteres) || liens.criteres;

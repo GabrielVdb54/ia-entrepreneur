@@ -13,9 +13,10 @@
  *        → l'entreprise, son effectif, son OPCO, sa convention. Sans le lien
  *          du barème : c'est ce que le visiteur reçoit par email.
  *   GET  /api/opco?siret=…&idcc=…   (idcc facultatif, saisi par le visiteur)
- *   POST /api/opco { siret, email, page?, piege?, salaries?, newsletter?, idcc? }
+ *   POST /api/opco { siret, email, page?, duree?, salaries?, newsletter?, idcc? }
  *        → le serveur refait la recherche, envoie le résultat par email
- *          (Brevo) et pose le lead dans le CRM, à traiter aujourd'hui.
+ *          (Brevo), pose le lead dans le CRM, à traiter aujourd'hui, et
+ *          prévient Gabriel. Aucune demande n'est jetée sans rien dire.
  *
  * Même discipline que /api/recap : le navigateur n'envoie qu'un numéro et
  * une adresse. Tout le contenu de l'email est reconstruit ici depuis les
@@ -37,6 +38,7 @@
 import { rechercher, SOCLE, FONDS_NON_SALARIES, parIdcc, convention as ficheConvention } from './_entreprise-opco.js';
 import { crmDisponible, enregistrerDemande } from './_crm-site.js';
 import { baremePour } from './_baremes.js';
+import { emailRefuse } from './_anti-robot.js';
 
 export const maxDuration = 20;
 
@@ -252,7 +254,7 @@ function versTexte(c) {
   return l.join('\n');
 }
 
-async function brevo(message) {
+async function brevoUneFois(message) {
   const stop = new AbortController();
   const minuteur = setTimeout(() => stop.abort(), 10000);
   try {
@@ -262,9 +264,27 @@ async function brevo(message) {
       body: JSON.stringify(message),
       signal: stop.signal,
     });
-    if (!r.ok) throw new Error(`brevo ${r.status} ${(await r.text()).slice(0, 200)}`);
+    if (!r.ok) {
+      throw Object.assign(new Error(`brevo ${r.status} ${(await r.text()).slice(0, 200)}`), { rejouable: r.status === 429 || r.status >= 500 });
+    }
+  } catch (e) {
+    // Réseau coupé avant la réponse : rejouable. Délai dépassé : Brevo a pu
+    // envoyer, on ne rejoue pas, pour ne pas doubler l'email.
+    if (e?.rejouable === undefined) e.rejouable = e?.name !== 'AbortError';
+    throw e;
   } finally {
     clearTimeout(minuteur);
+  }
+}
+
+// Une seconde tentative quand Brevo n'a sûrement rien envoyé (réseau, 429, 5xx).
+async function brevo(message) {
+  try {
+    await brevoUneFois(message);
+  } catch (e) {
+    if (!e?.rejouable) throw e;
+    await new Promise((fin) => setTimeout(fin, 800));
+    await brevoUneFois(message);
   }
 }
 
@@ -368,7 +388,7 @@ async function inscrireNewsletter(email, r) {
 
 // --- Le CRM ------------------------------------------------------------------
 
-function versCrm(r, email, page, newsletter) {
+function versCrm(r, email, page, newsletter, { envoi, doute }) {
   const o = r.opco;
   const ref = o ? o.gestion || o : null;
   const conv = r.convention;
@@ -386,7 +406,9 @@ function versCrm(r, email, page, newsletter) {
     resume: `A demandé son budget formation sur le site : ${o ? o.nom : 'OPCO à vérifier'}`,
     detail: [
       `Page : ${page}`,
-      'Outil : Quel est mon OPCO (SIRET), résultat envoyé par email',
+      envoi === 'ok'
+        ? 'Outil : Quel est mon OPCO (SIRET), résultat envoyé par email'
+        : `Outil : Quel est mon OPCO (SIRET). Email non parti (${envoi}) : lui envoyer son budget à la main`,
       `Email : ${email}`,
       `Entreprise : ${nom}${r.entreprise?.commune ? `, ${r.entreprise.commune}` : ''}`,
       `SIRET : ${r.siret || r.numero}`,
@@ -397,13 +419,14 @@ function versCrm(r, email, page, newsletter) {
         return b ? `Montant annoncé : ${b.paliers.map((p) => `${p.libelle} ${p.montant}`).join(' ; ')} (${b.version}), lien ${b.lien}` : `Lien envoyé : ${ref.criteres}`;
       })(),
       `Newsletter : ${newsletter ? 'inscrit' : 'refusée (case cochée)'}`,
+      doute && `À vérifier : ${doute}`,
     ].filter(Boolean).join('\n'),
     source: 'Site : Quel est mon OPCO',
     tags: ['site', 'outil-opco'],
     besoin: `Budget formation demandé sur le site. ${constat}.`,
-    prochaine_note: o
+    prochaine_note: (envoi === 'ok' ? '' : "Son email n'est pas parti : lui envoyer son budget à la main. ") + (o
       ? `A demandé son budget formation (${o.nom}${o.gestion ? `, géré par ${o.gestion.nom}` : ''}) : lui écrire aujourd'hui, proposer de vérifier le barème de sa branche et de monter le dossier`
-      : "A demandé son budget formation, OPCO non trouvé : lui écrire aujourd'hui pour vérifier s'il a des salariés",
+      : "A demandé son budget formation, OPCO non trouvé : lui écrire aujourd'hui pour vérifier s'il a des salariés"),
     champs: {
       siret: r.siret || r.numero,
       financeur: o ? ref.nom : null,
@@ -411,6 +434,74 @@ function versCrm(r, email, page, newsletter) {
       localisation: [r.entreprise?.code_postal, r.entreprise?.commune].filter(Boolean).join(' ') || null,
     },
   });
+}
+
+// --- Aucune demande perdue --------------------------------------------------------
+
+// Gabriel, 12/11/2026 : « fais en sorte que quelqu'un qui fait une demande
+// reçoive son budget et que moi je reçoive la lead ». Jusque-là, un champ
+// caché (« site_web ») arrivé rempli faisait répondre « envoyé » sans rien
+// faire. Le remplissage automatique de son navigateur l'avait rempli : sa
+// demande Lilycosy du 12/11 n'a donné ni email, ni alerte, ni lead, alors que
+// la page affichait « C'est envoyé ». Plus rien n'est jeté. Restent l'origine,
+// la limite par IP, l'adresse vérifiée (domaine qui reçoit des emails, pas
+// d'adresse jetable) et un email entièrement reconstruit ici. Un formulaire
+// envoyé très vite après son affichage est seulement signalé à Gabriel.
+const TROP_RAPIDE_MS = 1500;
+
+function doute(corps) {
+  if (corps.duree === undefined || corps.duree === null || corps.duree === '') return null;
+  const duree = Number(corps.duree);
+  if (!Number.isFinite(duree) || duree < 0 || duree >= TROP_RAPIDE_MS) return null;
+  return `formulaire envoyé ${(duree / 1000).toLocaleString('fr-FR', { maximumFractionDigits: 1 })} s après son affichage, peut-être un robot`;
+}
+
+async function auCrm(enregistrer) {
+  if (!crmDisponible()) return 'CRM non configuré';
+  try {
+    await enregistrer();
+    return 'ok';
+  } catch (e) {
+    console.error('opco crm', e?.message || e);
+    return `erreur : ${String(e?.message || e).slice(0, 160)}`;
+  }
+}
+
+// L'alerte à Gabriel, envoyée quoi qu'il arrive : elle dit si le visiteur a
+// reçu son budget et si le lead est dans le CRM, et quoi faire sinon.
+async function prevenir({ r, siret, email, page, newsletter, envoi, crm, suspect, nom }) {
+  if (!NOTIFICATION || !envoiPossible()) return;
+  const trouve = r && r.etat === 'trouve';
+  const entreprise = trouve ? r.entreprise?.nom || nom || nomEntreprise(r) : `SIRET ${siret}`;
+  const lignes = [
+    envoi === 'ok'
+      ? `${email} vient de recevoir son budget formation (page ${page}).`
+      : `${email} a demandé son budget formation (page ${page}), mais l'email n'est pas parti (${envoi}). Lui envoyer son budget à la main aujourd'hui.`,
+    '',
+    `Entreprise : ${entreprise}${trouve && r.entreprise?.commune ? `, ${r.entreprise.commune}` : ''}`,
+    `SIRET : ${trouve ? r.siret || r.numero : siret}`,
+    trouve && `OPCO : ${r.opco ? r.opco.nom : 'non trouvé'}`,
+    trouve && r.convention && `Convention : ${r.convention.titre || ''} (IDCC ${r.convention.idcc})`,
+    trouve && r.effectif.libelle && `Effectif : ${r.effectif.libelle}${r.effectif.declare !== undefined ? ' (déclaré par le visiteur)' : r.effectif.annee ? ` (Insee ${r.effectif.annee})` : ''}`,
+    `Newsletter : ${newsletter ? 'inscrit' : 'refusée'}`,
+    suspect && `À vérifier : ${suspect}.`,
+    '',
+    crm === 'ok'
+      ? `Le lead est dans le CRM, à traiter aujourd'hui : ${SITE}/crm/`
+      : `Le lead n'a pas pu être enregistré dans le CRM (${crm}) : le créer à la main.`,
+  ];
+  try {
+    await brevo({
+      sender: { email: EXPEDITEUR, name: 'Site IA-Entrepreneur' },
+      to: [{ email: NOTIFICATION }],
+      replyTo: { email },
+      subject: `Lead outil OPCO : ${entreprise}${trouve && r.opco ? ` (${r.opco.nom})` : ''}${envoi === 'ok' ? '' : ', email à lui envoyer'}`,
+      textContent: lignes.filter((l) => l !== null && l !== undefined && l !== false).join('\n'),
+      tags: ['outil-opco-notification'],
+    });
+  } catch (e) {
+    console.error('opco notification', e?.message || e);
+  }
 }
 
 // --- Handler ------------------------------------------------------------------
@@ -436,81 +527,79 @@ export default async function handler(req, res) {
   if (typeof corps === 'string') { try { corps = JSON.parse(corps); } catch { corps = {}; } }
   corps = corps && typeof corps === 'object' ? corps : {};
 
-  // Pot de miel : un champ invisible que seul un robot remplit. Réponse
-  // normale, sans rien faire : lui signaler qu'il est repéré l'aiderait.
-  if (typeof corps.piege === 'string' && corps.piege.trim()) return res.status(200).json({ ok: true });
-
+  // Plus de champ piège : il faisait répondre « envoyé » sans rien faire, et le
+  // remplissage automatique du navigateur le remplissait (voir doute()). Un
+  // ancien script encore en cache peut l'envoyer : il est ignoré.
   const email = String(corps.email || '').trim().toLowerCase();
   if (email.length < 6 || email.length > 254 || !EMAIL_RE.test(email)) {
     return res.status(400).json({ erreur: 'email_invalide' });
   }
   if (tropDeDemandes('envoi', ip)) return res.status(429).json({ erreur: 'trop_de_demandes' });
+  // Une faute de frappe dans le domaine (gmial.com) ferait croire au visiteur
+  // que son budget arrive : on le lui dit tout de suite, comme la page de RDV.
+  const motif = await emailRefuse(email);
+  if (motif) return res.status(400).json({ erreur: motif === 'jetable' ? 'email_jetable' : 'email_domaine' });
+
+  const page = /^\/[a-z0-9\-/.]{0,120}$/i.test(String(corps.page || '')) ? corps.page : '/quel-est-mon-opco.html';
+  const newsletter = corps.newsletter !== false; // seule la case « je ne souhaite pas » l'enlève
+  const suspect = doute(corps);
 
   const r = await avecIdccSaisi(await rechercher(corps.siret || corps.numero), corps.idcc);
   if (r.etat !== 'trouve') {
-    return res.status(r.etat === 'indisponible' ? 503 : 400).json({ erreur: r.etat });
+    if (r.etat !== 'indisponible') return res.status(400).json({ erreur: r.etat });
+    // Les registres ne répondent plus au moment de l'envoi (le résultat de
+    // l'écran n'est gardé que sur l'instance qui l'a calculé). Le visiteur a
+    // laissé son adresse : sa demande arrive quand même chez Gabriel.
+    const siret = String(corps.siret || corps.numero || '').replace(/\D/g, '').slice(0, 14);
+    const envoi = 'registres publics injoignables au moment de l\'envoi';
+    const crm = await auCrm(() => enregistrerDemande({
+      email,
+      entreprise: `SIRET ${siret}`,
+      resume: 'A demandé son budget formation sur le site : email non parti, à lui envoyer',
+      detail: [`Page : ${page}`, `Outil : Quel est mon OPCO (SIRET). Email non parti (${envoi}) : lui envoyer son budget à la main`, `Email : ${email}`, `SIRET : ${siret}`, `Newsletter : ${newsletter ? 'oui' : 'refusée (case cochée)'}`, suspect && `À vérifier : ${suspect}`].filter(Boolean).join('\n'),
+      source: 'Site : Quel est mon OPCO',
+      tags: ['site', 'outil-opco'],
+      besoin: 'Budget formation demandé sur le site.',
+      prochaine_note: "Son email n'est pas parti (registres injoignables) : chercher son OPCO sur ia-entrepreneur.fr/quel-est-mon-opco.html et lui envoyer son budget",
+      champs: { siret },
+    }));
+    await prevenir({ r: null, siret, email, page, newsletter, envoi, crm, suspect });
+    return res.status(503).json({ erreur: 'indisponible' });
   }
-  const page = /^\/[a-z0-9\-/.]{0,120}$/i.test(String(corps.page || '')) ? corps.page : '/quel-est-mon-opco.html';
   r.effectif = effectifDeclare(r.effectif, corps.salaries);
-  const newsletter = corps.newsletter !== false; // seule la case « je ne souhaite pas » l'enlève
   const message = contenu(r);
 
-  // Le lead d'abord : si l'email échoue, la demande n'est pas perdue pour
-  // autant, et l'équipe peut répondre à la main.
-  if (crmDisponible()) {
-    try { await versCrm(r, email, page, newsletter); } catch (e) { console.error('opco crm', e?.message || e); }
-  }
-
+  let envoi = 'ok';
   if (!envoiPossible()) {
-    return res.status(503).json({ erreur: 'envoi_indisponible', liens: liens(r) });
-  }
-  try {
-    await brevo({
-      sender: { email: EXPEDITEUR, name: EXPEDITEUR_NOM },
-      to: [{ email }],
-      replyTo: { email: EXPEDITEUR, name: EXPEDITEUR_NOM },
-      subject: message.sujet,
-      htmlContent: versHtml(message),
-      textContent: versTexte(message),
-      tags: ['outil-opco'],
-    });
-  } catch (e) {
-    console.error('opco brevo', e?.message || e);
-    // Le visiteur garde l'essentiel : la page lui affiche alors les liens.
-    return res.status(502).json({ erreur: 'envoi_impossible', liens: liens(r) });
-  }
-
-  if (newsletter) {
-    try { await inscrireNewsletter(email, r); } catch (e) { console.error('opco newsletter', e?.message || e); }
-  }
-
-  // Prévenir tout de suite : un lead qui vient de demander son budget se
-  // rappelle le jour même. Un échec ici ne concerne pas le visiteur.
-  if (NOTIFICATION) {
+    envoi = 'Brevo non configuré';
+  } else {
     try {
       await brevo({
-        sender: { email: EXPEDITEUR, name: 'Site IA-Entrepreneur' },
-        to: [{ email: NOTIFICATION }],
-        replyTo: { email },
-        subject: `Lead outil OPCO : ${r.entreprise?.nom || message.nom}${r.opco ? ` (${r.opco.nom})` : ''}`,
-        textContent: [
-          `${email} vient de recevoir son budget formation (page ${page}).`,
-          '',
-          `Entreprise : ${r.entreprise?.nom || message.nom}${r.entreprise?.commune ? `, ${r.entreprise.commune}` : ''}`,
-          `SIRET : ${r.siret || r.numero}`,
-          `OPCO : ${r.opco ? r.opco.nom : 'non trouvé'}`,
-          r.convention && `Convention : ${r.convention.titre || ''} (IDCC ${r.convention.idcc})`,
-          r.effectif.libelle && `Effectif : ${r.effectif.libelle}${r.effectif.declare !== undefined ? ' (déclaré par le visiteur)' : r.effectif.annee ? ` (Insee ${r.effectif.annee})` : ''}`,
-          `Newsletter : ${newsletter ? 'inscrit' : 'refusée'}`,
-          '',
-          `Le lead est dans le CRM, à traiter aujourd'hui : ${SITE}/crm/`,
-        ].filter((l) => l !== null && l !== undefined && l !== false).join('\n'),
-        tags: ['outil-opco-notification'],
+        sender: { email: EXPEDITEUR, name: EXPEDITEUR_NOM },
+        to: [{ email }],
+        replyTo: { email: EXPEDITEUR, name: EXPEDITEUR_NOM },
+        subject: message.sujet,
+        htmlContent: versHtml(message),
+        textContent: versTexte(message),
+        tags: ['outil-opco'],
       });
     } catch (e) {
-      console.error('opco notification', e?.message || e);
+      console.error('opco brevo', e?.message || e);
+      envoi = `refusé par Brevo : ${String(e?.message || e).slice(0, 160)}`;
     }
   }
 
+  // Le lead après l'envoi, pour que le CRM dise si l'email est parti. Puis
+  // Gabriel est prévenu dans tous les cas, échec compris.
+  const crm = await auCrm(() => versCrm(r, email, page, newsletter, { envoi, doute: suspect }));
+  if (envoi === 'ok' && newsletter) {
+    try { await inscrireNewsletter(email, r); } catch (e) { console.error('opco newsletter', e?.message || e); }
+  }
+  await prevenir({ r, email, page, newsletter, envoi, crm, suspect, nom: message.nom });
+
+  // Email non parti : la page donne les liens tout de suite, et dit que nous
+  // lui envoyons son budget nous-mêmes (Gabriel est prévenu, le lead est posé).
+  if (!envoiPossible()) return res.status(503).json({ erreur: 'envoi_indisponible', liens: liens(r) });
+  if (envoi !== 'ok') return res.status(502).json({ erreur: 'envoi_impossible', liens: liens(r) });
   return res.status(200).json({ ok: true });
 }
