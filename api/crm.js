@@ -577,6 +577,8 @@ async function lireTout() {
     aujourdhui: aujourdHuiParis(),
     // Qui est connecté, l'équipe (tout pour Gabriel, les noms pour un membre) et à qui confier un lead.
     moi: { email: moiPublic.email, prenom: moiPublic.prenom, nom: moiPublic.nom, role: moiPublic.role, google: Boolean(moiPublic.google), robot_cle_le: moiPublic.robot_cle_le || null },
+    // Le quota d'invitations LinkedIn du jour, celui que le serveur applique (la page ne le recalcule plus : 12/11, « 20 sur 10 »).
+    quota_invitations_li: quotaInvitationsLi(aujourdHuiParis()),
     equipe, closers: closersListe, google_equipe: googleEquipeConfigure(),
   };
 }

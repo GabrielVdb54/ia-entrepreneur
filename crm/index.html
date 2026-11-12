@@ -3044,7 +3044,7 @@ function envoisLiDuJour() {
   return { invitations: du.filter((a) => a.type === 'invitation').length, messages: du.filter((a) => a.type === 'message').length };
 }
 const jourLocal = (iso) => new Intl.DateTimeFormat('fr-CA', { timeZone: 'Europe/Paris' }).format(new Date(iso));
-const quotaInvitations = () => (aujourdhui() <= '2026-11-20' ? 10 : 15);
+const quotaInvitations = () => (D && D.quota_invitations_li) || 20; // donné par le serveur (quotaInvitationsLi)
 function etatMac() {
   const r = (D.reglages && D.reglages.linkedin_robot) || {};
   if (!r.dernier_passage) return { texte: "Ton Mac n'est pas encore branché : rien ne part tant qu'il ne l'est pas.", alerte: true };
