@@ -325,6 +325,7 @@
   .li-barre.alerte-li p { color: var(--danger); }
   .em-barre .em-bilan { font-size: 13.5px; }
   .em-adresse { margin: 0; font-size: 14px; overflow-wrap: anywhere; }
+  .em-vues { margin: 0; overflow-wrap: anywhere; }
   .em-verifiee { display: inline-block; font-size: 12px; font-weight: 700; padding: 1px 8px; border-radius: 999px; background: var(--accent-soft); color: var(--accent-dark); }
   .em-appuis { margin: 4px 0 0; padding-left: 18px; font-size: 13.5px; overflow-wrap: anywhere; }
   .em-appuis li + li { margin-top: 3px; }
@@ -726,6 +727,10 @@ const ERREURS = {
   adresse_manquante: "Pas encore d'adresse vérifiée pour ce dirigeant.",
   adresse_opposee: "Cette personne s'est désinscrite : plus aucun message ne lui part.",
   adresse_non_verifiee: "FullEnrich ne donne pas cette adresse comme vérifiée (DELIVERABLE) : on ne l'utilise pas.",
+  adresse_generale: "C'est une adresse générale (contact@, info@, accueil@…) : on n'écrit qu'au dirigeant (Gabriel, 12/11).",
+  adresse_societe: "Cette adresse est au nom de la société, pas du dirigeant : on n'écrit qu'au dirigeant.",
+  adresse_autre_personne: "Cette adresse n'est pas celle du dirigeant ni d'un co-dirigeant au registre.",
+  domaine_sans_mx: "Ce domaine ne reçoit pas d'email (pas de serveur de messagerie).",
   pieces_trop_lourdes: "Pièces jointes trop lourdes pour le CRM (3,3 Mo au plus) : rien n'est parti. Envoie ce message depuis Gmail.",
   piece_invalide: "Une pièce jointe est vide ou illisible : rien n'est parti.",
   piece_trop_lourde: 'Pièce jointe trop lourde pour le CRM (plus de 4 Mo) : ouvre le fil dans Gmail.',
@@ -3240,7 +3245,7 @@ document.addEventListener('click', async (ev) => {
 // trouve l'adresse vérifiée (FullEnrich), lit les faits publics, Claude écrit l'objet et l'accroche ; ici Gabriel relit et
 // valide d'un clic, puis le serveur envoie par Brevo le matin d'un jour ouvré (5 par jour au plus, « molo »). Après 10
 // emails validés tels quels d'affilée, ils partent seuls, comme LinkedIn. Gabriel seulement : un membre ne reçoit rien.
-const ETAT_EMAIL = { a_enrichir: 'Adresse en cours de recherche', a_rediger: 'Claude rédige au prochain passage', brouillon: 'À valider', a_envoyer: 'En file : part le prochain matin', en_cours: "Brevo l'envoie…", envoye: 'Envoyé', echec: 'Pas parti', annule: 'Arrêté', sans_email: "Pas d'adresse vérifiée" };
+const ETAT_EMAIL = { a_enrichir: 'Adresse du dirigeant en cours de recherche', a_rediger: 'Claude rédige au prochain passage', brouillon: 'À valider', a_envoyer: 'En file : part le prochain matin', en_cours: "Brevo l'envoie…", envoye: 'Envoyé', echec: 'Pas parti', annule: 'Arrêté', sans_email: "Pas d'adresse du dirigeant" };
 const CLASSE_ETAT_EMAIL = { brouillon: 'li-brouillon', a_envoyer: 'li-a_envoyer', en_cours: 'li-en_cours', echec: 'li-echec', sans_email: 'li-echec' };
 const EVENEMENTS_LUS = { delivered: 'arrivé', hard_bounce: 'adresse en erreur', invalid: 'adresse en erreur', blocked: 'bloqué par Brevo', soft_bounce: 'boîte pleine ou indisponible', spam: 'signalé comme spam', unsubscribed: 'désinscrit' };
 const emailsProspection = () => D.emails || [];
@@ -3256,6 +3261,13 @@ function majEmailProspection(e) {
 }
 const plurielEm = (n, un, plusieurs = `${un}s`) => `${n} ${n > 1 ? plusieurs : un}`;
 const texteBilanEm = (b) => `${plurielEm(b.envoyes, 'envoyé')}, ${plurielEm(b.arrives, 'arrivé')}, ${plurielEm(b.erreurs, 'adresse en erreur', 'adresses en erreur')}, ${plurielEm(b.spam, 'spam', 'spams')}, ${plurielEm(b.desinscriptions, 'désinscription')}, ${plurielEm(b.reponses, 'réponse')}`;
+// Où en sont les candidats (Gabriel, 12/11 : l'adresse du dirigeant d'abord gratuitement, FullEnrich pour les ultra qualifiés).
+function texteCandidatsEm(p) {
+  const k = p.candidats || {};
+  return [`${k.en_attente || 0} en attente (registre, adresse)`, `${plurielEm(k.gratuites || 0, 'adresse trouvée', 'adresses trouvées')} gratuitement`,
+    `${plurielEm(k.ultra_attente || 0, 'ultra qualifié', 'ultra qualifiés')} en attente de FullEnrich${k.ultra_attente && !p.fullenrich ? ' (clé FullEnrich absente)' : ''}`,
+    ...(k.ultra_en_cours ? [`${k.ultra_en_cours} en cours chez FullEnrich`] : []), `${k.sans_adresse || 0} sans adresse (pour Anna)`].join(', ');
+}
 const heureEm = (hm) => String(hm || '').replace(/^0/, '').replace(':', ' h ').replace(/ h 00$/, ' h');
 const fenetreEm = () => { const f = (D.prospection_email && D.prospection_email.fenetre) || ['08:30', '11:30']; return `entre ${heureEm(f[0])} et ${heureEm(f[1])}`; };
 function texteConfianceEmail() {
@@ -3271,25 +3283,34 @@ function barreEmail() {
   const etats = [];
   if (p.pause) etats.push(`En pause : ${p.pause.raison}`);
   if (!p.brevo) etats.push("La clé Brevo n'est pas sur le serveur : rien ne part.");
-  if (p.a_enrichir && !p.fullenrich) etats.push(`${plurielEm(p.a_enrichir, 'dirigeant attend', 'dirigeants attendent')} une adresse : la clé FullEnrich n'est pas branchée (Claude Code peut les chercher).`);
-  else if (p.a_enrichir) etats.push(`${plurielEm(p.a_enrichir, 'adresse')} en cours de recherche.`);
   if (p.fullenrich_erreur) etats.push(p.fullenrich_erreur);
   const alerte = Boolean(p.pause || !p.brevo || p.fullenrich_erreur);
   const k = texteConfianceEmail();
   const n = emailsAValider().length;
-  return `<div class="li-barre em-barre${alerte ? ' alerte-li' : ''}" data-em-barre><p><b>Prospection email</b> · Aujourd'hui : ${b.aujourdhui.envoyes} envoyé${b.aujourdhui.envoyes > 1 ? 's' : ''} sur ${b.aujourdhui.quota}${p.en_file ? `, ${p.en_file} en file (${esc(fenetreEm())}, jours ouvrés)` : ''}.<br><span class="em-bilan">7 derniers jours : ${esc(texteBilanEm(b.semaine))}.</span><br><span class="em-bilan">Depuis le début : ${esc(texteBilanEm(b.debut))}.</span>${etats.length ? `<br><span class="li-file" role="status">${esc(etats.join(' '))}</span>` : ''}<br><span class="li-confiance">${esc(k.texte)}</span></p><div class="actions">${n ? `<button type="button" class="btn petit primaire" data-em-jour>Emails à valider (${n})</button>` : ''}${p.pause ? '<button type="button" class="btn petit" data-em-reprendre>Reprendre</button>' : ''}${k.auto ? '<button type="button" class="btn petit lien" data-em-couper>Couper l\'envoi automatique</button>' : ''}</div></div>`;
+  return `<div class="li-barre em-barre${alerte ? ' alerte-li' : ''}" data-em-barre><p><b>Prospection email</b> · Aujourd'hui : ${b.aujourdhui.envoyes} envoyé${b.aujourdhui.envoyes > 1 ? 's' : ''} sur ${b.aujourdhui.quota}${p.en_file ? `, ${p.en_file} en file (${esc(fenetreEm())}, jours ouvrés)` : ''}.<br><span class="em-bilan">7 derniers jours : ${esc(texteBilanEm(b.semaine))}.</span><br><span class="em-bilan">Depuis le début : ${esc(texteBilanEm(b.debut))}.</span>${p.candidats ? `<br><span class="em-bilan" data-em-candidats>Candidats : ${esc(texteCandidatsEm(p))}.</span>` : ''}${etats.length ? `<br><span class="li-file" role="status">${esc(etats.join(' '))}</span>` : ''}<br><span class="li-confiance">${esc(k.texte)}</span></p><div class="actions">${n ? `<button type="button" class="btn petit primaire" data-em-jour>Emails à valider (${n})</button>` : ''}${p.pause ? '<button type="button" class="btn petit" data-em-reprendre>Reprendre</button>' : ''}${k.auto ? '<button type="button" class="btn petit lien" data-em-couper>Couper l\'envoi automatique</button>' : ''}</div></div>`;
 }
+// D'où vient l'adresse, avec le lien de la page où elle a été lue (site, annuaire RGE de l'ADEME, avis BOAMP), ou FullEnrich.
+const SOURCES_ADRESSE = { site: "site de l'entreprise", ademe: "annuaire RGE de l'ADEME", boamp: 'avis BOAMP', fullenrich: 'FullEnrich', manuel: 'posée à la main' };
+const sourceAdresse = (e) => e.adresse_source || (e.faits && e.faits.adresse) || null;
 function adresseEmailLue(e) {
   if (!e.email) return '<span class="meta">Pas encore d\'adresse</span>';
-  const verifiee = e.email_statut === 'DELIVERABLE' ? ' <span class="em-verifiee">vérifiée</span>' : e.source_email === 'site' ? ' <span class="meta">(site de l\'entreprise)</span>' : e.source_email === 'manuel' ? ' <span class="meta">(posée à la main)</span>' : '';
-  return `${esc(e.email)}${verifiee}`;
+  const s = sourceAdresse(e) || {};
+  const cle = s.email === e.email && SOURCES_ADRESSE[s.source] ? s.source : e.source_email === 'fullenrich' ? 'fullenrich' : e.source_email === 'site' ? 'site' : 'manuel';
+  const lien = s.email === e.email && /^https:\/\//.test(s.url || '') ? ` <a href="${esc(s.url)}" target="_blank" rel="noopener noreferrer">voir la page</a>` : '';
+  const verifiee = e.email_statut === 'DELIVERABLE' ? ' <span class="em-verifiee">vérifiée</span>' : '';
+  return `${esc(e.email)}${verifiee} <span class="meta" data-em-source="${esc(cle)}">(${esc(SOURCES_ADRESSE[cle])})</span>${lien}`;
+}
+// Ce qui a été vu puis écarté (adresses générales, au nom de la société, d'une autre personne…), pour que Gabriel voie pourquoi.
+function vuesEcarteesEm(e) {
+  const vues = ((sourceAdresse(e) || {}).vues || []).slice(0, 4);
+  return vues.length ? `<p class="meta em-vues">Écartées : ${vues.map((v) => `${esc(v.email)} (${esc(v.raison)})`).join(', ')}</p>` : '';
 }
 const evenementsLus = (e) => [...new Set(Object.keys(e.evenements || {}).map((k) => EVENEMENTS_LUS[k]).filter(Boolean))].join(', ');
 function blocEmail(e) {
   const l = IDX.lead.get(e.lead_id);
   const c = contactParId(e.contact_id) || (l ? contactPrincipal(l.id) : null);
   const qui = [e.civilite || '', nomContact(c)].filter(Boolean).join(' ') || 'Dirigeant';
-  const tete = `<div class="li-tete"><b>${esc(l ? l.entreprise : 'Lead supprimé')}</b> <span class="meta">${esc(qui)}${c && c.poste ? `, ${esc(c.poste)}` : ''}</span> <span class="li-etat ${CLASSE_ETAT_EMAIL[e.statut] || ''}">${esc(ETAT_EMAIL[e.statut] || e.statut)}</span></div><p class="em-adresse">${adresseEmailLue(e)}</p>`;
+  const tete = `<div class="li-tete"><b>${esc(l ? l.entreprise : 'Lead supprimé')}</b> <span class="meta">${esc(qui)}${c && c.poste ? `, ${esc(c.poste)}` : ''}</span> <span class="li-etat ${CLASSE_ETAT_EMAIL[e.statut] || ''}">${esc(ETAT_EMAIL[e.statut] || e.statut)}</span></div><p class="em-adresse">${adresseEmailLue(e)}</p>${vuesEcarteesEm(e)}`;
   const appuis = Array.isArray(e.appuis) && e.appuis.length ? `<div><p class="meta">Ce qui justifie le message</p><ul class="em-appuis">${e.appuis.map((a) => `<li>${esc(a.fait)}${a.source && a.source !== 'aucune' ? ` <span class="meta">· ${esc(a.source)}${a.date ? `, ${esc(/^\d{4}-\d{2}-\d{2}$/.test(a.date) ? dateCourte(a.date) : a.date)}` : ''}</span>` : ''}</li>`).join('')}</ul></div>` : '';
   const detail = e.detail ? `<p class="li-detail${['echec', 'annule', 'sans_email'].includes(e.statut) || /erreur|interdit|nomme|montant|majuscules|lien|origine|annuaire/i.test(e.detail) ? ' alerte-li' : ''}">${esc(e.detail)}</p>` : '';
   if (['brouillon', 'echec'].includes(e.statut)) {
