@@ -3290,7 +3290,8 @@ function barreEmail() {
   if (p.pause) etats.push(`En pause : ${p.pause.raison}`);
   if (!p.brevo) etats.push("La clé Brevo n'est pas sur le serveur : rien ne part.");
   if (p.fullenrich_erreur) etats.push(p.fullenrich_erreur);
-  const alerte = Boolean(p.pause || !p.brevo || p.fullenrich_erreur);
+  if (p.reserve_brevo) etats.push(p.reserve_brevo);
+  const alerte = Boolean(p.pause || !p.brevo || p.fullenrich_erreur || p.reserve_brevo);
   const k = texteConfianceEmail();
   const n = emailsAValider().length;
   const parType = (x) => (x.generales && x.generales.envoyes ? ` (au dirigeant : ${texteBilanEm(x.nominatives)} ; à l'accueil : ${texteBilanEm(x.generales)})` : '');

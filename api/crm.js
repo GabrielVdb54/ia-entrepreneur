@@ -4408,10 +4408,39 @@ async function leadsPourFileEmail(lignes) {
   return new Map(ls.map((l) => [l.id, l]));
 }
 
+// La réserve pour les emails du site (Gabriel, 13/11) : un seul compte Brevo envoie aussi les emails du site (rendez-vous,
+// demandes) ; s'il reste moins de 100 envois au compte, aucun email de prospection ne part à ce passage. Documentation
+// officielle lue le 13/11/2026 (https://developers.brevo.com/reference/get-account) : GET /v3/account rend plan[], chaque
+// élément avec type (free, subscription, payAsYouGo, sms), creditsType (sendLimit : les emails qu'il reste à envoyer) et
+// credits (les crédits restants, un nombre, parfois écrit en chaîne). On additionne les sendLimit hors SMS. Si Brevo ne
+// répond pas ou rend autre chose, on ne bloque pas l'envoi (null).
+const RESERVE_BREVO = 100;
+async function creditsBrevo() {
+  try {
+    const r = await fetch(`${BREVO}/account`, { headers: { 'api-key': process.env.BREVO_API_KEY, accept: 'application/json' }, signal: AbortSignal.timeout(8000) });
+    if (!r.ok) { console.error('crm email compte brevo', r.status); return null; }
+    const d = await r.json();
+    const plans = (Array.isArray(d?.plan) ? d.plan : []).filter((p) => p?.creditsType === 'sendLimit' && p.type !== 'sms' && Number.isFinite(Number.parseFloat(String(p.credits))));
+    return plans.length ? plans.reduce((t, p) => t + Number.parseFloat(String(p.credits)), 0) : null;
+  } catch (x) {
+    console.error('crm email compte brevo', x?.name || x?.message);
+    return null;
+  }
+}
+
 async function envoyerFileEmail(r, bilan, reste, signature = null) {
   let place = Math.min(r.par_passage, r.par_jour - (await envoyesDuJourEmail()));
   if (place <= 0) return;
   const { lignes: file } = await sb('iae_crm_emails?statut=eq.a_envoyer&order=valide_le.asc&limit=100&select=*');
+  if (!file.length) return;
+  const credits = await creditsBrevo();
+  if (credits != null && credits < RESERVE_BREVO) {
+    const texte = `Brevo : plus que ${Math.floor(credits)} envois au compte aujourd'hui (réserve de ${RESERVE_BREVO} pour les emails du site) : aucun email de prospection n'est parti au passage de ${heureMinuteParis().replace(':', ' h ')}.`;
+    console.log('crm email réserve brevo', credits);
+    bilan.reserve_brevo = texte;
+    await ecrireReglage('email_prospection_suivi', { ...((await lireReglage('email_prospection_suivi')) || {}), reserve_brevo: { texte, credits, le: new Date().toISOString() } });
+    return;
+  }
   const lignes = ordonnerFileEmail(file, await leadsPourFileEmail(file));
   for (const e of lignes) {
     if (place <= 0 || !reste()) break;
@@ -4733,7 +4762,8 @@ async function suivreCampagnesEmail(bilan) {
 }
 
 // Pause automatique (Gabriel, 12/11 : « molo ») : dès 1 signalement comme spam, ou plus d'1 adresse en erreur, depuis la
-// dernière reprise. Seul Gabriel reprend (bouton « Reprendre »).
+// dernière reprise ; depuis le 13/11, aussi 2 désinscriptions ou « stop » sur 7 jours, ou un email différé plus de 24 h.
+// Seul Gabriel reprend (bouton « Reprendre »).
 async function verifierPauseEmail() {
   const r = await reglageEmail();
   if (r.pause) return r.pause;
@@ -4743,7 +4773,15 @@ async function verifierPauseEmail() {
   const apres = (ev, k) => ev?.[k] && Date.parse(ev[k]) >= Date.parse(depuis);
   const spam = lignes.filter((x) => apres(x.evenements, 'spam')).length;
   const erreurs = lignes.filter((x) => ERREURS_ADRESSE.some((k) => apres(x.evenements, k))).length;
-  const raison = spam >= 1 ? `${spam} message${spam > 1 ? 's' : ''} signalé${spam > 1 ? 's' : ''} comme spam` : erreurs > 1 ? `${erreurs} adresses en erreur` : null;
+  // Gabriel, 13/11 : aussi 2 désinscriptions ou « stop » sur 7 jours glissants, et un email différé depuis plus de 24 h sans
+  // remise (toujours depuis la dernière reprise : une pause n'est jamais levée toute seule).
+  const il7 = Date.now() - 7 * 86400000;
+  const desinscriptions = lignes.filter((x) => apres(x.evenements, 'unsubscribed') && Date.parse(x.evenements.unsubscribed) >= il7).length;
+  const differes = lignes.filter((x) => apres(x.evenements, 'deferred') && differeSansRemise(x)).length;
+  const raison = spam >= 1 ? `${spam} message${spam > 1 ? 's' : ''} signalé${spam > 1 ? 's' : ''} comme spam`
+    : erreurs > 1 ? `${erreurs} adresses en erreur`
+      : desinscriptions >= 2 ? `${desinscriptions} désinscriptions ou « stop » sur 7 jours`
+        : differes ? `${differes > 1 ? `${differes} emails différés` : 'un email différé'} depuis plus de 24 h sans être arrivé${differes > 1 ? 's' : ''}` : null;
   if (!raison) return null;
   const pause = { le: new Date().toISOString(), raison: `${raison} : envois arrêtés automatiquement.`, auto: true };
   await majReglageEmail({ pause });
@@ -4773,26 +4811,55 @@ function bilanEmail(envoyes, recus, { quota, jour = aujourdHuiParis() } = {}) {
   return { aujourdhui: { envoyes: partis.filter((e) => jourParis(e.envoye_le) === jour).length, quota }, debut: compter(partis), semaine: compter(partis.filter((e) => Date.parse(e.envoye_le) >= il7)) };
 }
 const estGeneraleEmail = (e) => e.email_statut === 'GENERIQUE' || Boolean((e.adresse ?? e.faits?.adresse)?.generique);
-// Le quota du jour : le dernier palier atteint, si le bilan depuis le début est propre (aucun signalement comme spam, au plus
-// 1 adresse en erreur et moins de 2 % des envoyés, pas de pause) ; sinon le palier d'avant (ou le quota de base), et pourquoi.
-function quotaEmail(r, debut, pause, jour = aujourdHuiParis()) {
+// Le bilan propre, condition d'un palier (Gabriel, 13/11) : sur les emails partis depuis le dernier changement de palier (le
+// début du palier d'avant ; depuis le début pour le premier), aucun signalement comme spam, au plus 1 adresse en erreur (rebond
+// dur), au plus 1 désinscription ou « stop », aucun email resté « différé » plus de 24 h sans être arrivé. Pas de nombre
+// minimum d'envois (10 par jour le 16/11 si le bilan est propre, validé par Gabriel).
+const DIFFERE_MAX_MS = 24 * 3600000;
+const differeSansRemise = (e, maintenant = Date.now()) => {
+  const ev = e.evenements || {};
+  return Boolean(ev.deferred) && !ev.delivered && !ERREURS_ADRESSE.some((k) => ev[k]) && maintenant - Date.parse(ev.deferred) > DIFFERE_MAX_MS;
+};
+function raisonsBilanEmail(partis) {
+  const a = (e, ...k) => k.some((x) => e.evenements?.[x]);
+  const spam = partis.filter((e) => a(e, 'spam')).length;
+  const erreurs = partis.filter((e) => a(e, ...ERREURS_ADRESSE)).length;
+  const desinscriptions = partis.filter((e) => a(e, 'unsubscribed')).length;
+  const differes = partis.filter((e) => differeSansRemise(e)).length;
+  const r = [];
+  if (spam > 0) r.push(`${pluriel(spam, 'signalement', 'signalements')} comme spam`);
+  if (erreurs > 1) r.push(`${pluriel(erreurs, 'adresse en erreur', 'adresses en erreur')} (1 au plus)`);
+  if (desinscriptions > 1) r.push(`${pluriel(desinscriptions, 'désinscription')} ou « stop » (1 au plus)`);
+  if (differes) r.push(`${pluriel(differes, 'email différé', 'emails différés')} depuis plus de 24 h sans être arrivé${differes > 1 ? 's' : ''}`);
+  return r;
+}
+// Le quota du jour : le plus haut palier atteint dont le bilan est propre sur sa fenêtre ; sinon le quota de base. Si le
+// dernier palier atteint n'est pas pris, bloque dit pourquoi (et depuis quand le bilan est compté).
+function quotaEmail(r, lignes, pause, jour = aujourdHuiParis()) {
   const paliers = (Array.isArray(r.paliers) ? r.paliers : []).filter((x) => DATE_RE.test(String(x?.a_partir_du || '')) && Number.isInteger(x.par_jour)).sort((a, b) => a.a_partir_du.localeCompare(b.a_partir_du));
   const atteints = paliers.filter((x) => x.a_partir_du <= jour);
-  const d = debut || { envoyes: 0, erreurs: 0, spam: 0 };
-  const raisons = [];
-  if (d.spam > 0) raisons.push(`${pluriel(d.spam, 'signalement', 'signalements')} comme spam`);
-  if (d.erreurs > 1 || (d.erreurs > 0 && d.erreurs >= 0.02 * d.envoyes)) raisons.push(`${pluriel(d.erreurs, 'adresse en erreur', 'adresses en erreur')} sur ${pluriel(d.envoyes, 'envoi')}`);
-  if (pause) raisons.push('prospection en pause');
+  const maintenant = Date.now();
+  const partis = (lignes || []).filter((e) => e.statut === 'envoye' && e.envoye_le && Date.parse(e.envoye_le) <= maintenant);
+  // La fenêtre d'un palier : depuis le début du palier d'avant (le dernier changement), sinon depuis le début.
+  const fenetre = (i) => (i > 0 ? atteints[i - 1].a_partir_du : null);
+  const raisonsDepuis = (d) => {
+    const x = raisonsBilanEmail(d ? partis.filter((e) => Date.parse(e.envoye_le) >= Date.parse(minuitParis(d))) : partis);
+    if (pause) x.push('prospection en pause');
+    return x;
+  };
+  let choisi = -1;
+  for (let i = atteints.length - 1; i >= 0 && choisi < 0; i--) if (!raisonsDepuis(fenetre(i)).length) choisi = i;
+  const dernier = atteints.length - 1;
+  // Sans palier atteint : la fenêtre du prochain (depuis le début), pour annoncer « si le bilan reste propre ».
+  const depuis = dernier >= 0 ? fenetre(dernier) : null;
+  const raisons = raisonsDepuis(depuis);
   const propre = !raisons.length;
-  const palier = atteints.at(-1) || null;
-  const precedent = atteints.at(-2) || null;
-  const par_jour = !palier || propre ? (palier ? palier.par_jour : r.par_jour) : (precedent ? precedent.par_jour : r.par_jour);
-  return { par_jour, palier: propre ? palier : precedent, prochain: paliers.find((x) => x.a_partir_du > jour) || null, bloque: palier && !propre ? { par_jour: palier.par_jour, raison: raisons.join(', ') } : null, propre, raisons };
-}
-// Le bilan depuis le début, pour les paliers (seulement s'il y a un palier à décider).
-async function bilanDebutEmail(r) {
-  if (!(Array.isArray(r.paliers) && r.paliers.some((x) => x?.a_partir_du <= aujourdHuiParis()))) return null;
-  return bilanEmail(await lignesBilanEmail(), [], { quota: r.par_jour }).debut;
+  const palier = choisi >= 0 ? atteints[choisi] : null;
+  const quand = depuis ? `depuis le ${dateCourte(depuis).slice(0, 5)}` : 'depuis le début';
+  return {
+    par_jour: palier ? palier.par_jour : r.par_jour, palier, prochain: paliers.find((x) => x.a_partir_du > jour) || null,
+    bloque: dernier >= 0 && choisi !== dernier ? { par_jour: atteints[dernier].par_jour, raison: `${raisons.join(', ')} ${quand}` } : null, propre, raisons, depuis,
+  };
 }
 function texteQuotaEmail(q) {
   const jourCourt = (iso) => dateCourte(iso).slice(0, 5);
@@ -4842,13 +4909,15 @@ async function etatProspectionEmail({ lignes = null, recus = null } = {}) {
     sans_adresse: n('sans_email'),
   };
   const bilan = bilanEmail(tout, rec, { quota: r.par_jour });
-  const q = quotaEmail(r, bilan.debut, r.pause);
+  const q = quotaEmail(r, tout, r.pause);
   bilan.aujourdhui.quota = q.par_jour;
   return {
     candidats,
     actif: tout.length > 0, pause: r.pause || null, quota: q.par_jour, palier: { actuel: q.palier, prochain: q.prochain, bloque: q.bloque, texte: texteQuotaEmail(q) || null },
     fenetre: [r.debut, r.fin], expediteur: r.expediteur,
     fullenrich: Boolean(process.env.FULLENRICH_API_KEY), brevo: Boolean(process.env.BREVO_API_KEY), fullenrich_erreur: suivi.fullenrich_erreur || null,
+    // La réserve Brevo du jour (13/11) : un passage sans envoi parce qu'il restait moins de 100 envois au compte.
+    reserve_brevo: suivi.reserve_brevo?.le && jourParis(suivi.reserve_brevo.le) === aujourdHuiParis() ? suivi.reserve_brevo.texte : null,
     a_valider: n('brouillon') + n('echec'), en_file: n('a_envoyer') + n('en_cours'), a_enrichir: n('a_enrichir'), a_rediger: n('a_rediger'), sans_email: n('sans_email'),
     campagnes: suivi.campagnes || {}, dernier_passage: suivi.passage_le || null,
     // La signature ajoutée à l'envoi : sa version texte pour l'aperçu de la page (jamais son HTML, qui ne s'affiche pas ici).
@@ -4884,7 +4953,7 @@ async function prospectionEmail({ limite = Date.now() + 40000 } = {}) {
   const hm = heureMinuteParis();
   if (process.env.BREVO_API_KEY && hm >= r.debut && hm < r.fin) {
     // Le quota du jour suit les paliers, si le bilan depuis le début est propre (Gabriel, 12/11).
-    const q = quotaEmail(r, (await bilanDebutEmail(r)), pause);
+    const q = quotaEmail(r, r.paliers?.some?.((x) => x?.a_partir_du <= jour) ? await lignesBilanEmail() : [], pause);
     await envoyerFileEmail({ ...r, par_jour: q.par_jour }, bilan, reste, signature);
   }
   // 4. Registre et faits publics, adresse gratuite du dirigeant, FullEnrich pour les ultra qualifiés ; 5. lecture des
