@@ -3112,24 +3112,86 @@ async function lireJsonPublic(url, delai = 6000) {
 // prospection commerciale », article 21.2 du RGPD et R.123-320 du Code de commerce) ? Des autres dirigeants, on ne garde
 // que le premier prénom, le nom et la qualité : de quoi reconnaître leur adresse nominative (Gabriel, 12/11 : seulement
 // l'adresse du dirigeant ou d'un co-dirigeant), rien d'autre.
-async function lireRegistre(siren, c) {
-  const j = await lireJsonPublic(`${REGISTRE}?q=${siren}&page=1&per_page=5`);
-  if (!j) return null;
-  const e = (j.results || []).find((x) => x.siren === siren);
-  if (!e) return { trouve: false };
+// Les holdings de patron (Gabriel, 12/11, pour la liste cœur de cible qui alimente aussi l'email : « holdings de patron
+// réintégrées : on n'écarte plus que les vrais groupes »). Une entreprise dirigée par une société (président, gérant ou
+// directeur général personne morale, hors commissaires aux comptes) n'est gardée que si cette holding est celle du patron,
+// selon les critères du script du 12/11 (holdings.py) : ni un grand groupe (même liste que prospection.py), ni une ETI ou
+// une grande entreprise, siège dans le Grand Est, elle-même dirigée par une personne physique et non par une société, aucun
+// administrateur judiciaire ni mandataire. Le dirigeant à saluer est alors celui de la holding : il doit être le contact
+// de la ligne (sinon on ne devine pas, la ligne s'arrête). L'opposition de la holding à la prospection arrête aussi.
+const QUALITE_DIRIGEANT_RE = /pr[ée]sident|g[ée]rant|directeur g[ée]n[ée]ral|directrice g[ée]n[ée]rale/i;
+const DIFFICULTE_RE = /administrateur|liquidat|mandataire/i;
+const GRANDS_GROUPES_EMAIL = /\b(vinci|bouygues|eiffage|spie|engie|equans|colas|eurovia|fayat|nge|razel|sogea|dodin|cegelec|axians|omexom|citeos|actemium|santerne|sdel|ineo|onet|derichebourg|samsic|atalian|gsf|elior|sodexo|veolia|suez|saint gobain|point p|iss|tfn|challancin)\b/;
+const DEPARTEMENTS_HOLDING = new Set(['08', '10', '51', '52', '54', '55', '57', '67', '68', '88']);
+const sansCommissaires = (ds) => (ds || []).filter((d) => !/commissaire/i.test(d.qualite || ''));
+const departementSiege = (siege) => String(siege?.departement || String(siege?.code_postal || '').slice(0, 2) || '').trim() || null;
+// Le dirigeant de la ligne parmi des personnes physiques du registre : le nom suffit (un prénom d'usage peut différer du
+// prénom d'état civil) ; le prénom, quand il colle, départage un père et un fils.
+function dirigeantDeLaLigne(physiques, c) {
   const qui = normaliser(c?.nom).split(' ').filter((x) => x.length > 1);
   const prenom = normaliser(c?.prenom).split(' ')[0] || '';
-  const physiques = (e.dirigeants || []).filter((d) => d.type_dirigeant !== 'personne morale');
-  // Le nom suffit (un prénom d'usage peut différer du prénom d'état civil) ; le prénom, quand il colle, départage un père et un fils.
   const memeNom = physiques.filter((d) => { const n = new Set(normaliser(d.nom).split(' ')); return qui.length && qui.every((x) => n.has(x)); });
-  const sien = memeNom.find((d) => prenom && normaliser(d.prenoms).split(' ').includes(prenom)) || memeNom[0];
+  return memeNom.find((d) => prenom && normaliser(d.prenoms).split(' ').includes(prenom)) || memeNom[0] || null;
+}
+async function lireEntrepriseRegistre(siren) {
+  const j = await lireJsonPublic(`${REGISTRE}?q=${siren}&page=1&per_page=5`);
+  if (!j) return null;
+  return (j.results || []).find((x) => x.siren === siren) || false;
+}
+// La holding qui dirige l'entreprise : { patron: true, … } ou { patron: false, raison } ; null si le registre ne répond pas.
+async function jugerHolding(h) {
+  const nom = couper(String(h.denomination || h.nom || '').trim(), 200) || 'sans nom';
+  if (GRANDS_GROUPES_EMAIL.test(normaliser(nom))) return { patron: false, nom, raison: `${nom}, un grand groupe` };
+  const siren = String(h.siren || '').replace(/\D/g, '');
+  if (!/^\d{9}$/.test(siren)) return { patron: false, nom, raison: `${nom}, holding sans SIREN au registre` };
+  const he = await lireEntrepriseRegistre(siren);
+  if (he === null) return null;
+  if (!he) return { patron: false, nom, siren, raison: `${nom}, holding introuvable au registre` };
+  const base = { nom, siren, opposition: he.opposition_diffusion_commerciale === true, departement: departementSiege(he.siege), commune: couper(he.siege?.libelle_commune || '', 80) || null, categorie: he.categorie_entreprise || null };
+  if (['GE', 'ETI'].includes(he.categorie_entreprise)) return { ...base, patron: false, raison: `${nom}, ${he.categorie_entreprise === 'GE' ? 'une grande entreprise' : 'une ETI'}` };
+  if (base.departement && !DEPARTEMENTS_HOLDING.has(base.departement)) return { ...base, patron: false, raison: `${nom}, holding dont le siège est hors du Grand Est (${base.departement})` };
+  const ds = sansCommissaires(he.dirigeants);
+  if (ds.some((d) => DIFFICULTE_RE.test(d.qualite || ''))) return { ...base, patron: false, raison: `${nom}, holding sous administrateur ou mandataire` };
+  if (ds.some((d) => d.type_dirigeant === 'personne morale')) return { ...base, patron: false, raison: `${nom}, holding elle-même dirigée par une société` };
+  const pp = ds.filter((d) => d.type_dirigeant !== 'personne morale');
+  const chef = pp.find((d) => QUALITE_DIRIGEANT_RE.test(d.qualite || '')) || pp[0] || null;
+  if (!chef) return { ...base, patron: false, raison: `${nom}, holding sans dirigeant personne physique au registre` };
+  return { ...base, patron: true, physiques: pp, chef };
+}
+
+async function lireRegistre(siren, c, { holding = true } = {}) {
+  const e = await lireEntrepriseRegistre(siren);
+  if (e === null) return null;
+  if (!e) return { trouve: false };
+  const ds = sansCommissaires(e.dirigeants);
+  const physiques = ds.filter((d) => d.type_dirigeant !== 'personne morale');
+  // Une société qui dirige (président, gérant, directeur général) : sa holding est lue (holdings de patron, 12/11).
+  const morales = ds.filter((d) => d.type_dirigeant === 'personne morale');
+  const tete = morales.find((d) => QUALITE_DIRIGEANT_RE.test(d.qualite || '')) || null;
+  let h = null;
+  if (holding && tete && !ds.some((d) => DIFFICULTE_RE.test(d.qualite || ''))) {
+    h = await jugerHolding(tete);
+    if (h === null) return null; // le registre ne répond pas pour la holding : on réessaiera
+  }
+  const chef = h?.patron ? h.chef : null;
+  let sien = dirigeantDeLaLigne(physiques, c);
+  // Le dirigeant à saluer est celui de la holding : il doit être le contact de la ligne.
+  const contactHolding = chef ? Boolean(dirigeantDeLaLigne([chef], c)) : null;
+  if (chef && contactHolding) sien = chef;
+  const personnes = [...physiques, ...(chef && !physiques.some((d) => normaliser(d.nom) === normaliser(chef.nom) && normaliser(d.prenoms) === normaliser(chef.prenoms)) ? [chef] : [])];
+  const pers = (d) => ({ prenom: couper(String(d.prenoms || '').trim().split(/\s+/)[0] || '', 60), nom: couper(String(d.nom || '').trim(), 80), qualite: couper(d.qualite || '', 60) });
   return {
     trouve: true, nom: couper(e.nom_complet || '', 200), etat: e.etat_administratif || null, creation: e.date_creation || null,
     opposition: e.opposition_diffusion_commerciale === true, effectif: e.tranche_effectif_salarie || null,
-    // Une filiale (président personne morale) n'est jamais contactée (Gabriel et Anna, 10/11).
-    filiale: (e.dirigeants || []).some((d) => d.type_dirigeant === 'personne morale' && /pr[ée]sident/i.test(d.qualite || '')),
-    dirigeants_connus: physiques.length, en_place: Boolean(sien), qualite: sien ? couper(sien.qualite || '', 80) : null,
-    personnes: physiques.slice(0, 8).map((d) => ({ prenom: couper(String(d.prenoms || '').trim().split(/\s+/)[0] || '', 60), nom: couper(String(d.nom || '').trim(), 80), qualite: couper(d.qualite || '', 60) })),
+    // Administrateur judiciaire, liquidateur ou mandataire au registre : on n'écrit pas.
+    difficulte: ds.some((d) => DIFFICULTE_RE.test(d.qualite || '')),
+    // Une filiale (dirigée par une société qui n'est pas la holding du patron) n'est jamais contactée (Gabriel et Anna, 10/11 ;
+    // holdings de patron réintégrées le 12/11).
+    filiale: Boolean(tete) && !h?.patron, filiale_raison: tete && !h?.patron ? (h?.raison || `${couper(tete.denomination || '', 120) || 'une société'} au registre`) : null,
+    holding: h ? { siren: h.siren || null, nom: h.nom, patron: Boolean(h.patron), opposition: Boolean(h.opposition), departement: h.departement || null, categorie: h.categorie || null,
+      dirigeant: chef ? pers(chef) : null, contact: contactHolding } : null,
+    dirigeants_connus: physiques.length + (chef ? 1 : 0), en_place: Boolean(sien), qualite: sien ? couper(`${sien.qualite || ''}${chef && sien === chef ? ` (holding ${h.nom})` : ''}`, 80) : null,
+    personnes: personnes.slice(0, 8).map(pers),
     // Le siège (latitude, longitude, commune) : le lieu du rendez-vous proposé dépend du trajet depuis Nancy (Gabriel, 12/11).
     siege: e.siege ? { lat: Number.parseFloat(e.siege.latitude) || null, lon: Number.parseFloat(e.siege.longitude) || null, commune: couper(e.siege.libelle_commune || '', 80) || null, code_commune: e.siege.commune || null, code_postal: e.siege.code_postal || null } : null,
   };
@@ -3225,7 +3287,11 @@ function raisonDArret(f, c) {
   if (r && r.trouve === false) return "SIREN introuvable au registre national : on n'écrit pas.";
   if (r?.etat === 'C') return 'Entreprise fermée au registre national.';
   if (r?.opposition) return "L'entreprise s'est opposée à la prospection commerciale (registre national des entreprises) : on ne lui écrit pas.";
-  if (r?.filiale) return "Filiale d'un groupe (président personne morale au registre) : pas de prospection.";
+  if (r?.holding?.opposition) return `La holding qui dirige l'entreprise (${r.holding.nom}) s'est opposée à la prospection commerciale (registre national des entreprises) : on ne lui écrit pas.`;
+  if (r?.difficulte) return 'Administrateur judiciaire, liquidateur ou mandataire au registre national : on n\'écrit pas.';
+  if (r?.filiale) return `Filiale d'un groupe (dirigée par ${r.filiale_raison || 'une personne morale au registre'}) : pas de prospection.`;
+  // Holding de patron (12/11) : le dirigeant à saluer est celui de la holding ; si ce n'est pas le contact de la ligne, on ne devine pas.
+  if (r?.holding?.patron && !r.holding.contact) return `L'entreprise est dirigée par la holding ${r.holding.nom}, dont le dirigeant au registre est ${[nomPropre(r.holding.dirigeant?.prenom), nomPropre(r.holding.dirigeant?.nom)].filter(Boolean).join(' ') || 'inconnu'}, pas ${nomContactEmail(c)} : à vérifier avant d'écrire.`;
   if (r && r.dirigeants_connus > 0 && !r.en_place) return `${nomContactEmail(c)} n'apparaît plus parmi les dirigeants au registre national : à vérifier avant d'écrire.`;
   const grave = (f.bodacc || []).find((a) => ['collective', 'radiation', 'retablissement_professionnel'].includes(a.famille));
   if (grave) return `${grave.libelle} au BODACC le ${dateCourte(grave.date)} : on n'écrit pas.`;
@@ -3735,7 +3801,7 @@ function ultraQualifie(e, l) {
   const f = e.faits || {};
   const r = f.registre || {};
   const manque = [];
-  if (!(r.trouve && r.etat !== 'C' && !r.opposition && !r.filiale && r.en_place)) manque.push('dirigeant non confirmé au registre');
+  if (!(r.trouve && r.etat !== 'C' && !r.opposition && !r.filiale && !r.holding?.opposition && !r.difficulte && r.en_place)) manque.push('dirigeant non confirmé au registre');
   if (!ULTRA_QUALIFIE.secteurs.includes(l?.secteur)) manque.push(`secteur hors niveau 1 (${l?.secteur || 'inconnu'})`);
   const eff = effectifDe(e);
   if (!eff || eff[0] < ULTRA_QUALIFIE.effectif[0] || eff[1] > ULTRA_QUALIFIE.effectif[1]) manque.push(`effectif hors 10 à 49 (${eff ? `${eff[0]} à ${eff[1]}` : 'inconnu'})`);
@@ -3888,7 +3954,7 @@ async function lieuRdvEmail(e, l, c) {
     let siege = f.registre?.siege || null;
     const siren = String(f.prospect?.siren || l?.siret || '').replace(/\D/g, '').slice(0, 9);
     // Une ligne lue avant le 12/11 au soir n'a pas le siège : le registre est relu une fois.
-    if (!siege && /^\d{9}$/.test(siren)) siege = (await lireRegistre(siren, c))?.siege || null;
+    if (!siege && /^\d{9}$/.test(siren)) siege = (await lireRegistre(siren, c, { holding: false }))?.siege || null;
     const geo = await communeGeo(siege, f.prospect);
     let lat = Number(siege?.lat);
     let lon = Number(siege?.lon);
