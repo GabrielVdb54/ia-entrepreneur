@@ -2954,7 +2954,8 @@ const JEUX_METIER_EMAIL = {
   },
 };
 const jeuMetierEmail = (metier) => JEUX_METIER_EMAIL[metier] || JEUX_METIER_EMAIL['des PME'];
-const LIEU_DISTANCE_EMAIL = 'en visio ou par téléphone';
+// Au-delà de 40 min de route, la visio seule (Gabriel, 13/11 : plus de « par téléphone ») : « … en 20 minutes de visio … ».
+const LIEU_DISTANCE_EMAIL = 'en visio';
 const SIGNATURE_EMAIL = 'Gabriel Vanderbecken\nIA-Entrepreneur';
 const motsEmail = (t) => String(t || '').split(/\s+/).filter((m) => /[\p{L}\p{N}]/u.test(m)).length;
 // La valeur : à l'infinitif, sans point final ni « à » devant (la phrase fixe le met), première lettre en minuscule.
@@ -2986,7 +2987,13 @@ function documentEmail(d, defaut = 'devis') {
 const ligneValeurEmail = (metier, valeur, reste) => `Je forme les équipes ${metier} à ${valeur}, et aussi à alléger le reste du bureau : ${reste.join(', ')}. Les formations sont éligibles à votre budget formation.`;
 // « un de vos propres mémoires », mais « une de vos propres annonces » : le genre se lit sur le premier mot du document.
 const DOCUMENTS_FEMININS_EMAIL = /^(annonces|fiches|estimations|factures|offres|réponses|propositions|notes|déclarations|attestations|relances|lettres|synthèses|notices|demandes|candidatures|consultations|analyses)\b/;
-const ligneRdvEmail = (document, lieu) => `Si ça vous parle, je peux vous montrer en 20 minutes ce que ça donne sur ${DOCUMENTS_FEMININS_EMAIL.test(document) ? 'une' : 'un'} de vos propres ${document}, ${lieu}. Ça vous intéresse ?`;
+// Près de Nancy, « …sur un de vos propres mémoires, en visio ou dans vos bureaux à Lunéville. Ça vous intéresse ? » ; plus loin,
+// ou sans commune connue, « …en 20 minutes de visio ce que ça donne sur un de vos propres mémoires. Ça vous intéresse ? ».
+const ligneRdvEmail = (document, lieu) => {
+  const sur = `${DOCUMENTS_FEMININS_EMAIL.test(document) ? 'une' : 'un'} de vos propres ${document}`;
+  return /^en visio ou dans vos bureaux à \S/.test(lieu || '') ? `Si ça vous parle, je peux vous montrer en 20 minutes ce que ça donne sur ${sur}, ${lieu}. Ça vous intéresse ?`
+    : `Si ça vous parle, je peux vous montrer en 20 minutes de visio ce que ça donne sur ${sur}. Ça vous intéresse ?`;
+};
 // Le métier de la phrase fixe (Gabriel, 12/11 : immobilier, gestion locative et syndic → agences immobilières ; assurance
 // et courtage → cabinets d'assurance ; sinon des PME).
 function metierEmail(l) {
@@ -3866,7 +3873,7 @@ Si ça vous parle, je peux vous montrer en 20 minutes ce que ça donne sur un de
 Gabriel Vanderbecken
 IA-Entrepreneur
 
-Ici : accroche = « J'ai vu que vous aviez remporté plusieurs chantiers publics cette année, dont la rénovation thermique d'une école. » ; valeur = « répondre plus vite aux appels d'offres avec l'IA, par exemple en partant de leurs anciens mémoires techniques » ; reste = ["emails", "devis", "relation client"] ; document = « mémoires ». La phrase « Je forme les équipes {métier} à {valeur}, et aussi à alléger le reste du bureau : {reste}. Les formations sont éligibles à votre budget formation. », la proposition « Si ça vous parle, … sur un (ou une) de vos propres {document}, {lieu}. Ça vous intéresse ? » et la signature sont fixes : ne les écris pas. Le métier (« du BTP », « de la propreté », « des agences immobilières », « des cabinets d'assurance », « des PME »), le lieu et le jeu du métier (liste fermée du reste du bureau, exemples de valeur, de document et d'objet) sont donnés dans la fiche : tiens-t'en à ce jeu.
+Ici : accroche = « J'ai vu que vous aviez remporté plusieurs chantiers publics cette année, dont la rénovation thermique d'une école. » ; valeur = « répondre plus vite aux appels d'offres avec l'IA, par exemple en partant de leurs anciens mémoires techniques » ; reste = ["emails", "devis", "relation client"] ; document = « mémoires ». La phrase « Je forme les équipes {métier} à {valeur}, et aussi à alléger le reste du bureau : {reste}. Les formations sont éligibles à votre budget formation. », la proposition « Si ça vous parle, je peux vous montrer en 20 minutes de visio ce que ça donne sur un (ou une) de vos propres {document}. Ça vous intéresse ? » (près de Nancy : « … sur un de vos propres {document}, en visio ou dans vos bureaux à {commune}. Ça vous intéresse ? ») et la signature sont fixes : ne les écris pas. Le métier (« du BTP », « de la propreté », « des agences immobilières », « des cabinets d'assurance », « des PME »), le lieu et le jeu du métier (liste fermée du reste du bureau, exemples de valeur, de document et d'objet) sont donnés dans la fiche : tiens-t'en à ce jeu.
 
 accroche : une seule phrase qui commence par « J'ai vu que vous », 15 à 30 mots, sur un seul fait réel de la fiche (Gabriel, 13/11).
 - Le fait : de préférence daté de moins de 12 mois, ou un fait qui désigne directement la tâche de la valeur (un marché public gagné → les appels d'offres ; une qualification RGE → les dossiers d'aides ; une spécialité « le viager » → les annonces de viager).
@@ -3905,7 +3912,7 @@ appuis : chaque fait utilisé, avec sa source et sa date telles que la fiche les
 // Gabriel, 12/11 : « moi j'habite à Nancy, du coup je veux bien rdv mais pas trop loin, sinon un appel ou visio quand c'est
 // plus loin », puis « 40 mn me va, pas plus ». Le temps de route vient d'OSRM (serveur public de démonstration : un seul
 // appel par entreprise, gardé dans faits.rdv) ; si OSRM ne répond pas, la distance à vol d'oiseau avec un seuil prudent
-// (25 km) ; sans coordonnées sûres du siège, « en visio ou par téléphone ».
+// (25 km) ; sans coordonnées sûres du siège, ou sans commune connue, la visio (« … en 20 minutes de visio … », 13/11).
 const NANCY = { lat: 48.6921, lon: 6.1844 };
 const OSRM = 'https://router.project-osrm.org/route/v1/driving';
 const GEO_COMMUNES = 'https://geo.api.gouv.fr/communes';
@@ -3928,6 +3935,14 @@ async function communeGeo(siege, p) {
   // Seulement une commune du même nom (aux accents près) : jamais la plus proche par défaut.
   const x = (Array.isArray(j) ? j : []).find((c) => normaliser(c.nom) === normaliser(nom));
   return x ? { nom: x.nom, centre: x.centre?.coordinates || null } : null;
+}
+// « MAXEVILLE » → « Maxeville », « PONT-A-MOUSSON » → « Pont-à-Mousson » ; un nom déjà en minuscules reste tel quel.
+const PETITS_MOTS_COMMUNE = new Set(['de', 'du', 'des', 'la', 'le', 'les', 'lès', 'sur', 'sous', 'en', 'et', 'aux', 'au', 'd', 'l']);
+function communePropre(n) {
+  const t = String(n || '').trim().replace(/\s+/g, ' ');
+  if (!t) return null;
+  if (t !== t.toUpperCase()) return couper(t, 80);
+  return couper(t.toLowerCase().split(/([\s'’-])/).map((m, i) => (!m || /^[\s'’-]$/.test(m) ? m : i > 0 && m === 'a' ? 'à' : i > 0 && PETITS_MOTS_COMMUNE.has(m) ? m : m[0].toUpperCase() + m.slice(1))).join(''), 80);
 }
 async function minutesDeRoute(lat, lon) {
   try {
@@ -3960,7 +3975,7 @@ async function lieuRdvEmail(e, l, c) {
     let lon = Number(siege?.lon);
     let coord = 'registre';
     if (!coordonneeSure(lat, lon) && geo?.centre) { [lon, lat] = geo.centre.map(Number); coord = 'commune'; }
-    rdv = { lu_le: new Date().toISOString(), commune: geo?.nom || null, coord: coordonneeSure(lat, lon) ? coord : null };
+    rdv = { lu_le: new Date().toISOString(), commune: geo?.nom || communePropre(siege?.commune || f.prospect?.commune), coord: coordonneeSure(lat, lon) ? coord : null };
     if (rdv.coord) {
       rdv.lat = Math.round(lat * 1e5) / 1e5;
       rdv.lon = Math.round(lon * 1e5) / 1e5;
@@ -3969,11 +3984,17 @@ async function lieuRdvEmail(e, l, c) {
       rdv.osrm = rdv.minutes == null ? 'sans réponse' : 'ok';
     }
   }
+  // Une commune restée vide (INSMATEL, 13/11 : « dans vos bureaux. » sans la commune) : le nom officiel par le code commune
+  // (geo.api.gouv.fr), sinon celui du registre ou de la liste en casse propre. Sans commune du tout, la visio.
+  if (!rdv.commune) {
+    const siege = f.registre?.siege || null;
+    rdv.commune = (await communeGeo(siege, f.prospect))?.nom || communePropre(siege?.commune || f.prospect?.commune);
+  }
   // La décision se refait à chaque rédaction avec les réglages du moment, sans relire OSRM.
   rdv.calcul = !rdv.coord ? 'sans coordonnées' : rdv.minutes != null ? 'route' : 'vol d\'oiseau';
   rdv.bureaux = rdv.calcul === 'route' ? rdv.minutes <= maxMinutes : rdv.calcul === 'vol d\'oiseau' ? rdv.km <= maxKm : false;
   rdv.seuil = rdv.calcul === 'route' ? `${maxMinutes} min` : rdv.calcul === 'vol d\'oiseau' ? `${maxKm} km` : null;
-  const lieu = rdv.bureaux ? (rdv.commune ? `en visio ou dans vos bureaux à ${rdv.commune}` : 'en visio ou dans vos bureaux') : LIEU_DISTANCE_EMAIL;
+  const lieu = rdv.bureaux && rdv.commune ? `en visio ou dans vos bureaux à ${rdv.commune}` : LIEU_DISTANCE_EMAIL;
   return { lieu, rdv };
 }
 
@@ -3996,7 +4017,7 @@ async function redigerEmail(e, l, c, { consigne = '', lieu = LIEU_DISTANCE_EMAIL
     `Exemples de valeur pour ce métier : ${jeu.valeurs.map((v) => `« ${v} »`).join(' ; ')}`,
     `Exemples de document pour ce métier : ${jeu.documents.join(', ')}`,
     `Exemples d'objet pour ce métier : ${jeu.objets.map((o) => `« ${o} »`).join(', ')}`,
-    `Lieu du rendez-vous dans la phrase fixe : ${lieu}`,
+    `Rendez-vous proposé dans la phrase fixe : ${lieu === LIEU_DISTANCE_EMAIL ? '20 minutes de visio' : lieu}`,
     accueil ? "Destinataire : l'adresse générale de l'entreprise (c'est l'accueil qui lit et transmet). Ton accroche reste adressée au dirigeant (« J'ai vu que vous… ») ; le CRM écrit avant elle « Bonjour, Ce message est à destination de … » puis le nom du dirigeant, et l'objet « À l'attention de … ». Ne parle pas de l'accueil." : '',
     `Dirigeant : ${nommerDirigeant(e.civilite, c) || 'inconnu'}${c?.poste ? `, ${qualiteCourteEmail(c.poste, e.civilite) || c.poste}` : ''}`,
     l.besoin ? `Ce que le CRM sait de l'entreprise : ${couper(l.besoin, 400)}` : '',
