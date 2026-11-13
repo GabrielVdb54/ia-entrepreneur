@@ -3266,6 +3266,12 @@ function majEmailProspection(e) {
   if (p) { p.a_valider = emailsAValider().length; p.en_file = emailsProspection().filter((x) => ['a_envoyer', 'en_cours'].includes(x.statut)).length; }
 }
 const plurielEm = (n, un, plusieurs = `${un}s`) => `${n} ${n > 1 ? plusieurs : un}`;
+// « 1er email : 3 envoyés, 1 réponse ; relance 1 : … » (13/11), vide tant qu'aucune relance n'est partie.
+function texteEtapesEm(b) {
+  const p = b && b.par_etape;
+  if (!p || !(((p.relance || {}).envoyes || 0) + ((p.findia || {}).envoyes || 0))) return '';
+  return ['message', 'relance', 'findia'].map((k) => `${LIB_ETAPE_EM[k].toLowerCase()} : ${plurielEm((p[k] || {}).envoyes || 0, 'envoyé')}, ${plurielEm((p[k] || {}).reponses || 0, 'réponse')}`).join(' ; ');
+}
 const texteBilanEm = (b) => `${plurielEm(b.envoyes, 'envoyé')}, ${plurielEm(b.arrives, 'arrivé')}, ${plurielEm(b.erreurs, 'adresse en erreur', 'adresses en erreur')}, ${plurielEm(b.spam, 'spam', 'spams')}, ${plurielEm(b.desinscriptions, 'désinscription')}, ${plurielEm(b.reponses, 'réponse')}`;
 // Où en sont les candidats (Gabriel, 12/11 : l'adresse du dirigeant d'abord gratuitement, FullEnrich pour les ultra qualifiés).
 function texteCandidatsEm(p) {
@@ -3276,11 +3282,14 @@ function texteCandidatsEm(p) {
 }
 const heureEm = (hm) => String(hm || '').replace(/^0/, '').replace(':', ' h ').replace(/ h 00$/, ' h');
 const fenetreEm = () => { const f = (D.prospection_email && D.prospection_email.fenetre) || ['08:30', '11:30']; return `entre ${heureEm(f[0])} et ${heureEm(f[1])}`; };
+// Les relances (13/11) ont chacune leur compteur : 10 validées telles quelles d'affilée pour que leur étape parte seule.
+const LIB_ETAPE_EM = { message: '1er email', relance: 'Relance 1', findia: 'Relance 2' };
 function texteConfianceEmail() {
   const k = (D.reglages && D.reglages.email_confiance) || {};
-  if (k.auto) return { texte: "Les emails rédigés par Claude partent tout seuls (sauf ceux qui portent une alerte, qui t'attendent).", auto: true };
+  const etapes = ['relance', 'findia'].map((x) => { const e = (k.etapes || {})[x] || {}; return e.auto ? `${LIB_ETAPE_EM[x]} : automatique` : `${LIB_ETAPE_EM[x]} : ${Math.min(e.serie || 0, 10)} sur 10`; }).join(', ');
+  if (k.auto) return { texte: `Les emails rédigés par Claude partent tout seuls (sauf ceux qui portent une alerte, qui t'attendent). Relances : ${etapes}.`, auto: true };
   const n = Math.min(k.serie || 0, 10);
-  return { texte: `${n} email${n > 1 ? 's' : ''} validé${n > 1 ? 's' : ''} tel${n > 1 ? 's' : ''} quel${n > 1 ? 's' : ''} d'affilée sur 10 ; après 10, ils partiront tout seuls.`, auto: false };
+  return { texte: `${n} email${n > 1 ? 's' : ''} validé${n > 1 ? 's' : ''} tel${n > 1 ? 's' : ''} quel${n > 1 ? 's' : ''} d'affilée sur 10 ; après 10, ils partiront tout seuls. Relances : ${etapes}.`, auto: Object.values(k.etapes || {}).some((x) => x && x.auto) };
 }
 function barreEmail() {
   const p = D.prospection_email;
@@ -3291,11 +3300,14 @@ function barreEmail() {
   if (!p.brevo) etats.push("La clé Brevo n'est pas sur le serveur : rien ne part.");
   if (p.fullenrich_erreur) etats.push(p.fullenrich_erreur);
   if (p.reserve_brevo) etats.push(p.reserve_brevo);
+  // Les appels d'Anna nés des relances email (13/11).
+  const appels = p.appels_anna || [];
+  const dus = appels.filter((x) => x.le && x.le <= D.aujourdhui).length;
   const alerte = Boolean(p.pause || !p.brevo || p.fullenrich_erreur || p.reserve_brevo);
   const k = texteConfianceEmail();
   const n = emailsAValider().length;
   const parType = (x) => (x.generales && x.generales.envoyes ? ` (au dirigeant : ${texteBilanEm(x.nominatives)} ; à l'accueil : ${texteBilanEm(x.generales)})` : '');
-  return `<div class="li-barre em-barre${alerte ? ' alerte-li' : ''}" data-em-barre><p><b>Prospection email</b> · Aujourd'hui : ${b.aujourdhui.envoyes} envoyé${b.aujourdhui.envoyes > 1 ? 's' : ''} sur ${b.aujourdhui.quota}${p.en_file ? `, ${p.en_file} en file (${esc(fenetreEm())}, jours ouvrés)` : ''}.${p.palier && p.palier.texte ? `<br><span class="em-bilan" data-em-palier>Palier : ${esc(p.palier.texte)}.</span>` : ''}<br><span class="em-bilan" data-em-semaine>7 derniers jours : ${esc(texteBilanEm(b.semaine))}${esc(parType(b.semaine))}.</span><br><span class="em-bilan" data-em-debut>Depuis le début : ${esc(texteBilanEm(b.debut))}${esc(parType(b.debut))}.</span>${p.candidats ? `<br><span class="em-bilan" data-em-candidats>Candidats : ${esc(texteCandidatsEm(p))}.</span>` : ''}${etats.length ? `<br><span class="li-file" role="status">${esc(etats.join(' '))}</span>` : ''}<br><span class="li-confiance">${esc(k.texte)}</span></p><div class="actions">${n ? `<button type="button" class="btn petit primaire" data-em-jour>Emails à valider (${n})</button>` : ''}${p.pause ? '<button type="button" class="btn petit" data-em-reprendre>Reprendre</button>' : ''}${k.auto ? '<button type="button" class="btn petit lien" data-em-couper>Couper l\'envoi automatique</button>' : ''}</div></div>`;
+  return `<div class="li-barre em-barre${alerte ? ' alerte-li' : ''}" data-em-barre><p><b>Prospection email</b> · Aujourd'hui : ${b.aujourdhui.envoyes} envoyé${b.aujourdhui.envoyes > 1 ? 's' : ''} sur ${b.aujourdhui.quota}${p.en_file ? `, ${p.en_file} en file (${esc(fenetreEm())}, jours ouvrés)` : ''}.${p.palier && p.palier.texte ? `<br><span class="em-bilan" data-em-palier>Palier : ${esc(p.palier.texte)}.</span>` : ''}<br><span class="em-bilan" data-em-semaine>7 derniers jours : ${esc(texteBilanEm(b.semaine))}${esc(parType(b.semaine))}.</span><br><span class="em-bilan" data-em-debut>Depuis le début : ${esc(texteBilanEm(b.debut))}${esc(parType(b.debut))}.</span>${p.candidats ? `<br><span class="em-bilan" data-em-candidats>Candidats : ${esc(texteCandidatsEm(p))}.</span>` : ''}${texteEtapesEm(b.debut) ? `<br><span class="em-bilan" data-em-etapes>Par étape : ${esc(texteEtapesEm(b.debut))}.</span>` : ''}${appels.length ? `<br><span class="em-bilan" data-em-anna>Appels d'Anna (relances email) : ${appels.length}${dus ? `, dont ${dus} aujourd'hui ou en retard` : ''}.</span>` : ''}${etats.length ? `<br><span class="li-file" role="status">${esc(etats.join(' '))}</span>` : ''}<br><span class="li-confiance">${esc(k.texte)}</span></p><div class="actions">${n ? `<button type="button" class="btn petit primaire" data-em-jour>Emails à valider (${n})</button>` : ''}${p.pause ? '<button type="button" class="btn petit" data-em-reprendre>Reprendre</button>' : ''}${k.auto ? '<button type="button" class="btn petit lien" data-em-couper>Couper l\'envoi automatique</button>' : ''}</div></div>`;
 }
 // D'où vient l'adresse, avec le lien de la page où elle a été lue (site, annuaire RGE de l'ADEME, avis BOAMP), ou FullEnrich.
 const SOURCES_ADRESSE = { site: "site de l'entreprise", ademe: "annuaire RGE de l'ADEME", boamp: 'avis BOAMP', outscraper: 'base Google Maps (Outscraper)', fullenrich: 'FullEnrich', manuel: 'posée à la main' };
@@ -3321,7 +3333,10 @@ function blocEmail(e) {
   const l = IDX.lead.get(e.lead_id);
   const c = contactParId(e.contact_id) || (l ? contactPrincipal(l.id) : null);
   const qui = [e.civilite || '', nomContact(c)].filter(Boolean).join(' ') || 'Dirigeant';
-  const tete = `<div class="li-tete"><b>${esc(l ? l.entreprise : 'Lead supprimé')}</b> <span class="meta">${esc(qui)}${c && c.poste ? `, ${esc(c.poste)}` : ''}</span> <span class="li-etat ${CLASSE_ETAT_EMAIL[e.statut] || ''}">${esc(ETAT_EMAIL[e.statut] || e.statut)}</span></div><p class="em-adresse">${adresseEmailLue(e)}</p>${vuesEcarteesEm(e)}`;
+  // Relance 1 ou 2 (13/11) : l'étape et le jour prévu.
+  const seq = e.sequence || (e.faits && e.faits.sequence) || null;
+  const etape = e.etape && e.etape !== 'message' ? ` <span class="li-etat" data-em-etape="${esc(e.etape)}">${esc(LIB_ETAPE_EM[e.etape] || e.etape)}${seq && seq.prevue_le ? `, prévue le ${esc(dateCourte(seq.prevue_le).slice(0, 5))}` : ''}</span>` : '';
+  const tete = `<div class="li-tete"><b>${esc(l ? l.entreprise : 'Lead supprimé')}</b> <span class="meta">${esc(qui)}${c && c.poste ? `, ${esc(c.poste)}` : ''}</span> <span class="li-etat ${CLASSE_ETAT_EMAIL[e.statut] || ''}">${esc(ETAT_EMAIL[e.statut] || e.statut)}</span>${etape}</div><p class="em-adresse">${adresseEmailLue(e)}</p>${vuesEcarteesEm(e)}`;
   const appuis = Array.isArray(e.appuis) && e.appuis.length ? `<div><p class="meta">Ce qui justifie le message</p><ul class="em-appuis">${e.appuis.map((a) => `<li>${esc(a.fait)}${a.source && a.source !== 'aucune' ? ` <span class="meta">· ${esc(a.source)}${a.date ? `, ${esc(/^\d{4}-\d{2}-\d{2}$/.test(a.date) ? dateCourte(a.date) : a.date)}` : ''}</span>` : ''}</li>`).join('')}</ul></div>` : '';
   const detail = e.detail ? `<p class="li-detail${['echec', 'annule', 'sans_email'].includes(e.statut) || /erreur|interdit|nomme|montant|majuscules|lien|origine|annuaire|faible|chiffre|Google|mots/i.test(e.detail) ? ' alerte-li' : ''}">${esc(e.detail)}</p>` : '';
   if (['brouillon', 'echec'].includes(e.statut)) {
@@ -3338,7 +3353,7 @@ function blocEmail(e) {
   const lu = e.envoye_le ? `<p class="meta">Envoyé le ${esc(instantLisible(e.envoye_le))}${e.brevo_campagne ? ` (campagne Brevo ${e.brevo_campagne})` : ''}${evenementsLus(e) ? ` · ${esc(evenementsLus(e))}` : ''}</p>` : '';
   const texte = e.objet || e.texte ? `<p class="meta">Objet : « ${esc(e.objet || '')} »</p>${e.texte ? `<p class="li-texte">${esc(e.texte)}</p>` : ''}` : '';
   return `<section class="li-bloc em-bloc" data-em-id="${e.id}">${tete}${detail}${lu}${texte}${appuis}
-    ${e.statut === 'a_envoyer' ? `<p class="aide">Part le prochain matin de jour ouvré, ${esc(fenetreEm())}.${e.priorite ? ` <span data-em-priorite="${Number(e.priorite.rang) || ''}">Ordre d'envoi : priorité ${esc(String(e.priorite.rang))} sur 4 (${esc(e.priorite.libelle || '')}${e.etape && e.etape !== 'message' ? ', relance avant les nouveaux emails' : ''}).</span>` : ''}</p>` : ''}
+    ${e.statut === 'a_envoyer' ? `<p class="aide">${seq && seq.prevue_le && seq.prevue_le > D.aujourdhui ? `Part le ${esc(dateCourte(seq.prevue_le).slice(0, 5))}` : 'Part le prochain matin de jour ouvré'}, ${esc(fenetreEm())}.${e.priorite ? ` <span data-em-priorite="${Number(e.priorite.rang) || ''}">Ordre d'envoi : priorité ${esc(String(e.priorite.rang))} sur 4 (${esc(e.priorite.libelle || '')}${e.etape && e.etape !== 'message' ? ', relance avant les nouveaux emails' : ''}).</span>` : ''}</p>` : ''}
     ${['a_envoyer', 'a_rediger', 'a_enrichir'].includes(e.statut) ? `<div class="actions">${e.statut === 'a_rediger' && D.ia ? '<button type="button" class="btn petit" data-em-rediger>Rédiger maintenant</button>' : ''}<button type="button" class="btn petit lien" data-em-ecarter>${e.statut === 'a_envoyer' ? 'Ne pas l\'envoyer' : 'Écarter'}</button></div>` : ''}
   </section>`;
 }

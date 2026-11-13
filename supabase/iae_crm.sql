@@ -182,7 +182,7 @@ create table if not exists public.iae_crm_emails (
   lead_id uuid not null references public.iae_crm_leads(id) on delete cascade,
   contact_id uuid references public.iae_crm_contacts(id) on delete set null,
   compte text not null default 'gabriel@ia-entrepreneur.fr',
-  etape text not null default 'message' check (etape in ('message', 'relance')),
+  etape text not null default 'message' check (etape in ('message', 'relance', 'findia')),  -- 1er email, relance 1, relance 2 (13/11)
   -- a_enrichir → a_rediger → brouillon → a_envoyer → en_cours → envoye ; ou echec, annule, sans_email.
   -- en_cours : la ligne est prise par un passage de la synchro, pour qu'un autre passage ne l'envoie pas une deuxième fois.
   statut text not null default 'a_enrichir'

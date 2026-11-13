@@ -2906,8 +2906,8 @@ async function journalEmail(l, c, type, resume, contenu = null, meta = {}, date 
 }
 // Ce que la page reçoit d'une ligne : ni l'empreinte du lien de désinscription, ni le texte de Claude, ni les faits bruts.
 // D'où vient l'adresse (site, ADEME, BOAMP, FullEnrich, à la main), avec le lien, et ce qui a été vu puis écarté.
-const emailPourPage = (e) => e && { ...Object.fromEntries(Object.entries(e).filter(([k]) => !['jeton_stop_hash', 'texte_claude', 'faits', 'fullenrich_id'].includes(k))), adresse_source: e.faits?.adresse || null };
-const COLONNES_EMAIL_PAGE = 'id,created_at,lead_id,contact_id,etape,statut,email,email_statut,source_email,civilite,objet,texte,appuis,valide_le,envoye_le,brevo_message_id,brevo_campagne,evenements,detail,adresse_source:faits->adresse,rdv_bureaux:faits->rdv->bureaux,siege_cp:faits->registre->siege->code_postal,prospect_dep:faits->prospect->dep';
+const emailPourPage = (e) => e && { ...Object.fromEntries(Object.entries(e).filter(([k]) => !['jeton_stop_hash', 'texte_claude', 'faits', 'fullenrich_id'].includes(k))), adresse_source: e.faits?.adresse || null, sequence: e.faits?.sequence ? { prevue_le: e.faits.sequence.prevue_le || null, rang: e.faits.sequence.rang || null } : null };
+const COLONNES_EMAIL_PAGE = 'id,created_at,lead_id,contact_id,etape,statut,email,email_statut,source_email,civilite,objet,texte,appuis,valide_le,envoye_le,brevo_message_id,brevo_campagne,evenements,detail,adresse_source:faits->adresse,rdv_bureaux:faits->rdv->bureaux,siege_cp:faits->registre->siege->code_postal,prospect_dep:faits->prospect->dep,sequence:faits->sequence';
 
 /* ----- Les textes : le modèle validé par Gabriel le 12/11, l'accroche et l'objet de Claude ----- */
 
@@ -3065,7 +3065,9 @@ function texteEmail(e, l, c, { accroche = '', valeur = '', reste = [], document 
 const INTERDITS_EMAIL = [...INTERDITS_LI, [/gratuit/i, '« gratuit »'], [/\bOPCO\b/i, 'OPCO']];
 const LIEN_EMAIL_RE = /https?:\/\/|www\.|\b[a-z0-9-]+\.(fr|com|net|org|eu|io|info|biz)\b|[^\s@]+@[^\s@]+\.[a-z]{2,}/i;
 const ORIGINE_EMAIL_RE = /trouv[ée]e? (votre|vos) (adresse|coordonn|e-?mail)|vos coordonn[ée]es|votre (adresse|e-?mail|courriel)[^.]{0,30}(communiqu|transmi|donn|trouv)|fullenrich|altares|linkedin/i;
-function verifierTexteEmail(objet, texte) {
+// La relance 2 (13/11) donne la ressource du métier : seuls ces liens du site passent, et seulement à cette étape.
+const LIENS_RELANCE2_EMAIL_RE = /https:\/\/ia-entrepreneur\.fr\/(?:skills-ia-gratuits\.html#(?:analyse-appel-offres|compte-rendu-chantier|devis-plan-nettoyage)|meilleures-ia\.html)(?=\s|$)/g;
+function verifierTexteEmail(objet, texte, { etape = 'message' } = {}) {
   const o = String(objet ?? '').replace(/\s+/g, ' ').trim();
   const t = String(texte ?? '').replace(/\r\n?/g, '\n').trim();
   if (!o) throw new Refus('objet_invalide');
@@ -3075,7 +3077,7 @@ function verifierTexteEmail(objet, texte) {
   if (!t) throw new Refus('message_vide');
   if (t.length > 3000) throw new Refus('message_trop_long');
   if (/[\t\u0000-\u0008\u000b-\u001f\u007f]/.test(t)) throw new Refus('caractere_refuse');
-  const tout = `${o}\n${t}`;
+  const tout = `${o}\n${t}`.replace(etape === 'findia' ? LIENS_RELANCE2_EMAIL_RE : /$^/g, '');
   for (const [re, quoi] of INTERDITS_EMAIL) if (re.test(tout)) throw new Refus(`email_interdit:${quoi}`);
   if (LIEN_EMAIL_RE.test(tout)) throw new Refus('email_lien');
   if (ORIGINE_EMAIL_RE.test(tout)) throw new Refus('email_origine');
@@ -4121,10 +4123,13 @@ async function enregistrerOpposition(email, origine, { leadId = null, ligne = nu
   return avecUtilisateur(ADMIN, async () => {
     if (await enOpposition(adresse)) return false;
     await sb('iae_crm_oppositions?on_conflict=email', { methode: 'POST', prefer: 'resolution=ignore-duplicates,return=minimal', corps: { email: adresse, origine: couper(origine, 200), lead_id: leadId || ligne?.lead_id || null } });
-    const { lignes: lignesEmail } = await sb(`iae_crm_emails?email=eq.${encodeURIComponent(adresse)}&select=id,lead_id,contact_id,evenements`);
+    const { lignes: lignesEmail } = await sb(`iae_crm_emails?email=eq.${encodeURIComponent(adresse)}&select=id,lead_id,contact_id,evenements,statut,envoye_le`);
     const leads = new Set([leadId, ligne?.lead_id, ...lignesEmail.map((x) => x.lead_id)].filter(Boolean));
     const quand = new Date().toISOString();
-    for (const x of lignesEmail) if (!x.evenements?.unsubscribed && /d[ée]sinscri|stop|un clic/i.test(origine)) await majLigneEmail(x.id, { evenements: { ...(x.evenements || {}), unsubscribed: quand } });
+    // Une désinscription compte une fois (13/11 : avec les relances, une même adresse a plusieurs emails partis) : sur l'email
+    // qui l'a déclenchée, sinon le dernier parti à cette adresse.
+    const cible = lignesEmail.find((x) => x.id === ligne?.id) || lignesEmail.filter((x) => x.statut === 'envoye').sort((x, y) => String(y.envoye_le || '').localeCompare(String(x.envoye_le || '')))[0] || null;
+    if (cible && !cible.evenements?.unsubscribed && /d[ée]sinscri|stop|un clic/i.test(origine)) await majLigneEmail(cible.id, { evenements: { ...(cible.evenements || {}), unsubscribed: quand } });
     for (const id of leads) {
       await arreterEnvoisEnAttente(id, `Désinscription (${origine}) : plus aucun envoi.`);
       const { l, c } = await leadEtContactEmail({ lead_id: id, contact_id: lignesEmail.find((x) => x.lead_id === id)?.contact_id || null });
@@ -4393,6 +4398,8 @@ async function refusAvantEnvoi(e, l, c) {
   if (mx === 'inconnu') return { attente: 'Le DNS ne répond pas pour vérifier le domaine : nouvel essai au prochain passage.' };
   if (!l || l.archive || l.statut === 'perdu') return 'Lead archivé ou perdu : rien ne part.';
   if (!['nouveau', 'contacte'].includes(l.statut)) return `Le lead est déjà à l'étape « ${l.statut} » : plus de message de prospection.`;
+  // Une relance (13/11) : tout ce qui arrête la séquence (rebond, désinscription, appel abouti, rendez-vous, réponse…).
+  if (e.etape === 'relance' || e.etape === 'findia') { const arret = await raisonArretSequence(l, e.email); if (arret) return `Séquence arrêtée : ${arret}. Rien ne part.`; }
   const { lignes: acts } = await sb(`iae_crm_activites?lead_id=eq.${l.id}&type=in.(email_recu,appel,rdv,linkedin)&select=type,meta&limit=200`);
   const repondu = acts.find((a) => a.type !== 'linkedin' || a.meta?.etape === 'reponse_recue');
   if (repondu) return `Il a déjà répondu ou échangé (${{ email_recu: 'email', appel: 'appel', rdv: 'rendez-vous', linkedin: 'LinkedIn' }[repondu.type]}) : le message de prospection ne part pas.`;
@@ -4469,7 +4476,12 @@ const sansSignatureTexte = (t) => String(t || '').replace(/\s*\n\s*Gabriel Vande
 async function envoyerBrevoEmail(e, c, r, jeton, signature = null) {
   const lien = `${URL_STOP}${jeton}`;
   const corpsTexte = signature ? sansSignatureTexte(e.texte) : e.texte;
-  const paragraphes = corpsTexte.split(/\n{2,}/).map((p) => `<p style="margin:0 0 14px">${echapperHtml(p).replace(/\n/g, '<br>')}</p>`).join('');
+  // La relance 2 : le lien de la ressource du métier, cliquable (seuls ces liens passent le filet, à cette étape).
+  const liens = (h) => (e.etape === 'findia' ? h.replace(LIENS_RELANCE2_EMAIL_RE, (u) => `<a href="${u}" style="color:#1a3cff">${u}</a>`) : h);
+  const paragraphes = corpsTexte.split(/\n{2,}/).map((p) => `<p style="margin:0 0 14px">${liens(echapperHtml(p)).replace(/\n/g, '<br>')}</p>`).join('');
+  // Le même fil (réglage relance_en_fil, voir les relances automatiques) : In-Reply-To et References.
+  const ids = e.faits?.sequence?.fil ? (e.faits.sequence.ids || []).filter((x) => /^<[^<>\s]+@[^<>\s]+>$/.test(x)) : [];
+  const fil = ids.length ? { 'In-Reply-To': ids.at(-1), References: ids.join(' ') } : {};
   const blocSignature = signature ? `<div style="margin:18px 0 0">${signature.html}</div>` : '';
   const html = `<!doctype html><html lang="fr"><head><meta charset="utf-8"></head><body style="margin:0;padding:16px;font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:1.5;color:#1f2330">${paragraphes}${blocSignature}<p style="margin:22px 0 0;font-size:12px;color:#6b7080">Pour ne plus recevoir mes messages : <a href="${echapperHtml(lien)}" style="color:#6b7080">se désinscrire</a></p></body></html>`;
   const corps = {
@@ -4480,7 +4492,7 @@ async function envoyerBrevoEmail(e, c, r, jeton, signature = null) {
     subject: e.objet,
     htmlContent: html,
     textContent: `${corpsTexte}${signature ? `\n\n${signature.texte}` : ''}\n\n--\nPour ne plus recevoir mes messages, se désinscrire : ${lien}`,
-    headers: { 'List-Unsubscribe': `<${lien}>, <mailto:${ADMIN_EMAIL}?subject=D%C3%A9sinscription>`, 'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click' },
+    headers: { 'List-Unsubscribe': `<${lien}>, <mailto:${ADMIN_EMAIL}?subject=D%C3%A9sinscription>`, 'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click', ...fil },
     ...(r.sans_tag ? {} : { tags: ['prospection-email'] }),
   };
   const poster = async (c2) => {
@@ -4514,13 +4526,16 @@ async function appliquerEnvoiEmail(e, l, c, { messageId = null, envoyeLe = new D
   const ligne = await majLigneEmail(e.id, { statut: 'envoye', envoye_le: envoyeLe, suite_le: new Date().toISOString(), ...(messageId ? { brevo_message_id: messageId } : {}), detail: campagne ? e.detail : null });
   if (!l) return ligne;
   const r = await reglageEmail();
-  await journalEmail(l, c, 'email_envoye', `Email de prospection envoyé à ${nomContactEmail(c)}${e.email ? ` (${e.email})` : ''}${campagne ? `, campagne Brevo ${campagne}` : ''} : « ${e.objet || ''} »`, e.texte || null,
+  const relance = e.etape === 'relance' || e.etape === 'findia';
+  await journalEmail(l, c, 'email_envoye', `${relance ? `${LIB_ETAPE_EMAIL[e.etape]} envoyée` : 'Email de prospection envoyé'} à ${nomContactEmail(c)}${e.email ? ` (${e.email})` : ''}${campagne ? `, campagne Brevo ${campagne}` : ''} : « ${e.objet || ''} »`, e.texte || null,
     { etape: e.etape, a: e.email, objet: e.objet, de: r.expediteur, brevo_message_id: messageId, brevo_campagne: campagne, prospection_email: e.id }, envoyeLe);
-  const maj = { relances_sans_reponse: 0, tache_fil: null };
+  // Une relance compte comme une relance sans réponse (comme LinkedIn) ; le 1er email remet le compteur à zéro.
+  const maj = { relances_sans_reponse: relance ? (l.relances_sans_reponse || 0) + 1 : 0, tache_fil: null };
   if (!l.dernier_contact || l.dernier_contact < jourEnvoi) maj.dernier_contact = jourEnvoi;
   if (l.statut === 'nouveau') maj.statut = 'contacte';
+  if (relance) await suiteRelanceEmail(e, l, c, jourEnvoi, maj);
   // Une tâche déjà écrite pour cet envoi (la campagne 1, préparée par Claude Code le 12/11) reste telle quelle.
-  if (!(campagne && /^Email :/.test(l.prochaine_note || ''))) {
+  else if (!(campagne && /^Email :/.test(l.prochaine_note || ''))) {
     Object.assign(maj, { prochaine_relance: dansJoursOuvres(4, jourEnvoi), prochaine_action: 'autre', prochaine_note: `Email : pas de réponse de ${nomContactEmail(c)} au message du ${dateCourte(jourEnvoi).slice(0, 5)} : décider de la relance (email ou appel d'Anna).` });
   }
   await sb(`iae_crm_leads?id=eq.${l.id}`, { methode: 'PATCH', prefer: 'return=minimal', corps: maj });
@@ -4588,7 +4603,10 @@ async function creditsBrevo() {
 async function envoyerFileEmail(r, bilan, reste, signature = null) {
   let place = Math.min(r.par_passage, r.par_jour - (await envoyesDuJourEmail()));
   if (place <= 0) return;
-  const { lignes: file } = await sb('iae_crm_emails?statut=eq.a_envoyer&order=valide_le.asc&limit=100&select=*');
+  // Une relance validée la veille attend son jour (faits.sequence.prevue_le).
+  const jourFile = aujourdHuiParis();
+  const { lignes: fileBrute } = await sb('iae_crm_emails?statut=eq.a_envoyer&order=valide_le.asc&limit=100&select=*');
+  const file = fileBrute.filter((e) => !(e.faits?.sequence?.prevue_le > jourFile));
   if (!file.length) return;
   const credits = await creditsBrevo();
   if (credits != null && credits < RESERVE_BREVO) {
@@ -4616,7 +4634,7 @@ async function envoyerFileEmail(r, bilan, reste, signature = null) {
     const refus = await refusAvantEnvoi(e, l, c);
     if (refus?.attente) { await majLigneEmail(e.id, { statut: 'a_envoyer', pris_le: null, detail: refus.attente }); continue; }
     if (refus) { await majLigneEmail(e.id, { statut: 'annule', detail: refus }); bilan.annules++; continue; }
-    try { verifierTexteEmail(e.objet, e.texte); } catch (x) { await majLigneEmail(e.id, { statut: 'brouillon', valide_le: null, detail: messageRefusEmail(x) }); continue; }
+    try { verifierTexteEmail(e.objet, e.texte, { etape: e.etape }); } catch (x) { await majLigneEmail(e.id, { statut: 'brouillon', valide_le: null, detail: messageRefusEmail(x) }); continue; }
     let messageId;
     try {
       messageId = await envoyerBrevoEmail(e, c, r, jeton, signature);
@@ -4813,12 +4831,249 @@ async function redigerEmails(bilan, reste) {
     if (!e) continue;
     n++;
     try {
-      await preparerEmailAvecClaude(e, l, c);
+      if (e.etape === 'message') await preparerEmailAvecClaude(e, l, c); else await preparerRelanceEmail(e, l, c);
       bilan.rediges++;
     } catch (x) {
       console.error('crm email rédaction', x?.code || x?.message);
     }
   }
+}
+
+/* ----- Les relances automatiques (13/11) ----- */
+
+// Gabriel, 13/11 (« oui elle va appeler ») : la séquence LinkedIn transposée à l'email. J0 : le 1er email (étape message).
+// R1 (étape relance) 3 jours ouvrés après : un autre usage concret, rédigé par Claude, 40 à 60 mots. Le lendemain de R1,
+// Anna appelle (BTP et propreté du Grand Est, s'il y a un téléphone). R2 (étape findia) 8 jours ouvrés après R1 : la
+// ressource du métier, sans question, puis fin. À l'accueil, R1 seulement. Chaque relance est préparée la veille et
+// attend Gabriel, jusqu'à 10 validées telles quelles d'affilée pour son étape (comme ETAPES_AUTO_LI). Tout arrête la
+// séquence : une vraie réponse (pas une absence), une désinscription ou un « stop », un rebond, une opposition, un appel
+// abouti ou un rendez-vous noté, un lead passé en qualifié ou plus loin, une réponse LinkedIn. Une absence la décale.
+// Les relances comptent dans le quota du jour et passent avant les nouveaux emails.
+// Le même fil (« Re: » et les en-têtes In-Reply-To et References) : la documentation officielle de Brevo (lue le
+// 13/11/2026, https://developers.brevo.com/docs/smtp-integration) dit que le champ headers de POST /v3/smtp/email ne prend
+// que des en-têtes non standard ; In-Reply-To et References sont standard. Par défaut, la relance garde donc l'objet du
+// 1er email, sans « Re: » ni en-têtes ; le réglage relance_en_fil (essai réel à faire) les active.
+const ETAPES_AUTO_EMAIL = ['message', 'relance', 'findia'];
+const LIB_ETAPE_EMAIL = { message: '1er email', relance: 'Relance 1', findia: 'Relance 2' };
+const SEQUENCE_EMAIL = { depuis: '2026-11-13', r1: 3, r2: 8 };
+const jourOuvrePrecedent = (jour) => { let d = ajouterJoursIso(jour, -1); while (!estOuvreIso(d)) d = ajouterJoursIso(d, -1); return d; };
+const jourMois = (iso) => dateCourte(iso).slice(0, 5);
+// La date prévue de l'étape qui suit l'email e : 3 jours ouvrés après le 1er email, 8 après la relance 1 ; une absence
+// (decale_au, posé par la synchro) la repousse.
+function prevueSuiteEmail(e) {
+  const base = apresJoursOuvres(e.etape === 'message' ? SEQUENCE_EMAIL.r1 : SEQUENCE_EMAIL.r2, jourParis(e.envoye_le));
+  const decale = e.faits?.decale_au;
+  return DATE_RE.test(decale || '') && decale > base ? decale : base;
+}
+async function confianceEmailEtape(etape) {
+  const k = await confianceEmail();
+  return etape === 'message' ? k : (k.etapes?.[etape] || { serie: 0, auto: false });
+}
+// Ce qui arrête la séquence d'un lead, ou null.
+async function raisonArretSequence(l, email) {
+  if (!l || l.archive || l.statut === 'perdu') return 'lead archivé ou perdu';
+  if (!['nouveau', 'contacte'].includes(l.statut)) return `le lead est passé à l'étape « ${l.statut} »`;
+  if (email && (await enOpposition(email))) return 'désinscription ou opposition';
+  const { lignes: partis } = await sb(`iae_crm_emails?lead_id=eq.${l.id}&statut=eq.envoye&select=evenements`);
+  if (partis.some((x) => ERREURS_ADRESSE.some((k) => x.evenements?.[k]))) return "l'adresse est en erreur (rebond)";
+  if (partis.some((x) => x.evenements?.unsubscribed || x.evenements?.spam)) return 'désinscription ou signalement comme spam';
+  const { lignes: acts } = await sb(`iae_crm_activites?lead_id=eq.${l.id}&type=in.(email_recu,appel,rdv,linkedin)&select=type,meta&limit=200`);
+  const a = acts.find((x) => x.type !== 'linkedin' || x.meta?.etape === 'reponse_recue');
+  return a ? { email_recu: 'il a répondu par email', appel: 'un appel a abouti', rdv: 'un rendez-vous est noté', linkedin: 'il a répondu sur LinkedIn' }[a.type] : null;
+}
+
+// Le passage : arrêter ce qui doit l'être, puis préparer l'étape suivante la veille du jour prévu.
+async function planifierSequenceEmail(r, bilan, reste) {
+  const jour = aujourdHuiParis();
+  const { lignes: ouvertes } = await sb(`iae_crm_emails?etape=in.(relance,findia)&statut=in.(${EN_ATTENTE_EMAIL.join(',')})&select=id,lead_id,email,etape&limit=200`);
+  for (const e of ouvertes) {
+    if (!reste(3000)) return;
+    const [l] = (await sb(`iae_crm_leads?id=eq.${e.lead_id}&select=id,statut,archive`)).lignes;
+    const raison = await raisonArretSequence(l, e.email);
+    if (raison) { await majLigneEmail(e.id, { statut: 'annule', detail: `Séquence arrêtée : ${raison}.` }); bilan.annules++; }
+  }
+  const { lignes: partis } = await sb(`iae_crm_emails?statut=eq.envoye&etape=in.(message,relance)&envoye_le=gte.${encodeURIComponent(minuitParis(SEQUENCE_EMAIL.depuis))}&faits->>suite=is.null&order=envoye_le.asc&limit=100&select=*`);
+  for (const e of partis) {
+    if (!reste(5000)) return;
+    const prevue = prevueSuiteEmail(e);
+    if (jour < jourOuvrePrecedent(prevue)) continue;
+    const suivante = e.etape === 'message' ? 'relance' : 'findia';
+    const noterSuite = (etat, extra = {}) => majLigneEmail(e.id, { faits: { ...(e.faits || {}), suite: { etat, le: new Date().toISOString(), ...extra } } });
+    if (suivante === 'findia' && estGeneraleEmail(e)) { await noterSuite('fin', { raison: "pas de relance 2 à l'accueil" }); continue; }
+    const { l } = await leadEtContactEmail(e);
+    const raison = await raisonArretSequence(l, e.email);
+    if (raison) { await noterSuite('arretee', { raison }); continue; }
+    const { lignes: deja } = await sb(`iae_crm_emails?lead_id=eq.${e.lead_id}&etape=eq.${suivante}&select=id&limit=1`);
+    if (deja.length) { await noterSuite('preparee', { id: deja[0].id }); continue; }
+    const premier = e.etape === 'message' ? e : (await sb(`iae_crm_emails?lead_id=eq.${e.lead_id}&etape=eq.message&statut=eq.envoye&order=envoye_le.asc&limit=1&select=*`)).lignes[0] || e;
+    const ids = [premier.brevo_message_id, e.etape === 'relance' ? e.brevo_message_id : null].filter((x) => /^<[^<>\s]+@[^<>\s]+>$/.test(x || ''));
+    const fil = r.relance_en_fil === true && ids.length > 0;
+    const objetPremier = String(premier.objet || e.objet || '').replace(/^(re\s*:\s*)+/i, '');
+    const sequence = {
+      prevue_le: prevue < jour ? jour : prevue, source: e.id, rang: suivante === 'relance' ? 1 : 2, fil, ids: fil ? ids : [],
+      premier: { id: premier.id, objet: objetPremier, envoye_le: premier.envoye_le, texte: premier.texte ? couper(premier.texte, 2000) : null, appuis: premier.appuis || null },
+      ...(e.etape === 'relance' ? { relance1_le: e.envoye_le } : {}),
+    };
+    const { prospect, registre, rdv, adresse, civilite } = e.faits || {};
+    const { lignes: [nouvelle] } = await sb('iae_crm_emails', { methode: 'POST', prefer: 'return=representation', corps: {
+      lead_id: e.lead_id, contact_id: e.contact_id, compte: e.compte || ADMIN_EMAIL, etape: suivante, statut: 'a_rediger', email: e.email, email_statut: e.email_statut,
+      source_email: e.source_email, civilite: e.civilite, objet: (fil ? `Re: ${objetPremier}` : objetPremier).slice(0, 200) || null,
+      faits: { ...(prospect ? { prospect } : {}), ...(registre ? { registre } : {}), ...(rdv ? { rdv } : {}), ...(adresse ? { adresse } : {}), ...(civilite ? { civilite } : {}), sequence },
+      detail: `${LIB_ETAPE_EMAIL[suivante]} prévue le ${dateCourte(sequence.prevue_le)} : Claude la rédige, puis elle attend ta validation.`,
+    } });
+    await noterSuite('preparee', { id: nouvelle.id });
+    bilan.relances = (bilan.relances || 0) + 1;
+  }
+}
+
+// La relance 1, rédigée par Claude : la salutation, la demande et la signature sont fixes (exemple validé le 13/11).
+const SCHEMA_RELANCE_EMAIL = {
+  type: 'object', additionalProperties: false,
+  properties: { usage: { type: 'string' }, document: { type: 'string' }, accroche_faible: { type: 'boolean' }, raison_faible: { type: 'string' } },
+  required: ['usage', 'document', 'accroche_faible', 'raison_faible'],
+};
+const CONSIGNES_RELANCE_EMAIL = `Tu écris la relance 1 d'un email de prospection de Gabriel Vanderbecken (IA-Entrepreneur, organisme de formation à l'IA pour les entreprises, à Nancy). Le premier email (donné dans la fiche) est parti trois jours ouvrés plus tôt, sans réponse. Gabriel relit la relance avant l'envoi. Tu écris deux morceaux (usage, document) ; le CRM écrit la salutation, la demande et la signature. Exemple validé par Gabriel le 13/11/2026 :
+
+Bonjour Monsieur Vigneron,
+
+Autre usage, avant même le mémoire : faire lire un DCE par l'IA pour en sortir les critères, les pièces à fournir et les pénalités.
+
+Je peux vous le montrer sur un appel d'offres que vous étudiez. Ça vous intéresse ?
+
+Gabriel Vanderbecken
+IA-Entrepreneur
+
+Ici : usage = « Autre usage, avant même le mémoire : faire lire un DCE par l'IA pour en sortir les critères, les pièces à fournir et les pénalités. » ; document = « un appel d'offres que vous étudiez ». La phrase « Je peux vous le montrer sur {document}. Ça vous intéresse ? » est fixe : ne l'écris pas.
+
+usage : une ou deux phrases, 18 à 35 mots, dans l'esprit de l'exemple (« Autre usage… ») : un autre usage concret de l'IA, différent de la valeur du premier email, lié au métier ou au fait du premier email. Pas de rappel du premier email (« je me permets de revenir vers vous », « suite à mon message »), pas de question, pas de lien, pas de chiffre.
+document : ce sur quoi Gabriel montrerait cet usage, avec son article (« un appel d'offres que vous étudiez », « une de vos annonces », « un de vos plannings »), 3 à 8 mots, sans point final.
+Le message entier, hors signature, fait 40 à 60 mots.
+
+À l'accueil : quand la fiche dit que la relance part à l'adresse générale, le CRM écrit avant ton usage « Bonjour, Ce message est à destination de Monsieur X, gérant. » puis « Monsieur X, » : écris l'usage pour le dirigeant, sans parler de l'accueil.
+
+Interdits : aucun montant, prix, chiffre de gain ou de ROI ; jamais le nom de l'acheteur, d'un client ou d'une personne ; jamais d'où vient l'adresse ; aucun lien ; pas de « gratuit », CPF, OPCO, « certifiante », code de certification, « reste à charge », « 100 % » ; pas de formule creuse, pas de tiret long, pas d'emoji, pas de point d'exclamation. Vouvoiement.
+
+N'invente rien : seulement le métier, les faits et le premier email de la fiche. Si aucun usage concret ne colle au métier ou au fait, ne force rien : écris un usage simple du métier, mets accroche_faible à vrai et dis pourquoi dans raison_faible, en une phrase courte. Sinon, accroche_faible à faux et raison_faible vide.`;
+function documentRelanceEmail(d, metier) {
+  const x = String(d || '').replace(/\s+/g, ' ').trim().replace(/[.,;:!?]+$/, '');
+  if (x && x.length <= 80 && /^(un|une|des|le|la|les|l'|l’|vos|votre|chacun|chacune)\b/i.test(x)) return x[0].toLowerCase() + x.slice(1);
+  const doc = documentEmail(x, jeuMetierEmail(metier).neutre[1]);
+  return `${DOCUMENTS_FEMININS_EMAIL.test(doc) ? 'une' : 'un'} de vos ${doc}`;
+}
+async function redigerRelance1Email(e, l, c, { consigne = '', accueil = false } = {}) {
+  const metier = metierEmail(l);
+  const jeu = jeuMetierEmail(metier);
+  const seq = e.faits?.sequence || {};
+  const p = e.faits?.prospect || {};
+  const jour = new Intl.DateTimeFormat('fr-FR', { timeZone: 'Europe/Paris', weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }).format(new Date());
+  const fiche = [
+    `Date du jour : ${jour}`,
+    `Entreprise : ${l.entreprise}${l.secteur ? ` (${l.secteur})` : ''}${l.localisation ? `, ${l.localisation}` : ''}${p.salaries ? `, ${p.salaries} salariés` : ''}`,
+    `Métier : ${metier}`,
+    `Exemples de valeur pour ce métier : ${jeu.valeurs.map((v) => `« ${v} »`).join(' ; ')}`,
+    accueil ? "Destinataire : l'adresse générale de l'entreprise (c'est l'accueil qui lit et transmet). Le CRM écrit avant ton usage « Bonjour, Ce message est à destination de … » puis le nom du dirigeant. Ne parle pas de l'accueil." : '',
+    `Dirigeant : ${nommerDirigeant(e.civilite, c) || 'inconnu'}${c?.poste ? `, ${qualiteCourteEmail(c.poste, e.civilite) || c.poste}` : ''}`,
+    `Premier email, envoyé le ${seq.premier?.envoye_le ? dateCourte(jourParis(seq.premier.envoye_le)) : 'inconnu'}, objet « ${seq.premier?.objet || e.objet || ''} » :\n${seq.premier?.texte ? couper(seq.premier.texte, 1500) : "(texte gardé dans Brevo : seulement l'objet)"}`,
+    Array.isArray(seq.premier?.appuis) && seq.premier.appuis.length ? `Ce qui justifiait le premier email : ${seq.premier.appuis.map((a) => `${a.fait}${a.source && a.source !== 'aucune' ? ` (${a.source}${a.date ? `, ${a.date}` : ''})` : ''}`).join(' ; ')}` : '',
+    consigne ? `Consigne de Gabriel : ${couper(consigne, 300)}` : '',
+  ].filter(Boolean).join('\n');
+  const r = await appelClaude({ consignes: CONSIGNES_RELANCE_EMAIL, schema: SCHEMA_RELANCE_EMAIL, contenu: fiche, max: 1500, timeout: 40000 });
+  const usage = String(r.usage || '').replace(/\s+/g, ' ').trim();
+  if (!usage) throw new Refus('ia_erreur', 502);
+  const demande = `Je peux vous le montrer sur ${documentRelanceEmail(r.document, metier)}. Ça vous intéresse ?`;
+  const debut = accueil ? debutAccueilEmail(e.civilite, c, usage) : [salutationEmail(e.civilite, c), '', usage];
+  return {
+    texte: [...debut, '', demande, '', SIGNATURE_EMAIL].join('\n'),
+    appuis: [{ fait: `relance 1 : un autre usage (${couper(usage, 120)})`, source: 'premier email et métier', date: '' }],
+    accroche_faible: r.accroche_faible === true ? { raison: couper(String(r.raison_faible || '').replace(/\s+/g, ' ').trim(), 200) || "pas d'usage concret qui colle au métier" } : null,
+  };
+}
+// La relance 2 : la ressource du métier (même table que LinkedIn, PAGES_METIER_LI), sans question, puis fin. BTP : le skill
+// d'analyse d'un dossier d'appel d'offres si le 1er email parlait de marchés publics ou d'appels d'offres, sinon celui du
+// compte rendu de chantier ; propreté : plan de nettoyage et devis ; les autres métiers : FindIA. Texte fixe, pas de Claude.
+const SKILLS_EMAIL = 'https://ia-entrepreneur.fr/skills-ia-gratuits.html';
+function ressourceRelance2Email(e, l) {
+  const metier = metierEmail(l);
+  const p = e.faits?.sequence?.premier || {};
+  const skill = pageMetierLi(l)?.skill || null;
+  if (metier === 'du BTP') {
+    // Le fait du 1er email (ses appuis) ou son objet : pas le texte, dont le reste du bureau peut citer les appels d'offres.
+    if (/march[ée]s? publics?|DECP|BOAMP|appels? d'offres/i.test([p.objet, JSON.stringify(p.appuis || [])].join(' '))) return { quoi: "analyse un dossier d'appel d'offres", url: `${SKILLS_EMAIL}#analyse-appel-offres` };
+    return { quoi: skill?.quoi || 'transforme vos notes de réunion de chantier en compte rendu prêt à relire', url: `${SKILLS_EMAIL}#compte-rendu-chantier` };
+  }
+  if (metier === 'de la propreté') return { quoi: skill?.quoi || "transforme vos notes de visite d'un site en plan de nettoyage et en courrier de devis", url: `${SKILLS_EMAIL}#devis-plan-nettoyage` };
+  return { findia: true, url: 'https://ia-entrepreneur.fr/meilleures-ia.html' };
+}
+function texteRelance2Email(e, l, c) {
+  const x = ressourceRelance2Email(e, l);
+  const ligne = x.findia ? `Je vous laisse FindIA, l'outil du site qui dit quelle IA choisir pour quelle tâche : ${x.url}` : `Je vous laisse un skill qui ${x.quoi}, à installer dans Claude ou à copier dans ChatGPT : ${x.url}`;
+  return {
+    texte: [salutationEmail(e.civilite, c), '', ligne, '', "Je n'insiste pas : si le sujet revient, il suffit de répondre à ce message.", '', SIGNATURE_EMAIL].join('\n'),
+    appuis: [{ fait: x.findia ? 'ressource : FindIA (métier sans skill)' : `ressource : le skill qui ${x.quoi}`, source: 'ia-entrepreneur.fr', date: '' }],
+    accroche_faible: null,
+  };
+}
+// Le brouillon d'une relance : la même vérification que le 1er email ; elle part seule si la confiance de SON étape est
+// acquise (10 validées telles quelles d'affilée) et que rien ne cloche ; une accroche faible attend toujours Gabriel.
+async function preparerRelanceEmail(e0, l, c, { auto = true, consigne = '' } = {}) {
+  const deduite = e0.civilite ? null : civiliteDuPrenom(c?.prenom);
+  const e = deduite ? { ...e0, civilite: deduite } : e0;
+  const accueil = estGeneraleEmail(e);
+  const seq = e.faits?.sequence || {};
+  const objet = e.objet || seq.premier?.objet || '';
+  let red;
+  try {
+    red = e.etape === 'findia' ? texteRelance2Email(e, l, c) : await redigerRelance1Email(e, l, c, { consigne, accueil });
+  } catch (err) {
+    const essais = (e.faits?.essais_claude || 0) + 1;
+    await majLigneEmail(e.id, essais >= 3
+      ? { statut: 'brouillon', objet, texte: [...(accueil ? debutAccueilEmail(e.civilite, c, '') : [salutationEmail(e.civilite, c), '']), '', `Je peux vous le montrer sur ${documentRelanceEmail('', metierEmail(l))}. Ça vous intéresse ?`, '', SIGNATURE_EMAIL].join('\n'), faits: { ...(e.faits || {}), essais_claude: essais }, detail: "Claude n'a pas pu rédiger cette relance : écris l'usage toi-même." }
+      : { faits: { ...(e.faits || {}), essais_claude: essais }, detail: "Claude n'a pas pu rédiger la relance : nouvel essai au prochain passage." });
+    throw err;
+  }
+  const alertes = [...alertesEmail(objet, red.texte)];
+  if (red.accroche_faible) alertes.unshift(`Accroche faible, selon Claude : ${String(red.accroche_faible.raison).replace(/[.\s]+$/, '')}. Choisis un autre usage ou écarte cette relance.`);
+  if (e.etape === 'relance') {
+    const corps = String(red.texte).replace(/\n+Gabriel Vanderbecken(\nIA-Entrepreneur)?\s*$/, '');
+    const mots = motsCorpsEmail(corps, accueil);
+    if (mots > 70 || mots < 30) alertes.push(`La relance fait ${mots} mots hors signature (40 à 60 visés).`);
+    if ((corps.match(/\?/g) || []).length > 1) alertes.push('Plusieurs questions dans la relance : une seule.');
+  }
+  let propre = true;
+  try { verifierTexteEmail(objet, red.texte, { etape: e.etape }); } catch (x) { propre = false; alertes.unshift(messageRefusEmail(x)); }
+  const { accroche_faible: _ancienne, essais_claude: _essais, ...faitsAvant } = e.faits || {};
+  const faits = { ...faitsAvant, ...(red.accroche_faible ? { accroche_faible: { ...red.accroche_faible, le: new Date().toISOString() } } : {}) };
+  const valeurs = { objet, texte: red.texte, texte_claude: `${objet}\n---\n${red.texte}`, faits, civilite: e.civilite || null, appuis: red.appuis, statut: 'brouillon', valide_le: null, detail: alertes.length ? alertes.join(' ') : null };
+  if (auto && propre && !alertes.length && !red.accroche_faible && (await confianceEmailEtape(e.etape)).auto) {
+    Object.assign(valeurs, { statut: 'a_envoyer', valide_le: new Date().toISOString(), detail: `Envoi automatique le ${dateCourte(seq.prevue_le || aujourdHuiParis())} : 10 relances ${e.etape === 'relance' ? '1' : '2'} validées telles quelles d'affilée.` });
+  }
+  return majLigneEmail(e.id, valeurs);
+}
+
+// Après une relance : la tâche du lead. Après la relance 1, Anna appelle le lendemain (BTP ou propreté du Grand Est, avec un
+// téléphone), sinon la relance 2 est annoncée ; à l'accueil, la séquence s'arrête là. Après la relance 2, fin de la séquence
+// (prendre des nouvelles dans 90 jours ouvrés, comme LinkedIn), sauf si l'appel d'Anna attend encore.
+async function suiteRelanceEmail(e, l, c, jourEnvoi, maj) {
+  const qui = nomContactEmail(c);
+  const fin = { prochaine_relance: dansJoursOuvres(90, jourEnvoi), prochaine_action: 'autre', prochaine_note: `Séquence email terminée avec ${qui} : prendre des nouvelles.` };
+  if (e.etape === 'findia') {
+    if (!(l.prochaine_action === 'appel' && l.setter === ANNA_LI)) Object.assign(maj, fin);
+    return;
+  }
+  const seq = e.faits?.sequence || {};
+  const dateR2 = estGeneraleEmail(e) ? null : apresJoursOuvres(SEQUENCE_EMAIL.r2, jourEnvoi);
+  const tel = String(l.telephone || c?.telephone || '').trim();
+  if (prioriteEmail(e, l).rang <= 2 && tel && (!l.setter || l.setter === ANNA_LI)) {
+    const jourAppel = apresJoursOuvres(1, jourEnvoi);
+    const nomme = nommerDirigeant(e.civilite, c) || 'le dirigeant';
+    const qualite = qualiteCourteEmail(c?.poste, e.civilite) || 'dirigeant';
+    const jourPremier = seq.premier?.envoye_le ? jourParis(seq.premier.envoye_le) : null;
+    Object.assign(maj, { setter: ANNA_LI, prochaine_action: 'appel', prochaine_relance: jourAppel,
+      prochaine_note: `Appeler ${nomme} (${qualite}, ${l.entreprise}) au ${tel} : Gabriel lui a écrit le ${jourPremier ? jourMois(jourPremier) : '?'} (« ${seq.premier?.objet || e.objet || ''} ») et l'a relancé le ${jourMois(jourEnvoi)}. Citer l'email pour passer le standard.` });
+    await journalEmail(l, c, 'note', `Prospection email : pas de réponse de ${qui} après la relance du ${jourMois(jourEnvoi)} : Anna voit maintenant ce lead et l'appelle le ${jourMois(jourAppel)}${dateR2 ? ` ; la relance 2 part quand même le ${jourMois(dateR2)}` : ''}.`, null, { etape: 'anna_prevenue' });
+    return;
+  }
+  Object.assign(maj, dateR2 ? { prochaine_relance: dateR2, prochaine_action: 'autre', prochaine_note: `Email : relance 2 à ${qui} prévue le ${jourMois(dateR2)} (la ressource du métier, puis fin de la séquence).` } : fin);
 }
 
 /* ----- Le bilan : événements Brevo, campagne, pause automatique ----- */
@@ -4847,6 +5102,8 @@ async function noterEvenementsEmail(e, nouveaux, bilan, { raison = '' } = {}) {
   if (ERREURS_ADRESSE.some((k) => ajout[k]) && l) {
     await majLigneEmail(e.id, { detail: `Adresse en erreur${raison ? ` (${couper(raison, 160)})` : ''} : l'email n'est pas arrivé.` });
     await journalEmail(l, c, 'note', `L'email de prospection à ${e.email} n'est pas arrivé (adresse en erreur${raison ? ` : ${couper(raison, 160)}` : ''}).`, null, { etape: 'erreur_adresse' });
+    // La séquence s'arrête (13/11) : plus de relance à cette adresse.
+    await arreterEnvoisEnAttente(l.id, `Adresse en erreur (${e.email}) : la séquence email s'arrête.`, { linkedin: false });
     if (['nouveau', 'contacte'].includes(l.statut)) await sb(`iae_crm_leads?id=eq.${l.id}`, { methode: 'PATCH', prefer: 'return=minimal', corps: { prochaine_relance: aujourdHuiParis(), prochaine_action: 'autre', prochaine_note: `Email : l'adresse de ${nomContactEmail(c)} est en erreur, le message n'est pas arrivé. Passer par le téléphone (Anna) ou trouver une autre adresse.` } });
   }
 }
@@ -4954,16 +5211,29 @@ function bilanEmail(envoyes, recus, { quota, jour = aujourdHuiParis() } = {}) {
   const recuParLead = new Map();
   for (const a of recus) { if (!recuParLead.has(a.lead_id)) recuParLead.set(a.lead_id, []); recuParLead.get(a.lead_id).push(a.date); }
   const a = (e, ...k) => k.some((x) => e.evenements?.[x]);
+  // Une réponse revient au dernier email parti avant elle (1er email, relance 1 ou relance 2 : 13/11), une fois par email.
+  const repondus = new Set();
+  const partisParLead = new Map();
+  for (const e of partis) { if (!partisParLead.has(e.lead_id)) partisParLead.set(e.lead_id, []); partisParLead.get(e.lead_id).push(e); }
+  for (const [lead, es] of partisParLead) {
+    for (const d of recuParLead.get(lead) || []) {
+      const t = Date.parse(d);
+      const avant = es.filter((e) => Date.parse(e.envoye_le) <= t).sort((x, y) => Date.parse(y.envoye_le) - Date.parse(x.envoye_le))[0];
+      if (avant) repondus.add(avant.id);
+    }
+  }
   const compterBase = (liste) => ({
     envoyes: liste.length,
     arrives: liste.filter((e) => a(e, 'delivered')).length,
     erreurs: liste.filter((e) => a(e, ...ERREURS_ADRESSE)).length,
     spam: liste.filter((e) => a(e, 'spam')).length,
     desinscriptions: liste.filter((e) => a(e, 'unsubscribed')).length,
-    reponses: liste.filter((e) => (recuParLead.get(e.lead_id) || []).some((d) => Date.parse(d) >= Date.parse(e.envoye_le))).length,
+    reponses: liste.filter((e) => repondus.has(e.id)).length,
   });
-  // Au dirigeant (adresse nominative) et à l'accueil (adresse générale), comptés à part (Gabriel, 12/11).
-  const compter = (liste) => ({ ...compterBase(liste), nominatives: compterBase(liste.filter((e) => !estGeneraleEmail(e))), generales: compterBase(liste.filter(estGeneraleEmail)) });
+  // Au dirigeant (adresse nominative) et à l'accueil (adresse générale), comptés à part (Gabriel, 12/11) ; et par étape de la
+  // séquence : 1er email, relance 1, relance 2 (13/11).
+  const parEtape = (liste) => Object.fromEntries(ETAPES_AUTO_EMAIL.map((k) => [k, compterBase(liste.filter((e) => (e.etape || 'message') === k))]));
+  const compter = (liste) => ({ ...compterBase(liste), nominatives: compterBase(liste.filter((e) => !estGeneraleEmail(e))), generales: compterBase(liste.filter(estGeneraleEmail)), par_etape: parEtape(liste) });
   const il7 = maintenant - 7 * 86400000;
   return { aujourdhui: { envoyes: partis.filter((e) => jourParis(e.envoye_le) === jour).length, quota }, debut: compter(partis), semaine: compter(partis.filter((e) => Date.parse(e.envoye_le) >= il7)) };
 }
@@ -5032,6 +5302,12 @@ function texteCandidatsEmail(etat) {
     `${k.ultra_attente || 0} en attente de FullEnrich (ultra qualifiés ou adresses déduites)${k.ultra_attente && !etat.fullenrich ? ', clé FullEnrich absente' : ''}`,
     ...(k.ultra_en_cours ? [`${k.ultra_en_cours} en cours chez FullEnrich`] : []), `${pluriel(k.generales || 0, 'adresse générale', 'adresses générales')} (accueil)`, `${k.sans_adresse || 0} sans adresse (pour Anna)`].join(', ');
 }
+// « 1er email : 3 envoyés, 1 réponse ; relance 1 : 2 envoyés, 0 réponse ; relance 2 : … » (13/11), vide sans relance partie.
+function texteEtapesEmail(b) {
+  const p = b?.par_etape;
+  if (!p || !((p.relance?.envoyes || 0) + (p.findia?.envoyes || 0))) return '';
+  return ETAPES_AUTO_EMAIL.map((k) => `${LIB_ETAPE_EMAIL[k].toLowerCase()} : ${pluriel(p[k]?.envoyes || 0, 'envoyé')}, ${pluriel(p[k]?.reponses || 0, 'réponse')}`).join(' ; ');
+}
 function texteBilanEmail(b) {
   return `${pluriel(b.envoyes, 'envoyé')}, ${pluriel(b.arrives, 'arrivé')}, ${pluriel(b.erreurs, 'adresse en erreur', 'adresses en erreur')}, ${pluriel(b.spam, 'spam', 'spams')}, ${pluriel(b.desinscriptions, 'désinscription')}, ${pluriel(b.reponses, 'réponse')}`;
 }
@@ -5039,7 +5315,7 @@ function texteBilanEmail(b) {
 async function lignesBilanEmail() {
   const lignes = [];
   for (let debut = 0; debut < 50000; debut += 1000) {
-    const { lignes: page } = await sb('iae_crm_emails?select=id,lead_id,statut,email_statut,envoye_le,evenements,fullenrich_id,adresse:faits->adresse,ultra:faits->ultra&order=created_at.asc', { plage: `${debut}-${debut + 999}` });
+    const { lignes: page } = await sb('iae_crm_emails?select=id,lead_id,etape,statut,email_statut,envoye_le,evenements,fullenrich_id,adresse:faits->adresse,ultra:faits->ultra&order=created_at.asc', { plage: `${debut}-${debut + 999}` });
     lignes.push(...page);
     if (page.length < 1000) break;
   }
@@ -5067,6 +5343,9 @@ async function etatProspectionEmail({ lignes = null, recus = null } = {}) {
   };
   const bilan = bilanEmail(tout, rec, { quota: r.par_jour });
   const q = quotaEmail(r, tout, r.pause);
+  // Les appels d'Anna nés des relances email (13/11) : setter Anna, action « appel », tâche écrite par la séquence.
+  const { lignes: appels } = await sb(`iae_crm_leads?setter=eq.${encodeURIComponent(ANNA_LI)}&prochaine_action=eq.appel&prochaine_note=like.${encodeURIComponent('Appeler *Citer l\'email pour passer le standard.')}&order=prochaine_relance.asc&limit=100&select=id,entreprise,prochaine_relance,prochaine_note`);
+  const appelsAnna = appels.map((l) => ({ lead_id: l.id, entreprise: l.entreprise, le: l.prochaine_relance, note: l.prochaine_note }));
   bilan.aujourdhui.quota = q.par_jour;
   return {
     candidats,
@@ -5080,6 +5359,7 @@ async function etatProspectionEmail({ lignes = null, recus = null } = {}) {
     // La signature ajoutée à l'envoi : sa version texte pour l'aperçu de la page (jamais son HTML, qui ne s'affiche pas ici).
     signature: signature?.texte ? { texte: signature.texte, le: signature.le || null } : null, gmail: gmailConfigure(),
     rdv: { minutes: Number.isFinite(r.rdv_minutes) ? r.rdv_minutes : EMAIL_PROSPECTION.rdv_minutes, km: Number.isFinite(r.rdv_km) ? r.rdv_km : EMAIL_PROSPECTION.rdv_km },
+    appels_anna: appelsAnna, relance_en_fil: r.relance_en_fil === true,
     bilan,
   };
 }
@@ -5087,7 +5367,7 @@ async function etatProspectionEmail({ lignes = null, recus = null } = {}) {
 // Un passage, toutes les 15 minutes, après la boîte de Gabriel (une réponse arrivée entre-temps arrête l'envoi).
 async function prospectionEmail({ limite = Date.now() + 40000 } = {}) {
   if (!estAdmin()) return { ignore: 'equipe' };
-  const bilan = { verifies: 0, gratuites: 0, generales: 0, enrichis: 0, adresses: 0, sans_email: 0, rediges: 0, envoyes: 0, echecs: 0, annules: 0, evenements: 0 };
+  const bilan = { verifies: 0, gratuites: 0, generales: 0, enrichis: 0, adresses: 0, sans_email: 0, rediges: 0, envoyes: 0, echecs: 0, annules: 0, evenements: 0, relances: 0 };
   const { lignes: ouvertes } = await sb('iae_crm_emails?statut=in.(a_enrichir,a_rediger,a_envoyer,en_cours,envoye)&select=id&limit=1');
   if (!ouvertes.length) return { rien: true };
   // marge : le temps qu'il faut encore pour finir proprement ce qu'on commence (une lecture de site, une rédaction).
@@ -5106,6 +5386,8 @@ async function prospectionEmail({ limite = Date.now() + 40000 } = {}) {
   if (!estOuvreIso(jour) || pause) { await noterPassageEmail(bilan); return { ...bilan, pause: Boolean(pause), ouvre: estOuvreIso(jour) }; }
   // La signature Gmail, relue une fois par 24 h : l'aperçu de « Emails à valider » est prêt avant le premier envoi.
   const signature = gmailConfigure() ? await signatureEmail().catch(() => null) : null;
+  // 2 bis. Les relances (13/11) : arrêter ce qui doit l'être, préparer l'étape suivante la veille du jour prévu.
+  if (reste()) await planifierSequenceEmail(r, bilan, reste).catch((x) => console.error('crm email séquence', x?.code || x?.message));
   // 3. Les envois du matin, dans le quota.
   const hm = heureMinuteParis();
   if (process.env.BREVO_API_KEY && hm >= r.debut && hm < r.fin) {
@@ -5154,7 +5436,7 @@ async function operationEmail(corps, ip) {
   }
   if (op === 'email_pause') return { reglage: await majReglageEmail({ pause: { le: new Date().toISOString(), raison: couper(String(corps.raison || 'Mise en pause par Gabriel.'), 200), auto: false } }) };
   if (op === 'email_auto_couper') {
-    await ecrireReglage('email_confiance', { serie: 0, auto: false, coupe_le: new Date().toISOString() });
+    await ecrireReglage('email_confiance', { serie: 0, auto: false, coupe_le: new Date().toISOString(), etapes: {} });
     return { confiance: await confianceEmail() };
   }
   if (op === 'email_reglage') {
@@ -5167,6 +5449,8 @@ async function operationEmail(corps, ip) {
     if (corps.rdv_minutes !== undefined) v.rdv_minutes = entier(corps.rdv_minutes, 0, 180);
     if (corps.rdv_km !== undefined) v.rdv_km = entier(corps.rdv_km, 0, 200);
     if (corps.fullenrich_deduites !== undefined) { if (typeof corps.fullenrich_deduites !== 'boolean') throw new Refus('valeur_invalide:reglage'); v.fullenrich_deduites = corps.fullenrich_deduites; }
+    // Les relances dans le même fil (« Re: », In-Reply-To, References) : après un essai réel chez Brevo (13/11).
+    if (corps.relance_en_fil !== undefined) { if (typeof corps.relance_en_fil !== 'boolean') throw new Refus('valeur_invalide:reglage'); v.relance_en_fil = corps.relance_en_fil; }
     if (corps.paliers !== undefined) {
       if (!Array.isArray(corps.paliers) || corps.paliers.length > 10) throw new Refus('valeur_invalide:reglage');
       v.paliers = corps.paliers.map((x) => { if (!DATE_RE.test(String(x?.a_partir_du || ''))) throw new Refus('valeur_invalide:reglage'); return { a_partir_du: x.a_partir_du, par_jour: entier(x.par_jour, 0, 50) }; }).sort((a, b) => a.a_partir_du.localeCompare(b.a_partir_du));
@@ -5180,7 +5464,7 @@ async function operationEmail(corps, ip) {
   const e = await ligneEmail(corps.id);
   if (op === 'email_valider') {
     if (!['brouillon', 'echec'].includes(e.statut)) throw new Refus('email_en_file', 409);
-    const { objet, texte } = verifierTexteEmail(corps.objet ?? e.objet, corps.texte ?? e.texte);
+    const { objet, texte } = verifierTexteEmail(corps.objet ?? e.objet, corps.texte ?? e.texte, { etape: e.etape });
     if (!e.email) throw new Refus('adresse_manquante');
     if (await enOpposition(e.email)) throw new Refus('adresse_opposee', 409);
     // La confiance : des messages de Claude validés tels quels (objet et texte), d'affilée. Un texte modifié, ou écrit par
@@ -5189,8 +5473,11 @@ async function operationEmail(corps, ip) {
     if (e.statut === 'brouillon') {
       const avant = await confianceEmail();
       const telQuel = Boolean(e.texte_claude) && normeLi(`${objet}\n---\n${texte}`) === normeLi(e.texte_claude);
-      const serie = telQuel ? (avant.serie || 0) + 1 : 0;
-      confiance = { ...avant, serie, auto: avant.auto || serie >= SEUIL_CONFIANCE_EMAIL, ...(serie >= SEUIL_CONFIANCE_EMAIL && !avant.auto ? { depuis: new Date().toISOString() } : {}) };
+      // Un compteur par étape (13/11, comme ETAPES_AUTO_LI) : le 1er email au premier niveau, les relances dans etapes.
+      const k = e.etape === 'message' ? avant : (avant.etapes?.[e.etape] || { serie: 0, auto: false });
+      const serie = telQuel ? (k.serie || 0) + 1 : 0;
+      const kk = { ...k, serie, auto: k.auto || serie >= SEUIL_CONFIANCE_EMAIL, ...(serie >= SEUIL_CONFIANCE_EMAIL && !k.auto ? { depuis: new Date().toISOString() } : {}) };
+      confiance = e.etape === 'message' || !ETAPES_AUTO_EMAIL.includes(e.etape) ? { ...avant, ...kk } : { ...avant, etapes: { ...(avant.etapes || {}), [e.etape]: kk } };
       await ecrireReglage('email_confiance', confiance);
     }
     // Les alertes (tiers nommé, « Bonjour Prénom Nom, »…) restent affichées, sans bloquer le clic de Gabriel.
@@ -5208,7 +5495,8 @@ async function operationEmail(corps, ip) {
     if (!l) throw new Refus('introuvable', 404);
     const verifiee = await verifierFaitsEmail(e, l, c, null);
     if (verifiee === false) return { email: emailPourPage(await ligneEmail(e.id)), annule: true };
-    const ligne = await preparerEmailAvecClaude(verifiee || e, l, c, { auto: false, consigne: String(corps.consigne || '') });
+    const pret = verifiee || e;
+    const ligne = pret.etape === 'message' ? await preparerEmailAvecClaude(pret, l, c, { auto: false, consigne: String(corps.consigne || '') }) : await preparerRelanceEmail(pret, l, c, { auto: false, consigne: String(corps.consigne || '') });
     return { email: emailPourPage(ligne) };
   }
   if (op === 'email_adresse') {
@@ -5662,6 +5950,14 @@ async function lignesRecapEmail() {
   lignes.push(`  (${parType(b.semaine)})`);
   lignes.push(`- Depuis le début : ${texteBilanEmail(b.debut)}.`);
   lignes.push(`  (${parType(b.debut)})`);
+  // Par étape de la séquence, et les appels d'Anna (13/11).
+  if (texteEtapesEmail(b.debut)) lignes.push(`  (par étape : ${texteEtapesEmail(b.debut)})`);
+  const jourR = aujourdHuiParis();
+  const appelsDus = (etat.appels_anna || []).filter((x) => x.le && x.le <= jourR);
+  if (etat.appels_anna?.length) {
+    lignes.push(`- Appels à passer par Anna (relances email) : ${etat.appels_anna.length}${appelsDus.length ? `, dont ${appelsDus.length} aujourd'hui ou en retard` : ''}.`);
+    for (const x of etat.appels_anna.slice(0, 10)) lignes.push(`  · ${x.le ? dateCourte(x.le).slice(0, 5) : 'sans date'} : ${x.note}`);
+  }
   const urgent = Boolean(etat.pause || etat.a_valider);
   return { lignes, urgent, resume: etat.pause ? 'prospection email en pause' : etat.a_valider ? `${pluriel(etat.a_valider, 'email')} à valider` : null };
 }

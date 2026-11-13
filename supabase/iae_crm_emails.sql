@@ -10,7 +10,7 @@ create table if not exists public.iae_crm_emails (
   lead_id uuid not null references public.iae_crm_leads(id) on delete cascade,
   contact_id uuid references public.iae_crm_contacts(id) on delete set null,
   compte text not null default 'gabriel@ia-entrepreneur.fr',
-  etape text not null default 'message' check (etape in ('message', 'relance')),
+  etape text not null default 'message' check (etape in ('message', 'relance', 'findia')),  -- 1er email, relance 1, relance 2 (13/11)
   -- a_enrichir → a_rediger → brouillon → a_envoyer → en_cours → envoye ; ou echec, annule, sans_email.
   -- en_cours : la ligne est prise par un passage de la synchro, pour qu'un autre passage ne l'envoie pas une deuxième fois.
   statut text not null default 'a_enrichir'
@@ -42,6 +42,12 @@ create unique index if not exists iae_crm_emails_jeton on public.iae_crm_emails 
 create index if not exists iae_crm_emails_message on public.iae_crm_emails (brevo_message_id) where brevo_message_id is not null;
 alter table public.iae_crm_emails enable row level security;
 revoke all on public.iae_crm_emails from anon, authenticated;
+
+-- Relances automatiques (13/11/2026, Gabriel : « oui elle va appeler ») : l'étape findia (relance 2, la ressource du métier).
+-- La table existe déjà en production avec la contrainte d'avant : à appliquer AVANT de mettre le code en ligne, sinon la
+-- relance 2 ne peut pas être créée. Sans risque à rejouer.
+alter table public.iae_crm_emails drop constraint if exists iae_crm_emails_etape_check;
+alter table public.iae_crm_emails add constraint iae_crm_emails_etape_check check (etape in ('message', 'relance', 'findia'));
 
 -- Opposition : une adresse qui s'est désinscrite (lien, bouton de la messagerie, réponse « stop ») ou qui a signalé un
 -- message comme spam ne reçoit plus jamais rien. Vérifiée avant chaque enrichissement retenu et avant chaque envoi.
