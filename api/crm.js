@@ -134,6 +134,7 @@ import {
   OPS_EQUIPE, REGLAGES_EQUIPE,
 } from './_equipe.js';
 import { creerDemande, GOOGLE_AVIS_RE } from './_avis.js';
+import { civiliteDuPrenom } from './_prenoms.js';
 import { MODALITES, nouveauJetonEval, questionnaire, propre as propreEval } from './_evaluations.js';
 import {
   deposerPiece, empreinte as empreinteTexte, etatDossier, lireFichier, majStatut, nouveauJeton, verifierSiret, aujourdHui as aujourdHuiF,
@@ -2917,11 +2918,18 @@ function metierEmail(l) {
   const m = pageMetierLi(l)?.metier || '';
   return /BTP/.test(m) ? 'du BTP' : /propret/.test(m) ? 'de la propreté' : /immobili|syndic|gestion locative/.test(m) ? 'des agences immobilières' : /assurance/.test(m) ? "des cabinets d'assurance" : 'des PME';
 }
+// Gabriel, 13/11 : « je suis pas fan d'écrire "Bonjour Olivier Michau", personne n'écrit ça, généralement on écrit Bonjour
+// M. Michau ». « Bonjour Monsieur X, » ou « Bonjour Madame X, » ; civilité inconnue (prénom mixte, rare ou absent) : « Bonjour, ».
 function salutationEmail(civilite, c) {
   const nom = nomPropre(c?.nom);
-  if (civilite && nom) return `Bonjour ${civilite === 'Mme' ? 'Madame' : 'Monsieur'} ${nom},`;
-  const qui = [c?.prenom, nom].filter(Boolean).join(' ');
-  return qui ? `Bonjour ${qui},` : 'Bonjour,';
+  return civilite && nom ? `Bonjour ${civilite === 'Mme' ? 'Madame' : 'Monsieur'} ${nom},` : 'Bonjour,';
+}
+// La civilité de la ligne, sinon celle du prénom (fichier des prénoms de l'Insee, api/_prenoms.js), sinon null.
+const civiliteEmail = (e, c) => e?.civilite || civiliteDuPrenom(c?.prenom);
+// Le dirigeant tel qu'on le nomme : « Monsieur Vigneron », sinon « Eric Vigneron » (pour la fiche de Claude et l'accueil).
+function nommerDirigeant(civilite, c) {
+  const nom = nomPropre(c?.nom);
+  return civilite && nom ? `${civilite === 'Mme' ? 'Madame' : 'Monsieur'} ${nom}` : [c?.prenom, nom].filter(Boolean).join(' ');
 }
 // Le message pour l'accueil (Gabriel, 12/11 à 17 h : « en prenant en compte qu'on écrit à l'accueil ») : « Bonjour, », la
 // demande de transmettre au dirigeant (pas une question), puis le même message, adressé à lui par son nom.
@@ -2936,10 +2944,9 @@ function qualiteCourteEmail(poste, civilite) {
   return couper(String(poste || '').trim().toLowerCase(), 40);
 }
 function destinataireAccueil(civilite, c) {
-  const nom = nomPropre(c?.nom);
-  const nomme = civilite && nom ? `${civilite === 'Mme' ? 'Madame' : 'Monsieur'} ${nom}` : [c?.prenom, nom].filter(Boolean).join(' ');
+  const nomme = nommerDirigeant(civilite, c);
   const qualite = qualiteCourteEmail(c?.poste, civilite);
-  return { nomme, qualite, feminin: civilite === 'Mme' || /^(gérante|présidente|directrice|cogérante)/.test(qualite) };
+  return { nomme, qualite, avecCivilite: Boolean(civilite && nomPropre(c?.nom)), feminin: civilite === 'Mme' || /^(gérante|présidente|directrice|cogérante)/.test(qualite) };
 }
 const voyelleEmail = (t) => /^[aeiouyàâäéèêëîïôöùûüœ]/i.test(String(t || ''));
 function objetAccueilEmail(civilite, c) {
@@ -2952,8 +2959,9 @@ function debutAccueilEmail(civilite, c, accroche) {
   const d = destinataireAccueil(civilite, c);
   const pour = d.nomme || (d.qualite ? `${voyelleEmail(d.qualite) ? "l'" : d.feminin ? 'la ' : 'le '}${d.qualite}` : 'la direction');
   const a = String(accroche || '').trim();
+  // « Monsieur Vigneron, j'ai vu que… » ; sans civilité, « J'ai vu que… » sans le nom devant (Gabriel, 13/11).
   return ['Bonjour,', '', `Ce message est pour ${pour}${d.nomme && d.qualite ? `, ${d.qualite}` : ''} : merci de bien vouloir le lui transmettre.`, '',
-    d.nomme && a ? `${d.nomme}, ${a.replace(/^\p{Lu}(?=[\p{Ll}'’])/u, (m) => m.toLowerCase())}` : a];
+    d.avecCivilite && a ? `${d.nomme}, ${a.replace(/^\p{Lu}(?=[\p{Ll}'’])/u, (m) => m.toLowerCase())}` : a];
 }
 // Le message entier : salutation, accroche, valeur et reste du bureau, proposition de rendez-vous (lieu selon le trajet
 // depuis Nancy), signature texte. Ces deux lignes de signature sont remplacées par la signature Gmail à l'envoi.
@@ -2991,6 +2999,8 @@ function verifierTexteEmail(objet, texte) {
 // Signalé à côté du texte, sans bloquer l'envoi validé par Gabriel ; un envoi automatique, lui, attend (12/11 : ne jamais
 // nommer l'acheteur ni le bailleur ; un lieu ou un bâtiment peut se nommer, comme « Haroué et la Villa Majorelle »).
 const ALERTES_EMAIL = [
+  // Gabriel, 13/11 : jamais « Bonjour Olivier Michau, » ; « Bonjour Monsieur Michau, » ou « Bonjour, ».
+  [/^Bonjour (?!Monsieur\b|Madame\b)(?:\p{Lu}[\p{L}'’-]*\s+){1,2}\p{Lu}[\p{L}'’-]*\s*,/mu, "Le message commence par « Bonjour Prénom Nom, » : on écrit « Bonjour Monsieur Nom, », « Bonjour Madame Nom, » ou « Bonjour, » (Gabriel, 13/11)."],
   [/annuaire|base de donn[ée]es|\bfichier\b|registre/i, "Le texte parle d'un annuaire, d'un fichier ou d'un registre : vérifie qu'il ne dit pas d'où vient l'adresse."],
   [/\b(conseil (d[ée]partemental|r[ée]gional)|mairie|la ville de|commune de|communaut[ée] (de communes|d'agglom[ée]ration)|m[ée]tropole|office public|OPH|bailleur|d[ée]partement de|r[ée]gion grand est)\b/i, "Le texte semble nommer l'acheteur ou un tiers : on ne nomme ni le client, ni la collectivité, ni le bailleur."],
   [/\b(march[ée]|lot) de \d|\b\d{1,3}(?:[\s.]\d{3})+\b|\b\d{5,}\b/i, "Le texte contient un grand nombre : vérifie qu'il ne s'agit pas d'un montant."],
@@ -3837,7 +3847,7 @@ async function redigerEmail(e, l, c, { consigne = '', lieu = LIEU_DISTANCE_EMAIL
     `Exemples d'objet pour ce métier : ${jeu.objets.map((o) => `« ${o} »`).join(', ')}`,
     `Lieu du rendez-vous dans la phrase fixe : ${lieu}`,
     accueil ? "Destinataire : l'adresse générale de l'entreprise (c'est l'accueil qui lit et transmet). Ton accroche reste adressée au dirigeant (« J'ai vu que vous… ») ; le CRM écrit avant elle « Bonjour, Ce message est pour … : merci de bien vouloir le lui transmettre. » puis le nom du dirigeant, et l'objet « À l'attention de … ». Ne parle pas de l'accueil." : '',
-    `Dirigeant : ${salutationEmail(e.civilite, c).replace(/^Bonjour /, '').replace(/,$/, '')}${c?.poste ? `, ${c.poste}` : ''}`,
+    `Dirigeant : ${nommerDirigeant(e.civilite, c) || 'inconnu'}${c?.poste ? `, ${qualiteCourteEmail(c.poste, e.civilite) || c.poste}` : ''}`,
     l.besoin ? `Ce que le CRM sait de l'entreprise : ${couper(l.besoin, 400)}` : '',
     `Faits publics des 12 derniers mois, du plus récent au plus ancien :\n${recents.join('\n') || '(aucun)'}`,
     autres.length ? `Autres faits publics :\n${autres.join('\n')}` : '',
@@ -3876,10 +3886,13 @@ function alertesModeleEmail(objet, texte, { appuis = [], accroche = null, genera
 
 // Claude rédige ; le texte reste à valider, sauf si la confiance est acquise et que rien ne cloche (filet et alertes).
 // Un brouillon déjà écrit n'est jamais réécrit seul (Gabriel retouche parfois à la main) : seulement « Rédiger avec Claude ».
-async function preparerEmailAvecClaude(e, l, c, { auto = true, consigne = '' } = {}) {
+async function preparerEmailAvecClaude(e0, l, c, { auto = true, consigne = '' } = {}) {
   let place = { lieu: LIEU_DISTANCE_EMAIL, rdv: null };
-  try { place = await lieuRdvEmail(e, l, c); } catch (x) { console.error('crm email lieu', x?.message); }
-  const faits = { ...(e.faits || {}), ...(place.rdv ? { rdv: place.rdv } : {}) };
+  try { place = await lieuRdvEmail(e0, l, c); } catch (x) { console.error('crm email lieu', x?.message); }
+  // Civilité inconnue : celle du prénom (Insee), gardée sur la ligne avec sa source ; prénom mixte, rare ou absent : aucune.
+  const deduite = e0.civilite ? null : civiliteDuPrenom(c?.prenom);
+  const e = deduite ? { ...e0, civilite: deduite } : e0;
+  const faits = { ...(e0.faits || {}), ...(place.rdv ? { rdv: place.rdv } : {}), ...(e0.civilite ? {} : { civilite: { source: deduite ? 'prénom (fichier des prénoms de l\'Insee)' : 'inconnue (prénom mixte, rare ou absent)', prenom: c?.prenom || null, civilite: deduite, le: new Date().toISOString() } }) };
   let red;
   try {
     red = await redigerEmail({ ...e, faits }, l, c, { consigne, lieu: place.lieu });
@@ -3887,14 +3900,14 @@ async function preparerEmailAvecClaude(e, l, c, { auto = true, consigne = '' } =
     // Claude a échoué : nouvel essai au passage suivant, puis, après 3 essais, la ligne passe à Gabriel avec le modèle vide.
     const essais = (e.faits?.essais_claude || 0) + 1;
     await majLigneEmail(e.id, essais >= 3
-      ? { statut: 'brouillon', objet: estGeneraleEmail(e) ? objetAccueilEmail(e.civilite, c) : null, texte: texteEmail(e, l, c, { lieu: place.lieu, accueil: estGeneraleEmail(e) }), faits: { ...faits, essais_claude: essais }, detail: "Claude n'a pas pu rédiger ce message : écris l'objet et l'accroche toi-même, et adapte la valeur." }
+      ? { statut: 'brouillon', objet: estGeneraleEmail(e) ? objetAccueilEmail(e.civilite, c) : null, texte: texteEmail(e, l, c, { lieu: place.lieu, accueil: estGeneraleEmail(e) }), civilite: e.civilite || null, faits: { ...faits, essais_claude: essais }, detail: "Claude n'a pas pu rédiger ce message : écris l'objet et l'accroche toi-même, et adapte la valeur." }
       : { faits: { ...faits, essais_claude: essais }, detail: "Claude n'a pas pu rédiger : nouvel essai au prochain passage." });
     throw err;
   }
   const alertes = [...alertesEmail(red.objet, red.texte), ...alertesModeleEmail(red.objet, red.texte, red)];
   let propre = true;
   try { verifierTexteEmail(red.objet, red.texte); } catch (x) { propre = false; alertes.unshift(messageRefusEmail(x)); }
-  const valeurs = { objet: red.objet, texte: red.texte, texte_claude: `${red.objet}\n---\n${red.texte}`, faits, appuis: red.appuis.length ? red.appuis : [{ fait: 'message général sur le métier', source: 'aucune', date: '' }], statut: 'brouillon', valide_le: null, detail: alertes.length ? alertes.join(' ') : null };
+  const valeurs = { objet: red.objet, texte: red.texte, texte_claude: `${red.objet}\n---\n${red.texte}`, faits, civilite: e.civilite || null, appuis: red.appuis.length ? red.appuis : [{ fait: 'message général sur le métier', source: 'aucune', date: '' }], statut: 'brouillon', valide_le: null, detail: alertes.length ? alertes.join(' ') : null };
   if (auto && propre && !alertes.length && (await confianceEmail()).auto) {
     Object.assign(valeurs, { statut: 'a_envoyer', valide_le: new Date().toISOString(), detail: "Envoi automatique : 10 messages validés tels quels d'affilée." });
   }
@@ -4891,7 +4904,9 @@ async function operationEmail(corps, ip) {
       confiance = { ...avant, serie, auto: avant.auto || serie >= SEUIL_CONFIANCE_EMAIL, ...(serie >= SEUIL_CONFIANCE_EMAIL && !avant.auto ? { depuis: new Date().toISOString() } : {}) };
       await ecrireReglage('email_confiance', confiance);
     }
-    return { email: emailPourPage(await majLigneEmail(e.id, { objet, texte, statut: 'a_envoyer', valide_le: new Date().toISOString(), detail: null })), confiance };
+    // Les alertes (tiers nommé, « Bonjour Prénom Nom, »…) restent affichées, sans bloquer le clic de Gabriel.
+    const alertes = alertesEmail(objet, texte);
+    return { email: emailPourPage(await majLigneEmail(e.id, { objet, texte, statut: 'a_envoyer', valide_le: new Date().toISOString(), detail: alertes.length ? `Validé malgré l'alerte : ${alertes.join(' ')}` : null })), confiance };
   }
   if (op === 'email_ecarter') {
     if (['en_cours', 'envoye'].includes(e.statut)) throw new Refus('deja_parti', 409);
