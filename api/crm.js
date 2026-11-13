@@ -3883,6 +3883,7 @@ accroche : une seule phrase qui commence par « J'ai vu que vous », 15 à 30 mo
 - L'ancienneté (« installée à X depuis Y »), l'adresse, le nombre d'avis ou la note Google ne servent jamais seuls.
 - La période juste : « cette année » seulement si tous les faits cités sont de l'année civile en cours (la date du jour est dans la fiche) ; sinon le mois et l'année (« en décembre 2025 »), ou « depuis l'an dernier ».
 - Jamais de liste de chantiers ou de lieux (« dans un collège et dans un gymnase » est interdit) : un seul chantier, décrit par sa nature (« la rénovation thermique d'une école »). Jamais deux faits collés dans une phrase.
+- Le fait se dit tout seul, comme à l'oral : aucun complément qui l'explique, le date ou le justifie après coup (participe « ayant », « étant », incise du type « votre entreprise ayant été créée à … en … »). Écris « J'ai vu que vous avez passé le cap des 45 ans d'activité ce mois-ci. », jamais « …, votre entreprise ayant été créée à Maxéville en novembre 1981. » (Gabriel, 13/11 : « ça fait tellement IA »).
 - Fidèle au périmètre réel : si l'entreprise n'a fait qu'un lot, dis le lot (« les sols et faïences de travaux d'accessibilité »), pas le chantier entier ; un seul marché ne devient pas « plusieurs ».
 - Pas de « sûrement », pas de déduction sur leur charge de travail, pas de question.
 
@@ -4058,6 +4059,9 @@ function alertesModeleEmail(objet, texte, { appuis = [], accroche = null, genera
   if (/\p{N}/u.test(objet || '')) a.push("L'objet contient un chiffre : on nomme la tâche ou le document (« Vos devis »).");
   if (/google/i.test(objet || '')) a.push("L'objet cite Google : pas de nom de marque dans l'objet.");
   if (accroche != null && !general && !/^J'ai vu que /.test(accroche)) a.push("L'accroche ne commence pas par « J'ai vu que ».");
+  // Gabriel, 13/11 (« votre entreprise ayant été créée à Maxéville en novembre 1981 ») : « ça fait tellement IA ».
+  const paraFait = corps.split(/\n{2,}/).find((x) => /j'ai vu que/i.test(x)) || '';
+  if (/\b(ayant|étant)\b/i.test(paraFait)) a.push("L'accroche s'explique avec « ayant » ou « étant » : dis le fait seul, comme à l'oral (Gabriel, 13/11).");
   const annee = aujourdHuiParis().slice(0, 4);
   if (/cette ann[ée]e/i.test(corps) && appuis.some((x) => /^\d{4}/.test(x.date || '') && x.date.slice(0, 4) !== annee)) a.push(`« Cette année » alors qu'un fait cité date d'avant ${annee}.`);
   return a;
