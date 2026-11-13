@@ -1369,9 +1369,79 @@ async function prochainRdv(leadId) {
 }
 const tacheRdv = (rdv, note) => ({ prochaine_relance: rdv.date, prochaine_action: 'rdv', prochaine_note: note.slice(0, 2000), relances_sans_reponse: 0, tache_fil: null });
 
+// Une réponse automatique d'absence (Gabriel, 13/11) : sans l'en-tête Auto-Submitted, elle comptait comme une vraie réponse
+// (arrêt croisé, compteurs remis à zéro, plus d'envoi). Il faut un mot d'absence clair, dans l'objet ou au début du corps :
+// « je suis actuellement intéressé » n'en est pas une, « je reviens vers vous après mes congés » non plus. Une date de
+// retour lisible (« de retour le 24/11 », « jusqu'au 24 novembre ») décale la relance : retour + 2 jours ouvrés.
+const OBJET_ABSENCE_RE = /\b(r[ée]ponse automatique|message automatique|automatic reply|auto[- ]?reply|autoreply|out of (the )?office|absente?s?|absence|en cong[ée]s?|cong[ée]s|en vacances|hors du bureau)\b/i;
+const CORPS_ABSENCE_RE = /\b(?:(?:je suis|nous sommes|suis|serai|serons)\s+(?:actuellement\s+|momentan[ée]ment\s+)?(?:absente?s?|en cong[ée]s?|en vacances|hors du bureau|en arr[êe]t)|absente?s? (?:du bureau|jusqu|du \d|à partir|pour)|en cong[ée]s? (?:jusqu|du \d|à partir|annuels?)|r[ée]ponse automatique|message automatique|out of (?:the )?office|automatic reply|i am (?:currently )?(?:out|away)|i'?m (?:currently )?(?:out|away)|on (?:annual )?leave)\b/i;
+const MOIS_ABSENCE = { janvier: 1, fevrier: 2, mars: 3, avril: 4, mai: 5, juin: 6, juillet: 7, aout: 8, septembre: 9, octobre: 10, novembre: 11, decembre: 12 };
+function dateDeRetour(texte, jour = aujourdHuiParis()) {
+  const t = String(texte || '').normalize('NFD').replace(/\p{M}/gu, '').toLowerCase().replace(/[’‘]/g, "'").replace(/\s+/g, ' ');
+  const intro = "(?:de retour(?: au bureau)?(?: le| a partir du| des le)?|retour(?: prevu)? le|reviendrai le|reprise le|(?:a nouveau |de nouveau )?disponible (?:le|a partir du|des le)|jusqu'(?:au|a)(?: et y compris)?(?: le)?|du \\d{1,2}(?:er)?(?: [a-z]+|[/.]\\d{1,2})? au|until|back on|returning on)";
+  const re = new RegExp(`${intro} (?:(?:lundi|mardi|mercredi|jeudi|vendredi|samedi|dimanche|monday|tuesday|wednesday|thursday|friday) )?(\\d{1,2})(?:er)?(?: ([a-z]+)|[/.](\\d{1,2}))(?:[/. ](\\d{4}|\\d{2})\\b)?`);
+  const m = t.match(re);
+  if (!m) return null;
+  const j = Number(m[1]);
+  const mois = m[3] ? Number(m[3]) : MOIS_ABSENCE[m[2]];
+  if (!mois || mois > 12 || j < 1 || j > 31) return null;
+  let an = m[4] ? Number(m[4].length === 2 ? `20${m[4]}` : m[4]) : Number(jour.slice(0, 4));
+  const iso = (a) => `${a}-${String(mois).padStart(2, '0')}-${String(j).padStart(2, '0')}`;
+  if (!m[4] && iso(an) < ajouterJoursIso(jour, -7)) an += 1;
+  const d = iso(an);
+  if (!DATE_RE.test(d) || Number.isNaN(Date.parse(`${d}T12:00:00Z`)) || new Date(`${d}T12:00:00Z`).getUTCDate() !== j) return null;
+  // Une date passée (vieux message d'absence) ou à plus de 6 mois : rien.
+  return d >= jour && d <= ajouterJoursIso(jour, 183) ? d : null;
+}
+function absenceAuto(r) {
+  const objet = String(r.objet || '');
+  const debut = String(r.texte || '').replace(/\s+/g, ' ').slice(0, 500);
+  const parObjet = OBJET_ABSENCE_RE.test(objet);
+  const parCorps = CORPS_ABSENCE_RE.test(debut) && !/int[ée]ress/i.test(debut);
+  if (!parObjet && !parCorps) return null;
+  return { retour: dateDeRetour(`${objet} ${debut}`) };
+}
+// L'absence va dans l'historique (une note, pas un email reçu : le filet d'envoi et le bilan ne la prennent pas pour une
+// réponse), rien ne s'arrête, aucun compteur ne bouge ; avec une date de retour, la relance prévue est décalée.
+async function noterAbsenceEmail(r, leadId, contact, absence, lead) {
+  const qui = r.de.nom || r.de.email;
+  const relance = absence.retour ? apresJoursOuvres(2, absence.retour) : null;
+  await sb('iae_crm_activites', {
+    methode: 'POST', prefer: 'return=minimal',
+    corps: {
+      lead_id: leadId, contact_id: contact?.id || null, date: r.quand, type: 'note',
+      resume: `Réponse automatique d'absence de ${qui} (« ${r.objet} »)${absence.retour ? ` : de retour le ${dateCourte(absence.retour)}, relance à partir du ${dateCourte(relance)}` : ''}. Ce n'est pas une réponse : la prospection continue.`.slice(0, 2000),
+      contenu: String(r.texte || '').slice(0, 4000) || null, source: 'gmail iae',
+      meta: { gmail_id: r.gmailId, fil: r.fil, objet: r.objet, absence: true, retour: absence.retour, canal: 'email' },
+    },
+  });
+  if (!relance) return;
+  const maj = { prochaine_relance: relance };
+  if (/^Email :/.test(lead?.prochaine_note || '')) maj.prochaine_note = `Email : ${qui} est absent (réponse automatique), de retour le ${dateCourte(absence.retour)} : relance à partir du ${dateCourte(relance)}.`;
+  await sb(`iae_crm_leads?id=eq.${leadId}`, { methode: 'PATCH', prefer: 'return=minimal', corps: maj });
+  if (lead) Object.assign(lead, maj);
+  await avecUtilisateur(ADMIN, () => decalerSequenceEmail(leadId, relance)).catch((x) => console.error('crm absence séquence', x?.code || x?.message));
+}
+
+// Une absence décale la relance prévue (13/11) : la relance de la séquence déjà préparée ne part pas avant cette date, et
+// celle qui ne l'est pas encore sera prévue au plus tôt ce jour-là.
+async function decalerSequenceEmail(leadId, jour) {
+  if (!UUID_RE.test(leadId || '') || !DATE_RE.test(jour || '')) return;
+  const { lignes } = await sb(`iae_crm_emails?lead_id=eq.${leadId}&select=id,etape,statut,faits`);
+  for (const e of lignes) {
+    const f = e.faits || {};
+    if (e.etape !== 'message' && EN_ATTENTE_EMAIL.includes(e.statut) && f.sequence) {
+      if ((f.sequence.prevue_le || '') < jour) await majLigneEmail(e.id, { faits: { ...f, sequence: { ...f.sequence, prevue_le: jour, decalee: 'absence' } } });
+    } else if (e.statut === 'envoye' && !f.suite && (f.decale_au || '') < jour) await majLigneEmail(e.id, { faits: { ...f, decale_au: jour } });
+  }
+}
+
 async function rattacherEmail(r, d, leadId, ann) {
   const lead = ann.lead(leadId);
   const contact = r.contact?.id ? r.contact : await contactPourLead(ann, leadId, r.de, d || {});
+  // Gabriel, 13/11 : une absence n'est pas une réponse (ni arrêt croisé, ni remise à zéro).
+  const absence = absenceAuto(r);
+  if (absence) return noterAbsenceEmail(r, leadId, contact, absence, lead);
   const qui = r.de.nom || r.de.email;
   let aFaire = d ? d.a_faire : 'repondre';
   if (r.dernierDeMoi && aFaire === 'repondre') aFaire = 'rien';
