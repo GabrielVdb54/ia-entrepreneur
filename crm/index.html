@@ -387,6 +387,26 @@
   .reco .score { margin-left: auto; font-weight: 800; color: var(--primary); }
   .reco ul { margin: 0 0 0 18px; }
   .reco .a-verifier { color: #874A08; }
+  /* Recherche dans les formateurs, en langage courant (13/11/2026) */
+  .cherche-f { margin: 14px 0 4px; background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); padding: 12px; }
+  .cherche-f label { display: block; font-weight: 700; font-size: 14px; margin-bottom: 6px; }
+  .cherche-f .ligne { display: flex; gap: 8px; }
+  .cherche-f input { flex: 1; min-width: 0; height: 44px; border: 1px solid var(--line-strong); border-radius: 10px; padding: 0 12px; background: var(--bg); }
+  .cherche-f .btn { min-height: 44px; }
+  .cherche-f .aide { margin-top: 6px; }
+  .compris-f { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin: 14px 0 4px; font-size: 14px; }
+  .compris-f .etiquettes { margin: 0; }
+  .compris-f .etiquettes li { background: var(--primary-soft); color: var(--primary); font-weight: 600; }
+  .note-f { margin: 8px 0 0; padding: 10px 12px; border-radius: 10px; background: var(--warn-soft); color: #7A2E0E; font-size: 14px; }
+  .resultat-f .tarif-f { font-size: 14px; font-weight: 700; }
+  .resultat-f .tarif-f.ok { color: var(--accent-dark); }
+  .resultat-f .tarif-f.inconnu { color: #874A08; }
+  .resultat-f .tarif-f.au-dessus { color: var(--danger); }
+  .resultat-f .score { margin-left: auto; font-weight: 800; color: var(--primary); font-size: 14px; white-space: nowrap; }
+  .resultat-f ul.raisons { margin: 0 0 0 18px; font-size: 14px; }
+  .resultat-f .a-verifier { color: #874A08; font-size: 14px; }
+  .ordre-f { margin: 6px 0 10px; font-size: 13px; }
+  @media (max-width: 480px) { .cherche-f .ligne { flex-direction: column; } .cherche-f input { flex: none; width: 100%; } .cherche-f .btn { width: 100%; } }
   .statut.f-valide { background: var(--accent-soft); color: var(--accent-dark); border-color: transparent; }
   .statut.f-verifier { background: #FEF1DC; color: #874A08; border-color: transparent; }
   .statut.f-cours { background: var(--primary-soft); color: var(--primary); border-color: transparent; }
@@ -1906,9 +1926,141 @@ function vueFormateurs() {
   return `<div class="tete-vue"><div><h1 class="titre-vue">Formateurs</h1>
       <p class="sous-titre">${n('valide')} validé${n('valide') > 1 ? 's' : ''} sur ${tous.length}. Un formateur n'est positionné sur une mission qu'une fois validé : contrat-cadre signé dans son lien d'envoi, toutes les pièces vérifiées.</p></div>
       <button type="button" class="btn primaire" data-act="formateur-nouveau">Nouveau formateur</button></div>
-    <div class="puces-type" role="group" aria-label="Statut du dossier">${puces}</div>
-    <div class="grille">${liste.map(carteFormateur).join('') || '<p class="vide">Aucun formateur ici.</p>'}</div>`;
+    ${tous.length ? formChercheF() : ''}
+    ${S.chercheF ? resultatsChercheF() : `<div class="puces-type" role="group" aria-label="Statut du dossier">${puces}</div>
+    <div class="grille">${liste.map(carteFormateur).join('') || '<p class="vide">Aucun formateur ici.</p>'}</div>`}`;
 }
+
+/* Recherche en langage courant (Gabriel, 13/11/2026 : « J'ai besoin d'un formateur à 500 € par jour maximum qui a de
+   l'expérience en finance »). Claude comprend la demande et lit les fiches (op formateurs_chercher) ; le tarif ne lui
+   est pas montré : la page compare elle-même tarif_jour au budget, avec les données du moment, et range à part ceux
+   dont le tarif n'est pas noté plutôt que de les écarter. Sans Claude (clé absente, panne), recherche par mots. */
+S.chercheF = null; // { demande, enCours } puis { demande, r: { compris, resultats }, local, raison }
+S.saisieF = null;
+function formChercheF() {
+  const c = S.chercheF;
+  const saisie = S.saisieF ?? (c ? c.demande : '');
+  return `<form class="cherche-f" id="form-cherche-f" role="search">
+      <label for="q-f">Trouver le formateur qu'il te faut</label>
+      <div class="ligne"><input type="search" id="q-f" name="demande" value="${esc(saisie)}" placeholder="Ex. : 500 € par jour au plus, expérience en finance" autocomplete="off" enterkeyhint="search" minlength="2" maxlength="400" required>
+        <button class="btn primaire" type="submit"${c && c.enCours ? ' disabled' : ''}>${c && c.enCours ? 'Recherche en cours' : 'Chercher'}</button></div>
+      <p class="aide">Écris ton besoin comme tu le dirais : budget par jour, domaine ou secteur, niveau, lieu. ${D.ia ? 'Claude lit les fiches et les CV, le CRM compare lui-même le tarif à ton budget.' : 'Recherche par mots dans les fiches et les CV.'}</p>
+    </form>`;
+}
+function etatBudgetF(l, budget) {
+  const t = Number(dossierDe(l.id).tarif_jour) || 0;
+  if (!budget) return 'sans';
+  if (!t) return 'inconnu';
+  return t <= budget ? 'ok' : 'au_dessus';
+}
+// Une seule liste, du plus compatible au moins compatible (Gabriel, 13/11 : « même un formateur un peu plus cher c'est
+// ok de le faire apparaître, le but est de les faire apparaître par ordre de compatibilité avec la demande »). La
+// compatibilité = le score de Claude (domaine, niveau, lieu), moins 1 point par % de tarif au-dessus du budget, 50 au
+// plus : un peu plus cher descend un peu, beaucoup plus cher descend beaucoup, personne n'est écarté.
+function compatibiliteF(l, x, budget) {
+  const t = Number(dossierDe(l.id).tarif_jour) || 0;
+  if (!budget || !t || t <= budget) return x.score;
+  return Math.max(0, x.score - Math.min(50, Math.round((100 * (t - budget)) / budget)));
+}
+function carteResultatF({ l, x, score }, budget) {
+  const f = dossierDe(l.id);
+  const [lib, cls] = STATUTS_F[f.statut] || [f.statut, ''];
+  const t = Number(f.tarif_jour) || 0;
+  const e = etatBudgetF(l, budget);
+  const tarif = e === 'inconnu' ? ['inconnu', 'Tarif jour pas encore noté : à lui demander']
+    : e === 'au_dessus' ? ['au-dessus', `${euros(t)} par jour, ${euros(t - budget)} au-dessus de ton budget`]
+      : e === 'ok' ? ['ok', `${euros(t)} par jour, dans ton budget`]
+        : t ? ['', `${euros(t)} par jour`] : ['', ''];
+  return `<article class="carte resultat-f" data-id="${l.id}">
+    <div class="carte-haut">${avatar(l, 'm')}<div class="carte-titre"><h3><button type="button" class="lien-carte" data-act="ouvrir">${esc(l.entreprise)}</button></h3><p class="meta">${esc([f.zone || l.localisation, f.distanciel ? 'distanciel' : ''].filter(Boolean).join(', '))}</p></div><span class="statut ${cls}">${esc(lib)}</span></div>
+    <div class="carte-haut"><p class="tarif-f ${tarif[0]}">${esc(tarif[1])}</p><span class="score" title="Compatibilité avec ta demande">${score}/100</span></div>
+    ${x.raisons.length ? `<ul class="raisons">${x.raisons.map((y) => `<li>${esc(y)}</li>`).join('')}</ul>` : ''}
+    ${x.a_verifier.length ? `<p class="a-verifier">À vérifier : ${esc(x.a_verifier.join(' ; '))}</p>` : ''}
+  </article>`;
+}
+function resultatsChercheF() {
+  const c = S.chercheF;
+  const tous = formateurs();
+  if (c.enCours) return `<p class="vide" role="status">${D.ia ? `Claude lit les fiches des ${tous.length} formateurs, quelques secondes.` : 'Recherche dans les fiches.'}</p>`;
+  const k = c.r.compris || {};
+  const budget = Number(k.tarif_max) || 0;
+  const items = (c.r.resultats || []).map((x) => ({ x, l: IDX.lead.get(x.lead_id) })).filter((o) => o.l && !o.l.archive && o.l.type === 'formateur')
+    .map((o) => ({ ...o, score: compatibiliteF(o.l, o.x, budget) })).sort((a, b) => b.score - a.score);
+  const puces = [budget ? `${euros(budget)} par jour au plus` : '', k.expertise ? `Expérience : ${k.expertise}` : '', k.niveau ? `Niveau ${k.niveau}` : '',
+    k.format === 'presentiel' ? `En présentiel${k.lieu ? ` à ${k.lieu}` : ''}` : k.format === 'distanciel' ? 'À distance' : ''].filter(Boolean);
+  const effacer = '<button type="button" class="btn petit lien" data-cherche-f="effacer">Effacer la recherche</button>';
+  let h = `<h2 class="sous-groupe" id="titre-cherche-f" tabindex="-1">${items.length ? `${items.length} formateur${items.length > 1 ? 's' : ''} pour « ${esc(c.demande)} »` : `Aucun formateur pour « ${esc(c.demande)} »`}</h2>
+    <div class="compris-f">${puces.length ? `<span class="meta">Compris :</span><ul class="etiquettes">${puces.map((p) => `<li>${esc(p)}</li>`).join('')}</ul>` : ''}${effacer}</div>`;
+  if (c.local) h += `<p class="note-f">${esc(c.raison || 'Claude ne répond pas')} : recherche par mots dans les fiches seulement. Un domaine voisin (la banque pour la finance, par exemple) peut manquer.</p>`;
+  if (budget && items.some((o) => etatBudgetF(o.l, budget) === 'inconnu')) {
+    const sans = tous.filter((l) => !Number(dossierDe(l.id).tarif_jour)).length;
+    h += `<p class="note-f">${sans === tous.length
+      ? `Aucune fiche n'a encore de tarif jour : le classement se fait sur le reste de ta demande, et ton budget de ${esc(euros(budget))} ne peut pas être vérifié. Demande son tarif à ceux qui t'intéressent, puis note-le dans « Modifier le profil » de sa fiche.`
+      : `${sans} fiche${sans > 1 ? 's' : ''} sur ${tous.length} n'${sans > 1 ? 'ont' : 'a'} pas encore de tarif jour : classée${sans > 1 ? 's' : ''} sur le reste de ta demande, tarif à demander. Note-le dans « Modifier le profil » de la fiche.`}</p>`;
+  }
+  if (!items.length) return `${h}<p class="vide">Personne dans ton réseau ne correspond${k.expertise ? ` à « ${esc(k.expertise)} »` : ''}. Essaie un domaine plus large, ou ajoute un formateur.</p>`;
+  return `${h}<p class="meta ordre-f">Du plus compatible au moins compatible${budget ? ". Un tarif au-dessus de ton budget fait descendre un formateur, sans l'écarter" : ''}.</p>
+    <div class="grille">${items.map((o) => carteResultatF(o, budget)).join('')}</div>`;
+}
+// Sans Claude : les mots de la demande cherchés dans les fiches et les CV lus, budget et niveau lus dans la phrase.
+const MOTS_VIDES_F = new Set(('besoin besoins formateur formatrice formateurs formatrices cherche cherches trouve trouver voudrais veux faut faudrait '
+  + 'avec dans pour des les une qui que quoi par jour jours journee journees maximum max minimum moins plus euros euro tarif tarifs budget prix '
+  + 'experience experiences ayant aussi sur son ses mon mes est sont avoir etre bonne bon tres peu niveau connait connaissance quelqu quelqu\'un '
+  + 'personne capable sait savoir maitrise maitriser').split(' '));
+function chercherFLocal(demande) {
+  const q = sansAccents(demande);
+  const m = q.match(/(\d[\d\s.]{0,7}\d|\d)\s*(?:€|eur\b|euros?\b|e\b)/);
+  const tarif = m ? Number(m[1].replace(/[\s.]/g, '')) : 0;
+  const niveau = Number((q.match(/niveau\s*([123])\b/) || [])[1] || 0);
+  const mots = [...new Set(q.replace(/[^a-z0-9\s]/g, ' ').split(/\s+/).filter((w) => w.length >= 4 && !MOTS_VIDES_F.has(w) && !/\d/.test(w)))];
+  const racine = (w) => (w.length > 5 ? w.replace(/(es|s|e)$/, '') : w);
+  const resultats = [];
+  for (const l of formateurs()) {
+    const f = dossierDe(l.id);
+    if (niveau && (f.niveaux || []).length && !f.niveaux.includes(niveau)) continue;
+    const lus = (IDX.documents.get(l.id) || []).filter((d) => !d.archive && ['cv', 'competences', 'formation_continue'].includes(d.type) && d.lecture && d.lecture.details).map((d) => d.lecture.details);
+    const texte = sansAccents([l.entreprise, l.besoin, f.zone, ...(f.competences || []), ...(f.outils || []), ...(f.secteurs || []), f.bio, f.notes, ...lus].join(' '));
+    const trouves = mots.filter((w) => texte.includes(racine(w)));
+    if (mots.length && !trouves.length) continue;
+    resultats.push({ lead_id: l.id, score: mots.length ? Math.round((100 * trouves.length) / mots.length) : 50, raisons: trouves.length ? [`Sa fiche parle de : ${trouves.join(', ')}.`] : [], a_verifier: [] });
+  }
+  resultats.sort((a, b) => b.score - a.score);
+  return { compris: { tarif_max: tarif >= 50 && tarif <= 100000 ? tarif : 0, niveau, format: 'indifferent', lieu: '', expertise: mots.join(', ') }, resultats };
+}
+async function chercherF(demande) {
+  S.chercheF = { demande, enCours: true };
+  S.saisieF = null;
+  rendre();
+  let suite;
+  if (!D.ia) suite = { demande, r: chercherFLocal(demande), local: true, raison: 'Claude n\'est pas branché' };
+  else {
+    try {
+      suite = { demande, r: await api('POST', { op: 'formateurs_chercher', demande }) };
+    } catch {
+      // Les messages d'erreur IA parlent de rédaction : ici on dit seulement que Claude n'a pas répondu.
+      suite = { demande, r: chercherFLocal(demande), local: true, raison: 'Claude ne répond pas pour le moment' };
+    }
+  }
+  if (!S.chercheF || S.chercheF.demande !== demande) return; // effacée ou remplacée entre-temps
+  S.chercheF = suite;
+  if (S.vue !== 'formateurs' || S.q) return;
+  rendre();
+  const titre = $('#titre-cherche-f');
+  if (titre) titre.focus();
+}
+document.addEventListener('submit', (ev) => {
+  if (ev.target.id !== 'form-cherche-f') return;
+  ev.preventDefault();
+  const demande = ev.target.elements.demande.value.replace(/\s+/g, ' ').trim();
+  if (demande.length < 2 || (S.chercheF && S.chercheF.enCours)) return;
+  chercherF(demande);
+});
+document.addEventListener('input', (ev) => {
+  if (ev.target.id !== 'q-f') return;
+  S.saisieF = ev.target.value;
+  // La croix du champ (ou tout effacer) ramène la liste complète.
+  if (!ev.target.value && S.chercheF && !S.chercheF.enCours) { S.chercheF = null; rendre(); const champ = $('#q-f'); if (champ) champ.focus(); }
+});
 function carteFormateur(l) {
   const f = dossierDe(l.id);
   const [lib, cls] = STATUTS_F[f.statut] || [f.statut, ''];
@@ -2178,6 +2330,11 @@ document.addEventListener('click', (ev) => {
   if (c) { navigator.clipboard.writeText(c.dataset.copier).then(() => toast('Copié.'), () => toast('Copie impossible : sélectionne le texte.')); return; }
   const filtre = ev.target.closest('[data-filtre-f]');
   if (filtre) { S.filtreF = filtre.dataset.filtreF; rendre(); }
+  if (ev.target.closest('[data-cherche-f="effacer"]')) {
+    S.chercheF = null; S.saisieF = '';
+    rendre();
+    const champ = $('#q-f'); if (champ) champ.focus();
+  }
 });
 
 /* ----- Programme de formation (rédigé par Claude, validé par Gabriel) et formateurs recommandés ----- */

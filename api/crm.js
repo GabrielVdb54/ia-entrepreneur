@@ -1958,6 +1958,87 @@ async function recommander(prog) {
   });
   return { le: new Date().toISOString(), liste };
 }
+
+// Recherche dans les formateurs, en langage courant (Gabriel, 13/11/2026 : « J'ai besoin d'un formateur à 500 € par
+// jour maximum qui a de l'expérience en finance »). Claude comprend la demande et lit les fiches (compétences, bio,
+// secteurs, CV lu, notes) ; le tarif ne lui est jamais montré : la page compare elle-même tarif_jour au budget compris,
+// et dit quand un tarif manque plutôt que d'écarter le formateur.
+const SCHEMA_RECHERCHE_F = {
+  type: 'object',
+  properties: {
+    compris: {
+      type: 'object',
+      properties: {
+        tarif_max: { type: 'integer', description: 'Tarif jour maximum demandé, en euros ; 0 si la demande ne fixe pas de plafond' },
+        niveau: { type: 'integer', description: 'Niveau demandé (1, 2 ou 3) ; 0 si aucun' },
+        format: { type: 'string', enum: ['presentiel', 'distanciel', 'indifferent'] },
+        lieu: { type: 'string', description: 'Lieu demandé pour le présentiel, ou vide' },
+        expertise: { type: 'string', description: "Le domaine, le secteur, l'outil ou l'expérience cherchés, en quelques mots, ou vide" },
+      },
+      required: ['tarif_max', 'niveau', 'format', 'lieu', 'expertise'],
+      additionalProperties: false,
+    },
+    resultats: {
+      type: 'array',
+      items: {
+        type: 'object',
+        properties: { lead_id: { type: 'string' }, score: { type: 'integer' }, raisons: { type: 'array', items: { type: 'string' } }, a_verifier: { type: 'array', items: { type: 'string' } } },
+        required: ['lead_id', 'score', 'raisons', 'a_verifier'],
+        additionalProperties: false,
+      },
+    },
+  },
+  required: ['compris', 'resultats'],
+  additionalProperties: false,
+};
+const CONSIGNES_RECHERCHE_F = `Tu aides Gabriel, dirigeant d'IA-Entrepreneur (organisme de formation à l'IA), à trouver dans son réseau le formateur qui répond à un besoin qu'il écrit en langage courant, par exemple « un formateur à 500 € par jour maximum qui a de l'expérience en finance ».
+1. compris : ce que la demande dit explicitement, rien d'autre. tarif_max en euros par jour (« 500 € max », « pas plus de 500 euros la journée » : 500) ; 0 si aucun plafond. niveau 1, 2 ou 3 seulement s'il est demandé. format presentiel si un lieu ou le présentiel est demandé, distanciel si la distance est demandée, sinon indifferent. expertise : le domaine, le secteur, l'outil ou l'expérience cherchés, en quelques mots (« finance »).
+2. resultats : les formateurs dont la fiche montre un vrai lien avec l'expertise demandée, du plus pertinent au moins pertinent, 10 au plus. Un domaine voisin compte s'il est utile, mais dis-le (la finance couvre la banque, l'assurance, la comptabilité, la gestion, le contrôle de gestion, la trésorerie ; une banque est un domaine voisin de la finance d'entreprise). Un formateur sans lien avec l'expertise n'apparaît pas. Si la demande ne cherche aucune expertise, garde tous ceux qui conviennent au niveau et au lieu demandés.
+Niveau et lieu pèsent dans le score : un formateur qui n'anime pas le niveau demandé ou dont la zone ne couvre pas le lieu du présentiel descend et le point va dans a_verifier.
+Le tarif n'est pas dans la liste : le CRM le compare lui-même au budget. N'en parle jamais.
+score : de 0 à 100, l'adéquation à la demande. raisons : 1 à 3 phrases courtes qui citent le fait de la fiche (« 35 ans en banque et assurance avant de devenir formateur »). a_verifier : ce que la fiche ne prouve pas (expérience seulement déduite d'un titre, déplacement hors de sa zone, niveau non indiqué). lead_id copié de la liste, jamais inventé. N'invente rien sur un formateur : seulement ce qui est dans sa fiche.`;
+async function chercherFormateurs(corps) {
+  const demande = String(corps.demande ?? '').replace(/\s+/g, ' ').trim();
+  if (demande.length < 2 || demande.length > 400) throw new Refus('demande_invalide');
+  const [{ lignes: leadsF }, { lignes: dossiers }, { lignes: docs }] = await Promise.all([
+    sb('iae_crm_leads?type=eq.formateur&archive=is.false&select=id,entreprise,besoin,localisation'),
+    sb('iae_crm_formateurs?select=lead_id,statut,competences,outils,niveaux,secteurs,zone,distanciel,disponibilites,bio,notes'),
+    sb('iae_crm_documents?type=in.(cv,competences,formation_continue)&archive=is.false&select=lead_id,type,lecture'),
+  ]);
+  if (!leadsF.length) return { compris: null, resultats: [], total: 0 };
+  const parId = new Map(dossiers.map((d) => [d.lead_id, d]));
+  const lus = new Map();
+  for (const x of docs) {
+    const t = x.lecture && !x.lecture.erreur && x.lecture.details;
+    if (t) lus.set(x.lead_id, [...(lus.get(x.lead_id) || []), couper(t, 300)]);
+  }
+  const champ = (x) => String(x ?? '').replace(/[|\n\r]+/g, ' ').trim();
+  const contenu = [
+    `Demande de Gabriel : ${demande}`,
+    '',
+    'Formateurs (id | nom | titre | dossier | zone | anime à distance | niveaux | compétences | outils | secteurs | bio | pièces lues (CV, justificatifs) | disponibilités | notes de Gabriel) :',
+    ...leadsF.map((l) => {
+      const d = parId.get(l.id) || {};
+      return [l.id, champ(l.entreprise), champ(couper(String(l.besoin || '').split('\n')[0], 160)), d.statut || 'a_inviter', champ(d.zone || l.localisation) || '?',
+        d.distanciel === false ? 'non' : 'oui', (d.niveaux || []).join(',') || '?', champ(couper((d.competences || []).join(' ; '), 900)), champ((d.outils || []).join(', ')),
+        champ((d.secteurs || []).join(', ')), champ(couper(d.bio, 900)), champ((lus.get(l.id) || []).join(' ; ')), champ(d.disponibilites) || '?', champ(couper(d.notes, 400))].join(' | ');
+    }),
+  ].join('\n');
+  const r = await appelClaude({ consignes: CONSIGNES_RECHERCHE_F, schema: SCHEMA_RECHERCHE_F, contenu, max: 4000 });
+  const c = r.compris || {};
+  const entier = (x, min, max) => { const n = Math.round(Number(x) || 0); return n >= min && n <= max ? n : 0; };
+  const compris = {
+    tarif_max: entier(c.tarif_max, 1, 100000), niveau: entier(c.niveau, 1, 3),
+    format: ['presentiel', 'distanciel'].includes(c.format) ? c.format : 'indifferent',
+    lieu: couper(String(c.lieu || '').trim(), 120), expertise: couper(String(c.expertise || '').trim(), 160),
+  };
+  const ids = new Set(leadsF.map((l) => l.id));
+  const vus = new Set();
+  const resultats = (Array.isArray(r.resultats) ? r.resultats : []).filter((x) => x && ids.has(x.lead_id) && !vus.has(x.lead_id) && vus.add(x.lead_id)).slice(0, 12)
+    .map((x) => ({ lead_id: x.lead_id, score: Math.max(0, Math.min(100, Math.round(Number(x.score) || 0))), raisons: textesListe(x.raisons, 3, 300), a_verifier: textesListe(x.a_verifier, 3, 300) }))
+    .sort((a, b) => b.score - a.score);
+  return { demande, compris, resultats, total: leadsF.length };
+}
 async function operationProgramme(corps) {
   const op = corps.op;
   if (op === 'programme_generer') {
@@ -6138,6 +6219,11 @@ async function traiter(req, res, ip) {
     if (corps && ['programme_generer', 'programme_recommander'].includes(corps.op)) {
       if (tropDeRedactions(ip)) throw new Refus('ia_trop_de_demandes', 429);
       return res.status(200).json(await operationProgramme(corps));
+    }
+    // Gabriel seul (pas dans OPS_EQUIPE) : un membre ne voit pas les formateurs.
+    if (corps && corps.op === 'formateurs_chercher') {
+      if (tropDeRedactions(ip)) throw new Refus('ia_trop_de_demandes', 429);
+      return res.status(200).json(await chercherFormateurs(corps));
     }
     if (corps && /^linkedin_[a-z_]+$/.test(String(corps.op || ''))) return res.status(200).json(await operationLinkedin(corps, ip));
     // La prospection email : Gabriel seul (un membre est refusé plus haut, ces opérations ne sont pas dans OPS_EQUIPE).
