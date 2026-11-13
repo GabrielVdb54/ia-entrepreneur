@@ -3337,7 +3337,7 @@ function blocEmail(e) {
   const lu = e.envoye_le ? `<p class="meta">Envoyé le ${esc(instantLisible(e.envoye_le))}${e.brevo_campagne ? ` (campagne Brevo ${e.brevo_campagne})` : ''}${evenementsLus(e) ? ` · ${esc(evenementsLus(e))}` : ''}</p>` : '';
   const texte = e.objet || e.texte ? `<p class="meta">Objet : « ${esc(e.objet || '')} »</p>${e.texte ? `<p class="li-texte">${esc(e.texte)}</p>` : ''}` : '';
   return `<section class="li-bloc em-bloc" data-em-id="${e.id}">${tete}${detail}${lu}${texte}${appuis}
-    ${e.statut === 'a_envoyer' ? `<p class="aide">Part le prochain matin de jour ouvré, ${esc(fenetreEm())}.</p>` : ''}
+    ${e.statut === 'a_envoyer' ? `<p class="aide">Part le prochain matin de jour ouvré, ${esc(fenetreEm())}.${e.priorite ? ` <span data-em-priorite="${Number(e.priorite.rang) || ''}">Ordre d'envoi : priorité ${esc(String(e.priorite.rang))} sur 4 (${esc(e.priorite.libelle || '')}${e.etape && e.etape !== 'message' ? ', relance avant les nouveaux emails' : ''}).</span>` : ''}</p>` : ''}
     ${['a_envoyer', 'a_rediger', 'a_enrichir'].includes(e.statut) ? `<div class="actions">${e.statut === 'a_rediger' && D.ia ? '<button type="button" class="btn petit" data-em-rediger>Rédiger maintenant</button>' : ''}<button type="button" class="btn petit lien" data-em-ecarter>${e.statut === 'a_envoyer' ? 'Ne pas l\'envoyer' : 'Écarter'}</button></div>` : ''}
   </section>`;
 }

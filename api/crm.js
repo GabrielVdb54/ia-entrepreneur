@@ -571,6 +571,11 @@ async function lireTout() {
     !admin ? rienSb : lignesBilanEmail().then((lignes) => ({ lignes })),
   ]);
   const moiPublic = utilisateurCourant();
+  // L'ordre d'envoi des lignes en file (13/11), pour la page.
+  if (admin && emails?.length) {
+    const parId = new Map(leads.map((l) => [l.id, l]));
+    for (const e of emails) if (e.statut === 'a_envoyer') e.priorite = prioriteEmail({ ...e, adresse: e.adresse ?? e.adresse_source }, parId.get(e.lead_id));
+  }
   const prospectionEmailEtat = admin ? await etatProspectionEmail({ lignes: emailsBilan || [], recus: activites.filter((a) => a.type === 'email_recu') }).catch((e) => { console.error('crm email état', e?.code || e?.message); return null; }) : null;
   return {
     leads, contacts, activites, memos, modeles, entrants, ecartes, documents, programmes, linkedin: linkedin || [], avis: avis || [], demandes_avis: demandesAvis || [],
@@ -2832,7 +2837,7 @@ async function journalEmail(l, c, type, resume, contenu = null, meta = {}, date 
 // Ce que la page reçoit d'une ligne : ni l'empreinte du lien de désinscription, ni le texte de Claude, ni les faits bruts.
 // D'où vient l'adresse (site, ADEME, BOAMP, FullEnrich, à la main), avec le lien, et ce qui a été vu puis écarté.
 const emailPourPage = (e) => e && { ...Object.fromEntries(Object.entries(e).filter(([k]) => !['jeton_stop_hash', 'texte_claude', 'faits', 'fullenrich_id'].includes(k))), adresse_source: e.faits?.adresse || null };
-const COLONNES_EMAIL_PAGE = 'id,created_at,lead_id,contact_id,etape,statut,email,email_statut,source_email,civilite,objet,texte,appuis,valide_le,envoye_le,brevo_message_id,brevo_campagne,evenements,detail,adresse_source:faits->adresse';
+const COLONNES_EMAIL_PAGE = 'id,created_at,lead_id,contact_id,etape,statut,email,email_statut,source_email,civilite,objet,texte,appuis,valide_le,envoye_le,brevo_message_id,brevo_campagne,evenements,detail,adresse_source:faits->adresse,rdv_bureaux:faits->rdv->bureaux,siege_cp:faits->registre->siege->code_postal,prospect_dep:faits->prospect->dep';
 
 /* ----- Les textes : le modèle validé par Gabriel le 12/11, l'accroche et l'objet de Claude ----- */
 
@@ -4365,10 +4370,49 @@ async function appliquerEnvoiEmail(e, l, c, { messageId = null, envoyeLe = new D
   return ligne;
 }
 
+// L'ordre de la file d'envoi (Gabriel, 13/11), sans changer le quota : 1. au dirigeant (adresse nominative), BTP ou propreté,
+// rendez-vous possible dans ses bureaux (trajet de 40 min au plus depuis Nancy, calculé à la rédaction : faits.rdv.bureaux) ;
+// 2. BTP ou propreté du Grand Est ; 3. autre métier du Grand Est ; 4. le reste. À rang égal, au dirigeant avant l'accueil, puis
+// la ligne validée la première. Le département vient du siège au registre, sinon de la liste (prospect.dep), sinon du lead.
+const DEPARTEMENTS_GRAND_EST = new Set(['08', '10', '51', '52', '54', '55', '57', '67', '68', '88']);
+const LIBELLES_PRIORITE_EMAIL = { 1: 'BTP ou propreté, au dirigeant, rendez-vous possible dans ses bureaux', 2: 'BTP ou propreté du Grand Est', 3: 'autre métier du Grand Est', 4: 'hors cœur de cible' };
+function departementEmail(e, l) {
+  const f = e.faits || {};
+  const cp = String(e.siege_cp ?? f.registre?.siege?.code_postal ?? '').trim();
+  if (/^\d{5}$/.test(cp)) return cp.slice(0, 2);
+  const code = String(f.registre?.siege?.code_commune || '').trim();
+  if (/^\d{5}$/.test(code)) return code.slice(0, 2);
+  const dep = String(e.prospect_dep ?? f.prospect?.dep ?? '').trim();
+  if (/^\d{2}$/.test(dep)) return dep;
+  return (String(l?.localisation || '').match(/\((\d{2})\d{0,3}\)/) || [])[1] || null;
+}
+function prioriteEmail(e, l) {
+  const metier = metierEmail(l);
+  const cible = metier === 'du BTP' || metier === 'de la propreté';
+  const nominative = !estGeneraleEmail(e);
+  const bureaux = (e.rdv_bureaux ?? e.faits?.rdv?.bureaux) === true;
+  const grandEst = DEPARTEMENTS_GRAND_EST.has(departementEmail(e, l));
+  const rang = nominative && cible && bureaux ? 1 : cible && grandEst ? 2 : grandEst ? 3 : 4;
+  return { rang, nominative, libelle: LIBELLES_PRIORITE_EMAIL[rang] };
+}
+// Les relances passent avant les nouveaux emails (13/11), puis l'ordre ci-dessus.
+function ordonnerFileEmail(lignes, leads) {
+  const cle = (e) => { const p = prioriteEmail(e, leads.get(e.lead_id)); return [e.etape === 'message' ? 1 : 0, p.rang, p.nominative ? 0 : 1, String(e.valide_le || '')]; };
+  const cles = new Map(lignes.map((e) => [e.id, cle(e)]));
+  return [...lignes].sort((a, b) => { const x = cles.get(a.id); const y = cles.get(b.id); for (let k = 0; k < x.length; k++) if (x[k] !== y[k]) return x[k] < y[k] ? -1 : 1; return 0; });
+}
+async function leadsPourFileEmail(lignes) {
+  const ids = [...new Set(lignes.map((e) => e.lead_id).filter((x) => UUID_RE.test(x || '')))];
+  if (!ids.length) return new Map();
+  const { lignes: ls } = await sb(`iae_crm_leads?id=in.(${ids.join(',')})&select=id,entreprise,secteur,tags,besoin,localisation`);
+  return new Map(ls.map((l) => [l.id, l]));
+}
+
 async function envoyerFileEmail(r, bilan, reste, signature = null) {
   let place = Math.min(r.par_passage, r.par_jour - (await envoyesDuJourEmail()));
   if (place <= 0) return;
-  const { lignes } = await sb(`iae_crm_emails?statut=eq.a_envoyer&order=valide_le.asc&limit=${place + 20}&select=*`);
+  const { lignes: file } = await sb('iae_crm_emails?statut=eq.a_envoyer&order=valide_le.asc&limit=100&select=*');
+  const lignes = ordonnerFileEmail(file, await leadsPourFileEmail(file));
   for (const e of lignes) {
     if (place <= 0 || !reste()) break;
     // La ligne est prise d'abord : un autre passage qui tournerait en même temps ne l'enverra pas une deuxième fois.
