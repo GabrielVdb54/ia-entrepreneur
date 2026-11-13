@@ -84,7 +84,7 @@
  * l'accueil ». En dernier recours seulement (pas d'adresse du dirigeant gratuite,
  * ni de la base Google Maps, ni de FullEnrich, ou 3 jours ouvrés d'attente pour un
  * ultra qualifié) : l'adresse générale de l'entreprise elle-même, et un message
- * pour l'accueil (« merci de bien vouloir le lui transmettre »). Le quota monte par
+ * pour l'accueil (« Ce message est à destination de Monsieur X »). Le quota monte par
  * paliers (10 par jour à partir du 16/11) si le bilan reste propre.
  *
  * Synchro (06/11/2026, choix de Gabriel) : chaque email reçu est lu en entier
@@ -2932,7 +2932,7 @@ function nommerDirigeant(civilite, c) {
   return civilite && nom ? `${civilite === 'Mme' ? 'Madame' : 'Monsieur'} ${nom}` : [c?.prenom, nom].filter(Boolean).join(' ');
 }
 // Le message pour l'accueil (Gabriel, 12/11 à 17 h : « en prenant en compte qu'on écrit à l'accueil ») : « Bonjour, », la
-// demande de transmettre au dirigeant (pas une question), puis le même message, adressé à lui par son nom.
+// dirigeant à qui il est destiné (pas une question, pas de « merci de transmettre »), puis le même message, adressé à lui par son nom.
 function qualiteCourteEmail(poste, civilite) {
   const p = normaliser(poste);
   const f = civilite === 'Mme';
@@ -2949,18 +2949,22 @@ function destinataireAccueil(civilite, c) {
   return { nomme, qualite, avecCivilite: Boolean(civilite && nomPropre(c?.nom)), feminin: civilite === 'Mme' || /^(gérante|présidente|directrice|cogérante)/.test(qualite) };
 }
 const voyelleEmail = (t) => /^[aeiouyàâäéèêëîïôöùûüœ]/i.test(String(t || ''));
+// « de Monsieur Vigneron », « d'Isabelle Moreau », « du gérant », « de la gérante », « de la direction ».
+function deDestinataireAccueil(d) {
+  if (d.nomme) return `${voyelleEmail(d.nomme) ? "d'" : 'de '}${d.nomme}`;
+  if (d.qualite) return `${voyelleEmail(d.qualite) ? "de l'" : d.feminin ? 'de la ' : 'du '}${d.qualite}`;
+  return 'de la direction';
+}
 function objetAccueilEmail(civilite, c) {
-  const d = destinataireAccueil(civilite, c);
-  if (d.nomme) return `À l'attention ${voyelleEmail(d.nomme) ? "d'" : 'de '}${d.nomme}`;
-  if (d.qualite) return `À l'attention ${voyelleEmail(d.qualite) ? "de l'" : d.feminin ? 'de la ' : 'du '}${d.qualite}`;
-  return "À l'attention de la direction";
+  return `À l'attention ${deDestinataireAccueil(destinataireAccueil(civilite, c))}`;
 }
 function debutAccueilEmail(civilite, c, accroche) {
   const d = destinataireAccueil(civilite, c);
-  const pour = d.nomme || (d.qualite ? `${voyelleEmail(d.qualite) ? "l'" : d.feminin ? 'la ' : 'le '}${d.qualite}` : 'la direction');
   const a = String(accroche || '').trim();
-  // « Monsieur Vigneron, j'ai vu que… » ; sans civilité, « J'ai vu que… » sans le nom devant (Gabriel, 13/11).
-  return ['Bonjour,', '', `Ce message est pour ${pour}${d.nomme && d.qualite ? `, ${d.qualite}` : ''} : merci de bien vouloir le lui transmettre.`, '',
+  // « Ce message est à destination de Monsieur Party, gérant. », sans « merci de bien vouloir le lui transmettre »
+  // (Gabriel, 13/11 : « ça fait prétentieux »). Puis « Monsieur Vigneron, j'ai vu que… » ; sans civilité, « J'ai vu que… »
+  // sans le nom devant (Gabriel, 13/11).
+  return ['Bonjour,', '', `Ce message est à destination ${deDestinataireAccueil(d)}${d.nomme && d.qualite ? `, ${d.qualite}` : ''}.`, '',
     d.avecCivilite && a ? `${d.nomme}, ${a.replace(/^\p{Lu}(?=[\p{Ll}'’])/u, (m) => m.toLowerCase())}` : a];
 }
 // Le message entier : salutation, accroche, valeur et reste du bureau, proposition de rendez-vous (lieu selon le trajet
@@ -3736,7 +3740,7 @@ objet : 2 à 5 mots, concret, tiré du fait ou de la valeur, qui ne ressemble pa
 
 Le message entier, hors signature, vise 70 à 95 mots : garde l'accroche et la valeur courtes. Une seule question dans tout le message : celle de la phrase fixe.
 
-À l'accueil : quand la fiche dit que le message part à l'adresse générale de l'entreprise (Gabriel, 12/11 : « en prenant en compte qu'on écrit à l'accueil »), écris les mêmes morceaux, sans rien changer à l'accroche : elle reste « J'ai vu que vous… », adressée au dirigeant. Le CRM écrit avant elle « Bonjour, Ce message est pour Monsieur X, gérant : merci de bien vouloir le lui transmettre. » et met « Monsieur X, » devant ton accroche ; l'objet devient « À l'attention de Monsieur X ».
+À l'accueil : quand la fiche dit que le message part à l'adresse générale de l'entreprise (Gabriel, 12/11 : « en prenant en compte qu'on écrit à l'accueil »), écris les mêmes morceaux, sans rien changer à l'accroche : elle reste « J'ai vu que vous… », adressée au dirigeant. Le CRM écrit avant elle « Bonjour, Ce message est à destination de Monsieur X, gérant. » et met « Monsieur X, » devant ton accroche ; l'objet devient « À l'attention de Monsieur X ».
 
 Interdits :
 - aucun montant, aucun prix, aucun chiffre de gain ou de ROI, même quand le marché public en donne un ;
@@ -3846,7 +3850,7 @@ async function redigerEmail(e, l, c, { consigne = '', lieu = LIEU_DISTANCE_EMAIL
     `Exemples de document pour ce métier : ${jeu.documents.join(', ')}`,
     `Exemples d'objet pour ce métier : ${jeu.objets.map((o) => `« ${o} »`).join(', ')}`,
     `Lieu du rendez-vous dans la phrase fixe : ${lieu}`,
-    accueil ? "Destinataire : l'adresse générale de l'entreprise (c'est l'accueil qui lit et transmet). Ton accroche reste adressée au dirigeant (« J'ai vu que vous… ») ; le CRM écrit avant elle « Bonjour, Ce message est pour … : merci de bien vouloir le lui transmettre. » puis le nom du dirigeant, et l'objet « À l'attention de … ». Ne parle pas de l'accueil." : '',
+    accueil ? "Destinataire : l'adresse générale de l'entreprise (c'est l'accueil qui lit et transmet). Ton accroche reste adressée au dirigeant (« J'ai vu que vous… ») ; le CRM écrit avant elle « Bonjour, Ce message est à destination de … » puis le nom du dirigeant, et l'objet « À l'attention de … ». Ne parle pas de l'accueil." : '',
     `Dirigeant : ${nommerDirigeant(e.civilite, c) || 'inconnu'}${c?.poste ? `, ${qualiteCourteEmail(c.poste, e.civilite) || c.poste}` : ''}`,
     l.besoin ? `Ce que le CRM sait de l'entreprise : ${couper(l.besoin, 400)}` : '',
     `Faits publics des 12 derniers mois, du plus récent au plus ancien :\n${recents.join('\n') || '(aucun)'}`,
@@ -4202,7 +4206,7 @@ async function refusAvantEnvoi(e, l, c) {
   if (estGeneraleEmail(e)) {
     const g = adressesGeneralesDe(e, l).choisies.find((x) => x.email === normEmail(e.email)) || (() => { const j = jugerGenerale(e.email, { entreprise: l?.entreprise, communes: [e.faits?.registre?.siege?.commune, e.faits?.rdv?.commune, e.faits?.prospect?.commune].filter(Boolean) }); return j.ok ? j : null; })();
     if (!g) return `${e.email} : pas une adresse générale de l'entreprise. Rien ne part.`;
-    if (!/merci de bien vouloir le lui transmettre/.test(e.texte || '')) return `${e.email} est une adresse générale : le message doit être celui pour l'accueil (« merci de bien vouloir le lui transmettre »). Rien ne part.`;
+    if (!/^Bonjour,\s+Ce message est à destination (de |d'|du )/.test(e.texte || '')) return `${e.email} est une adresse générale : le message doit être celui pour l'accueil (« Ce message est à destination de Monsieur X »). Rien ne part.`;
   } else {
     const j = jugerAdresse(e.email, c ? [{ prenom: c.prenom, nom: c.nom, contact: true }] : [], l?.entreprise);
     if (!j.ok) return `${e.email} : ${MOTIFS_ADRESSE[j.raison]}. Rien ne part (Gabriel, 12/11 : jamais d'adresse générale sans le message pour l'accueil, sinon seulement celle du dirigeant).`;
