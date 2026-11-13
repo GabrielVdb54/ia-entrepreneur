@@ -3002,8 +3002,19 @@ function metierEmail(l) {
 }
 // Gabriel, 13/11 : « je suis pas fan d'écrire "Bonjour Olivier Michau", personne n'écrit ça, généralement on écrit Bonjour
 // M. Michau ». « Bonjour Monsieur X, » ou « Bonjour Madame X, » ; civilité inconnue (prénom mixte, rare ou absent) : « Bonjour, ».
+// Le nom après « Monsieur » ou « Madame » (Gabriel, 13/11 : « Monsieur Rodriguez Gonzalez au lieu de M. Rodriguez ou
+// M. Gonzalez ») : un nom double sans particule se réduit au premier (« Rodriguez Gonzalez » → « Rodriguez ») ; un nom à trait
+// d'union (« Dalla-Costa ») ou à particule (« Da Silva », « Le Gall », « Ben Ali », « Ferreira Da Silva ») reste entier.
+const PARTICULES_NOM = new Set(['de', 'du', 'des', 'd', 'da', 'das', 'do', 'dos', 'di', 'del', 'della', 'dalla', 'dello', 'le', 'la', 'les', 'l', 'van', 'von', 'der', 'den', 'ter', 'ten', 'mac', 'mc', 'saint', 'sainte', 'st', 'ste', 'ben', 'bou', 'el', 'al', 'ait', 'aït', 'ou', 'o', 'y', 'e', 'abd']);
+function nomDAppel(n) {
+  const t = nomPropre(n);
+  const mots = t.split(' ').filter(Boolean);
+  if (mots.length < 2) return t;
+  if (mots.some((m) => m.split(/['’]/).some((x) => PARTICULES_NOM.has(x.toLowerCase())))) return t;
+  return mots[0];
+}
 function salutationEmail(civilite, c) {
-  const nom = nomPropre(c?.nom);
+  const nom = nomDAppel(c?.nom);
   return civilite && nom ? `Bonjour ${civilite === 'Mme' ? 'Madame' : 'Monsieur'} ${nom},` : 'Bonjour,';
 }
 // La civilité de la ligne, sinon celle du prénom (fichier des prénoms de l'Insee, api/_prenoms.js), sinon null.
@@ -3011,7 +3022,7 @@ const civiliteEmail = (e, c) => e?.civilite || civiliteDuPrenom(c?.prenom);
 // Le dirigeant tel qu'on le nomme : « Monsieur Vigneron », sinon « Eric Vigneron » (pour la fiche de Claude et l'accueil).
 function nommerDirigeant(civilite, c) {
   const nom = nomPropre(c?.nom);
-  return civilite && nom ? `${civilite === 'Mme' ? 'Madame' : 'Monsieur'} ${nom}` : [c?.prenom, nom].filter(Boolean).join(' ');
+  return civilite && nom ? `${civilite === 'Mme' ? 'Madame' : 'Monsieur'} ${nomDAppel(nom)}` : [c?.prenom, nom].filter(Boolean).join(' ');
 }
 // Le message pour l'accueil (Gabriel, 12/11 à 17 h : « en prenant en compte qu'on écrit à l'accueil ») : « Bonjour, », la
 // dirigeant à qui il est destiné (pas une question, pas de « merci de transmettre »), puis le même message, adressé à lui par son nom.
