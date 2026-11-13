@@ -2850,31 +2850,31 @@ const JEUX_METIER_EMAIL = {
   'du BTP': {
     reste: RESTE_BTP_EMAIL, defaut: ['emails', 'devis', 'relation client', 'plannings'],
     valeurs: ["répondre plus vite aux appels d'offres avec l'IA, par exemple en partant de leurs anciens mémoires techniques", "monter plus vite les dossiers d'aides de leurs clients avec l'IA, par exemple à partir des devis signés", "préparer plus vite leurs devis avec l'IA, par exemple à partir de leurs notes de visite"],
-    documents: ['mémoires', 'devis', "dossiers d'aides", 'comptes rendus'], objets: ["Vos appels d'offres", "Vos chantiers d'accessibilité", 'Votre qualification chaudière bois', '40 ans en avril'],
+    documents: ['mémoires', 'devis', "dossiers d'aides", 'comptes rendus'], objets: ['Vos mémoires techniques', "Vos dossiers d'aides", 'Vos devis', "Vos appels d'offres"],
     neutre: ["préparer plus vite leurs devis avec l'IA, par exemple à partir de leurs notes de visite", 'devis'],
   },
   'de la propreté': {
     reste: RESTE_BTP_EMAIL.filter((x) => x !== 'suivi de chantier'), defaut: ['plannings', 'devis', 'relation client', 'emails'],
     valeurs: ["préparer plus vite les plannings des équipes avec l'IA, par exemple à partir de ceux de la semaine passée", "répondre plus vite aux appels d'offres avec l'IA, par exemple en partant de leurs anciens mémoires techniques", "préparer plus vite leurs devis avec l'IA, par exemple à partir de leurs notes de visite de site"],
-    documents: ['plannings', 'devis', 'mémoires'], objets: ["Vos appels d'offres", "Vos plannings d'équipe", '20 ans en mars'],
+    documents: ['plannings', 'devis', 'mémoires'], objets: ["Vos plannings d'équipe", 'Vos mémoires techniques', 'Vos devis'],
     neutre: ["préparer plus vite leurs devis avec l'IA, par exemple à partir de leurs notes de visite de site", 'devis'],
   },
   'des agences immobilières': {
     reste: ['emails', 'annonces', 'comptes rendus de visite', 'relances vendeurs et acquéreurs', 'gestion des mandats', 'estimations', 'relation client'], defaut: ['emails', 'comptes rendus de visite', 'relances vendeurs et acquéreurs', 'annonces'],
     valeurs: ["rédiger plus vite leurs annonces avec l'IA, par exemple à partir de leurs notes de visite", "préparer plus vite les comptes rendus de visite pour leurs vendeurs avec l'IA, par exemple à partir d'une note vocale", "répondre plus vite aux demandes des acquéreurs avec l'IA, par exemple à partir de leurs fiches de biens"],
-    documents: ['annonces', 'comptes rendus de visite', 'mandats', 'fiches de biens'], objets: ['Vos annonces', 'Vos comptes rendus de visite', '15 ans à Vincennes'],
+    documents: ['annonces', 'comptes rendus de visite', 'mandats', 'fiches de biens'], objets: ['Vos annonces', 'Vos comptes rendus', 'Vos relances vendeurs'],
     neutre: ["rédiger plus vite leurs annonces avec l'IA, par exemple à partir de leurs notes de visite", 'annonces'],
   },
   "des cabinets d'assurance": {
     reste: ['emails', 'devis', 'gestion des sinistres', 'relances', 'renouvellements', 'relation client'], defaut: ['emails', 'relances', 'renouvellements', 'devis'],
     valeurs: ["traiter plus vite les déclarations de sinistre avec l'IA, par exemple à partir des emails de leurs clients", "préparer plus vite leurs comparatifs avec l'IA, par exemple à partir des conditions des assureurs", "préparer plus vite les renouvellements avec l'IA, par exemple à partir des contrats en cours"],
-    documents: ['dossiers sinistres', 'comparatifs', 'contrats', 'devis'], objets: ['Vos dossiers sinistres', 'Vos renouvellements', '30 ans à Metz'],
+    documents: ['dossiers sinistres', 'comparatifs', 'contrats', 'devis'], objets: ['Vos dossiers sinistres', 'Vos comparatifs', 'Vos renouvellements'],
     neutre: ["traiter plus vite les déclarations de sinistre avec l'IA, par exemple à partir des emails de leurs clients", 'dossiers sinistres'],
   },
   'des PME': {
     reste: ['emails', 'devis', 'relation client', 'factures et relances', 'plannings', 'recrutement'], defaut: ['emails', 'devis', 'relation client', 'factures et relances'],
     valeurs: ["traiter plus vite leurs emails avec l'IA, par exemple en partant de leurs réponses types", "préparer plus vite leurs devis avec l'IA, par exemple à partir de leurs anciens devis"],
-    documents: ['emails', 'devis', 'comptes rendus'], objets: ['Vos devis', 'Vos emails clients', '10 ans en juin'],
+    documents: ['emails', 'devis', 'comptes rendus'], objets: ['Vos devis', 'Vos emails clients', 'Vos relances clients'],
     neutre: ["traiter plus vite leurs emails avec l'IA, par exemple en partant de leurs réponses types", 'emails'],
   },
 };
@@ -3703,9 +3703,12 @@ const schemaEmail = (jeu) => ({
     reste: { type: 'array', items: { type: 'string', enum: jeu.reste } },
     document: { type: 'string' },
     general: { type: 'boolean' },
+    // Gabriel, 13/11 : aucun fait ne passe le test du confrère → Claude le dit, au lieu d'inventer ; le brouillon attend Gabriel.
+    accroche_faible: { type: 'boolean' },
+    raison_faible: { type: 'string' },
     appuis: { type: 'array', items: { type: 'object', additionalProperties: false, properties: { fait: { type: 'string' }, source: { type: 'string' }, date: { type: 'string' } }, required: ['fait', 'source', 'date'] } },
   },
-  required: ['objet', 'accroche', 'valeur', 'reste', 'document', 'general', 'appuis'],
+  required: ['objet', 'accroche', 'valeur', 'reste', 'document', 'general', 'accroche_faible', 'raison_faible', 'appuis'],
 });
 const CONSIGNES_EMAIL = `Tu écris le premier email de prospection de Gabriel Vanderbecken (IA-Entrepreneur, organisme de formation à l'IA pour les entreprises, à Nancy) au dirigeant d'une petite entreprise (3 à 99 salariés) qu'il ne connaît pas. Gabriel le relit avant l'envoi. Le modèle a été validé par Gabriel le 12/11/2026 : « montrer que c'est du personnalisé + aller sur des valeurs ajoutées personnalisées mais aussi dire ce qu'on fait assez généralement ». Tu écris cinq morceaux (objet, accroche, valeur, reste, document) ; le CRM les place dans le modèle, le reste est fixe. Exemple validé, pour une entreprise du BTP qui a remporté des marchés publics cette année :
 
@@ -3713,7 +3716,7 @@ Objet : Vos appels d'offres
 
 Bonjour Monsieur Vigneron,
 
-J'ai vu que vous aviez remporté plusieurs chantiers publics cette année, dont la rénovation thermique d'une école et une mise en accessibilité.
+J'ai vu que vous aviez remporté plusieurs chantiers publics cette année, dont la rénovation thermique d'une école.
 
 Je forme les équipes du BTP à répondre plus vite aux appels d'offres avec l'IA, par exemple en partant de leurs anciens mémoires techniques, et aussi à alléger le reste du bureau : emails, devis, relation client. Les formations sont éligibles à votre budget formation.
 
@@ -3722,23 +3725,26 @@ Si ça vous parle, je peux vous montrer en 20 minutes ce que ça donne sur un de
 Gabriel Vanderbecken
 IA-Entrepreneur
 
-Ici : accroche = « J'ai vu que vous aviez remporté plusieurs chantiers publics cette année, dont la rénovation thermique d'une école et une mise en accessibilité. » ; valeur = « répondre plus vite aux appels d'offres avec l'IA, par exemple en partant de leurs anciens mémoires techniques » ; reste = ["emails", "devis", "relation client"] ; document = « mémoires ». La phrase « Je forme les équipes {métier} à {valeur}, et aussi à alléger le reste du bureau : {reste}. Les formations sont éligibles à votre budget formation. », la proposition « Si ça vous parle, … sur un (ou une) de vos propres {document}, {lieu}. Ça vous intéresse ? » et la signature sont fixes : ne les écris pas. Le métier (« du BTP », « de la propreté », « des agences immobilières », « des cabinets d'assurance », « des PME »), le lieu et le jeu du métier (liste fermée du reste du bureau, exemples de valeur, de document et d'objet) sont donnés dans la fiche : tiens-t'en à ce jeu.
+Ici : accroche = « J'ai vu que vous aviez remporté plusieurs chantiers publics cette année, dont la rénovation thermique d'une école. » ; valeur = « répondre plus vite aux appels d'offres avec l'IA, par exemple en partant de leurs anciens mémoires techniques » ; reste = ["emails", "devis", "relation client"] ; document = « mémoires ». La phrase « Je forme les équipes {métier} à {valeur}, et aussi à alléger le reste du bureau : {reste}. Les formations sont éligibles à votre budget formation. », la proposition « Si ça vous parle, … sur un (ou une) de vos propres {document}, {lieu}. Ça vous intéresse ? » et la signature sont fixes : ne les écris pas. Le métier (« du BTP », « de la propreté », « des agences immobilières », « des cabinets d'assurance », « des PME »), le lieu et le jeu du métier (liste fermée du reste du bureau, exemples de valeur, de document et d'objet) sont donnés dans la fiche : tiens-t'en à ce jeu.
 
-accroche : une seule phrase qui commence par « J'ai vu que vous », 15 à 30 mots, sur des faits réels de la fiche (marchés publics remportés, qualification RGE obtenue, nouvel établissement, anniversaire de création).
+accroche : une seule phrase qui commence par « J'ai vu que vous », 15 à 30 mots, sur un seul fait réel de la fiche (Gabriel, 13/11).
+- Le fait : de préférence daté de moins de 12 mois, ou un fait qui désigne directement la tâche de la valeur (un marché public gagné → les appels d'offres ; une qualification RGE → les dossiers d'aides ; une spécialité « le viager » → les annonces de viager).
+- Le test du confrère : remplace l'entreprise par un confrère du même métier ; si la phrase de valeur ne change pas, le fait est trop faible.
+- L'ancienneté (« installée à X depuis Y »), l'adresse, le nombre d'avis ou la note Google ne servent jamais seuls.
 - La période juste : « cette année » seulement si tous les faits cités sont de l'année civile en cours (la date du jour est dans la fiche) ; sinon le mois et l'année (« en décembre 2025 »), ou « depuis l'an dernier ».
-- Pas d'énumération de chantiers ni de lieux : au plus un ou deux exemples, décrits par leur nature (« la rénovation thermique d'une école »), jamais une liste de communes.
+- Jamais de liste de chantiers ou de lieux (« dans un collège et dans un gymnase » est interdit) : un seul chantier, décrit par sa nature (« la rénovation thermique d'une école »). Jamais deux faits collés dans une phrase.
 - Fidèle au périmètre réel : si l'entreprise n'a fait qu'un lot, dis le lot (« les sols et faïences de travaux d'accessibilité »), pas le chantier entier ; un seul marché ne devient pas « plusieurs ».
 - Pas de « sûrement », pas de déduction sur leur charge de travail, pas de question.
 
-valeur : la tâche précise que ces faits rendent utile dans ce métier, à l'infinitif, suivie d'un exemple concret introduit par « par exemple » ; 10 à 20 mots, sans chiffre, sans point final, sans « à » devant (la phrase fixe le met). Inspire-toi des exemples du métier donnés dans la fiche, sans les recopier si un fait permet mieux.
+valeur : une seule tâche, celle que le fait implique, à l'infinitif, suivie d'un exemple concret introduit par « par exemple » ; 10 à 20 mots, sans chiffre, sans point final, sans « à » devant (la phrase fixe le met). Inspire-toi des exemples du métier donnés dans la fiche, sans les recopier si un fait permet mieux. Agences immobilières : l'annonce, le compte rendu de visite ou les relances vendeurs et acquéreurs ; « répondre aux avis » seulement si la fiche montre des avis restés sans réponse.
 
 reste : exactement trois tâches du quotidien du bureau, prises dans la liste fermée du métier donnée dans la fiche. Aucune ne redit la valeur (si la valeur parle des annonces, pas « annonces »).
 
 document : le document de l'exemple, au pluriel, pour « sur un de vos propres … » (ou « une » : le CRM accorde) (exemples du métier dans la fiche : « mémoires », « annonces », « dossiers sinistres »…). Il doit coller à la valeur.
 
-objet : 2 à 5 mots, concret, tiré du fait ou de la valeur, qui ne ressemble pas à un email de veille d'appels d'offres : jamais « Vos chantiers publics », « Vos marchés publics », « Nouveau marché », « Opportunité ». Exemples validés par Gabriel pour le BTP : « Vos appels d'offres », « Vos chantiers d'accessibilité », « Votre qualification chaudière bois », « 40 ans en avril » ; ceux du métier sont dans la fiche. Pas de majuscules partout, pas de point d'exclamation, pas de question, pas de « Re: ».
+objet : 2 à 4 mots qui nomment la tâche ou le document de la valeur (Gabriel, 13/11 : « Vos mémoires techniques », « Vos dossiers d'aides », « Vos comparatifs », « Vos annonces », « Vos devis » ; ceux du métier sont dans la fiche). Jamais de chiffre, de nom de marque (Google…), ni « IA », « formation », « gratuit ». Il ne ressemble pas à un email de veille d'appels d'offres : jamais « Vos chantiers publics », « Vos marchés publics », « Nouveau marché », « Opportunité ». Pas de majuscules partout, pas de point d'exclamation, pas de question, pas de « Re: ».
 
-Le message entier, hors signature, vise 70 à 95 mots : garde l'accroche et la valeur courtes. Une seule question dans tout le message : celle de la phrase fixe.
+Le message entier, hors signature, fait 75 à 95 mots : garde l'accroche et la valeur courtes. Une seule question dans tout le message : celle de la phrase fixe.
 
 À l'accueil : quand la fiche dit que le message part à l'adresse générale de l'entreprise (Gabriel, 12/11 : « en prenant en compte qu'on écrit à l'accueil »), écris les mêmes morceaux, sans rien changer à l'accroche : elle reste « J'ai vu que vous… », adressée au dirigeant. Le CRM écrit avant elle « Bonjour, Ce message est à destination de Monsieur X, gérant. » et met « Monsieur X, » devant ton accroche ; l'objet devient « À l'attention de Monsieur X ».
 
@@ -3749,7 +3755,7 @@ Interdits :
 - aucun lien ni adresse email, pas de « gratuit », ni CPF, ni OPCO, ni « certifiante », ni code de certification, ni « reste à charge », ni « 100 % » ;
 - pas de « nous connaissons bien le quotidien d'une entreprise comme la vôtre » ni rien qui prétend connaître leur quotidien (Gabriel, 12/11 : peut être mal perçu), pas de formule creuse (« j'espère que vous allez bien », « je me permets »), pas de tiret long, pas d'emoji, pas de point d'exclamation. Vouvoiement.
 
-N'invente rien : seulement les faits de la fiche. Sans fait récent assez fort (rien dans les 12 derniers mois, ou seulement la ville et la taille), écris une accroche simple et vraie tirée de la fiche, toujours « J'ai vu que … » (« J'ai vu que votre entreprise de nettoyage est installée à Frouard depuis 2016. », « J'ai vu que votre agence immobilière est installée à Vincennes depuis 2012. »), une valeur tirée du métier, et mets general à vrai. L'ancienneté se compte depuis la date de création du registre ; la commune est celle du siège donnée dans la fiche.
+N'invente rien : seulement les faits de la fiche. Si aucun fait ne passe le test du confrère (rien dans les 12 derniers mois, ni de fait qui désigne une tâche ; seulement l'ancienneté, l'adresse, la ville, la taille ou les avis), ne force rien : écris une accroche simple et vraie tirée de la fiche, toujours « J'ai vu que … » (« J'ai vu que votre entreprise de nettoyage est installée à Frouard depuis 2016. »), une valeur tirée du métier, mets general à vrai, accroche_faible à vrai, et dis pourquoi dans raison_faible, en une phrase courte (« seulement l'ancienneté et la commune »). Gabriel décidera. Sinon, accroche_faible à faux et raison_faible vide. L'ancienneté se compte depuis la date de création du registre ; la commune est celle du siège donnée dans la fiche.
 
 appuis : chaque fait utilisé, avec sa source et sa date telles que la fiche les donne (fait : « marché de ferronnerie notifié », source : « marchés publics attribués (DECP) », date : « 2026-09-17 »). Pour une accroche générale : un seul appui, fait « message général sur le métier », source « aucune », date vide.`;
 
@@ -3863,25 +3869,30 @@ async function redigerEmail(e, l, c, { consigne = '', lieu = LIEU_DISTANCE_EMAIL
   if (!objet || !accroche) throw new Refus('ia_erreur', 502);
   const appuis = (Array.isArray(r.appuis) ? r.appuis : []).slice(0, 4).map((a) => ({ fait: couper(String(a?.fait || ''), 300), source: couper(String(a?.source || ''), 120), date: couper(String(a?.date || ''), 40) }));
   const texte = texteEmail(e, l, c, { accroche, valeur: r.valeur, reste: r.reste, document: r.document, lieu, accueil });
-  return { objet: accueil ? objetAccueilEmail(e.civilite, c) : objet, texte, appuis, general: r.general === true, accroche, accueil };
+  const faible = r.accroche_faible === true ? { raison: couper(String(r.raison_faible || '').replace(/\s+/g, ' ').trim(), 200) || 'aucun fait ne passe le test du confrère' } : null;
+  return { objet: accueil ? objetAccueilEmail(e.civilite, c) : objet, texte, appuis, general: r.general === true, accroche, accueil, accroche_faible: faible };
 }
 
 // Ce que le modèle du 12/11 demande et que le filet peut voir, signalé à côté du texte (un envoi automatique attend).
-function alertesModeleEmail(objet, texte, { appuis = [], accroche = null, general = false, accueil = false } = {}) {
+// Gabriel, 13/11 : objet de 2 à 4 mots, sans chiffre ni marque (Google) ; 75 à 95 mots hors signature, alerte au-delà de
+// 110 ; une accroche que Claude dit faible attend toujours Gabriel.
+const motsCorpsEmail = (corps, accueil) => motsEmail(accueil ? String(corps).replace(/^Ce message est à destination [^\n]*$/m, '') : corps);
+function alertesModeleEmail(objet, texte, { appuis = [], accroche = null, general = false, accueil = false, accroche_faible: faible = null } = {}) {
   const a = [];
+  if (faible) a.push(`Accroche faible, selon Claude : ${String(faible.raison || 'aucun fait ne passe le test du confrère').replace(/[.\s]+$/, '')}. Choisis un autre fait ou écarte ce message.`);
   const corps = String(texte || '').replace(/\n+Gabriel Vanderbecken(\nIA-Entrepreneur)?\s*$/, '');
   const questions = (corps.match(/\?/g) || []).length;
   if (questions > 1) a.push(`${questions} questions dans le message : une seule (Gabriel, 12/11).`);
-  const mots = motsEmail(corps);
-  // 70 à 95 mots visés ; l'exemple validé en compte un peu plus de 100 au décompte simple, d'où la marge (25 de plus pour la
-  // demande de transmission du message pour l'accueil).
-  const [min, max] = accueil ? [70, 135] : [60, 110];
-  if (mots > max || mots < min) a.push(`Le message fait ${mots} mots (70 à 95 visés${accueil ? ', plus la demande de transmission' : ''}).`);
+  // À l'accueil, la ligne fixe « Ce message est à destination de … » ne compte pas : le reste est le même message.
+  const mots = motsCorpsEmail(corps, accueil);
+  if (mots > 110 || mots < 60) a.push(`Le message fait ${mots} mots hors signature (75 à 95 visés).`);
   if (!accueil) {
     const motsObjet = motsEmail(objet);
-    if (motsObjet < 2 || motsObjet > 5) a.push(`L'objet fait ${motsObjet} mot${motsObjet > 1 ? 's' : ''} (2 à 5).`);
+    if (motsObjet < 2 || motsObjet > 4) a.push(`L'objet fait ${motsObjet} mot${motsObjet > 1 ? 's' : ''} (2 à 4).`);
     if (/(chantiers?|march[ée]s?) publics?|nouveau march|opportunit|veille|avis d'appel/i.test(objet || '')) a.push("L'objet ressemble à un email de veille d'appels d'offres.");
   }
+  if (/\p{N}/u.test(objet || '')) a.push("L'objet contient un chiffre : on nomme la tâche ou le document (« Vos devis »).");
+  if (/google/i.test(objet || '')) a.push("L'objet cite Google : pas de nom de marque dans l'objet.");
   if (accroche != null && !general && !/^J'ai vu que /.test(accroche)) a.push("L'accroche ne commence pas par « J'ai vu que ».");
   const annee = aujourdHuiParis().slice(0, 4);
   if (/cette ann[ée]e/i.test(corps) && appuis.some((x) => /^\d{4}/.test(x.date || '') && x.date.slice(0, 4) !== annee)) a.push(`« Cette année » alors qu'un fait cité date d'avant ${annee}.`);
@@ -3896,7 +3907,9 @@ async function preparerEmailAvecClaude(e0, l, c, { auto = true, consigne = '' } 
   // Civilité inconnue : celle du prénom (Insee), gardée sur la ligne avec sa source ; prénom mixte, rare ou absent : aucune.
   const deduite = e0.civilite ? null : civiliteDuPrenom(c?.prenom);
   const e = deduite ? { ...e0, civilite: deduite } : e0;
-  const faits = { ...(e0.faits || {}), ...(place.rdv ? { rdv: place.rdv } : {}), ...(e0.civilite ? {} : { civilite: { source: deduite ? 'prénom (fichier des prénoms de l\'Insee)' : 'inconnue (prénom mixte, rare ou absent)', prenom: c?.prenom || null, civilite: deduite, le: new Date().toISOString() } }) };
+  // L'accroche faible d'une rédaction précédente ne colle pas à la nouvelle : seule la dernière compte.
+  const { accroche_faible: _ancienneFaible, ...faitsAvant } = e0.faits || {};
+  const faits = { ...faitsAvant, ...(place.rdv ? { rdv: place.rdv } : {}), ...(e0.civilite ? {} : { civilite: { source: deduite ? 'prénom (fichier des prénoms de l\'Insee)' : 'inconnue (prénom mixte, rare ou absent)', prenom: c?.prenom || null, civilite: deduite, le: new Date().toISOString() } }) };
   let red;
   try {
     red = await redigerEmail({ ...e, faits }, l, c, { consigne, lieu: place.lieu });
@@ -3911,8 +3924,10 @@ async function preparerEmailAvecClaude(e0, l, c, { auto = true, consigne = '' } 
   const alertes = [...alertesEmail(red.objet, red.texte), ...alertesModeleEmail(red.objet, red.texte, red)];
   let propre = true;
   try { verifierTexteEmail(red.objet, red.texte); } catch (x) { propre = false; alertes.unshift(messageRefusEmail(x)); }
+  if (red.accroche_faible) faits.accroche_faible = { ...red.accroche_faible, le: new Date().toISOString() };
   const valeurs = { objet: red.objet, texte: red.texte, texte_claude: `${red.objet}\n---\n${red.texte}`, faits, civilite: e.civilite || null, appuis: red.appuis.length ? red.appuis : [{ fait: 'message général sur le métier', source: 'aucune', date: '' }], statut: 'brouillon', valide_le: null, detail: alertes.length ? alertes.join(' ') : null };
-  if (auto && propre && !alertes.length && (await confianceEmail()).auto) {
+  // Une accroche que Claude dit faible ne part jamais seule, même en confiance (Gabriel, 13/11).
+  if (auto && propre && !alertes.length && !red.accroche_faible && (await confianceEmail()).auto) {
     Object.assign(valeurs, { statut: 'a_envoyer', valide_le: new Date().toISOString(), detail: "Envoi automatique : 10 messages validés tels quels d'affilée." });
   }
   return majLigneEmail(e.id, valeurs);

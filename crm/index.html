@@ -3322,7 +3322,7 @@ function blocEmail(e) {
   const qui = [e.civilite || '', nomContact(c)].filter(Boolean).join(' ') || 'Dirigeant';
   const tete = `<div class="li-tete"><b>${esc(l ? l.entreprise : 'Lead supprimé')}</b> <span class="meta">${esc(qui)}${c && c.poste ? `, ${esc(c.poste)}` : ''}</span> <span class="li-etat ${CLASSE_ETAT_EMAIL[e.statut] || ''}">${esc(ETAT_EMAIL[e.statut] || e.statut)}</span></div><p class="em-adresse">${adresseEmailLue(e)}</p>${vuesEcarteesEm(e)}`;
   const appuis = Array.isArray(e.appuis) && e.appuis.length ? `<div><p class="meta">Ce qui justifie le message</p><ul class="em-appuis">${e.appuis.map((a) => `<li>${esc(a.fait)}${a.source && a.source !== 'aucune' ? ` <span class="meta">· ${esc(a.source)}${a.date ? `, ${esc(/^\d{4}-\d{2}-\d{2}$/.test(a.date) ? dateCourte(a.date) : a.date)}` : ''}</span>` : ''}</li>`).join('')}</ul></div>` : '';
-  const detail = e.detail ? `<p class="li-detail${['echec', 'annule', 'sans_email'].includes(e.statut) || /erreur|interdit|nomme|montant|majuscules|lien|origine|annuaire/i.test(e.detail) ? ' alerte-li' : ''}">${esc(e.detail)}</p>` : '';
+  const detail = e.detail ? `<p class="li-detail${['echec', 'annule', 'sans_email'].includes(e.statut) || /erreur|interdit|nomme|montant|majuscules|lien|origine|annuaire|faible|chiffre|Google|mots/i.test(e.detail) ? ' alerte-li' : ''}">${esc(e.detail)}</p>` : '';
   if (['brouillon', 'echec'].includes(e.statut)) {
     return `<section class="li-bloc em-bloc" data-em-id="${e.id}">${tete}${detail}
       <label class="champ">Objet<input type="text" data-em-objet maxlength="90" value="${esc(e.objet || '')}"></label>
