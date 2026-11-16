@@ -3,6 +3,8 @@
  * Le CRM à plusieurs (10/11/2026) : ce que la page change selon la personne connectée.
  * Chargé après le script de la page (même portée globale : D, S, COMPTE, api, toast…).
  *
+ * - 13/11/2026 : Anna (setter) voit aussi les formateurs et les marchés ; Ludovic (partenaire) ne voit
+ *   qu'eux, en lecture (crm/marches.js fait sa fiche et sa vue de départ).
  * - Un membre (closer, setter) : ses leads seulement (le serveur filtre), pas de
  *   formateurs, satisfaction, paiements ni programmes ; un bouton pour connecter sa
  *   boîte Google ; sa signature et sa photo. LinkedIn seulement quand son robot est
@@ -23,7 +25,7 @@ const prenomDe = (email) => {
   const m = ((D && D.equipe) || []).find((x) => x.email === email) || ((D && D.closers) || []).find((x) => x.email === email);
   return m ? m.prenom : email.split('@')[0];
 };
-const LIB_ROLE = { closer: 'Closer', setter: 'Setter' };
+const LIB_ROLE = { closer: 'Closer', setter: 'Setter', partenaire: "Partenaire appels d'offres" };
 function lireFiltreEquipe() { try { return localStorage.getItem(CLE_FILTRE_EQUIPE) || 'moi'; } catch { return 'moi'; } }
 function ecrireFiltreEquipe(v) { try { localStorage.setItem(CLE_FILTRE_EQUIPE, v); } catch { /* navigation privée */ } }
 
@@ -33,8 +35,14 @@ Object.assign(ERREURS, {
   google_a_connecter: "Connecte d'abord ta boîte Google (bouton « Connecter ma boîte Google »).",
   google_a_reconnecter: 'Ta boîte Google est déconnectée : reconnecte-la (Réglages).',
   gmail_mauvaise_boite: "La boîte reliée n'est pas la tienne : rien n'est parti.",
-  email_invalide: 'Une adresse @ia-entrepreneur.fr, sauf la tienne.',
-  role_invalide: 'Choisis Closer ou Setter.',
+  email_invalide: 'Une adresse @ia-entrepreneur.fr, sauf la tienne (un partenaire peut garder son adresse à lui).',
+  role_invalide: 'Choisis Closer, Setter ou Partenaire.',
+  statut_reserve: 'Seul Gabriel retient ou écarte un marché.',
+  formateurs_invalides: 'Un des formateurs choisis n\'existe plus dans le CRM.',
+  lien_invalide: 'Le lien du marché doit commencer par https://',
+  montant_invalide: 'Le montant doit être un nombre (en euros HT).',
+  fichier_trop_lourd: 'Fichier trop lourd : 3,4 Mo au plus.',
+  format_refuse: 'Format non accepté : PDF, JPEG ou PNG.',
 });
 
 const MESSAGES_GOOGLE = {
@@ -66,7 +74,7 @@ function apresChargement() {
     const f = lireFiltreEquipe();
     if (f !== 'tous') {
       const cible = f === 'moi' ? ADMIN_EQUIPE : f;
-      D.leads = D.leads.filter((l) => (l.proprietaire || ADMIN_EQUIPE) === cible || l.setter === cible);
+      D.leads = D.leads.filter((l) => l.type === 'formateur' || (l.proprietaire || ADMIN_EQUIPE) === cible || l.setter === cible);
       indexer();
     }
   }
@@ -198,6 +206,7 @@ window.ouvrirReglages = function (...args) {
     // Le lien d'avis Google est celui de Gabriel.
     const lien = form.querySelector('[name="lien_google"]');
     if (lien) { lien.closest('label').remove(); const b = form.querySelector('[data-lien-google]'); if (b) b.closest('div').remove(); }
+    if (D.moi.role === 'partenaire') return; // Ludovic n'envoie rien depuis le CRM : pas de boîte à relier
     const fs = document.createElement('fieldset');
     fs.innerHTML = `<legend>Ma boîte Google</legend>${D.moi.google
       ? `<p class="aide">Connectée : tes emails partent de ${esc(D.moi.email)}.</p><div class="actions"><button type="button" class="btn" data-google-connecter>Reconnecter</button></div>`
@@ -214,18 +223,18 @@ window.ouvrirReglages = function (...args) {
 function dessinerEquipe(fs, cleMontree = null) {
   const liste = D.equipe || [];
   fs.innerHTML = `<legend>Équipe</legend>
-    <p class="aide">Chacun entre avec sa clé, ne voit que ses leads (et ceux qu'il a posés, pour un setter) et envoie depuis sa propre boîte. Toi, tu vois tout.</p>
+    <p class="aide">Chacun entre avec sa clé, ne voit que ses leads (et ceux qu'il a posés, pour un setter) et envoie depuis sa propre boîte. Le setter voit aussi les formateurs (sans les valider) et les marchés. Un partenaire ne voit que les formateurs, leurs pièces, les marchés et les pièces de l'organisme. Toi, tu vois tout.</p>
     ${cleMontree ? `<div class="alerte"><p><b>${cleMontree.robot ? 'Clé du robot LinkedIn' : 'Clé'} de ${esc(cleMontree.prenom)} :</b> <code data-cle>${esc(cleMontree.cle)}</code></p><p class="aide">${cleMontree.robot ? "Elle ne s'affichera plus. Elle se colle dans la configuration du robot, sur son ordinateur, pendant l'installation (avec Claude) : ne l'envoie pas par email." : "Elle ne s'affichera plus. Donne-la-lui par SMS ou de vive voix, avec le lien https://ia-entrepreneur.fr/crm/."}</p><div class="actions"><button type="button" class="btn petit" data-copier-cle>Copier la clé</button></div></div>` : ''}
     ${liste.length ? `<ul class="liste-equipe">${liste.map((m) => `<li data-membre="${esc(m.email)}">
-      <span><b>${esc(m.prenom)} ${esc(m.nom || '')}</b> · ${esc(LIB_ROLE[m.role] || m.role)} · ${esc(m.email)}<br><span class="meta">${m.actif ? 'Accès actif' : 'Accès coupé'}${m.google ? ', boîte Google connectée' : ', boîte Google pas connectée'}${m.cle_le ? `, clé du ${esc(instantLisible(m.cle_le))}` : ''}${m.robot_cle_le ? `, robot LinkedIn relié le ${esc(instantLisible(m.robot_cle_le))}` : ', pas de robot LinkedIn'}</span></span>
-      <span class="actions"><button type="button" class="btn petit" data-equipe="cle">Nouvelle clé</button><button type="button" class="btn petit" data-equipe="robot">${m.robot_cle_le ? 'Nouvelle clé de robot LinkedIn' : 'Clé de robot LinkedIn'}</button><button type="button" class="btn petit" data-equipe="actif">${m.actif ? "Couper l'accès" : "Rétablir l'accès"}</button></span>
+      <span><b>${esc(m.prenom)} ${esc(m.nom || '')}</b>, ${esc(LIB_ROLE[m.role] || m.role)}, ${esc(m.email)}<br><span class="meta">${m.actif ? 'Accès actif' : 'Accès coupé'}${m.role === 'partenaire' ? '' : m.google ? ', boîte Google connectée' : ', boîte Google pas connectée'}${m.cle_le ? `, clé du ${esc(instantLisible(m.cle_le))}` : ''}${m.role === 'partenaire' ? '' : m.robot_cle_le ? `, robot LinkedIn relié le ${esc(instantLisible(m.robot_cle_le))}` : ', pas de robot LinkedIn'}</span></span>
+      <span class="actions"><button type="button" class="btn petit" data-equipe="cle">Nouvelle clé</button>${m.role === 'partenaire' ? '' : `<button type="button" class="btn petit" data-equipe="robot">${m.robot_cle_le ? 'Nouvelle clé de robot LinkedIn' : 'Clé de robot LinkedIn'}</button>`}<button type="button" class="btn petit" data-equipe="actif">${m.actif ? "Couper l'accès" : "Rétablir l'accès"}</button></span>
     </li>`).join('')}</ul>` : '<p class="meta">Personne pour l\'instant.</p>'}
     <details${liste.length ? '' : ' open'}><summary>Ajouter quelqu'un</summary>
       <div class="ligne-champs">
-        ${champ('Adresse', '<input type="email" data-n="email" placeholder="prenom@ia-entrepreneur.fr" autocomplete="off">')}
+        ${champ('Adresse', '<input type="email" data-n="email" placeholder="prenom@ia-entrepreneur.fr" autocomplete="off">', 'Un partenaire garde son adresse à lui.')}
         ${champ('Prénom', '<input type="text" data-n="prenom" autocomplete="off">')}
         ${champ('Nom', '<input type="text" data-n="nom" autocomplete="off">')}
-        ${champ('Rôle', '<select data-n="role"><option value="closer">Closer</option><option value="setter">Setter</option></select>')}
+        ${champ('Rôle', '<select data-n="role"><option value="closer">Closer</option><option value="setter">Setter</option><option value="partenaire">Partenaire appels d\'offres</option></select>')}
       </div>
       <div class="actions"><button type="button" class="btn primaire" data-equipe="creer">Créer son accès</button></div>
     </details>`;

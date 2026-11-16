@@ -155,6 +155,17 @@
       var par = (new URLSearchParams(location.search).get('par') || '').toLowerCase().replace(/[^a-z]/g, '').slice(0, 20);
       // Lien personnel d'un conseiller (12/11/2026) : ?avec=gabriel ne propose que ses créneaux, tous ses agendas lus.
       var avec = (new URLSearchParams(location.search).get('avec') || '').toLowerCase().replace(/[^a-z0-9._-]/g, '').slice(0, 40);
+      // RDV posé par Anna depuis le CRM (13/11/2026) : les coordonnées arrivent dans le fragment (#prenom=…),
+      // qui ne part jamais au serveur ; le formulaire est rempli, puis le fragment effacé de l'adresse.
+      (function preremplir() {
+        if (!par || !location.hash) return;
+        var p = new URLSearchParams(location.hash.slice(1));
+        ['prenom', 'nom', 'email', 'telephone', 'entreprise'].forEach(function (k) {
+          var el = document.getElementById(k), v = (p.get(k) || '').slice(0, 254);
+          if (el && v && !el.value) el.value = v;
+        });
+        history.replaceState(null, '', location.pathname + location.search);
+      })();
       // Anti-robot (12/11/2026, après deux faux RDV) : le jeton signé que donne /api/rdv à l'ouverture,
       // et Cloudflare Turnstile quand le serveur envoie sa clé (le plus souvent invisible).
       var jeton = '', cleTs = '', widgetTs = null, jetonTs = '', attenteTs = false, tsHs = false;

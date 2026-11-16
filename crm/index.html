@@ -601,8 +601,34 @@
     .btn-texte-long { display: none; }
   }
 
-/* CRM à plusieurs (crm/equipe.js) : un membre de l'équipe ne voit ni les formateurs, ni la satisfaction, ni LinkedIn. */
-body.equipe [data-vue="formateurs"], body.equipe [data-vue="satisfaction"], body.equipe [data-act="linkedin"] { display: none !important; }
+/* CRM à plusieurs (crm/equipe.js pose body.equipe et body[data-role]) : un membre ne voit ni la satisfaction ni LinkedIn ;
+   un closer ni les formateurs ni les marchés ; Anna (setter) les voit ; Ludovic (partenaire) ne voit qu'eux (13/11/2026). */
+body.equipe [data-vue="satisfaction"], body.equipe [data-act="linkedin"] { display: none !important; }
+body[data-role="closer"] [data-vue="formateurs"], body[data-role="closer"] [data-vue="marches"] { display: none !important; }
+body[data-role="partenaire"] [data-vue="jour"], body[data-role="partenaire"] [data-vue="pipeline"], body[data-role="partenaire"] [data-vue="tableau"],
+body[data-role="partenaire"] [data-vue="memo"], body[data-role="partenaire"] #btn-nouveau, body[data-role="partenaire"] .barre .recherche,
+body[data-role="partenaire"] #btn-reglages img.photo { display: none !important; }
+body[data-role="partenaire"] #btn-reglages { margin-left: auto; }
+body[data-role="partenaire"] #btn-reglages .btn-texte-long { display: inline !important; }
+/* Marchés publics (crm/marches.js) et résultats d'appel du tableau. */
+.carte.marche .urgent { color: var(--danger); font-weight: 600; }
+.groupe-marches { margin-top: 14px; }
+.groupe-marches > summary { cursor: pointer; list-style: none; }
+.groupe-marches > summary::-webkit-details-marker { display: none; }
+.groupe-marches > summary h2 { display: inline; }
+.pieces-org { margin-top: 22px; }
+.choix-formateurs { max-height: 320px; overflow: auto; }
+.choix-formateurs .case { align-items: flex-start; }
+.choix-formateurs .aide { display: block; }
+.decision-marche { margin: 10px 0 14px; }
+.barre-marches { margin: 0 0 16px; display: flex; flex-wrap: wrap; gap: 8px; align-items: center; justify-content: space-between; }
+.barre-marches p { margin: 0; }
+.filtres-f input[type="search"] { font: inherit; padding: 8px 10px; border: 1px solid var(--line-strong); border-radius: 8px; min-width: 0; flex: 1 1 260px; }
+.filtres-f select { font: inherit; }
+.res-appel { font-weight: 600; }
+.res-appel.r-rdv { color: var(--accent-dark); }
+.res-appel.r-pas_interesse, .res-appel.r-siege, .res-appel.r-faux_numero { color: var(--danger); }
+.res-appel.r-rappeler, .res-appel.r-email { color: var(--primary); }
 .filtre-equipe { font: inherit; font-size: 14px; padding: 7px 8px; border: 1px solid var(--bord, #D5D8E8); border-radius: 8px; background: #fff; max-width: 160px; }
 .suivi-par { margin: 6px 20px 0; }
 .suivi-par select { font: inherit; margin-left: 6px; padding: 3px 6px; }
@@ -647,7 +673,8 @@ body.equipe [data-vue="formateurs"], body.equipe [data-vue="satisfaction"], body
       <button type="button" data-vue="jour" aria-selected="true">Aujourd'hui<span class="compteur" id="compteur" hidden></span></button>
       <button type="button" data-vue="pipeline" aria-selected="false">Pipeline</button>
       <button type="button" data-vue="tableau" aria-selected="false">Tableau</button>
-      <button type="button" data-vue="formateurs" aria-selected="false">Formateurs</button>
+      <button type="button" data-vue="formateurs" aria-selected="false" aria-label="Formateurs"><span class="lib-long">Formateurs</span><span class="lib-court" aria-hidden="true">Form.</span></button>
+      <button type="button" data-vue="marches" aria-selected="false" aria-label="Marchés publics"><span class="lib-long">Marchés</span><span class="lib-court" aria-hidden="true">AO</span><span class="compteur" id="compteur-marches" hidden></span></button>
       <button type="button" data-vue="satisfaction" aria-selected="false"><span class="lib-long">Satisfaction</span><span class="lib-court" aria-hidden="true">Avis</span></button>
       <button type="button" data-vue="memo" aria-selected="false">Mémo</button>
     </nav>
@@ -943,7 +970,7 @@ const S = {
   cle: localStorage.getItem('crm_cle') || sessionStorage.getItem('crm_cle') || '',
   vue: 'jour',
   q: '',
-  filtres: { type: '', statut: '', source: '', action: '', relance: '', archives: false },
+  filtres: { type: '', statut: '', source: '', action: '', relance: '', appel: '', archives: false },
   fiche: null,
   chargeA: 0,
 };
@@ -1897,7 +1924,12 @@ const LIB_PIECE = Object.fromEntries([...PIECES_F, ['contrat', 'Ancien contrat']
 const STATUTS_F = { valide: ['Validé', 'f-valide'], a_verifier: ['À vérifier', 'f-verifier'], en_cours: ['Dossier en cours', 'f-cours'], a_inviter: ['À inviter', 'f-inviter'], a_renouveler: ['À mettre à jour', 'f-renouveler'], refuse: ['Refusé', 'f-refuse'] };
 const ETATS_PIECE = { manquante: ['Manquante', 'e-manque'], facultative: ['Facultative', 'e-facultatif'], a_verifier: ['À vérifier', 'e-verifier'], verifiee: ['Vérifiée', 'e-ok'], refusee: ['À refaire', 'e-refus'], expiree: ['Expirée', 'e-refus'] };
 const URSSAF_VERIF = 'https://www.urssaf.fr/accueil/outils-documentation/outils/verification-attestation.html';
-const NIVEAUX_F = { 1: 'Niveau 1', 2: 'Niveau 2', 3: 'Niveau 3' };
+// Les trois niveaux (Gabriel, point appels d'offres du 13/11/2026) : 1 = les bases (savoir expliquer ChatGPT, Claude…),
+// 2 = formation métier, adaptée aux process et aux outils de l'entreprise, 3 = automatisation et intégration.
+const NIVEAUX_F = { 1: 'Niveau 1, les bases', 2: 'Niveau 2, IA métier', 3: 'Niveau 3, automatisation' };
+const AIDE_NIVEAUX_F = { 1: 'Sait expliquer l\'IA et les outils (ChatGPT, Claude…) à des débutants.', 2: 'Adapte la formation aux process et aux outils de l\'entreprise.', 3: 'Forme à l\'automatisation et à l\'intégration (n8n, Make, agents…).' };
+const roleCrm = () => (D && D.moi && D.moi.role) || 'admin';
+const lectureSeuleF = () => roleCrm() === 'partenaire';
 const dossierDe = (id) => IDX.formateur.get(id) || { lead_id: id, statut: 'a_inviter', competences: [], outils: [], niveaux: [], secteurs: [], distanciel: true };
 function piecesDe(id) {
   const t = aujourdhui();
@@ -1915,20 +1947,40 @@ function compteF(id) {
 }
 const formateurs = () => D.leads.filter((l) => l.type === 'formateur' && !l.archive);
 S.filtreF = 'tous';
+S.niveauF = '';
+S.domaineF = '';
+const ORDRE_F = ['a_verifier', 'a_renouveler', 'valide', 'en_cours', 'a_inviter', 'refuse'];
+// Filtres par niveau et par domaine métier (13/11/2026 : Ludovic cherche « 5 anciens fonctionnaires » ou « un
+// expert-comptable » pour un appel d'offres). La recherche en langage courant (formChercheF) est au-dessus.
+function formateursFiltres() {
+  return formateurs().filter((l) => {
+    const f = dossierDe(l.id);
+    if (S.filtreF !== 'tous' && f.statut !== S.filtreF) return false;
+    if (S.niveauF && !(f.niveaux || []).includes(Number(S.niveauF))) return false;
+    if (S.domaineF && !(f.secteurs || []).some((x) => sansAccents(x) === S.domaineF)) return false;
+    return true;
+  }).sort((a, b) => ORDRE_F.indexOf(dossierDe(a.id).statut) - ORDRE_F.indexOf(dossierDe(b.id).statut) || a.entreprise.localeCompare(b.entreprise, 'fr'));
+}
+const grilleFormateurs = (liste) => liste.map(carteFormateur).join('') || '<p class="vide">Aucun formateur ne correspond.</p>';
 function vueFormateurs() {
   const tous = formateurs();
-  const ordre = ['a_verifier', 'a_renouveler', 'valide', 'en_cours', 'a_inviter', 'refuse'];
   const n = (k) => tous.filter((l) => dossierDe(l.id).statut === k).length;
-  const liste = tous.filter((l) => S.filtreF === 'tous' || dossierDe(l.id).statut === S.filtreF)
-    .sort((a, b) => ordre.indexOf(dossierDe(a.id).statut) - ordre.indexOf(dossierDe(b.id).statut) || a.entreprise.localeCompare(b.entreprise, 'fr'));
-  const puces = [['tous', 'Tous', tous.length], ...ordre.map((k) => [k, STATUTS_F[k][0], n(k)])].filter(([k, , c]) => c || k === 'tous')
+  const liste = formateursFiltres();
+  const puces = [['tous', 'Tous', tous.length], ...ORDRE_F.map((k) => [k, STATUTS_F[k][0], n(k)])].filter(([k, , c]) => c || k === 'tous')
     .map(([k, v, c]) => `<button type="button" class="puce-type" data-filtre-f="${k}" aria-pressed="${S.filtreF === k}">${esc(v)} <small>${c}</small></button>`).join('');
+  const domaines = [...new Map(tous.flatMap((l) => dossierDe(l.id).secteurs || []).map((x) => [sansAccents(x), x])).entries()].sort((a, b) => a[1].localeCompare(b[1], 'fr'));
+  const peutCreer = ['admin', 'setter'].includes(roleCrm());
   return `<div class="tete-vue"><div><h1 class="titre-vue">Formateurs</h1>
       <p class="sous-titre">${n('valide')} validé${n('valide') > 1 ? 's' : ''} sur ${tous.length}. Un formateur n'est positionné sur une mission qu'une fois validé : contrat-cadre signé dans son lien d'envoi, toutes les pièces vérifiées.</p></div>
-      <button type="button" class="btn primaire" data-act="formateur-nouveau">Nouveau formateur</button></div>
+      <div class="actions">${peutCreer ? '<button type="button" class="btn primaire" data-act="formateur-nouveau">Nouveau formateur</button>' : ''}<button type="button" class="btn" data-act="formateurs-exporter">Exporter</button></div></div>
     ${tous.length ? formChercheF() : ''}
-    ${S.chercheF ? resultatsChercheF() : `<div class="puces-type" role="group" aria-label="Statut du dossier">${puces}</div>
-    <div class="grille">${liste.map(carteFormateur).join('') || '<p class="vide">Aucun formateur ici.</p>'}</div>`}`;
+    ${S.chercheF ? resultatsChercheF() : `<div class="outils filtres-f">
+      <select data-niveau-f aria-label="Niveau"><option value="">Tous les niveaux</option>${[1, 2, 3].map((k) => `<option value="${k}" ${String(k) === S.niveauF ? 'selected' : ''}>${esc(NIVEAUX_F[k])}</option>`).join('')}</select>
+      ${domaines.length ? `<select data-domaine-f aria-label="Domaine métier"><option value="">Tous les domaines</option>${domaines.map(([k, v]) => `<option value="${esc(k)}" ${k === S.domaineF ? 'selected' : ''}>${esc(v)}</option>`).join('')}</select>` : ''}
+    </div>
+    <div class="puces-type" role="group" aria-label="Statut du dossier">${puces}</div>
+    <p class="sous-titre">${liste.length} formateur${liste.length > 1 ? 's' : ''}</p>
+    <div class="grille">${grilleFormateurs(liste)}</div>`}`;
 }
 
 /* Recherche en langage courant (Gabriel, 13/11/2026 : « J'ai besoin d'un formateur à 500 € par jour maximum qui a de
@@ -1944,7 +1996,7 @@ function formChercheF() {
       <label for="q-f">Trouver le formateur qu'il te faut</label>
       <div class="ligne"><input type="search" id="q-f" name="demande" value="${esc(saisie)}" placeholder="Ex. : 500 € par jour au plus, expérience en finance" autocomplete="off" enterkeyhint="search" minlength="2" maxlength="400" required>
         <button class="btn primaire" type="submit"${c && c.enCours ? ' disabled' : ''}>${c && c.enCours ? 'Recherche en cours' : 'Chercher'}</button></div>
-      <p class="aide">Écris ton besoin comme tu le dirais : budget par jour, domaine ou secteur, niveau, lieu. ${D.ia ? 'Claude lit les fiches et les CV, le CRM compare lui-même le tarif à ton budget.' : 'Recherche par mots dans les fiches et les CV.'}</p>
+      <p class="aide">Écris ton besoin comme tu le dirais : budget par jour, domaine ou secteur, niveau, lieu. ${D.ia ? (lectureSeuleF() ? 'Claude lit les fiches et les CV.' : 'Claude lit les fiches et les CV, le CRM compare lui-même le tarif à ton budget.') : 'Recherche par mots dans les fiches et les CV.'}</p>
     </form>`;
 }
 function etatBudgetF(l, budget) {
@@ -1967,7 +2019,8 @@ function carteResultatF({ l, x, score }, budget) {
   const [lib, cls] = STATUTS_F[f.statut] || [f.statut, ''];
   const t = Number(f.tarif_jour) || 0;
   const e = etatBudgetF(l, budget);
-  const tarif = e === 'inconnu' ? ['inconnu', 'Tarif jour pas encore noté : à lui demander']
+  // Ludovic ne voit pas les tarifs internes (13/11/2026) : pas de ligne de tarif pour lui.
+  const tarif = lectureSeuleF() ? ['', ''] : e === 'inconnu' ? ['inconnu', 'Tarif jour pas encore noté : à lui demander']
     : e === 'au_dessus' ? ['au-dessus', `${euros(t)} par jour, ${euros(t - budget)} au-dessus de ton budget`]
       : e === 'ok' ? ['ok', `${euros(t)} par jour, dans ton budget`]
         : t ? ['', `${euros(t)} par jour`] : ['', ''];
@@ -1992,7 +2045,7 @@ function resultatsChercheF() {
   let h = `<h2 class="sous-groupe" id="titre-cherche-f" tabindex="-1">${items.length ? `${items.length} formateur${items.length > 1 ? 's' : ''} pour « ${esc(c.demande)} »` : `Aucun formateur pour « ${esc(c.demande)} »`}</h2>
     <div class="compris-f">${puces.length ? `<span class="meta">Compris :</span><ul class="etiquettes">${puces.map((p) => `<li>${esc(p)}</li>`).join('')}</ul>` : ''}${effacer}</div>`;
   if (c.local) h += `<p class="note-f">${esc(c.raison || 'Claude ne répond pas')} : recherche par mots dans les fiches seulement. Un domaine voisin (la banque pour la finance, par exemple) peut manquer.</p>`;
-  if (budget && items.some((o) => etatBudgetF(o.l, budget) === 'inconnu')) {
+  if (budget && !lectureSeuleF() && items.some((o) => etatBudgetF(o.l, budget) === 'inconnu')) {
     const sans = tous.filter((l) => !Number(dossierDe(l.id).tarif_jour)).length;
     h += `<p class="note-f">${sans === tous.length
       ? `Aucune fiche n'a encore de tarif jour : le classement se fait sur le reste de ta demande, et ton budget de ${esc(euros(budget))} ne peut pas être vérifié. Demande son tarif à ceux qui t'intéressent, puis note-le dans « Modifier le profil » de sa fiche.`
@@ -2061,6 +2114,21 @@ document.addEventListener('input', (ev) => {
   // La croix du champ (ou tout effacer) ramène la liste complète.
   if (!ev.target.value && S.chercheF && !S.chercheF.enCours) { S.chercheF = null; rendre(); const champ = $('#q-f'); if (champ) champ.focus(); }
 });
+function exporterFormateurs() {
+  const ligne = (vals) => vals.map((v) => `"${String(v ?? '').replace(/"/g, '""')}"`).join(';');
+  const lignes = [ligne(['Formateur', 'Email', 'Téléphone', 'Dossier', 'Niveaux', 'Domaines métier', 'Compétences', 'Outils', 'Zone', 'Distanciel', 'SIRET', 'Structure', 'Pièces reçues', 'Contrat signé'])];
+  for (const l of formateursFiltres()) {
+    const f = dossierDe(l.id);
+    const c = contactPrincipal(l.id) || {};
+    const k = compteF(l.id);
+    lignes.push(ligne([l.entreprise, c.email, c.telephone, (STATUTS_F[f.statut] || [f.statut])[0], (f.niveaux || []).map((x) => NIVEAUX_F[x]).join(' ; '), (f.secteurs || []).join(', '), (f.competences || []).join(' | '), (f.outils || []).join(', '), f.zone, f.distanciel ? 'oui' : 'non', f.siret, (f.identite || {}).raison_sociale, `${k.recues} sur ${k.total}`, f.signature ? 'oui' : 'non']));
+  }
+  telecharger(`formateurs-${aujourdhui()}.csv`, `\uFEFF${lignes.join('\r\n')}`, 'text/csv;charset=utf-8');
+}
+document.addEventListener('change', (ev) => {
+  if (ev.target.matches('[data-niveau-f]')) { S.niveauF = ev.target.value; rendre(); }
+  else if (ev.target.matches('[data-domaine-f]')) { S.domaineF = ev.target.value; rendre(); }
+});
 function carteFormateur(l) {
   const f = dossierDe(l.id);
   const [lib, cls] = STATUTS_F[f.statut] || [f.statut, ''];
@@ -2068,7 +2136,7 @@ function carteFormateur(l) {
   const comp = (f.competences || []).slice(0, 4);
   return `<article class="carte" data-id="${l.id}">
     <div class="carte-haut">${avatar(l, 'm')}<div class="carte-titre"><h3><button type="button" class="lien-carte" data-act="ouvrir">${esc(l.entreprise)}</button></h3><p class="meta">${esc([f.zone || l.localisation, f.distanciel ? 'distanciel' : ''].filter(Boolean).join(', '))}</p></div><span class="statut ${cls}">${esc(lib)}</span></div>
-    <p class="meta">Pièces : ${c.recues} sur ${c.total}${c.verifiees ? `, ${c.verifiees} vérifiée${c.verifiees > 1 ? 's' : ''}` : ''}. Contrat ${f.signature ? 'signé' : 'à signer'}.${(f.niveaux || []).length ? ` ${f.niveaux.map((x) => NIVEAUX_F[x]).join(', ')}.` : ''}</p>
+    <p class="meta">Pièces : ${c.recues} sur ${c.total}${c.verifiees ? `, ${c.verifiees} vérifiée${c.verifiees > 1 ? 's' : ''}` : ''}. Contrat ${f.signature ? 'signé' : 'à signer'}.${(f.niveaux || []).length ? ` ${f.niveaux.map((x) => NIVEAUX_F[x]).join(' ; ')}.` : ''}${(f.secteurs || []).length ? ` Domaines : ${esc(f.secteurs.join(', '))}.` : ''}</p>
     ${comp.length ? `<ul class="etiquettes">${comp.map((x) => `<li>${esc(x.length > 60 ? `${x.slice(0, 58)}…` : x)}</li>`).join('')}</ul>` : ''}
   </article>`;
 }
@@ -2077,7 +2145,9 @@ function explicationF(f, ps) {
   const aVerifier = ps.filter((p) => p.etat === 'a_verifier').length;
   if (f.statut === 'valide') return `Validé le ${dateCourte(String(f.valide_le).slice(0, 10))} : il peut être positionné sur une mission.`;
   if (f.statut === 'refuse') return 'Dossier refusé : le lien d\'envoi ne fonctionne plus.';
-  if (f.statut === 'a_verifier') return `Tout est arrivé. ${aVerifier ? `${aVerifier} pièce${aVerifier > 1 ? 's' : ''} à regarder, ` : ''}puis valide le formateur : ça contresigne son contrat.`;
+  if (f.statut === 'a_verifier') return roleCrm() === 'admin'
+    ? `Tout est arrivé. ${aVerifier ? `${aVerifier} pièce${aVerifier > 1 ? 's' : ''} à regarder, ` : ''}puis valide le formateur : ça contresigne son contrat.`
+    : `Tout est arrivé. ${aVerifier ? `${aVerifier} pièce${aVerifier > 1 ? 's' : ''} à regarder, ` : ''}puis Gabriel valide le formateur (il contresigne son contrat).`;
   if (f.statut === 'a_renouveler') return `À mettre à jour : ${manque.join(', ') || 'des pièces à revérifier'}. Il reste positionnable seulement une fois à jour.`;
   if (f.statut === 'a_inviter') return 'Crée son lien d\'envoi : il y remplira son entreprise et son profil, déposera ses pièces et signera le contrat-cadre.';
   return `En attente${!f.signature ? ' de sa signature' : ''}${manque.length ? `${!f.signature ? ' et' : ''} de : ${manque.join(', ')}` : ''}.`;
@@ -2091,30 +2161,37 @@ function blocDossierFormateur(l) {
   const c = compteF(l.id);
   const siret = f.siret ? `${esc(f.siret)}${sv ? (sv.trouve ? (sv.actif ? ` : actif au registre (${esc(sv.nom)}${sv.activite ? `, APE ${esc(sv.activite)}` : ''})` : ' : établissement FERMÉ au registre') : sv.joignable === false ? ' : registre injoignable, à revérifier' : ' : INTROUVABLE au registre') : ' : pas encore vérifié'}` : 'pas encore saisi';
   const tva = { exonere: `exonéré (NDA ${esc(f.nda || '?')})`, franchise: 'franchise en base (art. 293 B)', assujetti: 'assujetti à la TVA' }[f.regime_tva] || 'pas encore indiqué';
+  // Gabriel valide ; Anna fait tout le reste ; Ludovic regarde et télécharge (13/11/2026).
+  const admin = roleCrm() === 'admin';
+  const lecture = lectureSeuleF();
+  const pret = ['a_verifier', 'a_renouveler'].includes(f.statut) && c.recues === c.total && f.signature;
+  const parQui = (d) => (lienDrive(d) ? (admin ? 'dans ton Drive depuis' : 'dans le Drive depuis') : d.depose_par === 'gabriel' ? (admin ? 'déposée par toi' : 'déposée par Gabriel')
+    : String(d.depose_par || '').includes('@') ? (D.moi && d.depose_par === D.moi.email ? 'déposée par toi' : `déposée par ${prenomDe(d.depose_par)}`) : 'envoyée');
   return `<section class="bloc dossier-f" data-dossier="${l.id}">
     <h3>Dossier formateur <span class="statut ${cls}">${esc(lib)}</span></h3>
     <p class="aide">${esc(explicationF(f, ps))}</p>
-    <div class="actions">
-      ${['a_verifier', 'a_renouveler'].includes(f.statut) && c.recues === c.total && f.signature ? '<button type="button" class="btn primaire" data-act="formateur-valider">Valider le formateur</button>' : ''}
+    ${lecture ? '' : `<div class="actions">
+      ${pret && admin ? '<button type="button" class="btn primaire" data-act="formateur-valider">Valider le formateur</button>' : ''}
       ${f.statut !== 'refuse' ? `<button type="button" class="btn${f.statut === 'a_inviter' ? ' primaire' : ''}" data-act="formateur-lien">${f.jeton_cree_le ? 'Nouveau lien d\'envoi' : 'Créer le lien d\'envoi'}</button>` : ''}
       <button type="button" class="btn" data-act="formateur-profil">Modifier le profil</button>
       <button type="button" class="btn" data-act="piece-deposer">Déposer une pièce</button>
       <button type="button" class="btn lien" data-act="formateur-refuser">${f.statut === 'refuse' ? 'Rouvrir le dossier' : 'Refuser'}</button>
-    </div>
+    </div>`}
+    ${pret && !admin && !lecture ? '<p class="aide">Dossier complet : Gabriel n\'a plus qu\'à le valider.</p>' : ''}
     <dl class="infos">
       <dt>Structure</dt><dd>${esc([id.raison_sociale, { ei: 'entreprise individuelle', micro: 'micro-entreprise', eurl: 'EURL', sarl: 'SARL', sasu: 'SASU', sas: 'SAS' }[id.forme] || id.forme_libre].filter(Boolean).join(', ') || 'pas encore saisie')}${id.siege ? `<br><span class="meta">${esc(id.siege)}</span>` : ''}</dd>
-      <dt>SIRET</dt><dd>${siret}${f.siret ? ' <button type="button" class="btn petit" data-act="formateur-siret">Revérifier</button>' : ''}</dd>
+      <dt>SIRET</dt><dd>${siret}${f.siret && !lecture ? ' <button type="button" class="btn petit" data-act="formateur-siret">Revérifier</button>' : ''}</dd>
       <dt>TVA</dt><dd>${tva}</dd>
       ${f.intervenants ? `<dt>Intervenants</dt><dd>${esc(f.intervenants)}</dd>` : ''}
-      <dt>Contrat-cadre</dt><dd>${f.signature ? `Signé le ${esc(instantLisible(f.signature.date))} à ${esc(f.signature.lieu)} par ${esc(f.signature.nom)}${f.contre_signature ? `, contresigné le ${esc(dateCourte(String(f.contre_signature.date).slice(0, 10)))}` : ''} <button type="button" class="btn petit" data-act="contrat-voir">Voir</button>` : 'pas encore signé'}</dd>
+      <dt>Contrat-cadre</dt><dd>${f.signature ? `Signé le ${esc(instantLisible(f.signature.date))} à ${esc(f.signature.lieu)} par ${esc(f.signature.nom)}${f.contre_signature ? `, contresigné le ${esc(dateCourte(String(f.contre_signature.date).slice(0, 10)))}` : ''}${lecture ? '' : ' <button type="button" class="btn petit" data-act="contrat-voir">Voir</button>'}` : 'pas encore signé'}</dd>
       <dt>Lien d'envoi</dt><dd>${f.jeton_cree_le ? `créé le ${esc(dateCourte(String(f.jeton_cree_le).slice(0, 10)))}, valable jusqu'au ${esc(dateCourte(String(f.jeton_expire).slice(0, 10)))}` : 'pas encore créé'}</dd>
     </dl>
     <h4 class="sous-groupe">Profil</h4>
     ${(f.competences || []).length ? `<ul class="etiquettes">${f.competences.map((x) => `<li>${esc(x)}</li>`).join('')}</ul>` : '<p class="vide">Pas encore de compétences.</p>'}
     <dl class="infos">
       ${(f.outils || []).length ? `<dt>Outils</dt><dd>${esc(f.outils.join(', '))}</dd>` : ''}
-      ${(f.niveaux || []).length ? `<dt>Niveaux</dt><dd>${esc(f.niveaux.map((x) => NIVEAUX_F[x]).join(', '))}</dd>` : ''}
-      ${(f.secteurs || []).length ? `<dt>Secteurs</dt><dd>${esc(f.secteurs.join(', '))}</dd>` : ''}
+      ${(f.niveaux || []).length ? `<dt>Niveaux</dt><dd>${esc(f.niveaux.map((x) => NIVEAUX_F[x]).join(' ; '))}</dd>` : ''}
+      ${(f.secteurs || []).length ? `<dt>Domaines métier</dt><dd>${esc(f.secteurs.join(', '))}</dd>` : ''}
       <dt>Zone</dt><dd>${esc(f.zone || 'non précisée')}${f.distanciel ? ', anime aussi à distance' : ''}</dd>
       ${f.disponibilites ? `<dt>Disponibilités</dt><dd>${esc(f.disponibilites)}</dd>` : ''}
       ${f.tarif_jour ? `<dt>Tarif jour (interne)</dt><dd>${esc(euros(f.tarif_jour))}</dd>` : ''}
@@ -2127,12 +2204,12 @@ function blocDossierFormateur(l) {
       const lu = d && d.lecture && !d.lecture.erreur ? d.lecture : null;
       return `<li${d ? ` data-doc="${d.id}"` : ''}>
         <div class="tete"><b>${esc(p.titre)}</b><span class="etat ${p.bientot ? 'e-verifier' : ecls}">${p.bientot ? `Expire le ${esc(dateCourte(d.expire_le))}` : esc(elib)}</span></div>
-        ${d ? `<p class="meta">${esc(d.nom)}, ${lienDrive(d) ? 'dans ton Drive depuis' : d.depose_par === 'gabriel' ? 'déposée par toi' : 'envoyée'} le ${esc(instantLisible(d.created_at))}${d.expire_le ? `, valable jusqu'au ${esc(dateCourte(d.expire_le))}` : ''}</p>
+        ${d ? `<p class="meta">${esc(d.nom)}, ${parQui(d)} le ${esc(instantLisible(d.created_at))}${d.expire_le ? `, valable jusqu'au ${esc(dateCourte(d.expire_le))}` : ''}</p>
           ${lu ? `<p class="lecture${lu.conforme ? ' conforme' : ''}">${lu.conforme ? 'Claude : conforme. ' : 'Claude : '}${esc(lu.details)}</p>` : d.lecture && d.lecture.erreur ? '<p class="aide">Claude n\'a pas pu lire cette pièce : regarde-la toi-même.</p>' : ''}
           ${lu && lu.alertes && lu.alertes.length ? `<ul class="alertes-f">${lu.alertes.map((x) => `<li>${esc(x)}</li>`).join('')}</ul>` : ''}
           ${lu && lu.code_verification ? `<p class="code-urssaf">Code de sécurité : <code>${esc(lu.code_verification)}</code> <button type="button" class="btn petit" data-copier="${esc(lu.code_verification)}">Copier</button> <a href="${URSSAF_VERIF}" target="_blank" rel="noopener noreferrer">Vérifier sur urssaf.fr</a></p>` : ''}
           ${d.statut === 'refuse' && d.motif ? `<p class="message-refus">À refaire : ${esc(d.motif)}</p>` : ''}
-          <div class="actions"><button type="button" class="btn petit" data-act="piece-voir">Voir</button>${p.etat === 'a_verifier' ? '<button type="button" class="btn petit primaire" data-act="piece-ok">Vérifiée</button>' : ''}${['a_verifier', 'verifiee'].includes(p.etat) ? '<button type="button" class="btn petit" data-act="piece-refaire">À refaire</button>' : ''}</div>` : ''}
+          <div class="actions"><button type="button" class="btn petit" data-act="piece-voir">Voir</button>${!lecture && p.etat === 'a_verifier' ? '<button type="button" class="btn petit primaire" data-act="piece-ok">Vérifiée</button>' : ''}${!lecture && ['a_verifier', 'verifiee'].includes(p.etat) ? '<button type="button" class="btn petit" data-act="piece-refaire">À refaire</button>' : ''}</div>` : ''}
       </li>`;
     }).join('')}</ul>
     ${autresDocuments(l.id)}
@@ -2211,8 +2288,8 @@ function ouvrirProfilFormateur(l) {
   ouvrirModale(`<h2>Profil de ${esc(l.entreprise)}</h2>
     ${champ('Compétences', `<textarea name="competences">${esc((f.competences || []).join(', '))}</textarea>`, 'Séparées par des virgules. Elles servent aux recommandations de formateurs.')}
     ${champ('Outils', `<input type="text" name="outils" value="${esc((f.outils || []).join(', '))}">`)}
-    <fieldset class="cases"><legend>Niveaux animés</legend>${[1, 2, 3].map((n) => `<label class="case"><input type="checkbox" name="niveaux" value="${n}" ${(f.niveaux || []).includes(n) ? 'checked' : ''}> ${NIVEAUX_F[n]}</label>`).join('')}</fieldset>
-    ${champ('Secteurs', `<input type="text" name="secteurs" value="${esc((f.secteurs || []).join(', '))}">`)}
+    <fieldset class="cases"><legend>Niveaux animés</legend>${[1, 2, 3].map((n) => `<label class="case"><input type="checkbox" name="niveaux" value="${n}" ${(f.niveaux || []).includes(n) ? 'checked' : ''}> ${NIVEAUX_F[n]}<span class="aide">${esc(AIDE_NIVEAUX_F[n])}</span></label>`).join('')}</fieldset>
+    ${champ('Domaines métier (en plus de l\'IA)', `<input type="text" name="secteurs" value="${esc((f.secteurs || []).join(', '))}" placeholder="Secteur public, Comptabilité, BTP…">`, 'Séparés par des virgules. Son expérience à part l\'IA (ancien fonctionnaire, expert-comptable, BTP, santé, RH…) : on s\'en sert pour choisir les formateurs d\'un appel d\'offres.')}
     <div class="deux">${champ('Zone', `<input type="text" name="zone" value="${esc(f.zone)}">`)}${champ('Tarif jour (interne)', `<input type="text" inputmode="decimal" name="tarif_jour" value="${esc(f.tarif_jour ?? '')}">`, 'Jamais montré au client.')}</div>
     <label class="case"><input type="checkbox" name="distanciel" ${f.distanciel !== false ? 'checked' : ''}> Anime aussi à distance</label>
     ${champ('Disponibilités', `<input type="text" name="disponibilites" value="${esc(f.disponibilites)}">`)}
@@ -4002,18 +4079,68 @@ function ouvrirEmail(leadId, contactId, { reponse: reponseDemandee = null } = {}
 
 /* ----- Appel ----- */
 
-function ouvrirAppel(leadId) {
+/* ----- Résultats d'appel (13/11/2026) -----
+   Les résultats que notait Anna dans son tableur (pas joint, pas intéressé, à rappeler, géré par le siège,
+   faux numéro…) deviennent ceux du CRM, pour tout le monde. Chacun prépare la suite : relance, étape, tâche.
+   Ils sont gardés dans meta.resultat de la ligne d'historique : la colonne « Dernier appel » du tableau les lit. */
+const RESULTATS_APPEL = {
+  pas_joint: { lib: 'Pas joint', joint: false },
+  message: { lib: 'Message laissé', joint: false },
+  barrage: { lib: 'Barrage du standard', joint: false },
+  faux_numero: { lib: 'Faux numéro', joint: false },
+  rdv: { lib: 'RDV posé', joint: true },
+  rappeler: { lib: 'À rappeler', joint: true },
+  email: { lib: 'Veut un email', joint: true },
+  interesse: { lib: 'Joint, à suivre', joint: true },
+  pas_interesse: { lib: 'Pas intéressé', joint: true },
+  siege: { lib: 'Géré par le siège', joint: true },
+};
+// Les anciens résultats (avant le 13/11) restent lisibles.
+const ANCIENS_RESULTATS = { joint: 'interesse', sans_reponse: 'pas_joint' };
+const LISTE_RESULTATS = Object.entries(RESULTATS_APPEL).map(([k, v]) => [k, v.lib]);
+function dernierAppel(id) {
+  const a = activitesDe(id).find((x) => x.type === 'appel' || x.type === 'appel_sans_reponse');
+  if (!a) return null;
+  const k = (a.meta && a.meta.resultat) || (a.type === 'appel' ? 'interesse' : 'pas_joint');
+  return { k: RESULTATS_APPEL[k] ? k : ANCIENS_RESULTATS[k] || 'interesse', date: String(a.date).slice(0, 10), a };
+}
+const estSetter = () => Boolean(D && D.moi && D.moi.role === 'setter');
+// Ce que chaque résultat prépare. n = nombre de relances sans réponse, cet appel compris.
+function suiteAppel(l, k, n) {
+  const sansRep = estSetter() ? (n <= 3 ? 1 : delaiApres(n - 3)) : delaiApres(n);
+  switch (k) {
+    case 'pas_joint': return { date: dansJours(sansRep), action: 'appel', note: '' };
+    case 'message': return { date: dansJours(estSetter() ? 2 : delaiApres(n)), action: 'appel', note: 'Message laissé : rappeler.' };
+    case 'barrage': return { date: dansJours(1), action: 'appel', note: 'Barrage du standard : rappeler tôt (avant 8 h 30) ou après 18 h, demander le dirigeant par son nom.' };
+    case 'faux_numero': return { date: dansJours(1), action: emailDe(l) ? 'email' : 'autre', note: 'Faux numéro : trouver le bon (site, fiche Google, Pages jaunes)' + (emailDe(l) ? ', ou écrire.' : '.') };
+    case 'rdv': return { date: '', action: 'rdv', note: '' };
+    case 'rappeler': return { date: dansJours(1), action: 'appel', note: '' };
+    case 'email': return { date: aujourdhui(), action: 'email', note: 'Envoyer l\'email promis au téléphone.' };
+    case 'pas_interesse': case 'siege': return { date: '', action: 'email', note: '' };
+    default: return { date: dansJours(7), action: 'email', note: '' };
+  }
+}
+function etapeApresAppel(l, k) {
+  if (k === 'pas_interesse' || k === 'siege') return 'perdu';
+  if (k === 'rdv') return ['nouveau', 'contacte'].includes(l.statut) ? 'qualifie' : l.statut;
+  return l.statut === 'nouveau' ? 'contacte' : l.statut;
+}
+
+function ouvrirAppel(leadId, { resultat: impose = '' } = {}) {
   const l = IDX.lead.get(leadId);
   const c = contactJoignable(leadId) || contactPrincipal(leadId);
   const tel = telephoneDe(l);
+  const puce = (k) => `<button type="button" data-v="${k}" aria-pressed="false">${esc(RESULTATS_APPEL[k].lib)}</button>`;
   ouvrirModale(`
     <h2>Appel avec ${esc(l.entreprise)}</h2>
     ${tel ? `<p><a class="btn petit" href="${esc(telLien(tel))}">Appeler le ${esc(tel)}</a></p>` : ''}
-    <fieldset><legend>Résultat</legend><div class="puces" data-resultat>
-      <button type="button" data-v="joint" aria-pressed="false">Joint</button>
-      <button type="button" data-v="sans_reponse" aria-pressed="false">Pas de réponse</button>
-      <button type="button" data-v="message" aria-pressed="false">Message laissé</button>
-    </div></fieldset>
+    <fieldset><legend>Résultat</legend>
+      <p class="meta">Pas eu la bonne personne</p>
+      <div class="puces" data-resultat>${['pas_joint', 'message', 'barrage', 'faux_numero'].map(puce).join('')}</div>
+      <p class="meta" style="margin-top:8px">Eu la bonne personne</p>
+      <div class="puces" data-resultat>${['rdv', 'rappeler', 'email', 'interesse', 'pas_interesse', 'siege'].map(puce).join('')}</div>
+    </fieldset>
+    <div data-heure hidden>${champ('À quelle heure le rappeler ?', '<input type="time" name="heure" step="900">', 'Elle s\'ajoute à ce qui est prévu.')}</div>
     ${contactsDe(leadId).length ? champ('Avec', `<select name="contact">${optionsContacts(leadId, c && c.id)}</select>`) : ''}
     ${champ('Ce qui s\'est dit', '<textarea name="note" placeholder="Intéressé par le niveau 2, rappeler après le comité du 20…"></textarea>')}
     ${champ('Étape', `<select name="statut">${options(STATUTS, l.statut === 'nouveau' ? 'contacte' : l.statut)}</select>`)}
@@ -4024,28 +4151,92 @@ function ouvrirAppel(leadId) {
     brancherPuces(form, 'apres');
     let resultat = '';
     const n = (l.relances_sans_reponse || 0) + 1;
-    $$('[data-resultat] button', form).forEach((b) => b.addEventListener('click', () => {
-      resultat = b.dataset.v;
-      $$('[data-resultat] button', form).forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
+    const choisir = (k) => {
+      resultat = k;
+      $$('[data-resultat] button', form).forEach((x) => x.setAttribute('aria-pressed', String(x.dataset.v === k)));
       const el = form.elements;
-      el.apres_date.value = resultat === 'joint' ? dansJours(7) : dansJours(delaiApres(n));
-      el.apres_action.value = resultat === 'joint' ? 'email' : 'appel';
+      const s = suiteAppel(l, k, n);
+      el.apres_date.value = s.date;
+      el.apres_action.value = s.action;
+      el.apres_note.value = s.note;
+      el.statut.value = etapeApresAppel(l, k);
+      $('[data-heure]', form).hidden = k !== 'rappeler';
       el.apres_date.dispatchEvent(new Event('input'));
-    }));
+    };
+    $$('[data-resultat] button', form).forEach((b) => b.addEventListener('click', () => choisir(b.dataset.v)));
+    if (impose && RESULTATS_APPEL[impose]) choisir(impose);
     form.addEventListener('submit', (ev) => {
       ev.preventDefault();
       soumettre(form, async () => {
         const el = form.elements;
         if (!resultat) throw new ErreurApi("Choisis le résultat de l'appel.");
-        const joint = resultat === 'joint';
+        const r = RESULTATS_APPEL[resultat];
         const note = el.note.value.trim();
-        const lib = { joint: 'Appel, joint', sans_reponse: 'Appel sans réponse', message: 'Appel, message laissé' }[resultat];
-        const maj = { ...lireProchaine(form, 'apres'), statut: el.statut.value, relances_sans_reponse: joint ? 0 : n };
-        if (joint) maj.dernier_contact = aujourdhui();
-        await journal(l.id, { type: joint ? 'appel' : 'appel_sans_reponse', resume: note ? `${lib} : ${note}` : lib, contact_id: el.contact ? el.contact.value || null : null, source: 'crm' }, maj);
+        const maj = { ...lireProchaine(form, 'apres'), statut: el.statut.value, relances_sans_reponse: r.joint ? 0 : n };
+        if (resultat === 'rappeler' && el.heure.value) maj.prochaine_note = `Rappeler à ${el.heure.value.replace(':', ' h ')}${maj.prochaine_note ? ` : ${maj.prochaine_note}` : ''}`;
+        if (maj.statut === 'perdu') { maj.raison_perte = r.lib + (note ? ` (${note.slice(0, 200)})` : ''); maj.prochaine_relance = null; maj.prochaine_note = null; }
+        if (r.joint) maj.dernier_contact = aujourdhui();
+        const lib = `Appel : ${r.lib.charAt(0).toLowerCase()}${r.lib.slice(1)}`;
+        await journal(l.id, { type: r.joint ? 'appel' : 'appel_sans_reponse', resume: note ? `${lib}. ${note}` : lib, contact_id: el.contact ? el.contact.value || null : null, source: 'crm', meta: { resultat } }, maj);
         fermerModale();
-        toast('Appel noté.');
-        actionFaite(l.id, 'appel');
+        toast(maj.statut === 'perdu' ? `Appel noté, passé en perdu (${r.lib.toLowerCase()}).` : 'Appel noté.');
+        actionFaite(l.id, maj.statut === 'perdu' ? 'perdu' : 'appel');
+        if (resultat === 'rdv') ouvrirRdvApresAppel(l.id);
+      });
+    });
+  });
+}
+
+// Le tableau : un résultat choisi dans la colonne « Dernier appel » se note tout de suite, avec sa suite par défaut.
+// RDV posé et À rappeler ouvrent la fenêtre (il faut le conseiller ou l'heure).
+async function noterResultatRapide(l, k) {
+  if (!RESULTATS_APPEL[k]) return;
+  if (k === 'rdv' || k === 'rappeler') { ouvrirAppel(l.id, { resultat: k }); return; }
+  const r = RESULTATS_APPEL[k];
+  const n = (l.relances_sans_reponse || 0) + 1;
+  const s = suiteAppel(l, k, n);
+  const statut = etapeApresAppel(l, k);
+  const maj = { prochaine_relance: s.date || null, prochaine_action: s.action, prochaine_note: s.note || null, statut, relances_sans_reponse: r.joint ? 0 : n };
+  if (statut === 'perdu') Object.assign(maj, { raison_perte: r.lib, prochaine_relance: null, prochaine_note: null });
+  if (r.joint) maj.dernier_contact = aujourdhui();
+  await journal(l.id, { type: r.joint ? 'appel' : 'appel_sans_reponse', resume: `Appel : ${r.lib.charAt(0).toLowerCase()}${r.lib.slice(1)} (noté depuis le tableau)`, source: 'crm', meta: { resultat: k } }, maj);
+  toast(`${l.entreprise} : ${r.lib.toLowerCase()}${maj.prochaine_relance ? `, rappel ${quand(maj.prochaine_relance)}` : statut === 'perdu' ? ', passé en perdu' : ''}.`, 2500);
+}
+
+// RDV posé au téléphone. Anna (setter) le pose sur la page de prise de rendez-vous en tour de rôle :
+// elle choisit le conseiller libre, l'invite et le met dans son agenda, et retrouve ce lead par l'email.
+// Gabriel et les closers gardent « Prévoir un RDV » dans leur propre agenda.
+function ouvrirRdvApresAppel(leadId) {
+  if (!estSetter()) { ouvrirRdv(leadId); return; }
+  const l = IDX.lead.get(leadId);
+  const c = contactPrincipal(leadId) || {};
+  const cle = sansAccents(D.moi.prenom || '').replace(/[^a-z]/g, '');
+  ouvrirModale(`<h2>Poser le RDV de ${esc(l.entreprise)}</h2>
+    <p class="aide">La page de prise de rendez-vous s'ouvre remplie : choisis le créneau avec ton interlocuteur. Elle donne le RDV au conseiller libre, l'invite par email et le relie à cette fiche grâce à son adresse.</p>
+    <div class="deux">${champ('Prénom', `<input type="text" name="prenom" value="${esc(c.prenom || '')}" required>`)}${champ('Nom', `<input type="text" name="nom" value="${esc(c.nom || '')}" required>`)}</div>
+    <div class="deux">${champ('Email', `<input type="email" name="email" value="${esc(c.email || '')}" required>`, 'Indispensable : l\'invitation part à cette adresse.')}${champ('Téléphone', `<input type="tel" name="telephone" value="${esc(c.telephone || telephoneDe(l) || '')}" required>`)}</div>
+    ${champ('Entreprise', `<input type="text" name="entreprise" value="${esc(l.entreprise)}" required>`)}
+    ${piedFormulaire('<button type="submit" class="btn primaire">Ouvrir la page de RDV</button>')}`, (form) => {
+    brancherAnnuler(form);
+    form.addEventListener('submit', (ev) => {
+      ev.preventDefault();
+      soumettre(form, async () => {
+        const el = form.elements;
+        const v = Object.fromEntries(['prenom', 'nom', 'email', 'telephone', 'entreprise'].map((k) => [k, el[k].value.trim()]));
+        if (!v.prenom || !v.nom || !v.telephone || !v.entreprise) throw new ErreurApi('Il faut le prénom, le nom, le téléphone et l\'entreprise.');
+        if (!/^[^@\s]+@[^@\s.]+(\.[^@\s.]+)+$/.test(v.email)) throw new ErreurApi('Il faut l\'email de ton interlocuteur : l\'invitation part à cette adresse.');
+        // L'email sur le contact : la page de RDV retrouve ainsi ce lead au lieu d'en créer un autre.
+        const fenetre = window.open('', '_blank');
+        const valeurs = { prenom: v.prenom, nom: v.nom, email: v.email, telephone: v.telephone };
+        try {
+          if (c.id) { const r = await api('POST', { op: 'maj', table: 'contacts', id: c.id, valeurs }); Object.assign(c, r.ligne); }
+          else { const r = await api('POST', { op: 'creer', table: 'contacts', valeurs: { lead_id: l.id, ...valeurs, principal: true } }); D.contacts.push(r.ligne); }
+        } catch (e) { if (fenetre) fenetre.close(); throw e; }
+        indexer();
+        const url = `/rendez-vous.html?par=${encodeURIComponent(cle)}#${new URLSearchParams(v)}`;
+        if (fenetre) fenetre.location.href = url; else location.href = url;
+        fermerModale();
+        toast('Choisis le créneau sur la page de RDV : la fiche se met à jour toute seule.', 6000);
       });
     });
   });
@@ -4642,6 +4833,8 @@ const COLS = [
   { cle: 'nom', titre: 'Nom', src: 'contact', type: 'texte' },
   { cle: 'email', titre: 'Email', src: 'contact', type: 'email' },
   { cle: 'telephone', titre: 'Téléphone', src: 'contact', type: 'tel' },
+  // Le résultat du dernier appel (13/11/2026) : en choisir un le note tout de suite, comme dans le tableur d'Anna.
+  { cle: 'dernier_appel', titre: 'Dernier appel', src: 'calc', type: 'choix', options: LISTE_RESULTATS },
   { cle: 'statut', titre: 'Étape', src: 'lead', type: 'choix', options: STATUTS },
   { cle: 'prochaine_relance', titre: 'Relance', src: 'lead', type: 'date' },
   { cle: 'prochaine_action', titre: 'Action', src: 'lead', type: 'choix', options: ACTIONS },
@@ -4655,6 +4848,7 @@ const COLS = [
   { cle: 'valeur', titre: 'Valeur (€ HT)', src: 'lead', type: 'nombre' },
   { cle: 'formation_debut', titre: 'Début formation', src: 'lead', type: 'date' },
   { cle: 'localisation', titre: 'Ville', src: 'lead', type: 'texte' },
+  { cle: 'secteur', titre: 'Secteur', src: 'lead', type: 'texte' },
   { cle: 'poste', titre: 'Poste', src: 'contact', type: 'texte' },
 ];
 S.selection = new Set();
@@ -4663,6 +4857,7 @@ S.actif = null;          // { id, col } : la cellule active du tableau
 S.derniereSelection = null;
 
 function valeurCellule(l, c) {
+  if (c.src === 'calc') return ''; // toujours vide : choisir « Pas joint » deux jours de suite note bien deux appels
   if (c.src === 'contact') {
     const ct = contactPrincipal(l.id);
     if (c.cle === 'telephone') { const j = contactJoignable(l.id); return (j && j.telephone) || l.telephone || ''; }
@@ -4683,7 +4878,15 @@ function quandCourt(s) {
 function celluleEntreprise(l) {
   return `<div class="ent">${avatar(l, 's')}<span class="nom-ent">${esc(l.entreprise)}</span><button type="button" class="ouvrir-fiche" data-act="ouvrir" tabindex="-1">Fiche</button></div>`;
 }
+function quandPasse(s) {
+  const e = ecartJours(s);
+  return e === 0 ? "aujourd'hui" : e === -1 ? 'hier' : dateCourte(s);
+}
 function affichageCellule(l, c, v) {
+  if (c.cle === 'dernier_appel') {
+    const d = dernierAppel(l.id);
+    return d ? `<span class="res-appel r-${esc(d.k)}">${esc(RESULTATS_APPEL[d.k].lib)}</span> <span class="meta">${esc(quandPasse(d.date))}</span>` : '<span class="vide-cel">Jamais</span>';
+  }
   if (v === '' || v == null) return '';
   if (c.cle === 'statut') return `<span class="statut s-${esc(v)}">${esc(LIB_STATUT[v])}</span>`;
   if (c.cle === 'type') return esc(LIB_TYPE[v]);
@@ -4705,6 +4908,7 @@ function leadsDuTableau() {
   let ls = D.leads.filter((l) => (f.archives ? true : !l.archive)
     && (!f.type || l.type === f.type) && (!f.statut || l.statut === f.statut) && (!f.source || l.source === f.source)
     && (!f.action || l.prochaine_action === f.action)
+    && (!f.appel || (f.appel === 'jamais' ? !dernierAppel(l.id) : (dernierAppel(l.id) || {}).k === f.appel))
     && (!f.relance
       || (f.relance === 'retard' && l.prochaine_relance && l.prochaine_relance < t)
       || (f.relance === 'jour' && l.prochaine_relance && l.prochaine_relance <= t)
@@ -4718,7 +4922,7 @@ function leadsDuTableau() {
   }
   const col = COLS.find((c) => c.cle === S.tri.col) || COLS[0];
   const cle = (l) => {
-    const v = valeurCellule(l, col);
+    const v = col.cle === 'dernier_appel' ? ((dernierAppel(l.id) || {}).date || '') : valeurCellule(l, col);
     if (v === '' || v == null) return null;
     return typeof v === 'number' ? v : sansAccents(v);
   };
@@ -4744,6 +4948,17 @@ function ligneTableau(l) {
   </tr>`;
 }
 
+// La séance d'appels (13/11/2026) : les appels prévus jusqu'à aujourd'hui, avec un numéro, l'un après l'autre.
+function aAppeler() {
+  const t = aujourdhui();
+  return D.leads.filter((l) => !l.archive && l.type !== 'formateur' && l.prochaine_action === 'appel' && l.prochaine_relance && l.prochaine_relance <= t && telephoneDe(l))
+    .sort((a, b) => (a.prochaine_relance < b.prochaine_relance ? -1 : a.prochaine_relance > b.prochaine_relance ? 1 : a.entreprise.localeCompare(b.entreprise, 'fr')));
+}
+function lancerSeanceAppels() {
+  const ids = S.vue === 'tableau' && S.selection.size ? [...S.selection] : aAppeler().map((l) => l.id);
+  demarrerSession(ids, "Séance d'appels");
+}
+
 function vueTableau() {
   const f = S.filtres;
   const ls = leadsDuTableau();
@@ -4751,13 +4966,16 @@ function vueTableau() {
   const toutes = ls.length > 0 && ls.every((l) => S.selection.has(l.id));
   const opt = (liste, val, tous) => `<option value="">${tous}</option>` + liste.map(([k, v]) => `<option value="${esc(k)}" ${k === val ? 'selected' : ''}>${esc(v)}</option>`).join('');
   const n = S.selection.size;
+  const nAppels = aAppeler().length;
   return `<div class="outils" style="margin-top:0"><h1 class="titre-vue">Tableau</h1><span class="espace"></span>
-      <button type="button" class="btn petit" data-act="importer">Coller depuis Excel</button>
+      ${nAppels ? `<button type="button" class="btn petit primaire" data-act="seance-appels">Séance d'appels (${nAppels})</button>` : ''}
+      <button type="button" class="btn petit" data-act="importer">Importer (CSV, Excel)</button>
       <button type="button" class="btn petit" data-act="exporter-tableau">Exporter</button></div>
     <div class="outils">
       <select data-filtre="relance" aria-label="Relance">${opt([['retard', 'En retard'], ['jour', "Jusqu'à aujourd'hui"], ['semaine', 'Dans les 7 jours'], ['sans', 'Sans relance prévue']], f.relance, 'Toutes les relances')}</select>
       <select data-filtre="statut" aria-label="Étape">${opt(STATUTS, f.statut, 'Toutes les étapes')}</select>
       <select data-filtre="action" aria-label="Action">${opt(ACTIONS, f.action, 'Toutes les actions')}</select>
+      <select data-filtre="appel" aria-label="Dernier appel">${opt([['jamais', 'Jamais appelé'], ...LISTE_RESULTATS], f.appel, 'Tous les appels')}</select>
       <select data-filtre="type" aria-label="Type">${opt(TYPES, f.type, 'Tous les types')}</select>
       <select data-filtre="source" aria-label="Source">${opt(sources().map((x) => [x, x]), f.source, 'Toutes les sources')}</select>
       <label class="case"><input type="checkbox" data-filtre="archives" ${f.archives ? 'checked' : ''}> Archivés</label>
@@ -4880,6 +5098,7 @@ async function enregistrerCellule(l, c, v) {
   }
   if (c.cle === 'entreprise' && !v) throw new ErreurApi("Le nom de l'entreprise ne peut pas être vide.");
   if (c.cle === 'statut') { await changerStatut(l.id, v); restaurerCellule(); return; }
+  if (c.cle === 'dernier_appel') { await noterResultatRapide(l, v); restaurerCellule(); return; }
   if (c.cle === 'suivi') { await changerSuivi(l.id, v || null); restaurerCellule(); return; }
   if (c.cle === 'prochaine_relance' || c.cle === 'prochaine_action') {
     const p = { prochaine_relance: l.prochaine_relance, prochaine_action: l.prochaine_action, [c.cle]: v || null };
@@ -4994,23 +5213,63 @@ function ouvrirLot(sorte) {
 /* ----- Coller depuis Excel ----- */
 
 const ENTETES = [
-  ['entreprise', ['entreprise', 'nom entreprise', 'societe', 'raison sociale', 'company', 'organisation', 'structure']],
-  ['prenom', ['prenom', 'prenom contact', 'first name', 'firstname']],
+  ['entreprise', ['entreprise', 'nom entreprise', 'nom de l entreprise', 'societe', 'raison sociale', 'denomination', 'enseigne', 'company', 'organisation', 'structure']],
+  ['prenom', ['prenom', 'prenom contact', 'prenom du dirigeant', 'first name', 'firstname']],
   ['nom', ['nom', 'nom contact', 'last name', 'lastname', 'nom de famille']],
-  ['email', ['email', 'e-mail', 'mail', 'email contact', 'adresse email', 'courriel']],
-  ['telephone', ['telephone', 'tel', 'telephone contact', 'portable', 'mobile', 'phone', 'numero']],
-  ['poste', ['poste', 'fonction', 'poste contact', 'titre', 'job title']],
-  ['tel_entreprise', ['telephone entreprise', 'standard']],
-  ['besoin', ['besoin', 'note', 'notes', 'commentaire', 'commentaires', 'remarque']],
+  // Une seule colonne pour le nom complet (tableurs d'Anna : Interlocuteur, Décideur), découpée à l'import.
+  ['nom_complet', ['interlocuteur', 'decideur', 'dirigeant', 'contact', 'nom complet', 'nom du contact', 'nom du dirigeant', 'gerant']],
+  ['email', ['email', 'e-mail', 'mail', 'email contact', 'adresse email', 'courriel', 'email du dirigeant']],
+  ['telephone', ['telephone', 'tel', 'telephone contact', 'portable', 'mobile', 'phone', 'numero', 'numero de telephone', 'telephone portable']],
+  ['ligne_directe', ['ligne directe', 'tel direct', 'telephone direct', 'telephone du dirigeant']],
+  ['poste', ['poste', 'fonction', 'poste contact', 'titre', 'job title', 'qualite']],
+  ['tel_entreprise', ['telephone entreprise', 'standard', 'telephone standard']],
+  ['besoin', ['besoin', 'notes', 'remarque']],
+  ['note_etoiles', ['note']],
+  ['commentaire', ['commentaire', 'commentaires', 'compte rendu']],
+  ['complement', ['brief', 'valeur ajoutee supposee', 'valeur ajoutee', 'offre supposee', 'signal recent', 'pourquoi cette note', 'autres contacts', 'autre contact']],
   ['source', ['source', 'origine', 'provenance']],
   ['localisation', ['ville', 'localisation', 'city', 'commune']],
-  ['secteur', ['secteur', 'activite', 'naf', 'industry']],
+  ['departement', ['departement', 'dep', 'dpt', 'code postal', 'cp']],
+  ['secteur', ['secteur', 'activite', 'type d activite', 'secteur d activite', 'metier', 'categorie', 'naf', 'industry']],
+  ['effectif', ['salaries', 'effectif', 'nombre de salaries', 'tranche d effectif', 'tranche effectif']],
   ['site_web', ['site', 'site web', 'website', 'url']],
   ['siret', ['siret', 'siren']],
-  ['adresse', ['adresse', 'address']],
-  ['statut', ['statut', 'etape', 'statut pipeline', 'stage']],
+  ['adresse', ['adresse', 'address', 'adresse complete']],
+  ['statut', ['statut', 'etape', 'statut pipeline', 'stage', 'statut appel', 'resultat', 'resultat appel', 'resultat de l appel']],
+  ['dernier_appel', ['dernier appel', 'date dernier appel', 'date de l appel', 'date appel', 'appele le']],
+  ['rappel_le', ['rappel le', 'a rappeler le', 'date de rappel', 'relance le', 'prochaine relance', 'rappel']],
   ['valeur', ['valeur', 'montant', 'valeur deal', 'valeur deal (€)']],
 ];
+// Le statut d'appel d'un tableur (Anna : Pas joint, Pas intéressé, À rappeler, Géré par le siège…).
+const STATUT_APPEL_TEXTE = [
+  [/^(pas joint|non joint|injoignable|ne repond pas|pas de reponse|repondeur|nrp)/, 'pas_joint'],
+  [/^message/, 'message'], [/barrage|secretari|standard/, 'barrage'], [/faux numero|mauvais numero|numero (errone|faux|invalide)/, 'faux_numero'],
+  [/^(rdv|rendez)/, 'rdv'], [/^(a rappeler|rappeler|rappel)/, 'rappeler'], [/^(email|mail)/, 'email'],
+  [/^(pas interesse|non interesse|refus|pas besoin|deja forme)/, 'pas_interesse'], [/siege|groupe|maison mere|franchise/, 'siege'], [/^(interesse|joint|a suivre)/, 'interesse'],
+];
+const resultatDuTexte = (t) => { const n = sansAccents(t || '').replace(/\s+/g, ' ').trim(); const r = n && STATUT_APPEL_TEXTE.find(([re]) => re.test(n)); return r ? r[1] : ''; };
+// 13/11/2026, 13/11/26, 2026-11-13 → 2026-11-13
+function dateDuTableur(t) {
+  const v = String(t || '').trim();
+  let m = v.match(/^(\d{4})-(\d{2})-(\d{2})/);
+  if (m) return `${m[1]}-${m[2]}-${m[3]}`;
+  m = v.match(/^(\d{1,2})[/.-](\d{1,2})[/.-](\d{2,4})/);
+  if (!m) return '';
+  const an = m[3].length === 2 ? `20${m[3]}` : m[3];
+  const d = `${an}-${m[2].padStart(2, '0')}-${m[1].padStart(2, '0')}`;
+  return Number.isNaN(Date.parse(d)) ? '' : d;
+}
+// « Jean-Marc DUPONT » ou « DUPONT Jean-Marc » : le nom est en capitales ; sinon, le premier mot est le prénom.
+function decouperNom(t) {
+  const mots = String(t || '').replace(/\s*[(,·|].*$/, '').trim().split(/\s+/).filter(Boolean);
+  if (mots.length < 2) return { prenom: '', nom: mots[0] || '' };
+  const cap = (m) => m.length > 1 && m === m.toUpperCase() && /[A-Z]/.test(sansAccents(m).toUpperCase());
+  const iNom = mots.findIndex(cap);
+  if (iNom === 0) return { nom: mots.filter(cap).join(' '), prenom: mots.filter((m) => !cap(m)).join(' ') };
+  if (iNom > 0) return { prenom: mots.slice(0, iNom).join(' '), nom: mots.slice(iNom).join(' ') };
+  return { prenom: mots[0], nom: mots.slice(1).join(' ') };
+}
+const telAvecZero = (t) => (t && /^[1-9]\d{8}$/.test(t.replace(/\s/g, '')) ? `0${t.replace(/\s/g, '')}` : t);
 const STATUT_DEPUIS_TEXTE = Object.fromEntries(STATUTS.flatMap(([k, v]) => [[sansAccents(v), k], [k, k]]));
 
 function lireTableauColle(texte) {
@@ -5032,7 +5291,7 @@ function lireTableauColle(texte) {
   };
   const entetes = decouper(premiere.replace(/^﻿/, ''));
   const carte = entetes.map((h) => {
-    const n = sansAccents(h).replace(/\s+/g, ' ').trim();
+    const n = sansAccents(h).replace(/['’()€._-]/g, ' ').replace(/\s+/g, ' ').trim(); // « Type d'activité » = « type d activite »
     const trouve = ENTETES.find(([, noms]) => noms.includes(n));
     return trouve ? trouve[0] : null;
   });
@@ -5041,33 +5300,90 @@ function lireTableauColle(texte) {
     const i = carte.indexOf('nom');
     if (i >= 0 && !carte.includes('prenom')) carte[i] = 'entreprise';
   }
-  const lignes = lignesBrutes.slice(1).map(decouper).map((cases) => Object.fromEntries(carte.map((k, i) => [k, cases[i] || '']).filter(([k, v]) => k && v)));
+  // Une même cible deux fois (Téléphone et Portable…) : la première colonne remplie gagne, l'autre complète.
+  const vues = new Set();
+  carte.forEach((k, i) => { if (!k) return; if (vues.has(k) && !['complement'].includes(k)) carte[i] = null; else vues.add(k); });
+  const lignes = lignesBrutes.slice(1).map(decouper).map((cases) => {
+    const x = {};
+    carte.forEach((k, i) => {
+      const v = cases[i] || '';
+      if (!k || !v) return;
+      if (k === 'complement') x.complement = [x.complement, `${entetes[i]} : ${v}`].filter(Boolean).join('\n');
+      else x[k] = v;
+    });
+    return x;
+  });
   return { entetes, carte, lignes };
 }
 
+// L'import d'un tableau (13/11/2026 : les tableurs d'Anna, exportés en CSV). Une ligne = une entreprise et son
+// interlocuteur ; le statut d'appel, le dernier appel et le commentaire passent dans l'historique ; « Rappel le »
+// devient la relance. Les entreprises déjà dans le CRM ne sont pas recréées (le serveur regarde toute la base).
+function preparerLigneImport(x, { source, action, jour }) {
+  const id = crypto.randomUUID();
+  const resultat = resultatDuTexte(x.statut);
+  const etape = resultat ? (['pas_interesse', 'siege'].includes(resultat) ? 'perdu' : resultat === 'rdv' ? 'qualifie' : 'contacte') : (STATUT_DEPUIS_TEXTE[sansAccents(x.statut || '')] || 'nouveau');
+  const nc = x.nom_complet ? decouperNom(x.nom_complet) : null;
+  const prenom = x.prenom || (nc && nc.prenom) || '';
+  const nom = x.nom && x.entreprise ? x.nom : (nc && nc.nom) || '';
+  const etoiles = /^\d([.,]\d)?\s*(\/\s*5|★+)?$/.test(String(x.note_etoiles || '').trim());
+  const besoin = [x.besoin, x.note_etoiles && !etoiles ? x.note_etoiles : '', x.effectif && `Effectif : ${x.effectif}`, x.complement].filter(Boolean).join('\n') || null;
+  const rappel = dateDuTableur(x.rappel_le);
+  const localisation = [x.localisation, x.departement && !String(x.localisation || '').includes(x.departement) ? `(${x.departement})` : ''].filter(Boolean).join(' ') || null;
+  const perdu = etape === 'perdu';
+  const lead = {
+    id, entreprise: x.entreprise || [prenom, nom].filter(Boolean).join(' ') || x.email, statut: etape, source: x.source || source || null,
+    besoin, localisation, secteur: x.secteur, site_web: x.site_web, siret: x.siret, adresse: x.adresse,
+    telephone: x.ligne_directe && x.telephone ? telAvecZero(x.telephone) : telAvecZero(x.tel_entreprise),
+    valeur: x.valeur ? x.valeur.replace(/[^\d,.-]/g, '') || null : null,
+    prochaine_relance: perdu ? null : rappel || jour, prochaine_action: resultat === 'email' ? 'email' : action,
+    prochaine_note: resultat === 'rappeler' && x.commentaire ? `Rappeler : ${x.commentaire}`.slice(0, 500) : null,
+    tags: ['import tableau', ...(etoiles ? [`note ${String(x.note_etoiles).trim().replace(/\s+/g, '')}`] : [])],
+    ...(perdu ? { raison_perte: RESULTATS_APPEL[resultat].lib } : {}),
+  };
+  const tel = telAvecZero(x.ligne_directe || x.telephone);
+  const aContact = prenom || nom || x.email || tel;
+  const contact = aContact ? { id: crypto.randomUUID(), prenom, nom, email: x.email, telephone: tel, poste: x.poste, principal: true } : null;
+  const activites = [];
+  const quand = dateDuTableur(x.dernier_appel);
+  if (resultat) {
+    const r = RESULTATS_APPEL[resultat];
+    activites.push({ type: r.joint ? 'appel' : 'appel_sans_reponse', resume: `Appel : ${r.lib.charAt(0).toLowerCase()}${r.lib.slice(1)} (repris du tableau importé)${x.commentaire ? `. ${x.commentaire}` : ''}`.slice(0, 2000), date: quand ? `${quand}T12:00:00` : undefined, meta: { resultat, import: true } });
+  } else if (x.commentaire) {
+    activites.push({ type: 'note', resume: `Commentaire du tableau importé : ${x.commentaire}`.slice(0, 2000), date: quand ? `${quand}T12:00:00` : undefined });
+  }
+  return { lead, contact, activites };
+}
+
 function ouvrirImport() {
-  ouvrirModale(`<h2>Coller des leads depuis Excel ou Google Sheets</h2>
-    <p class="aide">Copie les lignes avec la ligne des titres de colonnes (Entreprise, Prénom, Nom, Email, Téléphone, Besoin, Source, Ville…), puis colle ici. Un fichier CSV marche aussi.</p>
-    ${champ('Tableau collé', '<textarea name="texte" class="grand" autofocus placeholder="Entreprise	Prénom	Nom	Email	Téléphone"></textarea>')}
-    ${champ('Ou un fichier CSV', '<input type="file" name="fichier" accept=".csv,.tsv,.txt,text/csv">')}
+  const setter = estSetter();
+  ouvrirModale(`<h2>Importer des leads</h2>
+    <p class="aide">Un fichier CSV (exporté de Google Sheets ou d'Excel : Fichier, Télécharger, CSV), ou les lignes copiées avec la ligne des titres de colonnes. Colonnes reconnues : Entreprise, Interlocuteur ou Prénom et Nom, Téléphone, Ligne directe, Email, Ville, Département, Activité, Salariés, SIRET, Statut (Pas joint, À rappeler…), Dernier appel, Rappel le, Commentaire.</p>
+    ${champ('Fichier CSV', '<input type="file" name="fichier" accept=".csv,.tsv,.txt,text/csv">')}
+    ${champ('Ou le tableau collé', '<textarea name="texte" class="grand" placeholder="Entreprise	Interlocuteur	Téléphone	Email	Ville"></textarea>')}
     <div data-apercu></div>
     <div class="deux">
       ${champ('Source pour toutes les lignes', `<input type="text" name="source" list="liste-sources" value="${esc(`Import du ${dateCourte(aujourdhui())}`)}">`)}
-      ${champ('Première relance', `<input type="date" name="debut" value="${esc(dansJours(1))}">`)}
+      ${champ('Première relance', `<input type="date" name="debut" value="${esc(setter ? aujourdhui() : dansJours(1))}">`)}
     </div>
     <datalist id="liste-sources">${sources().map((x) => `<option value="${esc(x)}">`).join('')}</datalist>
     <div class="deux">
-      ${champ('Relances par jour', '<input type="number" name="parjour" min="1" max="200" value="10">', 'Les relances sont étalées sur les jours ouvrés suivants.')}
-      ${champ('Action', `<select name="action">${options(ACTIONS, 'email')}</select>`)}
+      ${champ('Relances par jour', `<input type="number" name="parjour" min="1" max="300" value="${setter ? 60 : 10}">`, 'Les relances sont étalées sur les jours ouvrés suivants. Une date « Rappel le » du fichier passe avant.')}
+      ${champ('Action', `<select name="action">${options(ACTIONS, setter ? 'appel' : 'email')}</select>`)}
     </div>
-    <label class="case"><input type="checkbox" name="doublons"> Importer aussi les lignes déjà présentes dans le CRM</label>
+    <label class="case"><input type="checkbox" name="doublons"> Importer aussi les lignes déjà dans ma liste</label>
+    <p class="aide">Une entreprise déjà suivie par quelqu'un d'autre de l'équipe n'est jamais recréée : on ne l'appelle pas deux fois.</p>
     ${piedFormulaire('<button type="submit" class="btn primaire" disabled data-importer>Importer</button>')}`, (form) => {
     brancherAnnuler(form);
     const el = form.elements;
     let analyse = null;
     const existants = new Set(D.leads.map((l) => sansAccents(l.entreprise)));
     const emails = new Set(D.contacts.map((c) => sansAccents(c.email)).filter(Boolean));
-    const estDoublon = (x) => existants.has(sansAccents(x.entreprise)) || (x.email && emails.has(sansAccents(x.email)));
+    const tels = new Set([...D.contacts.map((c) => c.telephone), ...D.leads.map((l) => l.telephone)].map((t) => String(t || '').replace(/\D/g, '').slice(-9)).filter((t) => t.length === 9));
+    const sirens = new Set(D.leads.map((l) => String(l.siret || '').replace(/\D/g, '').slice(0, 9)).filter((t) => t.length === 9));
+    const estDoublon = (x) => existants.has(sansAccents(x.entreprise)) || (x.email && emails.has(sansAccents(x.email)))
+      || [x.telephone, x.ligne_directe].some((t) => t && tels.has(String(t).replace(/\D/g, '').slice(-9)))
+      || (x.siret && sirens.has(String(x.siret).replace(/\D/g, '').slice(0, 9)));
     const apercu = () => {
       analyse = lireTableauColle(el.texte.value);
       const zone = $('[data-apercu]', form);
@@ -5075,44 +5391,61 @@ function ouvrirImport() {
       if (!analyse) { zone.innerHTML = ''; bouton.disabled = true; return; }
       const reconnues = analyse.entetes.filter((h, i) => analyse.carte[i]);
       const ignorees = analyse.entetes.filter((h, i) => !analyse.carte[i] && h);
-      const utiles = analyse.lignes.filter((x) => x.entreprise || x.nom || x.email);
+      const utiles = analyse.lignes.filter((x) => x.entreprise || x.nom || x.nom_complet || x.email);
       const doublons = utiles.filter(estDoublon).length;
+      const appels = utiles.filter((x) => resultatDuTexte(x.statut)).length;
       if (!analyse.carte.includes('entreprise')) { zone.innerHTML = '<p class="erreur">Je ne trouve pas de colonne « Entreprise ». Vérifie la ligne des titres.</p>'; bouton.disabled = true; return; }
-      zone.innerHTML = `<p class="aide"><b>${utiles.length} ligne${utiles.length > 1 ? 's' : ''}</b>${doublons ? `, dont ${doublons} déjà dans le CRM` : ''}. Colonnes reprises : ${esc(reconnues.join(', '))}${ignorees.length ? `. Ignorées : ${esc(ignorees.join(', '))}` : ''}.</p>
-        <div class="apercu"><table><thead><tr>${['Entreprise', 'Prénom', 'Nom', 'Email', 'Téléphone', 'Besoin'].map((t) => `<th>${t}</th>`).join('')}</tr></thead><tbody>
-        ${utiles.slice(0, 8).map((x) => `<tr>${['entreprise', 'prenom', 'nom', 'email', 'telephone', 'besoin'].map((k) => `<td>${esc(x[k] || '')}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`;
+      const apercuLignes = utiles.slice(0, 8).map((x) => { const p = preparerLigneImport(x, { source: '', action: 'appel', jour: '' }); return [p.lead.entreprise, nomContact(p.contact), p.contact && p.contact.telephone, x.email, x.statut, x.rappel_le]; });
+      zone.innerHTML = `<p class="aide"><b>${utiles.length} ligne${utiles.length > 1 ? 's' : ''}</b>${doublons ? `, dont ${doublons} déjà dans ta liste` : ''}${appels ? `, ${appels} avec un résultat d'appel repris dans l'historique` : ''}. Colonnes reprises : ${esc(reconnues.join(', '))}${ignorees.length ? `. Ignorées : ${esc(ignorees.join(', '))}` : ''}.</p>
+        <div class="apercu"><table><thead><tr>${['Entreprise', 'Interlocuteur', 'Téléphone', 'Email', 'Statut', 'Rappel le'].map((t) => `<th>${t}</th>`).join('')}</tr></thead><tbody>
+        ${apercuLignes.map((r) => `<tr>${r.map((v) => `<td>${esc(v || '')}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`;
       bouton.disabled = utiles.length === 0;
       bouton.textContent = `Importer ${utiles.length} ligne${utiles.length > 1 ? 's' : ''}`;
     };
     el.texte.addEventListener('input', apercu);
-    el.fichier.addEventListener('change', async () => { const f = el.fichier.files[0]; if (f) { el.texte.value = await f.text(); apercu(); } });
+    el.fichier.addEventListener('change', async () => {
+      const f = el.fichier.files[0];
+      if (!f) return;
+      // Excel enregistre souvent ses CSV en Windows-1252 : on le relit ainsi si l'UTF-8 donne des caractères cassés.
+      const octets = await f.arrayBuffer();
+      let texte = new TextDecoder('utf-8').decode(octets);
+      if (texte.includes('�')) texte = new TextDecoder('windows-1252').decode(octets);
+      el.texte.value = texte;
+      apercu();
+    });
     form.addEventListener('submit', (ev) => {
       ev.preventDefault();
       soumettre(form, async () => {
-        if (!analyse) throw new ErreurApi('Colle un tableau d\'abord.');
-        let lignes = analyse.lignes.filter((x) => x.entreprise || x.nom || x.email);
+        if (!analyse) throw new ErreurApi('Choisis un fichier ou colle un tableau d\'abord.');
+        let lignes = analyse.lignes.filter((x) => x.entreprise || x.nom || x.nom_complet || x.email);
         if (!el.doublons.checked) lignes = lignes.filter((x) => !estDoublon(x));
-        if (!lignes.length) throw new ErreurApi('Toutes les lignes sont déjà dans le CRM.');
-        if (lignes.length > 500) throw new ErreurApi('500 lignes au plus par import.');
+        if (!lignes.length) throw new ErreurApi('Toutes les lignes sont déjà dans ta liste.');
+        if (lignes.length > 3000) throw new ErreurApi('3 000 lignes au plus par import : coupe le fichier en plusieurs.');
         const parJour = Math.max(1, Number(el.parjour.value) || 10);
         let jour = prochainOuvre(el.debut.value || dansJours(1));
         const envoi = lignes.map((x, i) => {
           if (i > 0 && i % parJour === 0) jour = dansJours(1, jour);
-          const id = crypto.randomUUID();
-          const statut = STATUT_DEPUIS_TEXTE[sansAccents(x.statut || '')] || 'nouveau';
-          const lead = { id, entreprise: x.entreprise || [x.prenom, x.nom].filter(Boolean).join(' ') || x.email, statut, source: x.source || el.source.value || null,
-            besoin: x.besoin, localisation: x.localisation, secteur: x.secteur, site_web: x.site_web, siret: x.siret, adresse: x.adresse,
-            telephone: x.tel_entreprise, valeur: x.valeur ? x.valeur.replace(/[^\d,.-]/g, '') || null : null,
-            prochaine_relance: jour, prochaine_action: el.action.value, tags: ['import tableau'] };
-          const aContact = x.prenom || x.nom || x.email || x.telephone;
-          const tel = x.telephone && /^[1-9]\d{8}$/.test(x.telephone.replace(/\s/g, '')) ? `0${x.telephone.replace(/\s/g, '')}` : x.telephone;
-          return { lead, contact: aContact ? { id: crypto.randomUUID(), prenom: x.prenom, nom: x.entreprise ? x.nom : null, email: x.email, telephone: tel, poste: x.poste, principal: true } : null };
+          return preparerLigneImport(x, { source: el.source.value, action: el.action.value, jour });
         });
-        const r = await api('POST', { op: 'importer', lignes: envoi });
-        D.leads.push(...r.leads); D.contacts.push(...r.contacts); r.activites.forEach(ajouterActivite);
+        // Par paquets de 500 (limite du serveur).
+        const bilan = { leads: 0, ignores: [] };
+        const bouton = $('[data-importer]', form);
+        for (let i = 0; i < envoi.length; i += 500) {
+          if (envoi.length > 500) bouton.textContent = `Import… ${Math.min(i + 500, envoi.length)} sur ${envoi.length}`;
+          const r = await api('POST', { op: 'importer', lignes: envoi.slice(i, i + 500), doublons: el.doublons.checked });
+          D.leads.push(...r.leads); D.contacts.push(...r.contacts); r.activites.forEach(ajouterActivite);
+          bilan.leads += r.leads.length;
+          bilan.ignores.push(...(r.ignores || []));
+        }
         indexer(); fermerModale();
         S.filtres.source = ''; rendre();
-        toast(`${r.leads.length} lead${r.leads.length > 1 ? 's' : ''} importé${r.leads.length > 1 ? 's' : ''}.`, 5000);
+        if (!bilan.ignores.length) { toast(`${bilan.leads} lead${bilan.leads > 1 ? 's' : ''} importé${bilan.leads > 1 ? 's' : ''}.`, 5000); return; }
+        const parRaison = {};
+        for (const x of bilan.ignores) (parRaison[x.raison] ||= []).push(x.entreprise);
+        ouvrirModale(`<h2>Import terminé</h2>
+          <p><b>${bilan.leads} lead${bilan.leads > 1 ? 's' : ''} importé${bilan.leads > 1 ? 's' : ''}</b>, ${bilan.ignores.length} laissé${bilan.ignores.length > 1 ? 's' : ''} de côté : ${bilan.ignores.length > 1 ? 'ces entreprises sont' : 'cette entreprise est'} déjà dans le CRM.</p>
+          ${Object.entries(parRaison).map(([raison, noms]) => `<p class="meta">${esc(raison.charAt(0).toUpperCase() + raison.slice(1))} (${noms.length})</p><p>${esc(noms.slice(0, 40).join(', '))}${noms.length > 40 ? '…' : ''}</p>`).join('')}
+          <div class="pied"><button type="button" class="btn primaire" data-fermer>Fermer</button></div>`, (f) => brancherAnnuler(f));
       });
     });
   });
@@ -5274,6 +5607,9 @@ function rendreSession() {
     <div class="session-actions">
       ${email ? `<button type="button" class="btn${prim('email')}" data-act="email" aria-keyshortcuts="E">Email <kbd>E</kbd></button>` : ''}
       <button type="button" class="btn" data-act="appel" aria-keyshortcuts="A">Noter un appel <kbd>A</kbd></button>
+      ${tel ? `<button type="button" class="btn" data-act="appel-rapide" data-resultat="pas_joint" aria-keyshortcuts="J">Pas joint <kbd>J</kbd></button>
+      <button type="button" class="btn" data-act="appel-rapide" data-resultat="message" aria-keyshortcuts="M">Message laissé <kbd>M</kbd></button>
+      <button type="button" class="btn" data-act="appel-rapide" data-resultat="barrage" aria-keyshortcuts="B">Barrage <kbd>B</kbd></button>` : ''}
       ${mobile ? '<button type="button" class="btn" data-act="sms" aria-keyshortcuts="S">SMS <kbd>S</kbd></button>' : ''}
       ${contactsLi(l.id).length ? `<button type="button" class="btn${liAValider(l) || /^LinkedIn :/.test(l.prochaine_note || '') ? ' primaire' : ''}" data-act="linkedin">LinkedIn</button>` : ''}
       <button type="button" class="btn" data-act="decaler">Décaler <kbd>D</kbd></button>
@@ -5342,7 +5678,8 @@ $('#session').addEventListener('close', () => {
 document.addEventListener('keydown', (ev) => {
   if (!$('#session').open || $('#modale').open || $('#fiche').open || ev.metaKey || ev.ctrlKey || ev.altKey) return;
   if (ev.target.matches('input, textarea, select')) return;
-  const raccourcis = { e: '[data-act="email"]', a: '[data-act="appel"]', s: '[data-act="sms"]', d: '[data-act="decaler"]', p: '[data-sess="passer"]' };
+  const raccourcis = { e: '[data-act="email"]', a: '[data-act="appel"]', s: '[data-act="sms"]', d: '[data-act="decaler"]', p: '[data-sess="passer"]',
+    j: '[data-resultat="pas_joint"]', m: '[data-resultat="message"]', b: '[data-resultat="barrage"]' };
   const sel = raccourcis[ev.key.toLowerCase()] || (ev.key === 'ArrowRight' ? '[data-sess="passer"]' : ev.key === 'ArrowLeft' ? '[data-sess="precedent"]' : null);
   const bouton = sel && $(`#session ${sel}`);
   if (bouton && !bouton.disabled) { ev.preventDefault(); bouton.click(); }
@@ -5836,6 +6173,7 @@ document.addEventListener('click', (ev) => {
     case 'echanges': return ouvrirEchanges(leadId, cible.dataset.fil || null);
     case 'eval-nouvelle': case 'eval-bilan': case 'eval-lien': case 'eval-resultats': case 'eval-modifier': case 'eval-imprimer': case 'eval-qr-grand': case 'eval-email': case 'eval-fermer': case 'eval-rouvrir': case 'eval-supprimer': case 'eval-reponse-suppr': return actionEval(act, cible);
     case 'formateur-nouveau': return ouvrirNouveauFormateur();
+    case 'formateurs-exporter': return exporterFormateurs();
     case 'programme-generer': return ouvrirGenererProgramme(IDX.lead.get(leadId));
     case 'programme-ouvrir': return ouvrirProgramme(cible.dataset.programme, { reco: cible.dataset.reco === '1' });
     case 'formateur-lien': { const l = IDX.lead.get(leadId); return opFormateur({ op: 'formateur_lien', lead_id: leadId }).then((r) => { if (r && r.jeton) ouvrirLienFormateur(l, r); }); }
@@ -5859,6 +6197,14 @@ document.addEventListener('click', (ev) => {
     case 'journal-edition': S.journalEdition = !S.journalEdition; return rendreFiche();
     case 'creer-depuis-recherche': { const nom = S.q.trim(); ouvrirNouveau(); const champNom = $('#modale input[name="entreprise"]'); if (champNom) champNom.value = nom; return; }
     case 'importer': return ouvrirImport();
+    case 'seance-appels': return lancerSeanceAppels();
+    // Un appel sans réponse en un geste, dans la séance d'appels (13/11/2026), puis le lead suivant.
+    case 'appel-rapide': {
+      const l = IDX.lead.get(leadId);
+      if (!l) return undefined;
+      cible.disabled = true;
+      return noterResultatRapide(l, cible.dataset.resultat).then(() => actionFaite(l.id, 'appel')).catch((e) => { toast(e.message); cible.disabled = false; });
+    }
     case 'exporter-tableau': return exporterCsv(leadsDuTableau(), 'tableau');
     case 'decaler': return ouvrirDecaler(leadId);
     case 'rdv': return ouvrirRdv(leadId);
@@ -6013,5 +6359,6 @@ $('#form-cle').addEventListener('submit', async (ev) => {
 if (S.cle) demarrer(); else deconnecter('');
 </script>
 <script src="/crm/equipe.js"></script>
+<script src="/crm/marches.js"></script>
 </body>
 </html>

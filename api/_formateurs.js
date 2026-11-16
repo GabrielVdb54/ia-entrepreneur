@@ -82,7 +82,8 @@ export async function base(chemin, { methode = 'GET', corps, prefer } = {}) {
   const t = await r.text();
   return t ? JSON.parse(t) : null;
 }
-async function deposerFichier(chemin, octets, mime) {
+// Exportée aussi pour les pièces de l'organisme (api/_marches.js, 13/11/2026), sous organisme/.
+export async function deposerFichier(chemin, octets, mime) {
   const r = await fetch(`${process.env.SUPABASE_URL}/storage/v1/object/${BUCKET}/${chemin}`, {
     method: 'POST',
     headers: { ...entetes(), 'Content-Type': mime, 'x-upsert': 'false', 'Cache-Control': 'no-store' },
@@ -111,7 +112,7 @@ export function formatFichier(o) {
   if (o.subarray(0, 4).toString('latin1') === 'RIFF' && o.subarray(8, 12).toString('latin1') === 'WEBP') return { mime: 'image/webp', ext: 'webp' };
   return null;
 }
-const nomPropre = (n) => String(n || 'piece').normalize('NFC').replace(/[\\/:*?"<>|\u0000-\u001f]/g, '_').slice(0, 160);
+export const nomPropre = (n) => String(n || 'piece').normalize('NFC').replace(/[\\/:*?"<>|\u0000-\u001f]/g, '_').slice(0, 160);
 
 /* ---------- SIRET : l'API publique recherche-entreprises (comme Clindit) ---------- */
 

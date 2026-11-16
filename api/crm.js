@@ -131,8 +131,9 @@ import Anthropic from '@anthropic-ai/sdk';
 import {
   ADMIN, ADMIN_EMAIL, avecUtilisateur, moi as utilisateurCourant, estAdmin, compte, nomComplet, pourMoi, cleReglage, cleReglageLue, garder,
   utilisateurParCle, utilisateurParCleRobot, fonctionDe, equipePourPage, closers, jetonGoogle, googleEquipeConfigure, urlConnexionGoogle, operationEquipe, membresConnectes,
-  OPS_EQUIPE, REGLAGES_EQUIPE,
+  REGLAGES_EQUIPE, opPermise, permissionsDe, voitFormateurs, voitMarches, estPartenaire,
 } from './_equipe.js';
+import { operationMarche, operationPieceOrganisme, lirePieceOrganisme, COLONNES_PIECE_ORGANISME } from './_marches.js';
 import { creerDemande, GOOGLE_AVIS_RE } from './_avis.js';
 import { civiliteDuPrenom } from './_prenoms.js';
 import { MODALITES, nouveauJetonEval, questionnaire, propre as propreEval } from './_evaluations.js';
@@ -544,6 +545,12 @@ async function lireTout() {
   const rien = Promise.resolve([]);
   const rienSb = Promise.resolve({ lignes: [] });
   const depuisEmails = new Date(Date.now() - 60 * 86400000).toISOString();
+  // Anna et Ludovic voient aussi les formateurs ; tous deux, avec Gabriel, les marchés et les pièces de l'organisme (13/11/2026).
+  const formateursVus = voitFormateurs();
+  const partenaire = estPartenaire();
+  const marchesEtPieces = voitMarches()
+    ? Promise.all([toutLire('iae_crm_marches', 'created_at.desc'), sb(`iae_crm_pieces_organisme?archive=is.false&order=type.asc,created_at.desc&select=${COLONNES_PIECE_ORGANISME}`).then((x) => x.lignes)])
+    : Promise.resolve([[], []]);
   const [leads, contacts, activites, memos, modeles, reglages, { lignes: entrants }, { lignes: ecartes }, formateurs, documents, programmes, { lignes: linkedin }, { lignes: avis }, { lignes: demandesAvis }, evaluations, evalReponses, equipe, closersListe, { lignes: emails }, { lignes: emailsBilan }] = await Promise.all([
     toutLire('iae_crm_leads', 'entreprise.asc'),
     toutLire('iae_crm_contacts', 'principal.desc,created_at.asc'),
@@ -554,8 +561,8 @@ async function lireTout() {
     // « À trier » : les emails de sa propre boîte (Gabriel ne trie pas celle de Dorian).
     sb(`iae_crm_entrants?select=*&statut=eq.a_trier&proprietaire=eq.${encodeURIComponent(compte())}&order=recu_le.desc&limit=100`),
     sb(`iae_crm_entrants?select=id,recu_le,canal,de_email,de_nom,objet,fil,meta&statut=eq.ignore&proprietaire=eq.${encodeURIComponent(compte())}&order=recu_le.desc&limit=60`),
-    admin ? toutLire('iae_crm_formateurs', 'created_at.asc') : rien,
-    !admin ? rien : sb('iae_crm_documents?select=id,created_at,lead_id,type,nom,chemin,mime,taille,depose_par,lecture,statut,motif,verifie_le,expire_le,archive&order=created_at.desc&limit=2000').then((x) => x.lignes),
+    formateursVus ? toutLire('iae_crm_formateurs', 'created_at.asc') : rien,
+    !formateursVus ? rien : sb('iae_crm_documents?select=id,created_at,lead_id,type,nom,chemin,mime,taille,depose_par,lecture,statut,motif,verifie_le,expire_le,archive&order=created_at.desc&limit=2000').then((x) => x.lignes),
     admin ? toutLire('iae_crm_programmes', 'created_at.desc') : rien,
     // LinkedIn : la file du compte de la personne connectée (Gabriel : la sienne ; un commercial : la sienne, filtrée aussi par garder).
     sb(`iae_crm_linkedin?${filtreCompteLi()}&or=(statut.in.(brouillon,a_envoyer,en_cours,echec,a_verifier),created_at.gte.${encodeURIComponent(depuisLi)})&order=created_at.desc&limit=500&select=id,created_at,lead_id,contact_id,type,etape,texte,statut,valide_le,envoye_le,detail`),
@@ -571,6 +578,7 @@ async function lireTout() {
     !admin ? rienSb : lignesBilanEmail().then((lignes) => ({ lignes })),
   ]);
   const moiPublic = utilisateurCourant();
+  const [marches, piecesOrganisme] = await marchesEtPieces;
   // L'ordre d'envoi des lignes en file (13/11), pour la page.
   if (admin && emails?.length) {
     const parId = new Map(leads.map((l) => [l.id, l]));
@@ -580,7 +588,9 @@ async function lireTout() {
   return {
     leads, contacts, activites, memos, modeles, entrants, ecartes, documents, programmes, linkedin: linkedin || [], avis: avis || [], demandes_avis: demandesAvis || [],
     evaluations, evaluation_reponses: evalReponses, emails: emails || [], prospection_email: prospectionEmailEtat,
-    formateurs: formateurs.map(({ jeton_hash: _h, signature, ...f }) => ({ ...f, signature: signature ? { nom: signature.nom, lieu: signature.lieu, date: signature.date, version: signature.version, empreinte: signature.empreinte, ip: signature.ip } : null })),
+    // Ludovic : ni le tarif interne ni les notes internes d'un formateur.
+    formateurs: formateurs.map(({ jeton_hash: _h, signature, ...f }) => ({ ...(partenaire ? { ...f, tarif_jour: null, notes: null } : f), signature: signature ? { nom: signature.nom, lieu: signature.lieu, date: signature.date, version: signature.version, empreinte: signature.empreinte, ip: signature.ip } : null })),
+    marches, pieces_organisme: piecesOrganisme,
     reglages: Object.fromEntries(reglages.filter((r) => !r.cle.endsWith('_cle')).map((r) => [cleReglageLue(r.cle), r.valeur])),
     gmail: gmailConfigure(),
     agenda: gmailConfigure(),
@@ -590,6 +600,7 @@ async function lireTout() {
     aujourdhui: aujourdHuiParis(),
     // Qui est connecté, l'équipe (tout pour Gabriel, les noms pour un membre) et à qui confier un lead.
     moi: { email: moiPublic.email, prenom: moiPublic.prenom, nom: moiPublic.nom, role: moiPublic.role, google: Boolean(moiPublic.google), robot_cle_le: moiPublic.robot_cle_le || null },
+    permissions: permissionsDe(moiPublic),
     // Le quota d'invitations LinkedIn du jour, celui que le serveur applique (la page ne le recalcule plus : 12/11, « 20 sur 10 »).
     quota_invitations_li: quotaInvitationsLi(aujourdHuiParis()),
     equipe, closers: closersListe, google_equipe: googleEquipeConfigure(),
@@ -639,6 +650,9 @@ async function operation(corps) {
   if (op === 'recap') return recapLead(corps);
   if (op && op.startsWith('formateur_') || op === 'piece_deposer' || op === 'document_verifier') return operationFormateur(corps);
   if (op && op.startsWith('programme_')) return operationProgramme(corps);
+  // Les marchés publics et les pièces de l'organisme (13/11/2026, api/_marches.js).
+  if (/^marche_[a-z]+$/.test(op || '')) return operationMarche(corps, { sb });
+  if (op === 'organisme_deposer' || op === 'organisme_archiver') return operationPieceOrganisme(corps, { sb });
   if (op === 'importer') return importer(corps);
   if (op === 'email') return envoyerEmail(corps);
   if (/^(avis|paiement|facture)_[a-z_]+$/.test(op || '')) return operationApresFormation(corps);
@@ -680,15 +694,84 @@ async function operationLot(corps) {
   return { leads, activites };
 }
 
+// Les doublons d'un import fait par un membre (13/11/2026, import CSV d'Anna) : la page ne voit que ses leads,
+// le serveur regarde toute la base (même SIREN, même nom d'entreprise, même email, même téléphone).
+// Une entreprise déjà suivie par quelqu'un d'autre n'est jamais recréée : on ne la contacte pas deux fois.
+const nomEntrepriseNorme = (t) => String(t || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase()
+  .replace(/\b(sarl|sas|sasu|eurl|sa|sci|snc|ets|etablissements|entreprise|societe|groupe)\b/g, ' ').replace(/[^a-z0-9]+/g, '');
+const telNorme = (t) => { const d = String(t || '').replace(/\D/g, ''); return d.length >= 9 ? d.slice(-9) : ''; };
+async function doublonsDansLaBase() {
+  return avecUtilisateur(ADMIN, async () => {
+    const lire = async (chemin) => {
+      const lignes = [];
+      for (let debut = 0; debut < 50000; debut += 1000) {
+        const { lignes: page } = await sb(chemin, { plage: `${debut}-${debut + 999}` });
+        lignes.push(...page);
+        if (page.length < 1000) break;
+      }
+      return lignes;
+    };
+    const [ls, cs] = await Promise.all([
+      lire('iae_crm_leads?select=id,entreprise,siret,telephone,proprietaire,setter,visible_par&order=id.asc'),
+      lire('iae_crm_contacts?select=lead_id,email,telephone&order=id.asc'),
+    ]);
+    const parId = new Map(ls.map((l) => [l.id, l]));
+    const index = new Map();
+    const poser = (cle, l) => { if (cle && l && !index.has(cle)) index.set(cle, l); };
+    for (const l of ls) {
+      const siren = String(l.siret || '').replace(/\D/g, '').slice(0, 9);
+      if (siren.length === 9) poser(`siren:${siren}`, l);
+      const n = nomEntrepriseNorme(l.entreprise);
+      if (n.length >= 3) poser(`nom:${n}`, l);
+      poser(telNorme(l.telephone) && `tel:${telNorme(l.telephone)}`, l);
+    }
+    for (const c of cs) {
+      const l = parId.get(c.lead_id);
+      if (c.email) poser(`email:${String(c.email).trim().toLowerCase()}`, l);
+      poser(telNorme(c.telephone) && `tel:${telNorme(c.telephone)}`, l);
+    }
+    return index;
+  });
+}
+
 async function importer(corps) {
   if (!Array.isArray(corps.lignes) || corps.lignes.length === 0 || corps.lignes.length > MAX_LOT) throw new Refus('liste_invalide');
   const leads = [];
   const contacts = [];
+  const historique = [];
+  const ignores = [];
+  const u = utilisateurCourant();
+  const index = estAdmin() ? null : await doublonsDansLaBase();
   for (const ligne of corps.lignes) {
+    if (index) {
+      const cles = [];
+      const siren = String(ligne.lead?.siret || '').replace(/\D/g, '').slice(0, 9);
+      if (siren.length === 9) cles.push(`siren:${siren}`);
+      const n = nomEntrepriseNorme(ligne.lead?.entreprise);
+      if (n.length >= 3) cles.push(`nom:${n}`);
+      if (ligne.contact?.email) cles.push(`email:${String(ligne.contact.email).trim().toLowerCase()}`);
+      for (const t of [ligne.contact?.telephone, ligne.lead?.telephone]) if (telNorme(t)) cles.push(`tel:${telNorme(t)}`);
+      const deja = cles.map((k) => index.get(k)).find(Boolean);
+      if (deja) {
+        const sien = (deja.visible_par || []).includes(u.email);
+        if (!sien || corps.doublons !== true) {
+          const qui = deja.proprietaire === ADMIN_EMAIL ? 'Gabriel' : String(deja.proprietaire || '').split('@')[0];
+          ignores.push({ entreprise: String(ligne.lead?.entreprise || '').slice(0, 160), raison: sien ? 'déjà dans ta liste' : `déjà suivie par ${qui.charAt(0).toUpperCase()}${qui.slice(1)}` });
+          continue;
+        }
+      }
+    }
     const lead = nettoyer(ligne.lead, 'leads', true, true);
     leads.push(lead);
     if (ligne.contact) contacts.push(nettoyer({ ...ligne.contact, lead_id: lead.id }, 'contacts', true, true));
+    // Le suivi d'appels d'un tableur (statut, dernier appel, commentaire) : 3 lignes d'historique au plus par entreprise.
+    for (const a of (Array.isArray(ligne.activites) ? ligne.activites : []).slice(0, 3)) {
+      if (!['appel', 'appel_sans_reponse', 'note'].includes(a?.type)) continue;
+      const h = nettoyer({ type: a.type, resume: a.resume, date: a.date, meta: a.meta, source: 'import', lead_id: lead.id }, 'activites', true);
+      historique.push({ ...h, date: h.date || new Date().toISOString(), meta: h.meta || null });
+    }
   }
+  if (!leads.length) return { leads: [], contacts: [], activites: [], ignores };
   // Toutes les lignes d'un envoi doivent avoir les mêmes colonnes pour PostgREST.
   const uniformiser = (lignes) => {
     const cles = [...new Set(lignes.flatMap((l) => Object.keys(l)))];
@@ -700,7 +783,12 @@ async function importer(corps) {
   if (contacts.length) ({ lignes: creesContacts } = await sb('iae_crm_contacts', { methode: 'POST', corps: uniformiser(contacts).map((c) => ({ ...c, principal: c.principal === true })), prefer: 'return=representation' }));
   const journal = creesLeads.map((l) => ({ lead_id: l.id, type: 'import', resume: 'Ajouté par import en masse (collage depuis un tableau)', source: 'crm' }));
   const { lignes: creesActivites } = await sb('iae_crm_activites', { methode: 'POST', corps: journal, prefer: 'return=representation' });
-  return { leads: creesLeads, contacts: creesContacts, activites: creesActivites };
+  let suivis = [];
+  if (historique.length) {
+    const cles = [...new Set(historique.flatMap((h) => Object.keys(h)))];
+    ({ lignes: suivis } = await sb('iae_crm_activites', { methode: 'POST', corps: historique.map((h) => Object.fromEntries(cles.map((k) => [k, h[k] === undefined ? null : h[k]]))), prefer: 'return=representation' }));
+  }
+  return { leads: creesLeads, contacts: creesContacts, activites: [...creesActivites, ...(suivis || [])], ignores };
 }
 
 async function envoyerEmail(corps) {
@@ -1781,12 +1869,13 @@ async function operationFormateur(corps) {
     return retourFormateur(lead.id);
   }
   if (op === 'piece_deposer') {
-    const doc = await deposerPiece({ f, leadId: lead.id, type: String(corps.type || ''), nom: corps.nom, base64: corps.base64, deposePar: 'gabriel' });
-    await inserer('activites', { lead_id: lead.id, type: 'note', resume: `Pièce déposée depuis le CRM : ${doc.nom}`.slice(0, 2000), source: 'crm' });
+    const doc = await deposerPiece({ f, leadId: lead.id, type: String(corps.type || ''), nom: corps.nom, base64: corps.base64, deposePar: estAdmin() ? 'gabriel' : utilisateurCourant().email });
+    await inserer('activites', { lead_id: lead.id, type: 'note', resume: `Pièce déposée depuis le CRM${estAdmin() ? '' : ` par ${utilisateurCourant().prenom}`} : ${doc.nom}`.slice(0, 2000), source: 'crm' });
     await majStatut(lead.id);
     return retourFormateur(lead.id);
   }
   if (op === 'formateur_valider') {
+    if (!estAdmin()) throw new Refus('reserve_admin', 403);
     // « Valider » : les pièces relues passent en vérifiées, puis le dossier doit être complet.
     if (corps.tout_verifier === true) {
       await sb(`iae_crm_documents?lead_id=eq.${lead.id}&archive=is.false&statut=eq.a_verifier`, { methode: 'PATCH', corps: { statut: 'verifie', verifie_le: new Date().toISOString() }, prefer: 'return=minimal' });
@@ -2021,7 +2110,9 @@ async function chercherFormateurs(corps) {
       const d = parId.get(l.id) || {};
       return [l.id, champ(l.entreprise), champ(couper(String(l.besoin || '').split('\n')[0], 160)), d.statut || 'a_inviter', champ(d.zone || l.localisation) || '?',
         d.distanciel === false ? 'non' : 'oui', (d.niveaux || []).join(',') || '?', champ(couper((d.competences || []).join(' ; '), 900)), champ((d.outils || []).join(', ')),
-        champ((d.secteurs || []).join(', ')), champ(couper(d.bio, 900)), champ((lus.get(l.id) || []).join(' ; ')), champ(d.disponibilites) || '?', champ(couper(d.notes, 400))].join(' | ');
+        champ((d.secteurs || []).join(', ')), champ(couper(d.bio, 900)), champ((lus.get(l.id) || []).join(' ; ')), champ(d.disponibilites) || '?',
+        // Ludovic (partenaire, 13/11) : les notes internes ne partent pas, il lirait leur trace dans les raisons de Claude.
+        estPartenaire() ? '' : champ(couper(d.notes, 400))].join(' | ');
     }),
   ].join('\n');
   const r = await appelClaude({ consignes: CONSIGNES_RECHERCHE_F, schema: SCHEMA_RECHERCHE_F, contenu, max: 4000 });
@@ -6195,7 +6286,15 @@ async function traiter(req, res, ip) {
         res.setHeader('X-Content-Type-Options', 'nosniff');
         return res.status(200).send(octets);
       }
+      if (params.get('piece_organisme') !== null) {
+        const p = await lirePieceOrganisme(params.get('piece_organisme'), { sb });
+        res.setHeader('Content-Type', p.mime || 'application/octet-stream');
+        res.setHeader('Content-Disposition', `inline; filename*=UTF-8''${encodeURIComponent(p.nom)}`);
+        res.setHeader('X-Content-Type-Options', 'nosniff');
+        return res.status(200).send(p.octets);
+      }
       if (params.get('contrat') !== null) {
+        if (estPartenaire()) throw new Refus('reserve_admin', 403);
         const id = params.get('contrat');
         if (!UUID_RE.test(id)) throw new Refus('id_invalide');
         const [f] = (await sb(`iae_crm_formateurs?lead_id=eq.${id}&select=signature,contre_signature`)).lignes;
@@ -6212,7 +6311,8 @@ async function traiter(req, res, ip) {
         throw new Refus('json_invalide');
       }
     }
-    if (!estAdmin() && !OPS_EQUIPE.has(String(corps?.op || ''))) throw new Refus('reserve_admin', 403);
+    // Chacun ses opérations : un closer, Anna (setter, + formateurs et marchés), Ludovic (partenaire : ses marchés).
+    if (!opPermise(corps?.op)) throw new Refus('reserve_admin', 403);
     if (corps && corps.op === 'rediger') return res.status(200).json(await rediger(corps, ip));
     if (corps && corps.op === 'vocal') return res.status(200).json(await interpreterVocal(corps, ip));
     if (corps && corps.op === 'voix') return await envoyerVoix(res, corps, ip);

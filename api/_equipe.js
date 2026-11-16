@@ -16,6 +16,13 @@
  *   oppositions) et contrôle chaque
  *   création. Un oubli ailleurs dans le code ne peut donc pas montrer la fiche
  *   d'un autre.
+ * - Anna, Axel et Ludovic (13/11/2026, après le point appels d'offres) : le setter
+ *   (Anna) voit et gère aussi les dossiers des formateurs, sauf les valider
+ *   (contresignature, Gabriel seul) ; le rôle « partenaire » (Ludovic, LM Conseil,
+ *   adresse extérieure) ne voit que les formateurs (toutes leurs pièces, choix de
+ *   Gabriel), les marchés publics et les pièces de l'organisme, en lecture, et
+ *   propose des marchés. Les leads formateur portent '@formateurs' dans visible_par
+ *   (supabase/iae_crm_acces_roles.sql).
  * - LinkedIn (10/11/2026) : un membre qui a un robot sur son ordinateur (clé
  *   robot_cle_hash, créée par Gabriel) voit et valide les envois de son propre
  *   compte (colonne compte de iae_crm_linkedin), jamais ceux d'un autre.
@@ -31,8 +38,11 @@ import { createCipheriv, createDecipheriv, createHash, createHmac, randomBytes, 
 
 export const ADMIN_EMAIL = 'gabriel@ia-entrepreneur.fr';
 export const ADMIN = Object.freeze({ email: ADMIN_EMAIL, prenom: 'Gabriel', nom: 'Vanderbecken', role: 'admin', fonction: null, google: true });
-export const ROLES = ['closer', 'setter'];
+export const ROLES = ['closer', 'setter', 'partenaire'];
 const EMAIL_EQUIPE_RE = /^[a-z0-9._-]+@ia-entrepreneur\.fr$/;
+// Un partenaire (Ludovic, LM Conseil) garde son adresse à lui.
+const EMAIL_PARTENAIRE_RE = /^[a-z0-9._+-]+@[a-z0-9.-]+\.[a-z]{2,}$/;
+export const MARQUE_FORMATEURS = '@formateurs';
 const PORTEES = [
   'openid', 'email',
   'https://www.googleapis.com/auth/gmail.compose',
@@ -59,7 +69,24 @@ export const estAdmin = (u = moi()) => u.role === 'admin';
 export const nomComplet = (u = moi()) => [u.prenom, u.nom].filter(Boolean).join(' ');
 export const compte = () => moi().email;
 
-const FONCTION_DEFAUT = { closer: 'conseiller formation IA', setter: 'conseillère formation IA' };
+const FONCTION_DEFAUT = { closer: 'conseiller formation IA', setter: 'conseillère formation IA', partenaire: "partenaire appels d'offres" };
+
+// Qui voit et fait quoi, au-delà de ses propres leads (13/11/2026).
+export const estPartenaire = (u = moi()) => u.role === 'partenaire';
+export const voitFormateurs = (u = moi()) => ['admin', 'setter', 'partenaire'].includes(u.role);
+export const gereFormateurs = (u = moi()) => ['admin', 'setter'].includes(u.role);
+export const voitMarches = (u = moi()) => ['admin', 'setter', 'partenaire'].includes(u.role);
+export const permissionsDe = (u = moi()) => ({
+  leads: !estPartenaire(u),
+  formateurs: voitFormateurs(u),
+  gerer_formateurs: gereFormateurs(u),
+  valider_formateurs: estAdmin(u),
+  marches: voitMarches(u),
+  proposer_marches: estAdmin(u) || estPartenaire(u),
+  decider_marches: estAdmin(u),
+  pieces_organisme: voitMarches(u),
+  deposer_pieces_organisme: gereFormateurs(u),
+});
 export const fonctionDe = (u = moi()) => u.fonction || FONCTION_DEFAUT[u.role] || "fondateur d'IA-Entrepreneur";
 
 // Les consignes données à Claude sont écrites pour Gabriel : pour un membre, elles
@@ -148,14 +175,62 @@ export async function equipePourPage() {
 
 const FILTREES = new Set(['iae_crm_leads', 'iae_crm_contacts', 'iae_crm_activites', 'iae_crm_entrants']);
 const LECTURE_SEULE = new Set(['iae_crm_memos', 'iae_crm_modeles']);
+// Dossiers des formateurs : lus par setter et partenaire, écrits par le setter (sauf la validation).
+const TABLES_FORMATEURS = new Set(['iae_crm_formateurs', 'iae_crm_documents']);
+const RIEN = 'id=is.null'; // un filtre qui ne renvoie aucune ligne
 const ajouterFiltre = (chemin, f) => chemin + (chemin.includes('?') ? '&' : '?') + f;
 
-async function leadsVisibles(ids, email) {
+// « visible_par contient mon adresse », ou la recoupe avec {mon adresse, @formateurs} pour qui voit les formateurs.
+function filtreVisible(u) {
+  return voitFormateurs(u)
+    ? `visible_par=ov.${encodeURIComponent(`{"${u.email}","${MARQUE_FORMATEURS}"}`)}`
+    : `visible_par=cs.${encodeURIComponent(`{"${u.email}"}`)}`;
+}
+
+async function leadsVisibles(ids, u) {
   const uniques = [...new Set(ids)];
   if (!uniques.length) return true;
   if (!uniques.every((x) => /^[0-9a-f-]{36}$/i.test(String(x)))) return false;
-  const lignes = await sbBrut(`iae_crm_leads?id=in.(${uniques.join(',')})&visible_par=cs.${encodeURIComponent(`{"${email}"}`)}&select=id`);
+  const lignes = await sbBrut(`iae_crm_leads?id=in.(${uniques.join(',')})&${filtreVisible(u)}&select=id`);
   return (lignes || []).length === uniques.length;
+}
+
+// Ludovic : les formateurs, les marchés et les pièces de l'organisme. Rien d'autre, et en lecture
+// (sauf les marchés, dont les champs sont contrôlés par api/_marches.js).
+function garderPartenaire(chemin, methode, corps, table) {
+  const lecture = methode === 'GET';
+  if (table === 'iae_crm_leads' || table === 'iae_crm_contacts') {
+    if (!lecture) throw new RefusEquipe('reserve_admin');
+    return { chemin: ajouterFiltre(chemin, `visible_par=cs.${encodeURIComponent(`{"${MARQUE_FORMATEURS}"}`)}`), corps };
+  }
+  if (TABLES_FORMATEURS.has(table) || table === 'iae_crm_pieces_organisme') {
+    if (!lecture) throw new RefusEquipe('reserve_admin');
+    return { chemin, corps };
+  }
+  if (table === 'iae_crm_marches') {
+    if (methode === 'DELETE') throw new RefusEquipe('reserve_admin');
+    return { chemin, corps };
+  }
+  // Le reste (journal, À trier, mémo, modèles, LinkedIn) : rien, pour que le chargement de la page passe.
+  if (lecture && ['iae_crm_activites', 'iae_crm_entrants', 'iae_crm_memos', 'iae_crm_modeles', 'iae_crm_linkedin'].includes(table)) {
+    return { chemin: ajouterFiltre(chemin, RIEN), corps };
+  }
+  if (table === 'iae_crm_reglages' && lecture) return { chemin: ajouterFiltre(chemin, RIEN), corps };
+  throw new RefusEquipe('reserve_admin');
+}
+
+// Anna : les dossiers des formateurs (pas la validation, ni la contresignature).
+function garderFormateurs(chemin, methode, corps, u) {
+  if (methode === 'GET') return { chemin, corps };
+  if (!gereFormateurs(u) || methode === 'DELETE') throw new RefusEquipe('reserve_admin');
+  const nettoyer = (l) => {
+    const c = { ...(l || {}) };
+    delete c.valide_le; delete c.contre_signature;
+    if (c.statut === 'valide') delete c.statut;
+    return c;
+  };
+  const c = Array.isArray(corps) ? corps.map(nettoyer) : corps && typeof corps === 'object' ? nettoyer(corps) : corps;
+  return { chemin, corps: c };
 }
 
 async function proprietaireAutorise(email) {
@@ -171,7 +246,17 @@ export async function garder(chemin, methode = 'GET', corps) {
   const u = moi();
   if (estAdmin(u)) return { chemin, corps };
   const table = chemin.split('?')[0];
-  const visible = `visible_par=cs.${encodeURIComponent(`{"${u.email}"}`)}`;
+  if (estPartenaire(u)) return garderPartenaire(chemin, methode, corps, table);
+  const visible = filtreVisible(u);
+  if (TABLES_FORMATEURS.has(table)) {
+    if (!voitFormateurs(u)) throw new RefusEquipe('reserve_admin');
+    return garderFormateurs(chemin, methode, corps, u);
+  }
+  if (table === 'iae_crm_marches' || table === 'iae_crm_pieces_organisme') {
+    if (!voitMarches(u)) throw new RefusEquipe('reserve_admin');
+    if (methode === 'DELETE') throw new RefusEquipe('reserve_admin');
+    return { chemin, corps }; // champs et droits contrôlés par api/_marches.js
+  }
 
   if (table === 'iae_crm_reglages') {
     if (methode === 'GET') return { chemin: ajouterFiltre(chemin, `cle=like.${encodeURIComponent(`*|${u.email}`)}`), corps };
@@ -191,7 +276,7 @@ export async function garder(chemin, methode = 'GET', corps) {
     if (methode === 'POST') {
       if (/[?&]on_conflict=/.test(chemin)) throw new RefusEquipe('reserve_admin');
       const lignes = (Array.isArray(corps) ? corps : [corps]).map((l) => ({ ...(l || {}), compte: u.email }));
-      if (!(await leadsVisibles(lignes.map((l) => l.lead_id), u.email))) throw new RefusEquipe('lead_inaccessible');
+      if (!(await leadsVisibles(lignes.map((l) => l.lead_id), u))) throw new RefusEquipe('lead_inaccessible');
       return { chemin, corps: Array.isArray(corps) ? lignes : lignes[0] };
     }
     throw new RefusEquipe('reserve_admin');
@@ -217,7 +302,7 @@ export async function garder(chemin, methode = 'GET', corps) {
     if (c && typeof c === 'object') {
       delete c.visible_par;
       // Déplacer un contact ou une ligne du journal : seulement vers un de ses leads.
-      if (c.lead_id && !(await leadsVisibles([c.lead_id], u.email))) throw new RefusEquipe('lead_inaccessible');
+      if (c.lead_id && !(await leadsVisibles([c.lead_id], u))) throw new RefusEquipe('lead_inaccessible');
     }
     return { chemin: ajouterFiltre(chemin, visible), corps: c };
   }
@@ -238,7 +323,7 @@ export async function garder(chemin, methode = 'GET', corps) {
       }
     } else if (table === 'iae_crm_entrants') {
       for (const l of lignes) l.proprietaire = u.email;
-    } else if (!(await leadsVisibles(lignes.map((l) => l.lead_id), u.email))) {
+    } else if (!(await leadsVisibles(lignes.map((l) => l.lead_id), u))) {
       throw new RefusEquipe('lead_inaccessible');
     }
     return { chemin, corps: Array.isArray(corps) ? lignes : lignes[0] };
@@ -376,14 +461,19 @@ const texteCourt = (v, max = 120) => {
   return t || null;
 };
 
+const adresseAdmise = (email, role) => email !== ADMIN_EMAIL && email.length <= 254
+  && (EMAIL_EQUIPE_RE.test(email) || (role === 'partenaire' && EMAIL_PARTENAIRE_RE.test(email)));
+
 export async function operationEquipe(corps) {
   if (!estAdmin()) throw new RefusEquipe('reserve_admin');
   const email = String(corps.email || '').trim().toLowerCase();
-  if (!EMAIL_EQUIPE_RE.test(email) || email === ADMIN_EMAIL) throw new RefusEquipe('email_invalide', 400);
+  if (!EMAIL_EQUIPE_RE.test(email) && !EMAIL_PARTENAIRE_RE.test(email)) throw new RefusEquipe('email_invalide', 400);
+  if (email === ADMIN_EMAIL) throw new RefusEquipe('email_invalide', 400);
   const maintenant = new Date().toISOString();
 
   if (corps.op === 'equipe_creer') {
     if (!ROLES.includes(corps.role)) throw new RefusEquipe('role_invalide', 400);
+    if (!adresseAdmise(email, corps.role)) throw new RefusEquipe('email_invalide', 400);
     const prenom = texteCourt(corps.prenom);
     if (!prenom) throw new RefusEquipe('champ_requis:prenom', 400);
     const cle = nouvelleCle();
@@ -411,6 +501,7 @@ export async function operationEquipe(corps) {
     const v = { updated_at: maintenant };
     if (corps.role !== undefined) {
       if (!ROLES.includes(corps.role)) throw new RefusEquipe('role_invalide', 400);
+      if (!adresseAdmise(email, corps.role)) throw new RefusEquipe('email_invalide', 400);
       v.role = corps.role;
     }
     if (corps.actif !== undefined) v.actif = corps.actif === true;
@@ -438,3 +529,16 @@ export const OPS_EQUIPE = new Set(['creer', 'maj', 'supprimer', 'journal', 'lot'
   // LinkedIn depuis son propre compte (10/11/2026) : sa file seulement (garder filtre par compte).
   'linkedin_preparer', 'linkedin_rediger', 'linkedin_valider', 'linkedin_annuler', 'linkedin_parti', 'linkedin_auto_couper']);
 export const REGLAGES_EQUIPE = new Set(['signature', 'rappel_matin']);
+// Anna (setter) : aussi les dossiers des formateurs (sauf formateur_valider), les marchés (profils,
+// formateurs, notes) et les pièces de l'organisme. Ludovic (partenaire) : proposer et suivre ses marchés.
+const OPS_SETTER = new Set([...OPS_EQUIPE, 'formateur_maj', 'formateur_lien', 'formateur_siret', 'piece_deposer', 'document_verifier',
+  'formateur_refuser', 'formateurs_chercher', 'marche_maj', 'organisme_deposer', 'organisme_archiver']);
+// La recherche des formateurs en langage courant (Claude) sert aussi à Ludovic pour ses appels d'offres.
+const OPS_PARTENAIRE = new Set(['marche_creer', 'marche_maj', 'formateurs_chercher']);
+export function opPermise(op, u = moi()) {
+  if (estAdmin(u)) return true;
+  const o = String(op || '');
+  if (u.role === 'partenaire') return OPS_PARTENAIRE.has(o);
+  if (u.role === 'setter') return OPS_SETTER.has(o);
+  return OPS_EQUIPE.has(o);
+}
