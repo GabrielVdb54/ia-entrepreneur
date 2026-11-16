@@ -2481,7 +2481,9 @@ const PAGES_METIER_LI = [
   // Assurance : skills en ligne le 16/11/2026 (rappel hebdo « skills de la semaine ») ; le dernier message offre la fiche conseil.
   { metier: 'agence ou cabinet de courtage en assurance', page: 'formation-ia-assurance.html', re: /assuran|agent g[ée]n[ée]ral/i,
     skill: { quoi: 'transforme vos notes de rendez-vous client en premier jet de fiche conseil', ancre: 'fiche-conseil-assurance' } },
-  { metier: 'agence immobilière', page: 'formation-ia-agence-immobiliere.html', re: /immobili|agence immo/i },
+  // Agences immobilières : skills en ligne le 16/11/2026 ; le dernier message offre l'annonce. Les syndics (SYNDIC_LI) gardent FindIA.
+  { metier: 'agence immobilière', page: 'formation-ia-agence-immobiliere.html', re: /immobili|agence immo/i,
+    skill: { quoi: 'transforme vos notes sur un bien en annonce prête à relire, avec les mentions à vérifier', ancre: 'annonce-immobiliere' } },
 ];
 const SYNDIC_LI = { metier: 'syndic de copropriété ou gestion locative', page: 'formation-ia-syndic-gestion-locative.html', re: /syndic|copropri|administrat\w* de biens/i };
 function pageMetierLi(l) {
@@ -5180,7 +5182,8 @@ async function redigerRelance1Email(e, l, c, { consigne = '', accueil = false } 
 // La relance 2 : la ressource du métier (même table que LinkedIn, PAGES_METIER_LI), sans question, puis fin. BTP : le skill
 // d'analyse d'un dossier d'appel d'offres si le 1er email parlait de marchés publics ou d'appels d'offres, sinon celui du
 // compte rendu de chantier ; propreté : plan de nettoyage et devis ; tout autre métier qui a un skill dans PAGES_METIER_LI
-// (assurance depuis le 16/11/2026 : la fiche conseil) : ce skill ; les autres métiers : FindIA. Texte fixe, pas de Claude.
+// (assurance et agences immobilières depuis le 16/11/2026 : la fiche conseil, l'annonce) : ce skill ; les autres métiers,
+// syndics compris : FindIA. Texte fixe, pas de Claude.
 const SKILLS_EMAIL = 'https://ia-entrepreneur.fr/skills-ia-gratuits.html';
 function ressourceRelance2Email(e, l) {
   const metier = metierEmail(l);

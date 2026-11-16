@@ -33,9 +33,10 @@ METIERS = {
     'btp': ('BTP', '/formation-ia-btp.html'),
     'proprete': ('Propreté', '/formation-ia-proprete.html'),
     'assurance': ('Assurance', '/formation-ia-assurance.html'),
+    'immobilier': ('Immobilier', '/formation-ia-agence-immobiliere.html'),
 }
 # Le métier avec son article, pour les phrases (« la formation IA pour le BTP, la propreté et l'assurance »)
-ARTICLES = {'btp': 'le BTP', 'proprete': 'la propreté', 'assurance': "l'assurance"}
+ARTICLES = {'btp': 'le BTP', 'proprete': 'la propreté', 'assurance': "l'assurance", 'immobilier': 'les agences immobilières'}
 
 # Ordre d'affichage. « metiers » décide sur quelles pages métier la carte apparaît.
 SKILLS = [
@@ -95,6 +96,27 @@ SKILLS = [
          donne="ce que vous avez sur le dossier : déclaration, mails, notes d'appel, devis, rapport d'expert.",
          rend="la fiche du dossier, la chronologie, l'étape en cours, les pièces reçues et manquantes, les relances prêtes à envoyer et un point d'étape pour l'assuré.",
          reste="vérifier les dates dans votre logiciel ; la position sur la garantie et les montants restent à la compagnie et à l'expert."),
+    # Agences immobilières (16/11/2026, même rappel ; la veille du jour les met en 3e cible, agences indépendantes de 3 à 9
+    # salariés). Tâches tirées de la recherche du 09/11 : annonce (mentions, non-discrimination), compte rendu de visite
+    # au vendeur (Étude Opco EP 2026), documents de copropriété avant une vente.
+    dict(slug='annonce-immobiliere', metiers=['immobilier'],
+         titre="L'annonce d'un bien, mentions comprises",
+         resume="Vos notes sur un bien deviennent l'annonce pour les portails, une version courte et la liste des informations à vérifier avant de publier.",
+         donne='la fiche du bien, vos notes de visite ou votre dictée.',
+         rend="le titre, le texte pour les portails, la version courte, la fiche des informations chiffrées et ce qu'il manque avant publication (prix ou loyer, honoraires, DPE, charges). Il retire tout critère sur la personne recherchée.",
+         reste="relire chaque chiffre contre le mandat et les diagnostics : le skill n'invente ni surface, ni prix, ni DPE."),
+    dict(slug='compte-rendu-visite-vendeur', metiers=['immobilier'],
+         titre='Le compte rendu de visite pour le vendeur',
+         resume='Vos notes après les visites deviennent le compte rendu de l\'agence, le mail au propriétaire et les relances des visiteurs intéressés.',
+         donne='vos notes ou votre dictée en sortant des visites.',
+         rend="le compte rendu par visite, la synthèse des retours, le mail au vendeur sans donnée personnelle des visiteurs, les relances et le tableau des actions.",
+         reste="relire le mail au vendeur et décider des suites : le skill ne promet ni offre, ni délai, ni prix."),
+    dict(slug='lecture-pv-copropriete', metiers=['immobilier'],
+         titre="Les PV d'assemblée générale avant une vente",
+         resume="Les procès-verbaux et documents de copropriété lus pour vous : travaux votés, appels de fonds, procédures, chacun avec sa résolution.",
+         donne="les procès-verbaux d'assemblée générale, et si vous les avez le pré-état daté, le carnet d'entretien ou les appels de fonds.",
+         rend="les travaux votés ou rejetés, les finances de la copropriété, les désordres cités, ce qu'il faut signaler à l'acquéreur et le mail de questions au syndic.",
+         reste="revenir aux procès-verbaux et laisser l'avant-contrat et le notaire répartir les travaux entre vendeur et acquéreur."),
 ]
 
 
@@ -275,13 +297,13 @@ def hero():
     <div class="container imm-outil-hero-grille">
       <div class="imm-outil-hero-texte">
         <h1>Des skills IA gratuits pour votre métier</h1>
-        <p class="imm-pour">Pour vos <span class="imm-rotatif" data-mots="comptes rendus de chantier|devis après visite|appels d'offres|fiches conseil|consignes de site|suivis de sinistre|réponses aux réclamations">comptes rendus de chantier</span></p>
+        <p class="imm-pour">Pour vos <span class="imm-rotatif" data-mots="comptes rendus de chantier|devis après visite|appels d'offres|fiches conseil|annonces immobilières|consignes de site|suivis de sinistre|comptes rendus de visite|réponses aux réclamations">comptes rendus de chantier</span></p>
         <p class="lead">Un skill est une consigne écrite une fois pour toutes. Vous donnez vos notes en vrac, l'IA rend un document en ordre, avec ce qu'il vous reste à vérifier. Installez-le dans Claude ou Gemini en une minute, ou copiez sa version texte dans ChatGPT, Mistral ou Copilot.</p>
         <div class="imm-voie-actions" style="margin-top:0">
           <a href="#skills" class="btn-primary">Voir les skills {FLECHE}</a>
           <a href="#installer" class="imm-lien">Comment l'installer</a>
         </div>
-        <ul class="imm-outil-faits"><li>Gratuits, sans inscription</li><li>Du texte que vous pouvez lire, aucun code</li><li>Testés sur des cas de BTP, de propreté et d'assurance</li></ul>
+        <ul class="imm-outil-faits"><li>Gratuits, sans inscription</li><li>Du texte que vous pouvez lire, aucun code</li><li>Testés sur des cas de BTP, de propreté, d'assurance et d'immobilier</li></ul>
       </div>
       <figure class="sk-demo" style="margin:0">
         <div class="sk-demo-avant"><span class="sk-demo-etiquette">Vos notes, dictées en sortant</span><p>« bon alors réunion de chantier numéro 7 ce matin, résidence Les Tilleuls à Laxou [...] Karim dit fin de semaine prochaine [...] le garde-corps provisoire au R+2 côté rue a été retiré, Karim doit le remettre aujourd'hui [...] »</p></div>
@@ -464,7 +486,7 @@ FAQ = [
     ("Puis-je adapter un skill à mon entreprise ?",
      "Oui. Ouvrez le fichier SKILL.md ou la version texte : c'est du français. Ajoutez vos règles, vos modèles de documents, vos mentions habituelles. C'est ce que nous faisons avec votre équipe en <a class=\"sk-lien\" href=\"/formation-ia-entreprise.html#niveau-2\">formation IA métier (niveau 2)</a>, à partir de vos propres dossiers."),
     ("D'autres métiers vont-ils arriver ?",
-     "Oui, nous en préparons pour les agences immobilières, les syndics et la gestion locative. Si votre métier n'y est pas, dites-nous quelle tâche vous prend le plus de temps."),
+     "Oui, nous en préparons pour les syndics et la gestion locative. Si votre métier n'y est pas, dites-nous quelle tâche vous prend le plus de temps."),
 ]
 
 
@@ -508,7 +530,8 @@ SCRIPT = '''
       cartes.forEach(function (c) { c.hidden = !!m && (' ' + c.getAttribute('data-metiers') + ' ').indexOf(' ' + m + ' ') < 0; });
     }
     filtres.forEach(function (b) { b.addEventListener('click', function () { filtrer(b.getAttribute('data-filtre')); }); });
-    function depuisAncre() { var h = (location.hash || '').slice(1); if (h === 'btp' || h === 'proprete') filtrer(h); }
+    // Tout métier qui a son bouton de filtre (jusqu'au 16/11/2026, seuls #btp et #proprete filtraient)
+    function depuisAncre() { var h = (location.hash || '').slice(1); for (var i = 0; i < filtres.length; i++) if (filtres[i].getAttribute('data-filtre') === h) filtrer(h); }
     depuisAncre();
     window.addEventListener('hashchange', depuisAncre);
     function evt(nom, skill) { if (window.gtag) gtag('event', nom, { skill: skill }); }
@@ -555,9 +578,9 @@ def bloc_metier(metier):
 
 # ---------------------------------------------------------------- page
 
-TITRE = 'Skills IA gratuits par métier : BTP, propreté, assurance'
+TITRE = 'Skills IA gratuits : BTP, propreté, assurance, immobilier'
 DESC = ("Skills gratuits pour Claude, Gemini, ChatGPT : compte rendu de chantier, devis, "
-        "appel d'offres, fiche conseil assurance, sinistre. Testés, sans code.")
+        "appel d'offres, fiche conseil assurance, annonce immobilière. Sans code.")
 IMAGE = 'formation-ia-equipes.jpg'
 
 
