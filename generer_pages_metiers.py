@@ -879,8 +879,11 @@ def page(p):
     # immersion.js fait entrer en cascade, au défilement, tout élément .reveal (et rien si l'appareil demande moins d'animations)
     corps = corps.replace('class="imm-limite"', 'class="imm-limite reveal"')
     # Le but de la page est l'appel de 30 minutes : c'est le bouton principal du hero, et le second mène à la fiche
-    nb = corps.count('class="fiche-tache"')
-    ancien = (f'<a href="/formation-ia-entreprise.html#devis" class="btn-primary">Construire mon programme {FLECHE}</a>\n'
+    # Les tâches de la seule section #fiche : le bloc #skills réutilise la classe fiche-tache pour ses cartes
+    # (jusqu'au 16/11/2026, les pages BTP et propreté annonçaient 16 tâches pour 12)
+    debut_f = corps.index('<section class="fiche-section" id="fiche">')
+    nb = corps[debut_f:corps.index('\n  </section>', debut_f)].count('class="fiche-tache"')
+    ancien =(f'<a href="/formation-ia-entreprise.html#devis" class="btn-primary">Construire mon programme {FLECHE}</a>\n'
               '          <a href="/rendez-vous.html" class="imm-lien">Réserver un appel de 30 min</a>')
     assert corps.count(ancien) == 1, p['slug']
     corps = corps.replace(ancien, f'<a href="/rendez-vous.html" class="btn-primary">Réserver un appel de 30 min {FLECHE}</a>\n'

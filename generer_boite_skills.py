@@ -32,7 +32,10 @@ DATE_ZIP = (2026, 11, 9, 0, 0, 0)
 METIERS = {
     'btp': ('BTP', '/formation-ia-btp.html'),
     'proprete': ('Propreté', '/formation-ia-proprete.html'),
+    'assurance': ('Assurance', '/formation-ia-assurance.html'),
 }
+# Le métier avec son article, pour les phrases (« la formation IA pour le BTP, la propreté et l'assurance »)
+ARTICLES = {'btp': 'le BTP', 'proprete': 'la propreté', 'assurance': "l'assurance"}
 
 # Ordre d'affichage. « metiers » décide sur quelles pages métier la carte apparaît.
 SKILLS = [
@@ -72,6 +75,26 @@ SKILLS = [
          donne="le mail ou l'avis du client, et ce que vous savez : relevé de passage, contrat, notes.",
          rend='ce que reproche le client et le risque, les faits à vérifier, la réponse prête à envoyer, la variante si le client a raison et une réponse publique pour un avis Google.',
          reste="vérifier les faits sur place et décider d'un éventuel geste commercial."),
+    # Assurance (16/11/2026, rappel hebdo « skills de la semaine », d'après la recherche métier du 09/11 :
+    # devoir de conseil art. L521-4, Observatoire Agéa 2026 sur les sinistres, cas d'usage Planète CSCA)
+    dict(slug='fiche-conseil-assurance', metiers=['assurance'],
+         titre='La fiche conseil après un rendez-vous client',
+         resume="Vos notes de rendez-vous, dictées en sortant, deviennent les besoins du client, la liste de ce qu'il manque, le premier jet de la fiche conseil et le mail de suivi.",
+         donne='vos notes ou votre dictée de rendez-vous, sans donnée de santé.',
+         rend="la situation du client, ses exigences et besoins dans ses mots, les informations et pièces à obtenir, le premier jet de la fiche conseil avec la raison de chaque proposition et le mail de suivi.",
+         reste="le conseil et sa motivation : le skill ne choisit aucun contrat à votre place."),
+    dict(slug='comparer-offres-assurance', metiers=['assurance'],
+         titre="Comparer deux propositions d'assurance",
+         resume="Deux devis ou contrats mis côte à côte : garanties, franchises, plafonds et exclusions, chaque ligne avec sa source.",
+         donne='les devis, les conditions générales ou particulières, ou le document d\'information (IPID), et les besoins du client.',
+         rend="le tableau des garanties, les franchises et plafonds, les exclusions qui changent la donne, les écarts qui comptent pour ce client, les questions à poser aux compagnies et une synthèse à montrer au client.",
+         reste="revenir aux conditions générales pour chaque point qui compte, puis conseiller : le skill ne désigne aucune offre."),
+    dict(slug='suivi-sinistre-assurance', metiers=['assurance'],
+         titre='Le point sur un dossier de sinistre',
+         resume="La déclaration, les mails et le rapport d'expert remis en ordre : où en est le dossier, ce qu'il manque, qui relancer.",
+         donne="ce que vous avez sur le dossier : déclaration, mails, notes d'appel, devis, rapport d'expert.",
+         rend="la fiche du dossier, la chronologie, l'étape en cours, les pièces reçues et manquantes, les relances prêtes à envoyer et un point d'étape pour l'assuré.",
+         reste="vérifier les dates dans votre logiciel ; la position sur la garantie et les montants restent à la compagnie et à l'expert."),
 ]
 
 
@@ -252,13 +275,13 @@ def hero():
     <div class="container imm-outil-hero-grille">
       <div class="imm-outil-hero-texte">
         <h1>Des skills IA gratuits pour votre métier</h1>
-        <p class="imm-pour">Pour vos <span class="imm-rotatif" data-mots="comptes rendus de chantier|devis après visite|appels d'offres|consignes de site|réponses aux réclamations">comptes rendus de chantier</span></p>
+        <p class="imm-pour">Pour vos <span class="imm-rotatif" data-mots="comptes rendus de chantier|devis après visite|appels d'offres|fiches conseil|consignes de site|suivis de sinistre|réponses aux réclamations">comptes rendus de chantier</span></p>
         <p class="lead">Un skill est une consigne écrite une fois pour toutes. Vous donnez vos notes en vrac, l'IA rend un document en ordre, avec ce qu'il vous reste à vérifier. Installez-le dans Claude ou Gemini en une minute, ou copiez sa version texte dans ChatGPT, Mistral ou Copilot.</p>
         <div class="imm-voie-actions" style="margin-top:0">
           <a href="#skills" class="btn-primary">Voir les skills {FLECHE}</a>
           <a href="#installer" class="imm-lien">Comment l'installer</a>
         </div>
-        <ul class="imm-outil-faits"><li>Gratuits, sans inscription</li><li>Du texte que vous pouvez lire, aucun code</li><li>Testés sur des cas de BTP et de propreté</li></ul>
+        <ul class="imm-outil-faits"><li>Gratuits, sans inscription</li><li>Du texte que vous pouvez lire, aucun code</li><li>Testés sur des cas de BTP, de propreté et d'assurance</li></ul>
       </div>
       <figure class="sk-demo" style="margin:0">
         <div class="sk-demo-avant"><span class="sk-demo-etiquette">Vos notes, dictées en sortant</span><p>« bon alors réunion de chantier numéro 7 ce matin, résidence Les Tilleuls à Laxou [...] Karim dit fin de semaine prochaine [...] le garde-corps provisoire au R+2 côté rue a été retiré, Karim doit le remettre aujourd'hui [...] »</p></div>
@@ -357,10 +380,10 @@ OUTILS = [
         "Choisissez le fichier .zip, sans le décompresser.",
     ], "Ensuite, collez vos notes : Claude reconnaît la demande et applique le skill. En offre Team ou Enterprise, vous pouvez le partager avec votre équipe ; en Enterprise, c'est le propriétaire du compte qui autorise les compétences."),
     ('Gemini', "Gratuit, avec un compte Google personnel. Fichier : le SKILL.md seul.", [
-        "Sur gemini.google.com ou l'application Mac, ouvrez la barre latérale, puis Personnaliser (ou Plus), puis Compétences.",
+        "Sur gemini.google.com, ouvrez la barre latérale, puis Personnaliser (ou Plus), puis Compétences.",
         "Cliquez sur Créer, puis Importer.",
         "Choisissez le fichier SKILL.md, puis Ouvrir et Créer.",
-    ], "Il faut avoir 18 ans et laisser « Conserver l'activité » activé. Les Gems des comptes personnels deviennent des compétences le 17 décembre 2026. Avec un compte Google Workspace d'entreprise, collez la version texte dans un Gem en attendant."),
+    ], "Il faut avoir 18 ans. Le 17 novembre 2026, les Gems des comptes personnels deviennent des compétences et passent en lecture seule ; ils sont supprimés le 17 décembre 2026. Avec un compte Google Workspace d'entreprise, collez la version texte dans un Gem en attendant."),
     ('ChatGPT', "Toutes les offres avec la version texte.", [
         "Créez un projet depuis la barre latérale.",
         "Ouvrez les paramètres du projet et collez la version texte dans ses instructions.",
@@ -402,7 +425,7 @@ def installation():
       <div class="sk-outils">
 {chr(10).join(blocs)}
       </div>
-      <p class="sk-sources">Démarches vérifiées le 9 novembre 2026 sur les pages d'aide des éditeurs : {sources}. Les menus changent souvent : si un intitulé a bougé, cherchez « skills » ou « instructions » dans les réglages.</p>
+      <p class="sk-sources">Démarches vérifiées le 16 novembre 2026 sur les pages d'aide des éditeurs : {sources}. Les menus changent souvent : si un intitulé a bougé, cherchez « skills » ou « instructions » dans les réglages.</p>
     </div>
   </section>
 '''
@@ -441,7 +464,7 @@ FAQ = [
     ("Puis-je adapter un skill à mon entreprise ?",
      "Oui. Ouvrez le fichier SKILL.md ou la version texte : c'est du français. Ajoutez vos règles, vos modèles de documents, vos mentions habituelles. C'est ce que nous faisons avec votre équipe en <a class=\"sk-lien\" href=\"/formation-ia-entreprise.html#niveau-2\">formation IA métier (niveau 2)</a>, à partir de vos propres dossiers."),
     ("D'autres métiers vont-ils arriver ?",
-     "Oui, nous en préparons pour les agences immobilières, les syndics et la gestion locative, et l'assurance. Si votre métier n'y est pas, dites-nous quelle tâche vous prend le plus de temps."),
+     "Oui, nous en préparons pour les agences immobilières, les syndics et la gestion locative. Si votre métier n'y est pas, dites-nous quelle tâche vous prend le plus de temps."),
 ]
 
 
@@ -459,12 +482,13 @@ def faq_section():
 
 
 def cta():
-    liens = ' et '.join(f'<a class="sk-lien" href="{u}" style="color:inherit">{n.lower() if n != "BTP" else n}</a>' for n, u in METIERS.values())
+    liens = [f'<a class="sk-lien" href="{u}" style="color:inherit">{ARTICLES[k]}</a>' for k, (n, u) in METIERS.items()]
+    liens = ', '.join(liens[:-1]) + ' et ' + liens[-1] if len(liens) > 1 else liens[0]
     return f'''
   <section class="cta-final">
     <div class="container">
       <h2>Des skills construits sur vos propres dossiers</h2>
-      <p>Ces skills partent de cas types. En formation, on écrit avec votre équipe ceux qui collent à vos modèles, à vos clients et à vos logiciels. Voir la formation IA pour le {liens}.</p>
+      <p>Ces skills partent de cas types. En formation, on écrit avec votre équipe ceux qui collent à vos modèles, à vos clients et à vos logiciels. Voir la formation IA pour {liens}.</p>
       <div class="imm-voie-actions" style="justify-content:center">
         <a href="/rendez-vous.html" class="btn-primary">Réserver un appel de 30 min {FLECHE}</a>
         <a href="/formation-ia-entreprise.html#niveau-2" class="imm-lien">Voir la formation IA métier</a>
@@ -531,9 +555,9 @@ def bloc_metier(metier):
 
 # ---------------------------------------------------------------- page
 
-TITRE = 'Skills IA gratuits par métier : BTP, propreté'
+TITRE = 'Skills IA gratuits par métier : BTP, propreté, assurance'
 DESC = ("Skills gratuits pour Claude, Gemini, ChatGPT : compte rendu de chantier, devis, "
-        "appel d'offres, consignes de site. Testés, sans code, sans inscription.")
+        "appel d'offres, fiche conseil assurance, sinistre. Testés, sans code.")
 IMAGE = 'formation-ia-equipes.jpg'
 
 

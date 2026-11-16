@@ -2478,7 +2478,9 @@ const PAGES_METIER_LI = [
   { metier: 'entreprise de propreté', page: 'formation-ia-proprete.html', re: /propret[ée]|nettoyage|entretien des locaux/i,
     skill: { quoi: "transforme vos notes de visite d'un site en plan de nettoyage et en courrier de devis", ancre: 'devis-plan-nettoyage' } },
   { metier: 'entreprise du BTP', page: 'formation-ia-btp.html', skill: { quoi: 'transforme vos notes de réunion de chantier en compte rendu prêt à relire', ancre: 'compte-rendu-chantier' }, re: /\bBTP\b|b[âa]timent|travaux publics|ma[çc]onnerie|gros[- ][oœ]e?uvre|second[- ][oœ]e?uvre|charpente|couverture|plomberie|terrassement/i },
-  { metier: 'agence ou cabinet de courtage en assurance', page: 'formation-ia-assurance.html', re: /assuran|agent g[ée]n[ée]ral/i },
+  // Assurance : skills en ligne le 16/11/2026 (rappel hebdo « skills de la semaine ») ; le dernier message offre la fiche conseil.
+  { metier: 'agence ou cabinet de courtage en assurance', page: 'formation-ia-assurance.html', re: /assuran|agent g[ée]n[ée]ral/i,
+    skill: { quoi: 'transforme vos notes de rendez-vous client en premier jet de fiche conseil', ancre: 'fiche-conseil-assurance' } },
   { metier: 'agence immobilière', page: 'formation-ia-agence-immobiliere.html', re: /immobili|agence immo/i },
 ];
 const SYNDIC_LI = { metier: 'syndic de copropriété ou gestion locative', page: 'formation-ia-syndic-gestion-locative.html', re: /syndic|copropri|administrat\w* de biens/i };
@@ -5177,7 +5179,8 @@ async function redigerRelance1Email(e, l, c, { consigne = '', accueil = false } 
 }
 // La relance 2 : la ressource du métier (même table que LinkedIn, PAGES_METIER_LI), sans question, puis fin. BTP : le skill
 // d'analyse d'un dossier d'appel d'offres si le 1er email parlait de marchés publics ou d'appels d'offres, sinon celui du
-// compte rendu de chantier ; propreté : plan de nettoyage et devis ; les autres métiers : FindIA. Texte fixe, pas de Claude.
+// compte rendu de chantier ; propreté : plan de nettoyage et devis ; tout autre métier qui a un skill dans PAGES_METIER_LI
+// (assurance depuis le 16/11/2026 : la fiche conseil) : ce skill ; les autres métiers : FindIA. Texte fixe, pas de Claude.
 const SKILLS_EMAIL = 'https://ia-entrepreneur.fr/skills-ia-gratuits.html';
 function ressourceRelance2Email(e, l) {
   const metier = metierEmail(l);
@@ -5189,6 +5192,7 @@ function ressourceRelance2Email(e, l) {
     return { quoi: skill?.quoi || 'transforme vos notes de réunion de chantier en compte rendu prêt à relire', url: `${SKILLS_EMAIL}#compte-rendu-chantier` };
   }
   if (metier === 'de la propreté') return { quoi: skill?.quoi || "transforme vos notes de visite d'un site en plan de nettoyage et en courrier de devis", url: `${SKILLS_EMAIL}#devis-plan-nettoyage` };
+  if (skill) return { quoi: skill.quoi, url: skill.url };
   return { findia: true, url: 'https://ia-entrepreneur.fr/meilleures-ia.html' };
 }
 function texteRelance2Email(e, l, c) {
