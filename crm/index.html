@@ -2847,7 +2847,7 @@ async function recosEnFond() {
     for (const l of cibles) {
       if (S.recapEnCours.size) await new Promise((ok) => setTimeout(ok, 500));
       S.recosFaits++;
-      await faireRecap(l.id, { auto: true });
+      await faireRecap(l.id, { auto: true, fond: true });
       const carteEl = $(`#vue .carte[data-id="${l.id}"]`);
       const maj = IDX.lead.get(l.id);
       if (carteEl && maj && S.vue === 'jour' && !S.q) carteEl.outerHTML = carte(maj);
@@ -2862,13 +2862,14 @@ function majRecaps(leadId) {
   const l = IDX.lead.get(leadId);
   if (z && l) z.outerHTML = blocRecap(l, { compact: true });
 }
-async function faireRecap(leadId, { auto = false } = {}) {
+async function faireRecap(leadId, { auto = false, fond = false } = {}) {
   if (!D.ia || S.recapEnCours.has(leadId)) return;
   S.recapEnCours.add(leadId);
   S.recapTente.add(leadId);
   majRecaps(leadId);
   try {
-    const r = await api('POST', { op: 'recap', lead_id: leadId });
+    // fond : récap des relances à venir lancé en arrière-plan, compté à part dans le relevé de consommation.
+    const r = await api('POST', fond ? { op: 'recap', lead_id: leadId, fond: true } : { op: 'recap', lead_id: leadId });
     remplacerLead(r.lead);
     indexer();
   } catch (e) {

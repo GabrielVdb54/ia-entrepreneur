@@ -16,6 +16,7 @@
 
 import { createHash, randomBytes } from 'node:crypto';
 import Anthropic from '@anthropic-ai/sdk';
+import { noterConso } from './_conso.js';
 
 export const BUCKET = 'iae-crm-formateurs';
 const MODELE = 'claude-opus-5-5';
@@ -213,6 +214,7 @@ async function lirePiece({ octets, mime, type, f }) {
     system: [{ type: 'text', text: CONSIGNES_LECTURE, cache_control: { type: 'ephemeral' } }],
     messages: [{ role: 'user', content: [fichier, { type: 'text', text: contexte }] }],
   });
+  await noterConso('lecture_document', r);
   if (r.stop_reason === 'refusal') return { erreur: 'refus' };
   const l = JSON.parse((r.content || []).filter((b) => b.type === 'text').map((b) => b.text).join(''));
   const date = (x) => (DATE_RE.test(x || '') ? x : '');

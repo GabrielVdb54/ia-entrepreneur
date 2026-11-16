@@ -140,6 +140,10 @@ import { MODALITES, nouveauJetonEval, questionnaire, propre as propreEval } from
 import {
   deposerPiece, empreinte as empreinteTexte, etatDossier, lireFichier, majStatut, nouveauJeton, verifierSiret, aujourdHui as aujourdHuiF,
 } from './_formateurs.js';
+import { noterConso } from './_conso.js';
+
+// Chaque réponse de Claude est relevée avec sa fonction (iae_crm_conso, 16/11/2026) : savoir ce qui coûte.
+const conso = (fonction, reponse) => noterConso(fonction, reponse, { compte: compte() });
 
 // La rédaction par Claude peut prendre une quinzaine de secondes.
 export const maxDuration = 60;
@@ -969,6 +973,7 @@ async function rediger(corps, ip) {
     if (e instanceof Anthropic.APIError) { console.error('crm rédaction', e.status, e.message); throw new Refus('ia_erreur', 502); }
     throw e;
   }
+  await conso('redaction_notes', reponse);
   if (reponse.stop_reason === 'refusal') throw new Refus('ia_refus', 422);
   if (reponse.stop_reason === 'max_tokens') throw new Refus('ia_coupe', 502);
   const texte = (reponse.content || []).filter((b) => b.type === 'text').map((b) => b.text).join('');
@@ -1391,6 +1396,7 @@ async function analyserEmails(items, ann) {
         system: [{ type: 'text', text: pourMoi(CONSIGNES_TRI), cache_control: { type: 'ephemeral' } }],
         messages: [{ role: 'user', content: contenu }],
       });
+      await conso('tri_emails', r);
       if (r.stop_reason === 'refusal') continue;
       const brut = (r.content || []).filter((b) => b.type === 'text').map((b) => b.text).join('');
       const { decisions: ds } = JSON.parse(brut);
@@ -1700,6 +1706,7 @@ async function jugerEnvoi(lead, { objet, texte, dest, quand, pieces = [] }) {
   const envoi = new Date(quand).toLocaleString('fr-FR', { timeZone: 'Europe/Paris', weekday: 'long', day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
   try {
     const r = await appelClaude({
+      fonction: 'verif_envoi',
       consignes: CONSIGNES_TACHE_FAITE,
       schema: SCHEMA_TACHE_FAITE,
       max: 1500,
@@ -1994,7 +2001,7 @@ function nettoyerProgramme(c) {
   if (!programme.titre) throw new Refus('programme_invalide');
   return programme;
 }
-async function appelClaude({ consignes, schema, contenu, effort = 'low', max = 6000, timeout = 50000 }) {
+async function appelClaude({ fonction = 'autre', consignes, schema, contenu, effort = 'low', max = 6000, timeout = 50000 }) {
   if (!process.env.ANTHROPIC_API_KEY) throw new Refus('ia_non_configuree', 503);
   const client = new Anthropic({ timeout, maxRetries: 1 });
   let r;
@@ -2014,6 +2021,7 @@ async function appelClaude({ consignes, schema, contenu, effort = 'low', max = 6
     if (e instanceof Anthropic.APIError) { console.error('crm claude', e.status, e.message); throw new Refus('ia_erreur', 502); }
     throw e;
   }
+  await conso(fonction, r);
   if (r.stop_reason === 'refusal') throw new Refus('ia_refus', 422);
   if (r.stop_reason === 'max_tokens') throw new Refus('ia_coupe', 502);
   try { return JSON.parse((r.content || []).filter((b) => b.type === 'text').map((b) => b.text).join('')); } catch { throw new Refus('ia_erreur', 502); }
@@ -2039,7 +2047,7 @@ async function recommander(prog) {
     'Formateurs (id | nom | dossier | zone | distanciel | niveaux | compétences | outils | secteurs | disponibilités | tarif jour) :',
     ...candidats.map(({ l, d }) => [l.id, l.entreprise, d.statut, d.zone || '?', d.distanciel === false ? 'non' : 'oui', (d.niveaux || []).join(',') || '?', couper((d.competences || []).join(' ; '), 700), (d.outils || []).join(', '), (d.secteurs || []).join(', '), d.disponibilites || '?', d.tarif_jour ? `${d.tarif_jour} €` : '?'].join(' | ')),
   ].join('\n');
-  const r = await appelClaude({ consignes: CONSIGNES_RECOMMANDATION, schema: SCHEMA_RECOMMANDATION, contenu, max: 3000 });
+  const r = await appelClaude({ fonction: 'formateurs_recommander', consignes: CONSIGNES_RECOMMANDATION, schema: SCHEMA_RECOMMANDATION, contenu, max: 3000 });
   const vus = new Set();
   const liste = (r.recommandations || []).filter((x) => parId.has(x.lead_id) || leadsF.some((l) => l.id === x.lead_id)).filter((x) => !vus.has(x.lead_id) && vus.add(x.lead_id)).slice(0, 6).map((x) => {
     const cand = candidats.find((k) => k.l.id === x.lead_id);
@@ -2115,7 +2123,7 @@ async function chercherFormateurs(corps) {
         estPartenaire() ? '' : champ(couper(d.notes, 400))].join(' | ');
     }),
   ].join('\n');
-  const r = await appelClaude({ consignes: CONSIGNES_RECHERCHE_F, schema: SCHEMA_RECHERCHE_F, contenu, max: 4000 });
+  const r = await appelClaude({ fonction: 'formateurs_chercher', consignes: CONSIGNES_RECHERCHE_F, schema: SCHEMA_RECHERCHE_F, contenu, max: 4000 });
   const c = r.compris || {};
   const entier = (x, min, max) => { const n = Math.round(Number(x) || 0); return n >= min && n <= max ? n : 0; };
   const compris = {
@@ -2158,7 +2166,7 @@ async function operationProgramme(corps) {
       parametres.consigne ? `Consigne de Gabriel : ${parametres.consigne}` : '',
       `Derniers échanges :\n${acts.filter((a) => a.type !== 'import').map((a) => `- ${String(a.date).slice(0, 10)} ${a.resume}${a.contenu ? ` / ${couper(a.contenu, 400)}` : ''}`).join('\n')}`,
     ].filter(Boolean).join('\n');
-    const prog = nettoyerProgramme(await appelClaude({ consignes: CONSIGNES_PROGRAMME, schema: SCHEMA_PROGRAMME, contenu, max: 8000, timeout: 55000 }));
+    const prog = nettoyerProgramme(await appelClaude({ fonction: 'programme', consignes: CONSIGNES_PROGRAMME, schema: SCHEMA_PROGRAMME, contenu, max: 8000, timeout: 55000 }));
     const { lignes: [ligne] } = await sb('iae_crm_programmes', { methode: 'POST', corps: { lead_id: lead.id, titre: prog.titre, niveau, parametres, contenu: prog, statut: 'brouillon' }, prefer: 'return=representation' });
     await inserer('activites', { lead_id: lead.id, type: 'note', resume: `Programme rédigé (brouillon) : ${prog.titre}`.slice(0, 2000), source: 'crm' });
     return { programme: ligne };
@@ -2288,6 +2296,8 @@ async function recapLead(corps) {
     if (e instanceof Anthropic.APIError) { console.error('crm recap', e.status, e.message); throw new Refus('ia_erreur', 502); }
     throw e;
   }
+  // « recap_fond » : relancé par la page en arrière-plan (jusqu'à 25 par visite) ; « recap » : demandé ou fiche ouverte.
+  await conso(corps.fond === true ? 'recap_fond' : 'recap', reponse);
   if (reponse.stop_reason === 'refusal') throw new Refus('ia_refus', 422);
   let r;
   try { r = JSON.parse((reponse.content || []).filter((b) => b.type === 'text').map((b) => b.text).join('')); } catch { throw new Refus('ia_erreur', 502); }
@@ -2663,7 +2673,7 @@ async function redigerLi(c, l, etape, { consigne = '', message = '' } = {}) {
     estAdmin() ? '' : `Expéditeur : ${nomComplet()}, ${fonctionDe()} chez IA-Entrepreneur (il ne donne pas les formations lui-même) : au temps 3 du message 1, écris « Chez IA-Entrepreneur, nous formons des équipes de PME du Grand Est à… » plutôt que « Je forme… », et signe de son prénom.`,
     acts.length ? `Historique (du plus récent au plus ancien) :\n${acts.map((a) => `- ${String(a.date).slice(0, 10)} ${a.type} : ${couper(a.resume, 200)}${a.contenu && a.type === 'linkedin' ? ` | texte : ${couper(a.contenu, 500)}` : ''}`).join('\n')}` : '',
   ].filter(Boolean).join('\n');
-  const r = await appelClaude({ consignes: CONSIGNES_LI, schema: SCHEMA_LI, contenu: fiche, max: 2000, timeout: 40000 });
+  const r = await appelClaude({ fonction: 'linkedin', consignes: CONSIGNES_LI, schema: SCHEMA_LI, contenu: fiche, max: 2000, timeout: 40000 });
   return { texte: String(r.texte || '').trim(), appuis: (r.appuis || []).slice(0, 6) };
 }
 async function preparerAvecClaude(c, l, etape, opts) {
@@ -4215,7 +4225,7 @@ async function redigerEmail(e, l, c, { consigne = '', lieu = LIEU_DISTANCE_EMAIL
     autres.length ? `Autres faits publics :\n${autres.join('\n')}` : '',
     consigne ? `Consigne de Gabriel : ${couper(consigne, 300)}` : '',
   ].filter(Boolean).join('\n');
-  const r = await appelClaude({ consignes: CONSIGNES_EMAIL, schema: schemaEmail(jeu), contenu: fiche, max: 3000, timeout: 40000 });
+  const r = await appelClaude({ fonction: 'prospection_email', consignes: CONSIGNES_EMAIL, schema: schemaEmail(jeu), contenu: fiche, max: 3000, timeout: 40000 });
   const objet = String(r.objet || '').replace(/[\r\n]+/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 120);
   const accroche = String(r.accroche || '').replace(/\s+/g, ' ').trim();
   if (!objet || !accroche) throw new Refus('ia_erreur', 502);
@@ -5168,7 +5178,7 @@ async function redigerRelance1Email(e, l, c, { consigne = '', accueil = false } 
     Array.isArray(seq.premier?.appuis) && seq.premier.appuis.length ? `Ce qui justifiait le premier email : ${seq.premier.appuis.map((a) => `${a.fait}${a.source && a.source !== 'aucune' ? ` (${a.source}${a.date ? `, ${a.date}` : ''})` : ''}`).join(' ; ')}` : '',
     consigne ? `Consigne de Gabriel : ${couper(consigne, 300)}` : '',
   ].filter(Boolean).join('\n');
-  const r = await appelClaude({ consignes: CONSIGNES_RELANCE_EMAIL, schema: SCHEMA_RELANCE_EMAIL, contenu: fiche, max: 1500, timeout: 40000 });
+  const r = await appelClaude({ fonction: 'prospection_relance', consignes: CONSIGNES_RELANCE_EMAIL, schema: SCHEMA_RELANCE_EMAIL, contenu: fiche, max: 1500, timeout: 40000 });
   const usage = String(r.usage || '').replace(/\s+/g, ' ').trim();
   if (!usage) throw new Refus('ia_erreur', 502);
   const demande = `Je peux vous le montrer sur ${documentRelanceEmail(r.document, metier)}. Ça vous intéresse ?`;
@@ -6022,6 +6032,7 @@ async function interpreterVocal(corps, ip) {
     if (e instanceof Anthropic.APIError) { console.error('crm vocal', e.status, e.message); throw new Refus('ia_erreur', 502); }
     throw e;
   }
+  await conso('vocal', reponse);
   if (reponse.stop_reason === 'refusal') throw new Refus('ia_refus', 422);
   const brut = (reponse.content || []).filter((b) => b.type === 'text').map((b) => b.text).join('');
   let r;
