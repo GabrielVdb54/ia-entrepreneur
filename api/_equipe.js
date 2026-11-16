@@ -215,7 +215,8 @@ function garderPartenaire(chemin, methode, corps, table) {
   if (lecture && ['iae_crm_activites', 'iae_crm_entrants', 'iae_crm_memos', 'iae_crm_modeles', 'iae_crm_linkedin'].includes(table)) {
     return { chemin: ajouterFiltre(chemin, RIEN), corps };
   }
-  if (table === 'iae_crm_reglages' && lecture) return { chemin: ajouterFiltre(chemin, RIEN), corps };
+  // iae_crm_reglages n'a pas de colonne id (sa clé est « cle ») : « id=is.null » y faisait une 400 (16/11).
+  if (table === 'iae_crm_reglages' && lecture) return { chemin: ajouterFiltre(chemin, 'cle=is.null'), corps };
   throw new RefusEquipe('reserve_admin');
 }
 
