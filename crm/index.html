@@ -5417,9 +5417,15 @@ function preparerGroupeImport(groupe, opts) {
   const lead = { ...parts[0].lead };
   for (const p of parts.slice(1)) for (const k of ['source', 'besoin', 'localisation', 'secteur', 'site_web', 'siret', 'adresse', 'telephone', 'valeur']) if (!lead[k] && p.lead[k]) lead[k] = p.lead[k];
   lead.tags = [...new Set(parts.flatMap((p) => p.lead.tags || []))];
-  // Perdue seulement si tout le monde a dit non : un salarié pas intéressé ne ferme pas l'entreprise.
-  const actives = parts.filter((p) => p.lead.statut !== 'perdu');
-  if (actives.length) {
+  // Perdue si tout le monde a dit non, ou si un dirigeant a dit non et qu'aucun autre dirigeant n'est encore à
+  // joindre ; un salarié pas intéressé ne ferme pas l'entreprise.
+  const dirigeantNon = parts.some((p) => p.lead.statut === 'perdu' && estDirigeant(p.contact));
+  const encore = parts.filter((p) => p.lead.statut !== 'perdu');
+  const actives = dirigeantNon && !encore.some((p) => estDirigeant(p.contact)) ? [] : encore;
+  if (!actives.length) {
+    lead.statut = 'perdu'; lead.prochaine_relance = null; lead.prochaine_note = null;
+    lead.raison_perte = (parts.find((p) => p.lead.statut === 'perdu') || parts[0]).lead.raison_perte || 'Pas intéressé';
+  } else {
     lead.statut = actives.map((p) => p.lead.statut).sort((a, b) => ORDRE_ETAPE.indexOf(b) - ORDRE_ETAPE.indexOf(a))[0];
     delete lead.raison_perte;
     const prochaine = actives.filter((p) => p.lead.prochaine_relance).sort((a, b) => a.lead.prochaine_relance.localeCompare(b.lead.prochaine_relance))[0] || actives[0];
@@ -5438,7 +5444,7 @@ function preparerGroupeImport(groupe, opts) {
     activites.push(...p.activites.map((a) => ({ ...a, contact_id: c.id, resume: qui ? `${qui} · ${a.resume}`.slice(0, 2000) : a.resume })));
   }
   // Le contact principal : le dirigeant joignable si on le reconnaît, sinon le premier joignable.
-  const principal = contacts.find((c) => estDirigeant(c) && c.telephone) || contacts.find((c) => c.telephone && !/pas int/i.test(c.notes || '')) || contacts[0];
+  const principal = contacts.find((c) => estDirigeant(c) && c.telephone && (!actives.length || !/pas int/i.test(c.notes || ''))) || contacts.find((c) => c.telephone && !/pas int/i.test(c.notes || '')) || contacts[0];
   if (principal) principal.principal = true;
   return { lead, contacts, activites };
 }
