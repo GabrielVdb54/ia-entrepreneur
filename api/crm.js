@@ -747,14 +747,17 @@ async function importer(corps) {
   const u = utilisateurCourant();
   const index = estAdmin() ? null : await doublonsDansLaBase();
   for (const ligne of corps.lignes) {
+    // Une ligne = une entreprise : `contacts` (une personne par ligne du tableau, 16/11/2026), ou `contact` seul
+    // (pages encore ouvertes avec l'ancienne version).
+    const cs = (Array.isArray(ligne.contacts) ? ligne.contacts : ligne.contact ? [ligne.contact] : []).filter((c) => c && typeof c === 'object').slice(0, 20);
     if (index) {
       const cles = [];
       const siren = String(ligne.lead?.siret || '').replace(/\D/g, '').slice(0, 9);
       if (siren.length === 9) cles.push(`siren:${siren}`);
       const n = nomEntrepriseNorme(ligne.lead?.entreprise);
       if (n.length >= 3) cles.push(`nom:${n}`);
-      if (ligne.contact?.email) cles.push(`email:${String(ligne.contact.email).trim().toLowerCase()}`);
-      for (const t of [ligne.contact?.telephone, ligne.lead?.telephone]) if (telNorme(t)) cles.push(`tel:${telNorme(t)}`);
+      for (const c of cs) if (c.email) cles.push(`email:${String(c.email).trim().toLowerCase()}`);
+      for (const t of [...cs.map((c) => c.telephone), ligne.lead?.telephone]) if (telNorme(t)) cles.push(`tel:${telNorme(t)}`);
       const deja = cles.map((k) => index.get(k)).find(Boolean);
       if (deja) {
         const sien = (deja.visible_par || []).includes(u.email);
@@ -767,11 +770,16 @@ async function importer(corps) {
     }
     const lead = nettoyer(ligne.lead, 'leads', true, true);
     leads.push(lead);
-    if (ligne.contact) contacts.push(nettoyer({ ...ligne.contact, lead_id: lead.id }, 'contacts', true, true));
-    // Le suivi d'appels d'un tableur (statut, dernier appel, commentaire) : 3 lignes d'historique au plus par entreprise.
-    for (const a of (Array.isArray(ligne.activites) ? ligne.activites : []).slice(0, 3)) {
+    const ids = new Set();
+    cs.forEach((c, i) => {
+      const propre = nettoyer({ ...c, lead_id: lead.id, principal: cs.length === 1 ? c.principal !== false : c.principal === true || (i === 0 && !cs.some((x) => x.principal === true)) }, 'contacts', true, true);
+      ids.add(propre.id);
+      contacts.push(propre);
+    });
+    // Le suivi d'appels d'un tableur (statut, dernier appel, commentaire) : 3 lignes d'historique au plus par personne.
+    for (const a of (Array.isArray(ligne.activites) ? ligne.activites : []).slice(0, 3 * Math.max(1, cs.length))) {
       if (!['appel', 'appel_sans_reponse', 'note'].includes(a?.type)) continue;
-      const h = nettoyer({ type: a.type, resume: a.resume, date: a.date, meta: a.meta, source: 'import', lead_id: lead.id }, 'activites', true);
+      const h = nettoyer({ type: a.type, resume: a.resume, date: a.date, meta: a.meta, source: 'import', lead_id: lead.id, contact_id: ids.has(a.contact_id) ? a.contact_id : undefined }, 'activites', true);
       historique.push({ ...h, date: h.date || new Date().toISOString(), meta: h.meta || null });
     }
   }

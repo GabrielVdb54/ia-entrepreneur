@@ -5273,10 +5273,30 @@ function decouperNom(t) {
 const telAvecZero = (t) => (t && /^[1-9]\d{8}$/.test(t.replace(/\s/g, '')) ? `0${t.replace(/\s/g, '')}` : t);
 const STATUT_DEPUIS_TEXTE = Object.fromEntries(STATUTS.flatMap(([k, v]) => [[sansAccents(v), k], [k, k]]));
 
+// Les lignes d'un CSV ou d'un tableau collé. Une case entre guillemets peut contenir le séparateur ou des retours à la
+// ligne : Google Sheets et Excel entourent ainsi une case écrite sur plusieurs lignes (16/11/2026 : un commentaire
+// d'Anna sur trois lignes avait coupé sa ligne en trois et créé deux fausses fiches). Un guillemet jamais refermé :
+// null, et l'appelant relit ligne à ligne comme avant.
+function lignesDuTableau(texte, sep) {
+  const lignes = []; let cases = []; let cur = ''; let guillemets = false; let debut = true;
+  for (let i = 0; i < texte.length; i++) {
+    const ch = texte[i];
+    if (guillemets) {
+      if (ch !== '"') cur += ch;
+      else if (texte[i + 1] === '"') { cur += '"'; i++; } else guillemets = false;
+    } else if (ch === '"' && debut) { guillemets = true; debut = false; }
+    else if (ch === sep) { cases.push(cur.trim()); cur = ''; debut = true; }
+    else if (ch === '\n') { cases.push(cur.trim()); lignes.push(cases); cases = []; cur = ''; debut = true; }
+    else { cur += ch; if (ch !== ' ') debut = false; }
+  }
+  if (guillemets) return null;
+  cases.push(cur.trim()); lignes.push(cases);
+  return lignes.filter((c) => c.some(Boolean));
+}
+
 function lireTableauColle(texte) {
-  const lignesBrutes = texte.replace(/\r\n?/g, '\n').split('\n').filter((l) => l.trim());
-  if (lignesBrutes.length < 2) return null;
-  const premiere = lignesBrutes[0];
+  const propre = texte.replace(/\r\n?/g, '\n').replace(/^﻿/, '');
+  const premiere = propre.split('\n').find((l) => l.trim()) || '';
   const sep = premiere.includes('\t') ? '\t' : (premiere.split(';').length >= premiere.split(',').length ? ';' : ',');
   const decouper = (ligne) => {
     if (sep === '\t') return ligne.split('\t').map((x) => x.trim());
@@ -5290,7 +5310,9 @@ function lireTableauColle(texte) {
     cases.push(cur.trim());
     return cases;
   };
-  const entetes = decouper(premiere.replace(/^﻿/, ''));
+  const toutes = lignesDuTableau(propre, sep) || propre.split('\n').filter((l) => l.trim()).map(decouper);
+  if (toutes.length < 2) return null;
+  const entetes = toutes[0];
   const carte = entetes.map((h) => {
     const n = sansAccents(h).replace(/['’()€._-]/g, ' ').replace(/\s+/g, ' ').trim(); // « Type d'activité » = « type d activite »
     const trouve = ENTETES.find(([, noms]) => noms.includes(n));
@@ -5304,7 +5326,7 @@ function lireTableauColle(texte) {
   // Une même cible deux fois (Téléphone et Portable…) : la première colonne remplie gagne, l'autre complète.
   const vues = new Set();
   carte.forEach((k, i) => { if (!k) return; if (vues.has(k) && !['complement'].includes(k)) carte[i] = null; else vues.add(k); });
-  const lignes = lignesBrutes.slice(1).map(decouper).map((cases) => {
+  const lignes = toutes.slice(1).map((cases) => {
     const x = {};
     carte.forEach((k, i) => {
       const v = cases[i] || '';
@@ -5332,17 +5354,22 @@ function preparerLigneImport(x, { source, action, jour }) {
   const rappel = dateDuTableur(x.rappel_le);
   const localisation = [x.localisation, x.departement && !String(x.localisation || '').includes(x.departement) ? `(${x.departement})` : ''].filter(Boolean).join(' ') || null;
   const perdu = etape === 'perdu';
+  // Le portable va au contact, le fixe à l'entreprise (16/11/2026 : les portables FullEnrich d'Anna étaient restés
+  // sur l'entreprise et la séance d'appels composait le standard, celui du contact passant en premier).
+  const direct = telAvecZero(x.ligne_directe); const autre = telAvecZero(x.telephone);
+  let tel = direct || autre;
+  let telLead = direct && autre ? autre : telAvecZero(x.tel_entreprise);
+  if (tel && telLead && estMobile(telLead) && !estMobile(tel)) [tel, telLead] = [telLead, tel];
   const lead = {
     id, entreprise: x.entreprise || [prenom, nom].filter(Boolean).join(' ') || x.email, statut: etape, source: x.source || source || null,
     besoin, localisation, secteur: x.secteur, site_web: x.site_web, siret: x.siret, adresse: x.adresse,
-    telephone: x.ligne_directe && x.telephone ? telAvecZero(x.telephone) : telAvecZero(x.tel_entreprise),
+    telephone: telLead,
     valeur: x.valeur ? x.valeur.replace(/[^\d,.-]/g, '') || null : null,
     prochaine_relance: perdu ? null : rappel || jour, prochaine_action: resultat === 'email' ? 'email' : action,
     prochaine_note: resultat === 'rappeler' && x.commentaire ? `Rappeler : ${x.commentaire}`.slice(0, 500) : null,
     tags: ['import tableau', ...(etoiles ? [`note ${String(x.note_etoiles).trim().replace(/\s+/g, '')}`] : [])],
     ...(perdu ? { raison_perte: RESULTATS_APPEL[resultat].lib } : {}),
   };
-  const tel = telAvecZero(x.ligne_directe || x.telephone);
   const aContact = prenom || nom || x.email || tel;
   const contact = aContact ? { id: crypto.randomUUID(), prenom, nom, email: x.email, telephone: tel, poste: x.poste, principal: true } : null;
   const activites = [];
@@ -5353,7 +5380,67 @@ function preparerLigneImport(x, { source, action, jour }) {
   } else if (x.commentaire) {
     activites.push({ type: 'note', resume: `Commentaire du tableau importé : ${x.commentaire}`.slice(0, 2000), date: quand ? `${quand}T12:00:00` : undefined });
   }
-  return { lead, contact, activites };
+  return { lead, contact, activites, resultat };
+}
+
+// Une entreprise = une fiche (16/11/2026 : l'import d'Anna avait fait 7 fiches AZURIA et 5 ZIKO, une par personne
+// enrichie, et la même entreprise revenait 7 fois dans ses appels du jour). Les lignes d'une même entreprise
+// (même SIREN, ou même nom sans la forme juridique) deviennent une fiche avec un contact par personne.
+const cleNomImport = (t) => sansAccents(t).replace(/\b(sarl|sas|sasu|eurl|sa|sci|snc|ets|etablissements|entreprise|societe|groupe)\b/g, ' ').replace(/[^a-z0-9]+/g, '');
+function grouperLignesImport(lignes) {
+  const groupes = []; const parCle = new Map();
+  for (const x of lignes) {
+    const siren = String(x.siret || '').replace(/\D/g, '').slice(0, 9);
+    const nomCle = cleNomImport(x.entreprise);
+    const cles = [siren.length === 9 && `siren:${siren}`, nomCle.length >= 3 && `nom:${nomCle}`].filter(Boolean);
+    let g = cles.map((k) => parCle.get(k)).find(Boolean);
+    if (!g) { g = []; groupes.push(g); }
+    g.push(x);
+    for (const k of cles) parCle.set(k, g);
+  }
+  return groupes;
+}
+const ORDRE_ETAPE = STATUTS.map(([k]) => k);
+const estDirigeant = (c) => /g[ée]rant|pr[ée]sident|dirigeant|directeur g[ée]n[ée]ral|fondat|associ[ée]|co-?g[ée]rant/i.test(c && c.poste || '');
+function preparerGroupeImport(groupe, opts) {
+  const parts = groupe.map((x) => preparerLigneImport(x, opts));
+  if (parts.length === 1) { const [p] = parts; return { lead: p.lead, contacts: p.contact ? [p.contact] : [], activites: p.activites }; }
+  // Un même numéro sur plusieurs personnes est celui de l'entreprise (ZIKO, 16/11 : le 07 du cabinet sur les 5
+  // personnes, leur portable à côté) : il passe sur la fiche, chacun garde le sien.
+  const chiffres = (t) => String(t || '').replace(/\D/g, '').slice(-9);
+  const vus = new Map();
+  for (const p of parts) { const t = chiffres(p.contact && p.contact.telephone); if (t) vus.set(t, (vus.get(t) || 0) + 1); }
+  for (const p of parts) {
+    const t = chiffres(p.contact && p.contact.telephone);
+    if (t && vus.get(t) > 1 && p.lead.telephone && chiffres(p.lead.telephone) !== t) [p.contact.telephone, p.lead.telephone] = [p.lead.telephone, p.contact.telephone];
+  }
+  const lead = { ...parts[0].lead };
+  for (const p of parts.slice(1)) for (const k of ['source', 'besoin', 'localisation', 'secteur', 'site_web', 'siret', 'adresse', 'telephone', 'valeur']) if (!lead[k] && p.lead[k]) lead[k] = p.lead[k];
+  lead.tags = [...new Set(parts.flatMap((p) => p.lead.tags || []))];
+  // Perdue seulement si tout le monde a dit non : un salarié pas intéressé ne ferme pas l'entreprise.
+  const actives = parts.filter((p) => p.lead.statut !== 'perdu');
+  if (actives.length) {
+    lead.statut = actives.map((p) => p.lead.statut).sort((a, b) => ORDRE_ETAPE.indexOf(b) - ORDRE_ETAPE.indexOf(a))[0];
+    delete lead.raison_perte;
+    const prochaine = actives.filter((p) => p.lead.prochaine_relance).sort((a, b) => a.lead.prochaine_relance.localeCompare(b.lead.prochaine_relance))[0] || actives[0];
+    lead.prochaine_relance = prochaine.lead.prochaine_relance;
+    lead.prochaine_action = prochaine.lead.prochaine_action;
+    const notes = actives.filter((p) => p.lead.prochaine_note).map((p) => (p.contact ? `${nomContact(p.contact)} : ${p.lead.prochaine_note}` : p.lead.prochaine_note));
+    lead.prochaine_note = notes.length ? notes.join(' · ').slice(0, 500) : null;
+  }
+  const contacts = []; const activites = [];
+  for (const p of parts) {
+    if (!p.contact) { activites.push(...p.activites); continue; }
+    const c = { ...p.contact, principal: false };
+    if (p.resultat) c.notes = `Tableau importé : ${RESULTATS_APPEL[p.resultat].lib}`;
+    contacts.push(c);
+    const qui = nomContact(c);
+    activites.push(...p.activites.map((a) => ({ ...a, contact_id: c.id, resume: qui ? `${qui} · ${a.resume}`.slice(0, 2000) : a.resume })));
+  }
+  // Le contact principal : le dirigeant joignable si on le reconnaît, sinon le premier joignable.
+  const principal = contacts.find((c) => estDirigeant(c) && c.telephone) || contacts.find((c) => c.telephone && !/pas int/i.test(c.notes || '')) || contacts[0];
+  if (principal) principal.principal = true;
+  return { lead, contacts, activites };
 }
 
 function ouvrirImport() {
@@ -5396,12 +5483,14 @@ function ouvrirImport() {
       const doublons = utiles.filter(estDoublon).length;
       const appels = utiles.filter((x) => resultatDuTexte(x.statut)).length;
       if (!analyse.carte.includes('entreprise')) { zone.innerHTML = '<p class="erreur">Je ne trouve pas de colonne « Entreprise ». Vérifie la ligne des titres.</p>'; bouton.disabled = true; return; }
-      const apercuLignes = utiles.slice(0, 8).map((x) => { const p = preparerLigneImport(x, { source: '', action: 'appel', jour: '' }); return [p.lead.entreprise, nomContact(p.contact), p.contact && p.contact.telephone, x.email, x.statut, x.rappel_le]; });
-      zone.innerHTML = `<p class="aide"><b>${utiles.length} ligne${utiles.length > 1 ? 's' : ''}</b>${doublons ? `, dont ${doublons} déjà dans ta liste` : ''}${appels ? `, ${appels} avec un résultat d'appel repris dans l'historique` : ''}. Colonnes reprises : ${esc(reconnues.join(', '))}${ignorees.length ? `. Ignorées : ${esc(ignorees.join(', '))}` : ''}.</p>
+      const groupes = grouperLignesImport(utiles);
+      const apercuLignes = groupes.slice(0, 8).map((g) => { const p = preparerGroupeImport(g, { source: '', action: 'appel', jour: '' }); const c = p.contacts.find((x) => x.principal) || p.contacts[0]; return [p.lead.entreprise, [nomContact(c), p.contacts.length > 1 ? `+ ${p.contacts.length - 1}` : ''].filter(Boolean).join(' '), c && c.telephone, g[0].email, g[0].statut, g[0].rappel_le]; });
+      const regroupe = groupes.length < utiles.length ? ` pour <b>${groupes.length} entreprise${groupes.length > 1 ? 's' : ''}</b> (les personnes d'une même entreprise vont sur une seule fiche)` : '';
+      zone.innerHTML = `<p class="aide"><b>${utiles.length} ligne${utiles.length > 1 ? 's' : ''}</b>${regroupe}${doublons ? `, dont ${doublons} déjà dans ta liste` : ''}${appels ? `, ${appels} avec un résultat d'appel repris dans l'historique` : ''}. Colonnes reprises : ${esc(reconnues.join(', '))}${ignorees.length ? `. Ignorées : ${esc(ignorees.join(', '))}` : ''}.</p>
         <div class="apercu"><table><thead><tr>${['Entreprise', 'Interlocuteur', 'Téléphone', 'Email', 'Statut', 'Rappel le'].map((t) => `<th>${t}</th>`).join('')}</tr></thead><tbody>
         ${apercuLignes.map((r) => `<tr>${r.map((v) => `<td>${esc(v || '')}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`;
       bouton.disabled = utiles.length === 0;
-      bouton.textContent = `Importer ${utiles.length} ligne${utiles.length > 1 ? 's' : ''}`;
+      bouton.textContent = groupes.length < utiles.length ? `Importer ${groupes.length} entreprise${groupes.length > 1 ? 's' : ''}` : `Importer ${utiles.length} ligne${utiles.length > 1 ? 's' : ''}`;
     };
     el.texte.addEventListener('input', apercu);
     el.fichier.addEventListener('change', async () => {
@@ -5424,9 +5513,9 @@ function ouvrirImport() {
         if (lignes.length > 3000) throw new ErreurApi('3 000 lignes au plus par import : coupe le fichier en plusieurs.');
         const parJour = Math.max(1, Number(el.parjour.value) || 10);
         let jour = prochainOuvre(el.debut.value || dansJours(1));
-        const envoi = lignes.map((x, i) => {
+        const envoi = grouperLignesImport(lignes).map((g, i) => {
           if (i > 0 && i % parJour === 0) jour = dansJours(1, jour);
-          return preparerLigneImport(x, { source: el.source.value, action: el.action.value, jour });
+          return preparerGroupeImport(g, { source: el.source.value, action: el.action.value, jour });
         });
         // Par paquets de 500 (limite du serveur).
         const bilan = { leads: 0, ignores: [] };
