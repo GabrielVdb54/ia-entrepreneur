@@ -2209,7 +2209,7 @@ function blocDossierFormateur(l) {
           ${lu && lu.alertes && lu.alertes.length ? `<ul class="alertes-f">${lu.alertes.map((x) => `<li>${esc(x)}</li>`).join('')}</ul>` : ''}
           ${lu && lu.code_verification ? `<p class="code-urssaf">Code de sécurité : <code>${esc(lu.code_verification)}</code> <button type="button" class="btn petit" data-copier="${esc(lu.code_verification)}">Copier</button> <a href="${URSSAF_VERIF}" target="_blank" rel="noopener noreferrer">Vérifier sur urssaf.fr</a></p>` : ''}
           ${d.statut === 'refuse' && d.motif ? `<p class="message-refus">À refaire : ${esc(d.motif)}</p>` : ''}
-          <div class="actions"><button type="button" class="btn petit" data-act="piece-voir">Voir</button>${!lecture && p.etat === 'a_verifier' ? '<button type="button" class="btn petit primaire" data-act="piece-ok">Vérifiée</button>' : ''}${!lecture && ['a_verifier', 'verifiee'].includes(p.etat) ? '<button type="button" class="btn petit" data-act="piece-refaire">À refaire</button>' : ''}</div>` : ''}
+          <div class="actions"><button type="button" class="btn petit" data-act="piece-voir">Voir</button>${lienDrive(d) ? '' : '<button type="button" class="btn petit" data-act="piece-telecharger">Télécharger</button>'}${!lecture && p.etat === 'a_verifier' ? '<button type="button" class="btn petit primaire" data-act="piece-ok">Vérifiée</button>' : ''}${!lecture && ['a_verifier', 'verifiee'].includes(p.etat) ? '<button type="button" class="btn petit" data-act="piece-refaire">À refaire</button>' : ''}</div>` : ''}
       </li>`;
     }).join('')}</ul>
     ${autresDocuments(l.id)}
@@ -2223,7 +2223,7 @@ function autresDocuments(id) {
       <div class="tete"><b>${esc(LIB_PIECE[d.type] || d.type)}</b><span class="meta">${lienDrive(d) ? 'Drive' : 'CRM'}, ${esc(dateCourte(String(d.created_at).slice(0, 10)))}</span></div>
       <p class="meta">${esc(d.nom)}</p>
       ${d.lecture && d.lecture.details ? `<p>${esc(d.lecture.details)}</p>` : ''}
-      <div class="actions"><button type="button" class="btn petit" data-act="piece-voir">Voir</button></div></li>`).join('')}</ul>`;
+      <div class="actions"><button type="button" class="btn petit" data-act="piece-voir">Voir</button>${lienDrive(d) ? '' : '<button type="button" class="btn petit" data-act="piece-telecharger">Télécharger</button>'}</div></li>`).join('')}</ul>`;
 }
 function majFormateur(r) {
   if (!r) return;
@@ -2250,9 +2250,21 @@ async function preparerFichier(fichier) {
 }
 const enBase64 = (blob) => new Promise((ok, ko) => { const l = new FileReader(); l.onload = () => ok(String(l.result).split(',')[1]); l.onerror = ko; l.readAsDataURL(blob); });
 const lienDrive = (d) => (d && String(d.chemin || '').startsWith('drive:') ? `https://drive.google.com/file/d/${encodeURIComponent(d.chemin.slice(6))}/view` : '');
-async function voirPiece(id) {
+// « Télécharger » (18/11/2026, demande d'Anna) : la pièce arrive sous son nom, sans passer par un onglet.
+async function voirPiece(id, enregistrer = false) {
   const doc = (D.documents || []).find((x) => x.id === id);
   if (lienDrive(doc)) { window.open(lienDrive(doc), '_blank', 'noopener'); return; }
+  if (enregistrer) {
+    try {
+      const r = await fetch(`${API}?document=${encodeURIComponent(id)}`, { headers: { 'X-Cle-Crm': S.cle } });
+      if (!r.ok) throw new Error();
+      const url = URL.createObjectURL(await r.blob());
+      const a = document.createElement('a');
+      a.href = url; a.download = (doc && doc.nom) || 'piece'; document.body.appendChild(a); a.click(); a.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 60000);
+    } catch { toast("La pièce n'a pas pu se télécharger. Réessaie."); }
+    return;
+  }
   const fenetre = window.open('', '_blank');
   try {
     const r = await fetch(`${API}?document=${encodeURIComponent(id)}`, { headers: { 'X-Cle-Crm': S.cle } });
@@ -6280,6 +6292,7 @@ document.addEventListener('click', (ev) => {
     case 'piece-deposer': return ouvrirDepotPiece(IDX.lead.get(leadId));
     case 'contrat-voir': return ouvrirContratSigne(IDX.lead.get(leadId));
     case 'piece-voir': return voirPiece(cible.closest('[data-doc]').dataset.doc);
+    case 'piece-telecharger': return voirPiece(cible.closest('[data-doc]').dataset.doc, true);
     case 'piece-ok': return opFormateur({ op: 'document_verifier', id: cible.closest('[data-doc]').dataset.doc, statut: 'verifie' }, 'Pièce vérifiée.');
     case 'piece-refaire': return ouvrirMotifPiece(cible.closest('[data-doc]').dataset.doc);
     case 'recap': return faireRecap(leadId);
