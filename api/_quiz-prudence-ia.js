@@ -92,14 +92,14 @@ export const FORMATIONS = {
             e: 'Le 30 novembre 2022. En deux mois, environ 100 millions de personnes l’avaient essayé.'
           },
           {
-            q: 'Le mot « intelligence artificielle » est né…',
+            q: 'L’« intelligence artificielle » a reçu son nom…',
             o: [
               'En 1956, lors d’une conférence de chercheurs aux États-Unis',
               'En 1997, quand un ordinateur a battu le champion du monde d’échecs',
               'En 2022, avec ChatGPT'
             ],
             a: 0,
-            e: 'À la conférence de Dartmouth, en 1956. L’IA a donc 70 ans.'
+            e: 'À la conférence de Dartmouth, en 1956. L’IA a donc 70 ans, même si on ne parle d’elle partout que depuis 2022.'
           },
           {
             q: 'L’invention de 2017 qui fait tourner toutes les IA actuelles s’appelle…',
@@ -165,9 +165,9 @@ export const FORMATIONS = {
           },
           {
             q: 'Vous voulez dicter à voix haute, comme un vocal, et récupérer un message écrit.',
-            o: ['ChatGPT en mode vocal', 'NotebookLM', 'Perplexity'],
+            o: ['Le micro de ChatGPT ou de Claude (la dictée)', 'NotebookLM', 'Perplexity'],
             a: 0,
-            e: 'Le mode vocal de ChatGPT, ou le micro de Claude, ou la dictée de votre téléphone.'
+            e: 'Le petit micro de ChatGPT ou de Claude transforme votre voix en texte. La dictée de votre téléphone marche aussi.'
           },
           {
             q: 'Vous voulez coller la fiche d’un vrai client (nom, plaque, téléphone) pour préparer une relance.',
