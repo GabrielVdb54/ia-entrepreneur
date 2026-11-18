@@ -209,7 +209,7 @@ export const FORMATIONS = {
               '« Relance vite fait le client, merci ! »'
             ],
             a: 1,
-            e: 'Contexte, rôle, action, format et ton : l’IA n’a plus rien à inventer.'
+            e: 'Contexte, rôle, action, format et ton : l’IA n’a plus besoin de deviner.'
           },
           {
             q: 'Le résultat est presque bon, mais trop long. Le mieux :',
@@ -295,7 +295,7 @@ export const FORMATIONS = {
             q: 'Rédiger chaque semaine les relances pour les cartes grises définitives pas reçues.',
             o: TACHE,
             a: 0,
-            e: 'Fréquent, long, du texte, et vous relisez avant d’envoyer : la tâche idéale.'
+            e: 'Fréquent, chronophage, du texte, et vous relisez avant d’envoyer : la tâche idéale.'
           },
           {
             q: 'Laisser l’IA décider si un sinistre est couvert, et l’annoncer au client.',
@@ -434,9 +434,9 @@ export const FORMATIONS = {
           },
           {
             q: 'Dans « Écris un mail de relance, ton cordial », il manque…',
-            o: ['Le contexte, le rôle et le format', 'Le ton', 'Rien'],
+            o: ['Le contexte et le rôle', 'Le ton', 'Rien'],
             a: 0,
-            e: 'Il y a l’action et le ton. Sans contexte, l’IA invente la situation.'
+            e: 'Il y a l’action, le format (un mail) et le ton. Sans contexte, l’IA invente la situation.'
           },
           {
             q: 'Pour interroger un PDF de conditions générales et voir le passage cité :',
@@ -462,7 +462,7 @@ export const FORMATIONS = {
               'Celle où il faut décider à la place du client'
             ],
             a: 0,
-            e: 'Fréquente, longue, du texte, et relue par vous.'
+            e: 'Fréquente, chronophage, du texte, et relue par vous.'
           },
           {
             q: 'Un « client » vous envoie un vocal pressant pour changer le RIB de son indemnisation.',
@@ -475,7 +475,7 @@ export const FORMATIONS = {
             e: 'Une voix se clone. Urgence + argent = on rappelle sur un numéro qu’on connaît déjà.'
           },
           {
-            q: 'Depuis le 2 août 2026, celui qui diffuse un deepfake doit…',
+            q: 'Depuis le 2 août 2026, un professionnel qui diffuse un deepfake fait avec une IA doit…',
             o: [
               'Indiquer que le contenu a été généré ou modifié par IA',
               'Le faire valider par la CNIL',
