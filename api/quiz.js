@@ -40,10 +40,11 @@
 import { timingSafeEqual } from 'node:crypto';
 import { FORMATIONS as FORMATIONS_PRUDENCE } from './_quiz-prudence.js';
 import { FORMATIONS as FORMATIONS_INTEGRATION } from './_quiz-integration.js';
+import { FORMATIONS as FORMATIONS_PRUDENCE_IA } from './_quiz-prudence-ia.js';
 
 // Une banque par fichier : _quiz-prudence.js est remplacé en bloc quand la
 // formation évolue, il ne doit pas emporter les autres quiz avec lui.
-const FORMATIONS = { ...FORMATIONS_PRUDENCE, ...FORMATIONS_INTEGRATION };
+const FORMATIONS = { ...FORMATIONS_PRUDENCE, ...FORMATIONS_INTEGRATION, ...FORMATIONS_PRUDENCE_IA };
 
 export const maxDuration = 15;
 
