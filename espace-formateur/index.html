@@ -33,6 +33,7 @@
   .intro { color: var(--muted); }
   .bandeau { border-radius: var(--radius); padding: 14px 16px; background: var(--primary-soft); font-weight: 600; }
   .bandeau.ok { background: var(--accent-soft); color: var(--accent-dark); }
+  #etape-contrat { scroll-margin-top: 72px; }
   .bandeau.attention { background: var(--warn-soft); color: var(--warn); }
   section.etape { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); padding: 18px; display: flex; flex-direction: column; gap: 14px; }
   .etape > header { display: flex; justify-content: space-between; gap: 10px; align-items: baseline; flex-wrap: wrap; }
@@ -114,6 +115,7 @@ const ERREURS = {
   format_refuse: 'Format non accepté : envoie un PDF, ou une photo (JPEG, PNG).',
   fichier_vide: 'Le fichier est vide.',
   identite_incomplete: "Complète d'abord ton entreprise (étape 1) et fais vérifier ton SIRET : le contrat se remplit avec ces informations.",
+  pieces_manquantes: 'Envoie d\'abord toutes tes pièces (étape 3) : le contrat se signe une fois ton dossier complet.',
   mention_invalide: 'Recopie la mention exacte : « Lu et approuvé, bon pour accord ».',
   signature_incomplete: 'Indique le lieu et ton nom, et coche la case.',
   trop_de_demandes: 'Beaucoup de demandes en peu de temps : réessaie dans quelques minutes.',
@@ -157,11 +159,12 @@ function rendre() {
   const bandeau = D.statut === 'valide' ? ['ok', 'Ton dossier est validé : tu peux être positionné sur des missions. Merci !']
     : D.statut === 'a_verifier' ? ['ok', 'Merci, tout est arrivé. Gabriel vérifie ton dossier et revient vers toi.']
     : D.statut === 'a_renouveler' ? ['attention', `Une pièce est à mettre à jour : ${D.pieces.filter((p) => ['manquante', 'refusee', 'expiree'].includes(p.etat) && !p.facultatif).map((p) => p.titre).join(', ') || 'regarde l\'étape 3'}.`]
+    : D.pret_a_signer && !D.signature ? ['ok', 'Ton dossier est complet et ton contrat est prêt, rempli avec les informations de ton entreprise : relis-le et signe-le à l\'étape 4.']
     : ['', `Ton dossier avance : ${a.recues} pièce${a.recues > 1 ? 's' : ''} sur ${a.total}, contrat ${D.signature ? 'signé' : 'à signer'}. Tu peux t'arrêter et revenir avec le même lien.`];
   $('#page').innerHTML = `
     <div><h1>Bonjour${D.prenom ? ` ${esc(D.prenom)}` : ''}, voici ton dossier formateur</h1>
       <p class="intro">Pour travailler avec IA-Entrepreneur, il nous faut ton entreprise, ton profil, quelques pièces et ta signature du contrat-cadre. Tout se fait ici, en une vingtaine de minutes.</p></div>
-    <p class="bandeau ${bandeau[0]}" role="status">${esc(bandeau[1])}</p>
+    <p class="bandeau ${bandeau[0]}" role="status">${esc(bandeau[1])}</p>${D.pret_a_signer && !D.signature ? '<div class="actions"><button type="button" class="btn primaire" data-act="aller-contrat">Lire et signer le contrat</button></div>' : ''}
 
     <section class="etape" id="etape-entreprise">
       <header><h2>1. Ton entreprise</h2><span class="puce ${a.etapes[0] ? 'fait' : 'afaire'}">${a.etapes[0] ? 'Fait' : 'À faire'}</span></header>
@@ -182,6 +185,9 @@ function rendre() {
         </div>
         <fieldset><legend>Ton régime de TVA</legend>
           ${[['exonere', 'Exonéré de TVA, avec un numéro de déclaration d\'activité (NDA)'], ['franchise', 'Franchise en base (art. 293 B du CGI), cas de la plupart des micro-entreprises'], ['assujetti', 'Assujetti à la TVA']].map(([k, v]) => `<label><input type="radio" name="regime_tva" value="${k}" ${D.regime_tva === k ? 'checked' : ''} ${fige ? 'disabled' : ''}> ${v}</label>`).join('')}
+        </fieldset>
+        <fieldset><legend>Ta situation pour le CPF (article 18 du contrat, facultatif)</legend>
+          ${[['certifie', 'Certifié Qualiopi'], ['exempte', 'Exempté : micro-entreprise sous 83 600 € HT de chiffre d\'affaires'], ['', 'Aucun des deux pour l\'instant']].map(([k, v]) => `<label><input type="radio" name="cpf" value="${k}" ${(id.cpf || '') === k ? 'checked' : ''} ${fige ? 'disabled' : ''}> ${v}</label>`).join('')}
         </fieldset>
         <label class="champ ${D.regime_tva === 'exonere' ? '' : 'cache'}" id="champ-nda">Numéro de déclaration d'activité<input name="nda" inputmode="numeric" value="${esc(D.nda)}" placeholder="11 chiffres" ${fige ? 'disabled' : ''}></label>
         <label class="champ">Qui intervient en formation ?<input name="intervenants" value="${esc(D.intervenants || id.representant || [D.prenom, D.nom].filter(Boolean).join(' '))}" ${fige ? 'disabled' : ''}><span class="aide">Toi, ou les personnes de ta structure qui animeront.</span></label>
@@ -227,14 +233,14 @@ function rendre() {
 
     <section class="etape" id="etape-contrat">
       <header><h2>4. Le contrat-cadre</h2><span class="puce ${a.etapes[3] ? 'fait' : 'afaire'}">${D.signature ? 'Signé' : 'À signer'}</span></header>
-      ${D.signature ? `<p class="verif ok">Signé le ${dateFr(D.signature.date)} à ${esc(D.signature.lieu)} par ${esc(D.signature.nom)}. Gabriel le contresigne en validant ton dossier.</p>` : `<p class="aide">Lis-le en entier. Il se remplit avec les informations de l'étape 1${D.identite_ok && D.siret_ok ? '' : ', à compléter d\'abord'}.</p>`}
+      ${D.signature ? `<p class="verif ok">Signé le ${dateFr(D.signature.date)} à ${esc(D.signature.lieu)} par ${esc(D.signature.nom)}. Gabriel le contresigne en validant ton dossier.</p>` : `<p class="aide">Lis-le en entier. Il se remplit avec les informations de l'étape 1. ${D.pret_a_signer ? 'Ton dossier est complet : tu peux le signer.' : `Tu pourras le signer une fois ${!(D.identite_ok && D.siret_ok) ? 'ton entreprise renseignée (étape 1) et ' : ''}tes pièces envoyées (étape 3).`}</p>`}
       <div class="contrat" id="contrat" tabindex="0" aria-label="Texte du contrat-cadre">${contratHtml(D.contrat.blocs)}</div>
       <div class="actions"><button type="button" class="btn" data-act="imprimer">Imprimer ou enregistrer en PDF</button></div>
       ${D.signature ? '' : `<form id="form-signer" class="choix" style="gap:12px">
         <div class="deux"><label class="champ">Fait à<input name="lieu" placeholder="Ta ville" required></label><label class="champ">Ton nom et prénom<input name="nom" autocomplete="name" value="${esc(id.representant || '')}" required></label></div>
         <label class="champ">Recopie la mention « Lu et approuvé, bon pour accord »<input name="mention" autocomplete="off" required></label>
         <label><input type="checkbox" name="accepte"> J'ai lu le contrat-cadre en entier et je l'accepte. Je signe électroniquement : cette signature m'engage comme une signature manuscrite.</label>
-        <div class="actions"><button type="submit" class="btn primaire" ${D.identite_ok && D.siret_ok ? '' : 'disabled'}>Signer le contrat</button><p class="message" data-message></p></div>
+        <div class="actions"><button type="submit" class="btn primaire" ${D.pret_a_signer ? '' : 'disabled'}>Signer le contrat</button><p class="message" data-message></p></div>
       </form>`}
     </section>`;
 }
@@ -293,6 +299,8 @@ document.addEventListener('click', async (ev) => {
   if (!b) return;
   const act = b.dataset.act;
   if (act === 'imprimer') return window.print();
+  // Pas d'ancre #etape-contrat : le # de l'adresse porte le jeton du lien.
+  if (act === 'aller-contrat') { const c = $('#etape-contrat'); c.scrollIntoView({ behavior: 'smooth', block: 'start' }); return setTimeout(() => $('#contrat').focus({ preventScroll: true }), 400); }
   if (act === 'siret') {
     const zone = $('#etape-entreprise');
     const siret = $('input[name="siret"]', zone).value.replace(/\s/g, '');
@@ -328,6 +336,7 @@ document.addEventListener('submit', (ev) => {
   const bouton = $('[type="submit"]', f);
   if (f.id === 'form-identite') {
     const identite = Object.fromEntries(['raison_sociale', 'forme', 'capital', 'siege', 'immatriculation', 'representant', 'qualite'].map((k) => [k, el[k].value]));
+    identite.cpf = (f.querySelector('input[name="cpf"]:checked') || {}).value || '';
     const regime = (f.querySelector('input[name="regime_tva"]:checked') || {}).value || null;
     if (regime === 'exonere' && !/^\d{11}$/.test(el.nda.value.replace(/\s/g, ''))) return message(f, ERREURS.nda_invalide, 'erreur');
     return envoyer($('#etape-entreprise'), bouton, () => api('POST', { op: 'identite', identite, regime_tva: regime, nda: el.nda.value, intervenants: el.intervenants.value }), 'Enregistré.');

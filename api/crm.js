@@ -138,8 +138,9 @@ import { creerDemande, GOOGLE_AVIS_RE } from './_avis.js';
 import { civiliteDuPrenom } from './_prenoms.js';
 import { MODALITES, nouveauJetonEval, questionnaire, propre as propreEval } from './_evaluations.js';
 import {
-  deposerPiece, empreinte as empreinteTexte, etatDossier, lireFichier, majStatut, nouveauJeton, verifierSiret, aujourdHui as aujourdHuiF,
+  deposerPiece, empreinte as empreinteTexte, etatDossier, identiteSaisie, lireFichier, majStatut, nouveauJeton, verifierSiret, aujourdHui as aujourdHuiF,
 } from './_formateurs.js';
+import { VERSION as VERSION_CONTRAT, blancsContrat, contratRempli, texteContrat } from './_contrat-formateur.js';
 import { noterConso } from './_conso.js';
 
 // Chaque réponse de Claude est relevée avec sa fonction (iae_crm_conso, 16/11/2026) : savoir ce qui coûte.
@@ -1874,6 +1875,35 @@ async function operationFormateur(corps) {
     await inserer('activites', { lead_id: lead.id, type: 'note', resume: `Lien d'envoi du dossier formateur créé (valable jusqu'au ${new Date(expire).toLocaleDateString('fr-FR', { timeZone: 'Europe/Paris' })}).`, source: 'crm' });
     await majStatut(lead.id);
     return { jeton, expire, ...(await retourFormateur(lead.id)) };
+  }
+  // L'entreprise du formateur, saisie depuis le CRM par Gabriel ou Anna (19/11/2026), comme l'étape 1 de son
+  // lien : elle remplit le contrat. Plus modifiable une fois le contrat signé.
+  if (op === 'formateur_identite') {
+    if (f.signature) throw new Refus('deja_signe', 409);
+    await sb(`iae_crm_formateurs?lead_id=eq.${lead.id}`, { methode: 'PATCH', corps: identiteSaisie(corps, f), prefer: 'return=minimal' });
+    await majStatut(lead.id);
+    return retourFormateur(lead.id);
+  }
+  // Le contrat pré-rempli (Gabriel, 19/11/2026 : « envoyer le contrat pré rempli une fois les docs obtenus…
+  // pour qu'Anna puisse l'envoyer elle-même depuis le CRM »). « apercu » : le texte tel qu'il sera signé et ce
+  // qui manque ; « lien » : un nouveau lien d'envoi, que la page met dans l'email (le formateur signe en ligne).
+  if (op === 'formateur_contrat') {
+    const { lignes: docs } = await sb(`iae_crm_documents?lead_id=eq.${lead.id}&select=type,statut,archive,expire_le,created_at`);
+    const e = etatDossier(f, docs);
+    if (corps.etape === 'apercu') {
+      return { version: VERSION_CONTRAT, texte: texteContrat(contratRempli(f, f.signature || null)), blancs: blancsContrat(f), signe: Boolean(f.signature), pret: e.pretASigner, identite_ok: e.identiteOk, siret_ok: e.siretOk, pieces_manquantes: e.a_envoyer };
+    }
+    if (corps.etape !== 'lien') throw new Refus('valeur_invalide:etape');
+    if (f.signature) throw new Refus('deja_signe', 409);
+    if (!e.identiteOk || !e.siretOk) throw new Refus('identite_incomplete', 409);
+    if (!e.piecesRecues) throw new Refus('pieces_manquantes', 409);
+    const jeton = nouveauJeton();
+    const expire = new Date(Date.now() + 30 * 86400000).toISOString();
+    await sb(`iae_crm_formateurs?lead_id=eq.${lead.id}`, { methode: 'PATCH', corps: { jeton_hash: empreinteTexte(jeton), jeton_expire: expire, jeton_cree_le: new Date().toISOString() }, prefer: 'return=minimal' });
+    const qui = estAdmin() ? 'Gabriel' : utilisateurCourant().prenom;
+    const activite = await inserer('activites', { lead_id: lead.id, type: 'note', resume: `Contrat pré-rempli prêt à signer : nouveau lien créé par ${qui}, valable jusqu'au ${new Date(expire).toLocaleDateString('fr-FR', { timeZone: 'Europe/Paris' })} (version ${VERSION_CONTRAT}).`, source: 'crm', meta: { contrat: 'a_signer', version: VERSION_CONTRAT } });
+    await majStatut(lead.id);
+    return { jeton, expire, activite, ...(await retourFormateur(lead.id)) };
   }
   if (op === 'formateur_siret') {
     const v = await verifierSiret(corps.siret || f.siret);

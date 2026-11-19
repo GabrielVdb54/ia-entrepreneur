@@ -427,6 +427,8 @@
   .alertes-f { margin: 0; padding-left: 18px; color: #874A08; }
   .code-urssaf code { font-size: 14px; background: #F2F3F6; padding: 1px 6px; border-radius: 6px; }
   .message-refus { color: #93390B; font-weight: 600; }
+  .saisie-bouton { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+  .saisie-bouton input { flex: 1 1 170px; width: auto; }
   .texte-contrat { white-space: pre-wrap; font-size: 13px; max-height: 50vh; overflow: auto; background: #FBFBFE; border: 1px solid var(--line); border-radius: 10px; padding: 12px; }
   fieldset.cases { border: 0; display: flex; flex-wrap: wrap; gap: 6px 16px; }
   fieldset.cases legend { font-weight: 600; font-size: 14px; margin-bottom: 4px; }
@@ -1961,6 +1963,17 @@ function compteF(id) {
   return { recues: ps.filter((p) => ['a_verifier', 'a_contresigner', 'verifiee'].includes(p.etat)).length, verifiees: ps.filter((p) => p.etat === 'verifiee').length, total: ps.length };
 }
 const etatContratF = (id) => piecesDe(id)[0].etat;
+// Dernier envoi du contrat pré-rempli (journal, meta.contrat = 'a_signer').
+const contratEnvoyeF = (id) => (activitesDe(id).find((a) => a.meta && a.meta.contrat === 'a_signer') || {}).date || null;
+// Le contrat pré-rempli part une fois l'entreprise renseignée, le SIRET vérifié et les pièces reçues (19/11/2026).
+function pretContratF(id) {
+  const f = dossierDe(id);
+  const i = f.identite || {};
+  const identiteOk = ['raison_sociale', 'forme', 'siege', 'representant', 'qualite'].every((k) => String(i[k] || '').trim()) && Boolean(f.regime_tva) && (f.regime_tva !== 'exonere' || Boolean(f.nda));
+  const siretOk = Boolean(f.siret_verif && f.siret_verif.trouve && f.siret_verif.actif);
+  const manquantes = piecesDe(id).slice(1).filter((p) => !FACULTATIVES_F.has(p.type) && ['manquante', 'refusee', 'expiree'].includes(p.etat)).map((p) => p.titre);
+  return { identiteOk, siretOk, manquantes, pret: identiteOk && siretOk && !manquantes.length };
+}
 const formateurs = () => D.leads.filter((l) => l.type === 'formateur' && !l.archive);
 S.filtreF = 'tous';
 S.niveauF = '';
@@ -2167,6 +2180,11 @@ function explicationF(f, ps) {
     : `Tout est arrivé. ${aVerifier ? `${aVerifier} pièce${aVerifier > 1 ? 's' : ''} à regarder, ` : ''}puis Gabriel valide le formateur${f.signature ? ' (il contresigne son contrat)' : ''}.`;
   if (f.statut === 'a_renouveler') return `À mettre à jour : ${manque.join(', ') || 'des pièces à revérifier'}. Il reste positionnable seulement une fois à jour.`;
   if (f.statut === 'a_inviter') return 'Crée son lien d\'envoi : il y remplira son entreprise et son profil, déposera ses pièces et signera le contrat-cadre. S\'il a déjà un contrat signé des deux côtés, dépose-le comme pièce.';
+  if (!f.signature) {
+    const k = pretContratF(f.lead_id);
+    if (k.pret) return 'Pièces reçues et entreprise renseignée : envoie-lui le contrat pré-rempli à signer (première ligne des pièces).';
+    if (!k.manquantes.length) return 'Pièces reçues : complète son entreprise (« Modifier l\'entreprise »), puis envoie-lui le contrat pré-rempli à signer.';
+  }
   return manque.length ? `En attente de : ${manque.join(', ')}.` : 'En attente de son entreprise et de son SIRET vérifié, à remplir dans son lien d\'envoi.';
 }
 function blocDossierFormateur(l) {
@@ -2190,6 +2208,7 @@ function blocDossierFormateur(l) {
     ${lecture ? '' : `<div class="actions">
       ${pret && admin ? '<button type="button" class="btn primaire" data-act="formateur-valider">Valider le formateur</button>' : ''}
       ${f.statut !== 'refuse' ? `<button type="button" class="btn${f.statut === 'a_inviter' ? ' primaire' : ''}" data-act="formateur-lien">${f.jeton_cree_le ? 'Nouveau lien d\'envoi' : 'Créer le lien d\'envoi'}</button>` : ''}
+      ${f.signature ? '' : '<button type="button" class="btn" data-act="formateur-entreprise">Modifier l\'entreprise</button>'}
       <button type="button" class="btn" data-act="formateur-profil">Modifier le profil</button>
       <button type="button" class="btn" data-act="piece-deposer">Déposer une pièce</button>
       <button type="button" class="btn lien" data-act="formateur-refuser">${f.statut === 'refuse' ? 'Rouvrir le dossier' : 'Refuser'}</button>
@@ -2199,6 +2218,7 @@ function blocDossierFormateur(l) {
       <dt>Structure</dt><dd>${esc([id.raison_sociale, { ei: 'entreprise individuelle', micro: 'micro-entreprise', eurl: 'EURL', sarl: 'SARL', sasu: 'SASU', sas: 'SAS' }[id.forme] || id.forme_libre].filter(Boolean).join(', ') || 'pas encore saisie')}${id.siege ? `<br><span class="meta">${esc(id.siege)}</span>` : ''}</dd>
       <dt>SIRET</dt><dd>${siret}${f.siret && !lecture ? ' <button type="button" class="btn petit" data-act="formateur-siret">Revérifier</button>' : ''}</dd>
       <dt>TVA</dt><dd>${tva}</dd>
+      ${id.cpf ? `<dt>CPF</dt><dd>${id.cpf === 'certifie' ? 'certifié Qualiopi' : 'exempté (micro-entreprise sous 83 600 € HT)'}</dd>` : ''}
       ${f.intervenants ? `<dt>Intervenants</dt><dd>${esc(f.intervenants)}</dd>` : ''}
       <dt>Lien d'envoi</dt><dd>${f.jeton_cree_le ? `créé le ${esc(dateCourte(String(f.jeton_cree_le).slice(0, 10)))}, valable jusqu'au ${esc(dateCourte(String(f.jeton_expire).slice(0, 10)))}` : 'pas encore créé'}</dd>
     </dl>
@@ -2225,13 +2245,19 @@ function blocDossierFormateur(l) {
           ${lecture ? '' : '<div class="actions"><button type="button" class="btn petit" data-act="contrat-voir">Voir</button></div>'}</li>`;
       }
       return `<li${d ? ` data-doc="${d.id}"` : ''}${p.type === 'contrat' ? ' class="contrat-f"' : ''}>
-        <div class="tete"><b>${esc(p.titre)}</b><span class="etat ${p.bientot ? 'e-verifier' : ecls}">${p.bientot ? `Expire le ${esc(dateCourte(d.expire_le))}` : esc(elib)}</span></div>
+        <div class="tete"><b>${esc(p.titre)}</b><span class="etat ${p.bientot ? 'e-verifier' : p.type === 'contrat' && p.etat === 'manquante' && contratEnvoyeF(l.id) ? 'e-verifier' : ecls}">${p.bientot ? `Expire le ${esc(dateCourte(d.expire_le))}` : p.type === 'contrat' && p.etat === 'manquante' ? (contratEnvoyeF(l.id) ? 'Envoyé, à signer' : pretContratF(l.id).pret ? 'À envoyer' : esc(elib)) : esc(elib)}</span></div>
         ${d ? `<p class="meta">${esc(d.nom)}, ${parQui(d)} le ${esc(instantLisible(d.created_at))}${d.expire_le ? `, valable jusqu'au ${esc(dateCourte(d.expire_le))}` : ''}</p>
           ${lu ? `<p class="lecture${lu.conforme ? ' conforme' : ''}">${lu.conforme ? 'Claude : conforme. ' : 'Claude : '}${esc(lu.details)}</p>` : d.lecture && d.lecture.erreur ? '<p class="aide">Claude n\'a pas pu lire cette pièce : regarde-la toi-même.</p>' : ''}
           ${lu && lu.alertes && lu.alertes.length ? `<ul class="alertes-f">${lu.alertes.map((x) => `<li>${esc(x)}</li>`).join('')}</ul>` : ''}
           ${lu && lu.code_verification ? `<p class="code-urssaf">Code de sécurité : <code>${esc(lu.code_verification)}</code> <button type="button" class="btn petit" data-copier="${esc(lu.code_verification)}">Copier</button> <a href="${URSSAF_VERIF}" target="_blank" rel="noopener noreferrer">Vérifier sur urssaf.fr</a></p>` : ''}
           ${d.statut === 'refuse' && d.motif ? `<p class="message-refus">À refaire : ${esc(d.motif)}</p>` : ''}
           <div class="actions"><button type="button" class="btn petit" data-act="piece-voir">Voir</button>${lienDrive(d) ? '' : '<button type="button" class="btn petit" data-act="piece-telecharger">Télécharger</button>'}${!lecture && p.etat === 'a_verifier' ? '<button type="button" class="btn petit primaire" data-act="piece-ok">Vérifiée</button>' : ''}${!lecture && ['a_verifier', 'verifiee'].includes(p.etat) ? '<button type="button" class="btn petit" data-act="piece-refaire">À refaire</button>' : ''}</div>` : ''}
+        ${p.type === 'contrat' && !lecture ? (() => {
+          const k = pretContratF(l.id);
+          const envoye = contratEnvoyeF(l.id);
+          return `${d ? '' : `<p class="meta">${envoye ? `Contrat pré-rempli envoyé le ${esc(instantLisible(envoye))} : il le signe en ligne avec son lien.` : k.pret ? 'Pièces reçues : le contrat pré-rempli peut partir, il le signe en ligne.' : 'Le contrat pré-rempli part une fois son entreprise renseignée et ses pièces reçues.'}</p>`}
+          <div class="actions"><button type="button" class="btn petit${k.pret && !d && !envoye ? ' primaire' : ''}" data-act="contrat-preparer">${k.pret ? (d ? 'Faire signer le contrat en ligne' : envoye ? 'Renvoyer le contrat' : 'Envoyer le contrat à signer') : 'Voir le contrat pré-rempli'}</button></div>`;
+        })() : ''}
       </li>`;
     }).join('')}</ul>
     ${autresDocuments(l.id)}
@@ -2298,12 +2324,12 @@ async function voirPiece(id, enregistrer = false) {
     setTimeout(() => URL.revokeObjectURL(url), 120000);
   } catch { if (fenetre) fenetre.close(); toast("La pièce n'a pas pu s'ouvrir. Réessaie."); }
 }
-function ouvrirLienFormateur(l, r) {
+function ouvrirLienFormateur(l, r, { contrat = false } = {}) {
   const lien = `${location.origin}/espace-formateur/#${r.jeton}`;
   const c = contactsDe(l.id).find((x) => x.email) || null;
   const jusquau = dateLongue(String(r.expire).slice(0, 10));
-  ouvrirModale(`<h2>Lien d'envoi de ${esc(l.entreprise)}</h2>
-    <p class="aide">Personnel, valable jusqu'au ${esc(jusquau)}. Il n'ouvre que son dossier. Il ne s'affiche qu'une fois : copie-le ou prépare l'email maintenant. Un nouveau lien remplace celui-ci.</p>
+  ouvrirModale(`<h2>${contrat ? `Contrat de ${esc(l.entreprise)} à signer` : `Lien d'envoi de ${esc(l.entreprise)}`}</h2>
+    <p class="aide">${contrat ? 'Le contrat pré-rempli est prêt. Ce lien l\'ouvre : il le relit et le signe en ligne. ' : ''}Personnel, valable jusqu'au ${esc(jusquau)}. Il n'ouvre que son dossier. Il ne s'affiche qu'une fois : copie-le ou prépare l'email maintenant. Un nouveau lien remplace celui-ci.${c && !D.gmail ? ' Ta boîte Google n\'est pas reliée au CRM : copie le lien dans ton email.' : ''}</p>
     ${champ('Lien', `<input type="text" name="lien" readonly value="${esc(lien)}">`)}
     <div class="pied"><button type="button" class="btn" data-copier="${esc(lien)}">Copier le lien</button>${c && D.gmail ? '<button type="button" class="btn primaire" data-email-lien>Préparer l\'email</button>' : ''}<button type="button" class="btn" data-fermer>Fermer</button></div>`, (form) => {
     brancherAnnuler(form);
@@ -2313,6 +2339,12 @@ function ouvrirLienFormateur(l, r) {
       ouvrirEmail(l.id, c.id);
       const el = $('#modale form').elements;
       const signature = (D.reglages.signature || SIGNATURE_DEFAUT).trim();
+      if (contrat) {
+        el.objet.value = 'Ton contrat de formateur IA-Entrepreneur à signer';
+        el.corps.value = `${salutation(c)}\n\nMerci pour tes pièces, ton dossier est complet. Voici ton contrat de sous-traitance avec IA-Entrepreneur, déjà rempli avec les informations de ton entreprise.\n\nTu le relis et tu le signes en ligne ici, en quelques minutes :\n\n${lien}\n\nSi une information de ton entreprise est à corriger, fais-le à l'étape 1 avant de signer : le contrat se met à jour. Gabriel le contresigne ensuite, et tu peux l'enregistrer en PDF depuis la même page.\n\nLe lien est personnel et valable jusqu'au ${jusquau}.\n\n${signature}`;
+        el.corps.dispatchEvent(new Event('input'));
+        return;
+      }
       el.objet.value = 'Ton dossier formateur IA-Entrepreneur';
       el.corps.value = `${salutation(c)}\n\nPour travailler ensemble sur les prochaines missions, voici ton espace formateur IA-Entrepreneur. Tu y renseignes ton entreprise et ton profil, tu déposes tes pièces (Kbis, attestation URSSAF, RIB, CV, etc.) et tu signes le contrat-cadre en ligne. Compte une vingtaine de minutes ; tu peux t'arrêter et reprendre avec le même lien.\n\n${lien}\n\nLe lien est personnel et valable jusqu'au ${jusquau}.\n\n${signature}`;
       el.corps.dispatchEvent(new Event('input'));
@@ -2388,6 +2420,100 @@ function ouvrirValiderFormateur(l) {
       });
     });
   });
+}
+// L'entreprise du formateur, comme l'étape 1 de son lien : Gabriel ou Anna la remplissent depuis son Kbis
+// pour envoyer un contrat pré-rempli (19/11/2026). Le registre remplit le nom, la forme et le siège.
+const FORMES_F = [['micro', 'Micro-entreprise'], ['ei', 'Entreprise individuelle'], ['eurl', 'EURL'], ['sarl', 'SARL'], ['sasu', 'SASU'], ['sas', 'SAS'], ['autre', 'Autre forme']];
+function ouvrirEntrepriseFormateur(l, apres = null) {
+  const f = dossierDe(l.id);
+  const id = f.identite || {};
+  const c = contactPrincipal(l.id) || {};
+  const sv = f.siret_verif;
+  const etatSiret = !f.siret ? 'Pas encore saisi.' : !sv ? 'Pas encore vérifié.' : sv.trouve ? (sv.actif ? `Actif au registre : ${sv.nom}${sv.adresse ? `, ${sv.adresse}` : ''}.` : 'Établissement FERMÉ au registre : demande-lui son SIRET actuel.') : sv.joignable === false ? 'Le registre ne répond pas : réessaie dans un instant.' : 'Introuvable au registre.';
+  ouvrirModale(`<h2>Entreprise de ${esc(l.entreprise)}</h2>
+    <p class="aide">Ces informations remplissent son contrat. Commence par le SIRET : le registre remplit le nom, la forme et le siège. Le reste se lit sur son Kbis.</p>
+    ${champ('SIRET', `<span class="saisie-bouton"><input type="text" name="siret" inputmode="numeric" autocomplete="off" value="${esc(f.siret)}" placeholder="14 chiffres"><button type="button" class="btn" data-verifier-siret>Vérifier au registre</button></span>`)}
+    <p class="meta" data-etat-siret>${esc(etatSiret)}</p>
+    ${champ('Nom de la structure', `<input type="text" name="raison_sociale" value="${esc(id.raison_sociale)}">`)}
+    <div class="deux">${champ('Forme juridique', `<select name="forme"><option value="">Choisis</option>${FORMES_F.map(([k, v]) => `<option value="${k}" ${id.forme === k ? 'selected' : ''}>${v}</option>`).join('')}</select>`)}${champ('Capital (société)', `<input type="text" inputmode="numeric" name="capital" value="${esc(id.capital)}">`)}</div>
+    ${champ('Adresse du siège', `<input type="text" name="siege" value="${esc(id.siege)}">`)}
+    ${champ('Immatriculation', `<input type="text" name="immatriculation" value="${esc(id.immatriculation)}" placeholder="Ex. RCS de Nancy. Vide pour une micro-entreprise">`)}
+    <div class="deux">${champ('Représentant (prénom et nom)', `<input type="text" name="representant" value="${esc(id.representant || [c.prenom, c.nom].filter(Boolean).join(' '))}">`)}${champ('En qualité de', `<input type="text" name="qualite" value="${esc(id.qualite)}" placeholder="Gérant, président, entrepreneur individuel">`)}</div>
+    <fieldset class="cases"><legend>Régime de TVA</legend>${[['exonere', 'Exonéré (NDA)'], ['franchise', 'Franchise en base (293 B)'], ['assujetti', 'Assujetti']].map(([k, v]) => `<label class="case"><input type="radio" name="regime_tva" value="${k}" ${f.regime_tva === k ? 'checked' : ''}> ${v}</label>`).join('')}</fieldset>
+    ${champ('Numéro de déclaration d\'activité (si exonéré)', `<input type="text" inputmode="numeric" name="nda" value="${esc(f.nda)}" placeholder="11 chiffres">`)}
+    ${champ('Qui intervient en formation', `<input type="text" name="intervenants" value="${esc(f.intervenants || id.representant || [c.prenom, c.nom].filter(Boolean).join(' '))}">`)}
+    <fieldset class="cases"><legend>Situation pour le CPF (facultatif)</legend>${[['certifie', 'Certifié Qualiopi'], ['exempte', 'Exempté (micro sous 83 600 € HT)'], ['', 'Aucun des deux']].map(([k, v]) => `<label class="case"><input type="radio" name="cpf" value="${k}" ${(id.cpf || '') === k ? 'checked' : ''}> ${v}</label>`).join('')}</fieldset>
+    ${piedFormulaire('<button type="submit" class="btn primaire">Enregistrer</button>')}`, (form) => {
+    brancherAnnuler(form);
+    const el = form.elements;
+    $('[data-verifier-siret]', form).addEventListener('click', async (ev) => {
+      const b = ev.currentTarget;
+      const siret = el.siret.value.replace(/\s/g, '');
+      if (!/^\d{14}$/.test(siret)) return toast('Le SIRET compte 14 chiffres.');
+      b.disabled = true;
+      try {
+        const r = await api('POST', { op: 'formateur_siret', lead_id: l.id, siret });
+        majFormateur(r);
+        const g = dossierDe(l.id);
+        const v = g.siret_verif || {};
+        $('[data-etat-siret]', form).textContent = v.trouve ? (v.actif ? `Actif au registre : ${v.nom}${v.adresse ? `, ${v.adresse}` : ''}.` : 'Établissement FERMÉ au registre : demande-lui son SIRET actuel.') : v.joignable === false ? 'Le registre ne répond pas : réessaie dans un instant.' : 'Introuvable au registre.';
+        const gi = g.identite || {};
+        for (const k of ['raison_sociale', 'siege']) if (!el[k].value && gi[k]) el[k].value = gi[k];
+        if (!el.forme.value && gi.forme) el.forme.value = gi.forme;
+      } catch (e) { toast(e.message); } finally { b.disabled = false; }
+    });
+    form.addEventListener('submit', (ev) => {
+      ev.preventDefault();
+      soumettre(form, async () => {
+        const regime = (form.querySelector('input[name="regime_tva"]:checked') || {}).value || null;
+        const nda = el.nda.value.replace(/\s/g, '');
+        if (regime === 'exonere' && !/^\d{11}$/.test(nda)) throw new ErreurApi('Exonéré de TVA : indique son numéro de déclaration d\'activité (11 chiffres).');
+        const identite = Object.fromEntries(['raison_sociale', 'forme', 'capital', 'siege', 'immatriculation', 'representant', 'qualite'].map((k) => [k, el[k].value]));
+        identite.cpf = (form.querySelector('input[name="cpf"]:checked') || {}).value || '';
+        majFormateur(await api('POST', { op: 'formateur_identite', lead_id: l.id, identite, regime_tva: regime, nda, intervenants: el.intervenants.value }));
+        fermerModale();
+        toast('Entreprise enregistrée.');
+        if (apres) apres();
+      });
+    });
+  });
+}
+// Le contrat pré-rempli : ce qui manque, le texte tel qu'il sera signé, puis le lien et l'email (19/11/2026).
+async function ouvrirContratFormateur(l) {
+  let r;
+  try { r = await api('POST', { op: 'formateur_contrat', lead_id: l.id, etape: 'apercu' }); } catch (e) { return toast(e.message); }
+  const c = contactsDe(l.id).find((x) => x.email) || null;
+  const ok = (v) => `<span class="etat ${v ? 'e-ok' : 'e-manque'}">${v ? 'Fait' : 'À faire'}</span>`;
+  ouvrirModale(`<h2>Contrat de ${esc(l.entreprise)}</h2>
+    <p class="aide">Le contrat-cadre (version du ${esc(r.version.replace(/^.*?(\d{4})-(\d{2})-(\d{2}).*$/, '$3/$2/$1'))}), rempli avec son entreprise. Il le relit et le signe en ligne avec son lien ; Gabriel le contresigne en validant le formateur.</p>
+    <ul class="pieces-f">
+      <li><div class="tete"><b>Entreprise renseignée</b>${ok(r.identite_ok)}</div>${r.blancs.length ? `<p class="meta">Reste à remplir : ${esc(r.blancs.join(', '))}.</p>` : ''}</li>
+      <li><div class="tete"><b>SIRET vérifié au registre</b>${ok(r.siret_ok)}</div></li>
+      <li><div class="tete"><b>Pièces reçues</b>${ok(!r.pieces_manquantes.length)}</div>${r.pieces_manquantes.length ? `<p class="meta">Manquent : ${esc(r.pieces_manquantes.join(', '))}.</p>` : ''}</li>
+    </ul>
+    <pre class="texte-contrat">${esc(r.texte)}</pre>
+    <div class="pied">
+      ${r.signe ? '' : '<button type="button" class="btn" data-entreprise>Modifier l\'entreprise</button>'}
+      ${r.pret ? `<button type="button" class="btn primaire" data-envoyer-contrat>${c && D.gmail ? 'Préparer l\'email' : 'Créer le lien à envoyer'}</button>` : ''}
+      <button type="button" class="btn" data-fermer>Fermer</button>
+    </div>
+    ${r.signe ? '<p class="aide">Déjà signé en ligne.</p>' : r.pret ? '' : '<p class="aide">Il part une fois l\'entreprise renseignée, le SIRET vérifié et les pièces reçues.</p>'}`, (form) => {
+    brancherAnnuler(form);
+    const be = $('[data-entreprise]', form);
+    if (be) be.addEventListener('click', () => { fermerModale(); ouvrirEntrepriseFormateur(l, () => ouvrirContratFormateur(l)); });
+    const b = $('[data-envoyer-contrat]', form);
+    if (b) b.addEventListener('click', async () => {
+      b.disabled = true;
+      try {
+        const x = await api('POST', { op: 'formateur_contrat', lead_id: l.id, etape: 'lien' });
+        if (x.activite) D.activites.push(x.activite);
+        majFormateur(x);
+        fermerModale();
+        ouvrirLienFormateur(l, x, { contrat: true });
+        if (c && D.gmail) $('#modale [data-email-lien]').click();
+      } catch (e) { toast(e.message); b.disabled = false; }
+    });
+  }, { large: true });
 }
 async function ouvrirContratSigne(l) {
   try {
@@ -6311,6 +6437,8 @@ document.addEventListener('click', (ev) => {
     case 'programme-ouvrir': return ouvrirProgramme(cible.dataset.programme, { reco: cible.dataset.reco === '1' });
     case 'formateur-lien': { const l = IDX.lead.get(leadId); return opFormateur({ op: 'formateur_lien', lead_id: leadId }).then((r) => { if (r && r.jeton) ouvrirLienFormateur(l, r); }); }
     case 'formateur-profil': return ouvrirProfilFormateur(IDX.lead.get(leadId));
+    case 'formateur-entreprise': return ouvrirEntrepriseFormateur(IDX.lead.get(leadId));
+    case 'contrat-preparer': return ouvrirContratFormateur(IDX.lead.get(leadId));
     case 'formateur-valider': return ouvrirValiderFormateur(IDX.lead.get(leadId));
     case 'formateur-siret': return opFormateur({ op: 'formateur_siret', lead_id: leadId }, 'SIRET revérifié.');
     case 'formateur-refuser': { const f = dossierDe(leadId); if (f.statut !== 'refuse' && !confirm('Refuser ce formateur ? Son lien d\'envoi ne fonctionnera plus.')) return; return opFormateur({ op: 'formateur_refuser', lead_id: leadId, annuler: f.statut === 'refuse' }, f.statut === 'refuse' ? 'Dossier rouvert.' : 'Formateur refusé.'); }

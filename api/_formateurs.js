@@ -262,6 +262,27 @@ export async function deposerPiece({ f, leadId, type, nom, base64, deposePar }) 
 
 /* ---------- L'état du dossier, et le statut qui en découle ---------- */
 
+/* ---------- L'entreprise du formateur (étape 1 de son lien, ou le CRM pour Gabriel et Anna) ---------- */
+
+const texteSaisi = (v, max) => String(v ?? '').replace(/[\u0000-\u001f]/g, ' ').trim().slice(0, max);
+const FORMES_SAISIE = ['ei', 'micro', 'eurl', 'sarl', 'sasu', 'sas', 'autre'];
+const REGIMES_SAISIE = ['exonere', 'assujetti', 'franchise'];
+// Ce qui est enregistré, après contrôle : jamais rien d'autre que ces champs.
+export function identiteSaisie(corps, f) {
+  const s = (corps && corps.identite) || {};
+  const identite = {
+    raison_sociale: texteSaisi(s.raison_sociale, 160), forme: FORMES_SAISIE.includes(s.forme) ? s.forme : '', forme_libre: texteSaisi(s.forme_libre, 80),
+    capital: texteSaisi(s.capital, 30), siege: texteSaisi(s.siege, 300), immatriculation: texteSaisi(s.immatriculation, 120),
+    representant: texteSaisi(s.representant, 120), qualite: texteSaisi(s.qualite, 80),
+  };
+  // Situation CPF (article 18 du contrat), facultative : seulement si elle est envoyée.
+  if (s.cpf !== undefined) identite.cpf = ['certifie', 'exempte'].includes(s.cpf) ? s.cpf : '';
+  const regime = REGIMES_SAISIE.includes(corps.regime_tva) ? corps.regime_tva : null;
+  const nda = texteSaisi(corps.nda, 20).replace(/\s/g, '');
+  if (nda && !/^\d{11}$/.test(nda)) throw refus('nda_invalide');
+  return { identite: { ...((f && f.identite) || {}), ...identite }, regime_tva: regime, nda: nda || null, intervenants: texteSaisi(corps.intervenants, 300) || null };
+}
+
 const IDENTITE_REQUISE = ['raison_sociale', 'forme', 'siege', 'representant', 'qualite'];
 export function etatDossier(f, docs) {
   const t = aujourdHui();
@@ -289,6 +310,9 @@ export function etatDossier(f, docs) {
   const aEnvoyer = requises.filter((p) => ['manquante', 'refusee', 'expiree'].includes(p.etat));
   const aVerifier = pieces.filter((p) => p.etat === 'a_verifier');
   if (!f?.signature && contrat.etat === 'a_verifier') aVerifier.push({ titre: CONTRAT.titre });
+  // Le contrat pré-rempli part une fois l'entreprise renseignée et les pièces reçues (Gabriel, 19/11/2026).
+  const piecesRecues = aEnvoyer.length === 0;
+  const pretASigner = identiteOk && siretOk && piecesRecues;
   const complet = identiteOk && siretOk && signe && aEnvoyer.length === 0;
   const verifie = complet && aVerifier.length === 0;
   let statut;
@@ -298,7 +322,7 @@ export function etatDossier(f, docs) {
   else if (f && (f.jeton_cree_le || actifs.length || f.signature || f.siret)) statut = 'en_cours';
   else statut = 'a_inviter';
   return {
-    statut, pieces, contrat, identiteOk, siretOk, signe, complet, verifie,
+    statut, pieces, contrat, identiteOk, siretOk, signe, piecesRecues, pretASigner, complet, verifie,
     a_envoyer: aEnvoyer.map((p) => p.titre), a_verifier: aVerifier.map((p) => p.titre),
     bientot: pieces.filter((p) => p.bientot).map((p) => ({ titre: p.titre, expire_le: p.document.expire_le })),
     recues: requises.filter((p) => ['a_verifier', 'verifiee'].includes(p.etat)).length, requises: requises.length,

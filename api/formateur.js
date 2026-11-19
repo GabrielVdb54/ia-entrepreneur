@@ -19,7 +19,7 @@
 
 import { timingSafeEqual } from 'node:crypto';
 import {
-  base, deposerPiece, empreinte, etatDossier, majStatut, verifierSiret, RefusFormateur,
+  base, deposerPiece, empreinte, etatDossier, identiteSaisie, majStatut, verifierSiret, RefusFormateur,
 } from './_formateurs.js';
 import { VERSION, contratRempli, texteContrat } from './_contrat-formateur.js';
 
@@ -39,8 +39,6 @@ function trop(cle, max) {
 
 const texte = (v, max) => String(v ?? '').replace(/[\u0000-\u001f]/g, ' ').trim().slice(0, max);
 const liste = (v, max = 30) => (Array.isArray(v) ? v : String(v || '').split(',')).map((x) => texte(x, 80)).filter(Boolean).slice(0, max);
-const FORMES = ['ei', 'micro', 'eurl', 'sarl', 'sasu', 'sas', 'autre'];
-const REGIMES = ['exonere', 'assujetti', 'franchise'];
 
 async function formateurDuJeton(jeton) {
   if (!/^[A-Za-z0-9_-]{40,60}$/.test(jeton || '')) return null;
@@ -76,7 +74,7 @@ async function dossier(f) {
         lu: p.document.lecture && !p.document.lecture.erreur ? { details: p.document.lecture.details, alertes: p.document.lecture.alertes, conforme: p.document.lecture.conforme } : null,
       } : null,
     })),
-    identite_ok: e.identiteOk, siret_ok: e.siretOk,
+    identite_ok: e.identiteOk, siret_ok: e.siretOk, pret_a_signer: e.pretASigner,
     signature: f.signature ? { date: f.signature.date, nom: f.signature.nom, lieu: f.signature.lieu } : null,
     contrat: { version: VERSION, blocs: contratRempli(f, f.signature) },
     lien_expire: f.jeton_expire,
@@ -123,16 +121,7 @@ export default async function handler(req, res) {
 
     if (corps.op === 'identite') {
       if (signe) throw new RefusFormateur('deja_signe', 409);
-      const s = corps.identite || {};
-      const identite = {
-        raison_sociale: texte(s.raison_sociale, 160), forme: FORMES.includes(s.forme) ? s.forme : '', forme_libre: texte(s.forme_libre, 80),
-        capital: texte(s.capital, 30), siege: texte(s.siege, 300), immatriculation: texte(s.immatriculation, 120),
-        representant: texte(s.representant, 120), qualite: texte(s.qualite, 80),
-      };
-      const regime = REGIMES.includes(corps.regime_tva) ? corps.regime_tva : null;
-      const nda = texte(corps.nda, 20).replace(/\s/g, '');
-      if (nda && !/^\d{11}$/.test(nda)) throw new RefusFormateur('nda_invalide');
-      await base(`iae_crm_formateurs?lead_id=eq.${f.lead_id}`, { methode: 'PATCH', prefer: 'return=minimal', corps: { identite: { ...(f.identite || {}), ...identite }, regime_tva: regime, nda: nda || null, intervenants: texte(corps.intervenants, 300) || null } });
+      await base(`iae_crm_formateurs?lead_id=eq.${f.lead_id}`, { methode: 'PATCH', prefer: 'return=minimal', corps: identiteSaisie(corps, f) });
       const nouveau = (await base(`iae_crm_formateurs?lead_id=eq.${f.lead_id}&select=*`))[0];
       await majStatut(f.lead_id, { source: 'espace formateur' });
       return res.status(200).json(await dossier(nouveau));
@@ -159,8 +148,11 @@ export default async function handler(req, res) {
 
     if (corps.op === 'signer') {
       if (signe) throw new RefusFormateur('deja_signe', 409);
-      const e = etatDossier(f, []);
+      // Le contrat se signe une fois l'entreprise renseignée et les pièces envoyées (Gabriel, 19/11/2026).
+      const docs = await base(`iae_crm_documents?lead_id=eq.${f.lead_id}&select=type,statut,archive,expire_le,created_at`);
+      const e = etatDossier(f, docs || []);
       if (!e.identiteOk || !e.siretOk) throw new RefusFormateur('identite_incomplete');
+      if (!e.piecesRecues) throw new RefusFormateur('pieces_manquantes');
       const mention = texte(corps.mention, 80).toLowerCase().normalize('NFD').replace(/\p{M}/gu, '').replace(/[^a-z ]/g, ' ').replace(/\s+/g, ' ').trim();
       if (mention !== 'lu et approuve bon pour accord') throw new RefusFormateur('mention_invalide');
       const nom = texte(corps.nom, 120);

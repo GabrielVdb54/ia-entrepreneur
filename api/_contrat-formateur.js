@@ -2,19 +2,29 @@
  * Contrat-cadre de sous-traitance formateur d'IA-Entrepreneur, signé en ligne
  * depuis l'espace formateur (choix de Gabriel, 06/11/2026).
  *
- * Source : Contrat_sous_traitance_formateur_IA-Entrepreneur_modele.docx du
- * 28/10/2026, repris mot pour mot, sauf :
+ * Version 2 (19/11/2026, choix de Gabriel : « 28/10 + article CPF ») :
+ *   - base : Contrat_sous_traitance_formateur_IA-Entrepreneur_modele.docx du
+ *     28/10/2026, repris mot pour mot ;
+ *   - article 18 « Prestations au bénéfice de particuliers (dispositif CPF) »,
+ *     repris mot pour mot de l'article 16 du ..._corrige.docx (16/10/2026),
+ *     son annexe devenant l'Annexe 4 ; préambule et article 3 complétés pour le
+ *     CPF ; « Dispositions diverses » et « Droit applicable » deviennent 19 et 20 ;
+ *   - pièces alignées sur le CRM (Gabriel, 19/11/2026) : plus d'attestation de
+ *     régime de TVA (article 6) ni de formation continue annuelle, RC Pro
+ *     facultative (articles 6 et 9, Annexe 2), justificatifs de compétences sous
+ *     toutes leurs formes (article 6, Annexe 3).
+ * Comme en version 1 :
  *   - le certificat Qualiopi : n° 883211-2 (celui des mentions légales du site,
  *     valable jusqu'au 23/04/2029) au lieu de l'ancien 883211-1 ;
- *   - les blancs (identité du formateur, régime de TVA, intervenants, lieu et
- *     date), remplis avec ce que le formateur a saisi ;
+ *   - les blancs (identité du formateur, régime de TVA, situation CPF,
+ *     intervenants, lieu et date), remplis avec le dossier du formateur ;
  *   - la formule finale : signature électronique, et mention « Lu et approuvé,
  *     bon pour accord » saisie au lieu d'être manuscrite.
  * Toute modification du texte change VERSION : une signature garde la version
  * et l'empreinte du texte exact qu'elle couvre.
  */
 
-export const VERSION = 'contrat-cadre-formateur-2026-10-28-v1';
+export const VERSION = 'contrat-cadre-formateur-2026-11-19-v2';
 
 export const BLOCS = [
  {
@@ -58,7 +68,7 @@ export const BLOCS = [
  },
  {
   "k": "p",
-  "x": "Le Donneur d'ordre exerce une activité d'organisme de formation professionnelle, notamment dans le domaine de l'intelligence artificielle appliquée aux entreprises (TPE et PME). Il conçoit, commercialise et réalise des actions de formation auprès de clients professionnels."
+  "x": "Le Donneur d'ordre exerce une activité d'organisme de formation professionnelle, notamment dans le domaine de l'intelligence artificielle appliquée aux entreprises (TPE et PME). Il conçoit, commercialise et réalise des actions de formation auprès de clients professionnels et, à compter de leur ouverture, auprès de particuliers dans le cadre du Compte Personnel de Formation (CPF)."
  },
  {
   "k": "p",
@@ -177,7 +187,7 @@ export const BLOCS = [
  },
  {
   "k": "p",
-  "x": "Pour les missions entreprise, le montant de référence n'est pas forfaitairement fixé au présent contrat : il est proposé par le Donneur d'ordre pour chaque mission, en fonction du client, du format et du contenu, et précisé au bon de commande correspondant, que le Formateur est libre d'accepter ou de refuser. La rémunération des missions apportées par le Formateur est déterminée à l'article 16 et la commission d'apport d'affaires à l'article 17. Toute prestation complémentaire ou tout format spécifique fait l'objet d'un accord écrit préalable. Les montants convenus sont fermes pour la mission concernée, sous réserve des règles de paiement après encaissement de l'article 4."
+  "x": "Pour les missions entreprise, le montant de référence n'est pas forfaitairement fixé au présent contrat : il est proposé par le Donneur d'ordre pour chaque mission, en fonction du client, du format et du contenu, et précisé au bon de commande correspondant, que le Formateur est libre d'accepter ou de refuser. La rémunération des missions apportées par le Formateur est déterminée à l'article 16, la commission d'apport d'affaires à l'article 17 et le montant de référence des prestations destinées aux particuliers financées par le CPF à l'article 18. Toute prestation complémentaire ou tout format spécifique fait l'objet d'un accord écrit préalable. Les montants convenus sont fermes pour la mission concernée, sous réserve des règles de paiement après encaissement de l'article 4."
  },
  {
   "k": "h",
@@ -273,11 +283,7 @@ export const BLOCS = [
  },
  {
   "k": "li",
-  "x": "une attestation justifiant de son régime de TVA (exonération au titre de l'article 261-4-4° a du CGI, franchise en base, ou assujettissement) ;"
- },
- {
-  "k": "li",
-  "x": "une attestation d'assurance de responsabilité civile professionnelle en cours de validité (article 9) ;"
+  "x": "le cas échéant, une attestation d'assurance de responsabilité civile professionnelle en cours de validité (article 9) ;"
  },
  {
   "k": "li",
@@ -285,11 +291,7 @@ export const BLOCS = [
  },
  {
   "k": "li",
-  "x": "le curriculum vitae à jour de chaque intervenant et tout élément justifiant sa légitimité à intervenir sur les thématiques confiées (au titre des exigences Qualiopi) ;"
- },
- {
-  "k": "li",
-  "x": "chaque année, un justificatif de formation continue pour chaque intervenant (attestation, certification ou preuve de mise à jour de ses compétences), au titre des exigences du Référentiel National Qualité applicables aux intervenants externes."
+  "x": "le curriculum vitae à jour de chaque intervenant et tout élément justifiant sa légitimité à intervenir sur les thématiques confiées, sous la forme de son choix (références de missions ou de clients, programmes animés, recommandations, attestations, certifications, diplômes), au titre des exigences Qualiopi."
  },
  {
   "k": "p",
@@ -366,7 +368,7 @@ export const BLOCS = [
  },
  {
   "k": "p",
-  "x": "Le Formateur est responsable des dommages directs survenant de son fait dans le cadre de l'exécution des prestations. Il déclare avoir souscrit, auprès d'une compagnie notoirement solvable, une police d'assurance de responsabilité civile professionnelle couvrant les conséquences pécuniaires de sa responsabilité, et s'engage à en justifier à première demande puis chaque année. La responsabilité du Formateur au titre d'une mission ne saurait excéder le montant de la rémunération convenue pour cette mission, sauf faute lourde ou dolosive."
+  "x": "Le Formateur est responsable des dommages directs survenant de son fait dans le cadre de l'exécution des prestations. La souscription, auprès d'une compagnie notoirement solvable, d'une police d'assurance de responsabilité civile professionnelle couvrant les conséquences pécuniaires de sa responsabilité est recommandée mais n'est pas exigée ; lorsque le Formateur en dispose, il s'engage à en justifier à première demande puis chaque année. La responsabilité du Formateur au titre d'une mission ne saurait excéder le montant de la rémunération convenue pour cette mission, sauf faute lourde ou dolosive."
  },
  {
   "k": "p",
@@ -526,7 +528,54 @@ export const BLOCS = [
  },
  {
   "k": "h",
-  "x": "Article 18 — Dispositions diverses"
+  "x": "Article 18 — Prestations au bénéfice de particuliers (dispositif CPF)"
+ },
+ {
+  "k": "p",
+  "x": "Le présent article s'applique à compter de l'ouverture, par le Donneur d'ordre, de prestations destinées aux particuliers financées par le Compte Personnel de Formation. Il s'active par mention expresse au bon de commande ou par signature de l'Annexe 4 — Conditions particulières CPF."
+ },
+ {
+  "k": "p",
+  "x": "Compte tenu des exigences propres au financement CPF, le Formateur réalise ces actions dans le strict respect du référentiel de la certification visée et des modalités de contrôle d'assiduité imposées par le financeur. Le déroulé pédagogique et les modalités d'évaluation sont, sauf indication contraire au bon de commande, fournis ou cadrés par le Donneur d'ordre."
+ },
+ {
+  "k": "h3",
+  "x": "Certification Qualiopi en sous-traitance CPF : principe et exemption."
+ },
+ {
+  "k": "p",
+  "x": "Pour les actions financées par le CPF, le sous-traitant doit en principe être lui-même certifié Qualiopi (décret n° 2023-1350 du 28 décembre 2023). Une exemption s'applique toutefois au Formateur qui relève du régime micro-social (micro-entreprise) et dont le chiffre d'affaires annuel reste inférieur à 83 600 € HT : il est alors dispensé de l'obligation de certification Qualiopi pour intervenir en sous-traitance CPF, dès lors qu'il intervient sur des actions partielles ne préparant pas à l'intégralité d'une certification. Dans tous les cas, le Formateur doit disposer d'un NDA en cours de validité et être à jour de ses obligations sociales et fiscales."
+ },
+ {
+  "k": "p",
+  "x": "Conformément à l'article R. 6333-6-2 du Code du travail, IA-Entrepreneur déclare tout contrat de sous-traitance CPF à la Caisse des dépôts et consignations via son espace EDOF, préalablement au démarrage de la mission concernée."
+ },
+ {
+  "k": "cpf"
+ },
+ {
+  "k": "h3",
+  "x": "Tarification CPF (montant de référence par journée d'intervention) :"
+ },
+ {
+  "k": "li",
+  "x": "400 € jusqu'à la quatrième (4e) session incluse ;"
+ },
+ {
+  "k": "li",
+  "x": "500 € à compter de la cinquième (5e) session ;"
+ },
+ {
+  "k": "li",
+  "x": "au-delà, le montant de référence est négociable d'un commun accord entre les Parties."
+ },
+ {
+  "k": "p",
+  "x": "Le principe de tarification tout compris de l'article 3 (imputation de la TVA à l'intérieur du montant de référence) s'applique également aux prestations CPF."
+ },
+ {
+  "k": "h",
+  "x": "Article 19 — Dispositions diverses"
  },
  {
   "k": "p",
@@ -534,7 +583,7 @@ export const BLOCS = [
  },
  {
   "k": "h",
-  "x": "Article 19 — Droit applicable et règlement des litiges"
+  "x": "Article 20 — Droit applicable et règlement des litiges"
  },
  {
   "k": "p",
@@ -560,11 +609,15 @@ export const BLOCS = [
  },
  {
   "k": "li",
-  "x": "Annexe 2 — Attestation d'assurance responsabilité civile professionnelle du Formateur."
+  "x": "Annexe 2 — Attestation d'assurance responsabilité civile professionnelle du Formateur, le cas échéant."
  },
  {
   "k": "li",
-  "x": "Annexe 3 — Pièces administratives et de vigilance du Formateur (Kbis, attestation de vigilance URSSAF, RIB, pièce d'identité, justificatif de régime de TVA, CV, NDA le cas échéant)."
+  "x": "Annexe 3 — Pièces administratives et de vigilance du Formateur (Kbis, attestation de vigilance URSSAF, RIB, pièce d'identité, CV et justificatifs de compétences, NDA le cas échéant)."
+ },
+ {
+  "k": "li",
+  "x": "Annexe 4 — Conditions particulières CPF (particuliers), activable à compter de l'ouverture du dispositif."
  }
 ];
 
@@ -589,12 +642,20 @@ export function phraseRegime(regime, nda) {
   return `Le Formateur indique ci-après son régime : ${c('exonere')} exonéré de TVA (NDA n° ${regime === 'exonere' && nda ? nda : '…'})   ${c('assujetti')} assujetti à la TVA   ${c('franchise')} franchise en base (art. 293 B du CGI). Il informe le Donneur d'ordre par écrit de tout changement de régime dans un délai de quinze (15) jours.`;
 }
 
+// Article 18 : « certifié » ou « exempté » ; rien de coché si le formateur n'est dans aucun des deux cas.
+export const SITUATIONS_CPF = ['certifie', 'exempte'];
+export function phraseCpf(situation) {
+  const c = (k) => (situation === k ? '☒' : '☐');
+  return `Le Formateur indique sa situation au regard du CPF : ${c('certifie')} certifié Qualiopi   ${c('exempte')} exempté (micro-entreprise sous 83 600 € HT). Le Donneur d'ordre vérifie cette situation avant toute mission CPF.`;
+}
+
 // Le contrat rempli, en blocs { k, x } : la page l'affiche, le serveur en calcule l'empreinte.
 export function contratRempli(f = {}, signature = null) {
   const id = f.identite || {};
   return BLOCS.map((b) => {
     if (b.k === 'identite') return { k: 'p', x: phraseIdentite({ ...id, siret: f.siret || id.siret }) };
     if (b.k === 'regime') return { k: 'p', x: phraseRegime(f.regime_tva, f.nda) };
+    if (b.k === 'cpf') return { k: 'p', x: phraseCpf(id.cpf) };
     if (b.k === 'intervenants') return { k: 'li', x: `${b.avant} ${blanc(f.intervenants || id.representant)}${b.apres}` };
     if (b.k === 'fait_a') {
       const date = signature ? new Date(signature.date).toLocaleDateString('fr-FR', { timeZone: 'Europe/Paris', day: '2-digit', month: '2-digit', year: 'numeric' }) : '…';
@@ -605,6 +666,20 @@ export function contratRempli(f = {}, signature = null) {
     }
     return b;
   });
+}
+// Ce qui reste en blanc dans le contrat pré-rempli, avant de l'envoyer (CRM, 19/11/2026).
+export function blancsContrat(f = {}) {
+  const id = f.identite || {};
+  const manque = [];
+  if (!String(id.raison_sociale || '').trim()) manque.push('raison sociale');
+  if (!id.forme && !String(id.forme_libre || '').trim()) manque.push('forme juridique');
+  if (!String(id.siege || '').trim()) manque.push('siège');
+  if (!String(f.siret || id.siret || '').trim()) manque.push('SIRET');
+  if (!String(id.representant || '').trim()) manque.push('représentant');
+  if (!String(id.qualite || '').trim()) manque.push('qualité du représentant');
+  if (!f.regime_tva) manque.push('régime de TVA');
+  else if (f.regime_tva === 'exonere' && !f.nda) manque.push('numéro de NDA');
+  return manque;
 }
 export function texteContrat(blocs) {
   return blocs.map((b) => (b.k === 'tableau' ? b.lignes.map((l) => l.join(' | ')).join('\n') : b.k === 'signatures' ? `Pour le Donneur d'ordre : ${b.donneur}\nPour le Formateur : ${b.formateur}` : b.x)).join('\n');

@@ -532,7 +532,7 @@ export const OPS_EQUIPE = new Set(['creer', 'maj', 'supprimer', 'journal', 'lot'
 export const REGLAGES_EQUIPE = new Set(['signature', 'rappel_matin']);
 // Anna (setter) : aussi les dossiers des formateurs (sauf formateur_valider), les marchés (profils,
 // formateurs, notes) et les pièces de l'organisme. Ludovic (partenaire) : proposer et suivre ses marchés.
-const OPS_SETTER = new Set([...OPS_EQUIPE, 'formateur_maj', 'formateur_lien', 'formateur_siret', 'piece_deposer', 'document_verifier',
+const OPS_SETTER = new Set([...OPS_EQUIPE, 'formateur_maj', 'formateur_lien', 'formateur_siret', 'formateur_identite', 'formateur_contrat', 'piece_deposer', 'document_verifier',
   'formateur_refuser', 'formateurs_chercher', 'marche_maj', 'organisme_deposer', 'organisme_archiver']);
 // La recherche des formateurs en langage courant (Claude) sert aussi à Ludovic pour ses appels d'offres.
 const OPS_PARTENAIRE = new Set(['marche_creer', 'marche_maj', 'formateurs_chercher']);
