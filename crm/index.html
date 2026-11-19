@@ -4326,8 +4326,10 @@ function etatsAppelContacts(l, extra = null) {
     const siens = appels.filter((x) => x.contact === c.id);
     const dernier = siens[0] || null;
     if (dernier && !NON_JOINTS.has(dernier.k)) return { c, etat: dernier.k === 'faux_numero' ? 'faux' : RESULTATS_APPEL[dernier.k].joint ? 'joint' : 'autre', echecs: 0, dernier, prochain: null };
-    let echecs = 0;
-    for (const x of siens) { if (NON_JOINTS.has(x.k)) echecs++; else break; }
+    // Les échecs se comptent en jours : deux lignes le même jour (l'import du 16/11 en a doublé) n'en font qu'un.
+    const jours = new Set();
+    for (const x of siens) { if (!NON_JOINTS.has(x.k)) break; jours.add(x.date); }
+    const echecs = jours.size;
     return { c, etat: 'a_joindre', echecs, dernier, prochain: dernier ? dansJours(delaiNonJoint(echecs), dernier.date) : null };
   });
 }
