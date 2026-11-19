@@ -1087,6 +1087,7 @@ function carte(l, { compacte = false } = {}) {
     <div class="carte-haut">${avatar(l, compacte ? 's' : 'm')}<div class="carte-titre"><h3><button type="button" class="lien-carte" data-act="ouvrir">${esc(l.entreprise)}</button></h3>${qui ? `<p class="meta">${esc(qui)}</p>` : ''}</div>${l.suivi ? `<span class="statut s-suivi">${esc(LIB_SUIVI[l.suivi])}</span>` : `<span class="statut s-${l.statut}">${esc(LIB_STATUT[l.statut])}</span>`}</div>
     ${l.formation_debut ? `<p class="meta">Formation : ${esc(periodeFormation(l))}</p>` : ''}
     ${relance}
+    ${compacte ? '' : aJoindreCarte(l)}
     ${texte ? `<p class="extrait">${esc(texte)}</p>` : ''}
     ${compacte ? '' : blocReco(l)}
     ${compacte ? '' : `<div class="carte-actions">
@@ -1099,6 +1100,14 @@ function carte(l, { compacte = false } = {}) {
       ${suivant ? `<button type="button" class="btn petit" data-act="suivi-suivant">Étape suivante : ${esc(LIB_SUIVI[suivant])}</button>` : enSuivi(l) ? '' : '<button type="button" class="btn petit lien" data-act="perdu">Perdu</button>'}
     </div>`}
   </article>`;
+}
+
+// Les contacts d'une entreprise à appeler aujourd'hui, un par un (Anna, 19/11/2026).
+function aJoindreCarte(l) {
+  if (l.prochaine_action !== 'appel' || !l.prochaine_relance || l.prochaine_relance > aujourdhui()) return '';
+  const cs = contactsAAppeler(l);
+  if (!cs || !cs.length) return '';
+  return `<p class="meta">À appeler aujourd'hui : ${cs.map((e) => esc(`${nomContact(e.c) || e.c.telephone}${e.echecs ? ` (${e.echecs} sans réponse)` : ''}`)).join(', ')}.</p>`;
 }
 
 function vueJour() {
@@ -1126,14 +1135,17 @@ function vueJour() {
     const parAction = (a) => dus.filter((l) => l.prochaine_action === a);
     const emails = parAction('email'), appels = parAction('appel');
     const autres = dus.filter((l) => l.prochaine_action !== 'email' && l.prochaine_action !== 'appel');
+    // Un appel par contact à joindre (Anna, 19/11/2026).
+    const nTout = dus.flatMap(entreesDe).length;
+    const nAppelsDus = appels.flatMap(entreesDe).length;
     h += `<div class="actions" style="margin-top:14px">
-      <button type="button" class="btn primaire" data-enchainer="tout">Enchaîner les ${dus.length} relances</button>
+      <button type="button" class="btn primaire" data-enchainer="tout">Enchaîner les ${nTout} relances</button>
       <button type="button" class="btn" data-enchainer="tout" data-a-la-voix>Les traiter à la voix</button>
       ${emails.length && emails.length < dus.length ? `<button type="button" class="btn" data-enchainer="email">Les emails (${emails.length})</button>` : ''}
-      ${appels.length && appels.length < dus.length ? `<button type="button" class="btn" data-enchainer="appel">Les appels (${appels.length})</button>` : ''}
+      ${appels.length && appels.length < dus.length ? `<button type="button" class="btn" data-enchainer="appel">Les appels (${nAppelsDus})</button>` : ''}
       ${autres.length && autres.length < dus.length ? `<button type="button" class="btn" data-enchainer="autre">Le reste (${autres.length})</button>` : ''}
     </div>`;
-    S.dusDuJour = { tout: dus.map((l) => l.id), email: emails.map((l) => l.id), appel: appels.map((l) => l.id), autre: autres.map((l) => l.id) };
+    S.dusDuJour = { tout: dus.flatMap(entreesDe), email: emails.map((l) => l.id), appel: appels.flatMap(entreesDe), autre: autres.map((l) => l.id) };
   }
   h += barreLinkedin();
   h += barreEmail();
@@ -1694,7 +1706,7 @@ function etatVocal(etat, texte = '') {
 }
 function voixActive(l, tour) {
   const s = S.session;
-  return Boolean(s && s.vocal && !s.pause && $('#session').open && s.tour === tour && s.ids[s.i] === l.id);
+  return Boolean(s && s.vocal && !s.pause && $('#session').open && s.tour === tour && leadEntree(s.ids[s.i]) === l.id);
 }
 function nouveauTour() { const s = S.session; s.tour = (s.tour || 0) + 1; return s.tour; }
 // Un tour : je lis (avec ce que je viens de faire sur le lead d'avant), puis j'écoute.
@@ -1736,7 +1748,7 @@ function pauseVocal(message = '') {
 }
 function reprendreVocal() {
   const s = S.session;
-  const l = s && IDX.lead.get(s.ids[s.i]);
+  const l = s && IDX.lead.get(leadEntree(s.ids[s.i]));
   if (!l) return;
   s.pause = false;
   cycleVocal(l, nouveauTour());
@@ -1761,7 +1773,7 @@ async function traiterPhrase(l, texte) {
   etatVocal('reflexion');
   let r;
   try { r = await api('POST', { op: 'vocal', lead_id: l.id, texte: brut }); } catch (e) { erreurVocal(l, e.message); return; }
-  if (S.session !== s || s.ids[s.i] !== l.id) return; // la fiche a changé entre-temps
+  if (S.session !== s || leadEntree(s.ids[s.i]) !== l.id) return; // la fiche a changé entre-temps
   if (r.action === 'incompris') {
     const question = r.confirmation || "Je n'ai pas compris. Redis-le autrement.";
     const tour = nouveauTour();
@@ -1835,7 +1847,7 @@ async function annulerDerniere() {
   const s = S.session;
   if (!s) return;
   const d = s.derniere;
-  const ici = IDX.lead.get(s.ids[Math.min(s.i, s.ids.length - 1)]);
+  const ici = IDX.lead.get(leadEntree(s.ids[Math.min(s.i, s.ids.length - 1)]));
   if (!d) { if (ici && s.vocal) { const tour = nouveauTour(); parler('Rien à annuler.', () => ecouterVocal(ici, tour)); } return; }
   s.derniere = null;
   arreterVocal();
@@ -1857,7 +1869,7 @@ document.addEventListener('click', (ev) => {
   const s = S.session;
   const sorte = b.dataset.vocal;
   if (sorte === 'annuler') { annulerDerniere(); return; }
-  const l = IDX.lead.get(s.ids[s.i]);
+  const l = IDX.lead.get(leadEntree(s.ids[s.i]));
   if (!l) return;
   if (sorte === 'lire') { s.pause = false; cycleVocal(l, nouveauTour()); }
   else if (sorte === 'pause') pauseVocal();
@@ -1894,7 +1906,7 @@ if (window.speechSynthesis && speechSynthesis.addEventListener) {
 document.addEventListener('keydown', (ev) => {
   if (ev.key !== 'Enter' || !ev.target.matches('[data-vocal-saisie]') || !S.session) return;
   ev.preventDefault();
-  const l = IDX.lead.get(S.session.ids[S.session.i]);
+  const l = IDX.lead.get(leadEntree(S.session.ids[S.session.i]));
   const v = ev.target.value.trim();
   if (l && v) { arreterVocal(); ev.target.value = ''; traiterPhrase(l, v); }
 });
@@ -4271,11 +4283,12 @@ function dernierAppel(id) {
 const estSetter = () => Boolean(D && D.moi && D.moi.role === 'setter');
 // Ce que chaque résultat prépare. n = nombre de relances sans réponse, cet appel compris.
 function suiteAppel(l, k, n) {
-  const sansRep = estSetter() ? (n <= 3 ? 1 : delaiApres(n - 3)) : delaiApres(n);
+  // Anna (19/11/2026) : jamais deux appels en deux jours ; 2 semaines après deux échecs (delaiNonJoint).
+  const sansRep = estSetter() ? delaiNonJoint(n) : delaiApres(n);
   switch (k) {
     case 'pas_joint': return { date: dansJours(sansRep), action: 'appel', note: '' };
-    case 'message': return { date: dansJours(estSetter() ? 2 : delaiApres(n)), action: 'appel', note: 'Message laissé : rappeler.' };
-    case 'barrage': return { date: dansJours(1), action: 'appel', note: 'Barrage du standard : rappeler tôt (avant 8 h 30) ou après 18 h, demander le dirigeant par son nom.' };
+    case 'message': return { date: dansJours(estSetter() ? delaiNonJoint(n) : delaiApres(n)), action: 'appel', note: 'Message laissé : rappeler.' };
+    case 'barrage': return { date: dansJours(estSetter() ? delaiNonJoint(n) : 1), action: 'appel', note: 'Barrage du standard : rappeler tôt (avant 8 h 30) ou après 18 h, demander le dirigeant par son nom.' };
     case 'faux_numero': return { date: dansJours(1), action: emailDe(l) ? 'email' : 'autre', note: 'Faux numéro : trouver le bon (site, fiche Google, Pages jaunes)' + (emailDe(l) ? ', ou écrire.' : '.') };
     case 'rdv': return { date: '', action: 'rdv', note: '' };
     case 'rappeler': return { date: dansJours(1), action: 'appel', note: '' };
@@ -4284,16 +4297,91 @@ function suiteAppel(l, k, n) {
     default: return { date: dansJours(7), action: 'email', note: '' };
   }
 }
+/* ----- Appels par contact (retour d'Anna, 19/11/2026) -----
+   « Un contact ne devrait pas être appelé 2 fois en deux jours. Pour les contacts non joints à deux reprises,
+   planifier automatiquement leur prochaine relance sous 2 à 3 semaines » et « tous les contacts, même s'ils
+   appartiennent à une même entreprise, devraient apparaître individuellement pour être relancés ».
+   Chaque contact qui a un numéro a sa propre file, lue dans l'historique (les appels notés avec lui ; un appel
+   noté sans contact compte pour le contact appelé par défaut) : jamais appelé = à appeler dès que la fiche est
+   due ; non joint (pas joint, message, barrage) une fois = 2 jours après ; deux ou trois fois = 2 semaines après ;
+   au-delà = 3 mois après (Anna, setter ; Gabriel et les closers gardent leur rythme, 3, 7, 14 jours puis 3 mois).
+   La fiche est due le jour du prochain contact à appeler. Seulement en prospection à froid (prospectionFroide) :
+   dès qu'un contact a été joint ou que l'entreprise a répondu, elle revient à une seule relance. */
+const NON_JOINTS = new Set(['pas_joint', 'message', 'barrage']);
+function delaiNonJoint(echecs) {
+  if (!estSetter()) return delaiApres(echecs);
+  return echecs <= 1 ? 2 : echecs <= 3 ? 14 : NURTURING;
+}
+function resultatDe(a) {
+  const k = (a.meta && a.meta.resultat) || (a.type === 'appel' ? 'interesse' : 'pas_joint');
+  return RESULTATS_APPEL[k] ? k : ANCIENS_RESULTATS[k] || 'interesse';
+}
+// extra : l'appel en train d'être noté ({ contact_id, resultat, date }).
+function etatsAppelContacts(l, extra = null) {
+  const defaut = (contactJoignable(l.id) || {}).id || null;
+  const appels = activitesDe(l.id).filter((a) => a.type === 'appel' || a.type === 'appel_sans_reponse')
+    .map((a) => ({ contact: a.contact_id || defaut, k: resultatDe(a), date: String(a.date).slice(0, 10) }));
+  if (extra) appels.unshift({ contact: extra.contact_id || defaut, k: extra.resultat, date: extra.date || aujourdhui() });
+  return contactsDe(l.id).filter((c) => c.telephone).map((c) => {
+    const siens = appels.filter((x) => x.contact === c.id);
+    const dernier = siens[0] || null;
+    if (dernier && !NON_JOINTS.has(dernier.k)) return { c, etat: dernier.k === 'faux_numero' ? 'faux' : RESULTATS_APPEL[dernier.k].joint ? 'joint' : 'autre', echecs: 0, dernier, prochain: null };
+    let echecs = 0;
+    for (const x of siens) { if (NON_JOINTS.has(x.k)) echecs++; else break; }
+    return { c, etat: 'a_joindre', echecs, dernier, prochain: dernier ? dansJours(delaiNonJoint(echecs), dernier.date) : null };
+  });
+}
+// Prospection à froid : étape Nouveau ou Contacté, et l'entreprise n'a encore répondu par aucun canal (email reçu,
+// RDV, réponse LinkedIn). Une relation déjà engagée (un partenaire, un client) garde une seule relance.
+function prospectionFroide(l) {
+  return ['nouveau', 'contacte'].includes(l.statut) && !activitesDe(l.id).some((a) => a.type === 'email_recu' || a.type === 'rdv' || (a.type === 'linkedin' && a.meta && a.meta.etape === 'reponse'));
+}
+// Les contacts à appeler un par un ce jour-là : en prospection à froid, s'ils sont plusieurs et que personne n'a été joint.
+function contactsAAppeler(l, jusquau = aujourdhui()) {
+  if (!prospectionFroide(l)) return null;
+  const etats = etatsAppelContacts(l);
+  if (etats.length < 2 || etats.some((e) => e.etat === 'joint')) return null;
+  return etats.filter((e) => e.etat === 'a_joindre' && (!e.prochain || e.prochain <= jusquau));
+}
+// Après un appel non abouti : la fiche revient le jour du prochain contact à appeler (null : règle habituelle).
+function prochaineDateAppels(l, extra) {
+  if (!prospectionFroide(l)) return null;
+  const etats = etatsAppelContacts(l, extra);
+  if (etats.some((e) => e.etat === 'joint')) return null;
+  const t = aujourdhui();
+  const dates = etats.filter((e) => e.etat === 'a_joindre').map((e) => e.prochain || t).sort();
+  return dates[0] || null;
+}
+function suiteAppelContact(l, k, n, contactId) {
+  const s = suiteAppel(l, k, n);
+  if (!NON_JOINTS.has(k) && k !== 'faux_numero') return s;
+  const d = prochaineDateAppels(l, { contact_id: contactId, resultat: k });
+  if (!d) return s;
+  if (k === 'faux_numero') {
+    const c = contactsDe(l.id).find((x) => x.id === contactId);
+    return { date: d, action: 'appel', note: `Faux numéro${c ? ` pour ${nomContact(c)}` : ''} : trouver le bon (site, fiche Google, Pages jaunes). Les autres contacts restent à appeler.` };
+  }
+  return { ...s, date: d };
+}
+// Les entrées d'un enchaînement : « lead », ou « lead:contact » pour chaque contact à appeler.
+function entreesDe(l) {
+  if (l.prochaine_action !== 'appel') return [l.id];
+  const cs = contactsAAppeler(l);
+  return cs && cs.length ? cs.map((e) => `${l.id}:${e.c.id}`) : [l.id];
+}
+const leadEntree = (e) => String(e || '').split(':')[0];
+const contactEntree = (e) => String(e || '').split(':')[1] || null;
+
 function etapeApresAppel(l, k) {
   if (k === 'pas_interesse' || k === 'siege') return 'perdu';
   if (k === 'rdv') return ['nouveau', 'contacte'].includes(l.statut) ? 'qualifie' : l.statut;
   return l.statut === 'nouveau' ? 'contacte' : l.statut;
 }
 
-function ouvrirAppel(leadId, { resultat: impose = '' } = {}) {
+function ouvrirAppel(leadId, { resultat: impose = '', contact: contactImpose = null } = {}) {
   const l = IDX.lead.get(leadId);
-  const c = contactJoignable(leadId) || contactPrincipal(leadId);
-  const tel = telephoneDe(l);
+  const c = (contactImpose && contactsDe(leadId).find((x) => x.id === contactImpose)) || contactJoignable(leadId) || contactPrincipal(leadId);
+  const tel = (contactImpose && c && c.telephone) || telephoneDe(l);
   const puce = (k) => `<button type="button" data-v="${k}" aria-pressed="false">${esc(RESULTATS_APPEL[k].lib)}</button>`;
   ouvrirModale(`
     <h2>Appel avec ${esc(l.entreprise)}</h2>
@@ -4319,7 +4407,7 @@ function ouvrirAppel(leadId, { resultat: impose = '' } = {}) {
       resultat = k;
       $$('[data-resultat] button', form).forEach((x) => x.setAttribute('aria-pressed', String(x.dataset.v === k)));
       const el = form.elements;
-      const s = suiteAppel(l, k, n);
+      const s = suiteAppelContact(l, k, n, el.contact ? el.contact.value || null : (c && c.id) || null);
       el.apres_date.value = s.date;
       el.apres_action.value = s.action;
       el.apres_note.value = s.note;
@@ -4328,6 +4416,7 @@ function ouvrirAppel(leadId, { resultat: impose = '' } = {}) {
       el.apres_date.dispatchEvent(new Event('input'));
     };
     $$('[data-resultat] button', form).forEach((b) => b.addEventListener('click', () => choisir(b.dataset.v)));
+    if (form.elements.contact) form.elements.contact.addEventListener('change', () => { if (resultat) choisir(resultat); });
     if (impose && RESULTATS_APPEL[impose]) choisir(impose);
     form.addEventListener('submit', (ev) => {
       ev.preventDefault();
@@ -4353,17 +4442,18 @@ function ouvrirAppel(leadId, { resultat: impose = '' } = {}) {
 
 // Le tableau : un résultat choisi dans la colonne « Dernier appel » se note tout de suite, avec sa suite par défaut.
 // RDV posé et À rappeler ouvrent la fenêtre (il faut le conseiller ou l'heure).
-async function noterResultatRapide(l, k) {
+async function noterResultatRapide(l, k, contactId = null) {
   if (!RESULTATS_APPEL[k]) return;
-  if (k === 'rdv' || k === 'rappeler') { ouvrirAppel(l.id, { resultat: k }); return; }
+  if (k === 'rdv' || k === 'rappeler') { ouvrirAppel(l.id, { resultat: k, contact: contactId }); return; }
   const r = RESULTATS_APPEL[k];
   const n = (l.relances_sans_reponse || 0) + 1;
-  const s = suiteAppel(l, k, n);
+  const s = suiteAppelContact(l, k, n, contactId || (contactJoignable(l.id) || {}).id || null);
   const statut = etapeApresAppel(l, k);
   const maj = { prochaine_relance: s.date || null, prochaine_action: s.action, prochaine_note: s.note || null, statut, relances_sans_reponse: r.joint ? 0 : n };
   if (statut === 'perdu') Object.assign(maj, { raison_perte: r.lib, prochaine_relance: null, prochaine_note: null });
   if (r.joint) maj.dernier_contact = aujourdhui();
-  await journal(l.id, { type: r.joint ? 'appel' : 'appel_sans_reponse', resume: `Appel : ${r.lib.charAt(0).toLowerCase()}${r.lib.slice(1)} (noté depuis le tableau)`, source: 'crm', meta: { resultat: k } }, maj);
+  const cq = contactId && contactsDe(l.id).find((x) => x.id === contactId);
+  await journal(l.id, { type: r.joint ? 'appel' : 'appel_sans_reponse', resume: `Appel${cq ? ` à ${nomContact(cq)}` : ''} : ${r.lib.charAt(0).toLowerCase()}${r.lib.slice(1)}${contactId ? '' : ' (noté depuis le tableau)'}`, contact_id: contactId || null, source: 'crm', meta: { resultat: k } }, maj);
   toast(`${l.entreprise} : ${r.lib.toLowerCase()}${maj.prochaine_relance ? `, rappel ${quand(maj.prochaine_relance)}` : statut === 'perdu' ? ', passé en perdu' : ''}.`, 2500);
 }
 
@@ -5119,7 +5209,7 @@ function aAppeler() {
     .sort((a, b) => (a.prochaine_relance < b.prochaine_relance ? -1 : a.prochaine_relance > b.prochaine_relance ? 1 : a.entreprise.localeCompare(b.entreprise, 'fr')));
 }
 function lancerSeanceAppels() {
-  const ids = S.vue === 'tableau' && S.selection.size ? [...S.selection] : aAppeler().map((l) => l.id);
+  const ids = S.vue === 'tableau' && S.selection.size ? [...S.selection].flatMap((id) => (IDX.lead.has(id) ? entreesDe(IDX.lead.get(id)) : [])) : aAppeler().flatMap(entreesDe);
   demarrerSession(ids, "Séance d'appels");
 }
 
@@ -5130,7 +5220,7 @@ function vueTableau() {
   const toutes = ls.length > 0 && ls.every((l) => S.selection.has(l.id));
   const opt = (liste, val, tous) => `<option value="">${tous}</option>` + liste.map(([k, v]) => `<option value="${esc(k)}" ${k === val ? 'selected' : ''}>${esc(v)}</option>`).join('');
   const n = S.selection.size;
-  const nAppels = aAppeler().length;
+  const nAppels = aAppeler().flatMap(entreesDe).length;
   return `<div class="outils" style="margin-top:0"><h1 class="titre-vue">Tableau</h1><span class="espace"></span>
       ${nAppels ? `<button type="button" class="btn petit primaire" data-act="seance-appels">Séance d'appels (${nAppels})</button>` : ''}
       <button type="button" class="btn petit" data-act="importer">Importer (CSV, Excel)</button>
@@ -5791,7 +5881,7 @@ document.addEventListener('keydown', (ev) => {
 const LIB_BILAN = { suivi: 'Étapes de suivi client', email: 'Emails envoyés', brouillon: 'Brouillons créés', appel: 'Appels notés', sms: 'SMS envoyés', decale: 'Relances décalées', rdv: 'RDV prévus', note: 'Notes ou réponses', passe: 'Passés', perdu: 'Passés en perdu', linkedin: 'Actions LinkedIn' };
 
 function demarrerSession(ids, titre, { vocal = false } = {}) {
-  const liste = ids.filter((id) => IDX.lead.has(id));
+  const liste = ids.filter((id) => IDX.lead.has(leadEntree(id)));
   if (!liste.length) return toast('Rien à enchaîner.');
   S.session = { ids: liste, i: 0, titre, bilan: {}, passes: [], modeleEmail: null, modeleSms: null, sansConfirmation: false, vocal, tour: 0 };
   rendreSession();
@@ -5828,16 +5918,20 @@ function rendreSession() {
       </div></div>`;
     return;
   }
-  const l = IDX.lead.get(s.ids[s.i]);
+  const l = IDX.lead.get(leadEntree(s.ids[s.i]));
   if (!l) { s.i++; return rendreSession(); }
-  const c = contactPrincipal(l.id);
-  const tel = telephoneDe(l);
+  // Une entrée « lead:contact » : ce contact-là, son numéro, où il en est (Anna, 19/11/2026).
+  const cid = contactEntree(s.ids[s.i]);
+  const etatsC = cid ? etatsAppelContacts(l) : [];
+  const eC = etatsC.find((e) => e.c.id === cid) || null;
+  const c = eC ? eC.c : contactPrincipal(l.id);
+  const tel = eC ? eC.c.telephone : telephoneDe(l);
   const email = emailDe(l);
   const mobile = mobileDe(l);
   const prim = (a) => (l.prochaine_action === a ? ' primaire' : '');
   const acts = activitesDe(l.id).filter((a) => a.type !== 'import').slice(0, 3);
   recapAuto(l.id);
-  d.innerHTML = `<div class="session-cadre${s.vocal ? ' mode-vocal' : ''}" data-id="${l.id}">
+  d.innerHTML = `<div class="session-cadre${s.vocal ? ' mode-vocal' : ''}" data-id="${l.id}"${eC ? ` data-contact="${eC.c.id}"` : ''}>
     <header class="session-tete">
       <div><p class="surtitre">${esc(s.titre)}</p><p class="pos">${s.i + 1} sur ${n}</p></div>
       <div class="actions"><button type="button" class="btn${s.vocal ? ' primaire' : ''}" data-sess="vocal" aria-pressed="${Boolean(s.vocal)}">À la voix</button><button type="button" class="btn" data-sess="fin" aria-label="Terminer l'enchaînement">Terminer ✕</button></div>
@@ -5847,6 +5941,7 @@ function rendreSession() {
       <p class="surtitre">${esc(LIB_TYPE[l.type])}, ${esc(l.suivi ? `suivi : ${LIB_SUIVI[l.suivi]}` : LIB_STATUT[l.statut])}${l.formation_debut ? `, formation ${esc(periodeFormation(l))}` : ''}</p>
       <div class="tete-ent">${avatar(l, 'l')}<h2>${esc(l.entreprise)}</h2></div>
       ${c ? `<p class="meta">${esc([nomContact(c), c.poste].filter(Boolean).join(', '))}</p>` : '<p class="meta">Aucun contact</p>'}
+      ${eC ? `<p class="meta">Contact ${etatsC.indexOf(eC) + 1} sur ${etatsC.length} de l'entreprise, ${eC.echecs ? `${eC.echecs} appel${eC.echecs > 1 ? 's' : ''} sans réponse` : 'jamais appelé'}.</p>` : ''}
       <div class="coord">
         ${tel ? `<a class="btn${prim('appel')}" href="${esc(telLien(tel))}" data-act="tel">Appeler le ${esc(tel)}</a>` : ''}
         ${email ? `<span class="meta">${esc(email)}</span>` : ''}
@@ -5880,7 +5975,7 @@ function rendreSession() {
     </div></div>`;
   chargerLogos();
   // À l'oral, chaque nouvelle fiche est lue une fois.
-  if (s.vocal && !s.pause && s.luPour !== l.id) { s.luPour = l.id; const tour = nouveauTour(); setTimeout(() => cycleVocal(l, tour), 250); }
+  if (s.vocal && !s.pause && s.luPour !== s.ids[s.i]) { s.luPour = s.ids[s.i]; const tour = nouveauTour(); setTimeout(() => cycleVocal(l, tour), 250); }
 }
 
 function sauverSession() {
@@ -5902,7 +5997,7 @@ function suivantSession() { if (!S.session) return; S.session.i++; S.session.pro
 // Appelée après chaque action réussie : on note, puis on passe au lead suivant.
 function actionFaite(leadId, nature) {
   const s = S.session;
-  if (!s || !$('#session').open || s.ids[s.i] !== leadId) return;
+  if (!s || !$('#session').open || leadEntree(s.ids[s.i]) !== leadId) return;
   s.bilan[nature] = (s.bilan[nature] || 0) + 1;
   setTimeout(suivantSession, 300);
 }
@@ -6421,7 +6516,7 @@ document.addEventListener('click', (ev) => {
   if (act === 'tel') {
     // Le lien tel: lance l'appel ; au retour sur la page, on propose de le noter.
     const zone = cible.closest('[data-id]');
-    S.appel = { id: (zone && zone.dataset.id) || S.fiche, t: Date.now() };
+    S.appel = { id: (zone && zone.dataset.id) || S.fiche, contact: (zone && zone.dataset.contact) || null, t: Date.now() };
     return;
   }
   const conteneur = cible.closest('[data-id]');
@@ -6451,7 +6546,7 @@ document.addEventListener('click', (ev) => {
     case 'recap': return faireRecap(leadId);
     case 'fermer-fiche': return $('#fiche').close();
     case 'email': return ouvrirEmail(leadId, cible.dataset.contact);
-    case 'appel': return ouvrirAppel(leadId);
+    case 'appel': return ouvrirAppel(leadId, { contact: (conteneur && conteneur.dataset.contact) || null });
     case 'perdu': return changerStatut(leadId, 'perdu').then(() => { if (IDX.lead.get(leadId)?.statut === 'perdu') actionFaite(leadId, 'perdu'); });
     case 'suivi-suivant': { const l = IDX.lead.get(leadId); const k = l && suivantDe(l.suivi); if (!k) return; return changerSuivi(leadId, k).then((r) => { if (r) actionFaite(leadId, 'suivi'); }); }
     case 'linkedin': return ouvrirLinkedin(leadId);
@@ -6465,7 +6560,7 @@ document.addEventListener('click', (ev) => {
       const l = IDX.lead.get(leadId);
       if (!l) return undefined;
       cible.disabled = true;
-      return noterResultatRapide(l, cible.dataset.resultat).then(() => actionFaite(l.id, 'appel')).catch((e) => { toast(e.message); cible.disabled = false; });
+      return noterResultatRapide(l, cible.dataset.resultat, (conteneur && conteneur.dataset.contact) || null).then(() => actionFaite(l.id, 'appel')).catch((e) => { toast(e.message); cible.disabled = false; });
     }
     case 'exporter-tableau': return exporterCsv(leadsDuTableau(), 'tableau');
     case 'decaler': return ouvrirDecaler(leadId);
@@ -6556,9 +6651,9 @@ async function actualiser() {
 document.addEventListener('visibilitychange', () => {
   if (document.visibilityState !== 'visible' || !D) return;
   if (S.appel && Date.now() - S.appel.t > 4000 && !$('#modale').open && IDX.lead.has(S.appel.id)) {
-    const id = S.appel.id;
+    const { id, contact } = S.appel;
     S.appel = null;
-    ouvrirAppel(id);
+    ouvrirAppel(id, { contact });
     return;
   }
   // Pas d'actualisation pendant une saisie ou une sélection dans le tableau.

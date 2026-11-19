@@ -6329,6 +6329,7 @@ export default async function handler(req, res) {
     // La prospection email de Gabriel, après sa boîte : une réponse arrivée entre-temps arrête l'envoi. 50 secondes au plus
     // depuis le début de la tâche (la fonction en a 60).
     resultat.prospection_email = await prospectionEmail({ limite: debutTache + 50000 }).catch((e) => { console.error('crm prospection email', e?.code || e?.message); return { erreur: e?.code || 'erreur' }; });
+    resultat.notif_formateurs = await notifierEspaceFormateurs().catch((e) => { console.error('crm notification formateurs', e?.code || e?.message); return { erreur: e?.code || 'erreur' }; });
     return res.status(200).json(resultat);
   }
   if (origineEtrangere(req)) return res.status(403).json({ erreur: 'origine' });
@@ -6373,6 +6374,37 @@ export default async function handler(req, res) {
 }
 
 // Gabriel, puis chaque membre dont la boîte est connectée, en parallèle et chacun dans son contexte.
+// Retour d'Anna (19/11/2026) : « recevoir une notification lorsqu'un formateur remplit ses dossiers via le lien ».
+// À chaque synchro (toutes les 15 minutes) : ce que les formateurs ont fait dans leur espace depuis le passage
+// précédent (journal, source « espace formateur » : entreprise, profil, pièces, signature, statut), en un seul
+// email aux setters actives (Anna), à Gabriel s'il n'y en a pas. Rien n'est envoyé s'il ne s'est rien passé ; un
+// envoi refusé par Brevo est retenté au passage suivant.
+async function notifierEspaceFormateurs() {
+  if (!process.env.BREVO_API_KEY) return { envoye: false, raison: 'brevo_absent' };
+  const etat = await lireReglage('notif_espace_formateurs');
+  const maintenant = new Date().toISOString();
+  if (!etat || !etat.depuis) { await ecrireReglage('notif_espace_formateurs', { depuis: maintenant }); return { envoye: false, raison: 'depart' }; }
+  const { lignes } = await sb(`iae_crm_activites?source=eq.${encodeURIComponent('espace formateur')}&date=gt.${encodeURIComponent(etat.depuis)}&select=lead_id,date,type,resume&order=date.asc&limit=200`);
+  if (!lignes.length) return { envoye: false, lignes: 0 };
+  const ids = [...new Set(lignes.map((a) => a.lead_id))];
+  const { lignes: leads } = await sb(`iae_crm_leads?id=in.(${ids.join(',')})&select=id,entreprise`);
+  const nom = new Map(leads.map((l) => [l.id, l.entreprise]));
+  const { lignes: setters } = await sb('iae_crm_utilisateurs?role=eq.setter&actif=is.true&select=email,prenom,nom');
+  const dest = setters.length ? setters.map((u) => ({ email: u.email, name: [u.prenom, u.nom].filter(Boolean).join(' ') || u.email })) : [{ email: ADMIN_EMAIL, name: 'Gabriel Vanderbecken' }];
+  const blocs = ids.map((id) => [`${nom.get(id) || 'Un formateur'} :`, ...[...new Set(lignes.filter((a) => a.lead_id === id).map((a) => a.resume))].map((r) => `- ${r}`)].join('\n'));
+  const sujet = ids.length === 1 ? `Espace formateur : ${nom.get(ids[0]) || 'un formateur'} a avancé son dossier` : `Espace formateur : ${ids.length} formateurs ont avancé leur dossier`;
+  const bonjour = setters.length === 1 && setters[0].prenom ? `Bonjour ${setters[0].prenom},` : 'Bonjour,';
+  const texte = [bonjour, '', 'Du nouveau dans les dossiers des formateurs, envoyé depuis leur lien :', '', blocs.join('\n\n'), '',
+    'Les pièces et le contrat sont sur leur fiche, onglet Formateurs : https://ia-entrepreneur.fr/crm/', '', 'Le CRM IA-Entrepreneur'].join('\n');
+  const r = await fetch(`${BREVO}/smtp/email`, {
+    method: 'POST', signal: AbortSignal.timeout(10000),
+    headers: { 'api-key': process.env.BREVO_API_KEY, 'Content-Type': 'application/json', accept: 'application/json' },
+    body: JSON.stringify({ sender: { email: ADMIN_EMAIL, name: 'CRM IA-Entrepreneur' }, to: dest, subject: sujet.slice(0, 180), textContent: texte }),
+  });
+  if (!r.ok) { console.error('crm notification formateurs brevo', r.status, (await r.text()).slice(0, 200)); return { envoye: false, erreur: r.status }; }
+  await ecrireReglage('notif_espace_formateurs', { depuis: lignes[lignes.length - 1].date, dernier_envoi: maintenant });
+  return { envoye: true, formateurs: ids.length, lignes: lignes.length, a: dest.map((x) => x.email) };
+}
 async function pourChacun(fn) {
   const resultat = { [ADMIN_EMAIL]: await fn().catch((e) => ({ erreur: e?.code || 'erreur' })) };
   if (!googleEquipeConfigure()) return resultat;

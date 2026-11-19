@@ -121,7 +121,10 @@ export default async function handler(req, res) {
 
     if (corps.op === 'identite') {
       if (signe) throw new RefusFormateur('deja_signe', 409);
-      await base(`iae_crm_formateurs?lead_id=eq.${f.lead_id}`, { methode: 'PATCH', prefer: 'return=minimal', corps: identiteSaisie(corps, f) });
+      const saisie = identiteSaisie(corps, f);
+      await base(`iae_crm_formateurs?lead_id=eq.${f.lead_id}`, { methode: 'PATCH', prefer: 'return=minimal', corps: saisie });
+      // Au journal (et dans la notification d'Anna, 19/11/2026).
+      await noter(f.lead_id, `Entreprise renseignée dans son espace : ${saisie.identite.raison_sociale || 'sans nom'}${f.siret ? `, SIRET ${f.siret}` : ''}.`);
       const nouveau = (await base(`iae_crm_formateurs?lead_id=eq.${f.lead_id}&select=*`))[0];
       await majStatut(f.lead_id, { source: 'espace formateur' });
       return res.status(200).json(await dossier(nouveau));
@@ -133,6 +136,7 @@ export default async function handler(req, res) {
         methode: 'PATCH', prefer: 'return=minimal',
         corps: { competences: liste(corps.competences), outils: liste(corps.outils), niveaux: [...new Set(niveaux)], secteurs: liste(corps.secteurs), zone: texte(corps.zone, 200) || null, distanciel: corps.distanciel !== false, disponibilites: texte(corps.disponibilites, 500) || null, bio: texte(corps.bio, 2000) || null },
       });
+      await noter(f.lead_id, 'Profil complété dans son espace (compétences, niveaux, zone).');
       const nouveau = (await base(`iae_crm_formateurs?lead_id=eq.${f.lead_id}&select=*`))[0];
       return res.status(200).json(await dossier(nouveau));
     }
