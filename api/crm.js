@@ -1898,8 +1898,10 @@ async function operationFormateur(corps) {
     const { lignes: docs } = await sb(`iae_crm_documents?lead_id=eq.${lead.id}&select=*`);
     const e = etatDossier(f, docs);
     if (!e.verifie) throw new Refus('dossier_incomplet', 409);
-    await sb(`iae_crm_formateurs?lead_id=eq.${lead.id}`, { methode: 'PATCH', corps: { valide_le: new Date().toISOString(), contre_signature: { nom: 'Gabriel VANDERBECKEN', qualite: 'Président', date: new Date().toISOString(), version: f.signature && f.signature.version }, statut: 'valide' }, prefer: 'return=minimal' });
-    await inserer('activites', { lead_id: lead.id, type: 'statut', resume: 'Formateur validé : contrat contresigné, toutes les pièces vérifiées. Il peut être positionné sur une mission.', source: 'crm' });
+    // Contrat signé dans le lien d'envoi : la validation le contresigne. Contrat signé hors du CRM et déposé :
+    // il porte déjà les deux signatures, il vient d'être vérifié avec les autres pièces.
+    await sb(`iae_crm_formateurs?lead_id=eq.${lead.id}`, { methode: 'PATCH', corps: { valide_le: new Date().toISOString(), contre_signature: f.signature ? { nom: 'Gabriel VANDERBECKEN', qualite: 'Président', date: new Date().toISOString(), version: f.signature.version } : null, statut: 'valide' }, prefer: 'return=minimal' });
+    await inserer('activites', { lead_id: lead.id, type: 'statut', resume: `Formateur validé : ${f.signature ? 'contrat contresigné' : 'contrat signé par les deux parties vérifié'}, toutes les pièces vérifiées. Il peut être positionné sur une mission.`, source: 'crm' });
     await sb(`iae_crm_leads?id=eq.${lead.id}`, { methode: 'PATCH', corps: { prochaine_relance: null, prochaine_note: 'Formateur validé, prêt pour une mission.' }, prefer: 'return=minimal' });
     return retourFormateur(lead.id);
   }

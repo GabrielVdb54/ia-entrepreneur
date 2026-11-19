@@ -1918,11 +1918,18 @@ function brancherDictee(form) {
 
 /* ----- Formateurs : le dossier (lien d'envoi, pièces, contrat), validé par Gabriel ----- */
 
-const PIECES_F = [['kbis', "Justificatif d'immatriculation"], ['identite', "Pièce d'identité"], ['rib', 'RIB'], ['tva', 'Régime de TVA'], ['rc_pro', 'Assurance RC Pro'],
-  ['urssaf', 'Attestation de vigilance URSSAF'], ['cv', 'CV à jour'], ['competences', 'Justificatifs de compétences'], ['formation_continue', 'Formation continue'], ['nda', 'Déclaration d\'activité (NDA)']];
-const LIB_PIECE = Object.fromEntries([...PIECES_F, ['contrat', 'Ancien contrat'], ['autre', 'Autre document']]);
+// Même liste que PIECES dans api/_formateurs.js. Choix de Gabriel (19/11/2026) : plus de justificatif de régime
+// de TVA ni de formation continue, RC Pro facultative, justificatifs de compétences sous toutes leurs formes,
+// et le contrat signé par les deux parties en tête de liste.
+const PIECES_F = [['kbis', "Justificatif d'immatriculation"], ['identite', "Pièce d'identité"], ['rib', 'RIB'],
+  ['urssaf', 'Attestation de vigilance URSSAF'], ['cv', 'CV à jour'], ['competences', 'Justificatifs de compétences (références, preuves, diplômes)'], ['rc_pro', 'Assurance RC Pro'], ['nda', 'Déclaration d\'activité (NDA)']];
+const FACULTATIVES_F = new Set(['rc_pro', 'nda']);
+const CONTRAT_F = 'Contrat signé par les deux parties';
+const LIB_PIECE = Object.fromEntries([...PIECES_F, ['contrat', CONTRAT_F], ['tva', 'Régime de TVA (plus demandé)'], ['formation_continue', 'Formation continue (plus demandée)'], ['autre', 'Autre document']]);
 const STATUTS_F = { valide: ['Validé', 'f-valide'], a_verifier: ['À vérifier', 'f-verifier'], en_cours: ['Dossier en cours', 'f-cours'], a_inviter: ['À inviter', 'f-inviter'], a_renouveler: ['À mettre à jour', 'f-renouveler'], refuse: ['Refusé', 'f-refuse'] };
-const ETATS_PIECE = { manquante: ['Manquante', 'e-manque'], facultative: ['Facultative', 'e-facultatif'], a_verifier: ['À vérifier', 'e-verifier'], verifiee: ['Vérifiée', 'e-ok'], refusee: ['À refaire', 'e-refus'], expiree: ['Expirée', 'e-refus'] };
+const ETATS_PIECE = { manquante: ['Manquante', 'e-manque'], facultative: ['Facultative', 'e-facultatif'], a_verifier: ['À vérifier', 'e-verifier'], a_contresigner: ['À contresigner', 'e-verifier'], verifiee: ['Vérifiée', 'e-ok'], refusee: ['À refaire', 'e-refus'], expiree: ['Expirée', 'e-refus'] };
+// Où en est le contrat, en quelques mots (carte, export).
+const ETAT_CONTRAT_F = { verifiee: 'signé par les deux parties', a_contresigner: 'signé par lui, à contresigner', a_verifier: 'déposé, à vérifier', refusee: 'à refaire', manquante: 'à signer' };
 const URSSAF_VERIF = 'https://www.urssaf.fr/accueil/outils-documentation/outils/verification-attestation.html';
 // Les trois niveaux (Gabriel, point appels d'offres du 13/11/2026) : 1 = les bases (savoir expliquer ChatGPT, Claude…),
 // 2 = formation métier, adaptée aux process et aux outils de l'entreprise, 3 = automatisation et intégration.
@@ -1934,17 +1941,26 @@ const dossierDe = (id) => IDX.formateur.get(id) || { lead_id: id, statut: 'a_inv
 function piecesDe(id) {
   const t = aujourdhui();
   const docs = (IDX.documents.get(id) || []).filter((d) => !d.archive);
-  return PIECES_F.map(([type, titre]) => {
-    const d = docs.filter((x) => x.type === type).sort((a, b) => (a.created_at < b.created_at ? 1 : -1))[0] || null;
+  const dernier = (type) => docs.filter((x) => x.type === type).sort((a, b) => (a.created_at < b.created_at ? 1 : -1))[0] || null;
+  // Le contrat (même règle que etatDossier) : signé dans le lien d'envoi puis contresigné en validant,
+  // ou signé hors du CRM et déposé comme pièce « contrat ».
+  const f = dossierDe(id);
+  const dc = f.signature ? null : dernier('contrat');
+  const contrat = { type: 'contrat', titre: CONTRAT_F, d: dc, enLigne: Boolean(f.signature), bientot: false,
+    etat: f.signature ? (f.contre_signature ? 'verifiee' : 'a_contresigner') : !dc ? 'manquante' : dc.statut === 'refuse' ? 'refusee' : dc.statut === 'verifie' ? 'verifiee' : 'a_verifier' };
+  return [contrat, ...PIECES_F.map(([type, titre]) => {
+    const d = dernier(type);
     const expiree = Boolean(d && d.expire_le && d.expire_le < t);
-    const etat = !d ? (type === 'nda' ? 'facultative' : 'manquante') : d.statut === 'refuse' ? 'refusee' : expiree ? 'expiree' : d.statut === 'verifie' ? 'verifiee' : 'a_verifier';
+    const etat = !d ? (FACULTATIVES_F.has(type) ? 'facultative' : 'manquante') : d.statut === 'refuse' ? 'refusee' : expiree ? 'expiree' : d.statut === 'verifie' ? 'verifiee' : 'a_verifier';
     return { type, titre, d, etat, bientot: Boolean(d && d.expire_le && !expiree && ecartJours(d.expire_le) <= 15) };
-  });
+  })];
 }
+// Les pièces demandées (contrat compris) : les facultatives ne comptent pas.
 function compteF(id) {
-  const ps = piecesDe(id).filter((p) => p.type !== 'nda');
-  return { recues: ps.filter((p) => ['a_verifier', 'verifiee'].includes(p.etat)).length, verifiees: ps.filter((p) => p.etat === 'verifiee').length, total: ps.length };
+  const ps = piecesDe(id).filter((p) => !FACULTATIVES_F.has(p.type));
+  return { recues: ps.filter((p) => ['a_verifier', 'a_contresigner', 'verifiee'].includes(p.etat)).length, verifiees: ps.filter((p) => p.etat === 'verifiee').length, total: ps.length };
 }
+const etatContratF = (id) => piecesDe(id)[0].etat;
 const formateurs = () => D.leads.filter((l) => l.type === 'formateur' && !l.archive);
 S.filtreF = 'tous';
 S.niveauF = '';
@@ -2116,12 +2132,12 @@ document.addEventListener('input', (ev) => {
 });
 function exporterFormateurs() {
   const ligne = (vals) => vals.map((v) => `"${String(v ?? '').replace(/"/g, '""')}"`).join(';');
-  const lignes = [ligne(['Formateur', 'Email', 'Téléphone', 'Dossier', 'Niveaux', 'Domaines métier', 'Compétences', 'Outils', 'Zone', 'Distanciel', 'SIRET', 'Structure', 'Pièces reçues', 'Contrat signé'])];
+  const lignes = [ligne(['Formateur', 'Email', 'Téléphone', 'Dossier', 'Niveaux', 'Domaines métier', 'Compétences', 'Outils', 'Zone', 'Distanciel', 'SIRET', 'Structure', 'Pièces reçues', 'Contrat'])];
   for (const l of formateursFiltres()) {
     const f = dossierDe(l.id);
     const c = contactPrincipal(l.id) || {};
     const k = compteF(l.id);
-    lignes.push(ligne([l.entreprise, c.email, c.telephone, (STATUTS_F[f.statut] || [f.statut])[0], (f.niveaux || []).map((x) => NIVEAUX_F[x]).join(' ; '), (f.secteurs || []).join(', '), (f.competences || []).join(' | '), (f.outils || []).join(', '), f.zone, f.distanciel ? 'oui' : 'non', f.siret, (f.identite || {}).raison_sociale, `${k.recues} sur ${k.total}`, f.signature ? 'oui' : 'non']));
+    lignes.push(ligne([l.entreprise, c.email, c.telephone, (STATUTS_F[f.statut] || [f.statut])[0], (f.niveaux || []).map((x) => NIVEAUX_F[x]).join(' ; '), (f.secteurs || []).join(', '), (f.competences || []).join(' | '), (f.outils || []).join(', '), f.zone, f.distanciel ? 'oui' : 'non', f.siret, (f.identite || {}).raison_sociale, `${k.recues} sur ${k.total}`, ETAT_CONTRAT_F[etatContratF(l.id)]]));
   }
   telecharger(`formateurs-${aujourdhui()}.csv`, `\uFEFF${lignes.join('\r\n')}`, 'text/csv;charset=utf-8');
 }
@@ -2136,7 +2152,7 @@ function carteFormateur(l) {
   const comp = (f.competences || []).slice(0, 4);
   return `<article class="carte" data-id="${l.id}">
     <div class="carte-haut">${avatar(l, 'm')}<div class="carte-titre"><h3><button type="button" class="lien-carte" data-act="ouvrir">${esc(l.entreprise)}</button></h3><p class="meta">${esc([f.zone || l.localisation, f.distanciel ? 'distanciel' : ''].filter(Boolean).join(', '))}</p></div><span class="statut ${cls}">${esc(lib)}</span></div>
-    <p class="meta">Pièces : ${c.recues} sur ${c.total}${c.verifiees ? `, ${c.verifiees} vérifiée${c.verifiees > 1 ? 's' : ''}` : ''}. Contrat ${f.signature ? 'signé' : 'à signer'}.${(f.niveaux || []).length ? ` ${f.niveaux.map((x) => NIVEAUX_F[x]).join(' ; ')}.` : ''}${(f.secteurs || []).length ? ` Domaines : ${esc(f.secteurs.join(', '))}.` : ''}</p>
+    <p class="meta">Pièces : ${c.recues} sur ${c.total}${c.verifiees ? `, ${c.verifiees} vérifiée${c.verifiees > 1 ? 's' : ''}` : ''}. Contrat ${ETAT_CONTRAT_F[etatContratF(l.id)]}.${(f.niveaux || []).length ? ` ${f.niveaux.map((x) => NIVEAUX_F[x]).join(' ; ')}.` : ''}${(f.secteurs || []).length ? ` Domaines : ${esc(f.secteurs.join(', '))}.` : ''}</p>
     ${comp.length ? `<ul class="etiquettes">${comp.map((x) => `<li>${esc(x.length > 60 ? `${x.slice(0, 58)}…` : x)}</li>`).join('')}</ul>` : ''}
   </article>`;
 }
@@ -2145,12 +2161,13 @@ function explicationF(f, ps) {
   const aVerifier = ps.filter((p) => p.etat === 'a_verifier').length;
   if (f.statut === 'valide') return `Validé le ${dateCourte(String(f.valide_le).slice(0, 10))} : il peut être positionné sur une mission.`;
   if (f.statut === 'refuse') return 'Dossier refusé : le lien d\'envoi ne fonctionne plus.';
+  const contre = f.signature ? ' : ça contresigne son contrat' : '';
   if (f.statut === 'a_verifier') return roleCrm() === 'admin'
-    ? `Tout est arrivé. ${aVerifier ? `${aVerifier} pièce${aVerifier > 1 ? 's' : ''} à regarder, ` : ''}puis valide le formateur : ça contresigne son contrat.`
-    : `Tout est arrivé. ${aVerifier ? `${aVerifier} pièce${aVerifier > 1 ? 's' : ''} à regarder, ` : ''}puis Gabriel valide le formateur (il contresigne son contrat).`;
+    ? `Tout est arrivé. ${aVerifier ? `${aVerifier} pièce${aVerifier > 1 ? 's' : ''} à regarder, ` : ''}puis valide le formateur${contre}.`
+    : `Tout est arrivé. ${aVerifier ? `${aVerifier} pièce${aVerifier > 1 ? 's' : ''} à regarder, ` : ''}puis Gabriel valide le formateur${f.signature ? ' (il contresigne son contrat)' : ''}.`;
   if (f.statut === 'a_renouveler') return `À mettre à jour : ${manque.join(', ') || 'des pièces à revérifier'}. Il reste positionnable seulement une fois à jour.`;
-  if (f.statut === 'a_inviter') return 'Crée son lien d\'envoi : il y remplira son entreprise et son profil, déposera ses pièces et signera le contrat-cadre.';
-  return `En attente${!f.signature ? ' de sa signature' : ''}${manque.length ? `${!f.signature ? ' et' : ''} de : ${manque.join(', ')}` : ''}.`;
+  if (f.statut === 'a_inviter') return 'Crée son lien d\'envoi : il y remplira son entreprise et son profil, déposera ses pièces et signera le contrat-cadre. S\'il a déjà un contrat signé des deux côtés, dépose-le comme pièce.';
+  return manque.length ? `En attente de : ${manque.join(', ')}.` : 'En attente de son entreprise et de son SIRET vérifié, à remplir dans son lien d\'envoi.';
 }
 function blocDossierFormateur(l) {
   const f = dossierDe(l.id);
@@ -2164,7 +2181,7 @@ function blocDossierFormateur(l) {
   // Gabriel valide ; Anna fait tout le reste ; Ludovic regarde et télécharge (13/11/2026).
   const admin = roleCrm() === 'admin';
   const lecture = lectureSeuleF();
-  const pret = ['a_verifier', 'a_renouveler'].includes(f.statut) && c.recues === c.total && f.signature;
+  const pret = ['a_verifier', 'a_renouveler'].includes(f.statut) && c.recues === c.total;
   const parQui = (d) => (lienDrive(d) ? (admin ? 'dans ton Drive depuis' : 'dans le Drive depuis') : d.depose_par === 'gabriel' ? (admin ? 'déposée par toi' : 'déposée par Gabriel')
     : String(d.depose_par || '').includes('@') ? (D.moi && d.depose_par === D.moi.email ? 'déposée par toi' : `déposée par ${prenomDe(d.depose_par)}`) : 'envoyée');
   return `<section class="bloc dossier-f" data-dossier="${l.id}">
@@ -2183,7 +2200,6 @@ function blocDossierFormateur(l) {
       <dt>SIRET</dt><dd>${siret}${f.siret && !lecture ? ' <button type="button" class="btn petit" data-act="formateur-siret">Revérifier</button>' : ''}</dd>
       <dt>TVA</dt><dd>${tva}</dd>
       ${f.intervenants ? `<dt>Intervenants</dt><dd>${esc(f.intervenants)}</dd>` : ''}
-      <dt>Contrat-cadre</dt><dd>${f.signature ? `Signé le ${esc(instantLisible(f.signature.date))} à ${esc(f.signature.lieu)} par ${esc(f.signature.nom)}${f.contre_signature ? `, contresigné le ${esc(dateCourte(String(f.contre_signature.date).slice(0, 10)))}` : ''}${lecture ? '' : ' <button type="button" class="btn petit" data-act="contrat-voir">Voir</button>'}` : 'pas encore signé'}</dd>
       <dt>Lien d'envoi</dt><dd>${f.jeton_cree_le ? `créé le ${esc(dateCourte(String(f.jeton_cree_le).slice(0, 10)))}, valable jusqu'au ${esc(dateCourte(String(f.jeton_expire).slice(0, 10)))}` : 'pas encore créé'}</dd>
     </dl>
     <h4 class="sous-groupe">Profil</h4>
@@ -2202,7 +2218,13 @@ function blocDossierFormateur(l) {
       const [elib, ecls] = ETATS_PIECE[p.etat];
       const d = p.d;
       const lu = d && d.lecture && !d.lecture.erreur ? d.lecture : null;
-      return `<li${d ? ` data-doc="${d.id}"` : ''}>
+      // Contrat-cadre signé dans le lien d'envoi : pas de fichier, le texte signé s'ouvre avec « Voir ».
+      if (p.enLigne) {
+        return `<li class="contrat-f"><div class="tete"><b>${esc(p.titre)}</b><span class="etat ${ecls}">${esc(elib)}</span></div>
+          <p class="meta">Contrat-cadre signé en ligne le ${esc(instantLisible(f.signature.date))} à ${esc(f.signature.lieu)} par ${esc(f.signature.nom)}, ${f.contre_signature ? `contresigné le ${esc(dateCourte(String(f.contre_signature.date).slice(0, 10)))}` : `${admin ? 'tu le contresignes' : 'Gabriel le contresigne'} en validant le formateur`}.</p>
+          ${lecture ? '' : '<div class="actions"><button type="button" class="btn petit" data-act="contrat-voir">Voir</button></div>'}</li>`;
+      }
+      return `<li${d ? ` data-doc="${d.id}"` : ''}${p.type === 'contrat' ? ' class="contrat-f"' : ''}>
         <div class="tete"><b>${esc(p.titre)}</b><span class="etat ${p.bientot ? 'e-verifier' : ecls}">${p.bientot ? `Expire le ${esc(dateCourte(d.expire_le))}` : esc(elib)}</span></div>
         ${d ? `<p class="meta">${esc(d.nom)}, ${parQui(d)} le ${esc(instantLisible(d.created_at))}${d.expire_le ? `, valable jusqu'au ${esc(dateCourte(d.expire_le))}` : ''}</p>
           ${lu ? `<p class="lecture${lu.conforme ? ' conforme' : ''}">${lu.conforme ? 'Claude : conforme. ' : 'Claude : '}${esc(lu.details)}</p>` : d.lecture && d.lecture.erreur ? '<p class="aide">Claude n\'a pas pu lire cette pièce : regarde-la toi-même.</p>' : ''}
@@ -2215,9 +2237,11 @@ function blocDossierFormateur(l) {
     ${autresDocuments(l.id)}
   </section>`;
 }
-// Anciens contrats et documents hors liste : consultables, ils ne comptent pas dans le dossier.
+// Documents hors liste (autre, anciennes pièces « tva » et « formation_continue », contrat déposé quand le
+// contrat-cadre a été signé en ligne) : consultables, ils ne comptent pas dans le dossier.
 function autresDocuments(id) {
-  const ds = (IDX.documents.get(id) || []).filter((d) => !d.archive && ['contrat', 'autre'].includes(d.type));
+  const montres = new Set(piecesDe(id).filter((p) => p.d).map((p) => p.d.id));
+  const ds = (IDX.documents.get(id) || []).filter((d) => !d.archive && !montres.has(d.id) && !PIECES_F.some(([t]) => t === d.type));
   if (!ds.length) return '';
   return `<h4 class="sous-groupe">Autres documents</h4><ul class="pieces-f">${ds.map((d) => `<li data-doc="${d.id}">
       <div class="tete"><b>${esc(LIB_PIECE[d.type] || d.type)}</b><span class="meta">${lienDrive(d) ? 'Drive' : 'CRM'}, ${esc(dateCourte(String(d.created_at).slice(0, 10)))}</span></div>
@@ -2290,7 +2314,7 @@ function ouvrirLienFormateur(l, r) {
       const el = $('#modale form').elements;
       const signature = (D.reglages.signature || SIGNATURE_DEFAUT).trim();
       el.objet.value = 'Ton dossier formateur IA-Entrepreneur';
-      el.corps.value = `${salutation(c)}\n\nPour travailler ensemble sur les prochaines missions, voici ton espace formateur IA-Entrepreneur. Tu y renseignes ton entreprise et ton profil, tu déposes tes pièces (Kbis, attestation URSSAF, RC Pro, etc.) et tu signes le contrat-cadre en ligne. Compte une vingtaine de minutes ; tu peux t'arrêter et reprendre avec le même lien.\n\n${lien}\n\nLe lien est personnel et valable jusqu'au ${jusquau}.\n\n${signature}`;
+      el.corps.value = `${salutation(c)}\n\nPour travailler ensemble sur les prochaines missions, voici ton espace formateur IA-Entrepreneur. Tu y renseignes ton entreprise et ton profil, tu déposes tes pièces (Kbis, attestation URSSAF, RIB, CV, etc.) et tu signes le contrat-cadre en ligne. Compte une vingtaine de minutes ; tu peux t'arrêter et reprendre avec le même lien.\n\n${lien}\n\nLe lien est personnel et valable jusqu'au ${jusquau}.\n\n${signature}`;
       el.corps.dispatchEvent(new Event('input'));
     });
   });
@@ -2324,7 +2348,7 @@ function ouvrirProfilFormateur(l) {
 }
 function ouvrirDepotPiece(l) {
   ouvrirModale(`<h2>Déposer une pièce pour ${esc(l.entreprise)}</h2>
-    ${champ('Pièce', `<select name="type">${[...PIECES_F, ['contrat', 'Contrat signé (ancien)'], ['autre', 'Autre pièce']].map(([k, v]) => `<option value="${k}">${esc(v)}</option>`).join('')}</select>`)}
+    ${champ('Pièce', `<select name="type">${[['contrat', `${CONTRAT_F} (signé hors du CRM)`], ...PIECES_F, ['autre', 'Autre pièce']].map(([k, v]) => `<option value="${k}">${esc(v)}</option>`).join('')}</select>`)}
     ${champ('Fichier', '<input type="file" name="fichier" accept="application/pdf,image/*" required>', 'PDF ou photo, 3,4 Mo au plus. Claude la lit, puis tu la vérifies.')}
     ${piedFormulaire('<button type="submit" class="btn primaire">Déposer</button>')}`, (form) => {
     brancherAnnuler(form);
@@ -2345,10 +2369,11 @@ function ouvrirDepotPiece(l) {
 }
 function ouvrirValiderFormateur(l) {
   const ps = piecesDe(l.id);
+  const f = dossierDe(l.id);
   const aVerifier = ps.filter((p) => p.etat === 'a_verifier');
   const alertes = aVerifier.filter((p) => p.d.lecture && p.d.lecture.alertes && p.d.lecture.alertes.length);
   ouvrirModale(`<h2>Valider ${esc(l.entreprise)} ?</h2>
-    <p>${aVerifier.length ? `Les ${aVerifier.length} pièce${aVerifier.length > 1 ? 's' : ''} encore « À vérifier » passeront en « Vérifiée » : tu confirmes les avoir regardées. ` : ''}Tu contresignes son contrat-cadre (Gabriel VANDERBECKEN, Président), et il pourra être positionné sur une mission.</p>
+    <p>${aVerifier.length ? `Les ${aVerifier.length} pièce${aVerifier.length > 1 ? 's' : ''} encore « À vérifier » passeront en « Vérifiée » : tu confirmes les avoir regardées${f.signature ? '' : ', contrat signé des deux côtés compris'}. ` : ''}${f.signature ? 'Tu contresignes son contrat-cadre (Gabriel VANDERBECKEN, Président), et il' : 'Il'} pourra être positionné sur une mission.</p>
     ${alertes.length ? `<div class="alerte-vocal"><b>Claude a signalé :</b><ul>${alertes.map((p) => `<li>${esc(p.titre)} : ${esc(p.d.lecture.alertes.join(' ; '))}</li>`).join('')}</ul></div>` : ''}
     ${ps.some((p) => p.type === 'urssaf' && p.d && p.d.lecture && p.d.lecture.code_verification && p.etat === 'a_verifier') ? `<p class="aide">Pense à vérifier l'attestation URSSAF avec son code de sécurité sur <a href="${URSSAF_VERIF}" target="_blank" rel="noopener noreferrer">urssaf.fr</a> : c'est l'obligation de vigilance du contrat (article 13).</p>` : ''}
     ${piedFormulaire('<button type="submit" class="btn primaire">Valider le formateur</button>')}`, (form) => {

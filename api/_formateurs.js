@@ -23,22 +23,26 @@ const MODELE = 'claude-opus-5-5';
 const OCTETS_MAX = 3.4 * 1024 * 1024; // une requête Vercel plafonne à 4,5 Mo, base64 compris
 const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
 
-// Les pièces de l'article 6 et de l'article 13 du contrat-cadre (modèle du 28/10/2026).
+// Les pièces demandées au formateur. Choix de Gabriel (19/11/2026) : plus de justificatif de régime de TVA
+// (le régime se déclare à l'étape 1), plus de formation continue, RC Pro facultative, et les justificatifs
+// de compétences sous toutes leurs formes. Les anciennes pièces « tva » et « formation_continue » restent
+// consultables dans « Autres documents » du CRM, sans compter dans le dossier.
 export const PIECES = [
   { type: 'kbis', titre: "Justificatif d'immatriculation", aide: "Extrait Kbis, avis de situation SIRENE ou extrait du registre national des entreprises, de moins de 3 mois." },
   { type: 'identite', titre: "Pièce d'identité", aide: "Carte d'identité (recto et verso) ou passeport, en cours de validité." },
   { type: 'rib', titre: 'RIB', aide: 'À ton nom ou à celui de ta structure.' },
-  { type: 'tva', titre: 'Régime de TVA', aide: "Justificatif de ton régime : exonération (NDA), franchise en base (art. 293 B du CGI) ou numéro de TVA." },
-  { type: 'rc_pro', titre: 'Assurance RC Pro', aide: "Attestation de responsabilité civile professionnelle en cours de validité, qui couvre ton activité de formation." },
   { type: 'urssaf', titre: 'Attestation de vigilance URSSAF', aide: "De moins de 6 mois, à télécharger sur ton espace urssaf.fr ou autoentrepreneur.urssaf.fr. Elle est redemandée tous les 6 mois." },
   { type: 'cv', titre: 'CV à jour', aide: 'Ton parcours, tes missions de formateur, ton expérience en IA.' },
-  { type: 'competences', titre: 'Justificatifs de compétences', aide: 'Diplômes, certifications ou références de missions qui montrent ta légitimité sur les sujets confiés.' },
-  { type: 'formation_continue', titre: 'Formation continue', aide: 'Une attestation ou une certification de moins de 12 mois. Elle est redemandée chaque année.' },
+  { type: 'competences', titre: 'Justificatifs de compétences', aide: "Ce qui prouve ton expertise, sous la forme que tu as : références de missions ou de clients, programmes animés, recommandations, attestations, certifications ou diplômes." },
+  { type: 'rc_pro', titre: 'Assurance RC Pro', aide: "Seulement si tu en as une : attestation de responsabilité civile professionnelle en cours de validité.", facultatif: true },
   { type: 'nda', titre: "Déclaration d'activité (NDA)", aide: "Seulement si tu as un numéro de déclaration d'activité d'organisme de formation.", facultatif: true },
 ];
 export const TYPES_PIECES = PIECES.map((p) => p.type);
+// Le contrat signé par les deux parties : le contrat-cadre signé dans le lien d'envoi (contresigné par Gabriel
+// quand il valide), ou un contrat signé hors du CRM, déposé comme pièce « contrat ».
+export const CONTRAT = { type: 'contrat', titre: 'Contrat signé par les deux parties' };
 // Durée de validité comptée depuis la date de la pièce, quand elle n'a pas de date de fin.
-const VALIDITE_MOIS = { kbis: 3, urssaf: 6, formation_continue: 12, rc_pro: 12 };
+const VALIDITE_MOIS = { kbis: 3, urssaf: 6, rc_pro: 12 };
 
 export class RefusFormateur extends Error {
   constructor(code, statut = 400) {
@@ -158,7 +162,7 @@ export async function verifierSiret(brut) {
 const SCHEMA_LECTURE = {
   type: 'object',
   properties: {
-    type_reconnu: { type: 'string', enum: [...TYPES_PIECES, 'autre'] },
+    type_reconnu: { type: 'string', enum: [...TYPES_PIECES, 'contrat', 'autre'] },
     lisible: { type: 'boolean' },
     titulaire: { type: 'string' },
     siret: { type: 'string' },
@@ -178,13 +182,12 @@ Ce qui est attendu, selon le type :
 - kbis : extrait Kbis, avis de situation SIRENE (INSEE) ou extrait du registre national des entreprises (INPI), daté de moins de 3 mois, au SIRET ou SIREN déclaré.
 - identite : carte d'identité (recto et verso) ou passeport, au nom du représentant déclaré ; date_expiration = fin de validité.
 - rib : relevé d'identité bancaire au nom du formateur ou de sa structure.
-- tva : document qui justifie le régime de TVA déclaré (exonération avec numéro de déclaration d'activité, franchise en base de l'article 293 B du CGI, ou numéro de TVA intracommunautaire).
-- rc_pro : attestation d'assurance responsabilité civile professionnelle, valable à la date du jour, qui couvre une activité de formation ou de conseil ; date_expiration = fin de la période couverte.
+- rc_pro (facultative) : attestation d'assurance responsabilité civile professionnelle, valable à la date du jour, qui couvre une activité de formation ou de conseil ; date_expiration = fin de la période couverte.
 - urssaf : attestation de vigilance (pas une attestation de régularité fiscale), datée de moins de 6 mois ; code_verification = le code de sécurité imprimé dessus, sans espaces, pour que Gabriel le vérifie sur urssaf.fr.
 - cv : CV de la personne déclarée, avec une expérience de formateur ou dans l'IA et le numérique.
-- competences : diplômes, certifications, attestations ou références de missions en lien avec l'IA, le numérique ou la formation.
-- formation_continue : preuve d'une formation suivie ou d'une certification obtenue dans les 12 derniers mois ; date_document = sa date.
+- competences : toute preuve d'expertise en lien avec l'IA, le numérique ou la formation, quelle que soit sa forme : références de missions ou de clients, programmes animés, recommandations, attestations, certifications, diplômes. Aucune forme n'est exigée plutôt qu'une autre.
 - nda : récépissé de déclaration d'activité d'organisme de formation (numéro à 11 chiffres).
+- contrat : contrat de sous-traitance ou contrat-cadre entre le formateur et IA-Entrepreneur (ou Clindit, la société qui porte IA-Entrepreneur). Il doit être signé par les deux parties : alerte si la signature du formateur ou celle d'IA-Entrepreneur (Gabriel Vanderbecken) manque, ou si le nom du formateur diffère.
 
 conforme est vrai seulement si la pièce est du type attendu, lisible, au bon nom et dans les délais. Sinon, alertes dit précisément ce qui ne va pas, en phrases courtes adressées à Gabriel. Une pièce qui semble retouchée ou incohérente (dates impossibles, polices mélangées, nom différent) est une alerte.
 details : une phrase qui dit ce que montre la pièce (« Attestation de vigilance URSSAF du 02/11/2026, au nom de … »).
@@ -193,7 +196,7 @@ N'invente rien : ce que tu ne lis pas reste vide. Dates en AAAA-MM-JJ.`;
 
 async function lirePiece({ octets, mime, type, f }) {
   if (!process.env.ANTHROPIC_API_KEY) return null;
-  const piece = PIECES.find((p) => p.type === type);
+  const piece = [...PIECES, CONTRAT].find((p) => p.type === type);
   const id = f.identite || {};
   const contexte = [
     `Date du jour : ${aujourdHui()}`,
@@ -273,10 +276,19 @@ export function etatDossier(f, docs) {
   const id = (f && f.identite) || {};
   const identiteOk = IDENTITE_REQUISE.every((k) => String(id[k] || '').trim()) && Boolean(f && f.regime_tva) && (f.regime_tva !== 'exonere' || Boolean(f.nda));
   const siretOk = Boolean(f && f.siret_verif && f.siret_verif.trouve && f.siret_verif.actif);
-  const signe = Boolean(f && f.signature);
+  // Le contrat : signé dans le lien d'envoi, ou un contrat signé déposé (et pas « à refaire »).
+  const contratDepose = actifs.filter((x) => x.type === CONTRAT.type).sort((a, b) => (a.created_at < b.created_at ? 1 : -1))[0] || null;
+  const contratDeposeOk = Boolean(contratDepose && contratDepose.statut !== 'refuse');
+  const signe = Boolean(f && f.signature) || contratDeposeOk;
+  const contrat = {
+    titre: CONTRAT.titre, document: contratDepose, en_ligne: Boolean(f && f.signature), contresigne: Boolean(f && f.contre_signature),
+    etat: f && f.signature ? (f.contre_signature ? 'verifiee' : 'a_contresigner')
+      : !contratDepose ? 'manquante' : contratDepose.statut === 'refuse' ? 'refusee' : contratDepose.statut === 'verifie' ? 'verifiee' : 'a_verifier',
+  };
   const requises = pieces.filter((p) => !p.facultatif);
   const aEnvoyer = requises.filter((p) => ['manquante', 'refusee', 'expiree'].includes(p.etat));
   const aVerifier = pieces.filter((p) => p.etat === 'a_verifier');
+  if (!f?.signature && contrat.etat === 'a_verifier') aVerifier.push({ titre: CONTRAT.titre });
   const complet = identiteOk && siretOk && signe && aEnvoyer.length === 0;
   const verifie = complet && aVerifier.length === 0;
   let statut;
@@ -286,7 +298,7 @@ export function etatDossier(f, docs) {
   else if (f && (f.jeton_cree_le || actifs.length || f.signature || f.siret)) statut = 'en_cours';
   else statut = 'a_inviter';
   return {
-    statut, pieces, identiteOk, siretOk, signe, complet, verifie,
+    statut, pieces, contrat, identiteOk, siretOk, signe, complet, verifie,
     a_envoyer: aEnvoyer.map((p) => p.titre), a_verifier: aVerifier.map((p) => p.titre),
     bientot: pieces.filter((p) => p.bientot).map((p) => ({ titre: p.titre, expire_le: p.document.expire_le })),
     recues: requises.filter((p) => ['a_verifier', 'verifiee'].includes(p.etat)).length, requises: requises.length,
