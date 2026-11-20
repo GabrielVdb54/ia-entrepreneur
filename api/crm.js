@@ -142,6 +142,7 @@ import {
 } from './_formateurs.js';
 import { VERSION as VERSION_CONTRAT, blancsContrat, contratRempli, texteContrat } from './_contrat-formateur.js';
 import { noterConso } from './_conso.js';
+import { CONSEILLERS_RDV } from './_conseillers.js';
 
 // Chaque réponse de Claude est relevée avec sa fonction (iae_crm_conso, 16/11/2026) : savoir ce qui coûte.
 const conso = (fonction, reponse) => noterConso(fonction, reponse, { compte: compte() });
@@ -1467,7 +1468,8 @@ async function noterRdv(leadId, contactId, rdv, origine, { fil, objet }) {
 async function prochainRdv(leadId) {
   const { lignes } = await sb(`iae_crm_activites?select=resume,meta&lead_id=eq.${leadId}&type=eq.rdv&order=date.desc&limit=20`);
   const auj = aujourdHuiParis();
-  const a = lignes.filter((x) => DATE_RE.test(x.meta?.date_rdv || '') && x.meta.date_rdv >= auj).sort((x, y) => x.meta.date_rdv.localeCompare(y.meta.date_rdv))[0];
+  // Un RDV déplacé ou annulé dans l'agenda du conseiller (remplace_par, suivreRdvPoses) ne compte plus.
+  const a = lignes.filter((x) => DATE_RE.test(x.meta?.date_rdv || '') && x.meta.date_rdv >= auj && !x.meta.remplace_par).sort((x, y) => x.meta.date_rdv.localeCompare(y.meta.date_rdv))[0];
   return a ? { date: a.meta.date_rdv, heure: a.meta.heure || '', resume: a.resume } : null;
 }
 const tacheRdv = (rdv, note) => ({ prochaine_relance: rdv.date, prochaine_action: 'rdv', prochaine_note: note.slice(0, 2000), relances_sans_reponse: 0, tache_fil: null });
@@ -2406,6 +2408,117 @@ async function synchroAgenda() {
   }
   await ecrireReglage('synchro_agenda', { depuis: new Date(debut.getTime() - 900000).toISOString(), le: debut.toISOString(), rdv, nouveaux });
   return { rdv, nouveaux };
+}
+
+/* ----- Les RDV posés par la page de RDV : déplacés ou annulés dans l'agenda du conseiller ----- */
+
+// Anna, 19/11/2026 : « Le rdv [de SO.DISS] est reporté le 26/11 à 10h mais le CRM n'a pas généré la modif. » Ces RDV
+// (api/rdv.js : site, Anna, lien personnel) sont dans l'agenda du conseiller, marqués crm_lead : la synchro de l'agenda ne
+// les lit pas, et rien ne les relisait. À chaque synchro, on relit donc chaque RDV posé qui n'est pas passé depuis plus de
+// 2 jours dans l'agenda de son conseiller (Gabriel en est propriétaire, comme pour la prise de RDV), et on reporte sur la
+// fiche un déplacement ou une annulation : historique, ligne iae_crm_rdv, et la tâche quand c'était celle de ce RDV.
+const CALENDRIERS = 'https://www.googleapis.com/calendar/v3/calendars';
+const dateLongueParis = (d) => new Intl.DateTimeFormat('fr-FR', { timeZone: 'Europe/Paris', weekday: 'long', day: 'numeric', month: 'long' }).format(new Date(d));
+// « 9 h », « 10 h 30 » : comme la page de RDV (api/rdv.js, heureLisible).
+const heureLisibleParis = (d) => heureParis(d).replace(/^0/, '');
+const heureMetaParis = (d) => new Intl.DateTimeFormat('fr-FR', { timeZone: 'Europe/Paris', hour: '2-digit', minute: '2-digit' }).format(new Date(d));
+// null : Google n'a pas répondu (on ne change rien, nouvel essai au passage suivant).
+async function lireEvenementConseiller(agenda, id) {
+  try {
+    const r = await fetch(`${CALENDRIERS}/${encodeURIComponent(agenda)}/events/${encodeURIComponent(id)}`, { headers: { Authorization: `Bearer ${await accesGmail()}` }, signal: AbortSignal.timeout(6000) });
+    if (r.status === 404 || r.status === 410) return { status: 'cancelled', supprime: true };
+    if (!r.ok) { console.error('crm suivi rdv', r.status, (await r.text()).slice(0, 200)); return null; }
+    return await r.json();
+  } catch (e) {
+    console.error('crm suivi rdv', e?.name || e?.message);
+    return null;
+  }
+}
+async function suivreRdvPoses() {
+  if (!gmailConfigure()) return { lus: 0, deplaces: 0, annules: 0 };
+  const depuis = new Date(Date.now() - 2 * 86400000).toISOString();
+  const { lignes } = await sb(`iae_crm_rdv?statut=eq.pose&evenement=not.is.null&lead_id=not.is.null&debut=gte.${encodeURIComponent(depuis)}&order=debut.asc&limit=40&select=*`);
+  if (!lignes.length) return { lus: 0, deplaces: 0, annules: 0 };
+  const tour = (await lireReglage('rdv_tour').catch(() => null)) || {};
+  const nomDe = (email) => {
+    const c = [...(Array.isArray(tour.conseillers) ? tour.conseillers : []), ...CONSEILLERS_RDV].find((x) => x?.email === email);
+    if (c) return [c.prenom, c.nom].filter(Boolean).join(' ');
+    const p = email.split('@')[0];
+    return p.charAt(0).toUpperCase() + p.slice(1);
+  };
+  const evs = await Promise.all(lignes.map((rdv) => lireEvenementConseiller(rdv.conseiller, rdv.evenement)));
+  const bilan = { lus: 0, deplaces: 0, annules: 0 };
+  for (const [i, rdv] of lignes.entries()) {
+    const ev = evs[i];
+    if (!ev) continue;
+    bilan.lus++;
+    try {
+      // Un RDV passé que le conseiller efface de son agenda n'est pas « annulé ».
+      if (ev.status === 'cancelled') {
+        if (Date.parse(rdv.debut) > Date.now()) { await rdvAnnule(rdv, nomDe(rdv.conseiller)); bilan.annules++; }
+        continue;
+      }
+      const debutEv = Date.parse(ev.start?.dateTime || '');
+      if (!Number.isFinite(debutEv) || debutEv === Date.parse(rdv.debut)) continue;
+      const finEv = Date.parse(ev.end?.dateTime || '');
+      await rdvDeplace(rdv, debutEv, Number.isFinite(finEv) && finEv > debutEv ? finEv : debutEv + (Date.parse(rdv.fin) - Date.parse(rdv.debut)), nomDe(rdv.conseiller));
+      bilan.deplaces++;
+    } catch (e) {
+      console.error('crm suivi rdv', rdv.id, e?.code || e?.message);
+    }
+  }
+  return bilan;
+}
+// Les lignes d'historique de ce RDV gardent leur date, mais ne comptent plus comme « prochain RDV » (prochainRdv).
+async function remplacerRdvHistorique(rdv, par) {
+  const { lignes } = await sb(`iae_crm_activites?select=id,meta&lead_id=eq.${rdv.lead_id}&type=eq.rdv&meta->>rdv_tour=eq.${rdv.id}`);
+  for (const a of lignes) if (!a.meta?.remplace_par) await sb(`iae_crm_activites?id=eq.${a.id}`, { methode: 'PATCH', corps: { meta: { ...a.meta, remplace_par: par } }, prefer: 'return=minimal' });
+}
+// La tâche de la fiche suit le RDV seulement si c'était la sienne (même jour, action rdv) ou s'il n'y en avait aucune.
+const tacheDuRdv = (l, jour) => !l.prochaine_relance || (l.prochaine_action === 'rdv' && l.prochaine_relance === jour);
+async function rdvDeplace(rdv, debut, fin, avec) {
+  const avant = Date.parse(rdv.debut);
+  const quandAvant = `${dateLongueParis(avant)} à ${heureLisibleParis(avant)}`;
+  const quand = `${dateLongueParis(debut)} à ${heureLisibleParis(debut)}`;
+  const jour = jourParis(debut);
+  // D'abord la ligne du tour de rôle (l'index unique conseiller + début peut refuser : rien d'autre n'est alors changé).
+  await sb(`iae_crm_rdv?id=eq.${rdv.id}`, { methode: 'PATCH', corps: { debut: new Date(debut).toISOString(), fin: new Date(fin).toISOString() }, prefer: 'return=minimal' });
+  await remplacerRdvHistorique(rdv, jour);
+  const { lignes: [l] } = await sb(`iae_crm_leads?id=eq.${rdv.lead_id}&select=id,prochaine_relance,prochaine_action`);
+  if (!l) return;
+  const { lignes: [c] } = await sb(`iae_crm_contacts?select=id&lead_id=eq.${rdv.lead_id}&order=principal.desc,created_at.asc&limit=1`);
+  await sb('iae_crm_activites', { methode: 'POST', prefer: 'return=minimal', corps: {
+    lead_id: rdv.lead_id, contact_id: c?.id || null, type: 'rdv',
+    resume: `RDV déplacé dans l'agenda de ${avec} : ${quand} (il était prévu le ${quandAvant})`.slice(0, 2000), source: 'agenda',
+    meta: { date_rdv: jour, heure: heureMetaParis(debut), conseiller: rdv.conseiller, evenement: rdv.evenement, rdv_tour: rdv.id, meet: rdv.meet || null, deplace_de: { date: jourParis(avant), heure: heureMetaParis(avant) }, origine: 'agenda_conseiller' },
+  } });
+  if (tacheDuRdv(l, jourParis(avant)) && jour >= aujourdHuiParis()) {
+    await sb(`iae_crm_leads?id=eq.${rdv.lead_id}`, { methode: 'PATCH', prefer: 'return=minimal', corps: {
+      prochaine_relance: jour, prochaine_action: 'rdv', relances_sans_reponse: 0, archive: false, tache_fil: null,
+      prochaine_note: `RDV découverte le ${quand} (${Math.round((fin - debut) / 60000)} min, Meet) avec ${avec}${rdv.setter ? ', posé par Anna' : ''}. Déplacé dans son agenda : il était prévu le ${quandAvant}.`.slice(0, 2000),
+    } });
+  }
+}
+async function rdvAnnule(rdv, avec) {
+  const avant = Date.parse(rdv.debut);
+  const quandAvant = `${dateLongueParis(avant)} à ${heureLisibleParis(avant)}`;
+  await sb(`iae_crm_rdv?id=eq.${rdv.id}`, { methode: 'PATCH', corps: { statut: 'annule' }, prefer: 'return=minimal' });
+  await remplacerRdvHistorique(rdv, 'annule');
+  const { lignes: [l] } = await sb(`iae_crm_leads?id=eq.${rdv.lead_id}&select=id,prochaine_relance,prochaine_action`);
+  if (!l) return;
+  const { lignes: [c] } = await sb(`iae_crm_contacts?select=id,prenom,nom&lead_id=eq.${rdv.lead_id}&order=principal.desc,created_at.asc&limit=1`);
+  await sb('iae_crm_activites', { methode: 'POST', prefer: 'return=minimal', corps: {
+    lead_id: rdv.lead_id, contact_id: c?.id || null, type: 'note',
+    resume: `RDV du ${quandAvant} avec ${avec} annulé dans son agenda`.slice(0, 2000), source: 'agenda',
+    meta: { conseiller: rdv.conseiller, evenement: rdv.evenement, rdv_tour: rdv.id, annule: { date: jourParis(avant), heure: heureMetaParis(avant) }, origine: 'agenda_conseiller' },
+  } });
+  if (tacheDuRdv(l, jourParis(avant))) {
+    const qui = c ? [c.prenom, c.nom].filter(Boolean).join(' ') : '';
+    await sb(`iae_crm_leads?id=eq.${rdv.lead_id}`, { methode: 'PATCH', prefer: 'return=minimal', corps: {
+      prochaine_relance: aujourdHuiParis(), prochaine_action: 'appel', archive: false, tache_fil: null,
+      prochaine_note: `Le RDV découverte du ${quandAvant} avec ${avec} a été annulé dans son agenda : appeler ${qui || 'le prospect'} pour en reposer un.`.slice(0, 2000),
+    } });
+  }
 }
 
 async function synchroniser() {
@@ -6326,6 +6439,8 @@ export default async function handler(req, res) {
     }
     const debutTache = Date.now();
     const resultat = await pourChacun(synchroniser);
+    // Les RDV posés par la page de RDV, relus dans l'agenda de leur conseiller (déplacés, annulés : Anna, 19/11).
+    resultat.rdv_suivis = await suivreRdvPoses().catch((e) => { console.error('crm suivi rdv', e?.code || e?.message); return { erreur: e?.code || 'erreur' }; });
     // La prospection email de Gabriel, après sa boîte : une réponse arrivée entre-temps arrête l'envoi. 50 secondes au plus
     // depuis le début de la tâche (la fonction en a 60).
     resultat.prospection_email = await prospectionEmail({ limite: debutTache + 50000 }).catch((e) => { console.error('crm prospection email', e?.code || e?.message); return { erreur: e?.code || 'erreur' }; });

@@ -50,6 +50,7 @@
  */
 import { randomUUID } from 'node:crypto';
 import { crmDisponible, sb, aujourdhui } from './_crm-site.js';
+import { CONSEILLERS_RDV } from './_conseillers.js';
 import { contientLien, emailRefuse, jetonPage, jetonRefuse, turnstileCle, turnstileValide } from './_anti-robot.js';
 
 const HOTES = ['ia-entrepreneur.fr', 'www.ia-entrepreneur.fr'];
@@ -60,11 +61,7 @@ const FENETRE_MS = 10 * 60 * 1000;
 const passages = { lecture: new Map(), reservation: new Map() };
 
 const DEFAUT = {
-  conseillers: [
-    { email: 'axel@ia-entrepreneur.fr', prenom: 'Axel', nom: 'Ouhadda', fonction: 'conseiller formation IA' },
-    { email: 'dorian@ia-entrepreneur.fr', prenom: 'Dorian', nom: 'Didiot', fonction: 'conseiller formation IA' },
-    { email: ADMIN, prenom: 'Gabriel', nom: 'Vanderbecken', fonction: "fondateur d'IA-Entrepreneur" },
-  ],
+  conseillers: CONSEILLERS_RDV,
   debut: '09:00', fin: '17:00', duree: 30, pas: 30, preavis_heures: 24, semaines: 4,
   setters: { anna: 'anna@ia-entrepreneur.fr' },
 };
