@@ -351,5 +351,16 @@ export async function majStatut(leadId, { source = 'crm' } = {}) {
     });
     if (tache) await base(`iae_crm_leads?id=eq.${leadId}`, { methode: 'PATCH', corps: { prochaine_relance: aujourdHui(), prochaine_action: 'autre', prochaine_note: tache, archive: false }, prefer: 'return=minimal' });
   }
+  // Entreprise et pièces reçues, contrat pas encore envoyé : il reste masqué dans son espace (Anna, 20/11/2026),
+  // donc la tâche de relire les pièces puis de l'envoyer. Une fois par dossier : pas de nouvelle ligne tant
+  // que la tâche est là.
+  if (e.pretASigner && !e.signe && !f.contrat_envoye_le) {
+    const [lead] = (await base(`iae_crm_leads?id=eq.${leadId}&select=entreprise,prochaine_note`)) || [];
+    const nom = lead ? lead.entreprise : 'ce formateur';
+    if (!String((lead && lead.prochaine_note) || '').startsWith('Envoyer le contrat')) {
+      await base('iae_crm_activites', { methode: 'POST', prefer: 'return=minimal', corps: { lead_id: leadId, type: 'note', resume: 'Dossier complet (entreprise et pièces) : contrat à envoyer depuis la fiche, après relecture des pièces.', source } });
+      await base(`iae_crm_leads?id=eq.${leadId}`, { methode: 'PATCH', corps: { prochaine_relance: aujourdHui(), prochaine_action: 'autre', prochaine_note: `Envoyer le contrat à ${nom} : relire ses pièces (onglet Formateurs), puis « Envoyer le contrat à signer » sur la ligne du contrat. Il ne le voit pas avant.`, archive: false }, prefer: 'return=minimal' });
+    }
+  }
   return { ...f, statut: e.statut, etat: e };
 }

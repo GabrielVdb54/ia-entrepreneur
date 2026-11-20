@@ -5,7 +5,8 @@
  * l'empreinte SHA-256, et il expire au bout de 30 jours (Gabriel en recrée un
  * depuis le CRM).
  *
- *   GET                                   le dossier : identité, profil, pièces, contrat
+ *   GET                                   le dossier : identité, profil, pièces, contrat (seulement une fois
+ *                                         envoyé depuis le CRM, ou signé)
  *   POST { op: 'siret', siret }           vérification par l'API publique recherche-entreprises
  *   POST { op: 'identite', identite, regime_tva, nda, intervenants }
  *   POST { op: 'profil', competences, outils, niveaux, secteurs, zone, distanciel, disponibilites, bio }
@@ -61,6 +62,10 @@ async function dossier(f) {
   const c = (contacts || [])[0] || {};
   const e = etatDossier(f, docs || []);
   const sv = f.siret_verif || null;
+  // Le contrat n'apparaît qu'une fois envoyé depuis le CRM, après relecture des pièces (Anna, 20/11/2026 :
+  // « pour éviter qu'un formateur le signe sans avoir complété les docs »), ou une fois signé.
+  const envoye = Boolean(f.contrat_envoye_le);
+  const visible = Boolean(f.signature) || (envoye && e.pretASigner);
   return {
     prenom: c.prenom || '', nom: c.nom || '', entreprise: lead ? lead.entreprise : '',
     statut: e.statut, complet: e.complet, verifie: e.verifie,
@@ -74,9 +79,9 @@ async function dossier(f) {
         lu: p.document.lecture && !p.document.lecture.erreur ? { details: p.document.lecture.details, alertes: p.document.lecture.alertes, conforme: p.document.lecture.conforme } : null,
       } : null,
     })),
-    identite_ok: e.identiteOk, siret_ok: e.siretOk, pret_a_signer: e.pretASigner,
+    identite_ok: e.identiteOk, siret_ok: e.siretOk, dossier_complet: e.pretASigner, contrat_envoye: envoye, pret_a_signer: e.pretASigner && envoye,
     signature: f.signature ? { date: f.signature.date, nom: f.signature.nom, lieu: f.signature.lieu } : null,
-    contrat: { version: VERSION, blocs: contratRempli(f, f.signature) },
+    contrat: visible ? { version: VERSION, blocs: contratRempli(f, f.signature) } : null,
     lien_expire: f.jeton_expire,
   };
 }
@@ -157,6 +162,8 @@ export default async function handler(req, res) {
       const e = etatDossier(f, docs || []);
       if (!e.identiteOk || !e.siretOk) throw new RefusFormateur('identite_incomplete');
       if (!e.piecesRecues) throw new RefusFormateur('pieces_manquantes');
+      // Puis il attend le contrat envoyé depuis le CRM, une fois ses pièces relues (Anna, 20/11/2026).
+      if (!f.contrat_envoye_le) throw new RefusFormateur('contrat_pas_envoye', 409);
       const mention = texte(corps.mention, 80).toLowerCase().normalize('NFD').replace(/\p{M}/gu, '').replace(/[^a-z ]/g, ' ').replace(/\s+/g, ' ').trim();
       if (mention !== 'lu et approuve bon pour accord') throw new RefusFormateur('mention_invalide');
       const nom = texte(corps.nom, 120);

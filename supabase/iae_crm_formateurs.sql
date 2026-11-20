@@ -35,6 +35,9 @@ create table if not exists public.iae_crm_formateurs (
   valide_le        timestamptz,
   notes            text
 );
+-- Envoi du contrat pré-rempli depuis le CRM (Anna, 20/11/2026) : tant qu'il est vide, l'espace du formateur
+-- ne montre pas le contrat et refuse la signature.
+alter table public.iae_crm_formateurs add column if not exists contrat_envoye_le timestamptz;
 
 create table if not exists public.iae_crm_documents (
   id          uuid primary key default gen_random_uuid(),

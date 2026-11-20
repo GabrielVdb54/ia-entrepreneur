@@ -116,6 +116,7 @@ const ERREURS = {
   fichier_vide: 'Le fichier est vide.',
   identite_incomplete: "Complète d'abord ton entreprise (étape 1) et fais vérifier ton SIRET : le contrat se remplit avec ces informations.",
   pieces_manquantes: 'Envoie d\'abord toutes tes pièces (étape 3) : le contrat se signe une fois ton dossier complet.',
+  contrat_pas_envoye: 'Ton contrat n\'est pas encore prêt : nous te l\'envoyons par email une fois tes pièces relues.',
   mention_invalide: 'Recopie la mention exacte : « Lu et approuvé, bon pour accord ».',
   signature_incomplete: 'Indique le lieu et ton nom, et coche la case.',
   trop_de_demandes: 'Beaucoup de demandes en peu de temps : réessaie dans quelques minutes.',
@@ -156,14 +157,17 @@ function rendre() {
   $('#barre').style.width = `${Math.round((a.faites / 4) * 100)}%`;
   const id = D.identite || {};
   const fige = Boolean(D.signature);
+  // Le contrat n'arrive qu'une fois les pièces relues et le contrat envoyé depuis le CRM (Anna, 20/11/2026).
+  const attente = D.dossier_complet && !D.contrat_envoye && !D.signature;
   const bandeau = D.statut === 'valide' ? ['ok', 'Ton dossier est validé : tu peux être positionné sur des missions. Merci !']
     : D.statut === 'a_verifier' ? ['ok', 'Merci, tout est arrivé. Gabriel vérifie ton dossier et revient vers toi.']
     : D.statut === 'a_renouveler' ? ['attention', `Une pièce est à mettre à jour : ${D.pieces.filter((p) => ['manquante', 'refusee', 'expiree'].includes(p.etat) && !p.facultatif).map((p) => p.titre).join(', ') || 'regarde l\'étape 3'}.`]
+    : attente ? ['ok', 'Merci, ton dossier est complet. Nous relisons tes pièces, puis nous t\'envoyons ton contrat-cadre à signer par email, avec un nouveau lien.']
     : D.pret_a_signer && !D.signature ? ['ok', 'Ton dossier est complet et ton contrat est prêt, rempli avec les informations de ton entreprise : relis-le et signe-le à l\'étape 4.']
-    : ['', `Ton dossier avance : ${a.recues} pièce${a.recues > 1 ? 's' : ''} sur ${a.total}, contrat ${D.signature ? 'signé' : 'à signer'}. Tu peux t'arrêter et revenir avec le même lien.`];
+    : ['', `Ton dossier avance : ${a.recues} pièce${a.recues > 1 ? 's' : ''} sur ${a.total}${D.signature ? ', contrat signé' : ''}. Tu peux t'arrêter et revenir avec le même lien.`];
   $('#page').innerHTML = `
     <div><h1>Bonjour${D.prenom ? ` ${esc(D.prenom)}` : ''}, voici ton dossier formateur</h1>
-      <p class="intro">Pour travailler avec IA-Entrepreneur, il nous faut ton entreprise, ton profil, quelques pièces et ta signature du contrat-cadre. Tout se fait ici, en une vingtaine de minutes.</p></div>
+      <p class="intro">Pour travailler avec IA-Entrepreneur, il nous faut ton entreprise, ton profil et quelques pièces. Une fois tes pièces relues, nous t'envoyons ton contrat-cadre à signer en ligne. Tout se fait ici, en une vingtaine de minutes.</p></div>
     <p class="bandeau ${bandeau[0]}" role="status">${esc(bandeau[1])}</p>${D.pret_a_signer && !D.signature ? '<div class="actions"><button type="button" class="btn primaire" data-act="aller-contrat">Lire et signer le contrat</button></div>' : ''}
 
     <section class="etape" id="etape-entreprise">
@@ -231,9 +235,9 @@ function rendre() {
       <input type="file" id="fichier" accept="application/pdf,image/*" class="cache">
     </section>
 
-    <section class="etape" id="etape-contrat">
+    <section class="etape" id="etape-contrat">${D.contrat ? `
       <header><h2>4. Le contrat-cadre</h2><span class="puce ${a.etapes[3] ? 'fait' : 'afaire'}">${D.signature ? 'Signé' : 'À signer'}</span></header>
-      ${D.signature ? `<p class="verif ok">Signé le ${dateFr(D.signature.date)} à ${esc(D.signature.lieu)} par ${esc(D.signature.nom)}. Gabriel le contresigne en validant ton dossier.</p>` : `<p class="aide">Lis-le en entier. Il se remplit avec les informations de l'étape 1. ${D.pret_a_signer ? 'Ton dossier est complet : tu peux le signer.' : `Tu pourras le signer une fois ${!(D.identite_ok && D.siret_ok) ? 'ton entreprise renseignée (étape 1) et ' : ''}tes pièces envoyées (étape 3).`}</p>`}
+      ${D.signature ? `<p class="verif ok">Signé le ${dateFr(D.signature.date)} à ${esc(D.signature.lieu)} par ${esc(D.signature.nom)}. Gabriel le contresigne en validant ton dossier.</p>` : '<p class="aide">Lis-le en entier : il est rempli avec les informations de l\'étape 1. Ton dossier est complet, tu peux le signer.</p>'}
       <div class="contrat" id="contrat" tabindex="0" aria-label="Texte du contrat-cadre">${contratHtml(D.contrat.blocs)}</div>
       <div class="actions"><button type="button" class="btn" data-act="imprimer">Imprimer ou enregistrer en PDF</button></div>
       ${D.signature ? '' : `<form id="form-signer" class="choix" style="gap:12px">
@@ -241,7 +245,11 @@ function rendre() {
         <label class="champ">Recopie la mention « Lu et approuvé, bon pour accord »<input name="mention" autocomplete="off" required></label>
         <label><input type="checkbox" name="accepte"> J'ai lu le contrat-cadre en entier et je l'accepte. Je signe électroniquement : cette signature m'engage comme une signature manuscrite.</label>
         <div class="actions"><button type="submit" class="btn primaire" ${D.pret_a_signer ? '' : 'disabled'}>Signer le contrat</button><p class="message" data-message></p></div>
-      </form>`}
+      </form>`}` : `
+      <header><h2>4. Le contrat-cadre</h2><span class="puce">${attente ? 'En préparation' : 'Après tes pièces'}</span></header>
+      <p class="aide">${D.contrat_envoye ? 'Une pièce est à renvoyer (étape 3) : ton contrat revient ici dès qu\'elle est reçue.'
+        : attente ? 'Tes pièces sont arrivées : nous les relisons, puis nous t\'envoyons ton contrat par email, déjà rempli avec les informations de ton entreprise, avec un nouveau lien pour le signer.'
+        : `Ton contrat arrive une fois ${!(D.identite_ok && D.siret_ok) ? 'ton entreprise renseignée (étape 1) et ' : ''}tes pièces envoyées (étape 3) : nous les relisons, puis nous te l'envoyons par email, déjà rempli.`}</p>`}
     </section>`;
 }
 

@@ -1901,9 +1901,15 @@ async function operationFormateur(corps) {
     if (!e.piecesRecues) throw new Refus('pieces_manquantes', 409);
     const jeton = nouveauJeton();
     const expire = new Date(Date.now() + 30 * 86400000).toISOString();
-    await sb(`iae_crm_formateurs?lead_id=eq.${lead.id}`, { methode: 'PATCH', corps: { jeton_hash: empreinteTexte(jeton), jeton_expire: expire, jeton_cree_le: new Date().toISOString() }, prefer: 'return=minimal' });
+    // contrat_envoye_le : l'espace du formateur montre le contrat et accepte la signature (Anna, 20/11/2026).
+    await sb(`iae_crm_formateurs?lead_id=eq.${lead.id}`, { methode: 'PATCH', corps: { jeton_hash: empreinteTexte(jeton), jeton_expire: expire, jeton_cree_le: new Date().toISOString(), contrat_envoye_le: new Date().toISOString() }, prefer: 'return=minimal' });
     const qui = estAdmin() ? 'Gabriel' : utilisateurCourant().prenom;
     const activite = await inserer('activites', { lead_id: lead.id, type: 'note', resume: `Contrat pré-rempli prêt à signer : nouveau lien créé par ${qui}, valable jusqu'au ${new Date(expire).toLocaleDateString('fr-FR', { timeZone: 'Europe/Paris' })} (version ${VERSION_CONTRAT}).`, source: 'crm', meta: { contrat: 'a_signer', version: VERSION_CONTRAT } });
+    // La tâche « Envoyer le contrat » (posée par majStatut) devient : vérifier la signature dans 3 jours ouvrés.
+    const { lignes: [tache] } = await sb(`iae_crm_leads?id=eq.${lead.id}&select=prochaine_note`);
+    if (String((tache && tache.prochaine_note) || '').startsWith('Envoyer le contrat')) {
+      await sb(`iae_crm_leads?id=eq.${lead.id}`, { methode: 'PATCH', corps: { prochaine_relance: apresJoursOuvres(3, aujourdHuiParis()), prochaine_action: 'email', prochaine_note: `Vérifier que ${lead.entreprise} a signé son contrat (envoyé le ${new Date().toLocaleDateString('fr-FR', { timeZone: 'Europe/Paris' })}), sinon le relancer.` }, prefer: 'return=minimal' });
+    }
     await majStatut(lead.id);
     return { jeton, expire, activite, ...(await retourFormateur(lead.id)) };
   }

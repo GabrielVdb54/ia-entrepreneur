@@ -2267,7 +2267,7 @@ function blocDossierFormateur(l) {
         ${p.type === 'contrat' && !lecture ? (() => {
           const k = pretContratF(l.id);
           const envoye = contratEnvoyeF(l.id);
-          return `${d ? '' : `<p class="meta">${envoye ? `Contrat pré-rempli envoyé le ${esc(instantLisible(envoye))} : il le signe en ligne avec son lien.` : k.pret ? 'Pièces reçues : le contrat pré-rempli peut partir, il le signe en ligne.' : 'Le contrat pré-rempli part une fois son entreprise renseignée et ses pièces reçues.'}</p>`}
+          return `${d ? '' : `<p class="meta">${envoye ? `Contrat pré-rempli envoyé le ${esc(instantLisible(envoye))} : il le signe en ligne avec son lien.` : k.pret ? 'Pièces reçues : relis-les, puis envoie le contrat pré-rempli, qu\'il signe en ligne. Il ne le voit pas dans son espace avant cet envoi.' : 'Le contrat pré-rempli part une fois son entreprise renseignée et ses pièces reçues. D\'ici là, il ne le voit pas dans son espace.'}</p>`}
           <div class="actions"><button type="button" class="btn petit${k.pret && !d && !envoye ? ' primaire' : ''}" data-act="contrat-preparer">${k.pret ? (d ? 'Faire signer le contrat en ligne' : envoye ? 'Renvoyer le contrat' : 'Envoyer le contrat à signer') : 'Voir le contrat pré-rempli'}</button></div>`;
         })() : ''}
       </li>`;
@@ -2358,7 +2358,7 @@ function ouvrirLienFormateur(l, r, { contrat = false } = {}) {
         return;
       }
       el.objet.value = 'Ton dossier formateur IA-Entrepreneur';
-      el.corps.value = `${salutation(c)}\n\nPour travailler ensemble sur les prochaines missions, voici ton espace formateur IA-Entrepreneur. Tu y renseignes ton entreprise et ton profil, tu déposes tes pièces (Kbis, attestation URSSAF, RIB, CV, etc.) et tu signes le contrat-cadre en ligne. Compte une vingtaine de minutes ; tu peux t'arrêter et reprendre avec le même lien.\n\n${lien}\n\nLe lien est personnel et valable jusqu'au ${jusquau}.\n\n${signature}`;
+      el.corps.value = `${salutation(c)}\n\nPour travailler ensemble sur les prochaines missions, voici ton espace formateur IA-Entrepreneur. Tu y renseignes ton entreprise et ton profil, tu déposes tes pièces (Kbis, attestation URSSAF, RIB, CV, etc.). Une fois tes pièces relues, nous t'envoyons ton contrat-cadre à signer en ligne. Compte une vingtaine de minutes ; tu peux t'arrêter et reprendre avec le même lien.\n\n${lien}\n\nLe lien est personnel et valable jusqu'au ${jusquau}.\n\n${signature}`;
       el.corps.dispatchEvent(new Event('input'));
     });
   });
@@ -2497,7 +2497,7 @@ async function ouvrirContratFormateur(l) {
   const c = contactsDe(l.id).find((x) => x.email) || null;
   const ok = (v) => `<span class="etat ${v ? 'e-ok' : 'e-manque'}">${v ? 'Fait' : 'À faire'}</span>`;
   ouvrirModale(`<h2>Contrat de ${esc(l.entreprise)}</h2>
-    <p class="aide">Le contrat-cadre (version du ${esc(r.version.replace(/^.*?(\d{4})-(\d{2})-(\d{2}).*$/, '$3/$2/$1'))}), rempli avec son entreprise. Il le relit et le signe en ligne avec son lien ; Gabriel le contresigne en validant le formateur.</p>
+    <p class="aide">Le contrat-cadre (version du ${esc(r.version.replace(/^.*?(\d{4})-(\d{2})-(\d{2}).*$/, '$3/$2/$1'))}), rempli avec son entreprise. Il ne le voit dans son espace qu'une fois envoyé d'ici : il le relit alors et le signe en ligne avec le lien de l'email. Gabriel le contresigne en validant le formateur.</p>
     <ul class="pieces-f">
       <li><div class="tete"><b>Entreprise renseignée</b>${ok(r.identite_ok)}</div>${r.blancs.length ? `<p class="meta">Reste à remplir : ${esc(r.blancs.join(', '))}.</p>` : ''}</li>
       <li><div class="tete"><b>SIRET vérifié au registre</b>${ok(r.siret_ok)}</div></li>
