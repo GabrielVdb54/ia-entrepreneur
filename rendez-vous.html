@@ -142,6 +142,16 @@
       el.innerHTML = '<b>Programme type : ' + p[0] + '</b>' + p[1].replace('sur', 'Sur') + ', ' + p[2] + ' (prix indicatif). Le conseiller l\'adaptera avec vous pendant l\'appel.';
       el.hidden = false;
     })();
+    // Projet d'application (page Développement, 22/11/2026) : ?sujet=application adapte la phrase d'accueil
+    // et part au CRM comme le programme type (api/rdv.js, PROGRAMMES).
+    var SUJETS = { application: 'pour parler de votre projet d\'application : ce qu\'elle doit contenir au lancement, et ce qui peut attendre.' };
+    var sujetChoisi = (new URLSearchParams(location.search).get('sujet') || '').toLowerCase();
+    if (!SUJETS[sujetChoisi]) sujetChoisi = '';
+    if (sujetChoisi) {
+      if (!programmeChoisi) programmeChoisi = sujetChoisi;
+      var intro0 = document.getElementById('intro');
+      if (intro0) intro0.textContent = '30 minutes en visio avec un conseiller IA-Entrepreneur, ' + SUJETS[sujetChoisi];
+    }
   </script>
   <script>
     // Prise de RDV en tour de rôle (10/11/2026) : /api/rdv donne les créneaux où au moins un conseiller
@@ -251,7 +261,7 @@
           .then(function (r) { if (r.status === 404 && avec) throw new Error('conseiller'); if (!r.ok) throw new Error(String(r.status)); return r.json(); })
           .then(function (j) {
             if (j.avec && j.avec.prenom) {
-              document.getElementById('intro').textContent = '30 minutes en visio avec ' + [j.avec.prenom, j.avec.nom].join(' ').trim() + ', ' + (j.avec.fonction || 'conseiller IA-Entrepreneur') + ', pour faire le point sur l\'usage de l\'IA dans vos équipes et voir ce qui vous serait utile.';
+              document.getElementById('intro').textContent = '30 minutes en visio avec ' + [j.avec.prenom, j.avec.nom].join(' ').trim() + ', ' + (j.avec.fonction || 'conseiller IA-Entrepreneur') + ', ' + (sujetChoisi ? SUJETS[sujetChoisi] : 'pour faire le point sur l\'usage de l\'IA dans vos équipes et voir ce qui vous serait utile.');
             }
             if (j.jeton && !jeton) jeton = j.jeton;
             if (j.turnstile && !cleTs) { cleTs = j.turnstile; chargerTurnstile(); }

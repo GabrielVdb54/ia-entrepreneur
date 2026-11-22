@@ -537,7 +537,7 @@ ANNUAIRE_JS = r"""/* ia-annuaire.js — genere par generate_ia_pages.py, ne pas 
 # page — voir simplifier_nav.py pour le détail des arbitrages.
 NAV_ITEMS = [
     ('/formation-ia-entreprise.html', 'Formations IA'),
-    ('/integrations-ia.html', 'Intégrations IA'),
+    ('/developpement-application-sur-mesure.html', 'Développement'),
     ('/meilleures-ia.html', 'Meilleures IA'),
     ('/nos-formateurs.html', 'Nos formateurs'),
 ]
@@ -547,6 +547,7 @@ MENU_MOBILE = [
     ('/formation-claude-entreprise.html', 'Formation Claude'),
     ('/formation-chatgpt-entreprise.html', 'Formation ChatGPT'),
     ('/formation-ia-independant.html', 'Formation indépendants'),
+    ('/developpement-application-sur-mesure.html', 'Développement'),
     ('/integrations-ia.html', 'Intégrations IA'),
     ('/meilleures-ia.html', 'Meilleures IA'),
     ('/skills-ia-gratuits.html', 'Skills IA gratuits'),
@@ -593,7 +594,8 @@ MENUS_NAV = [
         ("Me mettre en conformité AI Act",        '/formation-ia-obligatoire-ai-act.html'),
         ("Me former, je suis indépendant",        '/formation-ia-independant.html'),
     ], None),
-    ('/integrations-ia.html', 'Intégrations IA', [
+    ('/developpement-application-sur-mesure.html', 'Développement', [
+        ("Développer mon application sur mesure", '/developpement-application-sur-mesure.html'),
         ("Créer mon chatbot client",              '/integration-chatbot-client.html'),
         ("Automatiser ma prospection LinkedIn",   '/integration-prospection-linkedin.html'),
         ("Répondre à mes emails automatiquement", '/integration-reponse-email.html'),
@@ -601,7 +603,7 @@ MENUS_NAV = [
         ("Produire mon contenu SEO",              '/integration-contenu-seo.html'),
         ("Surveiller mes concurrents",            '/integration-veille-concurrentielle.html'),
         ("Automatiser mes rapports d'activité",   '/integration-rapport-performance.html'),
-    ], ('Voir toutes les intégrations', '/integrations-ia.html')),
+    ], ('Voir toutes les intégrations IA', '/integrations-ia.html')),
     ('/meilleures-ia.html', 'Meilleures IA', [
         ("Goodweek : toutes les IA réunies",      '/partenaire-goodweek.html'),
         ("Skills IA gratuits pour mon métier",    '/skills-ia-gratuits.html'),

@@ -454,7 +454,8 @@ function tropDePassages(sorte, ip, max) {
   return false;
 }
 
-const PROGRAMMES = { 'niveau-1': 'Niveau 1, Acculturation IA', 'niveau-2': 'Niveau 2, IA métier', 'niveau-3': 'Niveau 3, Automatisation & intégration' };
+// 'application' : RDV pris depuis la page Développement (rendez-vous.html?sujet=application, 22/11/2026).
+const PROGRAMMES = { 'niveau-1': 'Niveau 1, Acculturation IA', 'niveau-2': 'Niveau 2, IA métier', 'niveau-3': 'Niveau 3, Automatisation & intégration', application: "Développement sur mesure : projet d'application" };
 
 async function reserver(corps, ip) {
   const r = await reglages();

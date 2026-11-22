@@ -178,7 +178,8 @@ const MENUS = [
     ["Me mettre en conformité AI Act", '/formation-ia-obligatoire-ai-act.html'],
     ["Me former, je suis indépendant", '/formation-ia-independant.html'],
   ], null],
-  ['/integrations-ia.html', 'Intégrations IA', [
+  ['/developpement-application-sur-mesure.html', 'Développement', [
+    ["Développer mon application sur mesure", '/developpement-application-sur-mesure.html'],
     ["Créer mon chatbot client", '/integration-chatbot-client.html'],
     ["Automatiser ma prospection LinkedIn", '/integration-prospection-linkedin.html'],
     ["Répondre à mes emails automatiquement", '/integration-reponse-email.html'],
@@ -186,7 +187,7 @@ const MENUS = [
     ["Produire mon contenu SEO", '/integration-contenu-seo.html'],
     ["Surveiller mes concurrents", '/integration-veille-concurrentielle.html'],
     ["Automatiser mes rapports d'activité", '/integration-rapport-performance.html'],
-  ], ['Voir toutes les intégrations', '/integrations-ia.html']],
+  ], ['Voir toutes les intégrations IA', '/integrations-ia.html']],
   ['/meilleures-ia.html', 'Meilleures IA', [
     ["Goodweek : toutes les IA réunies", '/partenaire-goodweek.html'],
     ["Skills IA gratuits pour mon métier", '/skills-ia-gratuits.html'],
@@ -213,7 +214,7 @@ html += '<button class="hamburger" id="hamburger" aria-label="Menu"><span></span
 html += '</div>';
 html += '</div>';
 html += '<div class="mobile-menu" id="mobile-menu">';
-html += '<a href="/formation-ia-entreprise.html">Formations IA</a><a href="/formation-claude-entreprise.html">Formation Claude</a><a href="/formation-chatgpt-entreprise.html">Formation ChatGPT</a><a href="/formation-ia-independant.html">Formation indépendants</a><a href="/integrations-ia.html">Intégrations IA</a><a href="/meilleures-ia.html">Meilleures IA</a><a href="/skills-ia-gratuits.html">Skills IA gratuits</a><a href="/nos-formateurs.html">Nos formateurs</a>';
+html += '<a href="/formation-ia-entreprise.html">Formations IA</a><a href="/formation-claude-entreprise.html">Formation Claude</a><a href="/formation-chatgpt-entreprise.html">Formation ChatGPT</a><a href="/formation-ia-independant.html">Formation indépendants</a><a href="/developpement-application-sur-mesure.html">Développement</a><a href="/integrations-ia.html">Intégrations IA</a><a href="/meilleures-ia.html">Meilleures IA</a><a href="/skills-ia-gratuits.html">Skills IA gratuits</a><a href="/nos-formateurs.html">Nos formateurs</a>';
 html += '<a href="/quel-est-mon-opco.html">Mon budget formation</a>';
 html += '<a href="/blog.html">Blog</a><a href="/apropos.html">À propos</a>';
 html += '<a href="mailto:contact@ia-entrepreneur.fr">Écrire un email</a>';
