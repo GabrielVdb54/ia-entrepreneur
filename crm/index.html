@@ -1066,7 +1066,6 @@ function rendre() {
   else if (S.vue === 'satisfaction') vue.innerHTML = vueSatisfaction();
   else vue.innerHTML = vueJour();
   chargerLogos();
-  if (S.vue === 'jour' && !S.q) setTimeout(recosEnFond, 300);
 }
 
 function carte(l, { compacte = false } = {}) {
@@ -2996,8 +2995,8 @@ function blocRecap(l, { compact = false } = {}) {
     ${r.recommandation && r.recommandation.quoi ? `<div class="reco reco-recap"><p><b>Recommandé${r.recommandation.canal ? ` (${esc(LIB_CANAL_RECO[r.recommandation.canal] || r.recommandation.canal)})` : ''} :</b> ${esc(r.recommandation.quoi)}</p>${r.recommandation.pourquoi ? `<p class="pourquoi">Pourquoi : ${esc(r.recommandation.pourquoi)}</p>` : ''}</div>` : r.prochaine_etape ? `<p><b>Ensuite :</b> ${esc(r.prochaine_etape)}</p>` : ''}
   </section>`;
 }
-// La tâche recommandée, avec le pourquoi, sur chaque relance (Gabriel, 09/11). Elle vient du récap de Claude,
-// refait en fond quand il y a du nouveau dans les échanges.
+// La tâche recommandée, avec le pourquoi, sur chaque relance (Gabriel, 09/11). Elle vient du récap de Claude, refait
+// à l'ouverture de la fiche ou dans Enchaîner quand il y a du nouveau (plus en fond depuis le 23/11 : trop cher).
 const LIB_CANAL_RECO = { appel: 'appel', email: 'email', sms: 'SMS', linkedin: 'LinkedIn', rdv: 'rendez-vous', attendre: 'attendre', autre: 'autre' };
 function blocReco(l) {
   if (!l.prochaine_relance || l.archive) return '';
@@ -3006,45 +3005,19 @@ function blocReco(l) {
   const maj = S.recapEnCours.has(l.id) ? ' <span class="meta">(mise à jour…)</span>' : '';
   return `<div class="reco"><p><b>Recommandé${r.canal ? ` (${esc(LIB_CANAL_RECO[r.canal] || r.canal)})` : ''} :</b> ${esc(r.quoi)}${maj}</p>${r.pourquoi ? `<p class="pourquoi">Pourquoi : ${esc(r.pourquoi)}</p>` : ''}</div>`;
 }
-// En fond, à l'affichage du jour : les relances dues puis celles de la semaine dont le récap manque ou date.
-S.recosEnFond = false;
-S.recosFaits = 0; // 25 récaps en fond au plus par visite (la limite de Claude est partagée avec les rédactions)
-async function recosEnFond() {
-  if (!D.ia || S.recosEnFond || S.recosFaits >= 25) return;
-  S.recosEnFond = true;
-  try {
-    const t = aujourdhui();
-    const fin = ajouterJours(t, 7);
-    const cibles = D.leads
-      .filter((l) => !l.archive && l.prochaine_relance && l.prochaine_relance <= fin && activitesDe(l.id).length && recapPerime(l) && !S.recapTente.has(l.id))
-      .sort((a, b) => (a.prochaine_relance < b.prochaine_relance ? -1 : 1))
-      .slice(0, 25 - S.recosFaits);
-    for (const l of cibles) {
-      if (S.recapEnCours.size) await new Promise((ok) => setTimeout(ok, 500));
-      S.recosFaits++;
-      await faireRecap(l.id, { auto: true, fond: true });
-      const carteEl = $(`#vue .carte[data-id="${l.id}"]`);
-      const maj = IDX.lead.get(l.id);
-      if (carteEl && maj && S.vue === 'jour' && !S.q) carteEl.outerHTML = carte(maj);
-    }
-  } finally {
-    S.recosEnFond = false;
-  }
-}
 function majRecaps(leadId) {
   if (S.fiche === leadId) rendreFiche();
   const z = $(`#session [data-recap="${leadId}"]`);
   const l = IDX.lead.get(leadId);
   if (z && l) z.outerHTML = blocRecap(l, { compact: true });
 }
-async function faireRecap(leadId, { auto = false, fond = false } = {}) {
+async function faireRecap(leadId, { auto = false } = {}) {
   if (!D.ia || S.recapEnCours.has(leadId)) return;
   S.recapEnCours.add(leadId);
   S.recapTente.add(leadId);
   majRecaps(leadId);
   try {
-    // fond : récap des relances à venir lancé en arrière-plan, compté à part dans le relevé de consommation.
-    const r = await api('POST', fond ? { op: 'recap', lead_id: leadId, fond: true } : { op: 'recap', lead_id: leadId });
+    const r = await api('POST', { op: 'recap', lead_id: leadId });
     remplacerLead(r.lead);
     indexer();
   } catch (e) {

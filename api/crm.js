@@ -1342,6 +1342,8 @@ const SCHEMA_TRI = {
 
 const CONSIGNES_TRI = `Tu tries la boîte mail professionnelle de Gabriel Vanderbecken (gabriel@ia-entrepreneur.fr), fondateur d'IA-Entrepreneur : un organisme de formation à l'IA pour les entreprises (formations en intra, financées par les OPCO, sous-traitance pour d'autres organismes de formation, partenariats). Son CRM personnel suit ses prospects, clients, partenaires, fournisseurs et formateurs (il recrute et fait travailler des formateurs indépendants). Pour chaque email reçu, tu décides ce qu'il en fait. Gabriel compte sur toi pour ne rien rater et ne pas encombrer son CRM.
 
+La liste des leads n'est pas toute la base : elle donne les relations suivies (clients, partenaires, fournisseurs, formateurs, prospects avancés) et, pour ces emails, les leads qui leur ressemblent (même adresse, même domaine, même nom, entreprise citée). Un email qui ne concerne aucun lead de la liste n'est rattaché à rien.
+
 action :
 - rattacher : l'email concerne un lead de la liste. lead_id = son id, copié de la liste, jamais inventé. C'est le cas quand l'expéditeur est un contact du lead, travaille dans la même structure (même domaine, collègue, assistante, parent qui répond à sa place), ou quand l'email porte clairement sur ce client ou ce partenaire (un formateur qui parle de sa mission chez ce client, par exemple). Les candidats proposés sont des pistes : vérifie avec le contenu, un même domaine peut cacher une notification sans rapport. Un email « déjà rattaché » reste rattaché à ce lead.
 - a_trier : une relation utile qui n'est pas encore dans le CRM : demande de formation ou de devis, entreprise intéressée, partenaire ou prescripteur qui propose quelque chose d'utile, formateur qui se propose ou envoie son CV, fournisseur avec qui il travaille. Remplis type, entreprise, prenom et nom si tu les vois.
@@ -1371,16 +1373,58 @@ const resumeAnalyse = (d) => ({
   resume: couper(d.resume, 600), raison: couper(d.raison, 300), type: d.type || '', entreprise: couper(d.entreprise, 160), prenom: couper(d.prenom, 80), nom: couper(d.nom, 80), le: new Date().toISOString(),
 });
 
+// Le tri ne reçoit plus toute la base (23/11/2026). La limite de 30 $ du workspace Claude a été atteinte : chaque
+// passage envoyait les 462 leads et 526 contacts (~65 000 tokens, jusqu'à 0,29 $ le tri, 54 % de la dépense du mois),
+// et la liste grossissait à chaque import de la prospection email. Il reçoit maintenant :
+// - les relations suivies, dont un tiers peut parler dans un email (tout ce qui n'est pas un prospect, et les prospects
+//   à partir de « qualifié ») ;
+// - pour chaque email du paquet, les leads qui lui ressemblent : celui du fil ou de l'adresse, les candidats (adresse
+//   partagée, domaine, même nom), et ceux dont le nom d'entreprise est écrit dans l'email.
+// Un prospect froid qui répond est reconnu par son adresse ou son domaine, comme avant.
+const MODELE_TRI = 'claude-sonnet-5-5'; // la moitié du prix d'Opus 5.5 pour un tri (Gabriel, 23/11)
+const ETAPES_SUIVIES_TRI = new Set(['qualifie', 'proposition', 'negociation', 'gagne']);
+const suiviPourTri = (l) => !l.archive && (l.type !== 'prospect' || ETAPES_SUIVIES_TRI.has(l.statut));
+const MAX_CITES_TRI = 8; // par email : un nom d'entreprise banal ne fait pas revenir la base entière
+// Le nom de chaque lead sans forme juridique ni mot du métier (« SARL Dupont Couverture » : « dupont couverture »),
+// 5 lettres au moins, du plus long au plus court pour garder les plus précis quand un email en cite beaucoup.
+function nomsPourTri(ann) {
+  return ann.leads.map((l) => ({ id: l.id, cle: motsDe(l.entreprise).filter((m) => !FORMES_JURIDIQUES.has(m)).join(' ') }))
+    .filter((x) => x.cle.replace(/ /g, '').length >= 5)
+    .sort((a, b) => b.cle.length - a.cle.length);
+}
+function leadsCitesDans(noms, r) {
+  const texte = ` ${motsDe([r.de?.nom, r.objet, r.texte, r.complet].filter(Boolean).join(' ')).join(' ')} `;
+  const ids = [];
+  for (const x of noms) {
+    if (texte.includes(` ${x.cle} `)) ids.push(x.id);
+    if (ids.length >= MAX_CITES_TRI) break;
+  }
+  return ids;
+}
+function leadsPourTri(ann, paquet, noms) {
+  const ids = new Set(ann.leads.filter(suiviPourTri).map((l) => l.id));
+  for (const r of paquet) {
+    if (r.contact?.lead_id) ids.add(r.contact.lead_id);
+    for (const c of r.candidats || []) ids.add(c.lead_id);
+    for (const id of leadsCitesDans(noms, r)) ids.add(id);
+  }
+  return ann.leads.filter((l) => ids.has(l.id));
+}
+
 async function analyserEmails(items, ann) {
   const decisions = new Map();
   if (!process.env.ANTHROPIC_API_KEY || !items.length) return decisions;
   const jourSemaine = new Intl.DateTimeFormat('fr-FR', { timeZone: 'Europe/Paris', weekday: 'long' }).format(new Date());
-  const lignesLeads = ann.leads.map((l) => [l.id, l.entreprise, `${l.type}, ${l.statut}${l.archive ? ', archivé' : ''}`,
+  const ligneLead = (l) => [l.id, l.entreprise, `${l.type}, ${l.statut}${l.archive ? ', archivé' : ''}`,
     (ann.parLead.get(l.id) || []).map((c) => `${nomDe(c) || '?'}${c.email ? ` <${c.email}>` : ''}`).join(' ; '),
-    [l.besoin ? `sujet : ${couper(l.besoin, 120)}` : '', l.prochaine_note ? couper(l.prochaine_note, 140) : ''].filter(Boolean).join(' ; ')].join(' | ')).join('\n');
+    [l.besoin ? `sujet : ${couper(l.besoin, 120)}` : '', l.prochaine_note ? couper(l.prochaine_note, 140) : ''].filter(Boolean).join(' ; ')].join(' | ');
+  const noms = nomsPourTri(ann);
   const client = new Anthropic({ timeout: 40000, maxRetries: 1 });
   for (let i = 0; i < items.length; i += 10) {
     const paquet = items.slice(i, i + 10);
+    const leadsPaquet = leadsPourTri(ann, paquet, noms);
+    const idsPaquet = new Set(leadsPaquet.map((l) => l.id));
+    const lignesLeads = leadsPaquet.map(ligneLead).join('\n');
     const emails = paquet.map((r) => [
       `--- ref : ${r.ref}`,
       `De : ${r.de.nom ? `${r.de.nom} ` : ''}<${r.de.email}>`,
@@ -1395,10 +1439,10 @@ async function analyserEmails(items, ann) {
       couper(r.texte, 2500),
       r.complet && r.complet !== r.texte ? `Message transféré, en entier :\n${couper(r.complet, 3000)}` : '',
     ].filter(Boolean).join('\n')).join('\n\n');
-    const contenu = `Date du jour : ${aujourdHuiParis()} (${jourSemaine})\n\nLeads du CRM (id | entreprise | type, étape | contacts | prévu) :\n${lignesLeads}\n\nEmails à trier :\n${emails}`;
+    const contenu = `Date du jour : ${aujourdHuiParis()} (${jourSemaine})\n\nLeads du CRM utiles pour ces emails (id | entreprise | type, étape | contacts | prévu) :\n${lignesLeads || 'aucun'}\n\nEmails à trier :\n${emails}`;
     try {
       const r = await client.beta.messages.create({
-        model: MODELE_REDACTION,
+        model: MODELE_TRI,
         max_tokens: 8000,
         output_config: { effort: 'low', format: { type: 'json_schema', schema: SCHEMA_TRI } },
         betas: ['server-side-fallback-2026-07-01'],
@@ -1412,7 +1456,7 @@ async function analyserEmails(items, ann) {
       const { decisions: ds } = JSON.parse(brut);
       for (const d of ds || []) {
         if (!paquet.some((x) => x.ref === d.ref)) continue;
-        if (d.action === 'rattacher' && !ann.ids.has(d.lead_id)) d.action = 'a_trier';
+        if (d.action === 'rattacher' && !idsPaquet.has(d.lead_id)) d.action = 'a_trier';
         decisions.set(d.ref, d);
       }
     } catch (e) {
@@ -2294,6 +2338,10 @@ const CONSIGNES_RECAP = `Tu fais, pour Gabriel Vanderbecken (fondateur d'IA-Entr
 N'invente rien : seulement ce qui est dans l'historique et les emails. Phrases courtes, en français, en tutoyant Gabriel (« tu lui as envoyé… »). Pas de formule.`;
 
 async function recapLead(corps) {
+  // Plus de récaps en fond (23/11/2026, limite de 30 $ atteinte : 201 récaps lancés par la page en 7 jours, 21 % de la
+  // dépense). Le récap se fait à l'ouverture d'une fiche, dans Enchaîner, ou sur demande. Refusé ici aussi, sans appeler
+  // Claude, pour les onglets restés ouverts sur l'ancienne page (elle ne montre rien quand un récap automatique échoue).
+  if (corps.fond === true) throw new Refus('recap_fond_coupe', 410);
   if (!process.env.ANTHROPIC_API_KEY) throw new Refus('ia_non_configuree', 503);
   if (!UUID_RE.test(corps.lead_id || '')) throw new Refus('id_invalide');
   const [{ lignes: ls }, { lignes: cs }, { lignes: acts }] = await Promise.all([
@@ -2344,8 +2392,8 @@ async function recapLead(corps) {
     if (e instanceof Anthropic.APIError) { console.error('crm recap', e.status, e.message); throw new Refus('ia_erreur', 502); }
     throw e;
   }
-  // « recap_fond » : relancé par la page en arrière-plan (jusqu'à 25 par visite) ; « recap » : demandé ou fiche ouverte.
-  await conso(corps.fond === true ? 'recap_fond' : 'recap', reponse);
+  // « recap » : demandé, fiche ouverte ou Enchaîner (« recap_fond », les récaps de fond, n'existe plus depuis le 23/11).
+  await conso('recap', reponse);
   if (reponse.stop_reason === 'refusal') throw new Refus('ia_refus', 422);
   let r;
   try { r = JSON.parse((reponse.content || []).filter((b) => b.type === 'text').map((b) => b.text).join('')); } catch { throw new Refus('ia_erreur', 502); }
