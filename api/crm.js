@@ -2093,6 +2093,7 @@ function nettoyerProgramme(c) {
   if (!programme.titre) throw new Refus('programme_invalide');
   return programme;
 }
+const LIMITE_IA_RE = /usage limit|spend(ing)? limit|credit balance|billing/i;
 async function appelClaude({ fonction = 'autre', consignes, schema, contenu, effort = 'low', max = 6000, timeout = 50000 }) {
   if (!process.env.ANTHROPIC_API_KEY) throw new Refus('ia_non_configuree', 503);
   const client = new Anthropic({ timeout, maxRetries: 1 });
@@ -2110,6 +2111,8 @@ async function appelClaude({ fonction = 'autre', consignes, schema, contenu, eff
   } catch (e) {
     if (e instanceof Anthropic.RateLimitError) throw new Refus('ia_trop_de_demandes', 429);
     if (e instanceof Anthropic.APIConnectionError) throw new Refus('ia_injoignable', 502);
+    // La limite de dépense du workspace (23/11/2026, 30 $ atteints) : dire pourquoi plutôt qu'« erreur ».
+    if (e instanceof Anthropic.APIError && LIMITE_IA_RE.test(String(e.message || ''))) { console.error('crm claude limite', e.status, e.message); throw new Refus('ia_limite', 503); }
     if (e instanceof Anthropic.APIError) { console.error('crm claude', e.status, e.message); throw new Refus('ia_erreur', 502); }
     throw e;
   }
@@ -2810,7 +2813,7 @@ const normeLi = (t) => String(t || '').replace(/\s+/g, ' ').trim();
 async function confianceLi() { return (await lireReglage('linkedin_confiance')) || { serie: 0, auto: false }; }
 
 // Un seul brouillon ouvert par personne : préparer le remplace ou le crée. Une invitation part seule.
-async function preparerLi(c, l, etape, texte, { claude = false } = {}) {
+async function preparerLi(c, l, etape, texte, { claude = false, fixe = false } = {}) {
   if (!PROFIL_LI_RE.test(c.linkedin || '')) throw new Refus('profil_linkedin_absent');
   if (!ETAPES_LI.includes(etape)) throw new Refus('valeur_invalide:etape');
   const type = etape === 'invitation' ? 'invitation' : 'message';
@@ -2822,7 +2825,8 @@ async function preparerLi(c, l, etape, texte, { claude = false } = {}) {
   let valeurs = { type, etape, texte: t, statut: 'brouillon', detail: null };
   if (claude) valeurs.texte_claude = t;
   if (etape === 'invitation') valeurs = { ...valeurs, texte: null, statut: 'a_envoyer', valide_le: maintenant, detail: 'Invitation automatique, sans note.' };
-  else if (claude && t && ETAPES_AUTO_LI.includes(etape) && (await confianceLi()).auto) {
+  // Le dernier message en texte fixe suit l'envoi automatique comme un texte de Claude (il a passé raisonArretLi).
+  else if ((claude || fixe) && t && ETAPES_AUTO_LI.includes(etape) && (await confianceLi()).auto) {
     try {
       verifierTexteLi(etape, t);
       valeurs = { ...valeurs, statut: 'a_envoyer', valide_le: maintenant, detail: 'Envoi automatique : 10 messages validés tels quels d\'affilée.' };
@@ -2834,7 +2838,13 @@ async function preparerLi(c, l, etape, texte, { claude = false } = {}) {
 }
 
 // Claude rédige le texte de l'étape, d'après la fiche (Gabriel relit toujours avant l'envoi).
-const SCHEMA_LI = { type: 'object', additionalProperties: false, properties: { texte: { type: 'string' }, appuis: { type: 'array', items: { type: 'string' } } }, required: ['texte', 'appuis'] };
+// proposer / raison : la relecture de Claude lui-même (Gabriel, 24/11/2026 : « je veux que tu te relises : si c'est pour faire
+// une mauvaise relance, une erreur ou quoi que ce soit, tu proposes pas »). Faux = rien n'est proposé, la raison va dans la tâche.
+const SCHEMA_LI = {
+  type: 'object', additionalProperties: false,
+  properties: { proposer: { type: 'boolean' }, raison: { type: 'string' }, texte: { type: 'string' }, appuis: { type: 'array', items: { type: 'string' } } },
+  required: ['proposer', 'raison', 'texte', 'appuis'],
+};
 const CONSIGNES_LI = `Tu écris, pour Gabriel Vanderbecken (IA-Entrepreneur, organisme de formation à l'IA pour les entreprises, en Lorraine et dans le Grand Est), un message LinkedIn à une personne de petite entreprise (1 à 99 salariés), souvent dirigeante, qu'il ne connaît pas ou peu. Le message part sous son nom, il le relit avant l'envoi.
 
 Selon l'étape :
@@ -2860,6 +2870,15 @@ Règles :
 - N'invente rien : seulement les faits de la fiche et de l'historique. Sans fait assez fort pour un message vraiment personnalisé, écris un message général assumé, construit sur son métier (Gabriel l'accepte) : ne force jamais un fait faible (la ville seule, un vieux post) pour avoir l'air de connaître la personne.
 - Le fait du temps 1 porte sur leur activité : ce qu'ils font, leurs clients, leurs chantiers ou interventions, un service, une croissance récente (recrutements, nouvelle agence), un post. Jamais l'ancienneté (« depuis plus de trente ans »), l'effectif ou la taille (« une entreprise de plus de vingt salariés »), l'adresse ou la ville comme argument (Gabriel, 18/11 : « votre cabinet existe depuis 1989 c'est de la merde. mets de meilleurs arguments qui concerne plutot son activité »). Exemple qui marche : « Sur votre profil, vous présentez ACROTIR avec ses 7 agences et plus de 1 000 interventions par an. Avec ce volume, la préparation des devis et des rapports d'intervention prend sûrement une bonne part du temps des équipes. »
 - Pas de tiret long, pas d'emoji, pas de point d'exclamation.
+
+Relis-toi avant de rendre (Gabriel, 24/11/2026 : « si c'est pour faire une mauvaise relance, une erreur ou quoi que ce soit, tu proposes pas »). Mets proposer à faux, texte vide et la raison en une phrase courte si, d'après la fiche et l'historique :
+- la personne a déjà répondu, par n'importe quel canal (email, appel, LinkedIn), ou un rendez-vous est pris ou a eu lieu : la séquence n'a plus lieu d'être ;
+- ce n'est plus un prospect à froid (client, partenaire, formateur, fournisseur, lead passé à « qualifié » ou plus loin), sauf à l'étape reponse ;
+- la fiche dit qu'il ne faut pas lui écrire (déjà prospecté avec Clindit, « à retirer », filiale d'un grand groupe, désinscription, refus) ;
+- le message répéterait presque mot pour mot un message déjà envoyé, ou contredirait ce qui a été dit ;
+- le prénom, l'entreprise ou le métier de la fiche ne collent pas entre eux (fiche douteuse) ;
+- ton texte enfreint une règle ci-dessus et tu ne peux pas le corriger.
+Sinon proposer à vrai et raison vide. Dans le doute sur un fait, n'en parle pas plutôt que de ne rien proposer.
 appuis : les faits de la fiche que tu as utilisés, en quelques mots chacun, avec leur source et leur date si elle est connue (« post sur les 10 ans du cabinet, il y a 5 semaines »). Si tu as donné la page métier, ajoute « page métier : <métier> » ; si tu l'as écartée, dis pourquoi en quelques mots. De même à l'étape findia : « skill : <métier> », ou pourquoi tu as gardé FindIA.`;
 async function redigerLi(c, l, etape, { consigne = '', message = '' } = {}) {
   const { lignes: acts } = await sb(`iae_crm_activites?lead_id=eq.${l.id}&order=date.desc&limit=12&select=date,type,resume,contenu`);
@@ -2872,6 +2891,7 @@ async function redigerLi(c, l, etape, { consigne = '', message = '' } = {}) {
     `Étape : ${etape}`,
     `Personne : ${nomContactLi(c)}${c.poste ? `, ${c.poste}` : ''}`,
     `Entreprise : ${l.entreprise}${l.secteur ? ` (${l.secteur})` : ''}${l.localisation ? `, ${l.localisation}` : ''}`,
+    `Fiche : ${l.type || 'prospect'}, étape « ${l.statut || 'nouveau'} »${(l.tags || []).length ? `, étiquettes ${l.tags.join(', ')}` : ''}`,
     l.besoin ? `Ce que Gabriel sait de leur besoin : ${couper(l.besoin, 600)}` : '',
     page ? `Page métier (métier : ${page.metier}) : ${page.url}` : '',
     skill ? `Skill du métier (métier : ${skill.metier}) : un skill qui ${skill.quoi} : ${skill.url}` : '',
@@ -2882,14 +2902,70 @@ async function redigerLi(c, l, etape, { consigne = '', message = '' } = {}) {
     acts.length ? `Historique (du plus récent au plus ancien) :\n${acts.map((a) => `- ${String(a.date).slice(0, 10)} ${a.type} : ${couper(a.resume, 200)}${a.contenu && a.type === 'linkedin' ? ` | texte : ${couper(a.contenu, 500)}` : ''}`).join('\n')}` : '',
   ].filter(Boolean).join('\n');
   const r = await appelClaude({ fonction: 'linkedin', consignes: CONSIGNES_LI, schema: SCHEMA_LI, contenu: fiche, max: 2000, timeout: 40000 });
-  return { texte: String(r.texte || '').trim(), appuis: (r.appuis || []).slice(0, 6) };
+  // Un ancien faux Claude (banc) sans « proposer » : on propose, comme avant.
+  if (r.proposer === false) return { texte: '', appuis: [], proposer: false, raison: couper(String(r.raison || '').replace(/\s+/g, ' ').trim(), 300) || 'Claude ne le juge pas utile.' };
+  return { texte: String(r.texte || '').trim(), appuis: (r.appuis || []).slice(0, 6), proposer: true, raison: '' };
 }
+
+// Dernier message (étape findia) : texte fixe, sans Claude, comme la relance 2 par email (Gabriel, 24/11/2026 : « les messages
+// linkedin sont pas prérédigés » ; l'API du site était coupée depuis la veille, limite de dépense atteinte, et les 10 derniers
+// messages du matin étaient restés vides). Le skill du métier quand l'activité de l'entreprise est ce métier, sinon FindIA.
+// Le secteur saisi décide d'abord : FVP Courtage (courtier en prêts, étiqueté « assurance ») garde FindIA, alors que son
+// besoin cite « courtage en assurance ». Sans secteur, la règle de la page métier (étiquettes, nom, besoin).
+function ressourceFinLi(l) {
+  const secteur = String(l?.secteur || '').trim();
+  const p = secteur ? pageMetierLi({ secteur, entreprise: l.entreprise }) : pageMetierLi(l);
+  return p?.skill ? { quoi: p.skill.quoi, url: p.skill.url, metier: p.metier } : { findia: true, url: 'https://ia-entrepreneur.fr/meilleures-ia.html' };
+}
+function texteFinLi(c, l) {
+  const x = ressourceFinLi(l);
+  const prenom = String(c?.prenom || '').trim();
+  const ligne = x.findia
+    ? `Je vous laisse FindIA, l'outil gratuit du site qui dit quelle IA choisir pour quelle tâche : ${x.url}`
+    : `Je vous laisse un outil gratuit : un skill qui ${x.quoi}, à installer dans Claude ou à copier dans ChatGPT : ${x.url}`;
+  const signe = estAdmin() ? 'Gabriel' : utilisateurCourant().prenom || 'Gabriel';
+  return `Bonjour${prenom ? ` ${prenom}` : ''}, je ne vous relancerai plus après ce message. ${ligne}\n${signe}`;
+}
+
+// Avant de préparer un message tout seul : ce que la base dit déjà, sans Claude (Gabriel, 24/11/2026 : « tu proposes pas »
+// une mauvaise relance). Une réponse ou un échange par un autre canal depuis le début de la séquence, un lead qui n'est plus
+// un prospect à froid, une consigne de ne plus écrire. Renvoie la raison, ou null.
+async function raisonArretLi(l, c, etape) {
+  if (etape === 'reponse') return null;
+  if (!l || l.archive || l.statut === 'perdu') return 'le lead est archivé ou perdu';
+  const tags = (l.tags || []).map((t) => String(t).toLowerCase());
+  if (tags.includes('deja-prospecte-clindit')) return 'déjà prospecté avec Clindit, on ne lui écrit plus';
+  if (tags.includes('a-retirer') || tags.includes('opposition')) return 'la fiche dit de ne plus lui écrire';
+  if (l.type && l.type !== 'prospect') return `ce n'est plus un prospect (${l.type})`;
+  if (!['nouveau', 'contacte'].includes(l.statut)) return `le lead est passé à l'étape « ${l.statut} »`;
+  const { lignes: debut } = await sb(`iae_crm_linkedin?contact_id=eq.${c.id}&order=created_at.asc&limit=1&select=created_at`);
+  const depuis = debut[0]?.created_at || null;
+  const { lignes: acts } = await sb(`iae_crm_activites?lead_id=eq.${l.id}&type=in.(email_recu,appel,rdv,linkedin)${depuis ? `&date=gte.${encodeURIComponent(depuis)}` : ''}&select=type,meta&limit=200`);
+  const a = acts.find((x) => x.type !== 'linkedin' || x.meta?.etape === 'reponse_recue');
+  return a ? { email_recu: 'il a répondu par email', appel: 'un appel a abouti', rdv: 'un rendez-vous est noté', linkedin: 'il a répondu sur LinkedIn' }[a.type] : null;
+}
+
+// Prépare le message d'une étape : texte fixe pour le dernier message, Claude pour les autres. Rien n'est proposé quand la base
+// ou la relecture de Claude dit non : { refus } (l'appelant écrit la tâche). Claude en panne : brouillon vide, avec la raison.
 async function preparerAvecClaude(c, l, etape, opts) {
-  let texte = null;
-  try { texte = (await redigerLi(c, l, etape, opts)).texte || null; } catch (e) { console.error('crm linkedin rédaction', e.code || e.message); }
+  const arret = await raisonArretLi(l, c, etape);
+  if (arret) return { refus: arret };
+  if (etape === 'findia') return { action: await preparerLi(c, l, etape, texteFinLi(c, l), { fixe: true }) };
+  let r = null;
+  let panne = null;
+  try { r = await redigerLi(c, l, etape, opts); } catch (e) { panne = e; console.error('crm linkedin rédaction', e.code || e.message); }
+  if (r && r.proposer === false) return { refus: r.raison };
+  const texte = r?.texte || null;
   try { if (texte) verifierTexteLi(etape, texte); } catch { /* Gabriel corrige : le texte reste en brouillon */ }
-  return preparerLi(c, l, etape, texte, { claude: Boolean(texte) });
+  let action = await preparerLi(c, l, etape, texte, { claude: Boolean(texte) });
+  if (!texte && action?.statut === 'brouillon') {
+    const pourquoi = panne?.code === 'ia_limite' ? "l'API Claude du site est coupée (limite de dépense du mois atteinte)" : panne ? "Claude n'a pas répondu" : 'Claude a rendu un texte vide';
+    action = (await majActionLi(action.id, { detail: `Pas de texte : ${pourquoi}. Écris-le toi-même, ou demande « LinkedIn du jour » à Claude Code.` })) || action;
+  }
+  return { action };
 }
+// La tâche d'un lead quand rien n'est proposé.
+const noteRefusLi = (c, etape, raison) => `LinkedIn : rien de proposé pour ${LIB_ETAPE_LI[etape].toLowerCase()} à ${c.prenom || nomContactLi(c)}, ${String(raison).replace(/[.\s]+$/, '')}. Si tu veux quand même lui écrire, ouvre LinkedIn sur la fiche.`;
 
 async function operationLinkedin(corps, ip) {
   const op = corps.op;
@@ -2910,6 +2986,9 @@ async function operationLinkedin(corps, ip) {
       const { lignes } = await sb(`iae_crm_activites?lead_id=eq.${l.id}&type=eq.linkedin&meta->>etape=eq.reponse_recue&order=date.desc&limit=1&select=contenu`);
       message = lignes[0]?.contenu || c.linkedin_vu || '';
     }
+    // Le dernier message est un texte fixe (24/11/2026) : il ne passe pas par Claude.
+    if (etape === 'findia') return { texte: texteFinLi(c, l), appuis: [], proposer: true, raison: '', fixe: true };
+    // Relu par Claude : s'il ne propose rien, la page le dit au lieu de remplir le message.
     return redigerLi(c, l, etape, { consigne: String(corps.consigne || ''), message });
   }
   const a = await actionLi(corps.id);
@@ -2919,7 +2998,8 @@ async function operationLinkedin(corps, ip) {
     // La confiance : des messages de Claude validés tels quels, d'affilée. Un texte modifié remet le compteur à zéro.
     // Un renvoi après un échec du Mac, texte inchangé, ne compte pas une deuxième fois.
     let confiance = null;
-    if (a.type === 'message' && ETAPES_AUTO_LI.includes(a.etape) && (a.statut === 'brouillon' || normeLi(texte) !== normeLi(a.texte))) {
+    // Le dernier message est un texte fixe : il ne dit rien de la qualité des rédactions de Claude, il ne compte pas.
+    if (a.type === 'message' && ETAPES_AUTO_LI.includes(a.etape) && a.etape !== 'findia' && (a.statut === 'brouillon' || normeLi(texte) !== normeLi(a.texte))) {
       const avant = await confianceLi();
       const telQuel = Boolean(a.texte_claude) && normeLi(texte) === normeLi(a.texte_claude);
       const serie = telQuel ? (avant.serie || 0) + 1 : 0;
@@ -2962,9 +3042,9 @@ async function appliquerEnvoiLi(a, { detail = '', statutMcp = '', resultat = nul
   if (a.type === 'invitation') {
     if (statutMcp === 'already_connected') {
       await majContactLi(c.id, { linkedin_etat: 'relation', linkedin_le: new Date().toISOString(), linkedin_compte: a.compte || ADMIN_EMAIL });
-      await journalLi(l, c, 'acceptee', `${nomContactLi(c)} est déjà dans tes relations LinkedIn : pas d'invitation, le message 1 est prêt`);
-      await preparerAvecClaude(c, l, 'message');
-      await majLeadLi(l.id, { prochaine_relance: jour, prochaine_action: 'autre', prochaine_note: `LinkedIn : ${prenom} est déjà dans tes relations. Message 1 prêt à valider.` });
+      const p = await preparerAvecClaude(c, l, 'message');
+      await journalLi(l, c, 'acceptee', `${nomContactLi(c)} est déjà dans tes relations LinkedIn : pas d'invitation, ${p.refus ? `pas de message 1 (${p.refus})` : 'le message 1 est prêt'}`);
+      await majLeadLi(l.id, { prochaine_relance: jour, prochaine_action: 'autre', prochaine_note: p.refus ? noteRefusLi(c, 'message', p.refus) : `LinkedIn : ${prenom} est déjà dans tes relations. Message 1 prêt à valider.` });
       return { action };
     }
     await majContactLi(c.id, { linkedin_etat: 'invitation_envoyee', linkedin_le: new Date().toISOString(), linkedin_compte: a.compte || ADMIN_EMAIL });
@@ -3144,8 +3224,8 @@ async function operationRobotLi(corps) {
       if (c.linkedin_etat !== 'invitation_envoyee' || !contactDuCompteLi(c)) continue;
       await majContactLi(c.id, { linkedin_etat: 'relation', linkedin_le: maintenant });
       await journalLi(l, c, 'acceptee', `${nomContactLi(c)} a accepté ton invitation LinkedIn (vu par ${machineLi()})`);
-      await preparerAvecClaude(c, l, 'message');
-      await majLeadLi(l.id, { prochaine_relance: aujourdHuiParis(), prochaine_action: 'autre', prochaine_note: `LinkedIn : ${c.prenom || nomContactLi(c)} a accepté ton invitation. Message 1 prêt à valider.`, relances_sans_reponse: 0 });
+      const p = await preparerAvecClaude(c, l, 'message');
+      await majLeadLi(l.id, { prochaine_relance: aujourdHuiParis(), prochaine_action: 'autre', prochaine_note: p.refus ? noteRefusLi(c, 'message', p.refus) : `LinkedIn : ${c.prenom || nomContactLi(c)} a accepté ton invitation. Message 1 prêt à valider.`, relances_sans_reponse: 0 });
       bilan.acceptes++;
     }
     for (const r of (corps.reponses || []).slice(0, 50)) {
@@ -3161,9 +3241,9 @@ async function operationRobotLi(corps) {
       await sb(`iae_crm_linkedin?contact_id=eq.${c.id}&statut=in.(brouillon,a_envoyer)&etape=in.(message,relance,findia)`, { methode: 'PATCH', corps: { statut: 'annule', detail: 'Il a répondu : la séquence s\'arrête.' }, prefer: 'return=minimal' });
       // Un canal répond, l'autre s'arrête (12/11/2026) : l'email de prospection en attente ne part pas.
       await arreterEnvoisEnAttente(l.id, `${nomContactLi(c)} a répondu sur LinkedIn : l'email ne part pas.`, { linkedin: false }).catch((e) => console.error('crm arrêt croisé', e?.code || e?.message));
-      await preparerAvecClaude(c, l, 'reponse', { message: texte });
+      const p = await preparerAvecClaude(c, l, 'reponse', { message: texte });
       const anna = /anna/i.test(l.source || '');
-      await majLeadLi(l.id, { prochaine_relance: aujourdHuiParis(), prochaine_action: 'autre', prochaine_note: `LinkedIn : ${c.prenom || nomContactLi(c)} t'a répondu. Réponse proposée à relire.${anna ? ' Préviens Anna : elle a aussi cette entreprise dans ses listes.' : ''}`, relances_sans_reponse: 0, dernier_contact: aujourdHuiParis() });
+      await majLeadLi(l.id, { prochaine_relance: aujourdHuiParis(), prochaine_action: 'autre', prochaine_note: `LinkedIn : ${c.prenom || nomContactLi(c)} t'a répondu. ${p.refus ? `Pas de réponse proposée : ${String(p.refus).replace(/[.\s]+$/, '')}. Lis son message sur la fiche.` : 'Réponse proposée à relire.'}${anna ? ' Préviens Anna : elle a aussi cette entreprise dans ses listes.' : ''}`, relances_sans_reponse: 0, dernier_contact: aujourdHuiParis() });
       bilan.reponses++;
     }
     // Invitation sans réponse depuis 3 semaines : on la retire (à la main, aucun outil ne le fait) et on arrête.
@@ -3177,7 +3257,7 @@ async function operationRobotLi(corps) {
       bilan.a_retirer++;
     }
     await prevenirAnnaLi(bilan);
-    // Les suites du jour (relance, dernier message) sont rédigées par Claude, comme le message 1.
+    // Les suites du jour : la relance rédigée par Claude, comme le message 1 ; le dernier message en texte fixe (24/11/2026).
     bilan.suites = 0;
     const { lignes: relations } = await sb(`iae_crm_contacts?${filtreContactsLi()}&linkedin_etat=eq.relation&select=id,lead_id&limit=1000`);
     for (const r of relations) {
@@ -3189,7 +3269,14 @@ async function operationRobotLi(corps) {
       const { lignes: ouverts } = await sb(`iae_crm_linkedin?${filtreCompteLi()}&contact_id=eq.${r.id}&statut=in.(${OUVERTS_LI.join(',')})&select=id&limit=1`);
       if (ouverts.length) continue;
       const [c] = (await sb(`iae_crm_contacts?id=eq.${r.id}&select=*`)).lignes;
-      await preparerAvecClaude(c, l, etapeSuite);
+      const p = await preparerAvecClaude(c, l, etapeSuite);
+      // Rien de proposé : la tâche dit pourquoi (et ne commence plus par « LinkedIn : relancer / dernier message », donc
+      // le contrôle du lendemain ne recommence pas).
+      if (p.refus) {
+        await majLeadLi(l.id, { prochaine_note: noteRefusLi(c, etapeSuite, p.refus) });
+        await journalLi(l, c, 'autre', `LinkedIn : ${LIB_ETAPE_LI[etapeSuite].toLowerCase()} à ${nomContactLi(c)} non proposé, ${String(p.refus).replace(/[.\s]+$/, '')}`);
+        bilan.non_proposes = (bilan.non_proposes || 0) + 1;
+      }
       bilan.suites++;
     }
     await ecrireReglage('linkedin_robot', { ...etat, dernier_passage: maintenant, dernier_controle: aujourdHuiParis(), dernier_bilan: bilan });

@@ -440,7 +440,7 @@
   .vocal .saisie { display: flex; gap: 8px; }
   .vocal .saisie input { flex: 1; min-width: 0; border: 1px solid var(--line-strong); border-radius: 10px; padding: 9px 11px; }
   .btn-dictee { align-self: flex-start; }
-  .mode-vocal .session-actions :is([data-act="email"], [data-act="appel"], [data-act="sms"], [data-act="decaler"], [data-act="perdu"]) { display: none; }
+  .mode-vocal .session-actions :is([data-act="email"], [data-act="appel"], [data-act="sms"], [data-act="decaler"], [data-act="fait"], [data-act="perdu"]) { display: none; }
   .perso { border: 1px solid var(--line); background: var(--bg); border-radius: 12px; padding: 12px; display: flex; flex-direction: column; gap: 10px; }
   .perso-tete { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
   .perso .appuis { font-size: 13px; color: var(--muted); }
@@ -801,7 +801,7 @@ const ERREURS = {
   fichier_trop_lourd: 'Fichier trop lourd : 3,4 Mo au plus.',
   format_refuse: 'Format non accepté : PDF, JPEG ou PNG.',
   stockage_indisponible: "Le stockage des pièces ne répond pas. Réessaie dans un instant.",
-  piece_drive: 'Cette pièce est dans ton Drive : ouvre-la depuis la fiche.',
+  piece_drive: "Cette pièce est restée dans le Drive de Gabriel : lui seul peut l'ouvrir. Demande-lui de la copier dans le CRM.",
   google_erreur: "Gmail n'a pas répondu. Réessaie dans un instant.",
   introuvable: "Introuvable : il a peut-être été supprimé.",
   ia_trop_de_demandes: 'Beaucoup de rédactions en peu de temps : réessaie dans une minute.',
@@ -809,6 +809,7 @@ const ERREURS = {
   ia_erreur: "La rédaction n'a pas abouti. Réessaie, ou écris le message toi-même.",
   ia_refus: 'Claude a refusé de rédiger ce message. Écris-le toi-même.',
   ia_coupe: 'La rédaction a été coupée. Réessaie.',
+  ia_limite: "L'API Claude du site est coupée : la limite de dépense du mois est atteinte (console Anthropic, Limits). Écris le message toi-même, ou demande-le à Claude Code.",
   micro: "Le micro n'a rien entendu. Réessaie, ou écris la phrase.",
 };
 
@@ -1095,6 +1096,7 @@ function carte(l, { compacte = false } = {}) {
       ${sms ? '<button type="button" class="btn petit" data-act="sms">SMS</button>' : ''}
       ${contactsLi(l.id).length ? `<button type="button" class="btn petit${liAValider(l) || /^LinkedIn :/.test(l.prochaine_note || '') ? ' primaire' : ''}" data-act="linkedin">LinkedIn</button>` : ''}
       <button type="button" class="btn petit" data-act="appel">Noter un appel</button>
+      ${l.prochaine_relance || l.prochaine_note ? '<button type="button" class="btn petit" data-act="fait" title="Fait en dehors du CRM : noter et prévoir la suite">Fait</button>' : ''}
       <button type="button" class="btn petit" data-act="decaler">Décaler</button>
       ${suivant ? `<button type="button" class="btn petit" data-act="suivi-suivant">Étape suivante : ${esc(LIB_SUIVI[suivant])}</button>` : enSuivi(l) ? '' : '<button type="button" class="btn petit lien" data-act="perdu">Perdu</button>'}
     </div>`}
@@ -1319,6 +1321,7 @@ function rendreFiche() {
         <button type="button" class="btn${l.prochaine_action !== 'appel' ? ' primaire' : ''}" data-act="email">Écrire un email</button>
         ${mobileDe(l) ? '<button type="button" class="btn" data-act="sms">SMS</button>' : ''}
         <button type="button" class="btn" data-act="appel">Noter un appel</button>
+        ${l.prochaine_relance || l.prochaine_note ? '<button type="button" class="btn" data-act="fait">C\'est fait</button>' : ''}
         <button type="button" class="btn" data-act="decaler">Décaler la relance</button>
         <button type="button" class="btn" data-act="rdv">Prévoir un RDV</button>
         <button type="button" class="btn" data-act="reponse">Réponse reçue</button>
@@ -2314,6 +2317,8 @@ const lienDrive = (d) => (d && String(d.chemin || '').startsWith('drive:') ? `ht
 // « Télécharger » (18/11/2026, demande d'Anna) : la pièce arrive sous son nom, sans passer par un onglet.
 async function voirPiece(id, enregistrer = false) {
   const doc = (D.documents || []).find((x) => x.id === id);
+  // Une pièce restée dans le Drive de Gabriel : lui seul peut l'ouvrir (Anna, 24/11 : « les documents sont masqués »).
+  if (lienDrive(doc) && roleCrm() !== 'admin') { toast(ERREURS.piece_drive, 6000); return; }
   if (lienDrive(doc)) { window.open(lienDrive(doc), '_blank', 'noopener'); return; }
   if (enregistrer) {
     try {
@@ -3516,16 +3521,23 @@ function brancherLi(form) {
           if (z) { z.value = 'Claude rédige…'; z.disabled = true; }
           try {
             const d = await api('POST', { op: 'linkedin_rediger', contact_id: contactId, etape: b.dataset.liPreparer });
-            r = await api('POST', { op: 'linkedin_preparer', contact_id: contactId, etape: b.dataset.liPreparer, texte: d.texte, claude: true });
-            majLi(r.action);
+            // Relu par Claude (24/11/2026) : s'il ne le propose pas, on dit pourquoi et le message reste vide.
+            if (d.proposer === false) toast(`Rien de proposé : ${d.raison}`, 9000);
+            else {
+              r = await api('POST', { op: 'linkedin_preparer', contact_id: contactId, etape: b.dataset.liPreparer, texte: d.texte, claude: true });
+              majLi(r.action);
+            }
           } catch (e) { toast(e.message); }
         }
       } else if (b.hasAttribute('data-li-rediger')) {
         b.textContent = 'Claude rédige…';
         const a = actionsLi().find((x) => x.id === id);
         const d = await api('POST', { op: 'linkedin_rediger', contact_id: contactId, etape: a.etape });
-        const r = await api('POST', { op: 'linkedin_preparer', contact_id: contactId, etape: a.etape, texte: d.texte, claude: true });
-        majLi(r.action);
+        if (d.proposer === false) toast(`Rien de proposé : ${d.raison}`, 9000);
+        else {
+          const r = await api('POST', { op: 'linkedin_preparer', contact_id: contactId, etape: a.etape, texte: d.texte, claude: true });
+          majLi(r.action);
+        }
       } else if (b.hasAttribute('data-li-valider')) {
         b.textContent = 'Envoi…';
         const r = await api('POST', { op: 'linkedin_valider', id, texte: zone ? zone.value : null });
@@ -4495,6 +4507,53 @@ function ouvrirDecaler(leadId) {
         fermerModale();
         toast(p.prochaine_relance ? `Relance ${quand(p.prochaine_relance)}.` : 'Plus de relance prévue.', 3200, () => annulerAction(l.id, r.activite, avant));
         actionFaite(l.id, 'decale');
+      });
+    });
+  });
+}
+
+/* ----- Fait (retour d'Anna, 24/11/2026) -----
+   « Il manque un statut « Fait » pour les actions traitées en dehors de l'outil (par mail, par exemple). Actuellement, une
+   fois l'action effectuée, il faut annuler la relance plutôt que de pouvoir la marquer comme terminée. » La tâche entre dans
+   l'historique comme faite (comment, ce qui en ressort), et la suite est proposée dans 3 jours : annuler la relance faisait
+   sortir le dossier du radar (Dorian, Sina et Mathieu, formateurs au lien envoyé, n'avaient plus aucune relance). */
+const CANAUX_FAIT = [['email', 'Par email'], ['telephone', 'Par téléphone'], ['sms', 'Par SMS ou WhatsApp'], ['visio', 'En visio ou en personne'], ['autre', 'Autrement']];
+const tacheDuLead = (l) => (l.prochaine_note || '').trim() || (l.prochaine_action && l.prochaine_action !== 'autre' ? actionLue(l.prochaine_action) : '');
+function ouvrirFait(leadId) {
+  const l = IDX.lead.get(leadId);
+  const tache = tacheDuLead(l);
+  ouvrirModale(`
+    <h2>C'est fait</h2>
+    <p class="aide">${esc(l.entreprise)}. Pour une action faite en dehors du CRM (un email depuis ta boîte, un appel depuis ton téléphone…) : elle entre dans l'historique et tu prévois la suite.</p>
+    ${champ('Ce qui est fait', `<textarea name="quoi" required placeholder="Lien d'envoi du dossier envoyé par email…">${esc(tache)}</textarea>`)}
+    <fieldset><legend>Comment</legend><div class="puces" data-canal>${CANAUX_FAIT.map(([k, v], i) => `<button type="button" data-v="${k}" aria-pressed="${i === 0}">${esc(v)}</button>`).join('')}</div></fieldset>
+    ${champ('Ce qui en ressort (facultatif)', '<textarea name="note" placeholder="Il complète son dossier cette semaine, CV demandé…"></textarea>')}
+    ${blocProchaine('apres', dansJours(3), l.prochaine_action === 'appel' ? 'appel' : 'email', '', { aide: 'La suite : quand y revenir et pour quoi faire. « Aucune relance » seulement si tout est réglé.' })}
+    ${piedFormulaire('<button type="submit" class="btn primaire">Enregistrer</button>')}
+  `, (form) => {
+    brancherAnnuler(form);
+    brancherPuces(form, 'apres');
+    form.elements.apres_note.placeholder = 'Relancer s\'il n\'a pas répondu, vérifier qu\'il a complété son dossier…';
+    $$('[data-canal] button', form).forEach((b) => b.addEventListener('click', () => $$('[data-canal] button', form).forEach((x) => x.setAttribute('aria-pressed', String(x === b)))));
+    const avant = { prochaine_relance: l.prochaine_relance, prochaine_action: l.prochaine_action, prochaine_note: l.prochaine_note, dernier_contact: l.dernier_contact, tache_fil: l.tache_fil };
+    form.addEventListener('submit', (ev) => {
+      ev.preventDefault();
+      soumettre(form, async () => {
+        const el = form.elements;
+        const quoi = el.quoi.value.trim().replace(/\s+/g, ' ');
+        if (!quoi) throw new ErreurApi('Dis en quelques mots ce qui est fait.');
+        const canal = ($('[data-canal] [aria-pressed="true"]', form) || {}).dataset?.v || 'autre';
+        const note = el.note.value.trim().replace(/\s+/g, ' ');
+        const p = lireProchaine(form, 'apres');
+        const comment = (CANAUX_FAIT.find(([k]) => k === canal) || CANAUX_FAIT[4])[1].toLowerCase();
+        // Le fil de l'email à traiter est réglé : « Lire l'email à traiter » disparaît de la fiche.
+        const maj = { ...p, tache_fil: null };
+        if (canal !== 'autre' && (!l.dernier_contact || l.dernier_contact < aujourdhui())) maj.dernier_contact = aujourdhui();
+        const resume = `Fait ${comment}, hors CRM : ${quoi.replace(/[.\s]+$/, '')}${note ? `. ${note.replace(/[.\s]+$/, '')}` : ''}.`;
+        const r = await journal(l.id, { type: 'note', resume: resume.slice(0, 2000), source: 'crm', meta: { fait: true, canal, tache: tache || null } }, maj);
+        fermerModale();
+        toast(p.prochaine_relance ? `Noté comme fait. Suite ${quand(p.prochaine_relance)}.` : 'Noté comme fait. Plus de relance prévue.', 3200, () => annulerAction(l.id, r.activite, avant));
+        actionFaite(l.id, 'fait');
       });
     });
   });
@@ -5941,6 +6000,7 @@ function rendreSession() {
       <button type="button" class="btn" data-act="appel-rapide" data-resultat="barrage" aria-keyshortcuts="B">Barrage <kbd>B</kbd></button>` : ''}
       ${mobile ? '<button type="button" class="btn" data-act="sms" aria-keyshortcuts="S">SMS <kbd>S</kbd></button>' : ''}
       ${contactsLi(l.id).length ? `<button type="button" class="btn${liAValider(l) || /^LinkedIn :/.test(l.prochaine_note || '') ? ' primaire' : ''}" data-act="linkedin">LinkedIn</button>` : ''}
+      <button type="button" class="btn" data-act="fait" aria-keyshortcuts="F">Fait <kbd>F</kbd></button>
       <button type="button" class="btn" data-act="decaler">Décaler <kbd>D</kbd></button>
       ${enSuivi(l) && suivantDe(l.suivi) ? `<button type="button" class="btn" data-act="suivi-suivant">Étape suivante : ${esc(LIB_SUIVI[suivantDe(l.suivi)])}</button>` : '<button type="button" class="btn" data-act="perdu">Perdu</button>'}
       <button type="button" class="btn" data-act="ouvrir">Fiche</button>
@@ -6007,7 +6067,7 @@ $('#session').addEventListener('close', () => {
 document.addEventListener('keydown', (ev) => {
   if (!$('#session').open || $('#modale').open || $('#fiche').open || ev.metaKey || ev.ctrlKey || ev.altKey) return;
   if (ev.target.matches('input, textarea, select')) return;
-  const raccourcis = { e: '[data-act="email"]', a: '[data-act="appel"]', s: '[data-act="sms"]', d: '[data-act="decaler"]', p: '[data-sess="passer"]',
+  const raccourcis = { e: '[data-act="email"]', a: '[data-act="appel"]', s: '[data-act="sms"]', d: '[data-act="decaler"]', f: '[data-act="fait"]', p: '[data-sess="passer"]',
     j: '[data-resultat="pas_joint"]', m: '[data-resultat="message"]', b: '[data-resultat="barrage"]' };
   const sel = raccourcis[ev.key.toLowerCase()] || (ev.key === 'ArrowRight' ? '[data-sess="passer"]' : ev.key === 'ArrowLeft' ? '[data-sess="precedent"]' : null);
   const bouton = sel && $(`#session ${sel}`);
@@ -6539,6 +6599,7 @@ document.addEventListener('click', (ev) => {
     }
     case 'exporter-tableau': return exporterCsv(leadsDuTableau(), 'tableau');
     case 'decaler': return ouvrirDecaler(leadId);
+    case 'fait': return ouvrirFait(leadId);
     case 'rdv': return ouvrirRdv(leadId);
     case 'note': return ouvrirNote(leadId, 'note');
     case 'reponse': return ouvrirNote(leadId, 'email_recu');
