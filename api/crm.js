@@ -2797,6 +2797,39 @@ const PROFIL_IMPOSSIBLE_LI = {
   // Le MCP refuse l'adresse avant toute action (emoji dans /in/…, page qui n'est pas un profil) : rien n'est parti, Gabriel invite à la main.
   invalid_argument: (nom) => `LinkedIn : ${machineLi()} ne lit pas l'adresse du profil de ${nom}, rien n'est parti. Envoie l'invitation à la main depuis son profil (« Se connecter », sans note), puis clique « Je l'ai envoyé moi-même » sur la fiche.`,
 };
+// Gabriel, 24/11/2026 : « j'en ai plein où j'ai aucune solution proposée, du coup on fait quoi ? » Un profil sans
+// « Se connecter » (ou avec seulement « Suivre ») ne sera jamais invité, et ces dirigeants n'ont ni email ni téléphone
+// dans le CRM. Le lead passe donc à la prospection par email, comme un dirigeant introuvable sur LinkedIn (12/11) :
+// adresse du dirigeant cherchée par le circuit habituel, message rédigé, à valider dans « Emails à valider ».
+// Seulement pour les prospects de Gabriel (les emails partent de son adresse) ; sinon la tâche d'avant reste.
+const BASCULE_EMAIL_LI = new Set(['follow_only', 'connect_unavailable']);
+const DETAIL_BASCULE_LI = {
+  follow_only: "Son profil ne propose que « Suivre » : pas d'invitation possible. Le CRM passe par l'email (adresse du dirigeant en recherche, puis message à valider dans « Emails à valider »).",
+  connect_unavailable: "LinkedIn ne propose pas « Se connecter » sur ce profil. Le CRM passe par l'email (adresse du dirigeant en recherche, puis message à valider dans « Emails à valider »).",
+};
+async function basculerEmailLi(l, c, mcp) {
+  if (!BASCULE_EMAIL_LI.has(mcp) || !estAdmin() || !l || !c || l.type !== 'prospect' || l.archive || l.statut === 'perdu') return false;
+  if (normEmail(l.proprietaire || ADMIN_EMAIL) !== ADMIN_EMAIL) return false;
+  const { lignes: dejaEmail } = await sb(`iae_crm_emails?lead_id=eq.${l.id}&statut=in.(${[...EN_ATTENTE_EMAIL, 'en_cours', 'envoye'].join(',')})&select=id&limit=1`);
+  let email = null;
+  if (c.email && EMAIL_RE.test(normEmail(c.email)) && jugerAdresse(normEmail(c.email), [{ prenom: c.prenom, nom: c.nom, contact: true }], l.entreprise).ok) email = normEmail(c.email);
+  if (email && (await enOpposition(email))) return false;
+  const pourquoi = mcp === 'follow_only' ? 'son profil LinkedIn ne propose que « Suivre »' : 'LinkedIn ne propose pas « Se connecter » sur son profil';
+  if (!dejaEmail.length) {
+    const loc = String(l.localisation || '').match(/^(.*?)\s*\((\d{2,3}|2[AB])\)\s*$/i);
+    const salaries = (String(l.besoin || '').match(/\((\d+\s*à\s*\d+)\s+salariés\)/) || [])[1] || '';
+    const siren = String(l.siret || '').replace(/\D/g, '').slice(0, 9) || null;
+    await sb('iae_crm_emails', { methode: 'POST', prefer: 'return=minimal', corps: {
+      lead_id: l.id, contact_id: c.id, compte: ADMIN_EMAIL, etape: 'message', statut: email ? 'a_rediger' : 'a_enrichir', email, email_statut: email ? 'MANUEL' : null, source_email: email ? 'manuel' : null,
+      civilite: null, faits: { prospect: { siren, salaries, commune: loc ? loc[1] : (l.localisation || ''), dep: loc ? loc[2] : '', fonction: c.poste || '', recherche_linkedin: null, invitation_impossible: mcp } },
+    } });
+  }
+  const tags = [...new Set([...(l.tags || []).filter((t) => t !== 'actif-linkedin'), 'email'])];
+  const chezAnna = (l.tags || []).includes('liste-anna');
+  await majLeadLi(l.id, { tags, prochaine_relance: null, prochaine_action: 'autre', prochaine_note: `Email : ${pourquoi}, on passe par l'email. ${dejaEmail.length ? 'Un email est déjà prévu pour ce lead.' : `${email ? 'Adresse connue' : 'Adresse du dirigeant en cours de recherche'}, puis message rédigé par Claude, à valider dans « Emails à valider ».`}${chezAnna ? " Anna l'a aussi dans sa base : dès qu'un canal a une réponse, l'autre s'arrête." : ''}` });
+  await journalEmail(l, c, 'note', `Prospection email : ${nomContactLi(c)}, ${pourquoi}. ${dejaEmail.length ? 'Email déjà prévu.' : `${email ? 'Adresse connue' : 'Adresse à vérifier'}, puis message à valider.`}`, null, { etape: 'candidat' });
+  return true;
+}
 // La file d'invitations se vide : une ligne dans la barre LinkedIn et dans le récap de 7 h (une par jour, pas une tâche
 // par lead). À 0, seulement si une invitation est partie dans les 7 derniers jours : sinon la prospection est en pause.
 const SEUIL_FILE_LI = 10;
@@ -3210,12 +3243,14 @@ async function operationRobotLi(corps) {
     const resultat = corps.resultat && typeof corps.resultat === 'object' ? JSON.parse(JSON.stringify(corps.resultat).slice(0, 4000)) : null;
     if (corps.issue === 'envoye') return appliquerEnvoiLi(a, { detail, statutMcp: String(corps.statut_mcp || ''), resultat });
     const statut = corps.issue === 'a_verifier' ? 'a_verifier' : 'echec';
-    const action = await majActionLi(a.id, { statut, detail: detail || 'Échec sans détail', resultat });
+    let action = await majActionLi(a.id, { statut, detail: detail || 'Échec sans détail', resultat });
     const mcp = String(corps.statut_mcp || '');
     if (a.type === 'invitation' && statut === 'echec' && Object.hasOwn(PROFIL_IMPOSSIBLE_LI, mcp)) {
       const { c, l } = await contactEtLeadLi(a.contact_id);
       await journalLi(l, c, 'invitation_impossible', `Invitation LinkedIn impossible pour ${nomContactLi(c)} : ${detail || 'profil introuvable'}`);
-      await majLeadLi(l.id, { prochaine_relance: aujourdHuiParis(), prochaine_action: 'autre', prochaine_note: PROFIL_IMPOSSIBLE_LI[mcp](nomContactLi(c)) });
+      // Passé à l'email : plus rien à faire sur LinkedIn, la carte ne reste pas « Pas parti » sans issue.
+      if (await basculerEmailLi(l, c, mcp)) action = await majActionLi(a.id, { statut: 'annule', detail: DETAIL_BASCULE_LI[mcp] });
+      else await majLeadLi(l.id, { prochaine_relance: aujourdHuiParis(), prochaine_action: 'autre', prochaine_note: PROFIL_IMPOSSIBLE_LI[mcp](nomContactLi(c)) });
     }
     return { action };
   }
