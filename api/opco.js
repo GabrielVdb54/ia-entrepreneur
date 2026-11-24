@@ -459,8 +459,8 @@ function doute(corps) {
 async function auCrm(enregistrer) {
   if (!crmDisponible()) return 'CRM non configuré';
   try {
-    await enregistrer();
-    return 'ok';
+    const r = await enregistrer();
+    return r?.interne ? 'interne' : 'ok';
   } catch (e) {
     console.error('opco crm', e?.message || e);
     return `erreur : ${String(e?.message || e).slice(0, 160)}`;
@@ -488,7 +488,9 @@ async function prevenir({ r, siret, email, page, newsletter, envoi, crm, suspect
     '',
     crm === 'ok'
       ? `Le lead est dans le CRM, à traiter aujourd'hui : ${SITE}/crm/`
-      : `Le lead n'a pas pu être enregistré dans le CRM (${crm}) : le créer à la main.`,
+      : crm === 'interne'
+        ? "Adresse de l'équipe : rien n'est mis dans le CRM (une recherche à toi n'est pas un prospect)."
+        : `Le lead n'a pas pu être enregistré dans le CRM (${crm}) : le créer à la main.`,
   ];
   try {
     await brevo({

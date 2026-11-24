@@ -1782,7 +1782,9 @@ async function synchroEnvoyes(depuis, ann) {
   if (!ids.length) return 0;
   const deja = new Set((await sb(`iae_crm_activites?select=meta&meta->>gmail_id=in.(${ids.join(',')})`)).lignes.map((x) => x.meta.gmail_id));
   const parEmail = new Map();
-  for (const c of ann.contacts.filter((x) => x.email)) {
+  // Une adresse de l'équipe n'est le contact de personne (24/11/2026 : la fiche CREANNE avait gabriel@ en contact et
+  // recevait chaque email que Gabriel s'envoie).
+  for (const c of ann.contacts.filter((x) => x.email && !interne(x.email.toLowerCase()))) {
     const e = c.email.toLowerCase();
     if (!parEmail.has(e)) parEmail.set(e, []);
     parEmail.get(e).push(c);

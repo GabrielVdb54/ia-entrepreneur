@@ -39,7 +39,15 @@ export function aujourdhui() {
  * `champs` complète un nouveau lead (siret, financeur, secteur, localisation…)
  * et, sur un lead existant, ne remplit que les colonnes encore vides.
  */
+// Une adresse de l'équipe n'est jamais le contact d'un prospect (24/11/2026). Le 13/11, Gabriel a cherché l'OPCO de CREANNE
+// avec sa propre adresse : le CRM l'a pris pour le contact de CREANNE, puis y a rangé ses autres recherches et ses propres
+// emails (alertes Codeur), et a proposé « Envoyer ce message au contact de CREANNE ». Une demande faite avec une adresse
+// interne n'entre plus dans le CRM ; l'alerte à Gabriel le dit.
+export const DOMAINES_INTERNES = ['ia-entrepreneur.fr', 'clindit.com'];
+export const adresseInterne = (email) => DOMAINES_INTERNES.some((x) => String(email || '').trim().toLowerCase().endsWith(`@${x}`));
+
 export async function enregistrerDemande(d) {
+  if (adresseInterne(d.email)) return { lead: null, nouveau: false, interne: true };
   const suite = {
     prochaine_relance: aujourdhui(),
     prochaine_action: d.telephone ? 'appel' : 'email',
