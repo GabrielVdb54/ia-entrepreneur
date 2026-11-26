@@ -264,7 +264,7 @@ PAGES['agence']['corps'] = (
               "Une formation appliquée à votre activité de transaction ou de gestion peut être présentée au titre de vos 14 heures annuelles. L'attestation précise objectifs, contenu, durée et date ; la validation revient à votre CCI.")],
             ident='cadre')
     + equipe('Qui vous forme',
-             "Gabriel Vanderbecken a fondé IA-Entrepreneur à Nancy et forme des équipes en entreprise dans tout le Grand Est. Benjamin Niel a dirigé une conciergerie jusqu'à 80 logements, avec des salariés, et conçoit des logiciels de gestion, notamment pour l'immobilier. Il forme à distance, partout en France.",
+             "Gabriel Vanderbecken, formateur certifié, a fondé IA-Entrepreneur à Nancy et forme des équipes en entreprise dans tout le Grand Est. Benjamin Niel a dirigé une conciergerie jusqu'à 80 logements, avec des salariés, et conçoit des logiciels de gestion, notamment pour l'immobilier. Il forme à distance, partout en France.",
              [GABRIEL, BENJAMIN], 'formation-2.jpg', 'Gabriel Vanderbecken en formation', AVIS)
     + marches('<h2 class="section-title">Trois niveaux, du premier pas à l\'automatisation</h2>')
     + faq_section(PAGES['agence']['faq'], "Vos questions sur la formation IA en agence immobilière")
@@ -402,7 +402,7 @@ PAGES['syndic']['corps'] = (
               'Un cabinet dont les équipes se servent de ChatGPT ou de Copilot doit, depuis la révision de juillet 2026, prendre des mesures pour développer la maîtrise de l\'IA de son personnel. C\'est une obligation de moyens : une formation, une charte d\'usage et une liste d\'outils autorisés en font partie. <a href="/formation-ia-obligatoire-ai-act.html">Ce que demande l\'AI Act</a>')],
             ident='cadre')
     + equipe('Qui vous forme',
-             "Gabriel Vanderbecken a fondé IA-Entrepreneur à Nancy et forme des équipes en entreprise dans tout le Grand Est. Benjamin Niel a dirigé une conciergerie jusqu'à 80 logements, avec des salariés, et conçoit des logiciels de gestion, notamment pour l'immobilier. Il forme à distance, partout en France.",
+             "Gabriel Vanderbecken, formateur certifié, a fondé IA-Entrepreneur à Nancy et forme des équipes en entreprise dans tout le Grand Est. Benjamin Niel a dirigé une conciergerie jusqu'à 80 logements, avec des salariés, et conçoit des logiciels de gestion, notamment pour l'immobilier. Il forme à distance, partout en France.",
              [GABRIEL, BENJAMIN], 'accompagnement-gabriel.jpg', 'Gabriel Vanderbecken avec un participant', AVIS)
     + marches('<h2 class="section-title">Trois niveaux, de la prise en main à l\'automatisation</h2>')
     + faq_section(PAGES['syndic']['faq'], "Vos questions sur la formation IA en cabinet de syndic et de gestion locative")
@@ -526,7 +526,7 @@ PAGES['btp']['corps'] = (
               'Vos conducteurs de travaux se servent peut-être déjà de ChatGPT sur leur téléphone, sans règle commune. Depuis la révision de juillet 2026, l\'article 4 de l\'AI Act demande aux entreprises qui utilisent l\'IA de prendre des mesures pour que leur personnel la maîtrise. C\'est une obligation de moyens, sans nombre d\'heures imposé : une formation et une charte d\'usage en font partie. <a href="/formation-ia-obligatoire-ai-act.html">Ce que demande l\'AI Act</a>')],
             ident='cadre')
     + equipe('Qui vous forme',
-             "Nous ne vous apprendrons pas votre métier : vous le connaissez mieux que nous. Gabriel Vanderbecken a fondé IA-Entrepreneur à Nancy ; Gilles Idoux forme à l'IA générative, à la vente et au management dans le Grand Est. Nous venons avec la méthode et les outils d'IA, vous venez avec vos dossiers : un DCE en cours, un compte rendu à faire, un mémoire à reprendre. C'est sur eux que l'on travaille, et c'est vous qui jugez si le résultat tient la route sur le chantier.",
+             "Nous ne vous apprendrons pas votre métier : vous le connaissez mieux que nous. Gabriel Vanderbecken, formateur certifié, a fondé IA-Entrepreneur à Nancy ; Gilles Idoux forme à l'IA générative, à la vente et au management dans le Grand Est. Nous venons avec la méthode et les outils d'IA, vous venez avec vos dossiers : un DCE en cours, un compte rendu à faire, un mémoire à reprendre. C'est sur eux que l'on travaille, et c'est vous qui jugez si le résultat tient la route sur le chantier.",
              [GABRIEL, GILLES], 'formation-1.jpg', 'Gabriel Vanderbecken en session', AVIS)
     + marches('<h2 class="section-title">Trois niveaux, comme les trois paliers de l\'Observatoire</h2>\n'
               '        <p class="section-sub">L\'étude de l\'Observatoire décrit trois paliers : une culture commune du numérique et des données, puis des usages installés dans l\'entreprise, puis des outils reliés entre eux et automatisés. Nos trois niveaux suivent le même chemin.</p>')
@@ -650,7 +650,7 @@ PAGES['proprete']['corps'] = (
               'Depuis sa révision de juillet 2026, l\'article 4 demande aux entreprises qui utilisent l\'IA de prendre des mesures pour développer la maîtrise de l\'IA de leur personnel : c\'est une obligation de moyens. Chaque participant reçoit une attestation individuelle de formation, et l\'entreprise un registre de conformité AI Act. <a href="/formation-ia-obligatoire-ai-act.html">Ce que demande l\'AI Act</a>')],
             ident='cadre')
     + equipe('Qui vous forme',
-             "Gabriel Vanderbecken a fondé IA-Entrepreneur à Nancy. Il enseigne à l'ECM Nancy Business School depuis 2023 et forme des équipes en entreprise dans tout le Grand Est. Gilles Idoux forme à l'IA générative, à la vente et au management, notamment à l'IUT de Thionville-Yutz et à l'ECM Nancy. Votre métier, c'est vous qui le connaissez : le programme se construit avec vous, sur vos documents et avec vos mots, et se valide avant la signature.",
+             "Gabriel Vanderbecken, formateur certifié, a fondé IA-Entrepreneur à Nancy. Il enseigne à l'ECM Nancy Business School depuis 2023 et forme des équipes en entreprise dans tout le Grand Est. Gilles Idoux forme à l'IA générative, à la vente et au management, notamment à l'IUT de Thionville-Yutz et à l'ECM Nancy. Votre métier, c'est vous qui le connaissez : le programme se construit avec vous, sur vos documents et avec vos mots, et se valide avant la signature.",
              [GABRIEL, GILLES], 'salon-demain-avec-ia.jpg', "Atelier animé par IA-Entrepreneur au salon Demain avec l'IA", AVIS)
     + marches('<h2 class="section-title">Trois niveaux, de la prise en main à l\'automatisation</h2>')
     + faq_section(PAGES['proprete']['faq'], "Vos questions sur la formation IA en entreprise de propreté")
@@ -796,7 +796,7 @@ PAGES['assurance']['corps'] = (
               f"Une formation IA peut être présentée au titre de la formation continue DDA si son contenu correspond aux compétences de l'{COMPETENCES_A512_8} et à vos fonctions. Le code ne prévoit pas de validation à l'avance : c'est à vous d'en justifier. Notre attestation indique l'organisme, la date, la durée, les modalités et les thèmes traités.")],
             ident='cadre')
     + equipe('Qui vous forme',
-             "Gabriel Vanderbecken a fondé IA-Entrepreneur à Nancy et forme des équipes en entreprise dans tout le Grand Est. Gilles Idoux a passé huit ans dans l'assurance, en B2B et en B2C, après vingt ans en agence bancaire, de l'accueil au guichet à la direction d'agence ; il forme aujourd'hui à l'IA générative, à la vente et au management. Votre métier, c'est vous qui le connaissez : le programme se construit sur vos dossiers et avec vos mots, et se valide avant la signature.",
+             "Gabriel Vanderbecken, formateur certifié, a fondé IA-Entrepreneur à Nancy et forme des équipes en entreprise dans tout le Grand Est. Gilles Idoux a passé huit ans dans l'assurance, en B2B et en B2C, après vingt ans en agence bancaire, de l'accueil au guichet à la direction d'agence ; il forme aujourd'hui à l'IA générative, à la vente et au management. Votre métier, c'est vous qui le connaissez : le programme se construit sur vos dossiers et avec vos mots, et se valide avant la signature.",
              [GABRIEL, GILLES], 'accompagnement-gabriel.jpg', 'Gabriel Vanderbecken avec un participant', AVIS)
     + marches('<h2 class="section-title">Trois niveaux, de la prise en main à l\'automatisation</h2>')
     + faq_section(PAGES['assurance']['faq'], "Vos questions sur la formation IA en agence générale et en cabinet de courtage")

@@ -65,7 +65,7 @@ def formateur(lien, img, nom, role, pos=''):
     return (f'<a class="imm-formateur" href="{lien}"><img src="/images/{img}" alt="{nom}" loading="lazy" width="128" height="128"{style}>'
             f'<span><b>{nom}</b>{role}</span></a>')
 
-GABRIEL = formateur('/apropos.html', 'gabriel-vanderbecken.jpg', 'Gabriel Vanderbecken', 'Fondateur, formateur IA, Nancy', 'top center')
+GABRIEL = formateur('/apropos.html', 'gabriel-vanderbecken.jpg', 'Gabriel Vanderbecken', 'Fondateur, formateur IA certifié, Nancy', 'top center')
 RYAD = formateur('/formateur-ryad-mimeche.html', 'ryad-mimeche.jpg', 'Ryad Mimeche', 'Vente, négociation et IA, Nancy')
 CELINE = formateur('/formateur-celine-herment.html', 'celine-herment.jpg', 'Céline Herment', 'SEO et IA, Moselle et Meurthe-et-Moselle')
 GILLES = formateur('/formateur-gilles-idoux.html', 'gilles-idoux.jpg', 'Gilles Idoux', 'IA générative, vente et management, Grand Est')
@@ -225,7 +225,7 @@ PAGES['nancy']['corps'] = (
              ("Ailleurs en Lorraine et en France",
               "À Épinal, Bar-le-Duc ou Verdun, comme partout en France, la formation se fait à distance en classe virtuelle, ou en présentiel avec un formateur de l'équipe installé dans votre région.")])
     + equipe('Une équipe de formateurs en Lorraine',
-             "Gabriel Vanderbecken a fondé IA-Entrepreneur à Nancy. Il enseigne à l'ECM Nancy Business School depuis 2023, sur six modules de Master, et forme des équipes en entreprise dans tout le Grand Est.",
+             "Gabriel Vanderbecken, formateur certifié, a fondé IA-Entrepreneur à Nancy. Il enseigne à l'ECM Nancy Business School depuis 2023, sur six modules de Master, et forme des équipes en entreprise dans tout le Grand Est.",
              [GABRIEL, RYAD, CELINE, GILLES], 'formation-1.jpg', 'Gabriel Vanderbecken en session',
              AVIS + '\n        <p class="ville-refs">Une formation déployée pour GRDF Est, des interventions régulières à l\'ECM Nancy. Grand Nancy Innovation, Bpifrance et l\'Apec font aussi partie des structures qui nous font confiance.</p>\n        <p class="ville-refs">IA-Entrepreneur porte lui-même sa certification Qualiopi (n° 883211-2, valable jusqu\'au 23 avril 2029) : le dossier OPCO se monte à notre nom, sans organisme intermédiaire.</p>')
     + modules("Ce que ça donne dans une entreprise lorraine",
