@@ -2880,6 +2880,38 @@ const SCHEMA_LI = {
   properties: { proposer: { type: 'boolean' }, raison: { type: 'string' }, texte: { type: 'string' }, appuis: { type: 'array', items: { type: 'string' } } },
   required: ['proposer', 'raison', 'texte', 'appuis'],
 };
+// Test du 26/11/2026 (Gabriel, 24/11 : « tester de prospecter en mettant en avant la formation IA mais aussi l'intégration
+// ou création d'outils sur mesure […] on peut vous former à l'ia ou vous créer des outils sur mesure et vous former dessus
+// derrière » ; formulation validée le 26/11). La moitié des prospects de Gabriel reçoit l'angle « outils » au message 1,
+// LinkedIn et email ; l'autre garde l'angle « formation ». Le partage est fixe par lead (dernier chiffre de son id : pair =
+// outils) et l'étiquette angle-outils / angle-formation le garde pour le bilan. Seule la formation est dite finançable : le
+// budget formation ne paie pas la création d'un outil.
+// Le test tourne tant que le réglage prospection_angle dit { actif: true } ; sans lui, null (angle d'avant, aucune étiquette).
+async function angleProspection(l) {
+  const tags = l?.tags || [];
+  if (tags.includes('angle-outils')) return 'outils';
+  if (tags.includes('angle-formation')) return 'formation';
+  if (!estAdmin() || !UUID_RE.test(String(l?.id || '')) || (l.type && l.type !== 'prospect')) return null;
+  if (!(await lireReglage('prospection_angle'))?.actif) return null;
+  return Number.parseInt(String(l.id).slice(-1), 16) % 2 === 0 ? 'outils' : 'formation';
+}
+const OUTILS_METIER = [
+  [/propret/, 'les plannings des équipes et les remplacements'],
+  [/BTP/, 'les devis et le suivi de chantier'],
+  [/syndic|gestion locative/, 'le suivi des demandes des copropriétaires et des locataires'],
+  [/immobili/, 'le suivi des mandats et les relances vendeurs'],
+  [/assurance/, 'le recueil des besoins et le suivi des dossiers clients'],
+];
+function exempleOutilMetier(l) {
+  const m = pageMetierLi(l)?.metier || '';
+  return (OUTILS_METIER.find(([re]) => re.test(m)) || [null, 'une tâche qui vous prend du temps chaque semaine'])[1];
+}
+async function marquerAngle(l, angle) {
+  const tags = l?.tags || [];
+  if (!l?.id || tags.includes(`angle-${angle}`) || tags.some((t) => /^angle-/.test(t))) return;
+  await sb(`iae_crm_leads?id=eq.${l.id}`, { methode: 'PATCH', prefer: 'return=minimal', corps: { tags: [...tags, `angle-${angle}`] } });
+  l.tags = [...tags, `angle-${angle}`];
+}
 const CONSIGNES_LI = `Tu écris, pour Gabriel Vanderbecken (IA-Entrepreneur, organisme de formation à l'IA pour les entreprises, en Lorraine et dans le Grand Est), un message LinkedIn à une personne de petite entreprise (1 à 99 salariés), souvent dirigeante, qu'il ne connaît pas ou peu. Le message part sous son nom, il le relit avant l'envoi.
 
 Selon l'étape :
@@ -2889,7 +2921,8 @@ Selon l'étape :
   3) Une ligne sur ce que fait Gabriel, rattachée à cette déduction, qui dit que les formations sont éligibles à leur budget formation (« Je forme des équipes de PME du Grand Est à l'alléger grâce à l'IA, avec des formations éligibles à votre budget formation »). Dans le message 1, ni OPCO ni « nous montons le dossier ».
   4) Une question simple sur leur façon de faire aujourd'hui, à deux options dont une qui ne met pas la personne en défaut (Gabriel : « ou avez-vous une autre solution ? »). Modèle : « Chez X, c'est encore surtout fait à la main, ou vous avez déjà trouvé une solution ? ». Une question qui oppose déjà deux façons de faire reste telle quelle (« c'est une personne dédiée qui s'en charge, ou chacun gère ses dossiers ? »).
   Pas de demande de rendez-vous, pas de lien. Exemple validé par Gabriel : « Bonjour Quentin, dans votre post sur les 10 ans de FVP Courtage, vous parliez de « tout le plaisir de l'administratif » à vos débuts. Avec les recrutements et le développement du cabinet depuis, l'administratif a sûrement grandi lui aussi. Je forme des équipes de PME du Grand Est à l'alléger grâce à l'IA, avec des formations éligibles à votre budget formation. Aujourd'hui, c'est une personne dédiée qui s'en charge chez vous, ou chacun gère ses dossiers ? » Ne recopie pas cet exemple : le sujet de la déduction (l'administratif, les devis, les comptes rendus, le recrutement…) découle du fait que tu as trouvé.
-- relance (après 4 jours sans réponse) : 200 à 400 caractères (jusqu'à 500 avec le lien de la page métier). Reprend la question autrement. Redit en une phrase que les formations sont éligibles à leur budget formation (peut ajouter « nous montons le dossier avec votre OPCO »). Si la fiche donne une « Page métier » et que l'activité de l'entreprise est bien ce métier, donne ce lien en une phrase, recopié tel quel (« Je vous mets ici les tâches où l'IA fait gagner le plus de temps dans une agence comme la vôtre : <lien> », en nommant son métier), juste avant la proposition des 30 minutes ; sinon, pas de lien. Une seule demande : un échange de 30 minutes, avec deux créneaux précis dans les trois jours ouvrés qui suivent la date du jour.
+  Angle « outils » (test de Gabriel, 26/11/2026), seulement quand la fiche dit « Angle du message 1 : formation ou outil sur mesure » : les temps 1 et 2 ne changent pas ; le temps 3 devient « On peut vous aider de deux façons : former votre équipe à l'IA, ou vous créer un outil fait pour votre entreprise (<l'exemple d'outil de la fiche>), puis vous former à vous en servir. La formation est finançable sur votre budget formation. » (seul l'exemple s'adapte au fait trouvé) ; le temps 4 devient « Qu'est-ce qui vous servirait le plus : former l'équipe, ou avoir votre propre outil ? ». 350 à 650 caractères. Jamais « le tout finançable », ni l'outil ou sa création dits finançables : seule la formation l'est.
+- relance (après 4 jours sans réponse) : 200 à 400 caractères (jusqu'à 500 avec le lien de la page métier). Reprend la question autrement. Redit en une phrase que les formations sont éligibles à leur budget formation (peut ajouter « nous montons le dossier avec votre OPCO »). Si la fiche donne une « Page métier » et que l'activité de l'entreprise est bien ce métier, donne ce lien en une phrase, recopié tel quel (« Je vous mets ici les tâches où l'IA fait gagner le plus de temps dans une agence comme la vôtre : <lien> », en nommant son métier), juste avant la proposition des 30 minutes ; sinon, pas de lien. Une seule demande : un échange de 30 minutes, avec deux créneaux précis dans les trois jours ouvrés qui suivent la date du jour. Si la fiche dit que le message 1 avait l'angle « formation ou outil sur mesure », la relance garde ces deux options en quelques mots, sans redire que l'outil serait finançable.
 - findia (dernier message, 8 jours après la relance, seulement si la personne n'a répondu à rien) : 200 à 400 caractères. Apporte quelque chose sans rien demander, et laisse partir poliment (« je ne vous relancerai plus après ce message »).
   - Si la fiche donne un « Skill du métier » et que l'activité de l'entreprise est bien ce métier : offre ce skill, avec ces mots (Gabriel, 09/11/2026) : « Je vous laisse un outil gratuit : un skill qui <ce qu'il fait, recopié de la fiche>, à installer dans Claude ou à copier dans ChatGPT : <lien recopié tel quel> ». Le mot « skill » reste tel quel : c'est celui de la page où arrive la personne. Modèle validé : « Bonjour Paul, je ne vous relancerai plus après ce message. Je vous laisse un outil gratuit : un skill qui transforme vos notes de réunion de chantier en compte rendu prêt à relire, à installer dans Claude ou à copier dans ChatGPT : https://ia-entrepreneur.fr/skills-ia-gratuits.html#compte-rendu-chantier ».
   - Sinon : FindIA, l'outil gratuit du site qui dit quelle IA choisir pour quel usage (https://ia-entrepreneur.fr/meilleures-ia.html).
@@ -2921,6 +2954,7 @@ async function redigerLi(c, l, etape, { consigne = '', message = '' } = {}) {
   const metierLi = ['relance', 'findia'].includes(etape) ? pageMetierLi(l) : null;
   const page = etape === 'relance' ? metierLi : null;
   const skill = etape === 'findia' && metierLi?.skill ? { metier: metierLi.metier, ...metierLi.skill } : null;
+  const angle = ['message', 'relance'].includes(etape) ? await angleProspection(l) : null;
   const fiche = [
     `Date du jour : ${jour}`,
     `Étape : ${etape}`,
@@ -2929,6 +2963,7 @@ async function redigerLi(c, l, etape, { consigne = '', message = '' } = {}) {
     `Fiche : ${l.type || 'prospect'}, étape « ${l.statut || 'nouveau'} »${(l.tags || []).length ? `, étiquettes ${l.tags.join(', ')}` : ''}`,
     l.besoin ? `Ce que Gabriel sait de leur besoin : ${couper(l.besoin, 600)}` : '',
     page ? `Page métier (métier : ${page.metier}) : ${page.url}` : '',
+    ['message', 'relance'].includes(etape) && angle === 'outils' ? `Angle du message 1 : formation ou outil sur mesure (test de Gabriel). Exemple d'outil pour ce métier : ${exempleOutilMetier(l)}.` : '',
     skill ? `Skill du métier (métier : ${skill.metier}) : un skill qui ${skill.quoi} : ${skill.url}` : '',
     c.notes ? `Notes sur la personne : ${couper(c.notes, 600)}` : '',
     message ? `Son dernier message : ${couper(message, 2000)}` : '',
@@ -2939,7 +2974,8 @@ async function redigerLi(c, l, etape, { consigne = '', message = '' } = {}) {
   const r = await appelClaude({ fonction: 'linkedin', consignes: CONSIGNES_LI, schema: SCHEMA_LI, contenu: fiche, max: 2000, timeout: 40000 });
   // Un ancien faux Claude (banc) sans « proposer » : on propose, comme avant.
   if (r.proposer === false) return { texte: '', appuis: [], proposer: false, raison: couper(String(r.raison || '').replace(/\s+/g, ' ').trim(), 300) || 'Claude ne le juge pas utile.' };
-  return { texte: String(r.texte || '').trim(), appuis: (r.appuis || []).slice(0, 6), proposer: true, raison: '' };
+  if (etape === 'message' && angle) await marquerAngle(l, angle).catch((e) => console.error('crm angle', e?.message));
+  return { texte: String(r.texte || '').trim(), appuis: (r.appuis || []).slice(0, 6), proposer: true, raison: '', angle };
 }
 
 // Dernier message (étape findia) : texte fixe, sans Claude, comme la relance 2 par email (Gabriel, 24/11/2026 : « les messages
@@ -3356,8 +3392,11 @@ const EN_ATTENTE_EMAIL = ['a_enrichir', 'a_rediger', 'brouillon', 'a_envoyer', '
 // fullenrich_deduites : une adresse déduite (base Google Maps) part aussi chez FullEnrich, dans le même plafond (Gabriel, 12/11).
 // paliers : le quota monte seul à une date, si le bilan depuis le début est propre (Gabriel, 12/11 : 10 par jour à partir du
 // lundi 16/11 ; pas de palier à 20 sans son accord, et sans doute pas sans domaine dédié).
-const EMAIL_PROSPECTION = { par_jour: 5, par_passage: 2, enrichissements: 3, tentatives_fullenrich: 10, debut: '08:30', fin: '11:30', expediteur: ADMIN_EMAIL, expediteur_nom: 'Gabriel Vanderbecken', rdv_minutes: 40, rdv_km: 25,
-  fullenrich_deduites: true, paliers: [{ a_partir_du: '2026-11-16', par_jour: 10 }] };
+// Gabriel, 26/11/2026 (« oui pour les emails ») : 10 premiers emails par jour, les relances en plus (elles prenaient tout le
+// quota : plus aucun message 1 depuis le 18/11). Plus de palier : la pause automatique (spam, adresses en erreur,
+// désinscriptions, email différé) reste le garde-fou. 3 par passage : 12 passages de 15 minutes entre 8 h 30 et 11 h 30.
+const EMAIL_PROSPECTION = { par_jour: 10, relances_par_jour: 10, par_passage: 3, enrichissements: 3, tentatives_fullenrich: 10, debut: '08:30', fin: '11:30', expediteur: ADMIN_EMAIL, expediteur_nom: 'Gabriel Vanderbecken', rdv_minutes: 40, rdv_km: 25,
+  fullenrich_deduites: true, paliers: [] };
 const SEUIL_CONFIANCE_EMAIL = SEUIL_CONFIANCE_LI;
 const SOURCE_EMAIL = 'crm, prospection email (Brevo)';
 const URL_STOP = 'https://ia-entrepreneur.fr/api/crm?stop=';
@@ -3502,7 +3541,17 @@ function documentEmail(d, defaut = 'devis') {
   const x = String(d || '').replace(/\s+/g, ' ').trim().replace(/^(vos|des|les|leurs)\s+/i, '').replace(/[.,;:!?]+$/, '').toLowerCase();
   return x && x.length <= 40 && x.split(' ').length <= 4 && /^[\p{Ll}' -]+$/u.test(x) ? x : defaut;
 }
-const ligneValeurEmail = (metier, valeur, reste) => `Je forme les équipes ${metier} à ${valeur}, et aussi à alléger le reste du bureau : ${reste.join(', ')}. Les formations sont éligibles à votre budget formation.`;
+// outil : null (angle « formation »), '' (outil sans exemple) ou l'exemple du métier.
+const ligneValeurEmail = (metier, valeur, reste, outil = null) => `Je forme les équipes ${metier} à ${valeur}, et aussi à alléger le reste du bureau : ${reste.join(', ')}.${outil != null ? ` Si aucun logiciel ne fait ce qu'il vous faut, je peux vous créer un outil sur mesure${outil ? ` (${outil})` : ''}, puis former votre équipe à s'en servir.` : ''} Les formations sont éligibles à votre budget formation.`;
+// L'exemple d'outil ne redit pas la valeur (« plannings » deux fois) : s'ils partagent un mot, l'outil reste sans exemple.
+function exempleOutilEmail(l, valeur) {
+  const ex = exempleOutilMetier(l);
+  const mots = (t) => new Set(normaliser(t).split(/[^a-z]+/).filter((m) => m.length >= 5).map((m) => m.replace(/s$/, '')));
+  const v = mots(valeur);
+  return [...mots(ex)].some((m) => v.has(m)) ? '' : ex;
+}
+// L'objet de l'angle « outils » (test du 26/11/2026, validé par Gabriel) : fixe, il remplace celui de Claude.
+const OBJET_OUTILS_EMAIL = "Former votre équipe à l'IA, ou un outil fait pour vous ?";
 // « un de vos propres mémoires », mais « une de vos propres annonces » : le genre se lit sur le premier mot du document.
 const DOCUMENTS_FEMININS_EMAIL = /^(annonces|fiches|estimations|factures|offres|réponses|propositions|notes|déclarations|attestations|relances|lettres|synthèses|notices|demandes|candidatures|consultations|analyses)\b/;
 // Près de Nancy, « …sur un de vos propres mémoires, en visio ou dans vos bureaux à Lunéville. Ça vous intéresse ? » ; plus loin,
@@ -3585,7 +3634,8 @@ function texteEmail(e, l, c, { accroche = '', valeur = '', reste = [], document 
   const [valeurDefaut, documentDefaut] = jeuMetierEmail(metier).neutre;
   const v = nettoyerValeurEmail(valeur) || valeurDefaut;
   const debut = accueil ? debutAccueilEmail(e.civilite, c, accroche) : [salutationEmail(e.civilite, c), '', String(accroche || '').trim()];
-  return [...debut, '', ligneValeurEmail(metier, v, resteBureauEmail(reste, v, metier)), '',
+  const outil = e?.faits?.angle === 'outils' && e.etape === 'message' ? exempleOutilEmail(l, v) : null;
+  return [...debut, '', ligneValeurEmail(metier, v, resteBureauEmail(reste, v, metier), outil), '',
     ligneRdvEmail(documentEmail(document, documentDefaut), lieu || LIEU_DISTANCE_EMAIL), '', SIGNATURE_EMAIL].join('\n');
 }
 
@@ -4613,14 +4663,15 @@ async function redigerEmail(e, l, c, { consigne = '', lieu = LIEU_DISTANCE_EMAIL
   const appuis = (Array.isArray(r.appuis) ? r.appuis : []).slice(0, 4).map((a) => ({ fait: couper(String(a?.fait || ''), 300), source: couper(String(a?.source || ''), 120), date: couper(String(a?.date || ''), 40) }));
   const texte = texteEmail(e, l, c, { accroche, valeur: r.valeur, reste: r.reste, document: r.document, lieu, accueil });
   const faible = r.accroche_faible === true ? { raison: couper(String(r.raison_faible || '').replace(/\s+/g, ' ').trim(), 200) || 'aucun fait ne passe le test du confrère' } : null;
-  return { objet: accueil ? objetAccueilEmail(e.civilite, c) : objet, texte, appuis, general: r.general === true, accroche, accueil, accroche_faible: faible };
+  const outils = f.angle === 'outils' && e.etape === 'message';
+  return { objet: accueil ? objetAccueilEmail(e.civilite, c) : outils ? OBJET_OUTILS_EMAIL : objet, texte, appuis, general: r.general === true, accroche, accueil, accroche_faible: faible, outils };
 }
 
 // Ce que le modèle du 12/11 demande et que le filet peut voir, signalé à côté du texte (un envoi automatique attend).
 // Gabriel, 13/11 : objet de 2 à 4 mots, sans chiffre ni marque (Google) ; 75 à 95 mots hors signature, alerte au-delà de
 // 110 ; une accroche que Claude dit faible attend toujours Gabriel.
 const motsCorpsEmail = (corps, accueil) => motsEmail(accueil ? String(corps).replace(/^Ce message est à destination [^\n]*$/m, '') : corps);
-function alertesModeleEmail(objet, texte, { appuis = [], accroche = null, general = false, accueil = false, accroche_faible: faible = null } = {}) {
+function alertesModeleEmail(objet, texte, { appuis = [], accroche = null, general = false, accueil = false, accroche_faible: faible = null, outils = false } = {}) {
   const a = [];
   if (faible) a.push(`Accroche faible, selon Claude : ${String(faible.raison || 'aucun fait ne passe le test du confrère').replace(/[.\s]+$/, '')}. Choisis un autre fait ou écarte ce message.`);
   const corps = String(texte || '').replace(/\n+Gabriel Vanderbecken(\nIA-Entrepreneur)?\s*$/, '');
@@ -4628,8 +4679,8 @@ function alertesModeleEmail(objet, texte, { appuis = [], accroche = null, genera
   if (questions > 1) a.push(`${questions} questions dans le message : une seule (Gabriel, 12/11).`);
   // À l'accueil, la ligne fixe « Ce message est à destination de … » ne compte pas : le reste est le même message.
   const mots = motsCorpsEmail(corps, accueil);
-  if (mots > 110 || mots < 60) a.push(`Le message fait ${mots} mots hors signature (75 à 95 visés).`);
-  if (!accueil) {
+  if (mots > (outils ? 135 : 110) || mots < 60) a.push(`Le message fait ${mots} mots hors signature (${outils ? '95 à 120' : '75 à 95'} visés).`);
+  if (!accueil && !outils) {
     const motsObjet = motsEmail(objet);
     if (motsObjet < 2 || motsObjet > 4) a.push(`L'objet fait ${motsObjet} mot${motsObjet > 1 ? 's' : ''} (2 à 4).`);
     if (/(chantiers?|march[ée]s?) publics?|nouveau march|opportunit|veille|avis d'appel/i.test(objet || '')) a.push("L'objet ressemble à un email de veille d'appels d'offres.");
@@ -4669,6 +4720,8 @@ async function preparerEmailAvecClaude(e0, l, c, { auto = true, consigne = '' } 
       }
     }
   }
+  if (e.etape === 'message' && !faits.angle) { const a = await angleProspection(l); if (a) faits.angle = a; }
+  if (e.etape === 'message' && faits.angle) await marquerAngle(l, faits.angle).catch((x) => console.error('crm angle', x?.message));
   let red;
   try {
     red = await redigerEmail({ ...e, faits }, l, c, { consigne, lieu: place.lieu });
@@ -4676,7 +4729,7 @@ async function preparerEmailAvecClaude(e0, l, c, { auto = true, consigne = '' } 
     // Claude a échoué : nouvel essai au passage suivant, puis, après 3 essais, la ligne passe à Gabriel avec le modèle vide.
     const essais = (e.faits?.essais_claude || 0) + 1;
     await majLigneEmail(e.id, essais >= 3
-      ? { statut: 'brouillon', objet: estGeneraleEmail(e) ? objetAccueilEmail(e.civilite, c) : null, texte: texteEmail(e, l, c, { lieu: place.lieu, accueil: estGeneraleEmail(e) }), civilite: e.civilite || null, faits: { ...faits, essais_claude: essais }, detail: "Claude n'a pas pu rédiger ce message : écris l'objet et l'accroche toi-même, et adapte la valeur." }
+      ? { statut: 'brouillon', objet: estGeneraleEmail(e) ? objetAccueilEmail(e.civilite, c) : faits.angle === 'outils' && e.etape === 'message' ? OBJET_OUTILS_EMAIL : null, texte: texteEmail({ ...e, faits }, l, c, { lieu: place.lieu, accueil: estGeneraleEmail(e) }), civilite: e.civilite || null, faits: { ...faits, essais_claude: essais }, detail: "Claude n'a pas pu rédiger ce message : écris l'objet et l'accroche toi-même, et adapte la valeur." }
       : { faits: { ...faits, essais_claude: essais }, detail: "Claude n'a pas pu rédiger : nouvel essai au prochain passage." });
     throw err;
   }
@@ -4967,10 +5020,10 @@ async function verifierFaitsEmail(e, l, c, bilan) {
   return majLigneEmail(e.id, { faits });
 }
 
-async function envoyesDuJourEmail() {
+async function envoyesDuJourEmail(quoi = 'tout') {
   const debut = minuitParis(aujourdHuiParis());
-  const { lignes } = await sb(`iae_crm_emails?statut=eq.envoye&envoye_le=gte.${encodeURIComponent(debut)}&select=envoye_le`);
-  return lignes.filter((x) => Date.parse(x.envoye_le) <= Date.now()).length;
+  const { lignes } = await sb(`iae_crm_emails?statut=eq.envoye&envoye_le=gte.${encodeURIComponent(debut)}&select=envoye_le,etape`);
+  return lignes.filter((x) => Date.parse(x.envoye_le) <= Date.now() && (quoi === 'tout' || (quoi === 'message') === (x.etape === 'message'))).length;
 }
 
 // Avant chaque envoi : jamais une adresse en opposition, un lead archivé ou perdu, ni quelqu'un qui a déjà répondu
@@ -5196,7 +5249,10 @@ async function creditsBrevo() {
 }
 
 async function envoyerFileEmail(r, bilan, reste, signature = null) {
-  let place = Math.min(r.par_passage, r.par_jour - (await envoyesDuJourEmail()));
+  // Deux quotas (26/11) : les premiers emails, et les relances à côté.
+  const restants = { message: r.par_jour - (await envoyesDuJourEmail('message')), relance: (r.relances_par_jour ?? 0) - (await envoyesDuJourEmail('relances')) };
+  const classe = (e) => (e.etape === 'message' ? 'message' : 'relance');
+  let place = Math.min(r.par_passage, Math.max(0, restants.message) + Math.max(0, restants.relance));
   if (place <= 0) return;
   // Une relance validée la veille attend son jour (faits.sequence.prevue_le).
   const jourFile = aujourdHuiParis();
@@ -5214,6 +5270,7 @@ async function envoyerFileEmail(r, bilan, reste, signature = null) {
   const lignes = ordonnerFileEmail(file, await leadsPourFileEmail(file));
   for (const e of lignes) {
     if (place <= 0 || !reste()) break;
+    if (restants[classe(e)] <= 0) continue;
     // La ligne est prise d'abord : un autre passage qui tournerait en même temps ne l'enverra pas une deuxième fois.
     const jeton = randomBytes(24).toString('base64url');
     const { lignes: pris } = await sb(`iae_crm_emails?id=eq.${e.id}&statut=eq.a_envoyer`, { methode: 'PATCH', prefer: 'return=representation', corps: { statut: 'en_cours', pris_le: new Date().toISOString(), jeton_stop_hash: createHash('sha256').update(jeton).digest('hex') } });
@@ -5241,6 +5298,7 @@ async function envoyerFileEmail(r, bilan, reste, signature = null) {
     }
     await appliquerEnvoiEmail(e, l, c, { messageId });
     place--;
+    restants[classe(e)]--;
     bilan.envoyes++;
   }
 }
@@ -6041,6 +6099,7 @@ async function operationEmail(corps, ip) {
     const v = {};
     const entier = (x, min, max) => { const n = Number(x); if (!Number.isInteger(n) || n < min || n > max) throw new Refus('valeur_invalide:reglage'); return n; };
     if (corps.par_jour !== undefined) v.par_jour = entier(corps.par_jour, 0, 50);
+    if (corps.relances_par_jour !== undefined) v.relances_par_jour = entier(corps.relances_par_jour, 0, 50);
     if (corps.par_passage !== undefined) v.par_passage = entier(corps.par_passage, 1, 5);
     if (corps.enrichissements !== undefined) v.enrichissements = entier(corps.enrichissements, 0, 100);
     if (corps.tentatives_fullenrich !== undefined) v.tentatives_fullenrich = entier(corps.tentatives_fullenrich, 0, 100);
